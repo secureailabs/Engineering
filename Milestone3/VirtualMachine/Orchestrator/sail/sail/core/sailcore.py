@@ -335,3 +335,19 @@ def smote(vmid, oversample, X_data_id, y_data_id, fns):
     results = queryresult(jobid, fns["smote"])
 
     return results[0], results[1]
+
+
+def shap_private(vmid, model, X_data_id, fns):
+    jobid = newguid()
+    # push string remotely
+    inputs = pushdata(vmid, [model])
+    print(inputs)
+    # add test data to inputs
+    inputs.append(X_data_id)
+
+    setparameter(vmid, jobid, fns["shap_private"], inputs)
+    submitjob(vmid, fns["shap_private"], jobid)
+    pulldata(vmid, jobid, fns["shap_private"])
+    results = queryresult(jobid, fns["shap_private"])
+
+    return results[0], results[1], results[2]

@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 def GetJsonFromSerializedBuffer(serializedStructureBuffer):
     oSb = StructuredBuffer(serializedBuffer=serializedStructureBuffer)
-    print(oSb.ToString())
     strJson = oSb.ToJson()
     return strJson
 

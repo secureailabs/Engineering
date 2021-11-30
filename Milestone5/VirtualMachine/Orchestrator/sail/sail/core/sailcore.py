@@ -6,8 +6,8 @@ from concurrent.futures import ThreadPoolExecutor
 def connect(serverIP, port):
     return SAILPyAPI.connect(serverIP, port)
 
-def login(email, password):
-    return SAILPyAPI.login(email,password)
+def login(email, password, port, IP):
+    return SAILPyAPI.login(email,password, port, IP)
 
 def newguid():
     return SAILPyAPI.createguid()

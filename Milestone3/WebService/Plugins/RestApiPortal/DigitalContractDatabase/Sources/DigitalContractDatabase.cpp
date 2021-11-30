@@ -2186,11 +2186,11 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                                     {
                                         case 4
                                         :
-                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_B4ms");
+                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D4s_v4");
                                             break;
                                         case 8
                                         :
-                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_B8ms");
+                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D8s_v4");
                                             break;
                                         case 16
                                         :

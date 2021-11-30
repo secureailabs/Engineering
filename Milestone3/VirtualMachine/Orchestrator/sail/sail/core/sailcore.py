@@ -175,8 +175,6 @@ def get_fns():
         "series_sub": "0899F5B598904B279AA98ADFD923888F",
         "series_unique": "B6FD9631354A4985A3E674DF28457A5D",
         "series_value_counts": "2275B04657D94BFD8787C519C2C3B8EA",
-        "shap_private": "3B3C53AFB1DF415D811E69B32BAB6842",
-        "smote": "A9EB0703F1464698B1A173C5A6911127",
         "util_get_dummies": "6FB479BE72A04B158C15FD5EBDF875FC",
         "util_to_datetime": "D35FC476B97F42AB9CE45D8E7604DD3C",
         "util_to_numeric": "6299E37D96884EAFB9E21692FB24014B",
@@ -318,36 +316,3 @@ def dataInfo(digitalcontracts, backendIP):
         dataInfo.append(response.json())
 
     return dataInfo
-
-
-def smote(vmid, oversample, X_data_id, y_data_id, fns):
-    jobid = newguid()
-    # push string remotely
-    inputs = pushdata(vmid, [oversample])
-    print(inputs)
-    # add test data to inputs
-    inputs.append(X_data_id)
-    inputs.append(y_data_id)
-
-    setparameter(vmid, jobid, fns["smote"], inputs)
-    submitjob(vmid, fns["smote"], jobid)
-    pulldata(vmid, jobid, fns["smote"])
-    results = queryresult(jobid, fns["smote"])
-
-    return results[0], results[1]
-
-
-def shap_private(vmid, model, X_data_id, fns):
-    jobid = newguid()
-    # push string remotely
-    inputs = pushdata(vmid, [model])
-    print(inputs)
-    # add test data to inputs
-    inputs.append(X_data_id)
-
-    setparameter(vmid, jobid, fns["shap_private"], inputs)
-    submitjob(vmid, fns["shap_private"], jobid)
-    pulldata(vmid, jobid, fns["shap_private"])
-    results = queryresult(jobid, fns["shap_private"])
-
-    return results[0], results[1], results[2]

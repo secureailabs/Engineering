@@ -17,6 +17,4 @@ from .sailcore import (
     create_dummy_data,
     dataInfo,
     VMSetup,
-    smote,
-    shap_private,
 )

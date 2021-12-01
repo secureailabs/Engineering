@@ -210,8 +210,8 @@ class fdxgb(BaseEstimator):
             all_dicts.append(result[i][0])
             all_hashes.append(result[i][1])
 
-        print("all_hashes has len {0}".format(len(all_hashes[0])))
-        print("all_hashes has len {0}".format(len(all_hashes[1])))
+        for i in range(len(self.vms)):
+            print("all_hashes has len {0}".format(len(all_hashes[i])))
 
         sim_mat = []
         jobids = []

@@ -194,7 +194,6 @@ std::vector<Byte> __thiscall DatabaseManager::ListDatasetFamilies(
                             {
                                 StructuredBuffer oObject(oObjectBlob.get_binary().bytes, oObjectBlob.get_binary().size);
                                 StructuredBuffer oDatasetFamilyInformation;
-                                StructuredBuffer oOrganizationName = this->GetOrganizationName(oObject.GetString("DatasetFamilyOwnerGuid"));
                                 oDatasetFamilyInformation.PutString("DatasetFamilyTitle", oObject.GetString("DatasetFamilyTitle"));
                                 oDatasetFamilyInformation.PutString("DatasetFamilyOwnerGuid", oObject.GetString("DatasetFamilyOwnerGuid"));
                                 if ( oObject.IsElementPresent("DatasetFamilyTags", ANSI_CHARACTER_STRING_VALUE_TYPE) )
@@ -202,6 +201,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListDatasetFamilies(
                                     oDatasetFamilyInformation.PutString("DatasetFamilyTags", oObject.GetString("DatasetFamilyTags"));
                                 }
                                 oDatasetFamilyInformation.PutBoolean("DatasetFamilyActive", oObject.GetBoolean("DatasetFamilyActive"));
+                                StructuredBuffer oOrganizationName = this->GetOrganizationName(oObject.GetString("DatasetFamilyOwnerGuid"));
                                 if ( 200 == oOrganizationName.GetDword("Status") )
                                 {
                                     oDatasetFamilyInformation.PutString("OrganizationName", oOrganizationName.GetString("OrganizationName"));
@@ -386,6 +386,15 @@ std::vector<Byte> __thiscall DatabaseManager::PullDatasetFamily(
                                 if (oObjectBlob && oObjectBlob.type() == type::k_binary)
                                 {
                                     StructuredBuffer oObject(oObjectBlob.get_binary().bytes, oObjectBlob.get_binary().size);
+                                    StructuredBuffer oOrganizationName = this->GetOrganizationName(oObject.GetString("DatasetFamilyOwnerGuid"));
+                                    if (200 == oOrganizationName.GetDword("Status"))
+                                    {
+                                        oObject.PutString("OrganizationName", oOrganizationName.GetString("OrganizationName"));
+                                    }
+                                    else
+                                    {
+                                        oObject.PutString("OrganizationName", "");
+                                    }
                                     oResponse.PutStructuredBuffer("DatasetFamily", oObject);
                                     dwStatus = 200;
                                 }

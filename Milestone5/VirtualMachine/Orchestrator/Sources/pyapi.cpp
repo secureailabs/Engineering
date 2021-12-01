@@ -8,11 +8,11 @@
 #include <iostream>
 #include "Guid.h"
 #include "frontend.h"
-
+#include "JsonValue.h"
 static Frontend& getFrontend()
 {
     
-    static Frontend oFrontend = Frontend();
+    static Frontend oFrontend;
     return oFrontend;
 }
 
@@ -42,6 +42,58 @@ static PyObject* login(PyObject* self, PyObject* args)
     std::string strEOSB = getFrontend().Login(strEmail, strPassword, serverPort, strServerIP);
     
     return Py_BuildValue("s", strEOSB.c_str());
+}
+
+static PyObject* get_safe_function_information(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    const char* c_szSafeFnGUID;
+    if(!PyArg_ParseTuple(args, "s", &c_szSafeFnGUID))
+    {
+        return NULL;
+    }
+
+    const std::string strSafeFNGuid(c_szSafeFnGUID);
+    StructuredBuffer oSafeFnInformation = getFrontend().GetSafeFunctionInformation(strSafeFNGuid);
+
+    std::string strJsonResult = "";
+    if ( oSafeFnInformation.GetNamesOfElements().size() > 0 )
+    {
+        JsonValue* oJsonValue = JsonValue::ParseStructuredBufferToJson(oSafeFnInformation);
+        strJsonResult = oJsonValue->ToString();
+        oJsonValue->Release();
+    }
+
+    return Py_BuildValue("s", strJsonResult.c_str());
+}
+
+static PyObject* get_list_of_safe_functions(PyObject* self, PyObject* args)
+{
+    const StructuredBuffer oListOfSafeFunctions = getFrontend().GetListOfSafeFunctions();
+
+    std::string strJsonResult = "";
+    if ( oListOfSafeFunctions.GetNamesOfElements().size() > 0 )
+    {
+        JsonValue* oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfSafeFunctions);
+        strJsonResult = oJsonValue->ToString();
+        oJsonValue->Release();
+    }
+    return Py_BuildValue("s", strJsonResult.c_str());
+}
+
+static PyObject* load_safe_objects(PyObject* self, PyObject* args)
+{
+    const char* c_szDirectory;
+    if(!PyArg_ParseTuple(args, "s", &c_szDirectory))
+    {
+        return NULL;
+    }
+
+    const std::string strDirectory(c_szDirectory);
+
+    return Py_BuildValue("i", getFrontend().LoadSafeObjects(strDirectory));
 }
 
 static PyObject* vmconnect(PyObject* self, PyObject* args)
@@ -379,6 +431,9 @@ static PyMethodDef SAILAPIMethods [] =
 {
     {"createguid", (PyCFunction)createguid, METH_NOARGS, NULL},
     {"login", (PyCFunction)login, METH_VARARGS, NULL},
+    {"get_list_of_safe_functions", (PyCFunction)get_list_of_safe_functions, METH_NOARGS, NULL},
+    {"get_safe_function_information", (PyCFunction)get_safe_function_information, METH_VARARGS, NULL},
+    {"load_safe_objects", (PyCFunction)load_safe_objects, METH_VARARGS,NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},
     {"pushdata", (PyCFunction)pushdata, METH_VARARGS, NULL},
     {"pulldata", (PyCFunction)pulldata, METH_VARARGS, NULL},

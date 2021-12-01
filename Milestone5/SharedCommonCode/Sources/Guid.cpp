@@ -145,6 +145,33 @@ Guid::Guid(
  *
  * @class Guid
  * @function Guid
+ * @brief Constructor which takes input from a incoming string representation of a GUID/UUID
+ * @param[in] c_strGuid std::string representation of a GUID/UUID
+ * @throw BaseException Invalid or improperly formatted @p c_strGuid parameter value
+ * @throw bad_alloc If there isn't enough memory left to allocate the internal GUID/UUID buffer
+ * @note
+ *    This constructor will parse the incoming string and initialize itself to that value.
+ * @par
+ *    The Guid() constructor accepts three kinds of string formats for guid:
+ *    (1) {6E574DA3-0688-43FD-9690-B5E15DE11402} --> hyphens and braces
+ *    (2) 6E574DA3-0688-43FD-9690-B5E15DE11402 ----> hyphens
+ *    (3) 6E574DA3068843FD9690B5E15DE11402 --------> raw
+ *    Any other format will cause the constructor to throw an exception
+ *
+ ********************************************************************************************/
+Guid::Guid(
+    _in const std::string& c_strGuid
+    )
+{
+    __DebugFunction();
+
+    this->InitializeFromString(c_strGuid.c_str());
+}
+
+/********************************************************************************************
+ *
+ * @class Guid
+ * @function Guid
  * @brief Constructor which takes input from a incoming 16 byte buffer containing a raw GUID/UUID
  * @param[in] c_pbBinaryBuffer 16 byte buffer containing a raw GUID/UUID
  * @throw bad_alloc If there isn't enough memory left to allocate the internal GUID/UUID buffer

@@ -20,6 +20,7 @@
 #include "HttpRequestParser.h"
 #include "CurlRest.h"
 #include "JsonValue.h"
+#include "FileUtils.h"
 #include <exception>
 #include <iostream>
 #include <fstream>
@@ -30,6 +31,12 @@
 #include <chrono>
 #include <thread>
 
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function Default constructor
+ *
+ ********************************************************************************************/
 Frontend::Frontend(void):
     m_stlConnectionMap(),
     m_stlJobStatusMap(),
@@ -41,6 +48,12 @@ Frontend::Frontend(void):
     __DebugFunction();
 }
 
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function Destructor
+ *
+ ********************************************************************************************/
 Frontend::~Frontend(void)
 {
     __DebugFunction();
@@ -90,6 +103,130 @@ std::string Frontend::Login(
     m_strEOSB = strEosb;
     m_strUsername = c_strEmail; 
     return strEosb;
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function LoadSafeObjects
+ * @brief Cache all the safeobjects found in a local folder
+ *
+ ********************************************************************************************/
+int __thiscall Frontend::LoadSafeObjects(
+    _in const std::string& c_strSafeObjectDirectory
+    )
+{
+    __DebugFunction();
+
+    // When all safe functions have a proper guid, enable this check
+    constexpr bool fCheckGuidType{false};
+    int nReturnValue{0};
+    std::error_code stlFileErrorCode;
+
+    bool fDirectoryExists = std::filesystem::exists(c_strSafeObjectDirectory, stlFileErrorCode);
+
+    if ( fDirectoryExists )
+    {
+        for ( const auto & oEntry : std::filesystem::directory_iterator(c_strSafeObjectDirectory) )
+        {
+            // Only load objects that have the right extension
+            if ( oEntry.path().extension() == ".safe" )
+            {
+                try
+                {
+                    std::string strFilename = oEntry.path().string();
+                    Guid oGuidName(oEntry.path().stem().string());
+                    if ( eSafeFunction != oGuidName.GetObjectType() )
+                    {
+                        if ( fCheckGuidType )
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            std::cout << "Legacy Safe Function guid being loaded: " << strFilename << std::endl;
+                        }
+                    }
+                    std::vector<Byte> stlFileContents = ::ReadFileAsByteBuffer(strFilename);
+
+                    if ( stlFileContents.size() > 0 )
+                    {
+                        StructuredBuffer oSafeObject(stlFileContents);
+                        m_stlAvailableSafeFunctions.emplace(oSafeObject.GetString("Uuid"), oSafeObject);
+                        ++nReturnValue;
+                    }
+                }
+                catch( BaseException oBaseException )
+                {
+                    ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+                }
+
+                catch( ... )
+                {
+                    ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+                }
+            }
+        }
+    }
+    else
+    {
+        if ( stlFileErrorCode )
+        {
+            nReturnValue = stlFileErrorCode.value();
+        }
+        else
+        {
+            nReturnValue = -1;
+        }
+    }
+
+    return nReturnValue;
+}
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function GetListOfSafeFunctions
+ * @brief Build a list of safe functions available
+ * @return std::string - Containing a list of our safe functions in the form: GUID:Title,GUID:Title
+ *
+ ********************************************************************************************/
+StructuredBuffer Frontend::GetListOfSafeFunctions(
+    void
+    ) const
+{
+    __DebugFunction();
+
+    StructuredBuffer oSafeFuncList;
+    for ( const auto& oSafeObjItr : m_stlAvailableSafeFunctions )
+    {
+        oSafeFuncList.PutString(oSafeObjItr.first.c_str(), oSafeObjItr.second.GetString("Title").c_str());
+    }
+
+    return oSafeFuncList;
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function GetSafeFunctionInformation
+ * @brief Extract the information about a safe function
+ * @return StructuredBuffer - The Structured Buffer containing the safe function information
+ *
+ ********************************************************************************************/
+StructuredBuffer Frontend::GetSafeFunctionInformation(
+    _in const std::string& c_strSafeFunctionId
+    ) const
+{
+    __DebugFunction();
+
+    StructuredBuffer oSafeFunctionInformation;
+    auto stlFoundSafeFunction = m_stlAvailableSafeFunctions.find(c_strSafeFunctionId);
+    if ( stlFoundSafeFunction != m_stlAvailableSafeFunctions.end() )
+    {
+        oSafeFunctionInformation = stlFoundSafeFunction->second;
+    }
+
+    return oSafeFunctionInformation;
 }
 
 void __thiscall Frontend::Listener(

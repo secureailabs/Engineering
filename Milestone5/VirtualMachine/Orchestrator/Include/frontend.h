@@ -17,6 +17,7 @@
 #include <string>
 #include <stack>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <future>
 #include <unordered_set>
@@ -55,6 +56,9 @@ class Frontend : public Object{
         Frontend(
             _in const Frontend& c_oFrontend
         ) = delete;
+        Frontend& operator= (
+            _in const Frontend&
+        ) = delete;
         ~Frontend(void);
 
         void __thiscall SetFrontend
@@ -66,12 +70,25 @@ class Frontend : public Object{
         void __thiscall Listener(
             _in std::string strVMID
         );
-        std::string Login(
+        std::string __thiscall Login(
             _in const std::string& c_strEmail,
             _in const std::string& c_strUserPassword,
             _in const int c_wordServerPort,
             _in const std::string& c_strServerIPAddress
         );
+
+        StructuredBuffer __thiscall GetListOfSafeFunctions(
+            void
+        ) const;
+
+        StructuredBuffer __thiscall GetSafeFunctionInformation(
+            _in const std::string& strSafeFunctionId
+        ) const;
+
+        int __thiscall LoadSafeObjects(
+            _in const std::string& c_strSafeObjectDirectory
+        );
+
         void __thiscall HandleSubmitJob
         (
             _in std::string& strVMID,
@@ -151,6 +168,9 @@ class Frontend : public Object{
         );
 
     private:
+
+
+        std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::map<std::string, std::shared_ptr<TlsNode>> m_stlConnectionMap;
         std::map<std::string, std::shared_ptr<std::mutex>> m_stlConnectionMutexMap;
         std::map<std::string, JobStatusSignals> m_stlJobStatusMap;

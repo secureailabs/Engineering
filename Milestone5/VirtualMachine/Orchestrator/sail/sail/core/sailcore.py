@@ -9,6 +9,15 @@ def connect(serverIP, port):
 def login(email, password, port, IP):
     return SAILPyAPI.login(email,password, port, IP)
 
+def get_list_of_safe_functions():
+    return SAILPyAPI.get_list_of_safe_functions()
+
+def get_safe_function_information(safeFnGuid):
+    return SAILPyAPI.get_safe_function_information(safeFnGuid)
+
+def load_safe_objects(safe_object_dir):
+    return SAILPyAPI.load_safe_objects(safe_object_dir)
+
 def newguid():
     return SAILPyAPI.createguid()
 

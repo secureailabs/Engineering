@@ -450,3 +450,31 @@ class fdxgb(BaseEstimator):
         for item in results:
             ret.append(item[0])
         return ret
+
+    def score(self, model, X, y, labels=None, sample_weight=None, normalize=None):
+        jobids = []
+        for i in range(len(self.vms)):
+            jobid = newguid()
+            jobids.append(jobid)
+            inputs = pushdata(self.vms[i], [model, labels, sample_weight, normalize])
+            inputs.append(X[i])
+            inputs.append(y[i])
+            setparameter(self.vms[i], jobid, self.fns["conf_mat"], inputs)
+            submitjob(self.vms[i], self.fns["conf_mat"], jobid)
+            pulldata(self.vms[i], jobid, self.fns["conf_mat"])
+        results = queryresults_parallel(jobids, self.fns["conf_mat"])
+        print(results)
+        tn = 0
+        fp = 0
+        fn = 0
+        tp = 0
+        for item in results:
+            ttn, tfp, tfn, ttp = item[0].ravel()
+            tn += ttn
+            fp += tfp
+            fn += tfn
+            tp += ttp
+        accuracy = (tp + tn) / (tn + fp + fn + tp)
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
+        return accuracy, precision, recall

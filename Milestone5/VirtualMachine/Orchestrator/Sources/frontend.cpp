@@ -182,6 +182,7 @@ int __thiscall Frontend::LoadSafeObjects(
 
     return nReturnValue;
 }
+
 /********************************************************************************************
  *
  * @class Frontend
@@ -197,9 +198,21 @@ StructuredBuffer Frontend::GetListOfSafeFunctions(
     __DebugFunction();
 
     StructuredBuffer oSafeFuncList;
-    for ( const auto& oSafeObjItr : m_stlAvailableSafeFunctions )
+    try
     {
-        oSafeFuncList.PutString(oSafeObjItr.first.c_str(), oSafeObjItr.second.GetString("Title").c_str());
+        for ( const auto& oSafeObjItr : m_stlAvailableSafeFunctions )
+        {
+            oSafeFuncList.PutString(oSafeObjItr.first.c_str(), oSafeObjItr.second.GetString("Title").c_str());
+        }
+    }
+    catch(BaseException oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
 
     return oSafeFuncList;

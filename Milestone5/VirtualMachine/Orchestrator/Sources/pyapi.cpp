@@ -9,6 +9,7 @@
 #include "Guid.h"
 #include "frontend.h"
 #include "JsonValue.h"
+#include "ExceptionRegister.h"
 static Frontend& getFrontend()
 {
     
@@ -74,10 +75,27 @@ static PyObject* get_list_of_safe_functions(PyObject* self, PyObject* args)
     const StructuredBuffer oListOfSafeFunctions = getFrontend().GetListOfSafeFunctions();
 
     std::string strJsonResult = "";
-    if ( oListOfSafeFunctions.GetNamesOfElements().size() > 0 )
+    JsonValue* oJsonValue = nullptr;
+    try
     {
-        JsonValue* oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfSafeFunctions);
-        strJsonResult = oJsonValue->ToString();
+        if ( oListOfSafeFunctions.GetNamesOfElements().size() > 0 )
+        {
+            oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfSafeFunctions);
+            strJsonResult = oJsonValue->ToString();
+            oJsonValue->Release();
+            oJsonValue = nullptr;
+        }
+    }
+    catch(BaseException oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    if ( nullptr != oJsonValue )
+    {
         oJsonValue->Release();
     }
     return Py_BuildValue("s", strJsonResult.c_str());

@@ -830,16 +830,18 @@ void __thiscall JobEngine::Heartbeat(void)
 
             if (true == m_fIsConnected)
             {
-                if(60 < std::difftime(std::time(nullptr), m_oTimeOfLastOrchestratorMessageArrival))
-                {
-                    StructuredBuffer oStructuredBuffer;
-                    oStructuredBuffer.PutBoolean("Timeout", true);
-                    this->SendMessageToOrchestrator(oStructuredBuffer);
+                // TODO: disabled to fix the bug [BOARD-756]
+                // if(60 < std::difftime(std::time(nullptr), m_oTimeOfLastOrchestratorMessageArrival))
+                // {
+                    // StructuredBuffer oStructuredBuffer;
+                    // oStructuredBuffer.PutBoolean("Timeout", true);
+                    // this->SendMessageToOrchestrator(oStructuredBuffer);
 
                     // Mark the JobEngine as not connected
-                    m_fIsConnected = false;
-                }
-                else if(30 < std::difftime(std::time(nullptr), m_oTimeOfLastOrchestratorMessageArrival))
+                    // m_fIsConnected = false;
+                // }
+                // else if(30 < std::difftime(std::time(nullptr), m_oTimeOfLastOrchestratorMessageArrival))
+                if(30 < std::difftime(std::time(nullptr), m_oTimeOfLastOrchestratorMessageArrival))
                 {
                     // If there was no message from the Orchestrator for the past 30 seconds, send a eHeartBeatPing
                     // Send the message to the Orchestrator

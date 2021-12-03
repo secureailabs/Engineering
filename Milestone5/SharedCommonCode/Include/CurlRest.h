@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 extern std::vector<Byte> __stdcall RestApiCall(
     _in const std::string & c_strHostIpAddress,

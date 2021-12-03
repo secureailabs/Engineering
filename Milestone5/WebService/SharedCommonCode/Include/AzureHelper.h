@@ -77,4 +77,17 @@ std::vector<std::string> AzureResourcesAssociatedWithVirtualMachine(
     const std::string & c_strSubscriptionID,
     const std::string & c_strResourceGroup,
     const std::string & c_strVirtualMachineName
-);
+    );
+
+std::string __thiscall GetJsonValue(
+    _in const std::string & strFullJsonString,
+    _in const std::string & strKey
+    );
+
+std::string ExecuteBashCommandAndGetResult(
+    const char* c_szCommnadToRun
+    );
+
+bool IsServerTimeoutError(
+    _in const StructuredBuffer & c_oStructuredBuffer
+    );

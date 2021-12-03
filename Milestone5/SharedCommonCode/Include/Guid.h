@@ -114,6 +114,9 @@ class Guid : public Object
         Guid(
             _in const Guid & c_oGuid
             );
+        Guid(
+            _in const std::string& c_strGuid
+            );
         virtual ~Guid(void) throw();
 
         // Assignment operator overloadings

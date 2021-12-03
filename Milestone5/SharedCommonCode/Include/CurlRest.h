@@ -2,6 +2,7 @@
 
 #include "CoreTypes.h"
 
+#include <map>
 #include <string>
 #include <vector>
 

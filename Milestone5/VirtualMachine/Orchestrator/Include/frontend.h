@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "EosbRotationManager.h"
 #include "StructuredBuffer.h"
 #include "SafeObject.h"
 #include "TlsNode.h"
@@ -70,11 +71,19 @@ class Frontend : public Object{
         void __thiscall Listener(
             _in std::string strVMID
         );
-        std::string __thiscall Login(
+        unsigned int __thiscall Login(
             _in const std::string& c_strEmail,
             _in const std::string& c_strUserPassword,
             _in const int c_wordServerPort,
             _in const std::string& c_strServerIPAddress
+        );
+
+        std::string __thiscall GetCurrentEosb(
+            void
+        ) const;
+
+        void __thiscall ExitCurrentSession(
+            void
         );
 
         StructuredBuffer __thiscall GetListOfSafeFunctions(
@@ -169,7 +178,7 @@ class Frontend : public Object{
 
     private:
 
-
+        EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::map<std::string, std::shared_ptr<TlsNode>> m_stlConnectionMap;
         std::map<std::string, std::shared_ptr<std::mutex>> m_stlConnectionMutexMap;

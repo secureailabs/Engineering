@@ -30,19 +30,31 @@ static PyObject* login(PyObject* self, PyObject* args)
     char* password;
     int serverPort;
     char* serverIP;
-    
+
     if(!PyArg_ParseTuple(args, "ssis", &email, &password, &serverPort, &serverIP))
     {
         return NULL;
     }
-    
+
     std::string strEmail(email);
     std::string strPassword(password);
     std::string strServerIP(serverIP);
-    
-    std::string strEOSB = getFrontend().Login(strEmail, strPassword, serverPort, strServerIP);
-    
-    return Py_BuildValue("s", strEOSB.c_str());
+
+    unsigned int unLoginStatus = getFrontend().Login(strEmail, strPassword, serverPort, strServerIP);
+
+    return Py_BuildValue("I", unLoginStatus);
+}
+
+static PyObject* get_current_eosb(PyObject * self, PyObject * args)
+{
+    return Py_BuildValue("s", getFrontend().GetCurrentEosb().c_str());
+}
+
+static PyObject* exit_current_session(PyObject * self, PyObject * args)
+{
+    getFrontend().ExitCurrentSession();
+
+    return Py_BuildValue("s", "exited");
 }
 
 static PyObject* get_safe_function_information(
@@ -449,6 +461,8 @@ static PyMethodDef SAILAPIMethods [] =
 {
     {"createguid", (PyCFunction)createguid, METH_NOARGS, NULL},
     {"login", (PyCFunction)login, METH_VARARGS, NULL},
+    {"get_current_eosb", (PyCFunction)get_current_eosb, METH_NOARGS, NULL},
+    {"exit_current_session", (PyCFunction)exit_current_session, METH_NOARGS, NULL},
     {"get_list_of_safe_functions", (PyCFunction)get_list_of_safe_functions, METH_NOARGS, NULL},
     {"get_safe_function_information", (PyCFunction)get_safe_function_information, METH_VARARGS, NULL},
     {"load_safe_objects", (PyCFunction)load_safe_objects, METH_VARARGS,NULL},

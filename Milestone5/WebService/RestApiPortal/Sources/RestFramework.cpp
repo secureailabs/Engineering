@@ -197,28 +197,20 @@ void __thiscall RestFramework::RunServer(void)
     __DebugFunction();
 
     RestFrameworkRuntimeData * poRestFrameworkRuntimeData = new RestFrameworkRuntimeData(m_poDictionaryManager);
-    unsigned int unNumberOfResources = std::thread::hardware_concurrency();
+    constexpr unsigned int unActiveConnectionWarnThreshold{10};
     while (false == poRestFrameworkRuntimeData->IsTerminationSignalEncountered())
     {
         try
         {
             if (true == m_poTlsServer->WaitForConnection(100))  // check if a connection and the resources are available
             {
-                // Make sure never to create more threads than the number of available logical cores
-                if (unNumberOfResources > poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
+                if (unActiveConnectionWarnThreshold < poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
                 {
-                    TlsNode * poTlsNode = m_poTlsServer->Accept();
-                    _ThrowIfNull(poTlsNode, "Could not establish connection", nullptr);
-                    poRestFrameworkRuntimeData->HandleConnection(poTlsNode);
+                    std::cout << "There are " << poRestFrameworkRuntimeData->GetNumberOfActiveConnections() << " connections alive" << std::endl;
                 }
-                else
-                {
-                    // Put this thread to sleep since we have maxed out our threading resources
-                    // and need to wait for a running thread to exit
-                    std::cout << "Resources maxed out. Going to sleep\n";
-                    ::sleep(10);
-                    std::cout << "Waking up. Checking resources...\n";
-                }
+                TlsNode * poTlsNode = m_poTlsServer->Accept();
+                _ThrowIfNull(poTlsNode, "Could not establish connection", nullptr);
+                poRestFrameworkRuntimeData->HandleConnection(poTlsNode);
             }
         }
         catch (BaseException oException)

@@ -62,7 +62,7 @@ The WebAPI allows data owners to accept contract requests and for researchers to
 In this iteration we implement a horizontal federated learning experiment using the SimFL algorithmm as outlined in [Practical Federated Gradient Boosting Decision Trees](https://arxiv.org/pdf/1911.04206.pdf). SimFL implements a version of gradient boosting decision trees where each party boosts a number of trees by exploiting shared similarity information based on [Locality Sensitive Hashing (LSH)](https://www.researchgate.net/publication/2634460_Similarity_Search_in_High_Dimensions_via_Hashing). The SimFl algorithm has two distinct phases; the preprocessing phase and the training phase.
 
 <p align="center">
-  <img src="images\SimFL_algo.png" height=300>
+  <img src="images\SimFL_algo.PNG" height=300>
 </p>
 
 #### Preprocessing SimFL
@@ -177,7 +177,7 @@ A time series model may be frustrated by a change in consumer behaviour over the
 Currently we run the model over 80 features. However, according to our SHAP plots, a large number of these are not useful. We would recommend making a cut-off to just the features included in the diagram below. Unnecessary features create unnecessary noise for the model to deal with. We recommend you choose only a minority of these features. Below they are listed in order of importance.
 
 <p align=center>
-    <img src="images\too_many_features.png" style="transform:rotate(270deg);" height=400>
+    <img src="images\too_many_features.png" style="transform:rotate(270deg);" height=600>
 <p>
 
 

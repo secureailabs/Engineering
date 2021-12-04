@@ -95,12 +95,12 @@ For purposes of this experiment the data has been split into 3 chunks:
 
 #### KPMG Precision/ Recall Curve 
 <p align="left">
-    <img src="images\SCL_KPMG_AUC.png" height=150> 
+    <img src="images\SCL_KPMG_AUC.png" height=300> 
 </p>
 
 #### SAIL Precision/ Recall Curve
 <p align="left">
-    <img src="images\SCL_only_AUC.png" height=150>
+    <img src="images\SCL_only_AUC.png" height=300>
 </p>
 
 
@@ -116,12 +116,12 @@ For purposes of this experiment the data has been split into 3 chunks:
 
 #### KPMG Precision/ Recall Curve 
 <p align="left">
-    <img src="images\GFR_KPMG_AUC.png" height=150> 
+    <img src="images\GFR_KPMG_AUC.png" height=300> 
 </p>
 
 #### SAIL Precision/ Recall Curve
 <p align="left">
-    <img src="images\GFR_only_AUC.png" height=150>
+    <img src="images\GFR_only_AUC.png" height=300>
 </p>
 
 ### SIMFL Federated Evaluation Results
@@ -133,7 +133,7 @@ For purposes of this experiment the data has been split into 3 chunks:
 
 #### Optuna Optimised Model
 <p align="left">
-    <img src="images\federated_optimised_AUC.png" height=150>
+    <img src="images\federated_optimised_AUC.png" height=300>
 </p>
 
 ### Discussion
@@ -158,8 +158,8 @@ The first of these is that there are a large number of NaN values in the dataset
 The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. While we were able to pick up on this potential through disparities in the comparsion of SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. our abilities to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
 
 <p align=center>
-    <img src="images\GFR_SHAP_Beeswarm.png" height=200>
-    <img src="images\SCL_SHAP_Beeswarm.png" height=200>
+    <img src="images\GFR_SHAP_Beeswarm.png" height=400>
+    <img src="images\SCL_SHAP_Beeswarm.png" height=400>
 
 #### Potential Date Formatting Logic Error
 There is a potential logic error in the way that date is where churn is allocated to dates. This compares year then month. Howeverer, it is unclear whether this compensates for months between November and Feburary where there wil be no wrap around for these months.
@@ -184,6 +184,12 @@ Currently we run the model over 80 features. However, according to our SHAP plot
 #### Conclusions
 
 Our SimFL learning model was able to successfully train in the distributed learning environment and exceed the performance of the baseline. The extent to which this was exceeded is low but consistent with centralised learning. The federated learning model was more performant than GFR but less performant when predicting upon SCL. However, this is likely due to poor predictive power of GFR. It is unclear to us at this time whether the datasets contain enough information to effectively predict customer churn. 
+
+### Proposed Goals for Iteration 2
+
+- Improve upon SIMFL computational performance
+- Improve upon feature engineering of the GFR and SCL datasets
+- Complete iteration 
 
 
 ## Deliverable Checklist

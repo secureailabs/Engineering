@@ -3,7 +3,7 @@
 
 
 ## Projected Outcomes 
-- Implement horizontally Federated learning using SAIL platform
+- Implement horizontally Federated Learning using SAIL platform
   - Create prediction csv files which will be consumed by the NGOs
   - Predictions made must be explainable with Shapley values
   - implement hyperparameter optimization for federated model training
@@ -18,7 +18,7 @@ We perform remote learning in four scenarios:
 
 - We execute remote learning on only the SCL dataset
 - We execute remote learning on only the GFR dataset 
-- We compute federated training on both datasets GFR and SCL with hyperparameter optimisation
+- We compute federated training on both datasets GFR and SCL with limited hyperparameter optimisation
 
 ### Hypotheses
 
@@ -138,31 +138,31 @@ For purposes of this experiment the data has been split into 3 chunks:
 
 ### Discussion
 
-While it was possible to train remotely on datasets SCL and GFR using the SAIL platform, training results were far from ideal. In all cases the baseline model was exceeded but predictive performance is poor. With this being said, it is unclear at this stage whether the data in SCL and GFR has the potential to effectively predict customer churn. This should be a topic of investigation for iteration 2.
+While it was possible to train remotely on datasets SCL and GFR using the SAIL platform, training results were far from ideal. In all cases the baseline model was exceeded but predictive performance remains poor. With this being said, it is unclear at this stage whether the data in SCL and GFR has the potential to effectively predict customer churn. This should be a topic of investigation for Iteration 2.
 
 The results produced by KPMG under ideal conditions were roughly matched by the experiments run on the individual datasets. However, the trained model is less performant on both datasets than the SCL predictor is alone. That being said, it is likely that the GFR NGO will benefit from the predictive power of the SCL dataset.
 
 #### Algorithm Resource Efficiency Issues
 
-While consistent with centralized learning, SimFL was found to be quite inefficient when processing larger datasets. Intensive memory usage makes this build unstable. A lack of parallelization makes it slow to run to completion. This severely inhibits our ability ot run hyperparameter optimization over a large number of iterations. This is an issue which will be resolved by SAIL in future iterations.
+While consistent with centralized learning, the SimFL implementation was found to be quite inefficient when processing larger datasets. Intensive memory usage makes this build unstable. A lack of parallelization makes it slow to run to completion. This severely inhibits our ability to run hyperparameter optimization over a large number of iterations. This is an issue which will be resolved by SAIL in future iterations.
 
 
-### Feature Engineering Output
+#### Feature Engineering Output
 
 There are a number of points where we believe we could improve the model performance by enhancing the feature engineering sections.
 
-#### Improved Data Imputation
+##### Improved Data Imputation
 The first of these is that there are a large number of NaN values in the dataset. NaN values cannot be hashed properly by SimFL and so we change all NaN values to 0. However, it would be to the advantage of the study of these data points were to be imputed with something meaningful for that column, for example the mean value.
 
-#### Dataset Incongruence
-The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. While we were able to pick up on this potential through disparities in the comparsion of SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. our abilities to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
+##### Dataset Incongruence
+The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. We were able to pick up on this potential through disparities found between the SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. Our ability to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
 
 <p align=center>
     <img src="images\GFR_SHAP_Beeswarm.png" height=400>
     <img src="images\SCL_SHAP_Beeswarm.png" height=400>
 
-#### Potential Date Formatting Logic Error
-There is a potential logic error in the way that date is where churn is allocated to dates. This compares year then month. Howeverer, it is unclear whether this compensates for months between November and Feburary where there wil be no wrap around for these months.
+##### Potential Date Formatting Logic Error
+There is a potential logic error in the way that date is where churn is allocated to dates. This compares year then month. However, it is unclear whether this compensates for months between November and February where there will be no wrap around for time periods between months 10 and 02 of the following year.
 
 ```
 # Churned within three months
@@ -170,10 +170,10 @@ agg_df["is_churned_within3m"] = np.where((agg_df['CancelDate_y_min'].dt.year <= 
                                    (agg_df['CancelDate_y_min'].dt.month <= agg_df["PaymentDate_"].dt.month+3), True, False)
 ```
 
-#### Covid Data Drift
+##### Covid Data Drift
 A time series model may be frustrated by a change in consumer behaviour over the last year. Covid has likely caused new competition between NGOs which may skew instances gathered more recently. This is likely compounded by the economic impact of the virus. This likely a source of data drift. We can avoid this by trimming a large amount of the old data. 
 
-#### Feature Reduction
+##### Feature Reduction
 Currently we run the model over 80 features. However, according to our SHAP plots, a large number of these are not useful. We would recommend making a cut-off to just the features included in the diagram below. Unnecessary features create unnecessary noise for the model to deal with. We recommend you choose only a minority of these features. Below they are listed in order of importance.
 
 <p align=center>
@@ -181,11 +181,11 @@ Currently we run the model over 80 features. However, according to our SHAP plot
 <p>
 
 
-#### Conclusions
+### Conclusions
 
 Our SimFL learning model was able to successfully train in the distributed learning environment and exceed the performance of the baseline. The extent to which this was exceeded is low but consistent with centralised learning. The federated learning model was more performant than GFR but less performant when predicting upon SCL. However, this is likely due to poor predictive power of GFR. It is unclear to us at this time whether the datasets contain enough information to effectively predict customer churn. 
 
-### Proposed Goals for Iteration 2
+#### Proposed Goals for Iteration 2
 
 - Improve upon SIMFL computational performance
 - Improve upon feature engineering of the GFR and SCL datasets

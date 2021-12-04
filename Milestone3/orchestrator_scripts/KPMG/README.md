@@ -62,7 +62,7 @@ The WebAPI allows data owners to accept contract requests and for researchers to
 In this iteration we implement a horizontal federated learning experiment using the SimFL algorithmm as outlined in [Practical Federated Gradient Boosting Decision Trees](https://arxiv.org/pdf/1911.04206.pdf). SimFL implements a version of gradient boosting decision trees where each party boosts a number of trees by exploiting shared similarity information based on [Locality Sensitive Hashing (LSH)](https://www.researchgate.net/publication/2634460_Similarity_Search_in_High_Dimensions_via_Hashing). The SimFl algorithm has two distinct phases; the preprocessing phase and the training phase.
 
 <p align="center">
-  <img src="images\SimFL_algo.PNG" height=300>
+  <img src="images\SimFL_algo.png" height=300>
 </p>
 
 #### Preprocessing SimFL
@@ -95,12 +95,12 @@ For purposes of this experiment the data has been split into 3 chunks:
 
 #### KPMG Precision/ Recall Curve 
 <p align="left">
-    <img src="images\SCL_KPMG_AUC.PNG" height=150> 
+    <img src="images\SCL_KPMG_AUC.png" height=150> 
 </p>
 
 #### SAIL Precision/ Recall Curve
 <p align="left">
-    <img src="images\SCL_only_AUC.PNG" height=150>
+    <img src="images\SCL_only_AUC.png" height=150>
 </p>
 
 
@@ -116,12 +116,12 @@ For purposes of this experiment the data has been split into 3 chunks:
 
 #### KPMG Precision/ Recall Curve 
 <p align="left">
-    <img src="images\GFR_KPMG_AUC.PNG" height=150> 
+    <img src="images\GFR_KPMG_AUC.png" height=150> 
 </p>
 
 #### SAIL Precision/ Recall Curve
 <p align="left">
-    <img src="images\GFR_only_AUC.PNG" height=150>
+    <img src="images\GFR_only_AUC.png" height=150>
 </p>
 
 ### SIMFL Federated Evaluation Results
@@ -133,7 +133,7 @@ For purposes of this experiment the data has been split into 3 chunks:
 
 #### Optuna Optimised Model
 <p align="left">
-    <img src="images\federated_optimised_AUC.PNG" height=150>
+    <img src="images\federated_optimised_AUC.png" height=150>
 </p>
 
 ### Discussion

@@ -190,7 +190,6 @@ class Frontend : public Object{
         //std::map<std::string, std::vector<Byte>> m_stlResultMap;
         std::unordered_set<std::string> m_stlResultSet;
         std::string m_strUsername;
-        std::string m_strEOSB;
         std::mutex m_stlResultMapMutex;
         std::mutex m_stlJobStatusMapMutex;
         std::mutex m_stlFlagMutex;

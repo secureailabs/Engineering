@@ -112,7 +112,6 @@ unsigned int Frontend::Login(
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
 
-    m_strEOSB = strEosb;
     m_strUsername = c_strEmail;
 
     // Pull Datasets
@@ -393,7 +392,7 @@ void __thiscall Frontend::SetFrontend(
     
     StructuredBuffer oBuffer;
     oBuffer.PutByte("RequestType", (Byte)EngineRequest::eConnectVirtualMachine);
-    oBuffer.PutString("Eosb", m_strEOSB);
+    oBuffer.PutString("Eosb", m_oEosbRotator.GetEosb());
     oBuffer.PutString("Username", m_strUsername);
 
     TlsNode * poSocket = nullptr;

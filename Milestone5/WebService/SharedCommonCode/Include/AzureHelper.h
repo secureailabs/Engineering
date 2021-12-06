@@ -15,12 +15,12 @@
 
 #include <string>
 
-std::string CreateAzureParamterJson(
+std::string __stdcall CreateAzureParamterJson(
     _in const std::string & c_strTemplateUrl,
     _in const StructuredBuffer & c_oStructuredBuffer
     );
 
-std::string CreateAzureResourceId(
+std::string __stdcall CreateAzureResourceId(
     _in const std::string & c_strSubscriptionIdentifier,
     _in const std::string & c_strResourceGroup,
     _in const std::string & c_strResourceProviderNamespace,
@@ -28,7 +28,7 @@ std::string CreateAzureResourceId(
     _in const std::string & c_strResourceName
     );
 
-bool DoesAzureResourceExist(
+bool __stdcall DoesAzureResourceExist(
     _in const std::string & c_strMicrosoftAzureAccessToken,
     _in const std::string & c_strResourceId
     );
@@ -39,7 +39,7 @@ std::string __stdcall LoginToMicrosoftAzureApiPortal(
     _in const std::string & c_szTenantIdentifier
     ) throw();
 
-StructuredBuffer CreateAzureDeployment(
+StructuredBuffer __stdcall CreateAzureDeployment(
     _in const std::string & c_strAzureAccessToken,
     _in const std::string & c_strdeploymentParameters,
     _in const std::string & c_strSubscriptionIdentifier,
@@ -47,7 +47,7 @@ StructuredBuffer CreateAzureDeployment(
     _in const std::string & c_strLocation
     ) throw();
 
-StructuredBuffer CopyVirtualMachineImage(
+StructuredBuffer __stdcall CopyVirtualMachineImage(
     _in const std::string c_strMicrosoftAzureAccessToken,
     _in const std::string c_strSubscriptionId,
     _in const std::string c_strResourceGroupName,
@@ -55,7 +55,7 @@ StructuredBuffer CopyVirtualMachineImage(
     _in const std::string c_strImageName
     ) throw();
 
-StructuredBuffer DeployVirtualMachineAndWait(
+StructuredBuffer __stdcall DeployVirtualMachineAndWait(
     _in const std::string & c_strApplicationIdentifier,
     _in const std::string & c_strSecret,
     _in const std::string & c_strTenantIdentifier,
@@ -66,15 +66,28 @@ StructuredBuffer DeployVirtualMachineAndWait(
     _in const std::string & c_strLocation
     ) throw();
 
-bool DeleteAzureResources(
+bool __stdcall DeleteAzureResources(
     _in const std::string & c_strApplicationIdentifier,
     _in const std::string & c_strTenantIdentifier,
     _in const std::string & c_strSecret,
     _in const std::vector<std::string> & c_stlResourceId
     );
 
-std::vector<std::string> AzureResourcesAssociatedWithVirtualMachine(
+std::vector<std::string> __stdcall AzureResourcesAssociatedWithVirtualMachine(
     const std::string & c_strSubscriptionID,
     const std::string & c_strResourceGroup,
     const std::string & c_strVirtualMachineName
-);
+    );
+
+std::string __thiscall __stdcall GetJsonValue(
+    _in const std::string & strFullJsonString,
+    _in const std::string & strKey
+    );
+
+std::string __stdcall ExecuteBashCommandAndGetResult(
+    const char* c_szCommnadToRun
+    );
+
+bool __stdcall IsServerTimeoutError(
+    _in const StructuredBuffer & c_oStructuredBuffer
+    );

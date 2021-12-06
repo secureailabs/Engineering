@@ -27,6 +27,17 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+/********************************************************************************************
+ *
+ * @function CreateAzureParamterJson
+ * @brief Function to create an Azure Template parameter json from the
+ *        propvided StructuredBuffer
+ * @param[in] c_strTemplateUrl Template schema url
+ * @param[in] c_oStructuredBuffer Structured Buffer to fill the template
+ * @return JSON string that woulb be passed on Azure
+ *
+ ********************************************************************************************/
+
 std::string CreateAzureParamterJson(
     _in const std::string & c_strTemplateUrl,
     _in const StructuredBuffer & c_oStructuredBuffer
@@ -101,6 +112,21 @@ std::string __thiscall GetJsonValue(
     return strStartOfValue.substr(0, strStartOfValue.find("\""));
 }
 
+/********************************************************************************************
+ *
+ * @function IsServerTimeoutError
+ * @brief Function to
+ * @param[in] strFullJsonString Json string to read the value from
+ * @param[in] strKey Key for which the value is needed
+ * @return Value corresponding to that key
+ * @note This is not a perfect function to get a value form the Json object.
+ *      This function would just find the first line with the key value in the format:
+ *      "key" : "value"
+ *      and return the value. This is the most that was needed in the Azure class.
+ *      For other operation we would need a full-fledged Json Module.
+ *
+ ********************************************************************************************/
+
 bool IsServerTimeoutError(
     _in const StructuredBuffer & c_oStructuredBuffer
 )
@@ -143,6 +169,19 @@ bool IsServerTimeoutError(
     return fIsServerTimeoutError;
 }
 
+/********************************************************************************************
+ *
+ * @function CreateAzureResourceId
+ * @brief Function to create an Azure format Id of a resource
+ * @param[in] c_strSubscriptionIdentifier Subscription Id
+ * @param[in] c_strResourceGroup Resource group where the resource is present
+ * @param[in] c_strResourceProviderNamespace Resource provider namespace
+ * @param[in] c_strResourceType Type of azure resource as defined on Azure
+ * @param[in] c_strResourceName Name of the resource
+ * @return Azure format resource id
+ *
+ ********************************************************************************************/
+
 std::string CreateAzureResourceId(
     _in const std::string & c_strSubscriptionIdentifier,
     _in const std::string & c_strResourceGroup,
@@ -163,6 +202,15 @@ std::string CreateAzureResourceId(
 
     return gc_strAzureIdFormat;
 }
+
+/********************************************************************************************
+ *
+ * @function ExecuteBashCommandAndGetResult
+ * @brief Run a shell command and get the result as string
+ * @param[in] c_szCommnadToRun Command to run
+ * @return string result of the command that was run
+ *
+ ********************************************************************************************/
 
 std::string ExecuteBashCommandAndGetResult(
     const char* c_szCommnadToRun
@@ -190,6 +238,17 @@ std::string ExecuteBashCommandAndGetResult(
 
     return result;
 }
+
+/********************************************************************************************
+ *
+ * @function AzureResourcesAssociatedWithVirtualMachine
+ * @brief List of all the resources associated with the virtual machine
+ * @param[in] c_strSubscriptionID Subscription id
+ * @param[in] c_strResourceGroup Resource group
+ * @param[in] c_strVirtualMachineName Virtual machine name
+ * @return list of all the resources associsted with the provided virtual machine name
+ *
+ ********************************************************************************************/
 
 std::vector<std::string> AzureResourcesAssociatedWithVirtualMachine(
     const std::string & c_strSubscriptionID,

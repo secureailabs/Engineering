@@ -18,9 +18,7 @@
 class EosbRotationManager
 {
     public:
-        explicit EosbRotationManager(
-            void
-            );
+        explicit EosbRotationManager(void);
 
         virtual ~EosbRotationManager(void);
 
@@ -32,17 +30,17 @@ class EosbRotationManager
             const EosbRotationManager&
             ) = delete;
 
-        void __thiscall Stop();
+        void __thiscall Stop(void);
         void __thiscall Start(
             _in const std::string& c_strServerIp,
             _in unsigned int c_unServerPort
         );
-        std::string __thiscall GetEosb() const;
+        std::string __thiscall GetEosb(void) const;
         void __thiscall SetEosb(const std::string& strEosb);
 
-        bool __thiscall IsRunning() const;
+        bool __thiscall IsRunning(void) const;
     private:
-        void __thiscall PeriodicEosbUpdate();
+        void __thiscall PeriodicEosbUpdate(void);
 
         mutable std::mutex m_oLock{};
         std::condition_variable m_oTimedWait{};

@@ -14,13 +14,9 @@
  * @class EosbRotationManager
  * @function EosbRotationManager
  * @brief Constructor
- * @param[in] strServerIp Ip address of the server we authenticate with
- * @param[in] unServerPort Port of the server we authenticate with
  *
  ********************************************************************************************/
-EosbRotationManager::EosbRotationManager(
-    void
-    )
+EosbRotationManager::EosbRotationManager(void)
 {
     __DebugFunction();
 }
@@ -46,7 +42,7 @@ EosbRotationManager::~EosbRotationManager(void)
  *        the updated EOSB
  *
  ********************************************************************************************/
-void __thiscall EosbRotationManager::PeriodicEosbUpdate()
+void __thiscall EosbRotationManager::PeriodicEosbUpdate(void)
 {
     __DebugFunction();
     while ( !fStopRequest )
@@ -89,7 +85,7 @@ void __thiscall EosbRotationManager::PeriodicEosbUpdate()
  * @brief Issues a stop request to our thread, and then waits to join the thread
  *
  ********************************************************************************************/
-void __thiscall EosbRotationManager::Stop()
+void __thiscall EosbRotationManager::Stop(void)
 {
     __DebugFunction();
     {
@@ -113,6 +109,8 @@ void __thiscall EosbRotationManager::Stop()
  * @class EosbRotationManager
  * @function Start
  * @brief Starts up our rotation thread
+ * @param[in] c_strServerIpAddress Ip address of the server we authenticate with
+ * @param[in] unServerPort Port of the server we authenticate with
  *
  ********************************************************************************************/
 void __thiscall EosbRotationManager::Start(
@@ -137,7 +135,7 @@ void __thiscall EosbRotationManager::Start(
  * @brief Starts up our rotation thread
  * @return std::string - The most up to date EOSB
  ********************************************************************************************/
-std::string __thiscall EosbRotationManager::GetEosb() const
+std::string __thiscall EosbRotationManager::GetEosb(void) const
 {
     __DebugFunction();
     std::lock_guard<std::mutex> oMutexLock{m_oLock};
@@ -165,7 +163,7 @@ void __thiscall EosbRotationManager::SetEosb(const std::string& strEosb)
  * @brief Determine if the rotation thread is running
  * @return bool - Whether the thread is running
  ********************************************************************************************/
-bool __thiscall EosbRotationManager::IsRunning() const
+bool __thiscall EosbRotationManager::IsRunning(void) const
 {
     __DebugFunction();
 

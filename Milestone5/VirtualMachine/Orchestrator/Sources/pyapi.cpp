@@ -126,6 +126,87 @@ static PyObject* load_safe_objects(PyObject* self, PyObject* args)
     return Py_BuildValue("i", getFrontend().LoadSafeObjects(strDirectory));
 }
 
+static PyObject* get_list_of_digital_contracts(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+
+    const StructuredBuffer oListOfDigitalContracts = getFrontend().GetListOfDigitalContracts();
+
+    std::string strJsonResult = "";
+    JsonValue* oJsonValue = nullptr;
+    try
+    {
+        if ( oListOfDigitalContracts.GetNamesOfElements().size() > 0 )
+        {
+            oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfDigitalContracts);
+            strJsonResult = oJsonValue->ToString();
+            oJsonValue->Release();
+            oJsonValue = nullptr;
+        }
+    }
+    catch(BaseException oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    if ( nullptr != oJsonValue )
+    {
+        oJsonValue->Release();
+    }
+    return Py_BuildValue("s", strJsonResult.c_str());
+}
+
+static PyObject* get_digital_contract_information(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    const char* szDcGuid;
+    if(!PyArg_ParseTuple(args, "s", &szDcGuid))
+    {
+        return NULL;
+    }
+
+    const std::string strDcGuid(szDcGuid);
+    StructuredBuffer oDcInformation;
+    std::string strJsonResult = "";
+    JsonValue* oJsonValue = nullptr;
+    try
+    {
+        oDcInformation = getFrontend().GetDigitalContractInformation(strDcGuid);
+
+        if ( oDcInformation.GetNamesOfElements().size() > 0 )
+        {
+            JsonValue* oJsonValue = JsonValue::ParseStructuredBufferToJson(oDcInformation);
+            strJsonResult = oJsonValue->ToString();
+            oJsonValue->Release();
+        }
+
+    }
+    catch(BaseException oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        strJsonResult = "";
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        strJsonResult = "";
+    }
+
+    if ( nullptr != oJsonValue )
+    {
+        oJsonValue->Release();
+    }
+
+    return Py_BuildValue("s", strJsonResult.c_str());
+}
+
 static PyObject* vmconnect(PyObject* self, PyObject* args)
 {
     char* serverIP;
@@ -466,6 +547,8 @@ static PyMethodDef SAILAPIMethods [] =
     {"get_list_of_safe_functions", (PyCFunction)get_list_of_safe_functions, METH_NOARGS, NULL},
     {"get_safe_function_information", (PyCFunction)get_safe_function_information, METH_VARARGS, NULL},
     {"load_safe_objects", (PyCFunction)load_safe_objects, METH_VARARGS,NULL},
+    {"get_list_of_digital_contracts", (PyCFunction)get_list_of_digital_contracts, METH_NOARGS,NULL},
+    {"get_digital_contract_information", (PyCFunction)get_digital_contract_information, METH_VARARGS, NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},
     {"pushdata", (PyCFunction)pushdata, METH_VARARGS, NULL},
     {"pulldata", (PyCFunction)pulldata, METH_VARARGS, NULL},

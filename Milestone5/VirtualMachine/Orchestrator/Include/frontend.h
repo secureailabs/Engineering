@@ -78,17 +78,11 @@ class Frontend : public Object{
             _in const std::string& c_strServerIPAddress
         );
 
-        std::string __thiscall GetCurrentEosb(
-            void
-        ) const;
+        std::string __thiscall GetCurrentEosb(void) const;
 
-        void __thiscall ExitCurrentSession(
-            void
-        );
+        void __thiscall ExitCurrentSession(void);
 
-        StructuredBuffer __thiscall GetListOfSafeFunctions(
-            void
-        ) const;
+        StructuredBuffer __thiscall GetListOfSafeFunctions(void) const;
 
         StructuredBuffer __thiscall GetSafeFunctionInformation(
             _in const std::string& strSafeFunctionId
@@ -97,6 +91,12 @@ class Frontend : public Object{
         int __thiscall LoadSafeObjects(
             _in const std::string& c_strSafeObjectDirectory
         );
+
+        StructuredBuffer __thiscall GetListOfDigitalContracts(void) const;
+
+        StructuredBuffer __thiscall GetDigitalContractInformation(
+            _in const std::string& strDcGuid
+        ) const;
 
         void __thiscall HandleSubmitJob
         (
@@ -177,9 +177,15 @@ class Frontend : public Object{
         );
 
     private:
+        void __thiscall CacheDigitalContractsFromRemote(
+            _in const std::string& c_strServerIpAddress,
+            _in unsigned long unServerPort
+        );
 
         EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
+        std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};
+
         std::map<std::string, std::shared_ptr<TlsNode>> m_stlConnectionMap;
         std::map<std::string, std::shared_ptr<std::mutex>> m_stlConnectionMutexMap;
         std::map<std::string, JobStatusSignals> m_stlJobStatusMap;

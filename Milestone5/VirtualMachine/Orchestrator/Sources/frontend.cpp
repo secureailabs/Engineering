@@ -62,7 +62,7 @@ Frontend::~Frontend(void)
 
 /********************************************************************************************/
 
-std::string Frontend::Login(
+unsigned int Frontend::Login(
     _in const std::string& c_strEmail,
     _in const std::string& c_strUserPassword,
     _in const int c_wordServerPort,
@@ -76,7 +76,7 @@ std::string Frontend::Login(
     __DebugAssert(0 < c_strUserPassword.size());
 
     std::string strEosb;
-
+    uint64_t unStatus{401};
     try
     {
         std::string strVerb = "POST";
@@ -86,8 +86,20 @@ std::string Frontend::Login(
         std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIPAddress, c_wordServerPort, strVerb, strApiUrl, strJsonBody, true);
         std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
         StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
-        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error logging in.", nullptr);
+        unStatus = static_cast<uint64_t>(oResponse.GetFloat64("Status"));
+        _ThrowBaseExceptionIf((201 != unStatus), "Error logging in.", nullptr);
         strEosb = oResponse.GetString("Eosb");
+
+        if ( m_oEosbRotator.IsRunning() )
+        {
+            std::cout << "Replacing existing session" << std::endl;
+            m_oEosbRotator.Stop();
+        }
+        m_oEosbRotator.SetEosb(strEosb);
+
+        // Start the periodic rotation of EOSBs
+        m_oEosbRotator.Start(c_strServerIPAddress, c_wordServerPort);
+
     }
 
     catch(BaseException oBaseException)
@@ -100,9 +112,43 @@ std::string Frontend::Login(
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
 
-    m_strEOSB = strEosb;
-    m_strUsername = c_strEmail; 
-    return strEosb;
+    m_strUsername = c_strEmail;
+
+    // Pull Datasets
+    return unStatus;
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function GetCurrentEosb
+ * @brief Return the EOSB currently being used
+ * @return std::string - The value of the EOSB currently being used
+ *
+ ********************************************************************************************/
+std::string __thiscall Frontend::GetCurrentEosb(void) const
+{
+    __DebugFunction();
+
+    return m_oEosbRotator.GetEosb();
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function ExitCurrentSession
+ * @brief Remove information related to our current lgoged in session, and stop EOSB rotation
+ *
+ ********************************************************************************************/
+void __thiscall Frontend::ExitCurrentSession(void)
+{
+    __DebugFunction();
+
+    if ( true == m_oEosbRotator.IsRunning() )
+    {
+        m_oEosbRotator.Stop();
+        m_oEosbRotator.SetEosb("");
+    }
 }
 
 /********************************************************************************************
@@ -358,7 +404,7 @@ void __thiscall Frontend::SetFrontend(
     
     StructuredBuffer oBuffer;
     oBuffer.PutByte("RequestType", (Byte)EngineRequest::eConnectVirtualMachine);
-    oBuffer.PutString("Eosb", m_strEOSB);
+    oBuffer.PutString("Eosb", m_oEosbRotator.GetEosb());
     oBuffer.PutString("Username", m_strUsername);
 
     TlsNode * poSocket = nullptr;

@@ -9,6 +9,12 @@ def connect(serverIP, port):
 def login(email, password, port, IP):
     return SAILPyAPI.login(email,password, port, IP)
 
+def get_current_eosb():
+    return SAILPyAPI.get_current_eosb()
+
+def exit_current_session():
+    return SAILPyAPI.exit_current_session()
+
 def get_list_of_safe_functions():
     return SAILPyAPI.get_list_of_safe_functions()
 

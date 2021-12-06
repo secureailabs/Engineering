@@ -117,14 +117,14 @@ void __thiscall EosbRotationManager::Stop()
  ********************************************************************************************/
 void __thiscall EosbRotationManager::Start(
     _in const std::string& c_strServerIpAddress,
-    _in unsigned int c_unServerPort
+    _in unsigned int unServerPort
 )
 {
     __DebugFunction();
     __DebugAssert(nullptr == m_oRotatingThread);
 
     m_strServerIp = c_strServerIpAddress;
-    m_unServerPort = c_unServerPort;
+    m_unServerPort = unServerPort;
 
     fStopRequest = false;
     m_oRotatingThread = std::unique_ptr<std::thread>(new std::thread(&EosbRotationManager::PeriodicEosbUpdate, this));

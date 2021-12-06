@@ -118,18 +118,29 @@ unsigned int Frontend::Login(
     return unStatus;
 }
 
-std::string __thiscall Frontend::GetCurrentEosb(
-    void
-    ) const
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function GetCurrentEosb
+ * @brief Return the EOSB currently being used
+ * @return std::string - The value of the EOSB currently being used
+ *
+ ********************************************************************************************/
+std::string __thiscall Frontend::GetCurrentEosb(void) const
 {
     __DebugFunction();
 
     return m_oEosbRotator.GetEosb();
 }
 
-void __thiscall Frontend::ExitCurrentSession(
-    void
-)
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function ExitCurrentSession
+ * @brief Remove information related to our current lgoged in session, and stop EOSB rotation
+ *
+ ********************************************************************************************/
+void __thiscall Frontend::ExitCurrentSession(void)
 {
     __DebugFunction();
 
@@ -139,6 +150,7 @@ void __thiscall Frontend::ExitCurrentSession(
         m_oEosbRotator.SetEosb("");
     }
 }
+
 /********************************************************************************************
  *
  * @class Frontend

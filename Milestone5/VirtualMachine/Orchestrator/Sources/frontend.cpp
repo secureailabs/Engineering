@@ -234,7 +234,6 @@ StructuredBuffer __thiscall Frontend::GetListOfDigitalContracts() const
  *
  ********************************************************************************************/
 std::string __thiscall Frontend::GetCurrentEosb(void) const
-
 {
     __DebugFunction();
 

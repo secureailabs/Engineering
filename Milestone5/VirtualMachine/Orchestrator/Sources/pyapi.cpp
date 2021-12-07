@@ -33,7 +33,7 @@ static PyObject* login(PyObject* self, PyObject* args)
 
     if(!PyArg_ParseTuple(args, "ssis", &email, &password, &serverPort, &serverIP))
     {
-        return NULL;
+        return nullptr;
     }
 
     std::string strEmail(email);
@@ -65,7 +65,7 @@ static PyObject* get_safe_function_information(
     const char* c_szSafeFnGUID;
     if(!PyArg_ParseTuple(args, "s", &c_szSafeFnGUID))
     {
-        return NULL;
+        return nullptr;
     }
 
     const std::string strSafeFNGuid(c_szSafeFnGUID);
@@ -90,7 +90,7 @@ static PyObject* get_list_of_safe_functions(PyObject* self, PyObject* args)
     JsonValue* oJsonValue = nullptr;
     try
     {
-        if ( oListOfSafeFunctions.GetNamesOfElements().size() > 0 )
+        if ( 0 < oListOfSafeFunctions.GetNamesOfElements().size() )
         {
             oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfSafeFunctions);
             strJsonResult = oJsonValue->ToString();
@@ -98,7 +98,7 @@ static PyObject* get_list_of_safe_functions(PyObject* self, PyObject* args)
             oJsonValue = nullptr;
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -118,7 +118,7 @@ static PyObject* load_safe_objects(PyObject* self, PyObject* args)
     const char* c_szDirectory;
     if(!PyArg_ParseTuple(args, "s", &c_szDirectory))
     {
-        return NULL;
+        return nullptr;
     }
 
     const std::string strDirectory(c_szDirectory);
@@ -138,7 +138,7 @@ static PyObject* get_list_of_digital_contracts(
     JsonValue* oJsonValue = nullptr;
     try
     {
-        if ( oListOfDigitalContracts.GetNamesOfElements().size() > 0 )
+        if ( 0 < oListOfDigitalContracts.GetNamesOfElements().size() )
         {
             oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfDigitalContracts);
             strJsonResult = oJsonValue->ToString();
@@ -146,7 +146,7 @@ static PyObject* get_list_of_digital_contracts(
             oJsonValue = nullptr;
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -169,7 +169,7 @@ static PyObject* get_digital_contract_information(
     const char* szDcGuid;
     if(!PyArg_ParseTuple(args, "s", &szDcGuid))
     {
-        return NULL;
+        return nullptr;
     }
 
     const std::string strDcGuid(szDcGuid);

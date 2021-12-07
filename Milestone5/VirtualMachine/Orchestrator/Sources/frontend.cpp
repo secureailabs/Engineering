@@ -95,7 +95,7 @@ void __thiscall Frontend::CacheDigitalContractsFromRemote(
             m_stlDigitalContracts.insert({strDcGuid, oDigitalContractRecord});
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
         m_stlDigitalContracts.clear();
@@ -178,7 +178,7 @@ unsigned int Frontend::Login(
 
     }
 
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -212,7 +212,7 @@ StructuredBuffer __thiscall Frontend::GetListOfDigitalContracts() const
             oDigitalContractList.PutString(oDigitalContractItr.first.c_str(), oDigitalContractItr.second.GetString("Title").c_str());
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -310,7 +310,7 @@ int __thiscall Frontend::LoadSafeObjects(
                         ++nReturnValue;
                     }
                 }
-                catch( BaseException oBaseException )
+                catch(const BaseException& oBaseException )
                 {
                     ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
                 }
@@ -359,7 +359,7 @@ StructuredBuffer Frontend::GetListOfSafeFunctions(
             oSafeFuncList.PutString(oSafeObjItr.first.c_str(), oSafeObjItr.second.GetString("Title").c_str());
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }

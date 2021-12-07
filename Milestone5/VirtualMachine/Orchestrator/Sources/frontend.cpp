@@ -57,7 +57,80 @@ Frontend::Frontend(void):
 Frontend::~Frontend(void)
 {
     __DebugFunction();
+}
 
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function CacheDigitalContractsFromRemote
+ * @brief Call to our remote server to get all our digital contracts, and cached their SBs
+ *        in a class member map
+ *
+ ********************************************************************************************/
+void __thiscall Frontend::CacheDigitalContractsFromRemote(
+    _in const std::string& c_strServerIpAddress,
+    _in unsigned long unServerPort
+    )
+{
+    __DebugFunction();
+    __DebugAssert(unServerPort < 65536);
+
+    try
+    {
+        std::string strApiUrl = "/SAIL/DigitalContractManager/DigitalContracts?Eosb=" + m_oEosbRotator.GetEosb();
+        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, unServerPort, "GET", strApiUrl, "", true);
+        std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
+        StructuredBuffer oDigitalContractResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+        _ThrowBaseExceptionIf((200 != oDigitalContractResponse.GetFloat64("Status")), "Failed to retrieve digital contracts", nullptr);
+
+        if ( oDigitalContractResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        {
+            m_oEosbRotator.SetEosb(oDigitalContractResponse.GetString("Eosb"));
+        }
+
+        StructuredBuffer oDigitalContracts = oDigitalContractResponse.GetStructuredBuffer("DigitalContracts");
+        for (const std::string& strDcGuid : oDigitalContracts.GetNamesOfElements())
+        {
+            StructuredBuffer oDigitalContractRecord = oDigitalContracts.GetStructuredBuffer(strDcGuid.c_str());
+            m_stlDigitalContracts.insert({strDcGuid, oDigitalContractRecord});
+        }
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        m_stlDigitalContracts.clear();
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        m_stlDigitalContracts.clear();
+    }
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function GetDigitalContractInformation
+ * @brief Lookup in our local cache for information about a specific digital contract
+ * @param[in] strDcGuid the string containing the GUID for the digital contract
+ * @return StructuredBuffer - The Structured buffer containing the dc if it was found, empty otherwise
+ *
+ ********************************************************************************************/
+StructuredBuffer __thiscall Frontend::GetDigitalContractInformation(
+    _in const std::string& c_strDcGuid
+    ) const
+{
+    __DebugFunction();
+
+    StructuredBuffer oDigitalContractInformation;
+    auto stlFoundContract = m_stlDigitalContracts.find(c_strDcGuid);
+    if ( stlFoundContract != m_stlDigitalContracts.end() )
+    {
+        oDigitalContractInformation = stlFoundContract->second;
+    }
+
+    return oDigitalContractInformation;
 }
 
 /********************************************************************************************/
@@ -100,9 +173,12 @@ unsigned int Frontend::Login(
         // Start the periodic rotation of EOSBs
         m_oEosbRotator.Start(c_strServerIPAddress, c_wordServerPort);
 
+        // Get our list of digital contracts
+        CacheDigitalContractsFromRemote(c_strServerIPAddress, c_wordServerPort);
+
     }
 
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -116,6 +192,37 @@ unsigned int Frontend::Login(
 
     // Pull Datasets
     return unStatus;
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function GetListOfDigitalContracts
+ * @brief Build a list of our cached digital contracts
+ * @return std::string - Containing a list of our datasets in the form: GUID:Title,GUID:Title
+ *
+ ********************************************************************************************/
+StructuredBuffer __thiscall Frontend::GetListOfDigitalContracts() const
+{
+    StructuredBuffer oDigitalContractList;
+    try
+    {
+        for ( const auto& oDigitalContractItr : m_stlDigitalContracts )
+        {
+            oDigitalContractList.PutString(oDigitalContractItr.first.c_str(), oDigitalContractItr.second.GetString("Title").c_str());
+        }
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
+    return oDigitalContractList;
 }
 
 /********************************************************************************************
@@ -149,6 +256,7 @@ void __thiscall Frontend::ExitCurrentSession(void)
         m_oEosbRotator.Stop();
         m_oEosbRotator.SetEosb("");
     }
+    m_stlDigitalContracts.clear();
 }
 
 /********************************************************************************************
@@ -202,7 +310,7 @@ int __thiscall Frontend::LoadSafeObjects(
                         ++nReturnValue;
                     }
                 }
-                catch( BaseException oBaseException )
+                catch(const BaseException& oBaseException )
                 {
                     ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
                 }
@@ -251,7 +359,7 @@ StructuredBuffer Frontend::GetListOfSafeFunctions(
             oSafeFuncList.PutString(oSafeObjItr.first.c_str(), oSafeObjItr.second.GetString("Title").c_str());
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }

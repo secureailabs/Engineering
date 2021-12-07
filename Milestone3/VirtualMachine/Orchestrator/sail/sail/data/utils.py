@@ -187,3 +187,15 @@ class Utils:
         pulldata(self.vm, jobid, self.fns["util_pr_curve"])
         result = queryresult(jobid, self.fns["util_pr_curve"])
         return result
+
+    def avg_precision(
+        self, y_true, probas_pred, average=None, pos_label=None, sample_weight=None
+    ):
+        jobid = newguid()
+        inputs = pushdata(self.vm, [probas_pred, average, pos_label, sample_weight])
+        inputs.append(y_true)
+        setparameter(self.vm, jobid, self.fns["util_avg_precision"], inputs)
+        submitjob(self.vm, self.fns["util_avg_precision"], jobid)
+        pulldata(self.vm, jobid, self.fns["util_avg_precision"])
+        result = queryresult(jobid, self.fns["util_avg_precision"])
+        return result

@@ -84,7 +84,9 @@ class Frontend : public Object{
 
         StructuredBuffer __thiscall GetListOfSafeFunctions(void) const;
 
-        StructuredBuffer __thiscall GetSafeFunctionInformation(
+        std::string GetDatasets(void) const;
+
+        StructuredBuffer GetSafeFunctionInformation(
             _in const std::string& strSafeFunctionId
         ) const;
 
@@ -181,19 +183,24 @@ class Frontend : public Object{
             _in const std::string& c_strServerIpAddress,
             _in unsigned long unServerPort
         );
+       void __thiscall CacheDatasetsFromRemote(
+            _in const std::string& c_strServerIpAddress,
+            _in unsigned long unServerPort
+        );
 
         EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};
+        std::unordered_map<std::string, StructuredBuffer> m_stlAvailableDatasets{};
+        std::unordered_map<std::string, StructuredBuffer> m_stlAvailableTables{};
 
         std::map<std::string, std::shared_ptr<TlsNode>> m_stlConnectionMap;
         std::map<std::string, std::shared_ptr<std::mutex>> m_stlConnectionMutexMap;
         std::map<std::string, JobStatusSignals> m_stlJobStatusMap;
         std::map<std::string, std::map<std::string, std::string>> m_stlDataTableMap;
-        //std::string m_strWebPortalIP;
-        //std::string m_strWebPortalPort;
+
         std::map<std::string, std::unique_ptr<SafeObject>> m_stlFNTable;
-        //std::map<std::string, std::vector<Byte>> m_stlResultMap;
+
         std::unordered_set<std::string> m_stlResultSet;
         std::string m_strUsername;
         std::mutex m_stlResultMapMutex;

@@ -33,6 +33,59 @@
 
 /********************************************************************************************
  *
+ * @function GetJsonForStructuredBufferMap
+ * @brief Helper function to create a JSON str out of a map of GUID:StructuredBuffer pairs
+ * @param [in] std::unordered_map - The map containg the GUID:StructuredBuffer pairs
+ * @return std::string - The JSON representation of the map, or "" on error
+ *
+ ********************************************************************************************/
+static std::string __stdcall GetJsonForStructuredBufferMap(
+    _in const std::unordered_map<std::string, StructuredBuffer>& stlStructuredBufferMap
+)
+{
+    __DebugFunction();
+
+    std::string strJSON{""};
+    JsonValue* oJsonValue{nullptr};
+    try
+    {
+        StructuredBuffer oBufferWithAllObjects;
+        for ( const auto& oStructuredBufferItr : stlStructuredBufferMap )
+        {
+            oBufferWithAllObjects.PutStructuredBuffer(oStructuredBufferItr.first.c_str(), oStructuredBufferItr.second);
+        }
+
+        if ( oBufferWithAllObjects.GetNamesOfElements().size() > 0 )
+        {
+            oJsonValue = JsonValue::ParseStructuredBufferToJson(oBufferWithAllObjects);
+            strJSON = oJsonValue->ToString();
+            oJsonValue->Release();
+            oJsonValue = nullptr;
+        }
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        strJSON.clear();
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        strJSON.clear();
+    }
+
+    if ( nullptr != oJsonValue )
+    {
+        oJsonValue->Release();
+        oJsonValue = nullptr;
+    }
+
+    return strJSON;
+}
+
+/********************************************************************************************
+ *
  * @class Frontend
  * @function Default constructor
  *
@@ -111,6 +164,66 @@ void __thiscall Frontend::CacheDigitalContractsFromRemote(
 /********************************************************************************************
  *
  * @class Frontend
+ * @function CacheDatasetsFromRemote
+ * @brief Call to our remote server to get all our datasets, and cached their SBs
+ *        in a class member map
+ *
+ ********************************************************************************************/
+void Frontend::CacheDatasetsFromRemote(
+    _in const std::string& c_strServerIpAddress,
+    _in unsigned long unServerPort
+    )
+{
+    __DebugFunction();
+    __DebugAssert(unServerPort < 65536);
+
+    try
+    {
+        std::string strApiUrl = "/SAIL/DatasetManager/ListDatasets?Eosb=" + m_oEosbRotator.GetEosb();
+        StructuredBuffer oDatasetRequest;
+        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, unServerPort, "GET", strApiUrl, "", true);
+        std::string strUnescapedResponse = ::UnEscapeJsonString((const char *)stlRestResponse.data());
+        StructuredBuffer oDatasetResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+        _ThrowBaseExceptionIf((200 != oDatasetResponse.GetFloat64("Status")), "Failed to retrieve datasets", nullptr);
+
+        if ( oDatasetResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        {
+            m_oEosbRotator.SetEosb(oDatasetResponse.GetString("Eosb"));
+        }
+
+        StructuredBuffer oDatasets = oDatasetResponse.GetStructuredBuffer("Datasets");
+        for (const std::string& strDatasetGuid : oDatasets.GetNamesOfElements())
+        {
+            StructuredBuffer oDatasetRecord = oDatasets.GetStructuredBuffer(strDatasetGuid.c_str());
+            Guid oDatasetGuid(strDatasetGuid.c_str());
+            m_stlAvailableDatasets.insert({strDatasetGuid, oDatasetRecord});
+
+            // Cache our tables
+            StructuredBuffer oDatasetTables = oDatasetRecord.GetStructuredBuffer("Tables");
+            for ( const auto& oTableItr : oDatasetTables.GetNamesOfElements() )
+            {
+                m_stlAvailableTables.insert({oTableItr, oDatasetTables.GetStructuredBuffer(oTableItr.c_str())});
+            }
+        }
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        m_stlAvailableTables.clear();
+        m_stlAvailableTables.clear();
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        m_stlAvailableTables.clear();
+        m_stlAvailableTables.clear();
+    }
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
  * @function GetDigitalContractInformation
  * @brief Lookup in our local cache for information about a specific digital contract
  * @param[in] strDcGuid the string containing the GUID for the digital contract
@@ -131,6 +244,21 @@ StructuredBuffer __thiscall Frontend::GetDigitalContractInformation(
     }
 
     return oDigitalContractInformation;
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function GetDatasets
+ * @brief Lookup in our local cache for the datasets we have and return them as a JSON string
+ * @return std::string - Containing a list of our datasets in the form: GUID:Metadata
+ *
+ ********************************************************************************************/
+std::string __thiscall Frontend::GetDatasets(void) const
+{
+    __DebugFunction();
+
+    return GetJsonForStructuredBufferMap(m_stlAvailableDatasets);
 }
 
 /********************************************************************************************/
@@ -176,6 +304,7 @@ unsigned int Frontend::Login(
         // Get our list of digital contracts
         CacheDigitalContractsFromRemote(c_strServerIPAddress, c_wordServerPort);
 
+        CacheDatasetsFromRemote(c_strServerIPAddress, c_wordServerPort);
     }
 
     catch(const BaseException& oBaseException)
@@ -257,6 +386,7 @@ void __thiscall Frontend::ExitCurrentSession(void)
         m_oEosbRotator.SetEosb("");
     }
     m_stlDigitalContracts.clear();
+    m_stlAvailableDatasets.clear();
 }
 
 /********************************************************************************************

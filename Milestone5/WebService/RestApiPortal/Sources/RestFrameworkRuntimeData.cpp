@@ -32,7 +32,8 @@ std::map<Dword, std::string> g_stlHttpCodes = {
     {eForbidden, "Forbidden"},
     {eNotFound, "NotFound"},
     {eRequestTimeout, "RequestTimeout"},
-    {eInternalError, "InternalServerError"}
+    {eInternalError, "InternalServerError"},
+    {eServiceUnavailable, "ServiceUnavailable"}
 };
 
 /********************************************************************************************

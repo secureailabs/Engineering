@@ -274,6 +274,7 @@ bool PutHttpResponse(
 )
 {
     __DebugFunction();
+    __DebugAssert(nullptr != poTlsNode);
 
     std::string strResponseHeader = "HTTP/1.1 200 OK \r\nContent-Length: " + std::to_string(stlPayload.length()) + "\r\nConnection: close\r\nContent-Type: application/json\r\n\r\n";
     std::string strResponseData(strResponseHeader);
@@ -282,6 +283,30 @@ bool PutHttpResponse(
 
     // Send back response data
     poTlsNode->Write((const Byte *) strResponseData.data(), strResponseData.size());
+
+    return true;
+}
+
+/********************************************************************************************
+ *
+ * @function PutHttpHeadOnlyResponse
+ * @brief Function to send a header only response through a TLS node
+ * @param[in] oTlsNode Reference to the TlsNode object connected to remote node
+ * @param[in] dStatus The numeric status code to send
+ * @param[in] strStatus The string status to send
+ * @return true on success, otherwise false
+ *
+ ********************************************************************************************/
+bool __stdcall PutHttpHeaderOnlyResponse(
+    _in TlsNode& oTlsNode,
+    _in Dword dStatus,
+    _in const std::string& strStatus
+)
+{
+    __DebugFunction();
+
+    std::string strResponseHeader = "HTTP/1.1 "+ std::to_string(dStatus) + " " + strStatus +" \r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
+    oTlsNode.Write(reinterpret_cast<const Byte*>(strResponseHeader.c_str()), strResponseHeader.length());
 
     return true;
 }

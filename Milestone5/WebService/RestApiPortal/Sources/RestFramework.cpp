@@ -10,11 +10,13 @@
 
 #include "RestFramework.h"
 #include "ExceptionRegister.h"
+#include "TlsTransactionHelperFunctions.h"
 
 /********************************************************************************************/
 
 static RestFramework * gs_poRestFramework = nullptr;
 
+extern std::map<Dword, std::string> g_stlHttpCodes;
 /********************************************************************************************
  *
  * @function RegisterPlugin
@@ -197,23 +199,28 @@ void __thiscall RestFramework::RunServer(void)
     __DebugFunction();
 
     RestFrameworkRuntimeData * poRestFrameworkRuntimeData = new RestFrameworkRuntimeData(m_poDictionaryManager);
-    constexpr unsigned int unActiveConnectionWarnThreshold{10};
+    constexpr unsigned int c_unActiveConnectionThreshold{100};
     while (false == poRestFrameworkRuntimeData->IsTerminationSignalEncountered())
     {
         try
         {
             if (true == m_poTlsServer->WaitForConnection(100))  // check if a connection and the resources are available
             {
-                if (unActiveConnectionWarnThreshold < poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
-                {
-                    std::cout << "There are " << poRestFrameworkRuntimeData->GetNumberOfActiveConnections() << " connections alive" << std::endl;
-                }
                 TlsNode * poTlsNode = m_poTlsServer->Accept();
                 _ThrowIfNull(poTlsNode, "Could not establish connection", nullptr);
-                poRestFrameworkRuntimeData->HandleConnection(poTlsNode);
+                if (c_unActiveConnectionThreshold <= poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
+                {
+                    std::cout << "There are " << poRestFrameworkRuntimeData->GetNumberOfActiveConnections() << " connections alive (max " << c_unActiveConnectionThreshold << ") refusing incoming connection" << std::endl;
+                    PutHttpHeaderOnlyResponse(*poTlsNode, eServiceUnavailable, g_stlHttpCodes[eServiceUnavailable]);
+                    poTlsNode->Release();
+                }
+                else
+                {
+                    poRestFrameworkRuntimeData->HandleConnection(poTlsNode);
+                }
             }
         }
-        catch (BaseException oException)
+        catch (const BaseException& oException)
         {
             ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         }
@@ -276,7 +283,7 @@ void __thiscall RestFramework::LoadPlugins(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         // Close all plugin handles

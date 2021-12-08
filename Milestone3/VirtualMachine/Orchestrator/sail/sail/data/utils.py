@@ -189,7 +189,7 @@ class Utils:
         return result
 
     def avg_precision(
-        self, y_true, probas_pred, average=None, pos_label=None, sample_weight=None
+        self, y_true, probas_pred, average=None, pos_label=1, sample_weight=None
     ):
         jobid = newguid()
         inputs = pushdata(self.vm, [probas_pred, average, pos_label, sample_weight])

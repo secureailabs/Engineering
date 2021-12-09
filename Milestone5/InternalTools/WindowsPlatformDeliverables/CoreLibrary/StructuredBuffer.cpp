@@ -259,6 +259,25 @@ std::vector<std::string> __thiscall StructuredBuffer::GetNamesOfElements(void) c
 
 /********************************************************************************************/
 
+Byte __thiscall StructuredBuffer::GetElementType(
+    _in const char * c_szElementName
+    ) const
+{
+    __DebugFunction();
+
+    Byte bElementType = INVALID_VALUE_TYPE;
+    Qword qwElementName64BitHash = ::Get64BitHashOfNullTerminatedString(c_szElementName, false);
+    // First we check to see if an element by the same name exists
+    if (m_stlMapOfElements.end() != m_stlMapOfElements.find(qwElementName64BitHash))
+    {
+        bElementType = m_stlMapOfElements.at(qwElementName64BitHash)->GetElementType();
+    }
+    
+    return bElementType;
+}
+
+/********************************************************************************************/
+
 std::vector<std::string> __thiscall StructuredBuffer::GetDescriptionOfElements(void) const throw()
 {
     __DebugFunction();
@@ -271,6 +290,24 @@ std::vector<std::string> __thiscall StructuredBuffer::GetDescriptionOfElements(v
     }
     
     return stlListOfElements;
+}
+
+/********************************************************************************************/
+
+StructuredBuffer __thiscall StructuredBuffer::operator = (
+    const StructuredBuffer & c_oStructuredBuffer
+    )
+{
+    __DebugFunction();
+
+    if (this != &c_oStructuredBuffer)
+    {
+        m_qw64BitHash = 0;
+        m_qwComposition64BitHash = 0;
+        this->DeSerialize(c_oStructuredBuffer.GetSerializedBufferRawDataPtr(), c_oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
+    }
+
+    return *this;
 }
 
 /********************************************************************************************/

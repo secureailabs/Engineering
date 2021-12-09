@@ -160,8 +160,17 @@ class StructuredBuffer : public Object
             _in const char * c_szElementName
             ) throw();
         std::vector<std::string> __thiscall GetNamesOfElements(void) const throw();
+        Byte __thiscall GetElementType(
+            _in const char * c_szElementName
+            ) const;
+
         std::vector<std::string> __thiscall GetDescriptionOfElements(void) const throw();
         
+        // Operatror overloading
+        StructuredBuffer __thiscall operator=(
+            const StructuredBuffer & oStructuredBuffer
+            );
+
         // Prints out all of the StructuredBuffer metadata and data
         std::string __thiscall ToString(void) throw();
 

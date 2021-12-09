@@ -20,6 +20,7 @@
  * @return Keys in JsonObject
  *
  ********************************************************************************************/
+
 static size_t __stdcall CurlHeaderWriteCallback(
     _in const Byte * c_pbAdditionalData,
     _in size_t unSizeOfElements,
@@ -59,6 +60,7 @@ static size_t __stdcall CurlHeaderWriteCallback(
  * @return Keys in JsonObject
  *
  ********************************************************************************************/
+
 static size_t __stdcall CurlWriteCallback(
     _in const Byte * c_pbAdditionalData,
     _in size_t unSizeOfElements,
@@ -187,6 +189,7 @@ std::vector<Byte> RestApiCall(
  * @return Rest Response
  *
  ********************************************************************************************/
+
 std::vector<Byte> __stdcall RestApiCall(
     _in const std::string & c_strHostIpAddress,
     _in const Word nPort,

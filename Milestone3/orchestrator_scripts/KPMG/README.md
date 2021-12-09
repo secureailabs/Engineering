@@ -167,7 +167,7 @@ The first is that there are a large number of NaN values in the dataset. NaN val
 #### Dataset Incongruence
 The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. We were able to pick up on this potential through disparities found between the SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. We've attached shap output for each model trained individually. However, our ability to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
 
-<p align=center>
+<p align='center'>
     <img src="images\GFR_SHAP_Beeswarm.png" height=400>
     <img src="images\SCL_SHAP_Beeswarm.png" height=400>
 
@@ -186,7 +186,7 @@ A time series model may be frustrated by a change in consumer behavior over the 
 #### Feature Reduction
 Currently we run the model over 80 features. However, according to our SHAP plots, a large number of these are not useful. We would recommend making a cut-off to just the features included in the diagram below. Unnecessary features create unnecessary noise for the model to deal with. We recommend you choose only a minority of these features. Below they are listed in order of importance.
 
-<p align=center>
+<p align='center'>
     <img src="images\too_many_features.png" style="transform:rotate(270deg);" height=600>
 <p>
 

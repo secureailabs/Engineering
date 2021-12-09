@@ -23,7 +23,7 @@ We perform remote learning in four scenarios:
 
 - Using the SimFL algorithm, we can produce a model that exceeds the performance of a baseline random classifier.
 - Training the SimFL algorithm on multiple datasets can produce a model which exceeds the performance of the same model trained on individual datasets.
-- Training a SimFL classifier on multiple datasets will give comparable results to training a normal decision boost tree. 
+- Training a SimFL classifier on multiple datasets will give comparable results to training a Extreme Gradient Boost (XGB) tree. 
 
 ### Constraints
 
@@ -138,7 +138,7 @@ The  SimFL models trained on individual sets were outperformed by the local XGBo
 
  In all cases the predictive performance of classifiers was not ideal and it is unclear whether every dataset is suitable for predicting customer churn. The SCL dataset shows much greater predictive potential than GFR. This could potentially be balanced out by adding more NGOs to the federation.
 
-It was clear that in this case the models trained on independent nodes performed best. If we were to choose a different algorithm to perform federated training/ predicition, [PATE](https://openreview.net/pdf?id=rkZB1XbRZ) style ensemble classifier could be approprite.
+It was clear that in this case the models trained on independent nodes performed best. If we were to choose a different algorithm to perform federated training/ predicition, [PATE](https://openreview.net/pdf?id=rkZB1XbRZ) style ensemble classifier could be appropriate.
 
 However, we know the SimFL algorithm works well in cases where datasets are uniformally distributed. Another promising route would be to perform extended feature exploration/ distribution analysis to diagnose issues of dissimilarity between datasets. 
 
@@ -200,15 +200,15 @@ While the SimFL learning model could be train in the distributed environment and
 
 ### Proposed Goals for Iteration 2
 
-- Improve upon SIMFL computational performance
+- Improve upon SimFL computational performance
 - Improve upon feature engineering of the GFR and SCL datasets
 - Establish priorities for feature engineering
 
 ## Deliverable Checklist
 - ```Fed_NGOs``` 
   - ```orchestrator_federated_clean.ipynb``` containing results for the single training example
-  - ```predictions_federated_shap_GFR_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by GFR. Pertains to SAIL optimised notebook.
-  - ```predictions_federated_shap_SCL_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by SCL. Pertains to SAIL optimised notebook.
+  - ```predictions_federated_shap_GFR_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by GFR.
+  - ```predictions_federated_shap_SCL_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by SCL. 
 - ```SCL_only```
   - ```orchestrator_Federated_clean.ipynb```, contains results from training SimFL on only SCL.
   - ```predictions_shap_SCL_test.csv```, contains predictions and shap values corresponding to SCL test.

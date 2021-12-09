@@ -207,11 +207,11 @@ While the SimFL learning model could be train in the distributed environment and
 ## Deliverable Checklist
 - ```Fed_NGOs``` 
   - ```orchestrator_federated_clean.ipynb``` containing results for the single training example
-  - ```predictions_federated_shap_GFR_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by GFR.
-  - ```predictions_federated_shap_SCL_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by SCL. 
+  - ```predictions_federated_shap_GFR_test.csv```, compressed folder containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by GFR.
+  - ```predictions_federated_shap_SCL_test.csv```, compressed folder containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by SCL. 
 - ```SCL_only```
   - ```orchestrator_Federated_clean.ipynb```, contains results from training SimFL on only SCL.
-  - ```predictions_shap_SCL_test.csv```, contains predictions and shap values corresponding to SCL test.
+  - ```predictions_shap_SCL_test.csv```, compressed folder contains predictions and shap values corresponding to SCL test.
 - ```GFR_only```
   - ```orchestrator_Federated_clean.ipynb```, contains results from training SimFL on only SCL.
-  - ```predictions_shap_GFR_test.csv```, contains predictions and shap values corresponding to SCL test.
+  - ```predictions_shap_GFR_test.csv```, compressed folder contains predictions and shap values corresponding to SCL test.

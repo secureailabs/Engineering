@@ -224,31 +224,6 @@ void Frontend::CacheDatasetsFromRemote(
 /********************************************************************************************
  *
  * @class Frontend
- * @function GetDigitalContractInformation
- * @brief Lookup in our local cache for information about a specific digital contract
- * @param[in] strDcGuid the string containing the GUID for the digital contract
- * @return StructuredBuffer - The Structured buffer containing the dc if it was found, empty otherwise
- *
- ********************************************************************************************/
-StructuredBuffer __thiscall Frontend::GetDigitalContractInformation(
-    _in const std::string& c_strDcGuid
-    ) const
-{
-    __DebugFunction();
-
-    StructuredBuffer oDigitalContractInformation;
-    auto stlFoundContract = m_stlDigitalContracts.find(c_strDcGuid);
-    if ( stlFoundContract != m_stlDigitalContracts.end() )
-    {
-        oDigitalContractInformation = stlFoundContract->second;
-    }
-
-    return oDigitalContractInformation;
-}
-
-/********************************************************************************************
- *
- * @class Frontend
  * @function GetDatasets
  * @brief Lookup in our local cache for the datasets we have and return them as a JSON string
  * @return std::string - Containing a list of our datasets in the form: GUID:Metadata
@@ -326,32 +301,16 @@ unsigned int Frontend::Login(
 /********************************************************************************************
  *
  * @class Frontend
- * @function GetListOfDigitalContracts
- * @brief Build a list of our cached digital contracts
- * @return std::string - Containing a list of our datasets in the form: GUID:Title,GUID:Title
+ * @function GetDigitalContracts
+ * @brief Lookup in our local cache for the digital contracts we have and return them as a JSON string
+ * @return std::string - Containing a JSON dictionary of our DCs in the form: GUID:Metadata
  *
  ********************************************************************************************/
-StructuredBuffer __thiscall Frontend::GetListOfDigitalContracts() const
+std::string __thiscall Frontend::GetDigitalContracts(void) const
 {
-    StructuredBuffer oDigitalContractList;
-    try
-    {
-        for ( const auto& oDigitalContractItr : m_stlDigitalContracts )
-        {
-            oDigitalContractList.PutString(oDigitalContractItr.first.c_str(), oDigitalContractItr.second.GetString("Title").c_str());
-        }
-    }
-    catch(const BaseException& oBaseException)
-    {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-    }
+    __DebugFunction();
 
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-
-    return oDigitalContractList;
+    return GetJsonForStructuredBufferMap(m_stlDigitalContracts);
 }
 
 /********************************************************************************************
@@ -470,60 +429,16 @@ int __thiscall Frontend::LoadSafeObjects(
 /********************************************************************************************
  *
  * @class Frontend
- * @function GetListOfSafeFunctions
+ * @function GetSafeFunctions
  * @brief Build a list of safe functions available
- * @return std::string - Containing a list of our safe functions in the form: GUID:Title,GUID:Title
+ * @return std::string - Containing a list of our safe functions in the form: GUID:Metadata
  *
  ********************************************************************************************/
-StructuredBuffer Frontend::GetListOfSafeFunctions(
-    void
-    ) const
+std::string __thiscall Frontend::GetSafeFunctions(void) const
 {
     __DebugFunction();
 
-    StructuredBuffer oSafeFuncList;
-    try
-    {
-        for ( const auto& oSafeObjItr : m_stlAvailableSafeFunctions )
-        {
-            oSafeFuncList.PutString(oSafeObjItr.first.c_str(), oSafeObjItr.second.GetString("Title").c_str());
-        }
-    }
-    catch(const BaseException& oBaseException)
-    {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-    }
-
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-
-    return oSafeFuncList;
-}
-
-/********************************************************************************************
- *
- * @class Frontend
- * @function GetSafeFunctionInformation
- * @brief Extract the information about a safe function
- * @return StructuredBuffer - The Structured Buffer containing the safe function information
- *
- ********************************************************************************************/
-StructuredBuffer Frontend::GetSafeFunctionInformation(
-    _in const std::string& c_strSafeFunctionId
-    ) const
-{
-    __DebugFunction();
-
-    StructuredBuffer oSafeFunctionInformation;
-    auto stlFoundSafeFunction = m_stlAvailableSafeFunctions.find(c_strSafeFunctionId);
-    if ( stlFoundSafeFunction != m_stlAvailableSafeFunctions.end() )
-    {
-        oSafeFunctionInformation = stlFoundSafeFunction->second;
-    }
-
-    return oSafeFunctionInformation;
+    return GetJsonForStructuredBufferMap(m_stlAvailableSafeFunctions);
 }
 
 void __thiscall Frontend::Listener(

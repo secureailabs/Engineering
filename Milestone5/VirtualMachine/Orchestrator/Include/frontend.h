@@ -82,23 +82,15 @@ class Frontend : public Object{
 
         void __thiscall ExitCurrentSession(void);
 
-        StructuredBuffer __thiscall GetListOfSafeFunctions(void) const;
+        std::string __thiscall GetSafeFunctions(void) const;
 
         std::string GetDatasets(void) const;
-
-        StructuredBuffer GetSafeFunctionInformation(
-            _in const std::string& strSafeFunctionId
-        ) const;
 
         int __thiscall LoadSafeObjects(
             _in const std::string& c_strSafeObjectDirectory
         );
 
-        StructuredBuffer __thiscall GetListOfDigitalContracts(void) const;
-
-        StructuredBuffer __thiscall GetDigitalContractInformation(
-            _in const std::string& strDcGuid
-        ) const;
+        std::string __thiscall GetDigitalContracts(void) const;
 
         void __thiscall HandleSubmitJob
         (

@@ -81,8 +81,7 @@ The WebAPI allows data owners to accept contract requests and for researchers to
 
 ## Results
 
-<p align="center">
-<table>
+<table align="center">
 <tr><th>SCL Results</th><th>GFR Results</th></tr>
 <tr><td>
 
@@ -104,7 +103,6 @@ The WebAPI allows data owners to accept contract requests and for researchers to
 | Local XGBoost     |      0.03      |
 
 </td></tr> </table>
-</p>
 
 <p align="center">
   <table>

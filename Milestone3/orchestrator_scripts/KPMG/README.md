@@ -165,9 +165,17 @@ The first is that there are a large number of NaN values in the dataset. NaN val
 #### Dataset Incongruence
 The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. We were able to pick up on this potential through disparities found between the SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. We've attached shap output for each model trained individually. However, our ability to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
 
-<p align='center'>
-    <img src="images\GFR_SHAP_Beeswarm.png" height=400>
-    <img src="images\SCL_SHAP_Beeswarm.png" height=400>
+<table  align='center'>
+<tr><th>GFR SHAP Beeswarm</th><th>SCL SHAP Beeswarm</th></tr>
+<tr><td>
+    <img src="images\GFR_SHAP_Beeswarm.png" >
+</td>
+<td>
+    <img src="images\SCL_SHAP_Beeswarm.png">
+</td><td>
+</td></tr> </table>
+
+</p>
 
 #### Potential Date Formatting Logic Error
 There is a potential logic error in the way that date is where churn is allocated to dates. This compares year then month. However, it is unclear whether this compensates for months between November and February where there will be no wrap around for time periods between months 10 and 02 of the following year.
@@ -210,8 +218,8 @@ While the SimFL learning model could be train in the distributed environment and
   - ```predictions_federated_shap_GFR_test.csv```, compressed folder containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by GFR.
   - ```predictions_federated_shap_SCL_test.csv```, compressed folder containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by SCL. 
 - ```SCL_only```
-  - ```orchestrator_Federated_clean.ipynb```, contains results from training SimFL on only SCL.
+  - ```orchestrator_SCL_only_clean.ipynb```, contains results from training SimFL on only SCL.
   - ```predictions_shap_SCL_test.csv```, compressed folder contains predictions and shap values corresponding to SCL test.
 - ```GFR_only```
-  - ```orchestrator_Federated_clean.ipynb```, contains results from training SimFL on only SCL.
+  - ```orchestrator_GFR_only_clean.ipynb```, contains results from training SimFL on only SCL.
   - ```predictions_shap_GFR_test.csv```, compressed folder contains predictions and shap values corresponding to SCL test.

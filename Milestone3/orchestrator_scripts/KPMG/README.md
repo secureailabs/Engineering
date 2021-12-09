@@ -82,7 +82,7 @@ The WebAPI allows data owners to accept contract requests and for researchers to
 
 ## Results
 
-<p align=center>
+<p align="center">
 <table>
 <tr><th>SCL Results</th><th>GFR Results</th></tr>
 <tr><td>
@@ -139,7 +139,7 @@ It's unclear whether this disparity can explain the poor performance of the fede
 
 The  SimFL models trained on individual sets were outperformed by the local XGBoost model trained under ideal conditions. A small loss in performance is to be expected with potential information lost during the LSH phase of preprocessing. 
 
- In all cases the predictive performance of classifiers was not ideal and it is unclear whether every dataset is suitable for predicting customer churn. The SCL dataset shows much greater predictive potential than SCL. This could potentially be balanced out by adding more NGOs to the federation.
+ In all cases the predictive performance of classifiers was not ideal and it is unclear whether every dataset is suitable for predicting customer churn. The SCL dataset shows much greater predictive potential than GFR. This could potentially be balanced out by adding more NGOs to the federation.
 
 It was clear that in this case the models trained on independent nodes performed best. If we were to choose a different algorithm to perform federated training/ predicition, [PATE](https://openreview.net/pdf?id=rkZB1XbRZ) style ensemble classifier could be approprite.
 

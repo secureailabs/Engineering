@@ -6,7 +6,6 @@
 - Implement horizontally Federated Learning using SAIL platform
   - Create prediction csv files which will be consumed by the NGOs
   - Predictions made must be explainable with Shapley values
-  - implement hyperparameter optimization for federated model training
 - Feature Engineering 
   - Generate output which will inform future iterations of feature engineering code
 
@@ -159,20 +158,20 @@ While consistent with centralized learning, the SimFL implementation was found t
 The SimFL algorithm is running on distributed infrastructure and this adds a layer of complexity. We need to expand upon features on the orchestrator side to negotiate this training sequence with the remote VMs in parallel. A lack of parallelization makes this slow to run to completion. Slow processing speeds severely inhibit our ability to run hyperparameter optimization over a large number of iterations. This is an issue which will be resolved by SAIL in future iterations.
 
 
-## Data Issues
+### Data Issues
 There are a number of points where we believe we could improve the model performance by enhancing the feature engineering sections.
 
-### Improved Data Imputation
+#### Improved Data Imputation
 The first is that there are a large number of NaN values in the dataset. NaN values cannot be hashed properly by SimFL and so we change all NaN values to 0 by default in the preprocessing script. However, we believe it would yield better results if these data points were to be imputed with something meaningful for that column; the mean value for example.
 
-### Dataset Incongruence
+#### Dataset Incongruence
 The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. We were able to pick up on this potential through disparities found between the SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. We've attached shap output for each model trained individually. However, our ability to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
 
 <p align=center>
     <img src="images\GFR_SHAP_Beeswarm.png" height=400>
     <img src="images\SCL_SHAP_Beeswarm.png" height=400>
 
-### Potential Date Formatting Logic Error
+#### Potential Date Formatting Logic Error
 There is a potential logic error in the way that date is where churn is allocated to dates. This compares year then month. However, it is unclear whether this compensates for months between November and February where there will be no wrap around for time periods between months 10 and 02 of the following year.
 
 ```
@@ -181,25 +180,25 @@ agg_df["is_churned_within3m"] = np.where((agg_df['CancelDate_y_min'].dt.year <= 
                                    (agg_df['CancelDate_y_min'].dt.month <= agg_df["PaymentDate_"].dt.month+3), True, False)
 ```
 
-### Covid Data Drift
+#### Covid Data Drift
 A time series model may be frustrated by a change in consumer behavior over the last year. Covid has likely caused new competition between NGOs which may skew instances gathered more recently. This is likely compounded by the economic impact of the virus. We believe this may be a source of data drift. We can avoid this by trimming a large amount of the old data. 
 
-### Feature Reduction
+#### Feature Reduction
 Currently we run the model over 80 features. However, according to our SHAP plots, a large number of these are not useful. We would recommend making a cut-off to just the features included in the diagram below. Unnecessary features create unnecessary noise for the model to deal with. We recommend you choose only a minority of these features. Below they are listed in order of importance.
 
 <p align=center>
     <img src="images\too_many_features.png" style="transform:rotate(270deg);" height=600>
 <p>
 
-### Postcode Feature Generation
+#### Postcode Feature Generation
 We see that postcode is a feature in your dataset. We can combine this with government statistics on postcodes to generate features relating to the customer demographic. For example, in Scotland we have the [Scottish Index of Multiple Deprivation (SIMD)](https://www.gov.scot/collections/scottish-index-of-multiple-deprivation-2020/). This is publicly maintained data which associates postcodes into quintile, decile and vigntile ranks. This can be an informative feature relating to customer demographic. This strategy could be applicable in the feature engineering here. 
 
-### NGO Feature
-In order to stem with potential incongruence between datasets, we recommend a categorical feature to be added to each instance which indicates which dataset it belongs to.
+#### NGO Indicator Feature
+In order to stem potential incongruence between datasets, we recommend a categorical feature to be added to each instance which indicates which dataset it belongs to.
 
 
-## Conclusions
-While the SimFL learning model could be train in the distributed environment and exceed the performance of the baseline, the extent to which this was exceeded is poor. In this case the model trained on the federated sets was the least performant.
+## Conclusion
+While the SimFL learning model could be train in the distributed environment and exceed the performance of the baseline, the extent to which this was exceeded is poor. In this case the model trained on the federated sets was the least performant. In this iteration, we have been unsuccessful in meeting this requirement of the study and we should consider how to proceed with Iteration 2.
 
 ### Proposed Goals for Iteration 2
 

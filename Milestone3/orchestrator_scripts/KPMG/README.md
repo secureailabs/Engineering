@@ -18,16 +18,13 @@ We perform remote learning in four scenarios:
 
 - We execute remote learning on only the SCL dataset
 - We execute remote learning on only the GFR dataset 
-- We execute federated learning on both datasets GFR and SCL with hyperparameters chosen by SAIL
-- We compute federated training on both datasets GFR and SCL with limited hyperparameter optimisation
+- We execute federated learning on both datasets GFR and SCL
 
 ### Hypotheses
 
-- Federated learning using SimFL can produce a model that exceeds the performance of a baseline random classifier.
-- Federated learning using SimFL can produce a model that exceeds the performance of models trained individually.
-- The features contained in the GFR and SCL datasets contain appropriate information to predict customer churn.
-- predictions made by a federated algorithm will provide more robust predictions for the NGOs than models trained individually.
-- The SAIL platform is capable of performing remote data science on the datasets produced by GFR and SCL.
+- Using the SimFL algorithm, we can produce a model that exceeds the performance of a baseline random classifier.
+- Training the SimFL algorithm on multiple datasets can produce a model which exceeds the performance of the same model trained on individual datasets.
+- Training a SimFL classifier on multiple datasets will give comparable results to training a normal decision boost tree. 
 
 ### Constraints
 
@@ -35,28 +32,6 @@ We perform remote learning in four scenarios:
 - The Researcher must only compute on data through the use of code contained in safe functions.
 - The Researcher may only consume the outputs of safe functions
 - The outputs of safe functions must not compromise the privacy of the researcher
-
-### Remote Execution Platform: SAIL
-
-The SAIL platform consists of 6 base components. These are utilised to create a secure environment which facilitates federated learning. 
-
-#### The Dataset Specifiction Tool (DST)
-The DST is used by Data Owners to specify their data in the appropriate format to be consumed by the rest of the infrastructure.
-
-#### The Remote Data Connector (RDC)
-The RDC uploads a given dataset or group of datasets associated with a digital contract to a remote secure execution environment.
-
-#### The Trusted Execution Environment (TEE)
-The TEE is a VM which is initialised once a contract is provisioned. The TEE receives a dataset from the RDC and executes Safe Functions supplied by the Orchestrator. Once execution is complete, the TEE is destroyed along with all data contents. The TEE can only execute SAIL minted Safe Functions and has strong logging mechanisms for audit.
-
-#### Safe Functions (SFs)
-Safe Functions are the core component of the remote execution infrastructure. These are immutable pieces of code which have been defined, tested and hardened against security leakage. The purpose of safe functions is to facilitate contextually appropriate privacy-preserving information flows between the secret assets on the TEE and the Orchestrator.
-
-#### The Orchestrator
-The Orchestrator is a python library designed to used inside a jupyter notebook environment. This can also be executed as a pure python script. The Orchestrator connects to the TEE and supplies SFs in order to perform some computation flow on the data and return the result.
-
-#### The SAIL WebAPI
-The WebAPI allows data owners to accept contract requests and for researchers to discover data, propose contracts for this data and provision TEEs to operate on it.
 
 ### The Algorithm: SimFL
 In this iteration we implement a horizontal federated learning experiment using the SimFL algorithmm as outlined in [Practical Federated Gradient Boosting Decision Trees](https://arxiv.org/pdf/1911.04206.pdf). SimFL implements a version of gradient boosting decision trees where each party boosts a number of trees by exploiting shared similarity information based on [Locality Sensitive Hashing (LSH)](https://www.researchgate.net/publication/2634460_Similarity_Search_in_High_Dimensions_via_Hashing). The SimFl algorithm has two distinct phases; the preprocessing phase and the training phase.
@@ -73,7 +48,7 @@ With the similarity matrix collaboratively produced by each party, each party tr
 
 ### The Data: NGO Federation Customer Churn
 
-The datasets used to train our model were provided by a federation set of two NGOs who will be referred to as SCL and GFR. These datasets are composed of a set of three tables which are preprocessed into a time series format where each instance represents whether a customer has churned or not at a given date. Instances are indexed by the unique customer GUID and the data at which this instance is measuring. 
+The datasets used to train our model were provided by a federation of two NGOs who are referred to as SCL and GFR. These datasets are composed of three tables which are preprocessed into a time series format where each instance represents whether a customer has churned. Instances are indexed by the unique customer GUID and the data at which this instance is measuring. 
 
 The target of our prediction is a binary class indicating whether a customer has churned in the last three months. The target class is extremely imbalanced with 78 negative instances to every 1 positive instance in the GFR dataset and 61 to 1 in the case of SCL. There are around 80 features to the data. By ethical and legal requirement, specifics of the dataset remain unknown to the researchers.
 
@@ -83,94 +58,121 @@ For purposes of this experiment the data has been split into 3 chunks:
 - The `validation set`, used to understand model performance
 - The `test set`, used to generate predictions and Shapley values on most recent cases to be consumed by NGOs in the federation
 
-## Evaluation Results
+### Remote Execution Platform: SAIL
 
-### SimFL SCL Only  Results
+The SAIL platform consists of 6 base components. These are utilized to create a secure environment which facilitates federated learning. 
 
-| Model    | Avg. Precision | Avg. Recall |
-| :------- | :------------- | :---------- |
-| Baseline | 0.01           |             |
-| KPMG     | 0.07           |             |
-| SAIL     | 0.12           | 0.06        |
+#### The Dataset Specifiction Tool (DST)
+The DST is used by Data Owners to specify their data in the appropriate format to be consumed by the rest of the infrastructure.
 
-#### KPMG Precision/ Recall Curve 
-<p align="left">
-    <img src="images\SCL_KPMG_AUC.png" height=300> 
+#### The Remote Data Connector (RDC)
+The RDC uploads a given dataset or group of datasets associated with a digital contract to a remote secure execution environment.
+
+#### The Secure VM (SVM)
+The SVM is a VM which is initialized once a contract is provisioned. The SVM receives a dataset from the RDC and executes Safe Functions supplied by the Orchestrator. Once execution is complete, the SVM is destroyed along with all data contents. The SVM can only execute SAIL minted Safe Functions and has strong logging mechanisms for audit.
+
+#### Safe Functions (SFs)
+Safe Functions are the core component of the remote execution infrastructure. These are immutable pieces of code which have been defined, tested and hardened against security leakage. The purpose of safe functions is to facilitate contextually appropriate privacy-preserving information flows between the secret assets on the SVM and the Orchestrator.
+
+#### The Orchestrator
+The Orchestrator is a python library designed to used inside a jupyter notebook environment. This can also be executed as a pure python script. The Orchestrator connects to the SVM and supplies SFs in order to perform some computation flow on the data and return the result.
+
+#### The SAIL WebAPI
+The WebAPI allows data owners to accept contract requests and for researchers to discover data, propose contracts for this data and provision SVMs to operate on it.
+
+## Results
+
+<p align=center>
+<table>
+<tr><th>SCL Results</th><th>GFR Results</th></tr>
+<tr><td>
+
+| Model             | Avg. Precision |
+| ----------------- | :------------: |
+| Baseline          |     0.015      |
+| Single Node SimFL |     0.065      |
+| Federated SimFL   |     0.058      |
+| Local XGBoost     |      0.07      |
+
+
+</td><td>
+
+| Model             | Avg. Precision |
+| ----------------- | :------------: |
+| Baseline          |     0.011      |
+| Single Node SimFL |     0.020      |
+| Federated SimFL   |     0.017      |
+| Local XGBoost     |      0.03      |
+
+</td></tr> </table>
 </p>
 
-#### SAIL Precision/ Recall Curve
-<p align="left">
-    <img src="images\SCL_only_AUC.png" height=300>
+<p align="center">
+  <table>
+<tr><th>SCL Single Node SimFL</th><th>SCL Federated SimFL</th><th>SCL Local XGBoost</th></tr>
+<tr><td>
+    <img src="images\SCL_only_AUC.png"> 
+</td><td>
+    <img src="images\SCL_FED_AUC.png" >
+</td><td>
+    <img src="images\SCL_KPMG_AUC.png">
+</td></tr> </table>
 </p>
 
-### SimFL GFR only Evaluation Results
-
-| Model    | Avg. Precision | Avg. Recall |
-| :------- | :------------- | :---------- |
-| Baseline | 0.015          |             |
-| KPMG     | 0.03           |             |
-| SAIL     | 0.38           | 0.013       |
-
-#### KPMG Precision/ Recall Curve 
-<p align="left">
-    <img src="images\GFR_KPMG_AUC.png" height=300> 
+<p align="center">
+  <table>
+<tr><th>GFR Single Node SimFL</th><th>GFR Federated SimFL</th><th>GFR Local XGBoost</th></tr>
+<tr><td>
+    <img src="images\GFR_only_AUC.png"> 
+</td><td>
+    <img src="images\GFR_FED_AUC.png">
+</td><td>
+    <img src="images\GFR_KPMG_AUC.png">
+</td></tr> </table>
 </p>
 
-#### SAIL Precision/ Recall Curve
-<p align="left">
-    <img src="images\GFR_only_AUC.png" height=300>
-</p>
+## Discussion
 
-### SIMFL Federated Evaluation Results
+The baseline model performance was exceeded by all classifiers. This demonstrates that models were able to develop some degree of skill after learning the training sets. However, the extent of this differs greatly between the two datasets. The model with greatest performance achieves average precision 0.07 with SCL and GFR at 0.03. This is a substantive difference. 
 
-| Model        | Avg. Precision | Avg. Recall |
-| :----------- | :------------- | :---------- |
-| Baseline     | 0.011          |             |
-| SAIL         | 0.11           | 0.026       |
-| Optuna Model | 0.07           | 0.026       |
+It's unclear whether this disparity can explain the poor performance of the federated classifier. It was demonstrated that in the case of the GFR and SCL, federated training did not produce results which exceeded either model trained individually. The federated classifier was unable to match the average precision of either the locally trained xgboost model or the SimFL model trained on the individual datasets. Data drift could account for this lack of coherence. 
 
-#### SAIL Optimised Model
-<p align="left">
-    <img src="images\federated_normal_AUC.png" height=300>
-</p>
+The  SimFL models trained on individual sets were outperformed by the local XGBoost model trained under ideal conditions. A small loss in performance is to be expected with potential information lost during the LSH phase of preprocessing. 
 
-#### Optuna Optimised Model
-<p align="left">
-    <img src="images\federated_optimised_AUC.png" height=300>
-</p>
+ In all cases the predictive performance of classifiers was not ideal and it is unclear whether every dataset is suitable for predicting customer churn. The SCL dataset shows much greater predictive potential than SCL. This could potentially be balanced out by adding more NGOs to the federation.
 
-### Discussion
+It was clear that in this case the models trained on independent nodes performed best. If we were to choose a different algorithm to perform federated training/ predicition, [PATE](https://openreview.net/pdf?id=rkZB1XbRZ) style ensemble classifier could be approprite.
 
-The SimFL algorithm was able to train on remote data as effectively as in ideal conditions. In all cases the baseline model performance was exceeded but predictive performance remains poor overall. It is unclear at this stage whether the data in SCL and GFR has the potential to effectively predict customer churn. This should be a topic of investigation for Iteration 2.
+However, we know the SimFL algorithm works well in cases where datasets are uniformally distributed. Another promising route would be to perform extended feature exploration/ distribution analysis to diagnose issues of dissimilarity between datasets. 
 
-The results produced by KPMG under ideal conditions were roughly matched by the experiments run on the individual datasets. However, the federated model is less performant on both datasets than the SCL predictor is alone.
+## Known Issues
 
-#### Algorithm/ Infrastructure Issues
+### Algorithm/ Infrastructure Issues
 
-The SimFL algorithm we are using is still in beta stage. We ran into a number of issues when processing the data.
+While implementing the SimFL algorithm on the SAIL infrastructure, we ran into a number of issues. These were largely discovered and fixed during the course of Iteration 1. However, issues still persist:
 
-##### Memory Consumption
+- Memory Consumption
+- Complications in SimFL Parallelization 
+
 While consistent with centralized learning, the SimFL implementation was found to be quite inefficient when processing larger datasets. Intensive memory usage makes this build unstable and causes complications in state management in our infrastructure. SAIL will address this memory consumption issue in the next iteration. 
 
-##### Distribution of data resources Complicates Parallelization of Exectution
 The SimFL algorithm is running on distributed infrastructure and this adds a layer of complexity. We need to expand upon features on the orchestrator side to negotiate this training sequence with the remote VMs in parallel. A lack of parallelization makes this slow to run to completion. Slow processing speeds severely inhibit our ability to run hyperparameter optimization over a large number of iterations. This is an issue which will be resolved by SAIL in future iterations.
 
 
-#### Feature Engineering Output
-
+## Data Issues
 There are a number of points where we believe we could improve the model performance by enhancing the feature engineering sections.
 
-##### Improved Data Imputation
+### Improved Data Imputation
 The first is that there are a large number of NaN values in the dataset. NaN values cannot be hashed properly by SimFL and so we change all NaN values to 0 by default in the preprocessing script. However, we believe it would yield better results if these data points were to be imputed with something meaningful for that column; the mean value for example.
 
-##### Dataset Incongruence
-The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. We were able to pick up on this potential through disparities found between the SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. Our ability to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
+### Dataset Incongruence
+The predictive performance of the federated model can partially be explained by structural dissimilarities between datasets SCL and GFR. Further investigation should go into this by the data owner federation. We were able to pick up on this potential through disparities found between the SHAP bee swarm plots (See below). While differences in SHAP output can be explained through covariance between features in specific examples, it can also mean that the structure learned by the model is incongruent. We've attached shap output for each model trained individually. However, our ability to accurately diagnose and fix is limited/ time expensive due to privacy constraints.
 
 <p align=center>
     <img src="images\GFR_SHAP_Beeswarm.png" height=400>
     <img src="images\SCL_SHAP_Beeswarm.png" height=400>
 
-##### Potential Date Formatting Logic Error
+### Potential Date Formatting Logic Error
 There is a potential logic error in the way that date is where churn is allocated to dates. This compares year then month. However, it is unclear whether this compensates for months between November and February where there will be no wrap around for time periods between months 10 and 02 of the following year.
 
 ```
@@ -179,34 +181,35 @@ agg_df["is_churned_within3m"] = np.where((agg_df['CancelDate_y_min'].dt.year <= 
                                    (agg_df['CancelDate_y_min'].dt.month <= agg_df["PaymentDate_"].dt.month+3), True, False)
 ```
 
-##### Covid Data Drift
+### Covid Data Drift
 A time series model may be frustrated by a change in consumer behavior over the last year. Covid has likely caused new competition between NGOs which may skew instances gathered more recently. This is likely compounded by the economic impact of the virus. We believe this may be a source of data drift. We can avoid this by trimming a large amount of the old data. 
 
-##### Feature Reduction
+### Feature Reduction
 Currently we run the model over 80 features. However, according to our SHAP plots, a large number of these are not useful. We would recommend making a cut-off to just the features included in the diagram below. Unnecessary features create unnecessary noise for the model to deal with. We recommend you choose only a minority of these features. Below they are listed in order of importance.
 
 <p align=center>
     <img src="images\too_many_features.png" style="transform:rotate(270deg);" height=600>
 <p>
 
+### Postcode Feature Generation
+We see that postcode is a feature in your dataset. We can combine this with government statistics on postcodes to generate features relating to the customer demographic. For example, in Scotland we have the [Scottish Index of Multiple Deprivation (SIMD)](https://www.gov.scot/collections/scottish-index-of-multiple-deprivation-2020/). This is publicly maintained data which associates postcodes into quintile, decile and vigntile ranks. This can be an informative feature relating to customer demographic. This strategy could be applicable in the feature engineering here. 
 
-### Conclusions
-The SimFL learning model was able to successfully train in the distributed environment and exceed the performance of the baseline. The extent to which this was exceeded is low but consistent with centralizeded learning in the ocntext of this data. The federated learning model was more performant than GFR but less performant when predicting upon SCL. However, this is likely due to poor predictive power of GFR. It is unclear to us at this time whether the datasets contain enough information to effectively predict customer churn. 
+### NGO Feature
+In order to stem with potential incongruence between datasets, we recommend a categorical feature to be added to each instance which indicates which dataset it belongs to.
 
-#### Proposed Goals for Iteration 2
+
+## Conclusions
+While the SimFL learning model could be train in the distributed environment and exceed the performance of the baseline, the extent to which this was exceeded is poor. In this case the model trained on the federated sets was the least performant.
+
+### Proposed Goals for Iteration 2
 
 - Improve upon SIMFL computational performance
 - Improve upon feature engineering of the GFR and SCL datasets
-- Complete iteration 
-
+- Establish priorities for feature engineering
 
 ## Deliverable Checklist
 - ```Fed_NGOs``` 
-  - ```hyperparameter_opt_clean.ipynb``` containing results for the single training example
   - ```orchestrator_federated_clean.ipynb``` containing results for the single training example
-  - ```study_federated_SCL_GFR.pkl``` a pickled ```Optuna``` study object used to reinitiate the hyperparameter optimisation after termination.
-  - ```predictions_federated_optimised_shap_GFR_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by GFR. Pertains to Optuna optimised notebook.
-  - ```predictions_federated_optimised_shap_SCL_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by SCL.  Pertains to Optuna optimised notebook.
   - ```predictions_federated_shap_GFR_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by GFR. Pertains to SAIL optimised notebook.
   - ```predictions_federated_shap_SCL_test.csv```, containing predictions and shap values corresponding to the predictions of the test dataset of GFR, to be consumed by SCL. Pertains to SAIL optimised notebook.
 - ```SCL_only```

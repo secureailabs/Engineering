@@ -136,7 +136,7 @@ std::vector<Byte> __stdcall GetTlsTransaction(
             }
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -196,7 +196,7 @@ bool __stdcall PutTlsTransaction(
             fSuccess = true;
         }
     }
-    catch(BaseException oBaseException)
+    catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -309,6 +309,50 @@ bool __stdcall PutHttpHeaderOnlyResponse(
     oTlsNode.Write(reinterpret_cast<const Byte*>(strResponseHeader.c_str()), strResponseHeader.length());
 
     return true;
+}
+
+/********************************************************************************************
+ *
+ * @function PutStructuredBuffer
+ * @brief Function to send a serialized StructuredBuffer through a TLS node
+ * @param[in] oTlsNode Reference to the TlsNode object connected to remote node
+ * @param[in] oStructuredBuffer The StructuredBuffer to send
+ * @return true on success, otherwise false
+ *
+ ********************************************************************************************/
+bool __stdcall PutStructuredBufferResponse(
+    _in TlsNode& oTlsNode,
+    _in const StructuredBuffer& oStructuredBuffer
+    )
+{
+    bool fResult{false};
+    try
+    {
+        // Create a response packet
+        unsigned int unSerializedBufferSizeInBytes = sizeof(uint32_t) + oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
+        std::vector<Byte> stlSerializedBuffer(unSerializedBufferSizeInBytes);
+        Byte * pbSerializedBuffer = (Byte *) stlSerializedBuffer.data();
+        *((uint32_t *) pbSerializedBuffer) = (uint32_t) oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
+        pbSerializedBuffer += sizeof(uint32_t);
+        ::memcpy((void *) pbSerializedBuffer, (const void *) oStructuredBuffer.GetSerializedBufferRawDataPtr(), oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
+        pbSerializedBuffer += oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
+
+        // Send back response data
+        oTlsNode.Write((const Byte *)stlSerializedBuffer.data(), stlSerializedBuffer.size());
+        fResult = true;
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        fResult = false;
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        fResult = false;
+    }
+
+    return fResult;
 }
 
 /********************************************************************************************/

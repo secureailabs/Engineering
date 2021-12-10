@@ -42,3 +42,8 @@ extern bool __stdcall PutHttpHeaderOnlyResponse(
     _in Dword dStatus,
     _in const std::string& strStatus
 );
+
+extern bool __stdcall PutStructuredBufferResponse(
+    _in TlsNode& oTlsNode,
+    _in const StructuredBuffer& oStructuredBuffer
+);

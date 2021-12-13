@@ -210,7 +210,7 @@ void __thiscall RestFramework::RunServer(void)
                     std::cout << "There are " << poRestFrameworkRuntimeData->GetNumberOfActiveConnections() << " connections alive (max " << c_unActiveConnectionThreshold << ") refusing incoming connection" << std::endl;
                     StructuredBuffer oResponseStructuredBuffer;
                     oResponseStructuredBuffer.PutDword("Status", 503);
-                    ::PutStructuredBufferResponse(*poTlsNode, oResponseStructuredBuffer);
+                    ::PutDatabaseGatewayResponse(*poTlsNode, oResponseStructuredBuffer);
                     poTlsNode->Release();
                 }
                 else

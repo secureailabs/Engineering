@@ -261,7 +261,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         }
         else
         {
-            PutStructuredBufferResponse(*poTlsNode, oResponseStructuredBuffer);
+            ::PutDatabaseGatewayResponse(*poTlsNode, oResponseStructuredBuffer);
         }
         // Delete the allocated parameter
         oLocalSmartMemoryAllocator.Deallocate(pbSerializedResponseBuffer);

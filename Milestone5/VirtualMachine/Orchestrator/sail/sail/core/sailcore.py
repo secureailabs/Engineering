@@ -30,6 +30,9 @@ def get_digital_contract_information(dcGuid):
 def load_safe_objects(safe_object_dir):
     return SAILPyAPI.load_safe_objects(safe_object_dir)
 
+def get_datasets():
+    return SAILPyAPI.get_datasets()
+
 def newguid():
     return SAILPyAPI.createguid()
 

@@ -161,6 +161,14 @@ static PyObject* get_list_of_digital_contracts(
     return Py_BuildValue("s", strJsonResult.c_str());
 }
 
+static PyObject* get_datasets(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    return Py_BuildValue("s", getFrontend().GetDatasets().c_str());
+}
+
 static PyObject* get_digital_contract_information(
     _in PyObject* self,
     _in PyObject* args
@@ -549,6 +557,7 @@ static PyMethodDef SAILAPIMethods [] =
     {"load_safe_objects", (PyCFunction)load_safe_objects, METH_VARARGS,NULL},
     {"get_list_of_digital_contracts", (PyCFunction)get_list_of_digital_contracts, METH_NOARGS,NULL},
     {"get_digital_contract_information", (PyCFunction)get_digital_contract_information, METH_VARARGS, NULL},
+    {"get_datasets", (PyCFunction)get_datasets, METH_NOARGS, NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},
     {"pushdata", (PyCFunction)pushdata, METH_VARARGS, NULL},
     {"pulldata", (PyCFunction)pulldata, METH_VARARGS, NULL},

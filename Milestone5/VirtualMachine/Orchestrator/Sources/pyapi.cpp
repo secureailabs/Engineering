@@ -57,60 +57,9 @@ static PyObject* exit_current_session(PyObject * self, PyObject * args)
     return Py_BuildValue("s", "exited");
 }
 
-static PyObject* get_safe_function_information(
-    _in PyObject* self,
-    _in PyObject* args
-    )
+static PyObject* get_safe_functions(PyObject* self, PyObject* args)
 {
-    const char* c_szSafeFnGUID;
-    if(!PyArg_ParseTuple(args, "s", &c_szSafeFnGUID))
-    {
-        return nullptr;
-    }
-
-    const std::string strSafeFNGuid(c_szSafeFnGUID);
-    StructuredBuffer oSafeFnInformation = getFrontend().GetSafeFunctionInformation(strSafeFNGuid);
-
-    std::string strJsonResult = "";
-    if ( oSafeFnInformation.GetNamesOfElements().size() > 0 )
-    {
-        JsonValue* oJsonValue = JsonValue::ParseStructuredBufferToJson(oSafeFnInformation);
-        strJsonResult = oJsonValue->ToString();
-        oJsonValue->Release();
-    }
-
-    return Py_BuildValue("s", strJsonResult.c_str());
-}
-
-static PyObject* get_list_of_safe_functions(PyObject* self, PyObject* args)
-{
-    const StructuredBuffer oListOfSafeFunctions = getFrontend().GetListOfSafeFunctions();
-
-    std::string strJsonResult = "";
-    JsonValue* oJsonValue = nullptr;
-    try
-    {
-        if ( 0 < oListOfSafeFunctions.GetNamesOfElements().size() )
-        {
-            oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfSafeFunctions);
-            strJsonResult = oJsonValue->ToString();
-            oJsonValue->Release();
-            oJsonValue = nullptr;
-        }
-    }
-    catch(const BaseException& oBaseException)
-    {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-    }
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-    if ( nullptr != oJsonValue )
-    {
-        oJsonValue->Release();
-    }
-    return Py_BuildValue("s", strJsonResult.c_str());
+    return Py_BuildValue("s",  getFrontend().GetSafeFunctions().c_str());
 }
 
 static PyObject* load_safe_objects(PyObject* self, PyObject* args)
@@ -126,39 +75,12 @@ static PyObject* load_safe_objects(PyObject* self, PyObject* args)
     return Py_BuildValue("i", getFrontend().LoadSafeObjects(strDirectory));
 }
 
-static PyObject* get_list_of_digital_contracts(
+static PyObject* get_digital_contracts(
     _in PyObject* self,
     _in PyObject* args
     )
 {
-
-    const StructuredBuffer oListOfDigitalContracts = getFrontend().GetListOfDigitalContracts();
-
-    std::string strJsonResult = "";
-    JsonValue* oJsonValue = nullptr;
-    try
-    {
-        if ( 0 < oListOfDigitalContracts.GetNamesOfElements().size() )
-        {
-            oJsonValue = JsonValue::ParseStructuredBufferToJson(oListOfDigitalContracts);
-            strJsonResult = oJsonValue->ToString();
-            oJsonValue->Release();
-            oJsonValue = nullptr;
-        }
-    }
-    catch(const BaseException& oBaseException)
-    {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-    }
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-    if ( nullptr != oJsonValue )
-    {
-        oJsonValue->Release();
-    }
-    return Py_BuildValue("s", strJsonResult.c_str());
+    return Py_BuildValue("s", getFrontend().GetDigitalContracts().c_str());
 }
 
 static PyObject* get_datasets(
@@ -167,52 +89,6 @@ static PyObject* get_datasets(
     )
 {
     return Py_BuildValue("s", getFrontend().GetDatasets().c_str());
-}
-
-static PyObject* get_digital_contract_information(
-    _in PyObject* self,
-    _in PyObject* args
-    )
-{
-    const char* szDcGuid;
-    if(!PyArg_ParseTuple(args, "s", &szDcGuid))
-    {
-        return nullptr;
-    }
-
-    const std::string strDcGuid(szDcGuid);
-    StructuredBuffer oDcInformation;
-    std::string strJsonResult = "";
-    JsonValue* oJsonValue = nullptr;
-    try
-    {
-        oDcInformation = getFrontend().GetDigitalContractInformation(strDcGuid);
-
-        if ( oDcInformation.GetNamesOfElements().size() > 0 )
-        {
-            JsonValue* oJsonValue = JsonValue::ParseStructuredBufferToJson(oDcInformation);
-            strJsonResult = oJsonValue->ToString();
-            oJsonValue->Release();
-        }
-
-    }
-    catch(BaseException oBaseException)
-    {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        strJsonResult = "";
-    }
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        strJsonResult = "";
-    }
-
-    if ( nullptr != oJsonValue )
-    {
-        oJsonValue->Release();
-    }
-
-    return Py_BuildValue("s", strJsonResult.c_str());
 }
 
 static PyObject* vmconnect(PyObject* self, PyObject* args)
@@ -552,11 +428,9 @@ static PyMethodDef SAILAPIMethods [] =
     {"login", (PyCFunction)login, METH_VARARGS, NULL},
     {"get_current_eosb", (PyCFunction)get_current_eosb, METH_NOARGS, NULL},
     {"exit_current_session", (PyCFunction)exit_current_session, METH_NOARGS, NULL},
-    {"get_list_of_safe_functions", (PyCFunction)get_list_of_safe_functions, METH_NOARGS, NULL},
-    {"get_safe_function_information", (PyCFunction)get_safe_function_information, METH_VARARGS, NULL},
     {"load_safe_objects", (PyCFunction)load_safe_objects, METH_VARARGS,NULL},
-    {"get_list_of_digital_contracts", (PyCFunction)get_list_of_digital_contracts, METH_NOARGS,NULL},
-    {"get_digital_contract_information", (PyCFunction)get_digital_contract_information, METH_VARARGS, NULL},
+    {"get_safe_functions", (PyCFunction)get_safe_functions, METH_NOARGS, NULL},
+    {"get_digital_contracts", (PyCFunction)get_digital_contracts, METH_NOARGS,NULL},
     {"get_datasets", (PyCFunction)get_datasets, METH_NOARGS, NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},
     {"pushdata", (PyCFunction)pushdata, METH_VARARGS, NULL},

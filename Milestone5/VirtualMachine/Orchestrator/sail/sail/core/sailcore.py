@@ -15,17 +15,11 @@ def get_current_eosb():
 def exit_current_session():
     return SAILPyAPI.exit_current_session()
 
-def get_list_of_safe_functions():
-    return SAILPyAPI.get_list_of_safe_functions()
+def get_safe_functions():
+    return SAILPyAPI.get_safe_functions()
 
-def get_safe_function_information(safeFnGuid):
-    return SAILPyAPI.get_safe_function_information(safeFnGuid)
-
-def get_list_of_digital_contracts():
-    return SAILPyAPI.get_list_of_digital_contracts()
-
-def get_digital_contract_information(dcGuid):
-    return SAILPyAPI.get_digital_contract_information(dcGuid)
+def get_digital_contracts():
+    return SAILPyAPI.get_digital_contracts()
 
 def load_safe_objects(safe_object_dir):
     return SAILPyAPI.load_safe_objects(safe_object_dir)

@@ -209,14 +209,14 @@ void Frontend::CacheDatasetsFromRemote(
     catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        m_stlAvailableTables.clear();
+        m_stlAvailableDatasets.clear();
         m_stlAvailableTables.clear();
     }
 
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        m_stlAvailableTables.clear();
+        m_stlAvailableDatasets.clear();
         m_stlAvailableTables.clear();
     }
 }
@@ -258,7 +258,7 @@ std::string __thiscall Frontend::GetDatasets(void) const
 {
     __DebugFunction();
 
-    return GetJsonForStructuredBufferMap(m_stlAvailableDatasets);
+    return ::GetJsonForStructuredBufferMap(m_stlAvailableDatasets);
 }
 
 /********************************************************************************************/

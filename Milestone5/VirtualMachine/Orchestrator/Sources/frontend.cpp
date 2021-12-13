@@ -310,7 +310,7 @@ std::string __thiscall Frontend::GetDigitalContracts(void) const
 {
     __DebugFunction();
 
-    return GetJsonForStructuredBufferMap(m_stlDigitalContracts);
+    return ::GetJsonForStructuredBufferMap(m_stlDigitalContracts);
 }
 
 /********************************************************************************************
@@ -438,7 +438,7 @@ std::string __thiscall Frontend::GetSafeFunctions(void) const
 {
     __DebugFunction();
 
-    return GetJsonForStructuredBufferMap(m_stlAvailableSafeFunctions);
+    return ::GetJsonForStructuredBufferMap(m_stlAvailableSafeFunctions);
 }
 
 void __thiscall Frontend::Listener(

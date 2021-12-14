@@ -36,6 +36,7 @@ namespace SailTablePackagerForCsv
             m_QuoteCharacterTextBox.KeyPress += m_QuoteCharacterTextBox_KeyPress;
             m_EscapeCharacterTextBox.KeyPress += m_EscapeCharacterTextBox_KeyPress;
             // Do the initial load and view
+            this.UpdateColumnNames();
             this.RefreshDataGridView();
         }
 
@@ -213,6 +214,7 @@ namespace SailTablePackagerForCsv
             EventArgs e
             )
         {
+            this.UpdateColumnNames();
             this.RefreshDataGridView();
         }
 
@@ -270,6 +272,101 @@ namespace SailTablePackagerForCsv
                 if (null == m_TableProperties.GetColumnProperty(index, "RejectRowDataIfInvalidData")) m_TableProperties.SetColumnProperty(index, "RejectRowDataIfInvalidData", false);
                 if (null == m_TableProperties.GetColumnProperty(index, "RejectRowDataIfMissingData")) m_TableProperties.SetColumnProperty(index, "RejectRowDataIfMissingData", false);
                 if (null == m_TableProperties.GetColumnProperty(index, "ReplaceCellDataWithEmptyIfInvalidData")) m_TableProperties.SetColumnProperty(index, "ReplaceCellDataWithEmptyIfInvalidData", true);
+            }
+        }
+
+        /// <summary>
+        /// Method used to update the column name based on whether or not we are using column headers or not
+        /// </summary>
+        private void UpdateColumnNames()
+        {
+            CsvConfiguration csvConfigurationSettings = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture);
+
+            csvConfigurationSettings.BadDataFound = null;
+            // Configure the delimiter for the input file
+            csvConfigurationSettings.Delimiter = m_ValueSeparatorCharacterTextBox.Text;
+            // Configure whether or not the input file contains column headers or not
+            if (true == m_FirstLineHeadersCheckBox.Checked)
+            {
+                csvConfigurationSettings.HasHeaderRecord = true;
+            }
+            else
+            {
+                csvConfigurationSettings.HasHeaderRecord = false;
+            }
+            // Configure whether or not the input file uses comments
+            if (true == m_ParseCommentLinesCheckBox.Checked)
+            {
+                if (1 == m_LineCommentCharacterTextBox.Text.Length)
+                {
+                    csvConfigurationSettings.AllowComments = true;
+                    csvConfigurationSettings.Comment = m_LineCommentCharacterTextBox.Text[0];
+                }
+                else
+                {
+                    csvConfigurationSettings.AllowComments = false;
+                }
+            }
+            else
+            {
+                csvConfigurationSettings.AllowComments = false;
+            }
+            // Configure the quote character
+            if (1 == m_QuoteCharacterTextBox.Text.Length)
+            {
+                csvConfigurationSettings.Quote = m_QuoteCharacterTextBox.Text[0];
+            }
+            if (1 == m_EscapeCharacterTextBox.Text.Length)
+            {
+                csvConfigurationSettings.Escape = m_EscapeCharacterTextBox.Text[0];
+            }
+            csvConfigurationSettings.IgnoreBlankLines = true;
+            csvConfigurationSettings.TrimOptions = (TrimOptions.Trim | TrimOptions.InsideQuotes);
+            // Read in the CSV file and display the first 100 lines. There is two ways to do this,
+            // with a header, or without a header. It's important NOT to try and access the
+            // header if csvConfigurationSettings.HasHeaderRecord = false
+            var streamReader = new System.IO.StreamReader(m_TableProperties.SourceFilename);
+            var csvReader = new CsvReader(streamReader, csvConfigurationSettings);
+            var dataReader = new CsvDataReader(csvReader);
+            // Update the column count
+            
+            if (true == m_FirstLineHeadersCheckBox.Checked)
+            {
+                int columnIndex = 0;
+
+                // Figure out the column count
+                m_ColumnCount = csvReader.HeaderRecord.Length;
+
+                if (0 == m_TableProperties.ColumnCount)
+                {
+                    m_TableProperties.ColumnCount = m_ColumnCount;
+                }
+
+                foreach (string oColumnName in csvReader.HeaderRecord)
+                {
+                    m_TableProperties.DeleteColumnProperty(columnIndex, "SourceFileColumnPosition");
+                    m_TableProperties.SetColumnProperty(columnIndex, "SourceFileHeaderName", oColumnName);
+                    m_TableProperties.SetColumnProperty(columnIndex, "Name", oColumnName);
+                    ++columnIndex;
+                }
+            }
+            else
+            {
+                // Figure out the column count
+                m_ColumnCount = csvReader.Parser.Record.Length;
+
+                if (0 == m_TableProperties.ColumnCount)
+                {
+                    m_TableProperties.ColumnCount = m_ColumnCount;
+                }
+
+                for (int columnIndex = 0; columnIndex < m_ColumnCount; columnIndex++)
+                {
+                    m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnPosition", columnIndex);
+                    m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnName", columnIndex.ToString());
+                    m_TableProperties.SetColumnProperty(columnIndex, "DestinationFileColumnName", columnIndex.ToString());
+                    ++columnIndex;
+                }
             }
         }
 
@@ -334,26 +431,11 @@ namespace SailTablePackagerForCsv
                 int rowIndex = 0;
 
                 m_ColumnCount = csvReader.HeaderRecord.Length;
-                if (0 == m_TableProperties.ColumnCount)
+                foreach (string oColumnName in csvReader.HeaderRecord)
                 {
-                    m_TableProperties.ColumnCount = m_ColumnCount;
-                    foreach (object oColumnName in csvReader.HeaderRecord)
-                    {
-                        DataColumn dataColumn = new DataColumn(oColumnName.ToString(), oColumnName.GetType());
-                        dataTableToDisplay.Columns.Add(dataColumn);
-                        m_TableProperties.SetColumnProperty(columnIndex, "SourceFileHeaderName", oColumnName.ToString());
-                        m_TableProperties.SetColumnProperty(columnIndex, "Name", oColumnName.ToString());
-                        ++columnIndex;
-                    }
-                }
-                else
-                {
-                    foreach (object oColumnName in csvReader.HeaderRecord)
-                    {
-                        DataColumn dataColumn = new DataColumn(m_TableProperties.GetColumnProperty(columnIndex, "Name"), m_TableProperties.GetColumnProperty(columnIndex, "Name").GetType());
-                        dataTableToDisplay.Columns.Add(dataColumn);
-                        ++columnIndex;
-                    }
+                    DataColumn dataColumn = new DataColumn(m_TableProperties.GetColumnProperty(columnIndex, "Name"), m_TableProperties.GetColumnProperty(columnIndex, "Name").GetType());
+                    dataTableToDisplay.Columns.Add(dataColumn);
+                    ++columnIndex;
                 }
 
                 while (csvReader.Read() && (rowIndex < 100))
@@ -371,14 +453,10 @@ namespace SailTablePackagerForCsv
                 int rowIndex = 0;
 
                 m_ColumnCount = csvReader.Parser.Record.Length;
-                m_TableProperties.ColumnCount = m_ColumnCount;
                 foreach (object oColumnName in csvReader.Parser.Record)
                 {
                     DataColumn dataColumn = new DataColumn(columnIndex.ToString(), oColumnName.GetType());
                     dataTableToDisplay.Columns.Add(dataColumn);
-                    m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnPosition", columnIndex);
-                    m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnName", columnIndex.ToString());
-                    m_TableProperties.SetColumnProperty(columnIndex, "DestinationFileColumnName", columnIndex.ToString());
                     ++columnIndex;
                 }
 

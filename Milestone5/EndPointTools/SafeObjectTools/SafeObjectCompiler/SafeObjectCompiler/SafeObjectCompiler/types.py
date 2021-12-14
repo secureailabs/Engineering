@@ -1,5 +1,6 @@
 import uuid
 
+
 class CodeBlock:
     '''
     Class associate with node and code block
@@ -10,17 +11,18 @@ class CodeBlock:
         '''
         self.start = start
         self.end = end
-    
+
     def blockToString(self, lines):
         '''
         convert a node to string block
         '''
         i = self.start - 1
         blockString = ""
-        while(i<self.end):
-            blockString+=lines[i]
-            i+=1
+        while(i < self.end):
+            blockString.join(lines[i])
+            i += 1
         return blockString
+
 
 class ClassBlock(CodeBlock):
     '''
@@ -29,12 +31,14 @@ class ClassBlock(CodeBlock):
     def __init__(self, start, end):
         super().__init__(start, end)
 
+
 class ImportBlock(CodeBlock):
     '''
     import node code block
     '''
     def __init__(self, start, end):
         super().__init__(start, end)
+
 
 class FunctionBlock(CodeBlock):
     '''
@@ -51,8 +55,10 @@ class FunctionBlock(CodeBlock):
         process the entry point function node
         '''
         pos = lines[self.start-1].index('(')
-        lines[self.start-1] = lines[self.start-1][:pos+1] + "self, " + lines[self.start-1][pos+1:]
+        lines[self.start-1] = \
+            f"{lines[self.start-1][:pos+1]}self, {lines[self.start-1][pos+1:]}"
         return super().blockToString(lines)
+
 
 class ScriptContent:
     '''
@@ -62,6 +68,7 @@ class ScriptContent:
         self.classes = classes
         self.imports = imports
         self.functions = functions
+
 
 class SafeFunction:
     '''
@@ -84,7 +91,7 @@ class SafeFunction:
         self.returnTypes = self.ProcessReturns(returns)
         self.confidentiality = confidentiality
         self.template = ""
-    
+
     def ProcessArgs(self, args):
         '''
         generate argument uuids
@@ -94,7 +101,7 @@ class SafeFunction:
             argTypes.append(str(args[arg]))
             self.argsuuid.append(uuid.uuid4().hex.upper())
         return argTypes
-    
+
     def ProcessReturns(self, returns):
         '''
         generate return variable uuids
@@ -104,7 +111,7 @@ class SafeFunction:
             returnTypes.append(str(val))
             self.returnsuuid.append(uuid.uuid4().hex.upper())
         return returnTypes
-    
+
     def SaveTemplate(self, template):
         '''
         accept template after process

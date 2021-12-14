@@ -1,4 +1,6 @@
-import sys, os, pickle
+import sys
+import os
+import pickle
 from SafeObjectCompiler.parser import ScriptParser
 from SafeObjectCompiler.process import TemplateProcessor, readScriptFile
 
@@ -10,7 +12,7 @@ if __name__ == "__main__":
 
     lines, code, title = readScriptFile(sourcePath, scriptFilename)
 
-    indexFileName = destinationPath + "/index"
+    indexFileName = f"{destinationPath}/index"
     if not os.path.isfile(indexFileName):
         with open(indexFileName, 'wb') as f:
             emptyIndexDict = {}

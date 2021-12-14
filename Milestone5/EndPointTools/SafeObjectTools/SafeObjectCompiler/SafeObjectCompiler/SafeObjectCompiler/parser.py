@@ -1,19 +1,19 @@
 import ast
-from .types import ClassBlock, FunctionBlock, ImportBlock, ScriptContent 
+from .types import ClassBlock, FunctionBlock, ImportBlock, ScriptContent
+
 
 class ScriptParser:
     '''
     parse a script by node
-    
     currently only support four different kinds of nodes
     '''
     def __init__(self, code):
         '''
         constructor
         '''
-        self.code =code
+        self.code = code
         self.tree = ast.parse(code)
-    
+
     def ParseAll(self):
         '''
         parse the entire script
@@ -34,6 +34,8 @@ class ScriptParser:
             elif isinstance(node, ast.FunctionDef):
                 block = self.ParseFunction(node)
                 functions.append(block)
+            else:
+                raise Exception("Ast node type not supported")
         return ScriptContent(classes, imports, functions)
 
     def ParseImports(self, node):

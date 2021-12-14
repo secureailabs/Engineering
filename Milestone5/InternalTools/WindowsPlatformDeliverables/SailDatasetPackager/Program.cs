@@ -159,6 +159,7 @@ namespace SailDatasetPackager
                 datasetProperties = new DatasetProperties();
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+                //Application.Run(new StructuredBufferTestDialog());
                 Application.Run(new MainDialog(ref datasetProperties, ref notificationsAndProgressTracker));
             }
 

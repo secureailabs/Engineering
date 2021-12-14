@@ -1,4 +1,4 @@
-/*********************************************************************************************
+ /*********************************************************************************************
  *
  * @file JsonParser.cpp
  * @author Luis Miguel Huapaya
@@ -17,18 +17,28 @@
 #include "Guid.h"
 #include "StructuredBuffer.h"
 
+// These are strings used to do easy character lookup while parsing. Helps simplify the
+// code considerably
 static const std::string gsc_strJsonWhitespaceCharacters = "\x09\x0a\x0d\x20";
 static const std::string gsc_strJsonValidLeadingNumericalCharacters = "-0123456789";
 static const std::string gsc_strJsonValiNumericalCharacters = "0123456789.-Ee";
 static const std::string gsc_strJsonHexadecimalCharacters = "0123456789abcdefABCDEF";
 
-// Some forward declarations that are unfortunately required
+// Forward declarations for ParseJsonObjectToStructuredBuffer. This is unfortunately required since
+// ParseJsonArrayToStructuredBuffer() needs to recurse into ParseJsonObjectToStructuredBuffer() and it ends
+// up being implemented beforehand. If it was the other way around, we'd have to do a forward declarations
+// for ParseJsonArrayToStructuredBuffer() instead
 static StructuredBuffer __stdcall ParseJsonObjectToStructuredBuffer(
     _in const char * c_szJsonString,
     _inout unsigned int * punOffset
     );
 
-// makes a number from two ascii hexa characters
+/// <summary>
+/// This is used to decode embedded /uxxxx string elements into a corresponding printable ANSI character
+/// </summary>
+/// <param name="c_szJsonString"></param>
+/// <param name="punOffset"></param>
+/// <returns></returns>
 static char __stdcall ConvertJsonHexCharactersToAnsiCharacter(
     _in const char * c_szJsonString,
     _inout unsigned int * punOffset
@@ -484,7 +494,7 @@ static StructuredBuffer __stdcall ParseJsonObjectToStructuredBuffer(
 }
 
 /// <summary>
-/// 
+/// Function which converts a JSON string into a StructuredBuffer
 /// </summary>
 /// <param name="c_szJsonString"></param>
 /// <returns></returns>
@@ -497,7 +507,8 @@ StructuredBuffer __stdcall ConvertJsonStringToStructuredBuffer(
 
     unsigned int unCurrentOffset = 0;
 
-    // We look for the first '{' which starts the ball rolling
+    // We look for the first '{' which starts the ball rolling. It's possible to have leading
+	// white spaces which we need to skip
     while ('{' != c_szJsonString[unCurrentOffset])
     {
         // Check to make sure that the current character is a blank, which means
@@ -528,24 +539,37 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
 {
     __DebugFunction();
 
+	// There is a very specific use case with StructuredBuffers, whereas if a StructuredBuffer has the elementName
+	// "(boolean) __IsArray__" in it, then the StructuredBuffer contents are coded as a JSON array
     bool fIsArray = c_oStructuredBuffer.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE);
+	// Get the list of elements in the current StructuredBuffer
     std::vector<std::string> stlListOfElements = c_oStructuredBuffer.GetNamesOfElements();
+	// Figure out what the indentation header is. This helps us produce nice looking JSON output
     std::string strIndentationHeader((unIndentationLevel * 4), ' ');
+	// We need to track the number of elements processed since this help us figure out when
+	// to put a comma (',') at the end of a value. In our case, we actually print one value and,
+	// if we loop around and there is another value to output, we first output the comma (',') and then
+	// we print out the value
     unsigned int unNumberOfElementsProcessed = 0;
 
     // Iterate through each of the elements
     for (std::string elementName: stlListOfElements)
     {
-        // Never process this reserved element name
+        // Never process this reserved element name, so we skip it if we encounter it.
         if ("__IsArray__" != elementName)
         {
+			// If we are printing out an array, then the elements of the array do not
+			// get a <ElementName>: <ElementValue> format, all they get is <ElementValue>
             std::string strElementName = (true == fIsArray) ? "" : (elementName + ": ");
-            // Make sure to insert the comma at the end of elements
+            // If this is not the first time we iterate through this loop (i.e. not the
+			// first element), then before we print out a new element, we need to print
+			// out a comma (',')
             if (0 < unNumberOfElementsProcessed)
             {
                 strJsonString += ",\r\n";
             }
-            // Are we dealing with a nested structured?
+            // Is the current element a nested structure. There are two types, one which
+			// nests using { ... } and the other is an array which nests with [ ... ]
             Byte bElementType = c_oStructuredBuffer.GetElementType(elementName.c_str());
             if (INDEXED_BUFFER_VALUE_TYPE == bElementType)
             {
@@ -553,15 +577,15 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
 
                 if (true == oNestedStructuredBuffer.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
                 {
-                    _ThrowBaseExceptionIf((false == oNestedStructuredBuffer.GetBoolean("__IsArray__")), "Unexpected __IsArray value of false", nullptr);
                     strJsonString += strIndentationHeader + strElementName + "[\r\n";
+					// Resurse into this function
                     ::ConvertStructuredBufferToStandardJson(oNestedStructuredBuffer, strJsonString, (unIndentationLevel + 1));
                     strJsonString += "\r\n" + strIndentationHeader + "]";
                 }
                 else
                 {
-                    _ThrowBaseExceptionIf((true == oNestedStructuredBuffer.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE)), "Unexpected __IsArray value found", nullptr);
                     strJsonString += strIndentationHeader + strElementName + "{\r\n";
+					// Resurse into this function
                     ::ConvertStructuredBufferToStandardJson(oNestedStructuredBuffer, strJsonString, (unIndentationLevel + 1));
                     strJsonString += "\r\n" + strIndentationHeader + "}";
                 }
@@ -697,6 +721,7 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
             }
             else if (BUFFER_VALUE_TYPE == bElementType)
             {
+				// Buffer are coded as Base64 strings
                 std::vector<Byte> stlBuffer = c_oStructuredBuffer.GetBuffer(elementName.c_str());
                 std::string strBase64Buffer = ::Base64Encode(stlBuffer.data(), (unsigned int) stlBuffer.size());
                 strJsonString += strIndentationHeader + strElementName + "\"" + strBase64Buffer + "\"";
@@ -713,214 +738,11 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
 }
 
 /// <summary>
-/// 
-/// </summary>
-/// <param name="c_oStructuredBuffer"></param>
-/// <param name="strJsonString"></param>
-/// <param name="unIndentationLevel"></param>
-/// <returns></returns>
-static void __stdcall ConvertStructuredBufferToStronglyTypedJson(
-    _in const StructuredBuffer & c_oStructuredBuffer,
-    _out std::string & strJsonString,
-    _in unsigned int unIndentationLevel
-    )
-{
-    __DebugFunction();
-
-    bool fIsArray = c_oStructuredBuffer.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE);
-    std::vector<std::string> stlListOfElements = c_oStructuredBuffer.GetNamesOfElements();
-    std::string strIndentationHeader((unIndentationLevel * 4), ' ');
-    unsigned int unNumberOfElementsProcessed = 0;
-
-    // Iterate through each of the elements
-    for (std::string elementName: stlListOfElements)
-    {
-        // Never process this reserved element name
-        if ("__IsArray__" != elementName)
-        {
-            // If we are iterating through an array, there we do not print out an element name,
-            // so the strElementName = ""
-            std::string strElementName = (true == fIsArray) ? "" : (elementName + ": ");
-            // Make sure to insert the comma at the end of elements. We basically do this once
-            // at least ONE element has been printed. This code effectively appends a ",\r\n"
-            // at the end of the current JSON before we print the current element value
-            if (0 < unNumberOfElementsProcessed)
-            {
-                strJsonString += ",\r\n";
-            }
-            // Are we dealing with a nested structured?
-            Byte bElementType = c_oStructuredBuffer.GetElementType(elementName.c_str());
-            if (INDEXED_BUFFER_VALUE_TYPE == bElementType)
-            {
-                StructuredBuffer oNestedStructuredBuffer = c_oStructuredBuffer.GetStructuredBuffer(elementName.c_str());
-
-                if (true == oNestedStructuredBuffer.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
-                {
-                    _ThrowBaseExceptionIf((false == oNestedStructuredBuffer.GetBoolean("__IsArray__")), "Unexpected __IsArray value of false", nullptr);
-                    strJsonString += strIndentationHeader + strElementName + "[\r\n";
-                    ::ConvertStructuredBufferToStronglyTypedJson(oNestedStructuredBuffer, strJsonString, (unIndentationLevel + 1));
-                    strJsonString += "\r\n" + strIndentationHeader + "]";
-                }
-                else
-                {
-                    _ThrowBaseExceptionIf((true == oNestedStructuredBuffer.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE)), "Unexpected __IsArray value found", nullptr);
-                    strJsonString += strIndentationHeader + strElementName + "{\r\n";
-                    ::ConvertStructuredBufferToStronglyTypedJson(oNestedStructuredBuffer, strJsonString, (unIndentationLevel + 1));
-                    strJsonString += "\r\n" + strIndentationHeader + "}";
-                }
-            }
-            else if (NULL_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "null";
-            }
-            else if (BOOLEAN_VALUE_TYPE == bElementType)
-            {
-                if (true == c_oStructuredBuffer.GetBoolean(elementName.c_str()))
-                {
-                    strJsonString += strIndentationHeader + strElementName + "true";
-                }
-                else
-                {
-                    strJsonString += strIndentationHeader + strElementName + "false";
-                }
-            }
-            else if (ANSI_CHARACTER_VALUE_TYPE == bElementType)
-            {
-                char chValue = c_oStructuredBuffer.GetCharacter(elementName.c_str());
-                strJsonString += strIndentationHeader + strElementName + "\"char:" + chValue + "\"";
-            }
-            else if (ANSI_CHARACTER_STRING_VALUE_TYPE == bElementType)
-            {
-                std::string strValue = c_oStructuredBuffer.GetString(elementName.c_str());
-                std::string strEscapedValue;
-                unsigned int unInsertedCharacterCount = 0;
-                // To be optimal, we pre-allocate the escaped string. At worse, it will be
-                // precisely twice as big as the original
-                strEscapedValue.resize(strValue.size() * 2);
-                // Now let's create the escaped string
-                for (unsigned unIndex = 0; unIndex < strValue.size(); ++unIndex)
-                {
-                    char chCurrentCharacter = strValue[unIndex];
-                    _ThrowBaseExceptionIf((('\x00' <= chCurrentCharacter)&&('\x1F' >= chCurrentCharacter)), "Invalid string character 0x%02X found at offset %d", (unsigned int) chCurrentCharacter, unIndex);
-
-                    if ('\\' == chCurrentCharacter)
-                    {
-                        strEscapedValue[unInsertedCharacterCount++] = '\\';
-                        strEscapedValue[unInsertedCharacterCount++] = '\\';
-                    }
-                    else if ('\b' == chCurrentCharacter)
-                    {
-                        strEscapedValue[unInsertedCharacterCount++] = '\\';
-                        strEscapedValue[unInsertedCharacterCount++] = 'b';
-                    }
-                    else if ('\f' == chCurrentCharacter)
-                    {
-                        strEscapedValue[unInsertedCharacterCount++] = '\\';
-                        strEscapedValue[unInsertedCharacterCount++] = 'f';
-                    }
-                    else if ('\n' == chCurrentCharacter)
-                    {
-                        strEscapedValue[unInsertedCharacterCount++] = '\\';
-                        strEscapedValue[unInsertedCharacterCount++] = 'n';
-                    }
-                    else if ('\r' == chCurrentCharacter)
-                    {
-                        strEscapedValue[unInsertedCharacterCount++] = '\\';
-                        strEscapedValue[unInsertedCharacterCount++] = 'r';
-                    }
-                    else if ('\t' == chCurrentCharacter)
-                    {
-                        strEscapedValue[unInsertedCharacterCount++] = '\\';
-                        strEscapedValue[unInsertedCharacterCount++] = 't';
-                    }
-                    else
-                    {
-                        strEscapedValue[unInsertedCharacterCount++] = chCurrentCharacter;
-                    }
-                }
-                strEscapedValue.resize(unInsertedCharacterCount);
-
-                strJsonString += strIndentationHeader + strElementName + "\"__string__:" + strEscapedValue + "\"";
-            }
-            else if (FLOAT32_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__float32_t__:" + std::to_string(c_oStructuredBuffer.GetFloat32(elementName.c_str())) + "\"";;
-            }
-            else if (FLOAT64_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__float64_t__:" + std::to_string(c_oStructuredBuffer.GetFloat64(elementName.c_str())) + "\"";;
-            }
-            else if (INT8_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__int8_t__:" + std::to_string(c_oStructuredBuffer.GetInt8(elementName.c_str())) + "\"";;
-            }
-            else if (INT16_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__int16_t__:" + std::to_string(c_oStructuredBuffer.GetInt16(elementName.c_str())) + "\"";;
-            }
-            else if (INT32_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__int32_t__:" + std::to_string(c_oStructuredBuffer.GetInt32(elementName.c_str())) + "\"";;
-            }
-            else if (INT64_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__int64_t__:" + std::to_string(c_oStructuredBuffer.GetInt64(elementName.c_str())) + "\"";;
-            }
-            else if (UINT8_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__uint8_t__:" + std::to_string(c_oStructuredBuffer.GetUnsignedInt8(elementName.c_str())) + "\"";;
-            }
-            else if (UINT16_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__uint16_t__:" + std::to_string(c_oStructuredBuffer.GetUnsignedInt16(elementName.c_str())) + "\"";;
-            }
-            else if (UINT32_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__uint32_t__:" + std::to_string(c_oStructuredBuffer.GetUnsignedInt32(elementName.c_str())) + "\"";;
-            }
-            else if (UINT64_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__uint64_t__:" + std::to_string(c_oStructuredBuffer.GetUnsignedInt64(elementName.c_str())) + "\"";;
-            }
-            else if (BYTE_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__Byte__:" + std::to_string(c_oStructuredBuffer.GetByte(elementName.c_str())) + "\"";;
-            }
-            else if (WORD_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__Word__:" + std::to_string(c_oStructuredBuffer.GetWord(elementName.c_str())) + "\"";;
-            }
-            else if (DWORD_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__Dword__:" + std::to_string(c_oStructuredBuffer.GetDword(elementName.c_str())) + "\"";;
-            }
-            else if (QWORD_VALUE_TYPE == bElementType)
-            {
-                strJsonString += strIndentationHeader + strElementName + "\"__Qword__:" + std::to_string(c_oStructuredBuffer.GetQword(elementName.c_str())) + "\"";;
-            }
-            else if (BUFFER_VALUE_TYPE == bElementType)
-            {
-                std::vector<Byte> stlBuffer = c_oStructuredBuffer.GetBuffer(elementName.c_str());
-                std::string strBase64Buffer = ::Base64Encode(stlBuffer.data(), (unsigned int) stlBuffer.size());
-                strJsonString += strIndentationHeader + strElementName + "\"__buffer__:" + strBase64Buffer + "\"";
-            }
-            else if (GUID_VALUE_TYPE == bElementType)
-            {
-                std::string strIdentifier = c_oStructuredBuffer.GetGuid(elementName.c_str()).ToString(eHyphensOnly);
-                strJsonString += strIndentationHeader + strElementName + "\"__uuid__:" + strIdentifier + "\"";
-            }
-
-            unNumberOfElementsProcessed++;
-        }
-    }
-}
-
-/// <summary>
-/// 
+/// This function converts a StructuredBuffer into a Json string
 /// </summary>
 /// <param name="c_oStructuredBuffer"></param>
 /// <returns></returns>
-std::string __stdcall ConvertStructuredBufferToStandardJson(
+std::string __stdcall ConvertStructuredBufferToJson(
     _in const StructuredBuffer & c_oStructuredBuffer
     )
 {
@@ -928,24 +750,6 @@ std::string __stdcall ConvertStructuredBufferToStandardJson(
 
     std::string strJsonString = "{\r\n";
     ::ConvertStructuredBufferToStandardJson(c_oStructuredBuffer, strJsonString, 1);
-    strJsonString.push_back('}');
-
-    return strJsonString;
-}
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="c_oStructuredBuffer"></param>
-/// <returns></returns>
-std::string __stdcall ConvertStructuredBufferToStronglyTypedJson(
-    _in const StructuredBuffer & c_oStructuredBuffer
-    )
-{
-    __DebugFunction();
-
-    std::string strJsonString = "{\r\n";
-    ::ConvertStructuredBufferToStronglyTypedJson(c_oStructuredBuffer, strJsonString, 1);
     strJsonString.push_back('}');
 
     return strJsonString;

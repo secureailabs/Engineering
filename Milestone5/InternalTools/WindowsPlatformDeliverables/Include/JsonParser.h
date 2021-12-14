@@ -29,15 +29,6 @@ extern StructuredBuffer __stdcall ConvertJsonStringToStructuredBuffer(
 /// </summary>
 /// <param name="c_oStructuredBuffer"></param>
 /// <returns></returns>
-extern std::string __stdcall ConvertStructuredBufferToStandardJson(
-    _in const StructuredBuffer & c_oStructuredBuffer
-    );
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="c_oStructuredBuffer"></param>
-/// <returns></returns>
-extern std::string __stdcall ConvertStructuredBufferToStronglyTypedJson(
+extern std::string __stdcall ConvertStructuredBufferToJson(
     _in const StructuredBuffer & c_oStructuredBuffer
     );

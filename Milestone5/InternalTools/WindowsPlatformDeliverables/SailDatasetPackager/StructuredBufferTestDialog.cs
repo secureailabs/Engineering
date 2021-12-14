@@ -12,9 +12,33 @@ namespace SailDatasetPackager
 {
     public partial class StructuredBufferTestDialog : Form
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public StructuredBufferTestDialog()
         {
             InitializeComponent();
+
+            System.IO.StreamReader reader;
+            char ch;
+            uint[] characterCounts = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            reader = new System.IO.StreamReader(@"passwords2.txt");
+            do
+            {
+                ch = (char)reader.Read();
+                if (128 > ch)
+                {
+                    characterCounts[ch]++;
+                }
+            }
+            while (!reader.EndOfStream);
+            reader.Close();
+            reader.Dispose();
+            foreach (uint characterCount in characterCounts)
+            {
+                m_ResultingStructureBufferTextBox.Text += characterCount.ToString() + ",";
+            }
         }
 
         /// <summary>

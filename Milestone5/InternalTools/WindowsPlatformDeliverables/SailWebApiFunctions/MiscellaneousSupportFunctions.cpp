@@ -94,8 +94,8 @@ extern "C" __declspec(dllexport) BSTR __cdecl TestConvertJsonStringToStructuredB
     {
         StructuredBuffer oStructuredBuffer(::ConvertJsonStringToStructuredBuffer(c_szJsonString));
         strStructureBufferStringRepresentation = oStructuredBuffer.ToString();
-        gs_strReconvertedJson = ::ConvertStructuredBufferToStandardJson(oStructuredBuffer);
-        gs_strReconvertedStronglyTypedJson = ::ConvertStructuredBufferToStronglyTypedJson(oStructuredBuffer);
+        gs_strReconvertedJson = ::ConvertStructuredBufferToJson(oStructuredBuffer);
+        gs_strReconvertedStronglyTypedJson = ::ConvertStructuredBufferToJson(oStructuredBuffer);
     }
 
     catch (BaseException oBaseException)

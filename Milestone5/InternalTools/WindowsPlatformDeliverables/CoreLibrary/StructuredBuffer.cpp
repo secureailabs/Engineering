@@ -122,6 +122,24 @@ StructuredBuffer::~StructuredBuffer(void) throw()
 
 /********************************************************************************************/
 
+StructuredBuffer & __thiscall StructuredBuffer::operator = (
+    const StructuredBuffer & c_oStructuredBuffer
+    )
+{
+    __DebugFunction();
+
+    if (this != &c_oStructuredBuffer)
+    {
+        m_qw64BitHash = 0;
+        m_qwComposition64BitHash = 0;
+        this->DeSerialize(c_oStructuredBuffer.GetSerializedBufferRawDataPtr(), c_oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
+    }
+
+    return *this;
+}
+
+/********************************************************************************************/
+
 void __thiscall StructuredBuffer::Clear(void) throw()
 {
     __DebugFunction();
@@ -261,7 +279,7 @@ std::vector<std::string> __thiscall StructuredBuffer::GetNamesOfElements(void) c
 
 Byte __thiscall StructuredBuffer::GetElementType(
     _in const char * c_szElementName
-    ) const
+    ) const throw()
 {
     __DebugFunction();
 
@@ -290,24 +308,6 @@ std::vector<std::string> __thiscall StructuredBuffer::GetDescriptionOfElements(v
     }
     
     return stlListOfElements;
-}
-
-/********************************************************************************************/
-
-StructuredBuffer __thiscall StructuredBuffer::operator = (
-    const StructuredBuffer & c_oStructuredBuffer
-    )
-{
-    __DebugFunction();
-
-    if (this != &c_oStructuredBuffer)
-    {
-        m_qw64BitHash = 0;
-        m_qwComposition64BitHash = 0;
-        this->DeSerialize(c_oStructuredBuffer.GetSerializedBufferRawDataPtr(), c_oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
-    }
-
-    return *this;
 }
 
 /********************************************************************************************/

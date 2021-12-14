@@ -95,7 +95,7 @@ static void __stdcall RunProcess(
     )
 {
     __DebugFunction();
-    
+
     // Get the RootOfTrustCore instance
     RootOfTrustCore * poRootOfTrustCore = RootOfTrustCore::GetInstance();
     // Create a unique IPC path. This value is very ephemeral and will not be required
@@ -112,7 +112,7 @@ static void __stdcall RunProcess(
     // Are we the child process or the parent process?
     if (0 == nProcessIdentifier)
     {
-        // We are the child process. Let's just call execl and pass the IPC path as 
+        // We are the child process. Let's just call execl and pass the IPC path as
         // a parameter. The full command line will end up looking like "DataDomainProcess -ipc /SAIL/Ipc/C5133B267E92424896C4ACC898F30852"
         ::execl(c_szProcessName, c_szProcessName, "-ipc", strTemporaryIpcPath.c_str(), nullptr);
     }
@@ -152,10 +152,10 @@ int __cdecl main(
     )
 {
     __DebugFunction();
-    
+
     try
     {
-        
+
         // Figure out whether or not the GlobalMonitor will be displaying status information
         // or not.
         StructuredBuffer oCommandLineParameters = ::ParseCommandLineParameters(nNumberOfArguments, (const char **) pszCommandLineArguments);
@@ -192,7 +192,7 @@ int __cdecl main(
         StatusMonitor oStatusMonitor("void __thiscall RootOfTrustCore::RootOfTrustIpcListenerThread(void)");
         oStatusMonitor.SignalTermination("Unrecoverable exception");
     }
-    
+
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -205,6 +205,6 @@ int __cdecl main(
     // All we have to do now is basically wait for ALL other threads to finish
     ThreadManager * poThreadManager = ThreadManager::GetInstance();
     poThreadManager->JoinAllThreads();
-        
+
     return 0;
 }

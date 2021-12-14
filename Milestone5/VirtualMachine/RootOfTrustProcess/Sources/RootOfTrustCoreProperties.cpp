@@ -45,16 +45,16 @@ std::string __thiscall RootOfTrustCoreProperties::GetProperty(
         _ThrowBaseExceptionIf((m_stlProperties.end() == m_stlProperties.find(qwPropertyNameHash)), "Property %s not found in RootOfTrustCoreProperties", c_szPropertyName);
         strPropertyValue = m_stlProperties.at(qwPropertyNameHash);
     }
-    
+
     catch (BaseException oException)
-	{
-		::RegisterException(oException, __func__, __FILE__, __LINE__);;
-	}
-	
-	catch(...)
-	{
-		::RegisterUnknownException(__func__, __FILE__, __LINE__);
-	}
+    {
+        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
 
     return strPropertyValue;
 }
@@ -74,14 +74,14 @@ void __thiscall RootOfTrustCoreProperties::SetProperty(
         const std::lock_guard<std::mutex> lock(m_stlMutex);
         m_stlProperties[qwPropertyNameHash] = c_szPropertyValue;
     }
-    
+
     catch (BaseException oException)
-	{
-		::RegisterException(oException, __func__, __FILE__, __LINE__);;
-	}
-	
-	catch(...)
-	{
-		::RegisterUnknownException(__func__, __FILE__, __LINE__);
-	}
+    {
+        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
 }

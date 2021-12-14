@@ -47,7 +47,17 @@ static PyObject* login(PyObject* self, PyObject* args)
 
 static PyObject* get_current_eosb(PyObject * self, PyObject * args)
 {
-    return Py_BuildValue("s", getFrontend().GetCurrentEosb().c_str());
+    std::string strEosb = getFrontend().GetCurrentEosb();
+    PyObject* poPythonReturn;
+    if ( !strEosb.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strEosb.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
 }
 
 static PyObject* exit_current_session(PyObject * self, PyObject * args)

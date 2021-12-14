@@ -10,6 +10,7 @@
 
 #include "RestFrameworkRuntimeData.h"
 #include "ExceptionRegister.h"
+#include "TlsTransactionHelperFunctions.h"
 
 /********************************************************************************************
  *
@@ -260,17 +261,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         }
         else
         {
-            // Create a response packet
-            unsigned int unSerializedBufferSizeInBytes = sizeof(uint32_t) + oResponseStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
-            std::vector<Byte> stlSerializedBuffer(unSerializedBufferSizeInBytes);
-            Byte * pbSerializedBuffer = (Byte *) stlSerializedBuffer.data();
-            *((uint32_t *) pbSerializedBuffer) = (uint32_t) oResponseStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
-            pbSerializedBuffer += sizeof(uint32_t);
-            ::memcpy((void *) pbSerializedBuffer, (const void *) oResponseStructuredBuffer.GetSerializedBufferRawDataPtr(), oResponseStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
-            pbSerializedBuffer += oResponseStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
-
-            // Send back response data
-            poTlsNode->Write((const Byte *)stlSerializedBuffer.data(), stlSerializedBuffer.size());
+            ::PutDatabaseGatewayResponse(*poTlsNode, oResponseStructuredBuffer);
         }
         // Delete the allocated parameter
         oLocalSmartMemoryAllocator.Deallocate(pbSerializedResponseBuffer);

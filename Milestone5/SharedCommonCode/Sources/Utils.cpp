@@ -497,15 +497,7 @@ bool ValidateUnsignedNumber(
     {
         stlRange.push_back(std::atof(strAllowedElement.c_str()));
     }
-    // Check if the number is allowed or not
-    if (BIG_NUMBER_TYPE == bRangeType)
-    {
-        if (stlRange.end() == std::find(stlRange.begin(), stlRange.end(), qwParameterValue))
-        {
-            fValid = false;
-        }
-    }
-    else if (ANY_VALUE_TYPE == bRangeType)
+    if (ANY_VALUE_TYPE == bRangeType)
     {
         _ThrowBaseExceptionIf((2 > stlRange.size()), "ERROR: Invalid range specified.", nullptr);
         // Check if the number is in the range specified or not
@@ -548,14 +540,7 @@ bool ValidateSignedNumber(
         stlRange.push_back(std::atof(strAllowedElement.c_str()));
     }
     // Check if the number is allowed or not
-    if (BIG_NUMBER_TYPE == bRangeType)
-    {
-        if (stlRange.end() == std::find(stlRange.begin(), stlRange.end(), fl64ParameterValue))
-        {
-            fValid = false;
-        }
-    }
-    else if (ANY_VALUE_TYPE == bRangeType)
+    if (ANY_VALUE_TYPE == bRangeType)
     {
         _ThrowBaseExceptionIf((2 > stlRange.size()), "ERROR: Invalid range specified.", nullptr);
         // Check if the number is in the range specified or not

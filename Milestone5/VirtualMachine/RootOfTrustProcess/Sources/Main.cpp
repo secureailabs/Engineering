@@ -31,7 +31,7 @@
 
 /********************************************************************************************/
 
-static RootOfTrustCore __stdcall RunInitializerProcess(void)
+static bool __stdcall RunInitializerProcess(void)
 {
     __DebugFunction();
 
@@ -79,21 +79,25 @@ static RootOfTrustCore __stdcall RunInitializerProcess(void)
         stlSerializedParameters = ::GetIpcTransaction(poSocket, false);
         // Close the connection
         poSocket->Release();
+        // Initialize the RootOfTrustCore
+        RootOfTrustCore * poRootOfTrustCore = RootOfTrustCore::GetInstance();
+        poRootOfTrustCore->Initialize(stlSerializedParameters);
     }
 
-    return RootOfTrustCore(stlSerializedParameters);
+    return true;
 }
 
 /********************************************************************************************/
 
 static void __stdcall RunProcess(
     _in const char * c_szProcessName,
-    _in const RootOfTrustCore & c_oRootOfTrustCore,
     _in const Guid & c_oDomainIdentifier
     )
 {
     __DebugFunction();
     
+    // Get the RootOfTrustCore instance
+    RootOfTrustCore * poRootOfTrustCore = RootOfTrustCore::GetInstance();
     // Create a unique IPC path. This value is very ephemeral and will not be required
     // past this function
     std::string strTemporaryIpcPath = Guid().ToString(eRaw);
@@ -130,7 +134,7 @@ static void __stdcall RunProcess(
         // 2. The Ipc path to the RootOfTrustProcess
         StructuredBuffer oInitializationData;
         oInitializationData.PutGuid("YourDomainIdentifier", c_oDomainIdentifier);
-        oInitializationData.PutString("RootOfTrustIpcPath", c_oRootOfTrustCore.GetRootOfTrustIpcPath());
+        oInitializationData.PutString("RootOfTrustIpcPath", poRootOfTrustCore->GetRootOfTrustIpcPath());
         // Write the initialization data to the socket and wait for a response
         StructuredBuffer oResponse(::PutIpcTransactionAndGetResponse(poSocket, oInitializationData, false));
         // Close the connection
@@ -164,24 +168,20 @@ int __cdecl main(
         // First we need to run the Initializer Process and then wait for the initialization
         // parameters to come in. This will end up initializing the root of trust engine
         // before it is able to run
-        RootOfTrustCore oRootOfTrustCore = ::RunInitializerProcess();
-        // Once the root of trust engine is initialized, we Run() the root of trust engine
-        // which basically spawns it's own thread and waits for incoming connections. This
-        // us basically what the RootOfTrust process does 99.9999% of the time.
-        oRootOfTrustCore.RunIpcListener();
+        RootOfTrustCore * poRootOfTrustCore = ::RootOfTrustCore::GetInstance();
         // Now that the root of trust engine is running, we need to spin up the
         // DataConnector process. The Data Connector process will end up connecting
         // to the root of trust engine and query it for all the information that it needs
         // to initialize itself
-        ::RunProcess("DataDomainProcess", oRootOfTrustCore, oRootOfTrustCore.GetDataDomainIdentifier());
+        ::RunProcess("DataDomainProcess", Guid(poRootOfTrustCore->GetDataDomainIdentifier()));
         // Once the DataConnector process is running, we need to spin up the
         // the computation process. The computation process will end up connecting
         // to the root of trust engine and query it for all the information that it needs
         // to initialize itself
-        ::RunProcess("JobEngine", oRootOfTrustCore, oRootOfTrustCore.GetComputationalDomainIdentifier());
+        ::RunProcess("JobEngine", Guid(poRootOfTrustCore->GetComputationalDomainIdentifier()));
         // Make sure to wait for all things 'RootOfTrust' to terminate before exiting
         // the try...catch block since doing so will destroy the RootOfTrust core object
-        oRootOfTrustCore.WaitForTermination();
+        poRootOfTrustCore->WaitForTermination();
     }
 
     catch(BaseException oBaseException)

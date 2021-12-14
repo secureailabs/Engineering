@@ -36,19 +36,26 @@ extern bool __stdcall TransmitAuditEventsToSailWebApiPortal(
     _in const StructuredBuffer & c_oAuditEvents
     );
     
-extern std::string __stdcall RegisterVirtualMachineWithSailWebApiPortal(
+extern StructuredBuffer __stdcall RegisterVirtualMachineAfterInitialization(
     _in const std::string & c_strEosb,
     _in const std::string & c_strVirtualMachineIdentifier,
     _in const std::string & c_strDigitalContractIdentifier,
     _in const std::string & c_strIpAddress
-    );
+    ) throw();
     
-extern std::string __stdcall RegisterVirtualMachineDataOwner(
+extern StructuredBuffer __stdcall RegisterVirtualMachineDataOwner(
     _in const std::string & c_strEosb,
     _in const std::string & c_strVirtualMachineIdentifier
-    );
+    ) throw();
     
-extern std::string RegisterVirtualMachineResearcher(
+extern StructuredBuffer __stdcall RegisterVirtualMachineResearchUser(
     _in const std::string & c_strEosb,
     _in const std::string & c_strVirtualMachineIdentifier
-    );
+    ) throw();
+	
+extern bool __stdcall VirtualMachineStatusUpdate(
+	_in const std::string & c_strEosb,
+	_in const std::string & c_strVirtualMachineIdentifier,
+	_in Dword dwState,
+	_in const std::string & c_strLoggedOnUserIdentifier
+	) throw();

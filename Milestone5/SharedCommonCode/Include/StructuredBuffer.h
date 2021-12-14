@@ -38,36 +38,8 @@
 #define BUFFER_VALUE_TYPE                 0x12
 #define INDEXED_BUFFER_VALUE_TYPE         0x13
 #define GUID_VALUE_TYPE                   0x14
-#define BIG_NUMBER_TYPE                   0x15
 #define INVALID_VALUE_TYPE                0xFF
 #define ANY_VALUE_TYPE                    0xFF
-
-static const char * gs_aszTypeNames[] =
-{
-    "Null",
-    "Bool",
-    "Char",
-    "String",
-    "float32_t",
-    "float64_t",
-    "int8_t",
-    "int16_t",
-    "int32_t",
-    "int64_t",
-    "uint8_t",
-    "uint16_t",
-    "uint32_t",
-    "uint8_t",
-    "Byte",
-    "Word",
-    "Dword",
-    "Qword",
-    "ByteArray",
-    "StructuredBuffer",
-    "Null",
-    "Guid",
-    "InvalidType"
-};
 
 /********************************************************************************************/
 
@@ -150,11 +122,13 @@ class StructuredBuffer : public Object
         StructuredBuffer(
             _in const StructuredBuffer & c_oStructuredBuffer
             );
-        StructuredBuffer& operator=(
-            const StructuredBuffer & c_oStructuredBuffer
-            );
         virtual ~StructuredBuffer(void) throw();
 
+		// Operator overloads
+		StructuredBuffer & operator=(
+            const StructuredBuffer & c_oStructuredBuffer
+            );
+			
         // Remove all element
         void __thiscall Clear(void) throw();
         
@@ -190,6 +164,9 @@ class StructuredBuffer : public Object
             _in const char * c_szElementName
             ) throw();
         std::vector<std::string> __thiscall GetNamesOfElements(void) const throw();
+		Byte __thiscall GetElementType(
+			_in const char * c_szElementName
+			) const throw();
         std::vector<std::string> __thiscall GetDescriptionOfElements(void) const throw();
         
         // Prints out all of the StructuredBuffer metadata and data

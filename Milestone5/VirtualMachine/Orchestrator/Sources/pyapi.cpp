@@ -59,7 +59,17 @@ static PyObject* exit_current_session(PyObject * self, PyObject * args)
 
 static PyObject* get_safe_functions(PyObject* self, PyObject* args)
 {
-    return Py_BuildValue("s",  getFrontend().GetSafeFunctions().c_str());
+    std::string strSafeFunctions = getFrontend().GetSafeFunctions();
+    PyObject* poPythonReturn;
+    if ( !strSafeFunctions.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strSafeFunctions.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
 }
 
 static PyObject* load_safe_objects(PyObject* self, PyObject* args)
@@ -80,7 +90,17 @@ static PyObject* get_digital_contracts(
     _in PyObject* args
     )
 {
-    return Py_BuildValue("s", getFrontend().GetDigitalContracts().c_str());
+    std::string strDigitalContracts = getFrontend().GetDigitalContracts().c_str();
+    PyObject* poPythonReturn;
+    if ( !strDigitalContracts.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strDigitalContracts.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
 }
 
 static PyObject* get_datasets(
@@ -88,7 +108,17 @@ static PyObject* get_datasets(
     _in PyObject* args
     )
 {
-    return Py_BuildValue("s", getFrontend().GetDatasets().c_str());
+    std::string strDatasets = getFrontend().GetDatasets().c_str();
+    PyObject* poPythonReturn;
+    if ( !strDatasets.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strDatasets.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
 }
 
 static PyObject* vmconnect(PyObject* self, PyObject* args)

@@ -27,6 +27,9 @@ def load_safe_objects(safe_object_dir):
 def get_datasets():
     return SAILPyAPI.get_datasets()
 
+def get_tables():
+    return SAILPyAPI.get_tables()
+
 def newguid():
     return SAILPyAPI.createguid()
 

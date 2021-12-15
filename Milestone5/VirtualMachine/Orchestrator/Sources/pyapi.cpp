@@ -82,6 +82,21 @@ static PyObject* get_safe_functions(PyObject* self, PyObject* args)
     return poPythonReturn;
 }
 
+static PyObject* get_tables(PyObject* self, PyObject* args)
+{
+    std::string strTables = getFrontend().GetTables();
+    PyObject* poPythonReturn;
+    if ( !strTables.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strTables.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
 static PyObject* load_safe_objects(PyObject* self, PyObject* args)
 {
     const char* c_szDirectory;
@@ -472,6 +487,7 @@ static PyMethodDef SAILAPIMethods [] =
     {"get_safe_functions", (PyCFunction)get_safe_functions, METH_NOARGS, NULL},
     {"get_digital_contracts", (PyCFunction)get_digital_contracts, METH_NOARGS,NULL},
     {"get_datasets", (PyCFunction)get_datasets, METH_NOARGS, NULL},
+    {"get_tables", (PyCFunction)get_tables, METH_NOARGS, NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},
     {"pushdata", (PyCFunction)pushdata, METH_VARARGS, NULL},
     {"pulldata", (PyCFunction)pulldata, METH_VARARGS, NULL},

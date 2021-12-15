@@ -316,6 +316,21 @@ std::string __thiscall Frontend::GetDigitalContracts(void) const
 /********************************************************************************************
  *
  * @class Frontend
+ * @function GetTables
+ * @brief Lookup in our local cache for the digital contracts we have and return them as a JSON string
+ * @return std::string - Containing a JSON dictionary of our DCs in the form: GUID:Metadata
+ *
+ ********************************************************************************************/
+std::string __thiscall Frontend::GetTables(void) const
+{
+    __DebugFunction();
+
+    return ::GetJsonForStructuredBufferMap(m_stlAvailableTables);
+}
+
+/********************************************************************************************
+ *
+ * @class Frontend
  * @function GetCurrentEosb
  * @brief Return the EOSB currently being used
  * @return std::string - The value of the EOSB currently being used
@@ -346,6 +361,7 @@ void __thiscall Frontend::ExitCurrentSession(void)
     }
     m_stlDigitalContracts.clear();
     m_stlAvailableDatasets.clear();
+    m_stlAvailableTables.clear();
 }
 
 /********************************************************************************************

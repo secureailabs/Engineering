@@ -92,6 +92,8 @@ class Frontend : public Object{
 
         std::string __thiscall GetDigitalContracts(void) const;
 
+        std::string __thiscall GetTables(void) const;
+
         void __thiscall HandleSubmitJob
         (
             _in std::string& strVMID,

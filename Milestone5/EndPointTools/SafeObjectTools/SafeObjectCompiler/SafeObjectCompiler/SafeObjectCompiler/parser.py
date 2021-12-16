@@ -1,4 +1,5 @@
 import ast
+import types
 from .types import ClassBlock, FunctionBlock, ImportBlock, ScriptContent
 
 
@@ -36,7 +37,8 @@ class ScriptParser:
                 functions.append(block)
             else:
                 raise Exception("Ast node type not supported")
-        return ScriptContent(classes, imports, functions)
+        libdict = self.ParseLibs()
+        return ScriptContent(classes, imports, functions, libdict)
 
     def ParseImports(self, node):
         '''
@@ -72,7 +74,21 @@ class ScriptParser:
         annotations = 0
         doc = 0
         if(name == 'Run'):
-            doc = node.__doc__
             exec(self.code)
             annotations = locals()['Run'].__annotations__
+            doc = locals()['Run'].__doc__
         return FunctionBlock(name, start, end, annotations, doc)
+
+    def ParseLibs(self):
+        '''
+        parse source code to get lib versions
+        '''
+        exec(self.code)
+        libdict = {}
+        for name, val in locals().items():
+            if isinstance(val, types.ModuleType):
+                if hasattr(val, '__version__'):
+                    libdict[val.__name__] = val.__version__
+                else:
+                    libdict[val.__name__] = "not available"
+        return libdict

@@ -76,6 +76,8 @@ static PyObject* parameterConvert(StructuredBuffer& oBuffer, PyObject* oUuids, P
 
         oBuffer.PutStructuredBuffer(std::to_string((int)i).c_str(), oItem);
     }
+    
+    return Py_BuildValue("");
 }
 
 /********************************************************************************************
@@ -89,10 +91,11 @@ static PyObject* writeSafeObject(PyObject* self, PyObject* args)
 {
     StructuredBuffer oResult;
     PyObject* oSafeObject;
+    PyObject* oLibraryDict;
     const char* szDestinationDir;
     std::string strTitle;
 
-    if(!PyArg_ParseTuple(args, "Os", &oSafeObject, &szDestinationDir))
+    if(!PyArg_ParseTuple(args, "OOs", &oSafeObject, &oLibraryDict, &szDestinationDir))
     {
         return Py_None;
     }
@@ -134,6 +137,27 @@ static PyObject* writeSafeObject(PyObject* self, PyObject* args)
         std::string strDes(szDes);
         oResult.PutString("Description", strDes);
         std::cout<<"safe object description: "<<strDes<<std::endl;
+        
+        if(!PyDict_Check(oLibraryDict))
+        {
+            PyErr_SetString(PyExc_Exception, "Library dictionary read fail");
+            return Py_None;
+        }
+
+        PyObject *oKey, *oValue;
+        Py_ssize_t unPos = 0;
+        StructuredBuffer oLibs;
+        std::cout<<"safe object lib dependecies:"<<std::endl;
+        while (PyDict_Next(oLibraryDict, &unPos, &oKey, &oValue))
+        {
+            const char* szKey = PyUnicode_AsUTF8(oKey);
+            std::string strKey(szKey);
+            const char* szValue = PyUnicode_AsUTF8(oValue);
+            std::string strValue(szValue);
+            std::cout<<strKey<<" : "<<strValue<<std::endl;
+            oLibs.PutString(strKey.c_str(), strValue);
+        }
+        oResult.PutStructuredBuffer("Libraries", oLibs);
 
         PyObject* oInputUuids = PyObject_GetAttrString(oSafeObject, "argsuuid");
         if(!oInputUuids)
@@ -204,6 +228,17 @@ static PyObject* writeSafeObject(PyObject* self, PyObject* args)
     catch (...) 
     { 
         ::RegisterUnknownException(__func__, __FILE__, __LINE__); 
+    }
+    
+    std::vector<std::string> stlNames = oResult.GetNamesOfElements();
+    std::cout<<"structuredbuffer names: "<<std::endl;
+    for(auto const& name: stlNames){
+        std::cout<<name<<std::endl;
+    }
+    std::vector<std::string> stlDescriptions = oResult.GetDescriptionOfElements();
+    std::cout<<"structuredbuffer descriptions: "<<std::endl;
+    for(auto const& description: stlDescriptions){
+        std::cout<<description<<std::endl;
     }
     
     std::ofstream stlFileStream;

@@ -17,10 +17,7 @@ class CodeBlock:
         convert a node to string block
         '''
         i = self.start - 1
-        blockString = ""
-        while(i < self.end):
-            blockString.join(lines[i])
-            i += 1
+        blockString = "".join(lines[i:self.end])
         return blockString
 
 
@@ -64,10 +61,11 @@ class ScriptContent:
     '''
     Data structure to store all code blocks in the parse tree
     '''
-    def __init__(self, classes, imports, functions):
+    def __init__(self, classes, imports, functions, libdict):
         self.classes = classes
         self.imports = imports
         self.functions = functions
+        self.libdict = libdict
 
 
 class SafeFunction:

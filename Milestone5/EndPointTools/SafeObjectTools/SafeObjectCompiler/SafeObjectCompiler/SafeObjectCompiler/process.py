@@ -68,7 +68,8 @@ class TemplateProcessor:
 
         safeFunction.SaveTemplate(self.template)
 
-        self.WriteStructureBuffer(safeFunction, self.destination)
+        self.WriteStructureBuffer(safeFunction, substituteContents.libdict,
+                                  self.destination)
         self.WriteIndexFile(safeFunction)
 
     def ProcessImports(self, importContents):
@@ -77,8 +78,8 @@ class TemplateProcessor:
         '''
         substituteImportContents = ""
         for contentBlock in importContents:
-            substituteImportContents\
-                .join(contentBlock.blockToString(self.lines))
+            substituteImportContents = substituteImportContents \
+                + contentBlock.blockToString(self.lines)
         return substituteImportContents
 
     def ProcessClasses(self, classContents):
@@ -87,9 +88,9 @@ class TemplateProcessor:
         '''
         substituteClassContents = ""
         for contentBlock in classContents:
-            substituteClassContents\
-                .join(contentBlock.blockToString(self.lines))
-            substituteClassContents.join("\n")
+            substituteClassContents = substituteClassContents +\
+                contentBlock.blockToString(self.lines)
+            substituteClassContents = substituteClassContents + "\n"
         return substituteClassContents
 
     def ProcessFunctions(self, functionContents):
@@ -99,11 +100,13 @@ class TemplateProcessor:
         localFunctions = majorFunction = entryFunction = ""
         for contentBlock in functionContents:
             if(contentBlock.name == 'Run'):
-                majorFunction.join(contentBlock.blockToStringMajor(self.lines))
+                majorFunction = majorFunction +\
+                    contentBlock.blockToStringMajor(self.lines)
                 entryFunction = self.GenerateMainFunction(contentBlock)
             else:
-                localFunctions.join(contentBlock.blockToString(self.lines))
-                localFunctions.join('\n')
+                localFunctions = localFunctions + \
+                    contentBlock.blockToString(self.lines)
+                localFunctions = localFunctions + "\n"
         majorFunction = textwrap.indent(majorFunction, "    ")
         return localFunctions, majorFunction, entryFunction
 
@@ -111,15 +114,15 @@ class TemplateProcessor:
         '''
         generate the safe function instance
         '''
-        returns = funcBlock.annotations.pop('return')
+        returnValues = funcBlock.annotations.pop('return')
         args = funcBlock.annotations
-        returns = list(returns)
-        returnConfidentiality = returns.pop()
-        returns = tuple(returns)
+        returnValues = list(returnValues)
+        returnConfidentiality = returnValues.pop()
+        returnValues = tuple(returnValues)
         return SafeFunction(self.title,
                             funcBlock.doc,
                             args,
-                            returns,
+                            returnValues,
                             returnConfidentiality)
 
     def GenerateFileLoad(self, safeFunction):
@@ -128,9 +131,9 @@ class TemplateProcessor:
         '''
         fileLoadStr = ''
         for argid in safeFunction.argsuuid:
-            fileLoadStr.join(
-              f"with open(oInputParameters[\"{argid}\"][\"0\"],'rb') as ifp:\n"
-              f"    self.m_{argid} = pickle.load(ifp)\n")
+            fileLoadStr = fileLoadStr + \
+                (f"with open(oInputParameters[\"{argid}\"][\"0\"],'rb') as ifp:\n"
+                 f"    self.m_{argid} = pickle.load(ifp)\n")
         fileLoadStr = textwrap.indent(fileLoadStr, "        ")
         return fileLoadStr
 
@@ -140,11 +143,11 @@ class TemplateProcessor:
         '''
         fileDumpStr = ''
         for returnid in safeFunction.returnsuuid:
-            fileDumpStr.join(
-                f"with open(self.m_JobIdentifier+\".{returnid}\",\"wb\") as ofp:\n"
-                f"    pickle.dump(self.m_{returnid}, ofp)\n"
-                f"with open(\"DataSignals/\"+self.m_JobIdentifier+\".{returnid}\", 'w') as fp:\n"
-                f"    pass\n")
+            fileDumpStr = fileDumpStr + \
+                (f"with open(self.m_JobIdentifier+\".{returnid}\",\"wb\") as ofp:\n"
+                 f"    pickle.dump(self.m_{returnid}, ofp)\n"
+                 f"with open(\"DataSignals/\"+self.m_JobIdentifier+\".{returnid}\", 'w') as fp:\n"
+                 f"    pass\n")
         fileDumpStr = textwrap.indent(fileDumpStr, "        ")
         return fileDumpStr
 
@@ -155,21 +158,22 @@ class TemplateProcessor:
         inputArgs = ""
         resultValues = ""
         for argid in safeFunction.argsuuid:
-            inputArgs.join(f"safe{safeFunction.uuid}.m_{argid}, ")
+            inputArgs = inputArgs + f"safe{safeFunction.uuid}.m_{argid}, "
         inputArgs = inputArgs[:-2]
         for returnid in safeFunction.returnsuuid:
-            resultValues.join(f"safe{safeFunction.uuid}.m_{returnid}, ")
+            resultValues = resultValues + \
+                f"safe{safeFunction.uuid}.m_{returnid}, "
         resultValues = resultValues[:-2]
         executionStr = \
             f"{resultValues} = safe{safeFunction.uuid}.Run({inputArgs})"
         executionStr = textwrap.indent(executionStr, "            ")
         return executionStr
 
-    def WriteStructureBuffer(self, safeFunction, destinationDir):
+    def WriteStructureBuffer(self, safeFunction, libdict, destinationDir):
         '''
         write structuredbuffer into file
         '''
-        writeSafeObject(safeFunction, destinationDir)
+        writeSafeObject(safeFunction, libdict, destinationDir)
 
     def WriteIndexFile(self, safeFunction):
         '''

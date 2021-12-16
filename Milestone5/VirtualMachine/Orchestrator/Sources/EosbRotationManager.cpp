@@ -169,3 +169,29 @@ bool __thiscall EosbRotationManager::IsRunning(void) const
 
     return m_oRotatingThread != nullptr;
 }
+
+/********************************************************************************************
+ *
+ * @class EosbRotationManager
+ * @function GetServerIp
+ * @brief Return the IP address of the remote that this EOSB is associated with
+ * @return std::string - The IP address for this EOSB
+ ********************************************************************************************/
+const std::string & EosbRotationManager::GetServerIp(void) const
+{
+    __DebugFunction();
+    return m_strServerIp;
+}
+
+/********************************************************************************************
+ *
+ * @class EosbRotationManager
+ * @function GetServerPort
+ * @brief Return the port of the remote that this EOSB is associated with
+ * @return unsigned int - The port for this EOSB
+ ********************************************************************************************/
+unsigned int EosbRotationManager::GetServerPort(void) const
+{
+    __DebugFunction();
+    return m_unServerPort;
+}

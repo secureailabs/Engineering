@@ -39,6 +39,9 @@ class EosbRotationManager
         void __thiscall SetEosb(const std::string& strEosb);
 
         bool __thiscall IsRunning(void) const;
+
+        const std::string & __thiscall GetServerIp(void) const;
+        unsigned int __thiscall GetServerPort(void)const;
     private:
         void __thiscall PeriodicEosbUpdate(void);
 

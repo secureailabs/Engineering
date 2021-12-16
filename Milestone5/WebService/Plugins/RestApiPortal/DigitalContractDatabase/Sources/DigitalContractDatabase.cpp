@@ -1939,7 +1939,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::GetProvisioningStatus(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();

@@ -457,6 +457,46 @@ std::string __thiscall Frontend::GetSafeFunctions(void) const
     return ::GetJsonForStructuredBufferMap(m_stlAvailableSafeFunctions);
 }
 
+/********************************************************************************************
+ *
+ * @class Frontend
+ * @function ProvisionDigitalContract
+ * @brief Send a request to provision a digital contract
+ * @param[in] c_strDigitalContractGUID The GUID of the digital contract to provision
+ * @param[in] std::string - Eventually the GUID of the dataset in the family to provision, un-used today
+ * @return std::string - Containing a list of our safe functions in the form: GUID:Metadata
+ *
+ ********************************************************************************************/
+unsigned int __thiscall Frontend::ProvisionDigitalContract(
+    _in const std::string & c_strDigitalContractGUID,
+    _in const std::string &
+    )
+{
+    unsigned int unStatus{404};
+    try
+    {
+        std::string strVerb = "POST";
+        std::string strApiUrl = "/SAIL/DigitalContractManager/Provision?Eosb=" + m_oEosbRotator.GetEosb();
+        std::string strContent = "{\n   \"DigitalContractGuid\":\"" + c_strDigitalContractGUID + "\"\n}";
+        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
+        std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
+        StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+        unStatus = oResponse.GetFloat64("Status");
+    }
+    catch(const BaseException& oBaseException )
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        unStatus = 404;
+    }
+    catch( ... )
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        unStatus = 404;
+    }
+
+    return unStatus;
+}
+
 void __thiscall Frontend::Listener(
     _in std::string strVMID
 )

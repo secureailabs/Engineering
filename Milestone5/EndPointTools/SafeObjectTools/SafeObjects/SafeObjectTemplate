@@ -9,7 +9,6 @@ import pickle
 {{__NONCLASSMETHODS__}}
 
 class SAFE_{{__SAFEOBJECTID__}}:
-    """Calculate the mean of two numbers"""
     m_SafeObjectIdentifier = "{{__SAFEOBJECTID__}}"
     def __init__(self, jobIdendifier, baseFolder):
         # Validate and record job identifier. Right now this code

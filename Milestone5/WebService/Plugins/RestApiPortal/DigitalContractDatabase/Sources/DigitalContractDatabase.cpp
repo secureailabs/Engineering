@@ -70,7 +70,7 @@ static void * __stdcall StartIpcServerThread(
         DigitalContractDatabase * poDigitalContractDatabase = ::GetDigitalContractDatabase();
         poDigitalContractDatabase->RunIpcServer(poIpcServerParameters->poIpcServer, poIpcServerParameters->poThreadManager);
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
@@ -123,7 +123,7 @@ static void * __stdcall StartIpcThread(
         DigitalContractDatabase * poDigitalContractDatabase = ::GetDigitalContractDatabase();
         poDigitalContractDatabase->HandleIpcRequest(poIpcSocket);
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
@@ -819,7 +819,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::GetUserInfo(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -1158,7 +1158,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ListDigitalContracts(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -1255,7 +1255,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::PullDigitalContract(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -1400,7 +1400,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -1543,7 +1543,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::AcceptDigitalContract(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -1688,7 +1688,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ActivateDigitalContract(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -1852,7 +1852,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::AssociateWithAzureTemplate
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -1939,7 +1939,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::GetProvisioningStatus(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -2041,7 +2041,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDcAuditEvent(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -2245,7 +2245,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -2282,7 +2282,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
             _ThrowBaseExceptionIf((200 != oUpdateProvisioningStateResponse.GetDword("Status")), "Update DC status fail", nullptr);
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
     }
@@ -2476,7 +2476,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             fIsProvisioningSuccess = true;
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         strErrorMessage = oException.GetExceptionMessage();
@@ -2516,7 +2516,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         StructuredBuffer oUpdateProvisioningStateResponse(this->UpdateDigitalContractProvisioningStatus(oUpdateProvisioningState));
         _ThrowBaseExceptionIf((200 != oUpdateProvisioningStateResponse.GetDword("Status")), "Update DC status fail", nullptr);
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
     }
@@ -2623,7 +2623,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::UpdateDigitalContractProvi
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -2789,7 +2789,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::DeprovisionDigitalContract
             }
         }
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
         oResponse.Clear();
@@ -2866,7 +2866,7 @@ void __thiscall DigitalContractDatabase::DeleteVirtualMachineResources(
         poIpcAzureManager->Release();
         poIpcAzureManager = nullptr;
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
     }
@@ -2933,7 +2933,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::InitializeVirtualMachine(
 
         dwStatus = 200;
     }
-    catch (BaseException oException)
+    catch (const BaseException& oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
     }

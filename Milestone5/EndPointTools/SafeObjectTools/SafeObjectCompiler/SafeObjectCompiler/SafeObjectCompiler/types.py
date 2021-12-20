@@ -78,7 +78,7 @@ class SafeFunction:
             self.doc = ""
         else:
             self.doc = doc
-        self.uuid = uuid.uuid4().hex.upper()
+        self.uuid = self.GenerateUUID(uuid.uuid4().hex, 0x44)
         self.argsuuid = []
         if not isinstance(args, dict):
             raise Exception("safe function args must be a dict")
@@ -97,7 +97,9 @@ class SafeFunction:
         argTypes = []
         for arg in args:
             argTypes.append(str(args[arg]))
-            self.argsuuid.append(uuid.uuid4().hex.upper())
+            rawid = uuid.uuid4().hex
+            typedID = self.GenerateUUID(rawid, 0x4c)
+            self.argsuuid.append(typedID)
         return argTypes
 
     def ProcessReturns(self, returns):
@@ -107,7 +109,9 @@ class SafeFunction:
         returnTypes = []
         for val in returns:
             returnTypes.append(str(val))
-            self.returnsuuid.append(uuid.uuid4().hex.upper())
+            rawid = uuid.uuid4().hex
+            typedID = self.GenerateUUID(rawid, 0x50)
+            self.returnsuuid.append(typedID)
         return returnTypes
 
     def SaveTemplate(self, template):
@@ -115,6 +119,18 @@ class SafeFunction:
         accept template after process
         '''
         self.template = template
+
+    def GenerateUUID(self, raw, type):
+        '''
+        add uuid types
+        '''
+        mask = 0x03
+        prefix = raw[:2]
+        print(prefix)
+        prefixval = (int(prefix, 16) & mask) | type
+        print(prefixval)
+        typedUUID = (hex(prefixval)[2:] + raw[2:]).upper()
+        return typedUUID
 
     def PrintFunction(self):
         print("name: {0}".format(self.name), flush=True)

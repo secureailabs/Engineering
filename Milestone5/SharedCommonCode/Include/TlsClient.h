@@ -29,6 +29,13 @@ TlsNode * __stdcall TlsConnectToNetworkSocket(
 
 /********************************************************************************************/
 
+TlsNode* __stdcall TlsConnectToNetworkSocket(
+    _in const std::string& c_strTargetIpAddress,
+    _in Word wPortNumber
+    );
+
+/********************************************************************************************/
+
 TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
     _in const char * c_strTargetIpAddress,
     _in Word wPortNumber,

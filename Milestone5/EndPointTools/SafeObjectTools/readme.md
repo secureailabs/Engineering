@@ -60,10 +60,9 @@ This particular function has a, b and c as input parameters, and d, e, f as outp
 ### Type annotations
 The input and output types are recorded via python type annotations, to read more about annotation, one can refer to:
 
-[Python typing](https://docs.python.org/3/library/typing.html)
-[Python function annotation](https://www.python.org/dev/peps/pep-3107/)
-[Python typing library](https://docs.python.org/3/library/typing.html)
-
+[Python typing](https://docs.python.org/3/library/typing.html)  
+[Python function annotation](https://www.python.org/dev/peps/pep-3107/)  
+[Python typing library](https://docs.python.org/3/library/typing.html)  
 Some simple examples are given below:
 ```
 def Run(a: float) -> (float, [False]):

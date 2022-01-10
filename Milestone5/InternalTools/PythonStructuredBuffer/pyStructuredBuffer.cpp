@@ -53,7 +53,6 @@ static PyObject *StructuredBufferInit(
     __DebugFunction();
 
     StructuredBuffer * poStructuredBuffer = new StructuredBuffer();
-    std::cout << "StructuredBuffer init" << std::endl;
 
     return Py_BuildValue("K", (void *)poStructuredBuffer);
 }
@@ -209,8 +208,6 @@ static PyObject *PutBoolean(
     {
         return nullptr;
     }
-    std::cout << "PutBool" << szElementName << std::endl;
-    std::cout << "PutBool" << fValue << std::endl;
 
     fValue = (fValue != 0);
     poStructuredBuffer->PutBoolean(szElementName, fValue);

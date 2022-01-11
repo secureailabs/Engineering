@@ -5,6 +5,7 @@ networkName="sailNetwork"
 backendImageName="backend"
 orchestratorImageName="orchestrator"
 remoteDataConnectorImageName="remotedataconnector"
+secureComputationNodeImageName="securecomputationnode"
 
 foundNetworkName=$(docker network ls --filter name=$networkName --format {{.Name}})
 echo $foundNetworkName
@@ -25,3 +26,6 @@ docker build -f Docker/Dockerfile.Orchestrator . -t $orchestratorImageName
 
 # Build the Remote DataConnector image
 docker build -f Docker/Dockerfile.RemoteDataConnector . -t $remoteDataConnectorImageName
+
+# Build the SecureComputationNode image
+docker build -f Docker/Dockerfile.SecureComputationNode . -t $secureComputationNodeImageName

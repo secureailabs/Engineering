@@ -21,6 +21,7 @@
 #include "CurlRest.h"
 #include "TlsTransactionHelperFunctions.h"
 #include "Base64Encoder.h"
+#include "InitializationVector.h"
 
 #include <algorithm>
 #include <thread>
@@ -2221,7 +2222,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                                     oVirtualMachineCreateParameter.PutString("adminUsername", "saildeveloper");
                                     oVirtualMachineCreateParameter.PutString("adminPassword", "Iw2btin2AC+beRl&dir!");
 
-                                    std::string strParamterJson = ::CreateAzureParamterJson("https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/DeployVirtualMachineNoPorts.json?sp=r&st=2021-06-29T12:01:40Z&se=2022-02-28T20:01:40Z&spr=https&sv=2020-02-10&sr=b&sig=epPQ8kO62sj%2F0jA1aifQVq1VH1yN5woISBaqC2mRGfg%3D", oVirtualMachineCreateParameter);
+                                    std::string strParamterJson = ::CreateAzureParamterJson(::GetInitializationValue("AzureVirtualMachineTemplateUrl"), oVirtualMachineCreateParameter);
                                     // Create a thread which will keep updating the VM status on the database as it proceeds
                                     // This API will return the response, stating that the VM creation has started
                                     std::thread oThreadCreateVirtualMachine(&DigitalContractDatabase::ProvisionVirtualMachine, this, oDigitialContract, oAzureTemplateResponse.GetBuffer("Eosb"), strApplicationID, strSecret, strTenantID, strSubscriptionID, strResourceGroup, oNewVmGuid.ToString(eRaw), strParamterJson, strLocation);
@@ -2416,8 +2417,8 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             StructuredBuffer oBinaryPackageInstructions;
             oBinaryPackageInstructions.PutString("Verb", "GET");
             oBinaryPackageInstructions.PutString("Content", "");
-            oBinaryPackageInstructions.PutString("Uri", "/deployemnttemplate/SecureComputationalVirtualMachine.binaries?sp=r&st=2021-08-31T19:10:45Z&se=2025-03-02T03:10:45Z&sv=2020-08-04&sr=b&sig=Cax0Bm685X0UN8dVLrZYw55bj2gvRLNheiuRVzUtjBU%3D");
-            oBinaryPackageInstructions.PutString("Host", "confidentialvmdeployment.blob.core.windows.net");
+            oBinaryPackageInstructions.PutString("Uri", ::GetInitializationValue("SecureComputationNodePackageUrl"));
+            oBinaryPackageInstructions.PutString("Host", ::GetInitializationValue("SecureComputationNodePackageHost"));
 
             // Send the url for the binary package and wait for a response on successful installation
             std::vector<Byte> stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode, oBinaryPackageInstructions, 0);

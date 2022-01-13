@@ -15,6 +15,7 @@
 #include "ThreadManager.h"
 #include "TlsClient.h"
 #include "AzureHelper.h"
+#include "InitializationVector.h"
 
 #include <thread>
 
@@ -61,7 +62,7 @@ static void * __stdcall StartIpcServerThread(
         AzureManager * poAzureManager = ::GetAzureManager();
         poAzureManager->RunIpcServer(poIpcServerParameters->poIpcServer, poIpcServerParameters->poThreadManager);
     }
-    
+
     catch (BaseException oException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
@@ -106,7 +107,7 @@ static void * __stdcall StartIpcThread(
 {
     __DebugFunction();
     __DebugAssert(nullptr != poVoidThreadParameter);
-    
+
     Socket * poIpcSocket = (Socket *) poVoidThreadParameter;
 
     try
@@ -114,7 +115,7 @@ static void * __stdcall StartIpcThread(
         AzureManager * poAzureManager = ::GetAzureManager();
         poAzureManager->HandleIpcRequest(poIpcSocket);
     }
-    
+
     catch (BaseException oException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
@@ -776,7 +777,7 @@ std::vector<Byte> __thiscall AzureManager::GetListOfAzureSettingsTemplates(
     Dword dwStatus = 404;
     TlsNode * poTlsNode = nullptr;
 
-    try 
+    try
     {
         StructuredBuffer oUserInfo(this->GetUserInfo(c_oRequest));
         if (200 == oUserInfo.GetDword("Status"))
@@ -1307,7 +1308,7 @@ void __thiscall AzureManager::UpdateAzureTemplateResources(
             // Create a Virutal Network accordingly
             StructuredBuffer oVirtualNetworkCreateParameter;
             oVirtualNetworkCreateParameter.PutString("VirtualNetworkName", strVirtualNetwork);
-            std::string strDeploymentParameters = ::CreateAzureParamterJson("https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/VirtualNetwork.json?sp=r&st=2021-08-18T11:49:19Z&se=2022-05-31T19:49:19Z&spr=https&sv=2020-08-04&sr=b&sig=UepJBsssk48ON0SKPRo8G1IOc%2F4dysKVOjjQ%2B59iNxA%3D", oVirtualNetworkCreateParameter);
+            std::string strDeploymentParameters = ::CreateAzureParamterJson(::GetInitializationValue("AzureVirtualNetworkTemplateUrl"), oVirtualNetworkCreateParameter);
             StructuredBuffer oDeploymentResult = ::CreateAzureDeployment(strAzureAccessToken, strDeploymentParameters, strSubscriptionIdentifier, strResourceGroup, strLocation);
             if ("Success" != oDeploymentResult.GetString("Status"))
             {
@@ -1340,7 +1341,7 @@ void __thiscall AzureManager::UpdateAzureTemplateResources(
             // Create the Network Security Group
             StructuredBuffer oNetworkSecurityGroupCreateParameter;
             oNetworkSecurityGroupCreateParameter.PutString("NetworkSecurityGroupName", strNetworksecurityGroupName);
-            std::string strDeploymentParameters = ::CreateAzureParamterJson("https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/NetworkSecurityGroup.json?sp=r&st=2021-08-18T11:45:41Z&se=2022-08-31T19:45:41Z&spr=https&sv=2020-08-04&sr=b&sig=6NdypMlPI6D0UVzeux1HUY9KaRns%2BFjX2yluqPoMT1w%3D", oNetworkSecurityGroupCreateParameter);
+            std::string strDeploymentParameters = ::CreateAzureParamterJson(::GetInitializationValue("AzureNetworkSecurityGroupTemplateUrl"), oNetworkSecurityGroupCreateParameter);
             StructuredBuffer oDeploymentResult = ::CreateAzureDeployment(strAzureAccessToken, strDeploymentParameters, strSubscriptionIdentifier, strResourceGroup, strLocation);
             if ("Success" != oDeploymentResult.GetString("Status"))
             {

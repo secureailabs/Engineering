@@ -63,37 +63,6 @@ void __stdcall PackageComputeServices()
     ::WriteBytesAsFile("SecureComputationalVirtualMachine.binaries", oPayloadToVm.GetSerializedBuffer());
 }
 
-void __stdcall PackageWebService()
-{
-    __DebugFunction();
-
-    StructuredBuffer oPayloadToVm;
-
-    // The instruction to execute after all the files are uploaded on the VM
-    oPayloadToVm.PutString("Entrypoint", "./RestApiPortal");
-
-    // Set the type of VM, either it runs Computation or WebService
-    oPayloadToVm.PutString("VirtualMachineType", "WebService");
-
-    // A nested Structured Buffer containing all the executable files
-    StructuredBuffer oFilesToPut;
-    oFilesToPut.PutBuffer("DatabaseGateway", ::ReadFileAsByteBuffer("DatabaseGateway"));
-    oFilesToPut.PutBuffer("RestApiPortal", ::ReadFileAsByteBuffer("RestApiPortal"));
-    oFilesToPut.PutBuffer("SharedLibraries/DatabasePortal/libDatabaseManager.so", ::ReadFileAsByteBuffer("SharedLibraries/DatabasePortal/libDatabaseManager.so"));
-    oFilesToPut.PutBuffer("SharedLibraries/RestApiPortal/libAccountDatabase.so", ::ReadFileAsByteBuffer("SharedLibraries/RestApiPortal/libAccountDatabase.so"));
-    oFilesToPut.PutBuffer("SharedLibraries/RestApiPortal/libCryptographicKeyManagement.so", ::ReadFileAsByteBuffer("SharedLibraries/RestApiPortal/libCryptographicKeyManagement.so"));
-    oFilesToPut.PutBuffer("SharedLibraries/RestApiPortal/libDigitalContractDatabase.so", ::ReadFileAsByteBuffer("SharedLibraries/RestApiPortal/libDigitalContractDatabase.so"));
-    oFilesToPut.PutBuffer("SharedLibraries/RestApiPortal/libVirtualMachineManager.so", ::ReadFileAsByteBuffer("SharedLibraries/RestApiPortal/libVirtualMachineManager.so"));
-    oFilesToPut.PutBuffer("SharedLibraries/RestApiPortal/libAuditLogManager.so", ::ReadFileAsByteBuffer("SharedLibraries/RestApiPortal/libAuditLogManager.so"));
-    oFilesToPut.PutBuffer("SharedLibraries/RestApiPortal/libDatasetDatabase.so", ::ReadFileAsByteBuffer("SharedLibraries/RestApiPortal/libDatasetDatabase.so"));
-    oFilesToPut.PutBuffer("SharedLibraries/RestApiPortal/libSailAuthentication.so", ::ReadFileAsByteBuffer("SharedLibraries/RestApiPortal/libSailAuthentication.so"));
-
-    // oFilesToPut.PutBuffer("", ::ReadFileAsByteBuffer(""));
-    oPayloadToVm.PutStructuredBuffer("ExecutableFiles", oFilesToPut);
-
-    ::WriteBytesAsFile("WebServicesPortal.binaries", oPayloadToVm.GetSerializedBuffer());
-}
-
 /********************************************************************************************/
 
 int __cdecl main(
@@ -105,7 +74,6 @@ int __cdecl main(
 
     try
     {
-        ::PackageWebService();
         ::PackageComputeServices();
     }
 

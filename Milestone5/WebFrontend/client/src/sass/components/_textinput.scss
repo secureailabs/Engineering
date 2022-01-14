@@ -1,0 +1,36 @@
+.text-input {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+
+  input {
+    @include form-element;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  &__label {
+    padding-top: 0.5rem;
+    font: {
+      size: var(--fontsize-base);
+      weight: bold;
+    }
+  }
+  .tool-tip {
+    position: relative;
+    display: inline-block;
+    width: 5%;
+    height: 0;
+    top: 1.4rem;
+    // left: 37rem;
+    left: 90%;
+
+    &__text {
+      width: 1900%;
+      border-radius: 5px;
+      padding: 5px 50%;
+      bottom: 1.5rem;
+      right: -100%;
+    }
+  }
+}

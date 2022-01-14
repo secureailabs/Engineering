@@ -1,0 +1,32 @@
+.dcforminfo {
+    width: 100%;
+    &__title {
+        font: {
+            size: var(--fontsize-4xl);
+        }
+        text-decoration: underline;
+    }
+    &__description {
+        font: {
+            size: var(--fontsize-sm);
+        }
+        padding: 2vh 0;
+    }
+}
+
+.acceptdigitalcontract {
+    .form {
+        .radio-input {
+            width: 100%;
+            &__options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        #HostRegion {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+        #NumberOfVCPU {
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        }
+    }
+}

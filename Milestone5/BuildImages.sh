@@ -6,6 +6,7 @@ backendImageName="backend"
 orchestratorImageName="orchestrator"
 remoteDataConnectorImageName="remotedataconnector"
 secureComputationNodeImageName="securecomputationnode"
+webFrontendImageName="webfrontend"
 
 foundNetworkName=$(docker network ls --filter name=$networkName --format {{.Name}})
 echo $foundNetworkName
@@ -29,3 +30,6 @@ docker build -f Docker/Dockerfile.RemoteDataConnector . -t $remoteDataConnectorI
 
 # Build the SecureComputationNode image
 docker build -f Docker/Dockerfile.SecureComputationNode . -t $secureComputationNodeImageName
+
+# Build the SecureComputationNode image
+docker build -f Docker/Dockerfile.WebFrontend . -t $webFrontendImageName

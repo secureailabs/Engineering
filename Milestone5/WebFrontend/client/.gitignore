@@ -1,0 +1,6 @@
+.snowpack
+# build (we want the VM to get the build from GH)
+node_modules
+dist
+build/*
+src/.env

@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      // Define either ONE of these...
+      // 1. General support: matches everything relative to the project directory
+      "*": ["*"],
+      // 2. Explicit support: match only your mounted directories (Recommended!)
+
+      "@redux/*": ["./src/redux/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@sass/*": ["./src/sass/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@components/*": ["./src/components/*"],
+      "@context/*": ["./src/context/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@layout/*": ["./src/layout/*"],
+      "@app/*": ["./src/*"],
+      "@utils/*": ["./src/utils/*"]
+    }
+  },
+  "include": ["src", "types", "src/pages/VirtualMachines/.component.tsx"]
+}

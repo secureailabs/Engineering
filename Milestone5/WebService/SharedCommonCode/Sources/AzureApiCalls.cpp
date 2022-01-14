@@ -13,6 +13,7 @@
 #include "CurlRest.h"
 #include "JsonValue.h"
 #include "ExceptionRegister.h"
+#include "InitializationVector.h"
 
 #include <algorithm>
 
@@ -842,7 +843,7 @@ StructuredBuffer CopyVirtualMachineImage(
         stlHeader.clear();
         stlHeader.push_back("Host: " + strStorageAccountName+".blob.core.windows.net");
         stlHeader.push_back("Content-Length: 0");
-        stlHeader.push_back("x-ms-copy-source: https://sailcomputationimage9872.blob.core.windows.net/system/Microsoft.Compute/Images/packer/SailUbuntu2004-osDisk.6126fa4d-ca83-438a-b427-7df563bf8026.vhd?sp=r&st=2021-12-03T13:20:09Z&se=2024-05-31T21:20:09Z&spr=https&sv=2020-08-04&sr=b&sig=XEzEQUmny87EvbrUGAcBlE%2BPP97YBlwRdp6c85z04xo%3D");
+        stlHeader.push_back("x-ms-copy-source: "+ ::GetInitializationValue("SecureVirtualMachineImageUrl"));
         long nResponseCode = 0;
         stlResponse = ::RestApiCall(strStorageAccountName+".blob.core.windows.net", 443, "PUT", "/images/sailimage.vhd?" + strSASToken, "", false, stlHeader, &nResponseCode);
         _ThrowBaseExceptionIf((202 != nResponseCode), "Failed to copy the image from SAIL account. Response code: %d %s", nResponseCode, stlResponse.data(), nullptr);

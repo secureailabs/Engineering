@@ -1,0 +1,11 @@
+{
+    "MongoDbUrl":"mongodb://localhost:27017",
+    "SecureVirtualMachineImageUrl":"https://sailcomputationimage9872.blob.core.windows.net/system/Microsoft.Compute/Images/packer/SailUbuntu2004-osDisk.6126fa4d-ca83-438a-b427-7df563bf8026.vhd?sp=r&st=2021-12-03T13:20:09Z&se=2024-05-31T21:20:09Z&spr=https&sv=2020-08-04&sr=b&sig=XEzEQUmny87EvbrUGAcBlE%2BPP97YBlwRdp6c85z04xo%3D",
+    "AzureVirtualNetworkTemplateUrl":"https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/VirtualNetwork.json?sp=r&st=2021-08-18T11:49:19Z&se=2022-05-31T19:49:19Z&spr=https&sv=2020-08-04&sr=b&sig=UepJBsssk48ON0SKPRo8G1IOc%2F4dysKVOjjQ%2B59iNxA%3D",
+    "AzureNetworkSecurityGroupTemplateUrl":"https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/NetworkSecurityGroup.json?sp=r&st=2021-08-18T11:45:41Z&se=2022-08-31T19:45:41Z&spr=https&sv=2020-08-04&sr=b&sig=6NdypMlPI6D0UVzeux1HUY9KaRns%2BFjX2yluqPoMT1w%3D",
+    "AzureVirtualMachineTemplateUrl":"https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/DeployVirtualMachineNoPorts.json?sp=r&st=2021-06-29T12:01:40Z&se=2022-02-28T20:01:40Z&spr=https&sv=2020-02-10&sr=b&sig=epPQ8kO62sj%2F0jA1aifQVq1VH1yN5woISBaqC2mRGfg%3D",
+    "SecureComputationNodePackageUrl":"/deployemnttemplate/SecureComputationalVirtualMachine.binaries?sp=r&st=2021-08-31T19:10:45Z&se=2025-03-02T03:10:45Z&sv=2020-08-04&sr=b&sig=Cax0Bm685X0UN8dVLrZYw55bj2gvRLNheiuRVzUtjBU%3D",
+    "SecureComputationNodePackageHost":"confidentialvmdeployment.blob.core.windows.net",
+    "TlsCertificate":"aaaa",
+    "TlsPrivateKey":"bbbb"
+}

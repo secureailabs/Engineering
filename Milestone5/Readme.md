@@ -14,6 +14,12 @@
 ### Remote Data Connector
 ./RunService.sh -s remoteDataConnector
 
+### Secure Computation Node
+./RunService.sh -s securecomputationnode
+
+### Web Frontend
+./RunService.sh -s webfrontend
+
 ### Shutdown services running in detached mode
 #### Backend
 ```
@@ -27,9 +33,16 @@ docker stop $(docker ps -q --filter ancestor=orchestrator)
 ```
 docker stop $(docker ps -q --filter ancestor=remotedataconnector)
 ```
+#### Secure Computation Node
+```
+docker stop $(docker ps -q --filter ancestor=securecomputationnode)
+```
+#### Web Frontend
+```
+docker stop $(docker ps -q --filter ancestor=webfrontend)
+```
 
 #### Note:
 1. Use the `-d` flag to run the services in the background in docker detached mode.
 2. To access the backend portal from any other container use `backend` as a domain name. e.g. the frontend webApp must connect to `https://backend:6200` instead of `https://127.0.0.1:6200/`
 3. The frontend WebApp is not part of this repository, it had to be built separately from https://github.com/secureailabs/Web-Development
-

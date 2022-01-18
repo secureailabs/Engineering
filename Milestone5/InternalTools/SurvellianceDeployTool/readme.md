@@ -1,10 +1,10 @@
 # Survelliance deploy tool
 
 ## Dependencies
-The deployment script requires paramiko and pyyaml library. To install, run:
+The deployment script requires external library. To install, run:
 
 ```
-sudo pip3 install paramiko PyYAML
+sudo pip3 -r requirement.txt
 ```
 
 To view the survelliance data, one can directly visit:

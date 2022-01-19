@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd /app
 yarn --cwd client install && yarn cache clean && yarn --cwd client build
 

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd app/sail
 pip3 install .
 cd ..

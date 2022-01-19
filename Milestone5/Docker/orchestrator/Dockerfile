@@ -9,12 +9,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 
-RUN apt-get update
-RUN apt-get -y upgrade
+RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y libssl-dev \
 libcurl4-openssl-dev \
 uuid-dev \
-git \
 libpython3.8 \
 python3 \
 python3-pip
@@ -30,7 +28,7 @@ RUN apt-get install -y jupyter
 
 EXPOSE 8080
 
-COPY Docker/Entrypoint.Orchestrator.sh /Entrypoint.sh
+COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
 CMD ["/bin/bash", "/Entrypoint.sh"]

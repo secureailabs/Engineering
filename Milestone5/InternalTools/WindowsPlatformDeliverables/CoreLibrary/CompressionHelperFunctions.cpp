@@ -27,9 +27,9 @@
  *
  ********************************************************************************************/
 extern StructuredBuffer CompressToStructuredBuffer(
-    const void* c_pbRawBytes,
+    const void * c_pbRawBytes,
     uint64_t unRawBufferSizeInBytes
-) throw()
+    ) throw()
 {
     __DebugFunction();
 
@@ -64,12 +64,7 @@ extern StructuredBuffer CompressToStructuredBuffer(
     SRes nLzmaStatus = Lzma2Enc_SetProps(hEncodeHandle, &encodeProperties);
     __DebugAssert(SZ_OK == nLzmaStatus);
 
-    nLzmaStatus = Lzma2Enc_Encode2(hEncodeHandle,
-        nullptr,
-        reinterpret_cast<Byte*>(&stlCompressedDestination[0]), &unOutBufSize,
-        nullptr,
-        reinterpret_cast<const Byte*>(c_pbRawBytes), unRawBufferSizeInBytes,
-        nullptr);
+    nLzmaStatus = Lzma2Enc_Encode2(hEncodeHandle, nullptr, reinterpret_cast<Byte*>(&stlCompressedDestination[0]), &unOutBufSize, nullptr, reinterpret_cast<const Byte*>(c_pbRawBytes), unRawBufferSizeInBytes, nullptr);
 
     // Clean-up the operation before any assertions
     Lzma2Enc_Destroy(hEncodeHandle);
@@ -80,6 +75,7 @@ extern StructuredBuffer CompressToStructuredBuffer(
         
     compressedBuffer.PutBuffer("CompressedBuffer", stlCompressedDestination);
     compressedBuffer.PutUnsignedInt64("OriginalSize", unRawBufferSizeInBytes);
+    compressedBuffer.PutUnsignedInt64("CompressedSize", stlCompressedDestination.size());
     compressedBuffer.PutByte("EncodingProperty", Lzma2Enc_WriteProperties(hEncodeHandle));
 
     std::cout << "Compression ratio: " << (1 - (double(unOutBufSize) / double(unRawBufferSizeInBytes))) * 100.0f << "% ("

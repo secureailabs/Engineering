@@ -125,9 +125,14 @@ class StructuredBuffer : public Object
             );
         virtual ~StructuredBuffer(void) throw();
         
-        // Remove all element
+        // Operatror overloading
+        StructuredBuffer & __thiscall operator=(
+            const StructuredBuffer & oStructuredBuffer
+            );
+
+		// Remove all element
         void __thiscall Clear(void) throw();
-        
+		
         // Get a serialized buffer representing this StructuredBuffer. This buffer
         // can be fed into one of the constructors to de-serialize this object. There
         // are two different ways to do it. Either you get a vector<Byte> or you can
@@ -160,8 +165,11 @@ class StructuredBuffer : public Object
             _in const char * c_szElementName
             ) throw();
         std::vector<std::string> __thiscall GetNamesOfElements(void) const throw();
+        Byte __thiscall GetElementType(
+            _in const char * c_szElementName
+            ) const throw();
         std::vector<std::string> __thiscall GetDescriptionOfElements(void) const throw();
-        
+
         // Prints out all of the StructuredBuffer metadata and data
         std::string __thiscall ToString(void) throw();
 

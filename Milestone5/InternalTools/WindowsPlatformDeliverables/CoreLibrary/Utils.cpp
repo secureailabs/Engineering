@@ -232,7 +232,7 @@ std::string UnEscapeJsonString(
  *
  ********************************************************************************************/
 
-std::string Base64Encode(
+/*std::string Base64Encode(
     _in const std::string & c_strInputString
     )
 {
@@ -279,7 +279,7 @@ std::string Base64Encode(
     }
 
     return strEncodedString;
-}
+}*/
 
 /********************************************************************************************
  *
@@ -290,7 +290,7 @@ std::string Base64Encode(
  *
  ********************************************************************************************/
 
-std::string Base64Decode(
+/*std::string Base64Decode(
     _in const std::string & c_strInputString
     )
 {
@@ -357,7 +357,7 @@ std::string Base64Decode(
     }
 
     return strDecodedString;
-}
+}*/
 
 /********************************************************************************************
  *

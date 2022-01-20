@@ -1,0 +1,32 @@
+.tile {
+  cursor: pointer;
+  background-color: var(--orange-0);
+  &__title {
+    font: {
+      size: var(--fontsize-4xl);
+    }
+  }
+  &__description {
+    font: {
+      size: var(--fontsize-sm);
+    }
+  }
+  &__icon {
+    padding: 2rem 0;
+    width: 4rem;
+    height: 4rem;
+    display: block;
+    margin: auto;
+  }
+  padding: 4vh 1vw;
+  border: {
+    style: solid;
+    radius: 0.5rem;
+    width: 0.25rem;
+  }
+  &:hover {
+    .tile__title {
+      text-decoration: underline;
+    }
+  }
+}

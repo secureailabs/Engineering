@@ -40,6 +40,12 @@
 
 /********************************************************************************************/
 
+extern bool __stdcall PutDatabaseGatewayResponse (
+    _in TlsNode& oTlsNode,
+    _in const StructuredBuffer& oStructuredBuffer
+);
+
+
 class RestFramework : public Object
 {
     public:

@@ -137,7 +137,7 @@ std::vector<Byte> __stdcall GetTlsTransaction(
         }
     }
     
-    catch(BaseException oBaseException)
+    catch(const BaseException & oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -198,8 +198,8 @@ bool __stdcall PutTlsTransaction(
             fSuccess = true;
         }
     }
-    
-    catch(BaseException oBaseException)
+
+    catch(const BaseException & oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
@@ -313,5 +313,7 @@ bool __stdcall PutHttpHeaderOnlyResponse(
 
     return true;
 }
+
+
 
 /********************************************************************************************/

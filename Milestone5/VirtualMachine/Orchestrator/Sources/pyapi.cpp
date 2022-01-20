@@ -47,7 +47,17 @@ static PyObject* login(PyObject* self, PyObject* args)
 
 static PyObject* get_current_eosb(PyObject * self, PyObject * args)
 {
-    return Py_BuildValue("s", getFrontend().GetCurrentEosb().c_str());
+    std::string strEosb = getFrontend().GetCurrentEosb();
+    PyObject* poPythonReturn;
+    if ( !strEosb.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strEosb.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
 }
 
 static PyObject* exit_current_session(PyObject * self, PyObject * args)
@@ -59,7 +69,32 @@ static PyObject* exit_current_session(PyObject * self, PyObject * args)
 
 static PyObject* get_safe_functions(PyObject* self, PyObject* args)
 {
-    return Py_BuildValue("s",  getFrontend().GetSafeFunctions().c_str());
+    std::string strSafeFunctions = getFrontend().GetSafeFunctions();
+    PyObject* poPythonReturn;
+    if ( !strSafeFunctions.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strSafeFunctions.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
+static PyObject* get_tables(PyObject* self, PyObject* args)
+{
+    std::string strTables = getFrontend().GetTables();
+    PyObject* poPythonReturn;
+    if ( !strTables.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strTables.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
 }
 
 static PyObject* load_safe_objects(PyObject* self, PyObject* args)
@@ -80,7 +115,17 @@ static PyObject* get_digital_contracts(
     _in PyObject* args
     )
 {
-    return Py_BuildValue("s", getFrontend().GetDigitalContracts().c_str());
+    std::string strDigitalContracts = getFrontend().GetDigitalContracts().c_str();
+    PyObject* poPythonReturn;
+    if ( !strDigitalContracts.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strDigitalContracts.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
 }
 
 static PyObject* get_datasets(
@@ -88,7 +133,36 @@ static PyObject* get_datasets(
     _in PyObject* args
     )
 {
-    return Py_BuildValue("s", getFrontend().GetDatasets().c_str());
+    std::string strDatasets = getFrontend().GetDatasets().c_str();
+    PyObject* poPythonReturn;
+    if ( !strDatasets.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strDatasets.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
+static PyObject* provision_digital_contract(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    char* pszDigitalContractGuid;
+    char* pszDatasetGuid;
+
+    if(!PyArg_ParseTuple(args, "ss", &pszDigitalContractGuid, &pszDatasetGuid))
+    {
+        return nullptr;
+    }
+
+    std::string strDigitalContractGuid(pszDigitalContractGuid);
+    std::string strDatasetGuid(pszDatasetGuid);
+    unsigned int returnVal = getFrontend().ProvisionDigitalContract(strDigitalContractGuid, strDatasetGuid);
+    return Py_BuildValue("i", returnVal);
 }
 
 static PyObject* vmconnect(PyObject* self, PyObject* args)
@@ -122,19 +196,8 @@ static PyObject* pulldata(PyObject* self, PyObject* args)
     std::string strVMID(vmID);
     std::string strJobID(jobID);
     std::string strFNID(fnID);
-    //std::vector<std::vector<Byte>> stlOutputList;
 
     getFrontend().HandlePullData(strVMID, strJobID, strFNID);
-
-    // PyObject* oOutput = PyList_New(stlOutputList.size());
-    
-    // for(size_t i =0; i<stlOutputList.size(); i++)
-    // {
-    //     void* tmpdata = stlOutputList[i].data();
-    //     PyList_SetItem(oOutput, i, Py_BuildValue("y#", tmpdata, stlOutputList[i].size()));
-    // }
-    
-    // return oOutput;
     return Py_BuildValue("");
 }
 
@@ -227,33 +290,6 @@ static PyObject* setparameter(PyObject* self, PyObject* args)
     return Py_BuildValue("");
 }
 
-// static PyObject* deletedata(PyObject* self, PyObject* args)
-// {
-//     char* vmID;
-//     PyObject* varArray;
-
-//     if(!PyArg_ParseTuple(args, "sO!", &vmID, &PyList_Type, &varArray))
-//     {
-//         return NULL;
-//     }
-    
-//     std::string strVMID(vmID);
-//     int number = PyList_Size(varArray);
-    
-//     std::vector<std::string> stlVarArray;
-//     for(int i =0; i<number; i++)
-//     {
-//         PyObject* strObj = PyList_GetItem(varArray, i);
-//         PyObject * temp_bytes = PyUnicode_AsEncodedString(strObj, "UTF-8", "strict");
-//         char* varstr = PyBytes_AS_STRING(temp_bytes);
-//         stlVarArray.push_back(std::string(varstr));
-//     }
-
-//     getFrontend().HandleDeleteData(strVMID, stlVarArray);
-
-//     return Py_BuildValue("");
-// }
-
 static PyObject* pushsafeobj(PyObject* self, PyObject* args)
 {
     char* vmID;
@@ -292,22 +328,6 @@ static PyObject* submitjob(PyObject* self, PyObject* args)
     return Py_BuildValue("");
 }
 
-// static PyObject* gettableID(PyObject* self, PyObject* args)
-// {
-//     char* vmID;
-//     std::string strTableID;
-
-//     if(!PyArg_ParseTuple(args, "s", &vmID))
-//     {
-//         return NULL;
-//     }
-    
-//     std::string strVMID(vmID);
-
-//     getFrontend().HandleGetTable(strVMID, strTableID);
-
-//     return Py_BuildValue("s", strTableID.c_str());
-// }
 static PyObject* queryjobstatus(PyObject* self, PyObject* args)
 {
     char* jobid;
@@ -432,6 +452,8 @@ static PyMethodDef SAILAPIMethods [] =
     {"get_safe_functions", (PyCFunction)get_safe_functions, METH_NOARGS, NULL},
     {"get_digital_contracts", (PyCFunction)get_digital_contracts, METH_NOARGS,NULL},
     {"get_datasets", (PyCFunction)get_datasets, METH_NOARGS, NULL},
+    {"get_tables", (PyCFunction)get_tables, METH_NOARGS, NULL},
+    {"provision_digital_contract", (PyCFunction)provision_digital_contract, METH_VARARGS, NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},
     {"pushdata", (PyCFunction)pushdata, METH_VARARGS, NULL},
     {"pulldata", (PyCFunction)pulldata, METH_VARARGS, NULL},

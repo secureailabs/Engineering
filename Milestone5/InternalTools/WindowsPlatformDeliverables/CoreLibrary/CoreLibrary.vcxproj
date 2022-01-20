@@ -23,8 +23,10 @@
     <ClCompile Include="Base64Encoder.cpp" />
     <ClCompile Include="BaseException.cpp" />
     <ClCompile Include="CompressionHelperFunctions.cpp" />
+    <ClCompile Include="DateAndTime.cpp" />
     <ClCompile Include="ExceptionRegister.cpp" />
     <ClCompile Include="Guid.cpp" />
+    <ClCompile Include="JsonParser.cpp" />
     <ClCompile Include="JsonValue.cpp" />
     <ClCompile Include="LzmaSdk\7zFile.c" />
     <ClCompile Include="LzmaSdk\7zStream.c" />
@@ -51,10 +53,12 @@
     <ClInclude Include="..\Include\Base64Encoder.h" />
     <ClInclude Include="..\Include\CompressionHelperFunctions.h" />
     <ClInclude Include="..\Include\CoreTypes.h" />
+    <ClInclude Include="..\Include\DateAndTime.h" />
     <ClInclude Include="..\Include\DebugLibrary.h" />
     <ClInclude Include="..\Include\Exceptions.h" />
     <ClInclude Include="..\Include\ExceptionRegister.h" />
     <ClInclude Include="..\Include\Guid.h" />
+    <ClInclude Include="..\Include\JsonParser.h" />
     <ClInclude Include="..\Include\JsonValue.h" />
     <ClInclude Include="..\Include\Object.h" />
     <ClInclude Include="..\Include\RestApiHelperFunctions.h" />
@@ -73,26 +77,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -149,7 +153,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
@@ -172,7 +176,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
@@ -195,7 +199,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
@@ -221,7 +225,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)Include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>

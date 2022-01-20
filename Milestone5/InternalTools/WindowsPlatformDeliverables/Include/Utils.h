@@ -33,14 +33,6 @@ std::string UnEscapeJsonString(
     _in const std::string & c_strData
     );
 
-std::string Base64Encode(
-    _in const std::string & c_strInputString
-    );
-
-std::string Base64Decode(
-    _in const std::string & c_strInputString
-    );
-
 extern "C" void PutJsonNumberToStructuredBuffer(
     _in const char * c_szRequireParameterName,
     _in Byte bElementType,

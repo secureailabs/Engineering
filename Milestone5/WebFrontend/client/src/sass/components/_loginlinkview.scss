@@ -1,0 +1,19 @@
+.loginlinkview {
+    @include single-form-view;
+    &__message {
+        // color: var(--orange-2);
+        background-color: rgba(255, 255, 255, 0.5);
+        padding: 2vw;
+        border-radius: 3px;
+        font: {
+            size: var(--fontsize-3xl);
+            weight: bold;
+        }
+    }
+    button {
+        padding: 0.5vh 100px;
+        font: {
+            size: var(--fontsize-xl);
+        }
+    }
+}

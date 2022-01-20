@@ -9,6 +9,7 @@
  ********************************************************************************************/
 
 #include "DatabaseManager.h"
+#include "InitializationVector.h"
 
 static DatabaseManager * gs_oDatabaseManager = nullptr;
 
@@ -70,7 +71,7 @@ DatabaseManager::DatabaseManager(void)
     m_fTerminationSignalEncountered = false;
     // Create only one instance
     mongocxx::instance oMongoInstance{};
-    mongocxx::uri oUri{"mongodb://localhost:27017/?replicaSet=rs0"};
+    mongocxx::uri oUri{::GetInitializationValue("MongoDbUrl")+"/?replicaSet=rs0"};
     m_poMongoPool = std::unique_ptr<mongocxx::pool>(new mongocxx::pool(oUri));
 }
 

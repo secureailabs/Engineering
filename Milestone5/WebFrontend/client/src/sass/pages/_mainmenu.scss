@@ -1,0 +1,17 @@
+.mainmenu {
+    &__title {
+        margin: 3% 2% 1%;
+        border-bottom: 1px solid grey;
+        font: {
+            size: var(--fontsize-xxl);
+            weight: bold;
+        }
+    }
+    &__tilecontainer {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr ;
+        column-gap: 1vw;
+        row-gap: 0.5vh;
+        padding: 0 10vw;
+    }
+}

@@ -59,3 +59,4 @@ cd $SCRIPT_DIR/Binary
 ./PackageWebServiceAndComputeVm
 
 cd $SCRIPT_DIR
+

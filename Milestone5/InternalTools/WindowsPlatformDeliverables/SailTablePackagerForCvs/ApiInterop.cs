@@ -6,6 +6,13 @@ public class ApiInterop
     /// <summary>
     /// 
     /// </summary>
+    /// <returns></returns>
+    [DllImport("kernel32")]
+    static extern public int AllocConsole();
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="value"></param>
     /// <param name="caseSensitive"></param>
     /// <returns></returns>

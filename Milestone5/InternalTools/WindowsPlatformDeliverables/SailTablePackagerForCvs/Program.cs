@@ -21,6 +21,14 @@ namespace SailTablePackagerForCsv
 
             if (0 < arguments.Length)
             {
+                ApiInterop.AllocConsole();
+
+                Console.WriteLine("===========================================================================================================");
+                Console.WriteLine("SAIL Table Packager v1.0");
+                Console.WriteLine("Copyright (C) 2021 Secure AI Labs Inc., All Rights Reserved.");
+                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine("");
+
                 string templateFilename = null;
                 string sourceCsvFile = null;
                 string destinationPackage = null;
@@ -69,6 +77,16 @@ namespace SailTablePackagerForCsv
                             index++;
                         }
                     }
+                    else if ("--workingfolder" == arguments[index])
+                    {
+                        System.IO.Directory.SetCurrentDirectory(arguments[index + 1]);
+                    }
+                    else
+                    {
+                        Console.WriteLine("ERROR: Unknown command line parameters specified.");
+                        Console.WriteLine("");
+                        Application.Exit();
+                    }
                 }
 
                 // Now that we presumably have all the information we need, let's verify that we have everything that
@@ -79,6 +97,10 @@ namespace SailTablePackagerForCsv
                     tableProperties.SourceFilename = sourceCsvFile;
                     TablePackagerCli tablePackagerCli = new TablePackagerCli(ref tableProperties, destinationPackage);
                     step = tablePackagerCli.PackageTable();
+                    Console.WriteLine("");
+                    Console.WriteLine("------------------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("Press a key when done");
+                    Console.ReadKey();
                 }
                 else if (null != newSailTableFile)
                 {

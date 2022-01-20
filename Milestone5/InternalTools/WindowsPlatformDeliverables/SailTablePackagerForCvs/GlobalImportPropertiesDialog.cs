@@ -347,6 +347,7 @@ namespace SailTablePackagerForCsv
                     m_TableProperties.DeleteColumnProperty(columnIndex, "SourceFileColumnPosition");
                     m_TableProperties.SetColumnProperty(columnIndex, "SourceFileHeaderName", oColumnName);
                     m_TableProperties.SetColumnProperty(columnIndex, "Name", oColumnName);
+                    m_TableProperties.DeleteColumnProperty(columnIndex, "DestinationFileColumnName");
                     ++columnIndex;
                 }
             }

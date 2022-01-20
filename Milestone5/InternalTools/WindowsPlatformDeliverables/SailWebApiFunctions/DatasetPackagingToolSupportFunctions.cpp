@@ -632,16 +632,16 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
         (void) ::WriteFile(hFileHandle, (const void *) c_pbSerializedDatasetMetadataBuffer, (DWORD) unSerializedDatasetMetadataBufferSizeInBytes, (DWORD *) &unNumberOfBytesWritten, nullptr);
         _ThrowBaseExceptionIf((unNumberOfBytesWritten != unSerializedDatasetMetadataBufferSizeInBytes), "Failed to write the dataset metadata to file", nullptr);
         // Now write the table data to file, one at a time
-        for (std::pair<unsigned int, StructuredBuffer *> tablePackageEntry : gs_ImportedTableMetadata)
+        for (const std::pair<unsigned int, StructuredBuffer *> c_stlTablePackageEntry : gs_ImportedTableMetadata)
         {
             // Variables required to read data from the table package in order to extract compressed data
             unsigned int unNumberOfBytesRead = 0;
             Qword qwTableFileMarker;
             std::vector<Byte> stlBuffer;
             // Read in the compressed data from the original file
-            __DebugAssert(gs_ImportedTableFilename.end() != gs_ImportedTableFilename.find(tablePackageEntry.first));
-            HANDLE hTableFileHandle = ::CreateFileA(gs_ImportedTableFilename[tablePackageEntry.first].c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-            _ThrowBaseExceptionIf((INVALID_HANDLE_VALUE == hTableFileHandle), "Failed to open file %s with GetLastError() = %d", gs_ImportedTableFilename[tablePackageEntry.first].c_str(), ::GetLastError());
+            __DebugAssert(gs_ImportedTableFilename.end() != gs_ImportedTableFilename.find(c_stlTablePackageEntry.first));
+            HANDLE hTableFileHandle = ::CreateFileA(gs_ImportedTableFilename[c_stlTablePackageEntry.first].c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            _ThrowBaseExceptionIf((INVALID_HANDLE_VALUE == hTableFileHandle), "Failed to open file %s with GetLastError() = %d", gs_ImportedTableFilename[c_stlTablePackageEntry.first].c_str(), ::GetLastError());
             // Read in the header marker from file
             (void) ::ReadFile(hTableFileHandle, (void *) &qwTableFileMarker, sizeof(qwTableFileMarker), (DWORD *) &unNumberOfBytesRead, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(qwTableFileMarker)), "Failed to read in the file header marker", nullptr);
@@ -666,12 +666,12 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
             _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(un64SerializedSizeInBytesOfCompressedData)), "Failed to read in the file header marker", nullptr);
             // Read in the compressed data from the file. There are a lot of reality checks here to ensure that
             // the table we are reading in is the correct table
-            __DebugAssert(true == tablePackageEntry.second->IsElementPresent("Identifier", GUID_VALUE_TYPE));
-            __DebugAssert(true == tablePackageEntry.second->IsElementPresent("CompressedDataSizeInBytes", UINT64_VALUE_TYPE));
+            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("Identifier", GUID_VALUE_TYPE));
+            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("CompressedDataSizeInBytes", UINT64_VALUE_TYPE));
             std::string tableIdentifier = oTableMetadata.GetGuid("Identifier").ToString(eHyphensAndCurlyBraces);
             uint64_t un64CompressedDataSizeInBytes = oTableMetadata.GetUnsignedInt64("CompressedDataSizeInBytes");
-            _ThrowBaseExceptionIf((tableIdentifier != tablePackageEntry.second->GetGuid("Identifier").ToString(eHyphensAndCurlyBraces)), "ERROR: Table identifiers do not match %s != %s", tableIdentifier.c_str(), tablePackageEntry.second->GetGuid("Identifier").ToString(eHyphensAndCurlyBraces).c_str());
-            _ThrowBaseExceptionIf((un64CompressedDataSizeInBytes != tablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes")), "ERROR: Table compressed data sizes do not match %ld != %ld", un64CompressedDataSizeInBytes, tablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes"));
+            _ThrowBaseExceptionIf((tableIdentifier != c_stlTablePackageEntry.second->GetGuid("Identifier").ToString(eHyphensAndCurlyBraces)), "ERROR: Table identifiers do not match %s != %s", tableIdentifier.c_str(), c_stlTablePackageEntry.second->GetGuid("Identifier").ToString(eHyphensAndCurlyBraces).c_str());
+            _ThrowBaseExceptionIf((un64CompressedDataSizeInBytes != c_stlTablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes")), "ERROR: Table compressed data sizes do not match %ld != %ld", un64CompressedDataSizeInBytes, c_stlTablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes"));
             stlBuffer.resize(un64SerializedSizeInBytesOfCompressedData);
             (void) ::ReadFile(hTableFileHandle, (void *) stlBuffer.data(), (unsigned int) stlBuffer.size(), (DWORD *) &unNumberOfBytesRead, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesRead != stlBuffer.size()), "Failed to read table metadate", nullptr);
@@ -686,7 +686,7 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
             (void) ::WriteFile(hFileHandle, (const void *) &qwFileMarker, (DWORD) sizeof(qwFileMarker), (DWORD *) &unNumberOfBytesWritten, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesWritten != sizeof(qwFileMarker)), "Failed to write the special header to file", nullptr);
             // Write the table identifier to file
-            (void) ::WriteFile(hFileHandle, (const void *) tablePackageEntry.second->GetGuid("Identifier").GetRawDataPtr(), (DWORD) 16, (DWORD *) &unNumberOfBytesWritten, nullptr);
+            (void) ::WriteFile(hFileHandle, (const void *) c_stlTablePackageEntry.second->GetGuid("Identifier").GetRawDataPtr(), (DWORD) 16, (DWORD *) &unNumberOfBytesWritten, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesWritten != 16), "Failed to write the table identifier to file", nullptr);
             // Write the compressed table data size in bytes to file
             (void) ::WriteFile(hFileHandle, (const void *) &un64SerializedSizeInBytesOfCompressedData, (DWORD) sizeof(un64SerializedSizeInBytesOfCompressedData), (DWORD *) &unNumberOfBytesWritten, nullptr);
@@ -737,6 +737,7 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
 
     try
     {
+        // The first part required is to load up the metadata portion of the dataset
 
     }
 

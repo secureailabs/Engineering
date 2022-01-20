@@ -48,6 +48,8 @@ namespace SailDatasetPackager
 
             if (0 < arguments.Length)
             {
+                ApiInterop.AllocConsole();
+
                 Console.WriteLine("===========================================================================================================");
                 Console.WriteLine("SAIL Dataset Packager v1.0");
                 Console.WriteLine("Copyright (C) 2021 Secure AI Labs Inc., All Rights Reserved.");
@@ -144,6 +146,10 @@ namespace SailDatasetPackager
                         datasetProperties = new DatasetProperties(templateFilename);
                         DatasetPackagerCli datasetPackagerCli = new DatasetPackagerCli(ref datasetProperties, ref notificationsAndProgressTracker, datasetFilename);
                         datasetPackagerCli.PackageDataset(publishDataset, sailPlatformAddress, username, password);
+                        Console.WriteLine("");
+                        Console.WriteLine("------------------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("Press a key when done");
+                        Console.ReadKey();
                     }
                 }
                 else

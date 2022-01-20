@@ -3,5 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>
     </StartArguments>
+    <StartWorkingDirectory>C:\Users\Luis Miguel Huapaya\Documents\GitHub\Engineering\Milestone5\InternalTools\WindowsPlatformDeliverables\Binaries\x64\Debug\</StartWorkingDirectory>
   </PropertyGroup>
 </Project>

@@ -3,6 +3,15 @@ using System.Runtime.InteropServices;
 
 public class ApiInterop
 {
+    #region Console Support Functions
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [DllImport("kernel32")]
+    static extern public int AllocConsole();
+    #endregion
+
     #region Miscellaneous Support Functions
 
     /// <summary>

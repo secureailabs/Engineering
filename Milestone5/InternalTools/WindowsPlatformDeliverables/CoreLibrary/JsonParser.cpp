@@ -17,6 +17,14 @@
 #include "Guid.h"
 #include "StructuredBuffer.h"
 
+#define STRING_QUOTE_BLOCK 1
+#define CURLY_BRACE_BLOCK 2
+#define ARRAY_BLOCK 3
+#define TRUE_VALUE 4
+#define FALSE_VALUE 5
+#define NULL_VALUE_TYPE 6
+#define NUMBER_VALUE 7
+
 // These are strings used to do easy character lookup while parsing. Helps simplify the
 // code considerably
 static const std::string gsc_strJsonWhitespaceCharacters = "\x09\x0a\x0d\x20";
@@ -228,31 +236,31 @@ static StructuredBuffer __stdcall ParseJsonArrayToStructuredBuffer(
         {
             if ('"' == c_szJsonString[unCurrentOffset])
             {
-                unCode = 1;
+                unCode = STRING_QUOTE_BLOCK;
             }
             else if ('{' == c_szJsonString[unCurrentOffset])
             {
-                unCode = 2;
+                unCode = CURLY_BRACE_BLOCK;
             }
             else if ('[' == c_szJsonString[unCurrentOffset])
             {
-                unCode = 3;
+                unCode = ARRAY_BLOCK;
             }
             else if (('t' == c_szJsonString[unCurrentOffset])||('T' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = 4;
+                unCode = TRUE_VALUE;
             }
             else if (('f' == c_szJsonString[unCurrentOffset])||('F' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = 5;
+                unCode = FALSE_VALUE;
             }
             else if (('n' == c_szJsonString[unCurrentOffset])||('N' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = 6;
+                unCode = NULL_VALUE_TYPE;
             }
             else if (std::string::npos != gsc_strJsonValidLeadingNumericalCharacters.find(c_szJsonString[unCurrentOffset]))
             {
-                unCode = 7;
+                unCode = NUMBER_VALUE;
             }
             else 
             {
@@ -265,44 +273,47 @@ static StructuredBuffer __stdcall ParseJsonArrayToStructuredBuffer(
         }
         while (0 == unCode);
         // Based on the code above, let's parse things accordingly
-        if (1 == unCode)
+        if (STRING_QUOTE_BLOCK == unCode)
         {
             ++unCurrentOffset;
             std::string strJsonValue = ::ParseJsonString(c_szJsonString, &unCurrentOffset);
             // TODO: Insert strong typing here
             oJsonObject.PutString(szValueName, strJsonValue);
         }
-        else if (2 == unCode)
+        else if (CURLY_BRACE_BLOCK == unCode)
         {
             ++unCurrentOffset;
             StructuredBuffer oNestedJsonObject(::ParseJsonObjectToStructuredBuffer(c_szJsonString, &unCurrentOffset));
             oJsonObject.PutStructuredBuffer(szValueName, oNestedJsonObject);
         }
-        else if (3 == unCode)
+        else if (ARRAY_BLOCK == unCode)
         {
             ++unCurrentOffset;
             StructuredBuffer oNestedJsonObject(::ParseJsonArrayToStructuredBuffer(c_szJsonString, &unCurrentOffset));
             oJsonObject.PutStructuredBuffer(szValueName, oNestedJsonObject);
         }
-        else if (4 == unCode)
+        else if (TRUE_VALUE == unCode)
         {
-            _ThrowBaseExceptionIf((0 != ::_strnicmp("true", &(c_szJsonString[unCurrentOffset]), 4)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
-            unCurrentOffset += 4;
+            unsigned int unExpectedLength = ::strlen("true");
+            _ThrowBaseExceptionIf((0 != ::_strnicmp("true", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
+            unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(szValueName, true);
         }
-        else if (5 == unCode)
+        else if (FALSE_VALUE == unCode)
         {
-            _ThrowBaseExceptionIf((0 != ::_strnicmp("false", &(c_szJsonString[unCurrentOffset]), 4)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
-            unCurrentOffset += 5;
+            unsigned int unExpectedLength = ::strlen("false");
+            _ThrowBaseExceptionIf((0 != ::_strnicmp("false", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
+            unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(szValueName, false);
         }
-        else if (6 == unCode)
+        else if (NULL_VALUE_TYPE == unCode)
         {
-            _ThrowBaseExceptionIf((0 != ::_strnicmp("null", &(c_szJsonString[unCurrentOffset]), 4)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
-            unCurrentOffset += 4;
+            unsigned int unExpectedLength = ::strlen("null");
+            _ThrowBaseExceptionIf((0 != ::_strnicmp("null", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
+            unCurrentOffset += unExpectedLength;
             oJsonObject.PutNull(szValueName);
         }
-        else if (7 == unCode)
+        else if (NUMBER_VALUE == unCode)
         {
             oJsonObject.PutFloat64(szValueName, ::ParseJsonNumber(c_szJsonString, &unCurrentOffset));
         }
@@ -391,31 +402,31 @@ static StructuredBuffer __stdcall ParseJsonObjectToStructuredBuffer(
         {
             if ('"' == c_szJsonString[unCurrentOffset])
             {
-                unCode = 1;
+                unCode = STRING_QUOTE_BLOCK;
             }
             else if ('{' == c_szJsonString[unCurrentOffset])
             {
-                unCode = 2;
+                unCode = CURLY_BRACE_BLOCK;
             }
             else if ('[' == c_szJsonString[unCurrentOffset])
             {
-                unCode = 3;
+                unCode = ARRAY_BLOCK;
             }
             else if (('t' == c_szJsonString[unCurrentOffset])||('T' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = 4;
+                unCode = TRUE_VALUE;
             }
             else if (('f' == c_szJsonString[unCurrentOffset])||('F' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = 5;
+                unCode = FALSE_VALUE;
             }
             else if (('n' == c_szJsonString[unCurrentOffset])||('N' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = 6;
+                unCode = NULL_VALUE_TYPE;
             }
             else if (std::string::npos != gsc_strJsonValidLeadingNumericalCharacters.find(c_szJsonString[unCurrentOffset]))
             {
-                unCode = 7;
+                unCode = NUMBER_VALUE;
             }
             else 
             {
@@ -428,43 +439,46 @@ static StructuredBuffer __stdcall ParseJsonObjectToStructuredBuffer(
         }
         while (0 == unCode);
         // Based on the code above, let's parse things accordingly
-        if (1 == unCode)
+        if (STRING_QUOTE_BLOCK == unCode)
         {
             ++unCurrentOffset;
             std::string strJsonValue = ::ParseJsonString(c_szJsonString, &unCurrentOffset);
             oJsonObject.PutString(strJsonNameString.c_str(), strJsonValue);
         }
-        else if (2 == unCode)
+        else if (CURLY_BRACE_BLOCK == unCode)
         {
             ++unCurrentOffset;
             StructuredBuffer oNestedJsonObject(::ParseJsonObjectToStructuredBuffer(c_szJsonString, &unCurrentOffset));
             oJsonObject.PutStructuredBuffer(strJsonNameString.c_str(), oNestedJsonObject);
         }
-        else if (3 == unCode)
+        else if (ARRAY_BLOCK == unCode)
         {
             ++unCurrentOffset;
             StructuredBuffer oNestedJsonObject(::ParseJsonArrayToStructuredBuffer(c_szJsonString, &unCurrentOffset));
             oJsonObject.PutStructuredBuffer(strJsonNameString.c_str(), oNestedJsonObject);
         }
-        else if (4 == unCode)
+        else if (TRUE_VALUE == unCode)
         {
-            _ThrowBaseExceptionIf((0 != ::_strnicmp("true", &(c_szJsonString[unCurrentOffset]), 4)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
-            unCurrentOffset += 4;
+            unsigned int unExpectedLength = ::strlen("true");
+            _ThrowBaseExceptionIf((0 != ::_strnicmp("true", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
+            unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(strJsonNameString.c_str(), true);
         }
-        else if (5 == unCode)
+        else if (FALSE_VALUE == unCode)
         {
-            _ThrowBaseExceptionIf((0 != ::_strnicmp("false", &(c_szJsonString[unCurrentOffset]), 4)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
-            unCurrentOffset += 5;
+            unsigned int unExpectedLength = ::strlen("false");
+            _ThrowBaseExceptionIf((0 != ::_strnicmp("false", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
+            unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(strJsonNameString.c_str(), false);
         }
-        else if (6 == unCode)
+        else if (NULL_VALUE_TYPE == unCode)
         {
-            _ThrowBaseExceptionIf((0 != ::_strnicmp("null", &(c_szJsonString[unCurrentOffset]), 4)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
-            unCurrentOffset += 4;
+            unsigned int unExpectedLength = ::strlen("null");
+            _ThrowBaseExceptionIf((0 != ::_strnicmp("null", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
+            unCurrentOffset += unExpectedLength;
             oJsonObject.PutNull(strJsonNameString.c_str());
         }
-        else if (7 == unCode)
+        else if (NUMBER_VALUE == unCode)
         {
             oJsonObject.PutFloat64(strJsonNameString.c_str(), ::ParseJsonNumber(c_szJsonString, &unCurrentOffset));
         }

@@ -15,11 +15,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SailWebApiPortalFunctions.cpp">
+    <ClCompile Include="VirtualMachineInitialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DllMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RemoteDataConnectorFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SailApiBaseServices.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DatasetPackagingToolSupportFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedUtilityFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DigitalContractSupportFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscellaneousSupportFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DatasetFamilySupportFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SharedUtilityFunctions.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExceptionsUtilityFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SailApiBaseServices.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

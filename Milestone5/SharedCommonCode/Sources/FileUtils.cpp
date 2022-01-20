@@ -33,19 +33,14 @@ std::vector<Byte> __stdcall ReadFileAsByteBuffer(
     std::vector<Byte> stlFileData;
 
     std::ifstream stlFile(c_strFileName.c_str(), (std::ios::in | std::ios::binary | std::ios::ate));
-    if (true == stlFile.good())
-    {
-        unsigned int unFileSizeInBytes = (unsigned int) stlFile.tellg();
-        stlFileData.resize(unFileSizeInBytes);
-        stlFile.seekg(0, std::ios::beg);
-        stlFile.read((char *)stlFileData.data(), unFileSizeInBytes);
-        stlFile.close();
-    }
-    else
-    {
-        _ThrowBaseException("Invalid File Path", nullptr);
-    }
-    
+    _ThrowBaseExceptionIf((false == stlFile.good()), "Invalid File Path. %s not found.", c_strFileName.c_str(), nullptr);
+
+    std::size_t unFileSizeInBytes = static_cast<std::size_t>(stlFile.tellg());
+    stlFileData.resize(unFileSizeInBytes);
+    stlFile.seekg(0, std::ios::beg);
+    stlFile.read((char *)stlFileData.data(), unFileSizeInBytes);
+    stlFile.close();
+
     return stlFileData;
 }
 
@@ -64,17 +59,17 @@ std::string __stdcall ReadFileAsString(
 {
     __DebugFunction();
 
+    std::string strFileContent;
     std::ifstream stlFile(c_strFileName, std::ios::ate);
+    _ThrowBaseExceptionIf((false == stlFile.good()), "Invalid File Path. %s not found.", c_strFileName.c_str(), nullptr);
     std::streamsize nSizeOfFile = stlFile.tellg();
     stlFile.seekg(0, std::ios::beg);
-    std::string strFileContent;
     strFileContent.resize(nSizeOfFile);
     stlFile.read(strFileContent.data(), nSizeOfFile);
     stlFile.close();
-    
+
     return strFileContent;
 }
-
 
 /********************************************************************************************
  *

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreTypes.h"
+#include "StructuredBuffer.h"
 
 #include <string>
 #include <vector>

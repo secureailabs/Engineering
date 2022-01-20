@@ -1,5 +1,6 @@
 from StructuredBuffer import StructuredBuffer
 import json
+import requests
 
 oSafeNestTObject = StructuredBuffer()
 oSafeNestTObject.PutString("TNest", "Stock")
@@ -28,18 +29,22 @@ print(len(oReverse.GetSerializedStructuredBuffer()))
 
 oSb = StructuredBuffer(serializedBuffer=oReverse.GetSerializedStructuredBuffer())
 
-import requests
-url = "http://127.0.0.1:5000/StructuredBufferToJson"
-payload = oReverse.GetSerializedStructuredBuffer()
-headers = {'Content-Type': 'application/octet-stream'}
-response = requests.request("GET", url, headers=headers, data=payload)
-print(response.text)
+jsonString = "{\"TopNest\":{\"BoolValue\":true,\"FloatValue\":200.0,\"StringValue\":\"Stock\",\"DoubleNest\":{\"DNest\":\"Stock\", \"DnextInt\":123}},\"Payload\":\"testload\"}"
+print("Original Json String:\n", jsonString)
 
-
-import requests
+print("\nConverting JsonToStructuredBuffer...")
 url = "http://127.0.0.1:5000/JsonToStructuredBuffer"
-payload = response.text
+payload = jsonString
 headers = {'Content-Type': 'application/json'}
 response = requests.request("GET", url, headers=headers, data=payload)
-print(response.text)
+
+oSb = StructuredBuffer(serializedBuffer=response.content)
+print("StructuredBufferResponse:\n", oSb.ToString())
+
+print("\nConverting StructuredBufferToJson...")
+url = "http://127.0.0.1:5000/StructuredBufferToJson"
+payload = response.content
+headers = {'Content-Type': 'application/octet-stream'}
+response = requests.request("GET", url, headers=headers, data=payload)
+print("Json string is:\n", response.text)
 

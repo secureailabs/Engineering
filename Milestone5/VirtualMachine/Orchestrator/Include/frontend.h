@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "EntityTypes.h"
 #include "EosbRotationManager.h"
 #include "StructuredBuffer.h"
 #include "SafeObject.h"
@@ -91,6 +92,13 @@ class Frontend : public Object{
         );
 
         std::string __thiscall GetDigitalContracts(void) const;
+
+        std::string __thiscall GetTables(void) const;
+
+        unsigned int __thiscall ProvisionDigitalContract(
+            _in const std::string & c_strDigitalContractGUID,
+            _in const std::string & c_strDatasetGUID
+            );
 
         void __thiscall HandleSubmitJob
         (
@@ -185,6 +193,7 @@ class Frontend : public Object{
         std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableDatasets{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableTables{};
+        std::unordered_map<std::string, DigitalContractProvisiongStatus> m_stlDigitalContractProvisionStatus{};
 
         std::map<std::string, std::shared_ptr<TlsNode>> m_stlConnectionMap;
         std::map<std::string, std::shared_ptr<std::mutex>> m_stlConnectionMutexMap;

@@ -10,6 +10,7 @@
 
 #include "RestFramework.h"
 #include "ExceptionRegister.h"
+#include "TlsTransactionHelperFunctions.h"
 
 /********************************************************************************************/
 
@@ -195,25 +196,26 @@ void __thiscall RestFramework::RunServer(void)
     __DebugFunction();
 
     RestFrameworkRuntimeData * poRestFrameworkRuntimeData = new RestFrameworkRuntimeData(m_poDictionaryManager);
-    unsigned int unNumberOfResources = std::thread::hardware_concurrency();
+    constexpr unsigned int c_unActiveConnectionThreshold{100};
     while (false == poRestFrameworkRuntimeData->IsTerminationSignalEncountered())
     {
         try
         {
             if (true == m_poTlsServer->WaitForConnection(100))  // check if a connection and the resources are available
             {
-                // Make sure never to create more threads than the number of available logical cores
-                if (unNumberOfResources > poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
+                TlsNode * poTlsNode = m_poTlsServer->Accept();
+                _ThrowIfNull(poTlsNode, "Could not establish connection", nullptr);
+                if (c_unActiveConnectionThreshold <= poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
                 {
-                    poRestFrameworkRuntimeData->HandleConnection(m_poTlsServer->Accept());
+                    std::cout << "There are " << poRestFrameworkRuntimeData->GetNumberOfActiveConnections() << " connections alive (max " << c_unActiveConnectionThreshold << ") refusing incoming connection" << std::endl;
+                    StructuredBuffer oResponseStructuredBuffer;
+                    oResponseStructuredBuffer.PutDword("Status", 503);
+                    ::PutDatabaseGatewayResponse(*poTlsNode, oResponseStructuredBuffer);
+                    poTlsNode->Release();
                 }
                 else
                 {
-                    // Put this thread to sleep since we have maxed out our threading resources
-                    // and need to wait for a running thread to exit
-                    std::cout << "Resources maxed out. Going to sleep\n";
-                    ::sleep(10);
-                    std::cout << "Waking up. Checking resources...\n";
+                    poRestFrameworkRuntimeData->HandleConnection(poTlsNode);
                 }
             }
         }
@@ -296,4 +298,48 @@ void __thiscall RestFramework::LoadPlugins(
             ::dlclose(pPluginHandle);
         }
     }
+}
+
+/********************************************************************************************
+ *
+ * @function PutDatabaseGatewayResponse
+ * @brief Function to send a serialized StructuredBuffer through a TLS node
+ * @param[in] oTlsNode Reference to the TlsNode object connected to remote node
+ * @param[in] oStructuredBuffer The StructuredBuffer to send
+ * @return true on success, otherwise false
+ *
+ ********************************************************************************************/
+bool __stdcall PutDatabaseGatewayResponse(
+    _in TlsNode& oTlsNode,
+    _in const StructuredBuffer& oStructuredBuffer
+    )
+{
+    bool fResult{false};
+    try
+    {
+        // Create a response packet
+        unsigned int unSerializedBufferSizeInBytes = sizeof(uint32_t) + oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
+        std::vector<Byte> stlSerializedBuffer(unSerializedBufferSizeInBytes);
+        Byte * pbSerializedBuffer = (Byte *) stlSerializedBuffer.data();
+        *((uint32_t *) pbSerializedBuffer) = (uint32_t) oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
+        pbSerializedBuffer += sizeof(uint32_t);
+        ::memcpy((void *) pbSerializedBuffer, (const void *) oStructuredBuffer.GetSerializedBufferRawDataPtr(), oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
+        pbSerializedBuffer += oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
+
+        // Send back response data
+        oTlsNode.Write((const Byte *)stlSerializedBuffer.data(), stlSerializedBuffer.size());
+        fResult = true;
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        fResult = false;
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        fResult = false;
+    }
+
+    return fResult;
 }

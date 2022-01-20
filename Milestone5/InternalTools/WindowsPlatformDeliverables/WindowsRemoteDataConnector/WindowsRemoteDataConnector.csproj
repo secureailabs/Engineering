@@ -98,11 +98,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SailWebApiFunctions\SailWebApiFunctions.vcxproj">
-      <Project>{97efffb3-7c1f-426c-8a27-4a02110f70ff}</Project>
-      <Name>SailWebApiPortalFunctions</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

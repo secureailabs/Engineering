@@ -10,6 +10,7 @@
 
 #include "DatabaseTools.h"
 #include "Base64Encoder.h"
+#include "InitializationVector.h"
 
 /********************************************************************************************/
 
@@ -19,7 +20,7 @@ void RunThreadedInserts(void)
 
     // Testing mongocxx::pool
     mongocxx::instance oInstance{}; // Create only one instance
-    mongocxx::pool oPool{mongocxx::uri{"mongodb://localhost:27017"}};
+    mongocxx::pool oPool{mongocxx::uri{::GetInitializationValue("MongoDbUrl").c_str()}};
     std::vector<std::thread> threads{};
 
     for (auto i : {0, 1, 2, 3, 4, 5}) {

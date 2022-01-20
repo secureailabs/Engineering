@@ -43,4 +43,3 @@ extern bool __stdcall PutHttpHeaderOnlyResponse(
     _in Dword dStatus,
     _in const std::string& strStatus
     );
-);

@@ -9,8 +9,8 @@
  ********************************************************************************************/
 
 #include "DebugLibrary.h"
-#include "FileUtils.h"
 #include "Exceptions.h"
+#include "FileUtils.h"
 
 #include <iostream>
 #include <fstream>
@@ -25,8 +25,8 @@
  ********************************************************************************************/
 
 std::vector<Byte> __stdcall ReadFileAsByteBuffer(
-    const std::string c_strFileName
-)
+    _in const std::string & c_strFileName
+    )
 {
     __DebugFunction();
 
@@ -53,16 +53,15 @@ std::vector<Byte> __stdcall ReadFileAsByteBuffer(
  *
  ********************************************************************************************/
 
-std::string ReadFileAsString(
+std::string __stdcall ReadFileAsString(
     _in const std::string & c_strFileName
-)
+    )
 {
     __DebugFunction();
 
     std::string strFileContent;
     std::ifstream stlFile(c_strFileName, std::ios::ate);
     _ThrowBaseExceptionIf((false == stlFile.good()), "Invalid File Path. %s not found.", c_strFileName.c_str(), nullptr);
-
     std::streamsize nSizeOfFile = stlFile.tellg();
     stlFile.seekg(0, std::ios::beg);
     strFileContent.resize(nSizeOfFile);
@@ -81,10 +80,10 @@ std::string ReadFileAsString(
  *
  ********************************************************************************************/
 
-void WriteBytesAsFile(
-    _in const std::string c_strFileName,
-    _in const std::vector<Byte> c_stlFileData
-)
+void __stdcall WriteBytesAsFile(
+    _in const std::string & c_strFileName,
+    _in const std::vector<Byte> & c_stlFileData
+    )
 {
     __DebugFunction();
 
@@ -102,10 +101,10 @@ void WriteBytesAsFile(
  *
  ********************************************************************************************/
 
-void WriteStringAsFile(
-    _in const std::string c_strFileName,
-    _in const std::string c_strFileData
-)
+void __stdcall WriteStringAsFile(
+    _in const std::string & c_strFileName,
+    _in const std::string & c_strFileData
+    )
 {
     __DebugFunction();
 

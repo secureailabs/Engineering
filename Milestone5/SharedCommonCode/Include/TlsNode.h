@@ -40,7 +40,7 @@ class TlsNode : public Object
         TlsNode(
             _in const TlsNode & c_oTLSNode
             );
-        ~TlsNode(void);
+        virtual ~TlsNode(void);
 
         // Callers can specify a unMillisecondTimeout on the read operations. If the methods
         // return 0, this means that the timeout expired before the read operation could be

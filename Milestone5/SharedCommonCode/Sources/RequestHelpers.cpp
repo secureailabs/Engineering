@@ -95,6 +95,7 @@ std::vector<Byte> __stdcall GetUserInfoFromEosb(
             dwStatus = 200;
         }
     }
+    
     catch (BaseException oException)
     {
         ::RegisterException(oException, __func__, __FILE__, __LINE__);;
@@ -105,6 +106,7 @@ std::vector<Byte> __stdcall GetUserInfoFromEosb(
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

@@ -18,10 +18,9 @@
 #include "Socket.h"
 #include "StructuredBuffer.h"
 
-#include <vector>
+#include <map>
 #include <string>
-
-#include <fstream>
+#include <vector>
 
 enum CSVRequest
 {
@@ -36,7 +35,7 @@ enum CSVRequest
 
 /********************************************************************************************/
 
-class DataConnector
+class DataConnector : public Object
 {
     public:
 
@@ -44,7 +43,7 @@ class DataConnector
         DataConnector(
             _in const DataConnector & c_oDataConnector
             );
-        ~DataConnector(void);
+        virtual ~DataConnector(void);
 
         bool __thiscall LoadAndVerify(
             _in const std::vector<Byte> c_stlDataset,

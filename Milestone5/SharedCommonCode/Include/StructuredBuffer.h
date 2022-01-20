@@ -13,7 +13,7 @@
 #include "CoreTypes.h"
 #include "Guid.h"
 #include "Object.h"
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 
@@ -38,36 +38,8 @@
 #define BUFFER_VALUE_TYPE                 0x12
 #define INDEXED_BUFFER_VALUE_TYPE         0x13
 #define GUID_VALUE_TYPE                   0x14
-#define BIG_NUMBER_TYPE                   0x15
 #define INVALID_VALUE_TYPE                0xFF
 #define ANY_VALUE_TYPE                    0xFF
-
-static const char * gs_aszTypeNames[] =
-{
-    "Null",
-    "Bool",
-    "Char",
-    "String",
-    "float32_t",
-    "float64_t",
-    "int8_t",
-    "int16_t",
-    "int32_t",
-    "int64_t",
-    "uint8_t",
-    "uint16_t",
-    "uint32_t",
-    "uint8_t",
-    "Byte",
-    "Word",
-    "Dword",
-    "Qword",
-    "ByteArray",
-    "StructuredBuffer",
-    "Null",
-    "Guid",
-    "InvalidType"
-};
 
 /********************************************************************************************/
 
@@ -76,7 +48,7 @@ class StructuredBufferElement : public Object
     public:
 
         // Constructors and destructors
-        
+
         StructuredBufferElement(
             _in const char * szElementName,
             _in Byte bElementType,
@@ -99,28 +71,28 @@ class StructuredBufferElement : public Object
         virtual ~StructuredBufferElement(void);
 
         // Public access methods
-        
+
         std::string __thiscall GetElementName(void) const throw();
         Qword __thiscall GetElementName64BitHash(void) const throw();
         Byte __thiscall GetElementType(void) const throw();
         const Byte * __thiscall GetRawDataPtr(void) const throw();
         unsigned int __thiscall GetRawDataSizeInBytes(void) const throw();
-        std::vector<Byte>  __thiscall GetRawData(void) const throw();        
+        std::vector<Byte>  __thiscall GetRawData(void) const throw();
         const Byte * __thiscall GetSerializedBufferRawDataPtr(void) const throw();
         unsigned int __thiscall GetSerializedBufferRawDataSizeInBytes(void) const throw();
         std::vector<Byte> __thiscall GetSerializedBuffer(void) const throw();
-        
+
     private:
-    
+
         // Internal Serialization methods
         void __thiscall Serialize(void) const throw();
         void __thiscall DeSerialize(
             _in const Byte * c_pbSerializedData,
             _in unsigned int unSerializedDataSizeInBytes
             );
-            
+
         // Private data members.
-        
+
         std::string m_strElementName;
         Byte m_bElementType;
         Qword m_qwElementName64BitHash;
@@ -133,9 +105,9 @@ class StructuredBufferElement : public Object
 class StructuredBuffer : public Object
 {
     public:
-        
+
         // Constructors and destructors
-        
+
         StructuredBuffer(void);
         StructuredBuffer(
             _in const Byte * c_pbSerializedBuffer,
@@ -150,14 +122,16 @@ class StructuredBuffer : public Object
         StructuredBuffer(
             _in const StructuredBuffer & c_oStructuredBuffer
             );
-        StructuredBuffer& operator=(
+        virtual ~StructuredBuffer(void) throw();
+
+        // Operator overloads
+        StructuredBuffer & operator=(
             const StructuredBuffer & c_oStructuredBuffer
             );
-        virtual ~StructuredBuffer(void) throw();
 
         // Remove all element
         void __thiscall Clear(void) throw();
-        
+
         // Get a serialized buffer representing this StructuredBuffer. This buffer
         // can be fed into one of the constructors to de-serialize this object. There
         // are two different ways to do it. Either you get a vector<Byte> or you can
@@ -166,7 +140,7 @@ class StructuredBuffer : public Object
         unsigned int __thiscall GetSerializedBufferRawDataSizeInBytes(void) const throw();
         std::vector<Byte> __thiscall GetSerializedBuffer(void) const throw();
         std::string __thiscall GetBase64SerializedBuffer(void) const throw();
-        
+
         // The "quick hashes" as 64 bit hash values that can be used to make quick
         // comparisons. The Get64BitHash() methods returns a hash representing both
         // the element composition and the element values within the StructuredBuffer while
@@ -175,10 +149,10 @@ class StructuredBuffer : public Object
         // different data within each element would have the same composition hash). The
         // composition hash is a really quick way of checking to make that required
         // elements are all present
-        
+
         Qword __thiscall Get64BitHash(void) const throw();
         Qword __thiscall GetComposition64BitHash(void) const throw();
-        
+
         // Methods used to access element. It should be noted that there can only
         // ever be one element with a specific name (case insensitive) at any one
         // time.
@@ -190,11 +164,14 @@ class StructuredBuffer : public Object
             _in const char * c_szElementName
             ) throw();
         std::vector<std::string> __thiscall GetNamesOfElements(void) const throw();
+        Byte __thiscall GetElementType(
+            _in const char * c_szElementName
+            ) const throw();
         std::vector<std::string> __thiscall GetDescriptionOfElements(void) const throw();
-        
+
         // Prints out all of the StructuredBuffer metadata and data
         std::string __thiscall ToString(void) const throw();
-        
+
         // Type strong methods to fetch element values
         void __thiscall GetNull(
             _in const char * c_szElementName
@@ -259,7 +236,7 @@ class StructuredBuffer : public Object
         StructuredBuffer __thiscall GetStructuredBuffer(
             _in const char * c_szElementName
             ) const;
-        
+
         // Type strong methods to put element values
         void __thiscall PutNull(
             _in const char * c_szElementName
@@ -353,9 +330,9 @@ class StructuredBuffer : public Object
             _in const char * c_szElementName,
             _in const StructuredBuffer & c_oStructuredBuffer
             );
-            
+
     private:
-    
+
         // Quick little utility method used to hash an element name AND check if
         // an element of that type exists. This utility function is used by all the
         // Get...() methods and returns the 64 bit quick hash of the element name.
@@ -364,7 +341,7 @@ class StructuredBuffer : public Object
             _in const char * c_szElementName,
             _in Byte bElementType
             ) const;
-            
+
         // Add a new typed Element to the StructuredBuffer
         void __thiscall AddElement(
             _in const char * c_szElementName,
@@ -385,19 +362,19 @@ class StructuredBuffer : public Object
             _in const Byte * c_pbSerializedData,
             _in unsigned int unSerializedDataSizeInBytes
             );
-        
+
         // Method used to managed cached serialized data
         void __thiscall DeleteCachedData(void) throw();
-  
+
         // Inner version of ToString()
         static void __stdcall ToString(
             _inout std::string & strDestination,
             _in const std::string & c_strIndent,
             _in const StructuredBuffer & c_oStructuredBuffer
             );
-            
+
         // Map of StructuredBufferElements
-        std::map<Qword, StructuredBufferElement *> m_stlMapOfElements;
+        std::unordered_map<Qword, StructuredBufferElement *> m_stlMapOfElements;
         // For optimization purposes, we cache the serialized buffer generated by a call to
         // Serialize() such that subsequent calls to the method can instantly return without
         // having to serialize the object all over again. Calling any methods that modify the

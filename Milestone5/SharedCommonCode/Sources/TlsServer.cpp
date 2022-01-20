@@ -106,7 +106,7 @@ bool __thiscall TlsServer::WaitForConnection(
  ********************************************************************************************/
 
 //TODO: [MVP-34] Add the support for a crypto trust store.
-TlsNode * __thiscall TlsServer::Accept(void)
+TlsNode * __thiscall TlsServer::Accept(void) throw()
 {
     __DebugFunction();
 
@@ -117,10 +117,12 @@ TlsNode * __thiscall TlsServer::Accept(void)
 
         poTlsNode = new TlsNode(poSocket, eSSLModeServer);
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

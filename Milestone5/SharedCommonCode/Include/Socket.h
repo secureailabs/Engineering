@@ -29,7 +29,7 @@ class Socket : public Object
         Socket(
             _in const Socket & c_oSocket
             ) throw();
-        ~Socket(void);
+        virtual ~Socket(void);
         
         // Callers can specify a unMillisecondTimeout on the read operations. If the methods
         // return 0, this means that the timeout expired before the read operation could be

@@ -18,14 +18,14 @@
 
 TlsNode * __stdcall TlsConnectToUnixDomainSocket(
     _in const char * c_strSocketPath
-    );
+    ) throw();
 
 /********************************************************************************************/
 
 TlsNode * __stdcall TlsConnectToNetworkSocket(
     _in const char * c_strTargetIpAddress,
     _in Word wPortNumber
-    );
+    ) throw();
 
 /********************************************************************************************/
 
@@ -34,6 +34,6 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
     _in Word wPortNumber,
     _in unsigned int unMillisecondTimeout,
     _in unsigned int unStepTime
-    );
+    ) throw();
 
 /********************************************************************************************/

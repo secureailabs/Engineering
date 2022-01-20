@@ -24,7 +24,7 @@
 
 /********************************************************************************************/
 
-static char GetCharacter(
+static char __stdcall GetCharacter(
     _in bool fEcho
     )
 {
@@ -126,6 +126,8 @@ std::string __stdcall GetStringInput(
             {
                 // Erase the last character printed on cout
                 std::cout << " \b \b";
+                // Possible fix for the backspace not working
+                ::fflush(stdout);
                 // Delete the last character in the string
                 strInputString.resize(strInputString.size() - 1);
             }

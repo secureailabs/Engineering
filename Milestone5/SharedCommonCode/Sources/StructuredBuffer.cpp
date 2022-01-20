@@ -22,6 +22,33 @@
 #include <iostream>
 #include <vector>
 
+static const char * gs_aszTypeNames[] =
+{
+    "Null",
+    "Bool",
+    "Char",
+    "String",
+    "float32_t",
+    "float64_t",
+    "int8_t",
+    "int16_t",
+    "int32_t",
+    "int64_t",
+    "uint8_t",
+    "uint16_t",
+    "uint32_t",
+    "uint8_t",
+    "Byte",
+    "Word",
+    "Dword",
+    "Qword",
+    "ByteArray",
+    "StructuredBuffer",
+    "Null",
+    "Guid",
+    "InvalidType"
+};
+
 /********************************************************************************************/
 
 StructuredBuffer::StructuredBuffer(void)
@@ -88,25 +115,29 @@ StructuredBuffer::StructuredBuffer(
 
 /********************************************************************************************/
 
-StructuredBuffer& StructuredBuffer::operator=(
-    const StructuredBuffer & c_oStructuredBuffer
-)
-{
-    __DebugFunction();
-
-    m_qw64BitHash = 0;
-    m_qwComposition64BitHash = 0;
-    this->DeSerialize(c_oStructuredBuffer.GetSerializedBufferRawDataPtr(), c_oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
-    return *this;
-}
-
-/********************************************************************************************/
-
 StructuredBuffer::~StructuredBuffer(void) throw()
 {
     __DebugFunction();
     
     this->Clear();
+}
+
+/********************************************************************************************/
+
+StructuredBuffer & StructuredBuffer::operator=(
+    const StructuredBuffer & c_oStructuredBuffer
+	)
+{
+    __DebugFunction();
+
+	if (this != &c_oStructuredBuffer)
+	{
+		m_qw64BitHash = 0;
+		m_qwComposition64BitHash = 0;
+		this->DeSerialize(c_oStructuredBuffer.GetSerializedBufferRawDataPtr(), c_oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes());
+	}
+	
+    return *this;
 }
 
 /********************************************************************************************/
@@ -244,6 +275,25 @@ std::vector<std::string> __thiscall StructuredBuffer::GetNamesOfElements(void) c
     }
     
     return stlListOfElements;
+}
+
+/********************************************************************************************/
+
+Byte __thiscall StructuredBuffer::GetElementType(
+    _in const char * c_szElementName
+    ) const throw()
+{
+    __DebugFunction();
+
+    Byte bElementType = INVALID_VALUE_TYPE;
+    Qword qwElementName64BitHash = ::Get64BitHashOfNullTerminatedString(c_szElementName, false);
+    // First we check to see if an element by the same name exists
+    if (m_stlMapOfElements.end() != m_stlMapOfElements.find(qwElementName64BitHash))
+    {
+        bElementType = m_stlMapOfElements.at(qwElementName64BitHash)->GetElementType();
+    }
+    
+    return bElementType;
 }
 
 /********************************************************************************************/
@@ -892,10 +942,10 @@ void __thiscall StructuredBuffer::Serialize(void) const throw()
         {
             unsigned int unSerializedBufferSizeInBytes = sizeof(Dword) + sizeof(Qword) + sizeof(Qword) + sizeof(uint32_t) + sizeof(Dword);
             std::vector<Qword> stlVectorOfElementName64BitHashes;
-            std::map<Qword, std::vector<Byte>> stlSerializedElements;
+            std::unordered_map<Qword, std::vector<Byte>> stlSerializedElements;
             
             // First we need to get a sorted vector of elements
-            for(auto const & element: m_stlMapOfElements)
+            for (auto const & element: m_stlMapOfElements)
             {
                 stlVectorOfElementName64BitHashes.push_back(element.first);
             }

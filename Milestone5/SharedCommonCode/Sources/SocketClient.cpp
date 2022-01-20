@@ -35,6 +35,7 @@ Socket * __stdcall ConnectToUnixDomainSocket(
     )
 {
     __DebugFunction();
+    
     int nSocketDescriptor = 0;
     struct sockaddr_un sSocketAddress;
     // Create the base socket
@@ -50,9 +51,11 @@ Socket * __stdcall ConnectToUnixDomainSocket(
     ::memset(&sSocketAddress, 0, sizeof(sSocketAddress));
     sSocketAddress.sun_family = AF_UNIX;
     ::strncpy(sSocketAddress.sun_path, c_strUnixDomainSocketPath.c_str(), (sizeof(sSocketAddress.sun_path) - 1));
+    
     // Make sure that any existing linkage in the system is deleted before binding
     nReturnCode = ::connect(nSocketDescriptor, (struct sockaddr *) &sSocketAddress, sizeof(sSocketAddress));
     _ThrowBaseExceptionIf((0 != nReturnCode), "connect() failed with errno = %d", errno);
+    
     return new Socket(nSocketDescriptor);
 }
 /********************************************************************************************
@@ -71,6 +74,7 @@ Socket * __stdcall ConnectToNetworkSocket(
     )
 {
     __DebugFunction();
+    
     int nSocketDescriptor = 0;
     struct sockaddr_in sSocketAddress;
     // Create the base socket

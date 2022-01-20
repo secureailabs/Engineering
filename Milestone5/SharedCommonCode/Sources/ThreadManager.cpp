@@ -127,7 +127,7 @@ uint64_t __thiscall ThreadManager::CreateThread(
 
     return un64ThreadIdentifier;
 }
-                          
+
 /********************************************************************************************/
 
 void __thiscall ThreadManager::TerminateThread(

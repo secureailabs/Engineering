@@ -24,16 +24,19 @@
 
 /********************************************************************************************/
 
-extern void __cdecl RegisterException(
+extern void __stdcall RegisterException(
     _in const BaseException & c_oBaseException,
     _in const char * c_szFunctionName,
     _in const char * c_szFileName,
     _in unsigned int unLineNumber
     ) throw();
-extern void __cdecl RegisterUnknownException(
+    
+extern void __stdcall RegisterUnknownException(
     _in const char * c_szFunctionName,
     _in const char * c_szFileName,
     _in unsigned int unLineNumber
     ) throw();
-extern unsigned int __cdecl GetRegisteredExceptionCount(void) throw();
-extern std::string __cdecl GetNextRegisteredException(void) throw();
+    
+extern unsigned int __stdcall GetRegisteredExceptionCount(void) throw();
+
+extern std::string __stdcall GetNextRegisteredException(void) throw();

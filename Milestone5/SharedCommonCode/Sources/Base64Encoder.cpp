@@ -16,6 +16,7 @@
 #include <cstring>
 
 /********************************************************************************************/
+
 std::string __stdcall Base64Encode(
     _in const Byte * c_pbRawBuffer,
     _in unsigned int unRawBufferSizeInBytes
@@ -28,7 +29,8 @@ std::string __stdcall Base64Encode(
     {
         size_t unSourceOffset{0};
         size_t unDestOffset{0};
-        constexpr char aszEncodingTable[] = {
+        constexpr char aszEncodingTable[] =
+        {
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
           'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
           'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
@@ -41,24 +43,23 @@ std::string __stdcall Base64Encode(
 
         // We add one to account for nul byte
         stlBase64EncodedString.resize((4 * ((unRawBufferSizeInBytes + 2) / 3)) + 1, 0);
-        char* pbDestPtr{&stlBase64EncodedString[0]};
+        char * pbDestPtr{&stlBase64EncodedString[0]};
 
         // Encode 3 bytes at a time
-        while ( unRawBufferSizeInBytes >= 3 )
+        while (3 <= unRawBufferSizeInBytes)
         {
             pbDestPtr[unDestOffset] = aszEncodingTable[(c_pbRawBuffer[unSourceOffset] & 0xFC) >> 2];
-            pbDestPtr[unDestOffset+1] = aszEncodingTable[((c_pbRawBuffer[unSourceOffset] & 0x03) << 4) + ((c_pbRawBuffer[unSourceOffset+1] & 0xF0) >> 4)];
-            pbDestPtr[unDestOffset+2] = aszEncodingTable[((c_pbRawBuffer[unSourceOffset+1] & 0x0F) << 2) + ((c_pbRawBuffer[unSourceOffset+2] & 0xC0) >> 6)];
-            pbDestPtr[unDestOffset+3] = aszEncodingTable[(c_pbRawBuffer[unSourceOffset+2] & 0x3F)];
+            pbDestPtr[unDestOffset + 1] = aszEncodingTable[((c_pbRawBuffer[unSourceOffset] & 0x03) << 4) + ((c_pbRawBuffer[unSourceOffset + 1] & 0xF0) >> 4)];
+            pbDestPtr[unDestOffset + 2] = aszEncodingTable[((c_pbRawBuffer[unSourceOffset + 1] & 0x0F) << 2) + ((c_pbRawBuffer[unSourceOffset + 2] & 0xC0) >> 6)];
+            pbDestPtr[unDestOffset + 3] = aszEncodingTable[(c_pbRawBuffer[unSourceOffset + 2] & 0x3F)];
 
             unDestOffset += 4;
             unSourceOffset += 3;
             unRawBufferSizeInBytes -= 3;
-
         }
 
         // Handle padding for 1 or 2 bytes
-        if ( unRawBufferSizeInBytes == 1 )
+        if (1 == unRawBufferSizeInBytes)
         {
             pbDestPtr[unDestOffset] = aszEncodingTable[(c_pbRawBuffer[unSourceOffset] & 0xFC) >> 2];
             pbDestPtr[unDestOffset + 1] = aszEncodingTable[((c_pbRawBuffer[unSourceOffset] & 0x03) << 4)];
@@ -67,7 +68,7 @@ std::string __stdcall Base64Encode(
             unRawBufferSizeInBytes -= 1;
             unDestOffset += 4;
         }
-        else if ( unRawBufferSizeInBytes == 2 )
+        else if (2 == unRawBufferSizeInBytes)
         {
             pbDestPtr[unDestOffset] = aszEncodingTable[(c_pbRawBuffer[unSourceOffset] & 0xFC) >> 2];
             pbDestPtr[unDestOffset + 1] = aszEncodingTable[((c_pbRawBuffer[unSourceOffset] & 0x03) << 4) + ((c_pbRawBuffer[unSourceOffset + 1] & 0xF0) >> 4)];
@@ -80,6 +81,8 @@ std::string __stdcall Base64Encode(
 
     return stlBase64EncodedString.size() > 0 ? std::string(&stlBase64EncodedString[0]) : "";
 }
+
+/********************************************************************************************/
 
 std::vector<Byte> __stdcall Base64Decode(
     _in const char * c_szBase64String
@@ -105,7 +108,8 @@ std::vector<Byte> __stdcall Base64Decode(
         // Allocate the destination buffer
         stlDecodedRawBuffer.resize(unOutputStringLength);
 
-        constexpr unsigned char aszDecodingTable[] = {
+        constexpr unsigned char aszDecodingTable[] =
+        {
           64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
           64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
           64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
@@ -147,6 +151,7 @@ std::vector<Byte> __stdcall Base64Decode(
             }
         }
     }
+    
     return stlDecodedRawBuffer;
 }
 

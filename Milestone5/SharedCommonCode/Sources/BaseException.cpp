@@ -13,10 +13,13 @@
  ********************************************************************************************/
 
 #include "Exceptions.h"
+
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <iostream>
 
 /********************************************************************************************
  *
@@ -30,7 +33,6 @@
  * @brief BaseException class constructor
  *
  ********************************************************************************************/
-#include <iostream>
 
 BaseException::BaseException(
 	_in const char * c_szFilename,
@@ -53,7 +55,7 @@ BaseException::BaseException(
 	// malloc directly. This is to ensure that if the actual MemoryAllocation components throws
 	// an exception, this doesn't lead to an infinite loop.
 	va_start( pListOfArguments, c_szExceptionFormat );
-	m_szExceptionMessage = (char *)::malloc(unSizeInCharactersIncludingNull * sizeof(char));
+	m_szExceptionMessage = (char *) ::malloc(unSizeInCharactersIncludingNull * sizeof(char));
 	if (nullptr != m_szExceptionMessage)
 	{
 		(void)::vsnprintf( m_szExceptionMessage, unSizeInCharactersIncludingNull, c_szExceptionFormat, pListOfArguments );
@@ -83,7 +85,7 @@ BaseException::BaseException(
 	// malloc directly. This is to ensure that if the actual MemoryAllocation components throws
 	// an exception, this doesn't lead to an infinite loop. This is one of the few places in
     // the code where the function malloc() should be used instead of using the SmartMemoryAllocator
-	m_szExceptionMessage = (char *)::malloc(unSizeInCharactersIncludingNull * sizeof(char));
+	m_szExceptionMessage = (char *) ::malloc(unSizeInCharactersIncludingNull * sizeof(char));
 	if (nullptr != m_szExceptionMessage)
 	{
 		::strncpy(m_szExceptionMessage, c_oBaseException.m_szExceptionMessage, unSizeInCharactersIncludingNull);
@@ -106,7 +108,7 @@ BaseException::~BaseException(void)
 
 	if (nullptr != m_szExceptionMessage)
 	{
-		::free((void *)m_szExceptionMessage);
+		::free((void *) m_szExceptionMessage);
 		m_szExceptionMessage = nullptr;
 	}
 }

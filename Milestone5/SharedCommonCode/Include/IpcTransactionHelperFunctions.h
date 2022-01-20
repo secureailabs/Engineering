@@ -16,14 +16,17 @@ extern std::vector<Byte> __stdcall GetIpcTransaction(
     _in Socket * poSocket,
     _in bool fIsBlocking
     );
+    
 extern bool __stdcall PutIpcTransaction(
     _in Socket * poSocket,
     _in const std::vector<Byte> c_stlSerializedTransaction
     ) throw();
+    
 extern bool __stdcall PutIpcTransaction(
     _in Socket * poSocket,
     _in const StructuredBuffer & c_oTransaction
     ) throw();
+    
 extern std::vector<Byte> __stdcall PutIpcTransactionAndGetResponse(
     _in Socket * poSocket,
     _in const StructuredBuffer & c_oTransaction,

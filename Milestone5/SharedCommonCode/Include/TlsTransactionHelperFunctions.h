@@ -21,6 +21,7 @@ extern bool __stdcall PutTlsTransaction(
     _in TlsNode * poTlsNode,
     _in const std::vector<Byte> & c_stlSerializedTransaction
     ) throw();
+    
 extern bool __stdcall PutTlsTransaction(
     _in TlsNode * poTlsNode,
     _in const StructuredBuffer & c_oTransaction
@@ -35,11 +36,10 @@ extern std::vector<Byte> __stdcall PutTlsTransactionAndGetResponse(
 extern bool __stdcall PutHttpResponse(
     _in TlsNode * poTlsNode,
     _in const std::string & stlPayload
-);
+    );
 
 extern bool __stdcall PutHttpHeaderOnlyResponse(
     _in TlsNode& oTlsNode,
     _in Dword dStatus,
     _in const std::string& strStatus
-);
-
+    );

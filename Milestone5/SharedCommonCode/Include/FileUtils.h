@@ -8,26 +8,25 @@
  *
  ********************************************************************************************/
 
-#include "DebugLibrary.h"
-#include "Exceptions.h"
+#include "CoreTypes.h"
 
 #include <vector>
 #include <string>
 
-std::vector<Byte> __stdcall ReadFileAsByteBuffer(
-    const std::string c_strFileName
-);
-
-std::string __stdcall ReadFileAsString(
+extern std::vector<Byte> __stdcall ReadFileAsByteBuffer(
     _in const std::string & c_strFileName
-);
+    );
 
-void __stdcall WriteBytesAsFile(
-    _in const std::string c_strFileName,
-    _in const std::vector<Byte> c_stlFileData
-);
+extern std::string __stdcall ReadFileAsString(
+    _in const std::string & c_strFileName
+    );
 
-void WriteStringAsFile(
-    _in const std::string c_strFileName,
-    _in const std::string c_strFileData
-);
+extern void __stdcall WriteBytesAsFile(
+    _in const std::string & c_strFileName,
+    _in const std::vector<Byte> & c_stlFileData
+    );
+
+extern void __stdcall WriteStringAsFile(
+    _in const std::string & c_strFileName,
+    _in const std::string & c_strFileData
+    );

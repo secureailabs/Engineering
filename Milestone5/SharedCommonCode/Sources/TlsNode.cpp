@@ -97,7 +97,6 @@ TlsNode::TlsNode(
 TlsNode::~TlsNode(void)
 {
     __DebugFunction();
-
 }
 
 /********************************************************************************************
@@ -159,7 +158,7 @@ std::vector<Byte> __thiscall TlsNode::Read(
                         fReadTimedOut = true;
                     }
 
-                    if(false == fReadTimedOut)
+                    if (false == fReadTimedOut)
                     {
                         // Write the TLS header to the read BIO for the SSL_read to use
                         _ThrowBaseExceptionIf((5 != ::BIO_write(m_poReadBIO, m_stlTlsHeaderCache.data(), 5)), "TLS Read failed: Writing to readBIO failed", nullptr);
@@ -195,10 +194,12 @@ std::vector<Byte> __thiscall TlsNode::Read(
             stlDestinationBuffer = m_oDecryptedBytesCache.Read(unNumberOfDesiredBytes);
         }
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -249,10 +250,12 @@ int __thiscall TlsNode::Write(
             _ThrowBaseExceptionIf((1 != ::BIO_ctrl(m_poWriteBIO, BIO_CTRL_RESET, 0, nullptr)), "TLS failed: Write BIO reset failed", nullptr);
         }
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

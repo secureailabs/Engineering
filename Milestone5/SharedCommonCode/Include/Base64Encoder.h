@@ -11,6 +11,7 @@
 #pragma once
 
 #include "CoreTypes.h"
+
 #include <string>
 #include <vector>
 

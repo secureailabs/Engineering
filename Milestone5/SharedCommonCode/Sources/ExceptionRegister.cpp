@@ -35,7 +35,7 @@ static std::mutex gs_stlMutex;
 /// <param name="c_szFunctionName"></param>
 /// <param name="unLineNumber"></param>
 /// <returns></returns>
-void __cdecl RegisterException(
+void __stdcall RegisterException(
     _in const BaseException & c_oBaseException,
     _in const char * c_szFunctionName,
     _in const char * c_szFileName,
@@ -85,7 +85,7 @@ void __cdecl RegisterException(
 /// <param name="c_szFunctionName"></param>
 /// <param name="unLineNumber"></param>
 /// <returns></returns>
-void __cdecl RegisterUnknownException(
+void __stdcall RegisterUnknownException(
     _in const char * c_szFunctionName,
     _in const char * c_szFileName,
     _in unsigned int unLineNumber
@@ -126,7 +126,7 @@ void __cdecl RegisterUnknownException(
 /// </summary>
 /// <param name=""></param>
 /// <returns></returns>
-unsigned int __cdecl GetRegisteredExceptionCount(void) throw()
+unsigned int __stdcall GetRegisteredExceptionCount(void) throw()
 {
     __DebugFunction();
     
@@ -153,7 +153,7 @@ unsigned int __cdecl GetRegisteredExceptionCount(void) throw()
 /// </summary>
 /// <param name=""></param>
 /// <returns></returns>
-std::string __cdecl GetNextRegisteredException(void) throw()
+std::string __stdcall GetNextRegisteredException(void) throw()
 {
     __DebugFunction();
 

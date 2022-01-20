@@ -12,6 +12,9 @@ RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y sudo \
 wget \
 iproute2 \
+git \
+make \
+build-essential \
 libcurl4-gnutls-dev \
 python3-pip
 

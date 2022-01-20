@@ -41,7 +41,7 @@ class HttpRequestParser : public Object
         // Parse http body if Content-Type is application/x-www-form-urlencoded
         void __thiscall ParseUrlEncodedString(
             _in const std::string & c_strRequestBody
-        );
+            );
 
         // Fetch position of end of the http request header
         unsigned int __thiscall GetHeaderEndPosition(void) const;
@@ -52,11 +52,11 @@ class HttpRequestParser : public Object
         // Fetch parameter value associated with c_strKey from m_stlParameters
         std::string __thiscall GetParameterValue(
             _in const std::string & c_strKey
-        ) const;
+            ) const;
         // Fetch header value associated with c_strKey from m_stlHeaders
         std::string __thiscall GetHeaderValue(
             _in const std::string & c_strKey
-        ) const;
+            ) const;
 
         // Check if a parameter value exists for c_strKey in m_stlParameters
         bool __thiscall ParameterExists(

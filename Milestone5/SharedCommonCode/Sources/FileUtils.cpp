@@ -9,8 +9,8 @@
  ********************************************************************************************/
 
 #include "DebugLibrary.h"
-#include "FileUtils.h"
 #include "Exceptions.h"
+#include "FileUtils.h"
 
 #include <iostream>
 #include <fstream>
@@ -25,8 +25,8 @@
  ********************************************************************************************/
 
 std::vector<Byte> __stdcall ReadFileAsByteBuffer(
-    const std::string c_strFileName
-)
+    _in const std::string & c_strFileName
+    )
 {
     __DebugFunction();
 
@@ -45,6 +45,7 @@ std::vector<Byte> __stdcall ReadFileAsByteBuffer(
     {
         _ThrowBaseException("Invalid File Path", nullptr);
     }
+    
     return stlFileData;
 }
 
@@ -57,9 +58,9 @@ std::vector<Byte> __stdcall ReadFileAsByteBuffer(
  *
  ********************************************************************************************/
 
-std::string ReadFileAsString(
+std::string __stdcall ReadFileAsString(
     _in const std::string & c_strFileName
-)
+    )
 {
     __DebugFunction();
 
@@ -69,8 +70,8 @@ std::string ReadFileAsString(
     std::string strFileContent;
     strFileContent.resize(nSizeOfFile);
     stlFile.read(strFileContent.data(), nSizeOfFile);
-
     stlFile.close();
+    
     return strFileContent;
 }
 
@@ -84,10 +85,10 @@ std::string ReadFileAsString(
  *
  ********************************************************************************************/
 
-void WriteBytesAsFile(
-    _in const std::string c_strFileName,
-    _in const std::vector<Byte> c_stlFileData
-)
+void __stdcall WriteBytesAsFile(
+    _in const std::string & c_strFileName,
+    _in const std::vector<Byte> & c_stlFileData
+    )
 {
     __DebugFunction();
 
@@ -105,10 +106,10 @@ void WriteBytesAsFile(
  *
  ********************************************************************************************/
 
-void WriteStringAsFile(
-    _in const std::string c_strFileName,
-    _in const std::string c_strFileData
-)
+void __stdcall WriteStringAsFile(
+    _in const std::string & c_strFileName,
+    _in const std::string & c_strFileData
+    )
 {
     __DebugFunction();
 

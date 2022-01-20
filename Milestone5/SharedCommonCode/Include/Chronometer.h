@@ -34,7 +34,7 @@ class Chronometer : public Object
     public:
 
         Chronometer(void) throw();
-        ~Chronometer(void) throw();
+        virtual ~Chronometer(void) throw();
 
         void __thiscall Start(void) throw();
         void __thiscall Stop(void) throw();

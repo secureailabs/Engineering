@@ -136,10 +136,12 @@ std::vector<Byte> __stdcall GetTlsTransaction(
             }
         }
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -161,7 +163,7 @@ std::vector<Byte> __stdcall GetTlsTransaction(
 bool __stdcall PutTlsTransaction(
     _in TlsNode * poTlsNode,
     _in const std::vector<Byte> & c_stlSerializedBuffer
-) throw()
+    ) throw()
 {
     __DebugFunction();
     __DebugAssert(nullptr != poTlsNode);
@@ -196,6 +198,7 @@ bool __stdcall PutTlsTransaction(
             fSuccess = true;
         }
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
@@ -268,10 +271,10 @@ bool __stdcall PutTlsTransaction(
  *
  ********************************************************************************************/
 
-bool PutHttpResponse(
+bool __stdcall PutHttpResponse(
     TlsNode * poTlsNode,
     const std::string & stlPayload
-)
+    )
 {
     __DebugFunction();
     __DebugAssert(nullptr != poTlsNode);
@@ -301,7 +304,7 @@ bool __stdcall PutHttpHeaderOnlyResponse(
     _in TlsNode& oTlsNode,
     _in Dword dStatus,
     _in const std::string& strStatus
-)
+    )
 {
     __DebugFunction();
 

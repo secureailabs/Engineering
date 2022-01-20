@@ -17,6 +17,8 @@
 
 /********************************************************************************************/
 
+// So we will kill almost all these functions and see what breaks ;-)
+
 extern "C" bool __stdcall IsNumber(
     _in const std::string & c_strValue
     );
@@ -60,6 +62,8 @@ extern "C" bool ValidateSignedNumber(
     _in const std::string & c_strRange,
     _in Byte bRangeType
     );
+
+// This should be in StringHelpers.h
 
 void __thiscall ReplaceAll(
     _inout std::string & strOriginalString,

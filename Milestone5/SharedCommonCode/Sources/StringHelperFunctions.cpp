@@ -34,8 +34,6 @@ int __stdcall _StringCompare(
 {
 	__DebugFunction();
 	
-	__DebugFunction();
-	
 	int nReturnValue = 0;
 
 	if ((nullptr != c_szInputString1)&&(nullptr == c_szInputString2))

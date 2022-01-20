@@ -38,7 +38,7 @@ class FifoBuffer : public Object
     private:
     
         // This class is thread safe, so we need a mutex to guard access to m_stlLockBuffer and m_stlFifoBuffer
-        std::recursive_mutex m_stlLock;
+        mutable std::recursive_mutex m_stlLock;
         // These buffers are used to host the data that is currently buffered or being buffered
         std::vector<Byte> m_stlFifoBuffer;
         std::vector<Byte> m_stlLockBuffer;

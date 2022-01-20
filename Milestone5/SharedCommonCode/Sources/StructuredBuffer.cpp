@@ -942,10 +942,10 @@ void __thiscall StructuredBuffer::Serialize(void) const throw()
         {
             unsigned int unSerializedBufferSizeInBytes = sizeof(Dword) + sizeof(Qword) + sizeof(Qword) + sizeof(uint32_t) + sizeof(Dword);
             std::vector<Qword> stlVectorOfElementName64BitHashes;
-            std::map<Qword, std::vector<Byte>> stlSerializedElements;
+            std::unordered_map<Qword, std::vector<Byte>> stlSerializedElements;
             
             // First we need to get a sorted vector of elements
-            for(auto const & element: m_stlMapOfElements)
+            for (auto const & element: m_stlMapOfElements)
             {
                 stlVectorOfElementName64BitHashes.push_back(element.first);
             }

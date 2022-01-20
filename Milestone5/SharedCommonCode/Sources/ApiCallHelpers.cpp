@@ -29,7 +29,7 @@
 #include <vector>
 
 static std::string gs_strIpAddressOfWebPortalGateway;
-static unsigned int gs_unPortAddressOfWebPortalGateway;
+static unsigned int gs_unPortAddressOfWebPortalGateway = 0;
     
 /*********************************************************************************************/
 
@@ -42,6 +42,7 @@ bool __stdcall SetIpAddressOfSailWebApiPortalGateway(
     __DebugAssert(0 == gs_strIpAddressOfWebPortalGateway.size());
     __DebugAssert(0 < c_strIpAddressOfWebPortalGateway.size());
 
+    // TODO: Hook to IP resolution function
     gs_strIpAddressOfWebPortalGateway = c_strIpAddressOfWebPortalGateway;
     gs_unPortAddressOfWebPortalGateway = wPortAddressOfWebPortalGateway;
 
@@ -56,6 +57,8 @@ std::string __stdcall LoginToSailWebApiPortal(
     )
 {
     __DebugFunction();
+    __DebugAssert(0 < gs_strIpAddressOfWebPortalGateway.size());
+    __DebugAssert(0 != gs_unPortAddressOfWebPortalGateway);
     
     std::string strEosb;
 

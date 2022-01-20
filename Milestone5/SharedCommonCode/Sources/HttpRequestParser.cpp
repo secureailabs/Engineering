@@ -63,7 +63,7 @@ bool __thiscall HttpRequestParser::ParseRequest(
     std::getline(oParser, strFirstLine, '\r');
 
     // Get Verb, Resource, Query parameters, and Protocol
-    if ( false == this->ParseFirstLine(strFirstLine))
+    if (false == this->ParseFirstLine(strFirstLine))
     {
         fSuccess = false;
     }
@@ -434,5 +434,4 @@ void __thiscall HttpRequestParser::ExtractQueryParameters(void)
             }
         }
     }
-
 }

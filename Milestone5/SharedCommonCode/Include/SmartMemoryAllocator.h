@@ -33,6 +33,6 @@ class SmartMemoryAllocator
 
     private:
 
-        std::mutex m_stlLock;
+        mutable std::mutex m_stlLock;
         std::map<void *, bool> m_stlElementsAllocated;
 };

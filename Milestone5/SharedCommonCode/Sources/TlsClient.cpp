@@ -26,21 +26,24 @@
 
 TlsNode * __stdcall TlsConnectToUnixDomainSocket(
     _in const char * c_szSocketPath
-    )
+    ) throw()
 {
     __DebugFunction();
 
     TlsNode * poTlsNode = nullptr;
+    
     try
     {
         Socket * poSocket = ::ConnectToUnixDomainSocket(std::string(c_szSocketPath));
 
         poTlsNode = new TlsNode(poSocket, eSSLModeClient);
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -54,7 +57,7 @@ TlsNode * __stdcall TlsConnectToUnixDomainSocket(
 TlsNode * __stdcall TlsConnectToNetworkSocket(
     _in const char * c_szTargetIpAddress,
     _in Word wPortNumber
-    )
+    ) throw()
 {
     __DebugFunction();
 
@@ -66,10 +69,12 @@ TlsNode * __stdcall TlsConnectToNetworkSocket(
 
         poTlsNode = new TlsNode(poSocket, eSSLModeClient);
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -85,7 +90,7 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
     _in Word wPortNumber,
     _in unsigned int unMillisecondTimeout,
     _in unsigned int unMillesecondStepTime
-    )
+    ) throw()
 {
     __DebugFunction();
 
@@ -106,6 +111,7 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
 
             catch(const BaseException & oBaseException)
             {
+                // BUGBUG: Fix this to use the other sleep which is in microseconds
                 ::sleep(unMillesecondStepTime/1000);
             }
         }
@@ -113,10 +119,12 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
 
         poTlsNode = new TlsNode(poSocket, eSSLModeClient);
     }
+    
     catch(BaseException oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -124,5 +132,3 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
 
     return poTlsNode;
 }
-
-/********************************************************************************************/

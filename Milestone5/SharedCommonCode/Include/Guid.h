@@ -109,13 +109,13 @@ class Guid : public Object
             _in const char * c_szGuid
             );
         Guid(
+            _in const std::string & c_strGuid
+            );
+        Guid(
             _in const Byte * c_pbBinaryBuffer
             );
         Guid(
             _in const Guid & c_oGuid
-            );
-        Guid(
-            _in const std::string& c_strGuid
             );
         virtual ~Guid(void) throw();
 

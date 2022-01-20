@@ -27,12 +27,12 @@ class TlsServer : public Object
         TlsServer(
             _in const char * c_szUnixSocketAddress
             );
-        ~TlsServer(void);
+        virtual ~TlsServer(void);
 
         bool __thiscall WaitForConnection(
             _in unsigned int unMillisecondTimeout
             );
-        TlsNode * __thiscall Accept(void);
+        TlsNode * __thiscall Accept(void) throw();
 
     private:
 

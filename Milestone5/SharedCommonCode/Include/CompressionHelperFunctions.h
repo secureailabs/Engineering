@@ -8,19 +8,20 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #pragma once
 
 #include "CoreTypes.h"
 #include "StructuredBuffer.h"
 
 /********************************************************************************************/
+
 extern StructuredBuffer __stdcall CompressToStructuredBuffer(
     _in const void * c_pbRawBytes,
     _in uint64_t unRawBufferSizeInBytes
     ) throw();
 
 /********************************************************************************************/
+
 extern std::vector<Byte> __stdcall DecompressStructuredBuffer(
     _in const StructuredBuffer & compressedBuffer
     ) throw();

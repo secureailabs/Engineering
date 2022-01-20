@@ -74,13 +74,12 @@ std::vector<Byte> __thiscall FifoBuffer::Read(
 
     if (0 < unNumberOfBytesToRead)
     {
-        m_stlLock.lock();
+        const std::lock_guard<std::recursive_mutex> stlMutex(m_stlLock);
         if (unNumberOfBytesToRead <= m_stlFifoBuffer.size())
         {
             stlReturnBuffer.assign(m_stlFifoBuffer.begin(), (m_stlFifoBuffer.begin() + unNumberOfBytesToRead));
             m_stlFifoBuffer.erase(m_stlFifoBuffer.begin(), (m_stlFifoBuffer.begin() + unNumberOfBytesToRead));
         }
-        m_stlLock.unlock();
     }
 
     return stlReturnBuffer;
@@ -100,9 +99,8 @@ std::size_t __thiscall FifoBuffer::GetBytesInBuffer(void)
     __DebugFunction();
 
     std::size_t unSizeToReturn = 0;
-    m_stlLock.lock();
+    const std::lock_guard<std::recursive_mutex> stlMutex(m_stlLock);
     unSizeToReturn = m_stlFifoBuffer.size();
-    m_stlLock.unlock();
 
     return unSizeToReturn;
 }
@@ -188,9 +186,6 @@ void __thiscall FifoBuffer::WriteUnlock(
         // Now unlock the original lock()
         m_stlLock.unlock();
     }
-
-    if (true == fThrowException)
-    {
-        _ThrowSimpleException("OUT_OF_BOUNDS EXCEPTION! unNumberOfBytesToPersist is greater than unNumberOfBytesToWrite specified when WriteLocked() was called");
-    }
+    
+    _ThrowBaseExceptionIf((true == fThrowException), "OUT_OF_BOUNDS EXCEPTION! unNumberOfBytesToPersist is greater than unNumberOfBytesToWrite specified when WriteLocked() was called", nullptr);
 }

@@ -47,7 +47,7 @@ SmartMemoryAllocator::~SmartMemoryAllocator(void) throw()
 {
     __DebugFunction();
     
-    m_stlLock.lock();
+    std::lock_guard<std::mutex> oLock(m_stlLock);
     for (auto const & memoryBlock : m_stlElementsAllocated)
     {
         if (true == memoryBlock.second)
@@ -57,7 +57,6 @@ SmartMemoryAllocator::~SmartMemoryAllocator(void) throw()
         }
     }
     m_stlElementsAllocated.clear();
-    m_stlLock.unlock();
 }
 
 /********************************************************************************************
@@ -83,12 +82,11 @@ void * __thiscall SmartMemoryAllocator::Allocate(
     
     if (0 < unSizeInBytesDesired)
     {
-        m_stlLock.lock();
+        std::lock_guard<std::mutex> oLock(m_stlLock);
         pMemoryBlock = ::malloc(unSizeInBytesDesired);
         _ThrowOutOfMemoryExceptionIfNull(pMemoryBlock);
         // Make sure to register the memory block
         m_stlElementsAllocated[pMemoryBlock] = fDeallocateAutomatically;
-        m_stlLock.unlock();
     }
     
     return pMemoryBlock;
@@ -113,11 +111,10 @@ void __thiscall SmartMemoryAllocator::Deallocate(
     {
         ::free(pMemoryToDeallocate);
         // If the memory block is registered, make sure to remove it
-        m_stlLock.lock();
+        std::lock_guard<std::mutex> oLock(m_stlLock);
         if (m_stlElementsAllocated.end() != m_stlElementsAllocated.find(pMemoryToDeallocate))
         {
             m_stlElementsAllocated.erase(pMemoryToDeallocate);
         }
-        m_stlLock.unlock();
     }
 }

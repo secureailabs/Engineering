@@ -48,9 +48,9 @@ static BSTR __cdecl ConvertToBSTR(
         pszString = ::SysAllocString(wszUnicodeString);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -83,9 +83,9 @@ extern "C" __declspec(dllexport) uint64_t __cdecl Get64BitHashOfString(
         un64HashValue = ::Get64BitHashOfNullTerminatedString(c_szValue, fCaseSensitive);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -114,9 +114,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GenerateIdentifier(
         pszString = ::ConvertToBSTR(oIdentifier.ToString(eHyphensOnly));
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -153,9 +153,9 @@ extern "C" __declspec(dllexport) void __cdecl OpenTablePackageFile(
         gs_un64CurrentOffset = 0;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -185,9 +185,9 @@ extern "C" __declspec(dllexport) void __cdecl AddRecordToTablePackageFile(
         gs_pbWriteTarget += strOutputRecord.length();
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -240,9 +240,9 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
         ::CloseHandle(hFileHandle);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

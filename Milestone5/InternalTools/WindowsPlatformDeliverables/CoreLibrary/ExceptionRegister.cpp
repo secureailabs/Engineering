@@ -80,6 +80,7 @@ void __cdecl RegisterExceptionalMessage(
 void __cdecl RegisterException(
     _in const BaseException & c_oBaseException,
     _in const char * c_szFunctionName,
+    _in const char * c_szFilename,
     _in unsigned int unLineNumber
     ) throw()
 {
@@ -99,7 +100,7 @@ void __cdecl RegisterException(
         strExceptionMessage += "\r\n               |Message = ";
         strExceptionMessage += c_oBaseException.GetExceptionMessage();
         strExceptionMessage += "\r\nCaught in ---->|File = ";
-        strExceptionMessage += __FILE__;
+        strExceptionMessage += c_szFilename;
         strExceptionMessage += "\r\n               |Function = ";
         strExceptionMessage += c_szFunctionName;
         strExceptionMessage += "\r\n               |Line Number = ";

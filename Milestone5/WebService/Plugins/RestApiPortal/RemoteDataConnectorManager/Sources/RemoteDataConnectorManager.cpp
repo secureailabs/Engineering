@@ -59,13 +59,13 @@ static void * __stdcall StartIpcServerThread(
         poRemoteDataConnectorManager->RunIpcServer(poIpcServerParameters->poIpcServer, poIpcServerParameters->poThreadManager);
     }
     
-    catch (BaseException oException)
+    catch (BaseException c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
@@ -112,13 +112,13 @@ static void * __stdcall StartIpcThread(
         poRemoteDataConnectorManager->HandleIpcRequest(poIpcSocket);
     }
     
-    catch (BaseException oException)
+    catch (BaseException c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
@@ -684,16 +684,18 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::GetUserInfo(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -780,16 +782,18 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::GetListOfRemoteDataConn
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -869,16 +873,18 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::PullRemoteDataConnector
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -962,16 +968,18 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::RegisterRemoteDataConne
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1052,16 +1060,18 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::UpdateRemoteDataConnect
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1163,16 +1173,18 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::ConnectorHeartBeat(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

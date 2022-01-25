@@ -22,7 +22,7 @@
 #define ARRAY_BLOCK 3
 #define TRUE_VALUE 4
 #define FALSE_VALUE 5
-#define NULL_VALUE_TYPE 6
+#define NULL_TYPE 6
 #define NUMBER_VALUE 7
 
 // These are strings used to do easy character lookup while parsing. Helps simplify the
@@ -256,7 +256,7 @@ static StructuredBuffer __stdcall ParseJsonArrayToStructuredBuffer(
             }
             else if (('n' == c_szJsonString[unCurrentOffset])||('N' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = NULL_VALUE_TYPE;
+                unCode = NULL_TYPE;
             }
             else if (std::string::npos != gsc_strJsonValidLeadingNumericalCharacters.find(c_szJsonString[unCurrentOffset]))
             {
@@ -294,21 +294,21 @@ static StructuredBuffer __stdcall ParseJsonArrayToStructuredBuffer(
         }
         else if (TRUE_VALUE == unCode)
         {
-            unsigned int unExpectedLength = ::strlen("true");
+            unsigned int unExpectedLength = (unsigned int) ::strlen("true");
             _ThrowBaseExceptionIf((0 != ::_strnicmp("true", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
             unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(szValueName, true);
         }
         else if (FALSE_VALUE == unCode)
         {
-            unsigned int unExpectedLength = ::strlen("false");
+            unsigned int unExpectedLength = (unsigned int) ::strlen("false");
             _ThrowBaseExceptionIf((0 != ::_strnicmp("false", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
             unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(szValueName, false);
         }
-        else if (NULL_VALUE_TYPE == unCode)
+        else if (NULL_TYPE == unCode)
         {
-            unsigned int unExpectedLength = ::strlen("null");
+            unsigned int unExpectedLength = (unsigned int) ::strlen("null");
             _ThrowBaseExceptionIf((0 != ::_strnicmp("null", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
             unCurrentOffset += unExpectedLength;
             oJsonObject.PutNull(szValueName);
@@ -422,7 +422,7 @@ static StructuredBuffer __stdcall ParseJsonObjectToStructuredBuffer(
             }
             else if (('n' == c_szJsonString[unCurrentOffset])||('N' == c_szJsonString[unCurrentOffset]))
             {
-                unCode = NULL_VALUE_TYPE;
+                unCode = NULL_TYPE;
             }
             else if (std::string::npos != gsc_strJsonValidLeadingNumericalCharacters.find(c_szJsonString[unCurrentOffset]))
             {
@@ -459,21 +459,21 @@ static StructuredBuffer __stdcall ParseJsonObjectToStructuredBuffer(
         }
         else if (TRUE_VALUE == unCode)
         {
-            unsigned int unExpectedLength = ::strlen("true");
+            unsigned int unExpectedLength = (unsigned int) ::strlen("true");
             _ThrowBaseExceptionIf((0 != ::_strnicmp("true", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
             unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(strJsonNameString.c_str(), true);
         }
         else if (FALSE_VALUE == unCode)
         {
-            unsigned int unExpectedLength = ::strlen("false");
+            unsigned int unExpectedLength = (unsigned int) ::strlen("false");
             _ThrowBaseExceptionIf((0 != ::_strnicmp("false", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
             unCurrentOffset += unExpectedLength;
             oJsonObject.PutBoolean(strJsonNameString.c_str(), false);
         }
-        else if (NULL_VALUE_TYPE == unCode)
+        else if (NULL_TYPE == unCode)
         {
-            unsigned int unExpectedLength = ::strlen("null");
+            unsigned int unExpectedLength = (unsigned int) ::strlen("null");
             _ThrowBaseExceptionIf((0 != ::_strnicmp("null", &(c_szJsonString[unCurrentOffset]), unExpectedLength)), "Invalid JSON string. 'true' token not found at offset %d", unCurrentOffset);
             unCurrentOffset += unExpectedLength;
             oJsonObject.PutNull(strJsonNameString.c_str());
@@ -604,7 +604,7 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
                     strJsonString += "\r\n" + strIndentationHeader + "}";
                 }
             }
-            else if (NULL_VALUE_TYPE == bElementType)
+            else if (NULL_TYPE == bElementType)
             {
                 strJsonString += strIndentationHeader + strElementName + "null";
             }

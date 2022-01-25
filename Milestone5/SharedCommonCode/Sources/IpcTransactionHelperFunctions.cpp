@@ -61,9 +61,9 @@ std::vector<Byte> __stdcall GetIpcTransaction(
         _ThrowBaseExceptionIf((0x0123456789ABCDEF != qwTailMarker), "Invalid marker encountered.", nullptr);
     }
 
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -110,9 +110,9 @@ bool __stdcall PutIpcTransaction(
         }
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)

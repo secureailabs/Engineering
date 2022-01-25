@@ -55,21 +55,19 @@ static Dword __stdcall UploadDatasetToVirtualMachine(
         std::vector<Byte> stlDatasetFiledata = ::GetBinaryFileBuffer(strDatasetFilename.c_str());
         std::string strEncoded = ::Base64Encode(stlDatasetFiledata.data(), (unsigned int)stlDatasetFiledata.size());
         oVirtualMachineInformation.PutString("Base64EncodedDataset", strEncoded);
-        // Prepare the JSON blob
-        auto oJsonBody = JsonValue::ParseStructuredBufferToJson(oVirtualMachineInformation);
-        std::string strJsonBody = oJsonBody->ToString();
-        oJsonBody->Release();
+        // Prepare the JSON string
+        std::string strJson = ::ConvertStructuredBufferToJson(oVirtualMachineInformation);
         // Add notification to mark the beginning of the upload transaction
         ::RegisterExceptionalMessage("Began uploading dataset %s to %s", strDatasetFilename.c_str(), strVirtualMachineIpAddress.c_str());
         // Execute the upload transaction
-        auto stlRestResponse = ::RestApiCall(strVirtualMachineIpAddress, (Word) 6200, "GET", "/something", strJsonBody, false);
+        auto stlRestResponse = ::RestApiCall(strVirtualMachineIpAddress, (Word) 6200, "PUT", "/something", strJson, false);
         // Parse the returning value.
         fSuccess = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -193,9 +191,9 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -270,9 +268,9 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -288,21 +286,22 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
 /// </summary>
 /// <param name="c_szSourceFolder"></param>
 /// <returns></returns>
-extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
+extern "C" __declspec(dllexport) bool __cdecl RemoteDataConnectorAddDataset(
     _in const char * c_szDatasetFilename
-)
+    )
 {
     __DebugFunction();
 
+    bool fSuccess = false;
+    
     try
     {
-        // Get the has of the dataset filename
+        // Get the hash of the dataset filename
         Qword qwHashOfDatasetFilename = ::Get64BitHashOfNullTerminatedString(c_szDatasetFilename, false);
         // Check to make sure we haven't registed the file already
         if ((gs_stlListOfRegisteredDatasetFiles.end() == gs_stlListOfRegisteredDatasetFiles.find(qwHashOfDatasetFilename)) && (gs_stlListOfNewDatasetFiles.end() == gs_stlListOfNewDatasetFiles.find(qwHashOfDatasetFilename)))
         {
             unsigned int unNumberOfRetries = 0;
-            bool fSuccess = false;
 
             // Because it is possible for this function to fire when someone is still writing to the
             // dataset, there are a series of race conditions that we must deal with in order for
@@ -314,35 +313,56 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
                     // Load the contents of the dataset file into a binary buffer
                     std::vector<Byte> stlBinaryFile = ::GetBinaryFileBuffer(c_szDatasetFilename);
                     _ThrowBaseExceptionIf((0 == stlBinaryFile.size()), "Failed to open file %s", c_szDatasetFilename);
+                    //
+                    // Prepare to read the metadata from to file. Format is:
+                    // 
+                    //                        +----------------------------------------------------------------+
+                    // Offset 0               | 64 bit marker = 0xEE094CBA1B48A123                             |
+                    //                        +----------------------------------------------------------------+
+                    // Offset 8               | 32 bit size in bytes (n) of dataset metadata serialized buffer |
+                    //                        +----------------------------------------------------------------+
+                    // Offset 12              | Dataset metadata serialized buffer                             |
+                    //                        +----------------------------------------------------------------+
+                    // Offset 12 + n          | 64 bit marker = 0xEE094CBA1B48A123                             |
+                    //                        +----------------------------------------------------------------+
+                    // Offset 20 + n          | UUID of table for next chunk of table data                     |
+                    //                        +----------------------------------------------------------------+
+                    // Offset 36 + n          | Size in Bytes of compressed table data                         |
+                    //                        +----------------------------------------------------------------+
+                    // Offset 42 + n          | Compressed table data                                          |
+                    //                        +----------------------------------------------------------------+
+                    //                                         Repeat for the number of tables
+                    //                        +----------------------------------------------------------------+
+                    //                        | 64 bit marker = 0xEE094CBA1B48A123                             |
+                    //                        +----------------------------------------------------------------+
+                    // Where (z) = (total size of all compressed table data) + (number of tables * 16)
+                    //
                     // Read the header marker of the file to make sure it's the expected value
                     const Byte * c_pbBinaryBuffer = (Byte *) stlBinaryFile.data();
                     uint64_t un64Header = *((uint64_t *) c_pbBinaryBuffer);
-                    _ThrowBaseExceptionIf((0xDEADBEEFDEADBEEF != un64Header), "Expected header to be [0xDEADBEEFDEADBEEF] but found [%xul]", un64Header);
+                    _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != un64Header), "Expected header to be [0xEE094CBA1B48A123] but found [%xul]", un64Header);
                     c_pbBinaryBuffer += sizeof(un64Header);
                     // Read the size in bytes of the header information structure
-                    uint32_t un32SizeOfHeaderStructure = *((uint32_t *) c_pbBinaryBuffer);
-                    _ThrowBaseExceptionIf(((un32SizeOfHeaderStructure + sizeof(un64Header) + sizeof(un32SizeOfHeaderStructure)) >= stlBinaryFile.size()), "Unrealistic size of header structure = %d", un32SizeOfHeaderStructure);
-                    c_pbBinaryBuffer += sizeof(un32SizeOfHeaderStructure);
+                    uint32_t un32SizeOfDatasetMetadataSerializedBuffer = *((uint32_t *) c_pbBinaryBuffer);
+                    _ThrowBaseExceptionIf(((un32SizeOfDatasetMetadataSerializedBuffer + sizeof(un64Header) + sizeof(un32SizeOfDatasetMetadataSerializedBuffer)) >= stlBinaryFile.size()), "Unrealistic size of header structure = %d", un32SizeOfDatasetMetadataSerializedBuffer);
+                    c_pbBinaryBuffer += sizeof(un32SizeOfDatasetMetadataSerializedBuffer);
                     // Read in the header information structure into a StructuredBuffer
-                    StructuredBuffer oHeaderInformation(c_pbBinaryBuffer, un32SizeOfHeaderStructure);
-                    uint64_t un64MetaDataOffset = oHeaderInformation.GetUnsignedInt64("MetaDataOffset");
-                    int32_t un32MetaDataSizeInBytes = oHeaderInformation.GetInt32("MetaDataSize");
-                    _ThrowBaseExceptionIf(((un64MetaDataOffset + un32MetaDataSizeInBytes) > stlBinaryFile.size()), "Unrealistic offset (%ul) and size (%d) of metadata structure = %d", un64MetaDataOffset, un32SizeOfHeaderStructure);
-                    // Reset the c_pbBinaryBuffer pointer and then extract the metadata
-                    c_pbBinaryBuffer = (Byte *) stlBinaryFile.data();
-                    c_pbBinaryBuffer += un64MetaDataOffset;
-                    StructuredBuffer oMetadataInformation(c_pbBinaryBuffer, un32MetaDataSizeInBytes);
+                    StructuredBuffer oSerializedDatasetMetadata(c_pbBinaryBuffer, un32SizeOfDatasetMetadataSerializedBuffer);
+                    c_pbBinaryBuffer += un32SizeOfDatasetMetadataSerializedBuffer;
+                    // Quick sanity check
+                    un64Header = *((uint64_t *) c_pbBinaryBuffer);
+                    _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != un64Header), "Expected header to be [0xEE094CBA1B48A123] but found [%xul]", un64Header);
                     // Get the identifier of the dataset
-                    std::string strDatasetIdentifier = oMetadataInformation.GetString("UUID");
+                    std::string strDatasetIdentifier = oSerializedDatasetMetadata.GetGuid("Identifier").ToString(eHyphensOnly);
                     // Add the new dataset now that we know that the identifier of the dataset is
                     gs_stlListOfNewDatasetFiles[qwHashOfDatasetFilename] = strDatasetIdentifier;
                     gs_stlListOfRegisteredDatasetFilenames[qwHashOfDatasetFilename] = c_szDatasetFilename;
                     fSuccess = true;
                 }
 
-                catch (BaseException oBaseException)
+                catch (const BaseException & c_oBaseException)
                 {
-                    ::RegisterException(oBaseException, __func__, __LINE__);
+                    ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
                     // Sleep for 5 seconds to give time for the dataset file to be fully copied to the folder
                     ::Sleep(5000);
                     unNumberOfRetries++;
@@ -359,15 +379,17 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }
+    
+    return fSuccess;
 }
 
 /// <summary>
@@ -377,7 +399,7 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
 /// <returns></returns>
 extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorRemoveDataset(
     _in const char * c_szDatasetFilename
-)
+    )
 {
     __DebugFunction();
 
@@ -400,9 +422,9 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorRemoveDataset(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

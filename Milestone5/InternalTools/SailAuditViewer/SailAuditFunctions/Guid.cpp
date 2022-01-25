@@ -270,9 +270,9 @@ bool __thiscall Guid::operator == (
         fIsEqual = (m_stlRawData == oGuidToCompareTo.m_stlRawData);
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, oException.GetFunctionName(), oException.GetLineNumber());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch(...)
@@ -332,9 +332,9 @@ bool __thiscall Guid::operator != (
         fIsDifferent = (m_stlRawData != oGuidToCompareTo.m_stlRawData);
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, oException.GetFunctionName(), oException.GetLineNumber());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch(...)

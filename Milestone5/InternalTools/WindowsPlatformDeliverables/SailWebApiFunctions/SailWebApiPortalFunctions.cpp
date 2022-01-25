@@ -86,9 +86,9 @@ static std::vector<Byte> __stdcall GetBinaryFileBuffer(
         while (0 < un64RemainingBytes);
     }
     
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -132,9 +132,9 @@ static BSTR __cdecl ConvertToBSTR(
         pszString = ::SysAllocString(wszUnicodeString);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -211,9 +211,9 @@ static Dword __stdcall UploadDatasetToVirtualMachine(
         fSuccess = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -276,9 +276,9 @@ extern "C" __declspec(dllexport) bool __cdecl SetIpAddress(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
 
         // Reset global values to starting uninitialized values
         gs_strIpAddressOfSailWebApiPortal = "";
@@ -325,9 +325,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetIpAddress(void)
         strIpAddress = gs_strIpAddressOfSailWebApiPortal;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -396,7 +396,7 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
         fSuccess = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         gs_strEosb = "";
         gs_strOrganizationIdentifier = "";
@@ -444,9 +444,9 @@ extern "C" __declspec(dllexport) bool __cdecl Logout(void)
         gs_qwAuthenticatedUserAccessRights = 0;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -495,9 +495,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetSailWebApiPortalImpostorEosb(vo
         strSailWebApiPortalImportorEosb = oGetSailWebApiPortalImpostorEosbResponse.GetString("UpdatedEosb");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -563,9 +563,9 @@ extern "C" __declspec(dllexport) unsigned int __cdecl LoadDigitalContracts(void)
         unDigitalContractsCount = (unsigned int) gs_stlIndexedListOfSerializedBase64DigitalContracts.size();
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -611,9 +611,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetDigitalContractIdentifierAtInde
         strDigitalContractIdentifier = oDigitalContract.GetString("DigitalContractIdentifier");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -701,9 +701,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetDigitalContractProperty(
         }        
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -756,9 +756,9 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInstallationPackageToVirtual
         fSuccess = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -853,9 +853,9 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInitializationParametersToVi
         } while ((0 <= unLoopCounter) && (false == fSuccess));
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -968,9 +968,9 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1054,9 +1054,9 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1124,9 +1124,9 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
                     fSuccess = true;
                 }
 
-                catch (BaseException oBaseException)
+                catch (const BaseException & c_oBaseException)
                 {
-                    ::RegisterException(oBaseException, __func__, __LINE__);
+                    ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
                     // Sleep for 5 seconds to give time for the dataset file to be fully copied to the folder
                     ::Sleep(5000);
                     unNumberOfRetries++;
@@ -1143,9 +1143,9 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1184,9 +1184,9 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorRemoveDataset(
         }
     }
     
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

@@ -182,10 +182,12 @@ void __thiscall RemoteDataConnector::NewDatasetFoundCallback(
             }
         }
     }
-    catch (const BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -280,10 +282,12 @@ void __thiscall RemoteDataConnector::SendDataConnectorHeartbeat(void) throw()
             }
         } while(true);
     }
-    catch (const BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -399,10 +403,12 @@ void __thiscall RemoteDataConnector::UploadDataSetToVirtualMachine(
             _ThrowBaseException("Dataset Uplaod failed.", nullptr);
         }
     }
-    catch (const BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -527,11 +533,13 @@ StructuredBuffer __thiscall RemoteDataConnector::VerifyDataset(
         // TODO: Prawal Make a call to the rest portal and check if the dataset are registered.
 
     }
-    catch (const BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oDatasetInformation.Clear();
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -588,10 +596,12 @@ void __thiscall RemoteDataConnector::ManualUploadDataSetToVirtualMachine(
             _ThrowBaseException("Dataset Uplaod failed.", nullptr);
         }
     }
-    catch (const BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

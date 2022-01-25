@@ -56,9 +56,9 @@ std::vector<Byte> __stdcall GetBinaryFileBuffer(
         while (0 < un64RemainingBytes);
     }
     
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -102,9 +102,9 @@ BSTR __stdcall ConvertToBSTR(
         pszString = ::SysAllocString(wszUnicodeString);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

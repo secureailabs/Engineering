@@ -59,13 +59,13 @@ static void * __stdcall StartIpcServerThread(
         AuditLogManager * poAuditLogManager = ::GetAuditLogManager();
         poAuditLogManager->RunIpcServer(poIpcServerParameters->poIpcServer, poIpcServerParameters->poThreadManager);
     }
-    catch (BaseException oException)
+    catch (BaseException c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
@@ -112,13 +112,13 @@ static void * __stdcall StartIpcThread(
         AuditLogManager * poAuditLogManager = ::GetAuditLogManager();
         poAuditLogManager->HandleIpcRequest(poIpcSocket);
     }
-    catch (BaseException oException)
+    catch (BaseException c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
@@ -679,11 +679,13 @@ std::vector<Byte> __thiscall AuditLogManager::GetUserInfo(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -754,12 +756,13 @@ std::vector<Byte> __thiscall AuditLogManager::AddNonLeafEvent(
             dwStatus = 201;
         }
     }
-    catch (BaseException oException)
+
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
@@ -799,7 +802,6 @@ std::vector<Byte> __thiscall AuditLogManager::AddLeafEvent(
     __DebugFunction();
 
     StructuredBuffer oStatus;
-
     Dword dwStatus = 404;
     TlsNode * poTlsNode = nullptr;
 
@@ -842,16 +844,18 @@ std::vector<Byte> __thiscall AuditLogManager::AddLeafEvent(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oStatus.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -929,16 +933,18 @@ std::vector<Byte> __thiscall AuditLogManager::GetListOfEvents(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oAuditLogs.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1009,16 +1015,18 @@ std::vector<Byte> __thiscall AuditLogManager::DigitalContractBranchExists(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oAuditLog.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

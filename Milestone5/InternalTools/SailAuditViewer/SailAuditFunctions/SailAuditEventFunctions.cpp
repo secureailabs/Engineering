@@ -125,9 +125,9 @@ static BSTR __cdecl ConvertToBSTR(
         pszString = ::SysAllocString(wszUnicodeString);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -214,9 +214,9 @@ extern "C" __declspec(dllexport) bool __cdecl SetSailWebApiPortalIpAddress(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         gs_strEosb = "";
         gs_strOrganizationIdentifier = "";
     }
@@ -270,9 +270,9 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
         fSuccess = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         gs_strEosb = "";
         gs_strOrganizationIdentifier = "";
     }
@@ -406,9 +406,9 @@ extern "C" __declspec(dllexport) void __cdecl ReloadLoadAllAuditEvents(
                     }
                 }
 
-                catch (BaseException oBaseException)
+                catch (const BaseException & c_oBaseException)
                 {
-                    ::RegisterException(oBaseException, __func__, __LINE__);
+                    ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
                 }
 
                 catch (...)
@@ -419,9 +419,9 @@ extern "C" __declspec(dllexport) void __cdecl ReloadLoadAllAuditEvents(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -498,9 +498,9 @@ extern "C" __declspec(dllexport) bool __cdecl DesignateAuditEventsUsingParentIde
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -583,9 +583,9 @@ extern "C" __declspec(dllexport)  BSTR __cdecl GetDesignatedAuditEventIdentifier
         strAuditEventIdentifier = oCurrentAuditEvent.GetString("AuditEventIdentifier");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -622,9 +622,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventIdentifierByIndex(
         strAuditEventIdentifier = oCurrentAuditEvent.GetString("AuditEventIdentifier");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -660,9 +660,9 @@ extern "C" __declspec(dllexport)  BSTR __cdecl GetAuditEventOrganizationalIdenti
         strAuditEventIdentifier = oCurrentAuditEvent.GetString("OrganizationalIdentifier");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -702,9 +702,9 @@ extern "C" __declspec(dllexport)  BSTR __cdecl GetAuditEventParentIdentifier(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -739,9 +739,9 @@ extern "C" __declspec(dllexport) bool __cdecl IsBranchNodeEditEvent(
         fIsBranchNodeEditEvent = oCurrentAuditEvent.GetBoolean("IsBranchAuditEventNode");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -776,9 +776,9 @@ extern "C" __declspec(dllexport) unsigned int __cdecl GetAuditEventSequenceNumbe
         unSequenceNumber = oCurrentAuditEvent.GetUnsignedInt32("SequenceNumber");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -814,9 +814,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventDateGmt(
         strAuditEventEpochGmtDate = ::GetDateStringFromEpochGmtTimestamp((uint64_t) oCurrentAuditEvent.GetUnsignedInt64("Timestamp"));
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -852,9 +852,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventTimeWithMillisecondsG
         strAuditEventEpochGmtDate = ::GetMillisecondEpochGmtTimeStringFromEpochGmtTimestamp(oCurrentAuditEvent.GetUnsignedInt64("Timestamp"));
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -889,9 +889,9 @@ extern "C" __declspec(dllexport) uint64_t GetAuditEventGmtEpochTimestampInMillis
         un64EpochGmtTimestampInSeconds = oCurrentAuditEvent.GetUnsignedInt64("Timestamp");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -938,9 +938,9 @@ extern "C" __declspec(dllexport) BSTR GetAuditEventEpochTimestampInMillisecondsG
 
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -979,9 +979,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventType(
         strAuditEventName = oCurrentAuditEvent.GetString("AuditEventType");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1020,9 +1020,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventGeneralDetails(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1062,9 +1062,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventAdditionalDataDetails
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

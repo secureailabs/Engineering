@@ -270,13 +270,15 @@ int __thiscall SafeObject::Run(
             }
         }
     }
-    catch(const BaseException & oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        std::cout << oBaseException.GetExceptionMessage() << '\n';
+        std::cout << c_oBaseException.GetExceptionMessage() << '\n';
     }
-    catch(const std::exception& e)
+    
+    catch (const std::exception & c_oException)
     {
-        std::cout << e.what() << '\n';
+        std::cout << c_oException.what() << '\n';
     }
 
     std::cout << "Process exit with status " << nProcessExitStatus << std::endl;

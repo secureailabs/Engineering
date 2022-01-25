@@ -634,23 +634,27 @@ std::string Frontend::RunJob(
     std::string strNewJobId{""};
     try
     {
-        Guid oSafeFunctionGuid(c_strSafeFunctionId);
-        if ( m_stlAvailableSafeFunctions.end() != m_stlAvailableSafeFunctions.find(oSafeFunctionGuid.ToString(eRaw)) )
+        // We must be logged in to start a job
+        if ( "" != m_oEosbRotator.GetEosb() )
         {
+            Guid oSafeFunctionGuid(c_strSafeFunctionId);
+            if ( m_stlAvailableSafeFunctions.end() != m_stlAvailableSafeFunctions.find(oSafeFunctionGuid.ToString(eRaw)) )
+            {
 
-                std::vector<std::string> stlInputParameters;
-                Guid oJobId(eJobIdentifier);
-                StructuredBuffer oSafeFunction = m_stlAvailableSafeFunctions[oSafeFunctionGuid.ToString(eRaw)];
-                StructuredBuffer oInputParameters = oSafeFunction.GetStructuredBuffer("InputParameters");
-                for (const std::string& strInputParameterId : oInputParameters.GetNamesOfElements() )
-                {
-                    stlInputParameters.push_back(oInputParameters.GetStructuredBuffer(strInputParameterId.c_str()).GetString("Uuid"));
-                }
-                // When returning GUIDs to the user we return human readable versions
-                strNewJobId = oJobId.ToString(eHyphensAndCurlyBraces);
+                    std::vector<std::string> stlInputParameters;
+                    Guid oJobId(eJobIdentifier);
+                    StructuredBuffer oSafeFunction = m_stlAvailableSafeFunctions[oSafeFunctionGuid.ToString(eRaw)];
+                    StructuredBuffer oInputParameters = oSafeFunction.GetStructuredBuffer("InputParameters");
+                    for (const std::string& strInputParameterId : oInputParameters.GetNamesOfElements() )
+                    {
+                        stlInputParameters.push_back(oInputParameters.GetStructuredBuffer(strInputParameterId.c_str()).GetString("Uuid"));
+                    }
+                    // When returning GUIDs to the user we return human readable versions
+                    strNewJobId = oJobId.ToString(eHyphensAndCurlyBraces);
 
-                // We make a unique pointer because mutexes are not trivially copyable
-                m_stlJobInformation.emplace(oJobId.ToString(eRaw), new JobInformation(oJobId, oSafeFunctionGuid, stlInputParameters, m_oJobMessageQueue));
+                    // We make a unique pointer because mutexes are not trivially copyable
+                    m_stlJobInformation.emplace(oJobId.ToString(eRaw), new JobInformation(oJobId, oSafeFunctionGuid, stlInputParameters, m_oJobMessageQueue));
+            }
         }
     }
     catch(const BaseException& oBaseException)

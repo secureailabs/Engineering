@@ -1,4 +1,16 @@
+################################################################################
+#
+#
+# @file sailcore.py
+# @author Jingwei Zhang + David Gascon
+# @date 25 Jan 2022
+# @License Private and Confidential. Internal Use Only.
+# @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
+# @brief Python interop between the orchestrator DLL and python
+#
+################################################################################
 from .. import SAILPyAPI
+import getpass
 import pickle, json, requests, pprint, time
 import pandas
 from concurrent.futures import ThreadPoolExecutor
@@ -7,6 +19,10 @@ def connect(serverIP, port):
     return SAILPyAPI.connect(serverIP, port)
 
 def login(email, password, port, IP):
+
+    if None == password:
+        password = getpass.getpass(prompt="Password: ")
+
     return SAILPyAPI.login(email,password, port, IP)
 
 def get_current_eosb():

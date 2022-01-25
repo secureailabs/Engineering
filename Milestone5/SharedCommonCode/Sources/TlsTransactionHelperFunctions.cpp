@@ -142,7 +142,7 @@ std::vector<Byte> __stdcall GetTlsTransaction(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -204,7 +204,7 @@ bool __stdcall PutTlsTransaction(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

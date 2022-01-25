@@ -100,7 +100,7 @@ StructuredBuffer __stdcall CompressToStructuredBuffer(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -148,7 +148,7 @@ std::vector<Byte> __stdcall DecompressStructuredBuffer(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

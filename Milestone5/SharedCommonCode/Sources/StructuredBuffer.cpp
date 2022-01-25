@@ -331,7 +331,7 @@ std::string __thiscall StructuredBuffer::ToString(void) const throw()
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -1021,7 +1021,7 @@ void __thiscall StructuredBuffer::Serialize(void) const throw()
         m_stlSerializedBuffer.clear();
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         m_qw64BitHash = 0;

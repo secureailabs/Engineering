@@ -215,7 +215,7 @@ void __thiscall CommunicationPortal::HandleConnection(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch (std::exception & c_oBaseException)
+    catch (const std::exception & c_oBaseException)
     {
         std::cout << "std::exception " << c_oBaseException.what() << std::endl;
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -308,7 +308,7 @@ void __thiscall CommunicationPortal::PersistantConnectionTlsToIpc(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch (std::exception & c_oBaseException)
+    catch (const std::exception & c_oBaseException)
     {
         std::cout << "std::exception " << c_oBaseException.what() << std::endl;
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -425,7 +425,7 @@ void __thiscall CommunicationPortal::OneTimeConnectionHandler(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch (std::exception & c_oBaseException)
+    catch (const std::exception & c_oBaseException)
     {
         std::cout << "std::exception " << c_oBaseException.what() << std::endl;
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

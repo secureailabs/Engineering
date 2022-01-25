@@ -44,7 +44,7 @@ TlsNode * __stdcall TlsConnectToUnixDomainSocket(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -75,7 +75,7 @@ TlsNode * __stdcall TlsConnectToNetworkSocket(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -109,7 +109,7 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
                 poSocket = ::ConnectToNetworkSocket(c_strTargetIpAddress, wPortNumber);
             }
 
-            catch(const BaseException & c_oBaseException)
+            catch (const BaseException & c_oBaseException)
             {
                 // BUGBUG: Fix this to use the other sleep which is in microseconds
                 ::sleep(unMillesecondStepTime/1000);
@@ -125,7 +125,7 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

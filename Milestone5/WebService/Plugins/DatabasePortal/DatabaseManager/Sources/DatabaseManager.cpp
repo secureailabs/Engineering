@@ -574,7 +574,7 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             _ThrowBaseException("Invalid resource.", nullptr);
         }
     }
-    catch(...)
+    catch (...)
     {
         StructuredBuffer oError;
         oError.PutDword("Status", 404);

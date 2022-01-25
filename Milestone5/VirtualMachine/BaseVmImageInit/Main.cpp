@@ -155,13 +155,13 @@ void __cdecl InitVirtualMachine(
             }
         }
         
-        catch(const BaseException & c_oBaseException)
+        catch (const BaseException & c_oBaseException)
         {
             oResponseStructuredBuffer.PutString("Status", "Fail");
             oResponseStructuredBuffer.PutString("Error", c_oBaseException.GetExceptionMessage());
         }
         
-        catch(std::exception & c_oException)
+        catch (const std::exception & c_oException)
         {
             oResponseStructuredBuffer.PutString("Status", "Fail");
             oResponseStructuredBuffer.PutString("Error", c_oException.what());
@@ -184,7 +184,7 @@ void __cdecl InitVirtualMachine(
             }
         }
         
-        catch(...)
+        catch (...)
         {
             std::cout << "Unexpected Error while sending init response.";
         }
@@ -205,7 +205,7 @@ int main(
         ::InitVirtualMachine();
     }
 
-    catch (BaseException c_oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "BaseVmImageInit" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl

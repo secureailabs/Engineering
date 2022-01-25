@@ -62,7 +62,7 @@ int main(
         oCommunicationPortal.StartServer(3500);
     }
 
-    catch (BaseException c_oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "CommunicationPortal" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl

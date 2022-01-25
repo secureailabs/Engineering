@@ -280,7 +280,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         poTlsNode->Write((const Byte *) stlErrorMessage.data(), stlErrorMessage.size());
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         // send back error message

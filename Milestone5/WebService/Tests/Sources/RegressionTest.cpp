@@ -37,7 +37,7 @@ void RegressionTest(void)
             std::cout << c_oBaseException.GetExceptionMessage() << std::endl;
         }
         
-        catch(...)
+        catch (...)
         {
             std::cout << "Unknown exception caught!" << std::endl;
         }

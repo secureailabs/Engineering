@@ -229,7 +229,7 @@ void __thiscall Job::RemoveAvailableDependency(
         std::cout << c_oBaseException.GetExceptionMessage() << '\n';
     }
     
-    catch(const std::exception & c_oException)
+    catch (const std::exception & c_oException)
     {
         std::cout << c_oException.what() << '\n';
     }

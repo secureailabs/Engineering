@@ -40,7 +40,8 @@ void __thiscall ReplaceAll(
             start_pos += c_strChangeTo.length();
         };
     }
-    catch(const std::exception & c_oBaseException)
+    
+    catch (const std::exception & c_oBaseException)
     {
         std::cout << "std Exception in RepaceAll " << c_oBaseException.what() << '\n';
     }
@@ -153,7 +154,8 @@ int __cdecl main(
     {
         ::PackageSafeObject();
     }
-    catch (BaseException c_oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
@@ -165,7 +167,8 @@ int __cdecl main(
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl;
     }
-    catch (std::exception & c_oBaseException)
+    
+    catch (const std::exception & c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31m%s\033[0m" << c_oBaseException.what() << std::endl
@@ -174,6 +177,7 @@ int __cdecl main(
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl;
     }
+    
     catch (...)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl

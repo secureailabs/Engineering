@@ -193,7 +193,7 @@ void __thiscall DatabaseManager::GetEventObjectBlob(
                             }
                             fAddToListOfEvents = true;
                         }
-                        catch (BaseException c_oBaseException)
+                        catch (const BaseException & c_oBaseException)
                         {
                             fAddToListOfEvents = false;
                         }

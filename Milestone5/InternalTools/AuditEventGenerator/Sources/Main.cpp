@@ -155,7 +155,7 @@ static void __thiscall AuditEventDispatcher(void)
             ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
         
-        catch(...)
+        catch (...)
         {
             ::RegisterUnknownException(__func__, __LINE__);
         }
@@ -249,7 +249,7 @@ static bool __stdcall InitializeVirtualMachine(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }
@@ -282,7 +282,7 @@ static bool __stdcall RegisterDataOwnerEosb(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }
@@ -315,7 +315,7 @@ static bool __stdcall RegisterResearcherEosb(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }
@@ -514,7 +514,7 @@ int __cdecl main(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }

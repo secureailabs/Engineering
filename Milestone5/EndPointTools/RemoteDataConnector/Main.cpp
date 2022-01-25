@@ -158,7 +158,8 @@ int main(
             oRemoteDataConnector.SetDatasetFolderAndRun(strDatasetFolderName);
         }
     }
-    catch (BaseException & c_oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "RemoteDataConnector" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
@@ -171,7 +172,8 @@ int main(
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl;
     }
-    catch (std::exception & c_oBaseException)
+    
+    catch (const std::exception & c_oBaseException)
     {
         std::cout << "RemoteDataConnector" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
@@ -181,6 +183,7 @@ int main(
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl;
     }
+    
     catch (...)
     {
         std::cout << "RemoteDataConnector" << std::endl

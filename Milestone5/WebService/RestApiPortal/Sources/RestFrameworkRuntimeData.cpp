@@ -374,7 +374,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         std::cout << "\n\nRest Response:\n\n" << strResponseData << std::endl;
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         // create error message
@@ -765,7 +765,7 @@ bool __thiscall RestFrameworkRuntimeData::ValidateParameter(
                 Guid oGuid(c_oSerializedRequest.GetString(c_szRequireParameterName).c_str());
                 poRequestStructuredBuffer->PutGuid(c_szRequireParameterName, oGuid);
             }
-            catch(const std::exception& e)
+            catch (const std::exception& e)
             {
                 fValid = false;
             }
@@ -783,7 +783,7 @@ bool __thiscall RestFrameworkRuntimeData::ValidateParameter(
                 std::vector<Byte> stlValue(strDecodedValue.begin(), strDecodedValue.end());
                 poRequestStructuredBuffer->PutBuffer(c_szRequireParameterName, stlValue);
             }
-            catch(const std::exception& e)
+            catch (const std::exception& e)
             {
                 fValid = false;
             }

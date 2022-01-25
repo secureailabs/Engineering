@@ -109,7 +109,7 @@ StructuredBuffer __stdcall GetSailWebApiPortalBasicUserInformation(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -152,7 +152,7 @@ bool __stdcall TransmitAuditEventsToSailWebApiPortal(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -194,7 +194,7 @@ StructuredBuffer __stdcall GetListOfDigitalContracts(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -239,7 +239,7 @@ StructuredBuffer __stdcall GetDigitalContract(
         oDigitalContract.Clear();
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         oDigitalContract.Clear();
@@ -285,7 +285,7 @@ StructuredBuffer __stdcall RegisterVirtualMachineAfterInitialization(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -324,7 +324,7 @@ StructuredBuffer __stdcall RegisterVirtualMachineDataOwner(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -363,7 +363,7 @@ StructuredBuffer __stdcall RegisterVirtualMachineResearchUser(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -417,7 +417,7 @@ bool __stdcall VirtualMachineStatusUpdate(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

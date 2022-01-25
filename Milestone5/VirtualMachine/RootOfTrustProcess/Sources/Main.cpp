@@ -193,7 +193,7 @@ int __cdecl main(
         oStatusMonitor.SignalTermination("Unrecoverable exception");
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         // If there is an exception here, this means that the RootOfTrust process is

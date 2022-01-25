@@ -59,7 +59,7 @@ static void * __stdcall StartIpcServerThread(
         poRemoteDataConnectorManager->RunIpcServer(poIpcServerParameters->poIpcServer, poIpcServerParameters->poThreadManager);
     }
     
-    catch (BaseException c_oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
@@ -112,7 +112,7 @@ static void * __stdcall StartIpcThread(
         poRemoteDataConnectorManager->HandleIpcRequest(poIpcSocket);
     }
     
-    catch (BaseException c_oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl

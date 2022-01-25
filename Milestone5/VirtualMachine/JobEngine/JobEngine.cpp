@@ -340,7 +340,7 @@ void __thiscall JobEngine::PushSafeObject(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -381,7 +381,7 @@ void __thiscall JobEngine::PushData(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -448,7 +448,7 @@ void __thiscall JobEngine::PullData(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -533,7 +533,7 @@ void __thiscall JobEngine::SubmitJob(
         std::cout << "Submit Job Exception: " << c_oBaseException.GetExceptionMessage() << std::endl;
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -609,12 +609,12 @@ void __thiscall JobEngine::SetJobParameter(
         }
     }
     
-    catch(const BaseException & c_oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -686,7 +686,7 @@ void __thiscall JobEngine::FileCreateCallback(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -751,7 +751,7 @@ void __thiscall JobEngine::SendMessageToOrchestrator(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -868,7 +868,7 @@ void __thiscall JobEngine::Heartbeat(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

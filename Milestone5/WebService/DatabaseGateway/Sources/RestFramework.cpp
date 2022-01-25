@@ -341,7 +341,7 @@ bool __stdcall PutDatabaseGatewayResponse(
         fResult = false;
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         fResult = false;

@@ -34,7 +34,7 @@ int __cdecl main(
         oStatusMonitor.SignalTermination("Manually forced.");
     }
     
-    catch (BaseException c_oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl

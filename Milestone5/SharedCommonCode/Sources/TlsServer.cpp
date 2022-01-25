@@ -123,7 +123,7 @@ TlsNode * __thiscall TlsServer::Accept(void) throw()
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

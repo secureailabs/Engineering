@@ -155,7 +155,7 @@ void __thiscall RootOfTrustNode::RecordAuditEvent(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

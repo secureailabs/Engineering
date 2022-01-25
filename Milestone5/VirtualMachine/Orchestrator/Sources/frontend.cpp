@@ -70,7 +70,7 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
         strJSON.clear();
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         strJSON.clear();
@@ -156,7 +156,7 @@ void __thiscall Frontend::CacheDigitalContractsFromRemote(
         m_stlDigitalContracts.clear();
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         m_stlDigitalContracts.clear();
@@ -216,7 +216,7 @@ void Frontend::CacheDatasetsFromRemote(
         m_stlAvailableTables.clear();
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         m_stlAvailableDatasets.clear();
@@ -290,7 +290,7 @@ unsigned int Frontend::Login(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -424,7 +424,7 @@ int __thiscall Frontend::LoadSafeObjects(
                     ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
                 }
 
-                catch( ... )
+                catch ( ... )
                 {
                     ::RegisterUnknownException(__func__, __FILE__, __LINE__);
                 }
@@ -493,7 +493,7 @@ unsigned int __thiscall Frontend::ProvisionDigitalContract(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         unStatus = 404;
     }
-    catch( ... )
+    catch ( ... )
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         unStatus = 404;
@@ -576,7 +576,7 @@ void __thiscall Frontend::Listener(
             ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
 
-        catch(...)
+        catch (...)
         {
             ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         }
@@ -669,7 +669,7 @@ void __thiscall Frontend::SetFrontend(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -710,7 +710,7 @@ void __thiscall Frontend::HandleSubmitJob(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -754,7 +754,7 @@ void __thiscall Frontend::HandleSubmitJob(
 //         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
 //     }
 
-//     catch(...)
+//     catch (...)
 //     {
 //         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
 //     }
@@ -795,7 +795,7 @@ void __thiscall Frontend::HandleSubmitJob(
 //         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
 //     }
 
-//     catch(...)
+//     catch (...)
 //     {
 //         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
 //     }
@@ -835,7 +835,7 @@ void __thiscall Frontend::HandleQuit(void)
             ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
 
-        catch(...)
+        catch (...)
         {
             ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         }
@@ -872,7 +872,7 @@ void __thiscall Frontend::HandlePushData(
             ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
 
-        catch(...)
+        catch (...)
         {
             ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         }
@@ -911,7 +911,7 @@ void __thiscall Frontend::HandleSetParameters(
             ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
 
-        catch(...)
+        catch (...)
         {
             ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         }
@@ -951,7 +951,7 @@ void __thiscall Frontend::HandlePullData(
                 ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
             }
 
-            catch(...)
+            catch (...)
             {
                 ::RegisterUnknownException(__func__, __FILE__, __LINE__);
             }
@@ -1040,7 +1040,7 @@ std::map<std::string, std::string> __thiscall Frontend::QueryDataset(
 //         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
 //     }
 
-//     catch(...)
+//     catch (...)
 //     {
 //         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
 //     }
@@ -1110,7 +1110,7 @@ void __thiscall Frontend::HandlePushSafeObject(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -1175,12 +1175,14 @@ void __thiscall Frontend::SendDataToJobEngine(
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    catch(std::exception & e)
+    
+    catch (const std::exception & c_oException)
     {
-        std::cout << "Exception: " << e.what() << '\n';
+        std::cout << "Exception: " << c_oException.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
-    catch(...)
+    
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

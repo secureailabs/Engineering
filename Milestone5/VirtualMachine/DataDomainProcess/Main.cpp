@@ -94,7 +94,7 @@ int __cdecl main(
         ::InitDataConnector();
     }
 
-    catch (BaseException c_oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "DataConnector" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl

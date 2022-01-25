@@ -71,13 +71,13 @@ static void * __stdcall StartIpcServerThread(
         DigitalContractDatabase * poDigitalContractDatabase = ::GetDigitalContractDatabase();
         poDigitalContractDatabase->RunIpcServer(poIpcServerParameters->poIpcServer, poIpcServerParameters->poThreadManager);
     }
-    catch (const BaseException& oException)
+    catch (const BaseException& c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
@@ -124,13 +124,13 @@ static void * __stdcall StartIpcThread(
         DigitalContractDatabase * poDigitalContractDatabase = ::GetDigitalContractDatabase();
         poDigitalContractDatabase->HandleIpcRequest(poIpcSocket);
     }
-    catch (const BaseException& oException)
+    catch (const BaseException& c_oBaseException)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m%s\033[0m" << oException.GetExceptionMessage() << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m%s\033[0m" << c_oBaseException.GetExceptionMessage() << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
@@ -820,16 +820,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::GetUserInfo(
             dwStatus = 200;
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1159,16 +1161,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ListDigitalContracts(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1256,16 +1260,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::PullDigitalContract(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1401,17 +1407,19 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
-        oResponse.PutString("ErrorMessage: ", oException.GetExceptionMessage());
+        oResponse.PutString("ErrorMessage: ", c_oBaseException.GetExceptionMessage());
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1544,16 +1552,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::AcceptDigitalContract(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1689,16 +1699,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ActivateDigitalContract(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1853,16 +1865,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::AssociateWithAzureTemplate
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1940,16 +1954,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::GetProvisioningStatus(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2042,11 +2058,13 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDcAuditEvent(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2246,18 +2264,20 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
-        strErrorMessage = oException.GetExceptionMessage();
-        oResponse.PutString("Messsage: ", oException.GetExceptionMessage());
+        strErrorMessage = c_oBaseException.GetExceptionMessage();
+        oResponse.PutString("Messsage: ", c_oBaseException.GetExceptionMessage());
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2283,10 +2303,12 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
             _ThrowBaseExceptionIf((200 != oUpdateProvisioningStateResponse.GetDword("Status")), "Update DC status fail", nullptr);
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2477,11 +2499,13 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             fIsProvisioningSuccess = true;
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
-        strErrorMessage = oException.GetExceptionMessage();
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        strErrorMessage = c_oBaseException.GetExceptionMessage();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2517,10 +2541,12 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         StructuredBuffer oUpdateProvisioningStateResponse(this->UpdateDigitalContractProvisioningStatus(oUpdateProvisioningState));
         _ThrowBaseExceptionIf((200 != oUpdateProvisioningStateResponse.GetDword("Status")), "Update DC status fail", nullptr);
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2624,16 +2650,18 @@ std::vector<Byte> __thiscall DigitalContractDatabase::UpdateDigitalContractProvi
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2790,17 +2818,19 @@ std::vector<Byte> __thiscall DigitalContractDatabase::DeprovisionDigitalContract
             }
         }
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
-        oResponse.PutString("Messsage: ", oException.GetExceptionMessage());
+        oResponse.PutString("Messsage: ", c_oBaseException.GetExceptionMessage());
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2867,10 +2897,12 @@ void __thiscall DigitalContractDatabase::DeleteVirtualMachineResources(
         poIpcAzureManager->Release();
         poIpcAzureManager = nullptr;
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2934,10 +2966,12 @@ std::vector<Byte> __thiscall DigitalContractDatabase::InitializeVirtualMachine(
 
         dwStatus = 200;
     }
-    catch (const BaseException& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

@@ -45,10 +45,12 @@ extern "C" uint64_t SubmitRequest(
             *punSerializedResponseSizeInBytes = 0;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -89,10 +91,12 @@ extern "C" bool GetResponse(
             fSuccess = poCryptographicKeyManagementPlugin->GetResponse(un64Identifier, pbSerializedResponseBuffer, unSerializedResponseBufferSizeInBytes);
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -130,10 +134,12 @@ extern "C" bool __stdcall InitializePlugin(
         std::vector<Byte> stlDictionary = poCryptographicKeyManagementPlugin->GetDictionarySerializedBuffer();
         fSuccess = fnRegisterPluginFn(poCryptographicKeyManagementPlugin->GetName(), poCryptographicKeyManagementPlugin->GetUuid(), poCryptographicKeyManagementPlugin->GetVersion(), SubmitRequest, GetResponse, stlDictionary.data(), stlDictionary.size());
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -158,10 +164,12 @@ extern "C" void __stdcall ShutdownPlugin(void)
     {
         ::ShutdownCryptographicKeyManagementPlugin();
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

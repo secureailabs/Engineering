@@ -109,16 +109,16 @@ static Dword __stdcall EosbMaintenanceThread(
                 }
                 else
                 {
-                    ::RegisterException(BaseException(__FILE__, __func__, __LINE__, "Unexpected return values from CheckEosb"), __func__, __LINE__);
+                    ::RegisterException(BaseException(__FILE__, __func__, __LINE__, "Unexpected return values from CheckEosb"), __func__, __FILE__, __LINE__);
                 }
             }
         }
         while (true == fIsLoggedOn);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -273,9 +273,9 @@ static bool __cdecl SetIpAndPortAddress(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -342,9 +342,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetIpAddress(void)
         strIpAddress = ::GetSailPlatformServicesIpAddress();
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -407,9 +407,9 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
         gs_fIsLoggedOn = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -449,9 +449,9 @@ extern "C" __declspec(dllexport) bool __cdecl Logout(void)
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -496,9 +496,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetSailWebApiPortalImpostorEosb(vo
         strSailWebApiPortalImportorEosb = oResponse.GetString("UpdatedEosb");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

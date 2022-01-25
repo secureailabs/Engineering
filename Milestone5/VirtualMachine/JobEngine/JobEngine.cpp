@@ -335,12 +335,12 @@ void __thiscall JobEngine::PushSafeObject(
         }
     }
 
-    catch(BaseException & oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -375,11 +375,13 @@ void __thiscall JobEngine::PushData(
         // Once the file write is complete we create a signal file for the same
         std::ofstream output(gc_strSignalFolderName + "/" + c_oStructuredBuffer.GetString("DataId"));
     }
-    catch(BaseException & oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    catch(...)
+    
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -441,12 +443,12 @@ void __thiscall JobEngine::PullData(
         }
     }
 
-    catch(BaseException & oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -525,11 +527,13 @@ void __thiscall JobEngine::SubmitJob(
             poJob->SetSafeObject(poSafeObject);
         }
     }
-    catch(BaseException & oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        std::cout << "Submit Job Exception: " << oBaseException.GetExceptionMessage() << std::endl;
+        std::cout << "Submit Job Exception: " << c_oBaseException.GetExceptionMessage() << std::endl;
     }
-    catch(...)
+    
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -604,11 +608,13 @@ void __thiscall JobEngine::SetJobParameter(
             }
         }
     }
-    catch(BaseException & oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    catch(...)
+    
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -675,12 +681,12 @@ void __thiscall JobEngine::FileCreateCallback(
         }
     }
 
-    catch(BaseException & oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -740,12 +746,12 @@ void __thiscall JobEngine::SendMessageToOrchestrator(
         fflush(stdout);
     }
 
-    catch(BaseException & oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -857,12 +863,12 @@ void __thiscall JobEngine::Heartbeat(void)
         }
     }
 
-    catch(BaseException & oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

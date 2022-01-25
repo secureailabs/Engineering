@@ -137,12 +137,12 @@ std::vector<Byte> __stdcall GetTlsTransaction(
         }
     }
     
-    catch(const BaseException & oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -199,12 +199,12 @@ bool __stdcall PutTlsTransaction(
         }
     }
 
-    catch(const BaseException & oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

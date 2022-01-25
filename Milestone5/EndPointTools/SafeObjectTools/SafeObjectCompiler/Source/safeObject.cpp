@@ -65,10 +65,11 @@ static PyObject* parameterConvert(StructuredBuffer& oBuffer, PyObject* oUuids, P
             }
         }
         
-        catch (const BaseException& oException) 
-        { 
-            ::RegisterException(oException, __func__, __FILE__, __LINE__); 
+        catch (const BaseException & c_oBaseException)
+        {
+            ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         } 
+        
         catch (...) 
         { 
             ::RegisterUnknownException(__func__, __FILE__, __LINE__); 
@@ -221,10 +222,11 @@ static PyObject* writeSafeObject(PyObject* self, PyObject* args)
         oResult.PutString("Payload", strBody);
     }
     
-    catch (const BaseException& oException) 
-    { 
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     } 
+    
     catch (...) 
     { 
         ::RegisterUnknownException(__func__, __FILE__, __LINE__); 

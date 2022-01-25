@@ -79,11 +79,13 @@ std::vector<Byte> __thiscall DatabaseManager::GetOrganizationInformation(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -156,11 +158,13 @@ std::vector<Byte> __thiscall DatabaseManager::GetBasicOrganizationRecord(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -222,11 +226,13 @@ std::vector<Byte> __thiscall DatabaseManager::GetOrganizationName(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -337,11 +343,13 @@ std::vector<Byte> __thiscall DatabaseManager::GetBasicUserRecord(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -410,11 +418,13 @@ std::vector<Byte> __thiscall DatabaseManager::GetConfidentialUserRecord(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -559,11 +569,13 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterOrganization(
             oResponse.PutString("ErrorMessage", "Organization already exists!");
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -685,11 +697,13 @@ std::vector<Byte> __thiscall DatabaseManager::AddSuperUser(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -830,11 +844,13 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterUser(
             }
         }
     }
-    catch (BaseException oException)
+
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -922,11 +938,13 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateUserRights(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1026,11 +1044,13 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateOrganizationInformation(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1119,11 +1139,13 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateUserInformation(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1210,11 +1232,13 @@ std::vector<Byte> __thiscall DatabaseManager::UpdatePassword(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1278,11 +1302,13 @@ std::vector<Byte> __thiscall DatabaseManager::ListOrganizations(
         oResponse.PutStructuredBuffer("Organizations", oListOfOrganizations);
         dwStatus = 200;
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1360,11 +1386,13 @@ std::vector<Byte> __thiscall DatabaseManager::ListUsers(
         oResponse.PutStructuredBuffer("Users", oListOfUsers);
         dwStatus = 200;
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1444,11 +1472,13 @@ std::vector<Byte> __thiscall DatabaseManager::ListOrganizationUsers(
         oResponse.PutStructuredBuffer("OrganizationUsers", oListOfUsers);
         dwStatus = 200;
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1521,11 +1551,13 @@ std::vector<Byte> __thiscall DatabaseManager::RecoverUser(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1628,11 +1660,13 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteUser(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1738,11 +1772,13 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteOrganization(
             std::cout << "Transaction exception: " << e.what() << std::endl;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

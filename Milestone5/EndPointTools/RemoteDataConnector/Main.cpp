@@ -158,29 +158,32 @@ int main(
             oRemoteDataConnector.SetDatasetFolderAndRun(strDatasetFolderName);
         }
     }
-    catch (BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "RemoteDataConnector" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m" << oException.GetExceptionMessage() << "\033[0m" << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m" << c_oBaseException.GetExceptionMessage() << "\033[0m" << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl;
     }
-    catch (std::exception & oException)
+    
+    catch (const std::exception & c_oBaseException)
     {
         std::cout << "RemoteDataConnector" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m" << oException.what() << "\033[0m" << std::endl
+                  << "\033[1;31m" << c_oBaseException.what() << "\033[0m" << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl;
     }
+    
     catch (...)
     {
         std::cout << "RemoteDataConnector" << std::endl

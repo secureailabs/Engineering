@@ -65,12 +65,12 @@ void __thiscall EosbRotationManager::PeriodicEosbUpdate(void)
                 _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error updating EOSB in.", nullptr);
                 m_strEosb = oResponse.GetString("Eosb");
             }
-            catch(BaseException oBaseException)
+            catch (const BaseException & c_oBaseException)
             {
-                ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+                ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
             }
 
-            catch(...)
+            catch (...)
             {
                 ::RegisterUnknownException(__func__, __FILE__, __LINE__);
             }

@@ -51,12 +51,12 @@ StatusMonitor::StatusMonitor(
         poSocket->Release();
     }
 
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -80,12 +80,12 @@ StatusMonitor::~StatusMonitor(void)
         poSocket->Release();
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -120,12 +120,12 @@ bool __thiscall StatusMonitor::IsTerminating(void) const throw()
         // }
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -154,12 +154,12 @@ void __thiscall StatusMonitor::SignalTermination(
         poSocket->Release();
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -198,12 +198,12 @@ void __thiscall StatusMonitor::UpdateStatus(
         poSocket->Release();
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

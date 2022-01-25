@@ -154,15 +154,17 @@ void __cdecl InitVirtualMachine(
                 fSuccess = true;
             }
         }
-        catch(const BaseException & oBaseException)
+        
+        catch (const BaseException & c_oBaseException)
         {
             oResponseStructuredBuffer.PutString("Status", "Fail");
-            oResponseStructuredBuffer.PutString("Error", oBaseException.GetExceptionMessage());
+            oResponseStructuredBuffer.PutString("Error", c_oBaseException.GetExceptionMessage());
         }
-        catch(std::exception & oException)
+        
+        catch (const std::exception & c_oException)
         {
             oResponseStructuredBuffer.PutString("Status", "Fail");
-            oResponseStructuredBuffer.PutString("Error", oException.what());
+            oResponseStructuredBuffer.PutString("Error", c_oException.what());
         }
 
         // We again try to send the Status response to the initializer tool so that it could know if the
@@ -182,7 +184,7 @@ void __cdecl InitVirtualMachine(
             }
         }
         
-        catch(...)
+        catch (...)
         {
             std::cout << "Unexpected Error while sending init response.";
         }
@@ -203,14 +205,14 @@ int main(
         ::InitVirtualMachine();
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "BaseVmImageInit" << std::endl
                   << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
-                  << "\033[1;31m" << oException.GetExceptionMessage() << "\033[0m" << std::endl
-                  << "\033[1;31mThrow from ->|File = \033[0m" << oException.GetFilename() << std::endl
-                  << "\033[1;31m             |Function = \033[0m" << oException.GetFunctionName() << std::endl
-                  << "\033[1;31m             |Line number = \033[0m" << oException.GetLineNumber() << std::endl
+                  << "\033[1;31m" << c_oBaseException.GetExceptionMessage() << "\033[0m" << std::endl
+                  << "\033[1;31mThrow from ->|File = \033[0m" << c_oBaseException.GetFilename() << std::endl
+                  << "\033[1;31m             |Function = \033[0m" << c_oBaseException.GetFunctionName() << std::endl
+                  << "\033[1;31m             |Line number = \033[0m" << c_oBaseException.GetLineNumber() << std::endl
                   << "\033[1;31mCaught in -->|File = \033[0m" << __FILE__ << std::endl
                   << "\033[1;31m             |Function = \033[0m" << __func__ << std::endl
                   << "\033[1;31m             |Line number = \033[0m" << __LINE__ << std::endl

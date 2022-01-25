@@ -31,6 +31,7 @@ extern void __cdecl RegisterExceptionalMessage(
 extern void __cdecl RegisterException(
     _in const BaseException & c_oBaseException,
     _in const char * c_szFunctionName,
+    _in const char * c_szFilename,
     _in unsigned int unLineNumber
     ) throw();
 extern void __cdecl RegisterUnknownException(

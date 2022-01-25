@@ -48,11 +48,13 @@ int main()
 
         // TODO: Once implemented, add calls to delete the test organization, its users, digital contract, virtual machine, and related audit logs
     }
-    catch(BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        std::cout << oBaseException.GetExceptionMessage() << std::endl;
+        std::cout << c_oBaseException.GetExceptionMessage() << std::endl;
     }
-    catch(...)
+    
+    catch (...)
     {
         std::cout << "Unknown exception caught!" << std::endl;
     }

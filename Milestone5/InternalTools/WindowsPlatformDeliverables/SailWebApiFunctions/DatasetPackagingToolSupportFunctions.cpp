@@ -48,9 +48,9 @@ extern "C" __declspec(dllexport) void __cdecl OpenTablePackageFileForWriting(
         gs_un64TotalSizeWritten = 0;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -92,9 +92,9 @@ extern "C" __declspec(dllexport) void __cdecl AddColumnToTablePackageFile(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -125,9 +125,9 @@ extern "C" __declspec(dllexport) void __cdecl AddRecordToTablePackageFile(
         gs_pbWriteTarget += strOutputRecord.length();
     }
         
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -177,6 +177,7 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
         oTableProperties.PutUnsignedInt64("DataSizeInBytes", oCompressedData.GetUnsignedInt64("OriginalSize"));
         oTableProperties.PutUnsignedInt64("CompressedDataSizeInBytes", oCompressedData.GetUnsignedInt64("CompressedSize"));
         // Build the StructuredBuffer containing column properties
+        __DebugAssert(nNumberOfColumns == gs_stlColumnProperties.size());
         for (auto const & columnProperties : gs_stlColumnProperties)
         {
             // Generate the 'name' of the column, which is basically the string literal of a column index
@@ -253,9 +254,9 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
         __DebugAssert(unTotalNumberOfBytesWritten == (28 + unSerializedTablePropertiesSizeInBytes + un64SerializedCompressedTableDataSizeInBytes));
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -351,9 +352,9 @@ extern "C" __declspec(dllexport) unsigned int __cdecl AddTablePackageFromFile(
         unReturnValue = gs_unTableIndex++;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -395,9 +396,9 @@ extern "C" __declspec(dllexport) void __cdecl RemoveTablePackageByIndex(
         gs_ImportedTableFilename.erase(unTableIndex);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -428,9 +429,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageIdentifierByIndex(
         strTablePackageIdentifier = gs_ImportedTableMetadata[unTableIndex]->GetGuid("Identifier").ToString(eHyphensOnly);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -463,9 +464,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageTitleByIndex(
         strTablePackageTitle = gs_ImportedTableMetadata[unTableIndex]->GetString("Title");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -498,9 +499,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageDescriptionByIndex(
         strTablePackageDescription = gs_ImportedTableMetadata[unTableIndex]->GetString("Description");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -533,9 +534,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageFilenameByIndex(
         strTablePackageFilename = gs_ImportedTableFilename[unTableIndex];
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -701,9 +702,9 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
         fSuccess = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -741,9 +742,9 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
 
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

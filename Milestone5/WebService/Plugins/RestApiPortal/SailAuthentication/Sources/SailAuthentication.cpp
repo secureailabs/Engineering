@@ -497,11 +497,13 @@ std::vector<Byte> __thiscall SailAuthentication::GetUserInfo(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -578,11 +580,13 @@ std::vector<Byte> __thiscall SailAuthentication::AuthenticateUserCredentails(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -683,11 +687,13 @@ std::vector<Byte> __thiscall SailAuthentication::UpdatePassword(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -758,11 +764,13 @@ std::vector<Byte> __thiscall SailAuthentication::GetBasicUserInformation(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -824,11 +832,13 @@ std::vector<Byte> __thiscall SailAuthentication::GetRemoteAttestationCertificate
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -891,11 +901,13 @@ std::vector<Byte> __thiscall SailAuthentication::ShutdownPortal(
         oResponse.PutBoolean("TerminateSignalEncountered", true);
         dwStatus = 200;
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -962,16 +974,18 @@ std::vector<Byte> __thiscall SailAuthentication::ResetDatabase(
             dwStatus = 200;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1018,16 +1032,18 @@ std::vector<Byte> __thiscall SailAuthentication::CheckEosb(
             }
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",oException.GetExceptionMessage()) == 0)
+        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
         {
             dwStatus = 408;
         }
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

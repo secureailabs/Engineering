@@ -209,15 +209,18 @@ void __thiscall CommunicationPortal::HandleConnection(
         }
         c_poTlsNode->Release();
     }
-    catch (BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    catch (std::exception & oException)
+    
+    catch (const std::exception & c_oBaseException)
     {
-        std::cout << "std::exception " << oException.what() << std::endl;
+        std::cout << "std::exception " << c_oBaseException.what() << std::endl;
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -299,15 +302,18 @@ void __thiscall CommunicationPortal::PersistantConnectionTlsToIpc(
         // Mark the connection as disconnected
         m_stlTlsToIpcConnectionConnected.at(c_strEndpoint) = false;
     }
-    catch (BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    catch (std::exception & oException)
+    
+    catch (const std::exception & c_oBaseException)
     {
-        std::cout << "std::exception " << oException.what() << std::endl;
+        std::cout << "std::exception " << c_oBaseException.what() << std::endl;
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -413,15 +419,18 @@ void __thiscall CommunicationPortal::OneTimeConnectionHandler(
             ::PutTlsTransaction(c_poTlsNode, oStructuredBufferFailureResponse.GetSerializedBuffer());
         }
     }
-    catch (BaseException & oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    catch (std::exception & oException)
+    
+    catch (const std::exception & c_oBaseException)
     {
-        std::cout << "std::exception " << oException.what() << std::endl;
+        std::cout << "std::exception " << c_oBaseException.what() << std::endl;
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

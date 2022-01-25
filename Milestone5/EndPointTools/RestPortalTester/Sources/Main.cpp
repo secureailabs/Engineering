@@ -555,9 +555,10 @@ int main()
 
         }
     }
-    catch(BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        std::cout << oBaseException.GetExceptionMessage() << std::endl;
+        std::cout << c_oBaseException.GetExceptionMessage() << std::endl;
     }
 
     return 0;

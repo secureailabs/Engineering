@@ -68,9 +68,9 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInstallationPackageToVirtual
         fSuccess = true;
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -161,9 +161,9 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInitializationParametersToVi
         } while ((0 <= unLoopCounter) && (false == fSuccess));
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

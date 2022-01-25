@@ -184,7 +184,7 @@ void __thiscall DatabaseTools::AddOtherUsers(void)
         }
     }
 
-    std::cout << "Users added to organizations successfully." << std::endl;;
+    std::cout << "Users added to organizations successfully." << std::endl;
 }
 
 /********************************************************************************************/
@@ -552,7 +552,7 @@ void __thiscall DatabaseTools::DeleteDatabase(void)
         StructuredBuffer oResponse(stlSerializedResponse);
         _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error resetting the database.", nullptr);
     }
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
         ::ShowErrorMessage("Resetting the database failed!");
     }

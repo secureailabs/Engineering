@@ -31,7 +31,7 @@ static char __stdcall GetCharacter(
     __DebugFunction();
     
     struct termios sOldTerminalSettings, sNewTerminalSettings;
-    int nCharacter;;
+    int nCharacter;
 
     ::tcgetattr( STDIN_FILENO, &sOldTerminalSettings);
     sNewTerminalSettings = sOldTerminalSettings;

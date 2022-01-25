@@ -86,9 +86,9 @@ void * __stdcall FileSystemWatcherThread(void * poThreadParameter)
         ::inotify_rm_watch( nINotifyFd, nDirectoryToWatchFd);
         ::close(nINotifyFd);
     }
-    catch(const BaseException & oException)
+    catch(const BaseException & c_oBaseException)
     {
-        std::cout << oException.GetExceptionMessage() << '\n';
+        std::cout << c_oBaseException.GetExceptionMessage() << '\n';
     }
     catch(const std::exception& e)
     {

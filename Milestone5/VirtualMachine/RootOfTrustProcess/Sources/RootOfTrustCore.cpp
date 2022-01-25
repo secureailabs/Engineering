@@ -315,9 +315,9 @@ void __thiscall RootOfTrustCore::AuditEventDispatcher(void) throw()
             }
         }
 
-        catch (BaseException oException)
+        catch (const BaseException & c_oBaseException)
         {
-            ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+            ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
 
         catch(...)
@@ -419,9 +419,9 @@ void __thiscall RootOfTrustCore::RunIpcListener(void)
         poIpcServer->Release();
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -496,9 +496,9 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleRegisterResearcherTransactio
         }
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -533,9 +533,9 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandlePutDatasetTransaction(
         oResponseBuffer.PutBoolean("Success", this->RegisterResearcherEosb());
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -569,9 +569,9 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleGetDatasetTransaction(
         }
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -612,9 +612,9 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleAuditEventTransaction(
         oResponseBuffer.PutBoolean("Success", true);
     }
 
-    catch (BaseException oException)
+    catch (BaseException c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -643,9 +643,9 @@ bool __thiscall RootOfTrustCore::RegisterVirtualMachine(void)
         fSuccess = true;
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -672,9 +672,9 @@ bool __thiscall RootOfTrustCore::RegisterDataOwnerEosb(void)
         fSuccess = true;
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -701,9 +701,9 @@ bool __thiscall RootOfTrustCore::RegisterResearcherEosb(void)
         fSuccess = true;
     }
 
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -741,9 +741,9 @@ void __thiscall RootOfTrustCore::RecordInternalAuditEvent(
         this->HandleAuditEventTransaction(oTransactionData);
     }
 
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)

@@ -184,9 +184,9 @@ int __cdecl main(
         poRootOfTrustCore->WaitForTermination();
     }
 
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         // If there is an exception here, this means that the RootOfTrust process is
         // truly wrecked. We need to signal termination across the board
         StatusMonitor oStatusMonitor("void __thiscall RootOfTrustCore::RootOfTrustIpcListenerThread(void)");

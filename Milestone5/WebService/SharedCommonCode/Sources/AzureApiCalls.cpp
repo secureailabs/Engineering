@@ -55,10 +55,12 @@ std::string __stdcall LoginToMicrosoftAzureApiPortal(
         _ThrowBaseExceptionIf((false == oMicrosoftAzureResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Microsoft Azure authentication failed. Response JSON is:\r\n%s", (const char *) oMicrosoftAzureResponse.ToString().c_str());
         strAccessToken = oMicrosoftAzureResponse.GetString("access_token");
     }
-    catch (BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -228,11 +230,13 @@ StructuredBuffer __stdcall CreateResourceGroup(
 
         oResponse.PutString("Status", "Success");
     }
-    catch (BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        oResponse.PutString("error", oBaseException.GetExceptionMessage());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oResponse.PutString("error", c_oBaseException.GetExceptionMessage());
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -401,11 +405,13 @@ StructuredBuffer DeployVirtualMachineAndWait(
         oResponse.PutString("Status", "Success");
         oResponse.PutString("IpAddress", strVirtualMachineIpAddress);
     }
-    catch (BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        oResponse.PutString("error", oBaseException.GetExceptionMessage());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oResponse.PutString("error", c_oBaseException.GetExceptionMessage());
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -530,16 +536,19 @@ StructuredBuffer CreateAzureDeployment(
 
         oDeploymentResult.PutString("Status", "Success");
     }
-    catch (BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        oDeploymentResult.PutString("error", oBaseException.GetExceptionMessage());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oDeploymentResult.PutString("error", c_oBaseException.GetExceptionMessage());
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         oDeploymentResult.PutString("error", "std error");
     }
+    
     return oDeploymentResult;
 }
 
@@ -928,11 +937,13 @@ StructuredBuffer CopyVirtualMachineImage(
         oCopyImageResult.PutString("VirtualImageId", oResponse.GetString("id"));
         oCopyImageResult.PutString("Status", "Success");
     }
-    catch (BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        oCopyImageResult.PutString("error", oBaseException.GetExceptionMessage());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oCopyImageResult.PutString("error", c_oBaseException.GetExceptionMessage());
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

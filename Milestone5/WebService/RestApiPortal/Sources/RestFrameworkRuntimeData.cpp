@@ -358,11 +358,12 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         poRequestParameters->Release();
         oLocalSmartMemoryAllocator.Deallocate(pbSerializedResponseBuffer);
     }
-    catch(BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         // create error message
-        if (strcmp("Resource not found.",oBaseException.GetExceptionMessage()) == 0)
+        if (strcmp("Resource not found.", c_oBaseException.GetExceptionMessage()) == 0)
         {
             strResponseData = "HTTP/1.1 404 NotFound\r\nConnection: close\r\n\r\n";
         }
@@ -372,6 +373,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         }
         std::cout << "\n\nRest Response:\n\n" << strResponseData << std::endl;
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -385,10 +387,12 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         // Send back the response data
         poTlsNode->Write((const Byte *) strResponseData.data(), strResponseData.size());
     }
-    catch (BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

@@ -54,9 +54,9 @@ static void * GlobalMonitorRunThread(
         gs_oGlobalMonitor.Run();
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch(...)
@@ -83,9 +83,9 @@ static void * GlobalMonitorHandleTransactionThread(
         gs_oGlobalMonitor.HandleTransaction(poSocket);
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch(...)
@@ -196,9 +196,9 @@ void __thiscall GlobalMonitor::Run(void)
             }
         }
         
-        catch(BaseException oBaseException)
+        catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch(...)

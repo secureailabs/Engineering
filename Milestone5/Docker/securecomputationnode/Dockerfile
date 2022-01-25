@@ -8,8 +8,7 @@ USER root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install dependencies
-RUN apt-get update
-RUN apt-get -y upgrade
+RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y \
 libcurl4-gnutls-dev \
 libcurl4 \
@@ -24,7 +23,7 @@ RUN pip3 install -U scikit-learn
 RUN pip3 install ipython
 RUN pip3 install torch --no-cache-dir
 
-COPY Docker/Entrypoint.SecureComputationNode.sh /Entrypoint.sh
+COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
 CMD ["/bin/bash", "/Entrypoint.sh"]

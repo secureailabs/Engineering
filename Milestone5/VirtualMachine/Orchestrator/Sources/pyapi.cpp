@@ -158,23 +158,35 @@ static PyObject* get_datasets(
     return poPythonReturn;
 }
 
-static PyObject* provision_digital_contract(
+static PyObject* provision_secure_computational_node(
     _in PyObject* self,
     _in PyObject* args
     )
 {
     char* pszDigitalContractGuid;
     char* pszDatasetGuid;
+    char* pszVirtualMachineType;
 
-    if(!PyArg_ParseTuple(args, "ss", &pszDigitalContractGuid, &pszDatasetGuid))
+    if(!PyArg_ParseTuple(args, "sss", &pszDigitalContractGuid, &pszDatasetGuid, &pszVirtualMachineType))
     {
         return nullptr;
     }
 
     std::string strDigitalContractGuid(pszDigitalContractGuid);
     std::string strDatasetGuid(pszDatasetGuid);
-    unsigned int returnVal = getFrontend().ProvisionDigitalContract(strDigitalContractGuid, strDatasetGuid);
-    return Py_BuildValue("i", returnVal);
+    std::string strVirtualMachineType(pszVirtualMachineType);
+    std::string strProvisionStatus = getFrontend().ProvisionSecureComputationalNode(strDigitalContractGuid, strDatasetGuid, strVirtualMachineType);
+    PyObject* poPythonReturn;
+    if ( !strProvisionStatus.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strProvisionStatus.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+
+    return poPythonReturn;
 }
 
 static PyObject* run_job(
@@ -205,7 +217,7 @@ static PyObject* run_job(
     return poPythonReturn;
 }
 
-static PyObject* wait_for_all_digital_contracts_to_be_provisioned(
+static PyObject* wait_for_all_secure_nodes_to_be_provisioned(
     _in PyObject * self,
     _in PyObject * args
     )
@@ -216,7 +228,7 @@ static PyObject* wait_for_all_digital_contracts_to_be_provisioned(
     {
         return nullptr;
     }
-    std::string strProvisionStatus = getFrontend().WaitForAllDigitalContractsToBeProvisioned(nTimeoutMs);
+    std::string strProvisionStatus = getFrontend().WaitForAllSecureNodesToBeProvisioned(nTimeoutMs);
     PyObject* poPythonReturn;
     if ( !strProvisionStatus.empty() )
     {
@@ -661,12 +673,12 @@ static PyMethodDef SAILAPIMethods [] =
     {"get_digital_contracts", (PyCFunction)get_digital_contracts, METH_NOARGS,NULL},
     {"get_datasets", (PyCFunction)get_datasets, METH_NOARGS, NULL},
     {"get_tables", (PyCFunction)get_tables, METH_NOARGS, NULL},
-    {"provision_digital_contract", (PyCFunction)provision_digital_contract, METH_VARARGS, NULL},
+    {"provision_secure_computational_node", (PyCFunction)provision_secure_computational_node, METH_VARARGS, NULL},
     {"run_job", (PyCFunction)run_job, METH_VARARGS, NULL},
     {"set_parameter", (PyCFunction)set_parameter, METH_VARARGS, NULL},
     {"push_user_data", (PyCFunction)push_user_data, METH_VARARGS, NULL},
     {"get_job_status", (PyCFunction)get_job_status, METH_VARARGS, NULL},
-    {"wait_for_all_digital_contracts_to_be_provisioned", (PyCFunction)wait_for_all_digital_contracts_to_be_provisioned, METH_VARARGS, NULL},
+    {"wait_for_all_secure_nodes_to_be_provisioned", (PyCFunction)wait_for_all_secure_nodes_to_be_provisioned, METH_VARARGS, NULL},
     {"pull_data", (PyCFunction)pull_data, METH_VARARGS, NULL},
     {"wait_for_data", (PyCFunction)wait_for_data, METH_VARARGS, NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},

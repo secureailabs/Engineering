@@ -30,14 +30,14 @@ def get_datasets():
 def get_tables():
     return SAILPyAPI.get_tables()
 
-def provision_digital_contract(digital_contract_guid, dataset_guid):
-    return SAILPyAPI.provision_digital_contract(digital_contract_guid, dataset_guid)
+def provision_secure_computational_node(digital_contract_guid, dataset_guid, virtual_machine_type):
+    return SAILPyAPI.provision_secure_computational_node(digital_contract_guid, dataset_guid, virtual_machine_type)
 
 def run_job(safe_object_guid):
     return SAILPyAPI.run_job(safe_object_guid)
 
-def wait_for_all_digital_contracts_to_be_provisioned(timeout):
-    return SAILPyAPI.wait_for_all_digital_contracts_to_be_provisioned(timeout)
+def wait_for_all_secure_nodes_to_be_provisioned(timeout):
+    return SAILPyAPI.wait_for_all_secure_nodes_to_be_provisioned(timeout)
 
 def set_parameter(job_guid, parameter_guid, str_value):
     return SAILPyAPI.set_parameter(job_guid, parameter_guid, str_value)

@@ -15,7 +15,9 @@
 struct SecureNodeInformation
 {
     DigitalContractProvisiongStatus eProvisionStatus{DigitalContractProvisiongStatus::eUnprovisioned};
+    std::string strDigitalContractGUID{""};
     std::string strRemoteIpAddress{""};
     std::string strVMGUID{""};
     std::string strDatasetGUID{""};
+    std::string strProvisionMessage{""};
 };

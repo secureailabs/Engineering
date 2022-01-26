@@ -68,9 +68,9 @@ extern "C" __declspec(dllexport) bool __cdecl UpdateDatasetFamilyInformation(voi
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -105,9 +105,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetListOfDatasetFamilyIdentifiers(
         strCommaDelimitedListOfDatasetFamilyIdentifiers.erase(strCommaDelimitedListOfDatasetFamilyIdentifiers.end() - 1);
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -141,9 +141,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetDatasetFamilyTitle(
         }
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

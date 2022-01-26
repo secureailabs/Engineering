@@ -114,10 +114,12 @@ StructuredBuffer GetListOfEvents(
 
         StructuredBuffer oListOfEvents(oResponse.GetStructuredBuffer("ListOfEvents"));
     }
-    catch (BaseException oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        std::cout << oBaseException.GetExceptionMessage();
+        std::cout << c_oBaseException.GetExceptionMessage();
     }
+    
     catch (...)
     {
         std::cout << "Error getting list of events.";
@@ -152,14 +154,16 @@ int main()
         const unsigned int unSequenceNumber = 0;
         StructuredBuffer oAuditEventsStructuredBuffer = ::GetListOfEvents(strEncodedEosb, c_strParentGuid, c_strOrganizationGuid, 0);
     }
-    catch (const std::exception& oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        std::cout << oException.what();
-    }
-    catch (const BaseException & oBaseException)
-    {
-        std::cout << oBaseException.GetExceptionMessage();
+        std::cout << c_oBaseException.GetExceptionMessage();
     }
 
+    catch (const std::exception & c_oException)
+    {
+        std::cout << c_oException.what();
+    }
+    
     return 0;
 }

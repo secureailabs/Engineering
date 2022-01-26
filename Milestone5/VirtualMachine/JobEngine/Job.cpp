@@ -223,13 +223,15 @@ void __thiscall Job::RemoveAvailableDependency(
             this->TryRunJob();
         }
     }
-    catch(const BaseException & oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        std::cout << oBaseException.GetExceptionMessage() << '\n';
+        std::cout << c_oBaseException.GetExceptionMessage() << '\n';
     }
-    catch(const std::exception& e)
+    
+    catch (const std::exception & c_oException)
     {
-        std::cout << e.what() << '\n';
+        std::cout << c_oException.what() << '\n';
     }
 }
 

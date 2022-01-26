@@ -39,12 +39,12 @@ TlsNode * __stdcall TlsConnectToUnixDomainSocket(
         poTlsNode = new TlsNode(poSocket, eSSLModeClient);
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -78,12 +78,12 @@ TlsNode * __stdcall TlsConnectToNetworkSocket(
         poTlsNode = new TlsNode(poSocket, eSSLModeClient);
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -117,7 +117,7 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
                 poSocket = ::ConnectToNetworkSocket(c_strTargetIpAddress, wPortNumber);
             }
 
-            catch(const BaseException & oBaseException)
+            catch (const BaseException & c_oBaseException)
             {
                 // BUGBUG: Fix this to use the other sleep which is in microseconds
                 ::sleep(unMillesecondStepTime/1000);
@@ -128,12 +128,12 @@ TlsNode * __stdcall TlsConnectToNetworkSocketWithTimeout(
         poTlsNode = new TlsNode(poSocket, eSSLModeClient);
     }
     
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

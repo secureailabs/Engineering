@@ -286,7 +286,7 @@ bool __thiscall Guid::operator == (
         fIsEqual = (m_stlRawData == oGuidToCompareTo.m_stlRawData);
     }
 
-    catch(...)
+    catch (...)
     {
 
     }
@@ -343,7 +343,7 @@ bool __thiscall Guid::operator != (
         fIsDifferent = (m_stlRawData != oGuidToCompareTo.m_stlRawData);
     }
 
-    catch(...)
+    catch (...)
     {
 
     }

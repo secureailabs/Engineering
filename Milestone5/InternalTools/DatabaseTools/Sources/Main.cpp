@@ -109,12 +109,14 @@ int main(
             oDatabaseTools.AddDatasetFamilies();
         }
     }
-    catch(BaseException & oBaseException)
+    
+    catch (const BaseException & c_oBaseException)
     {
         std::cout << "Exception: " << std::endl;
-        std::cout << oBaseException.GetExceptionMessage() << std::endl;
+        std::cout << c_oBaseException.GetExceptionMessage() << std::endl;
     }
-    catch(...)
+    
+    catch (...)
     {
         std::cout << "Error: Unknown exception caught." << std::endl;
     }

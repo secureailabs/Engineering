@@ -31,11 +31,13 @@ void RegressionTest(void)
             ::ListDigitalContracts(strEosb);
             ::GetListOfEvents(strEosb, strRootEventGuid, strOrganizationGuid, 0);
         }
-        catch(BaseException oBaseException)
+        
+        catch (const BaseException & c_oBaseException)
         {
-            std::cout << oBaseException.GetExceptionMessage() << std::endl;
+            std::cout << c_oBaseException.GetExceptionMessage() << std::endl;
         }
-        catch(...)
+        
+        catch (...)
         {
             std::cout << "Unknown exception caught!" << std::endl;
         }

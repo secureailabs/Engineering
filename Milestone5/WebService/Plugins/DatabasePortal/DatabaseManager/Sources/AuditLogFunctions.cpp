@@ -71,11 +71,13 @@ std::vector<Byte> __thiscall DatabaseManager::GetListOfEvents(
         oResponse.PutStructuredBuffer("ListOfEvents", oListOfEvents);
         dwStatus = 200;
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -191,7 +193,7 @@ void __thiscall DatabaseManager::GetEventObjectBlob(
                             }
                             fAddToListOfEvents = true;
                         }
-                        catch (BaseException oException)
+                        catch (const BaseException & c_oBaseException)
                         {
                             fAddToListOfEvents = false;
                         }
@@ -417,11 +419,13 @@ std::vector<Byte> __thiscall DatabaseManager::AddNonLeafEvent(
             std::cout << "Collection transaction exception: " << e.what() << std::endl;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -561,11 +565,13 @@ std::vector<Byte> __thiscall DatabaseManager::AddLeafEvent(
             std::cout << "Collection transaction exception: " << e.what() << std::endl;
         }
     }
-    catch (BaseException oException)
+    
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

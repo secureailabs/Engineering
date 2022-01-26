@@ -267,20 +267,20 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         oLocalSmartMemoryAllocator.Deallocate(pbSerializedResponseBuffer);
     }
 
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         // send back error message
-        unsigned int unErrorResponseSizeInBytes = sizeof(uint32_t) + strlen(oBaseException.GetExceptionMessage());
+        unsigned int unErrorResponseSizeInBytes = sizeof(uint32_t) + strlen(c_oBaseException.GetExceptionMessage());
         std::vector<Byte> stlErrorMessage(unErrorResponseSizeInBytes);
         Byte * pbErrorMessage = (Byte *) stlErrorMessage.data();
-        *((uint32_t *) pbErrorMessage) = (uint32_t) strlen(oBaseException.GetExceptionMessage());
+        *((uint32_t *) pbErrorMessage) = (uint32_t) strlen(c_oBaseException.GetExceptionMessage());
         pbErrorMessage += sizeof(uint32_t);
-        ::memcpy((void *) pbErrorMessage, (const void *) oBaseException.GetExceptionMessage(), strlen(oBaseException.GetExceptionMessage()));
+        ::memcpy((void *) pbErrorMessage, (const void *) c_oBaseException.GetExceptionMessage(), strlen(c_oBaseException.GetExceptionMessage()));
         poTlsNode->Write((const Byte *) stlErrorMessage.data(), stlErrorMessage.size());
     }
 
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         // send back error message

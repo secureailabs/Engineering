@@ -62,9 +62,9 @@ extern "C" __declspec(dllexport) unsigned int __cdecl LoadDigitalContracts(void)
         unDigitalContractsCount = (unsigned int) gs_stlIndexedListOfSerializedBase64DigitalContracts.size();
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -105,9 +105,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetDigitalContractIdentifierAtInde
         strDigitalContractIdentifier = oDigitalContract.GetString("DigitalContractIdentifier");
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -191,9 +191,9 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetDigitalContractProperty(
         }        
     }
 
-    catch (BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

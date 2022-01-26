@@ -986,7 +986,7 @@ void __thiscall StructuredBuffer::Serialize(void) const throw()
         }
     }
     
-    catch(...)
+    catch (...)
     {
         std::cout << "\r\033[1;31m---------------------------------------------------------------------------------\033[0m" << std::endl
                   << "\033[1;31mOH NO, AN UNKNOWN EXCEPTION!!!\033[0m" << std::endl << std::endl

@@ -3,27 +3,23 @@ FROM ubuntu:20.04
 ENV TZ=America/Toronto
 LABEL authors="prawal@secureailabs.com"
 USER root
+
 # Set time zone data
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install dependencies
-RUN apt-get update
-RUN apt-get -y upgrade
+RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y sudo \
-git \
-make \
 wget \
-systemd \
 iproute2 \
 libcurl4-gnutls-dev \
-python3-pip \
-build-essential
+python3-pip
 
-COPY Docker/install.Backend.sh /install.sh
+COPY install.sh /install.sh
 RUN chmod +x /install.sh
 RUN /install.sh
 
-COPY Docker/Entrypoint.Backend.sh /Entrypoint.sh
+COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
 EXPOSE 6200

@@ -51,21 +51,21 @@ fi
 runtimeFlags="$detachFlags --network sailNetwork "
 if [ "orchestrator" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags -p 8080:8080 -v $(pwd)/VirtualMachine/Orchestrator:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 8080:8080 -v $(pwd)/../VirtualMachine/Orchestrator:/app $imageName"
 elif [ "backend" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $(pwd)/Binary:/app $imageName"
+    runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $(pwd)/../Binary:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags -p 3000:3000 -v $(pwd)/WebFrontend:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 3000:3000 -v $(pwd)/../WebFrontend:/app $imageName"
 elif [ "securecomputationnode" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags -p 3500:3500 -p 9090:9090 -p 6800:6800 -v $(pwd)/Binary:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 3500:3500 -p 9090:9090 -p 6800:6800 -v $(pwd)/../Binary:/app $imageName"
 elif [ "remotedataconnector" == "$imageName" ]
 then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1
-    # runtimeFlags="$runtimeFlags -v $(pwd)/Binary:/Development $imageName"
+    # runtimeFlags="$runtimeFlags -v $(pwd)/../Binary:/Development $imageName"
 else
     echo "!!! Kindly provide correct service name !!!"
     PrintHelp

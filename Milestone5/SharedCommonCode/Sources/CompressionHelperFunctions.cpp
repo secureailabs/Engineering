@@ -95,12 +95,12 @@ StructuredBuffer __stdcall CompressToStructuredBuffer(
         //std::cout << "Compression ratio: " << (1 - (double(unOutBufSize) / double(unRawBufferSizeInBytes))) * 100.0f << "% (" << unRawBufferSizeInBytes << " -> " << unOutBufSize << ")" << std::endl;
     }
     
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -143,12 +143,12 @@ std::vector<Byte> __stdcall DecompressStructuredBuffer(
         __DebugAssert((SZ_OK == nLzmaStatus) && (pLzmaStatus == LZMA_STATUS_FINISHED_WITH_MARK));
     }
     
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, __func__, __FILE__, __LINE__);;
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

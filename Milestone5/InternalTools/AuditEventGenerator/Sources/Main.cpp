@@ -150,12 +150,12 @@ static void __thiscall AuditEventDispatcher(void)
             }
         }
         
-        catch (BaseException oException)
+        catch (const BaseException & c_oBaseException)
         {
-            ::RegisterException(oException, oException.GetFunctionName(), oException.GetLineNumber());
+            ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
         
-        catch(...)
+        catch (...)
         {
             ::RegisterUnknownException(__func__, __LINE__);
         }
@@ -195,9 +195,9 @@ static void * __stdcall StartAuditEventDispatcherThread(
         ::AuditEventDispatcher();
     }
     
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, oException.GetFunctionName(), oException.GetLineNumber());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -244,12 +244,12 @@ static bool __stdcall InitializeVirtualMachine(void)
         ::RecordAuditEvent("DC_INITIALIZE", 0x1100, 0x05, oEventData);
     }
     
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, oException.GetFunctionName(), oException.GetLineNumber());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }
@@ -277,12 +277,12 @@ static bool __stdcall RegisterDataOwnerEosb(void)
         }
     }
     
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, oException.GetFunctionName(), oException.GetLineNumber());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }
@@ -310,12 +310,12 @@ static bool __stdcall RegisterResearcherEosb(void)
         }
     }
     
-    catch (BaseException oException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oException, oException.GetFunctionName(), oException.GetLineNumber());
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }
@@ -509,12 +509,12 @@ int __cdecl main(
         }
     }
 
-    catch(BaseException oBaseException)
+    catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __LINE__);
+        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch(...)
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
     }

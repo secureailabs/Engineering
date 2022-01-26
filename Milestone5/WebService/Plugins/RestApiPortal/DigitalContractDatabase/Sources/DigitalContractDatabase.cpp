@@ -427,6 +427,7 @@ void __thiscall DigitalContractDatabase::InitializePlugin(
     oDatasetDRMMetadata.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("DatasetDRMMetadata", oDatasetDRMMetadata);
 
+
     // Add parameters for digital contract acceptance
     StructuredBuffer oDcAcceptance;
     oDcAcceptance.PutStructuredBuffer("Eosb", oEosb);
@@ -519,9 +520,20 @@ void __thiscall DigitalContractDatabase::InitializePlugin(
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DigitalContractManager/Deprovision", oDcProvisioningStatus, 1);
 
     // Provision a digital contract
+    StructuredBuffer oOptionalDatasetIdentifier;
+    oOptionalDatasetIdentifier.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
+    oOptionalDatasetIdentifier.PutBoolean("IsRequired", false);
+
+    StructuredBuffer oOptionalVirtualMachineType;
+    oOptionalVirtualMachineType.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
+    oOptionalVirtualMachineType.PutBoolean("IsRequired", false);
+
     StructuredBuffer oDcProvision;
     oDcProvision.PutStructuredBuffer("Eosb", oEosb);
     oDcProvision.PutStructuredBuffer("DigitalContractGuid", oDcGuid);
+    oDcProvision.PutStructuredBuffer("DatasetGuid", oOptionalDatasetIdentifier);
+    oDcProvision.PutStructuredBuffer("VirtualMachineType", oOptionalVirtualMachineType);
+
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DigitalContractManager/Provision", oDcProvision, 1);
 
     StructuredBuffer oInitializeVm;
@@ -2083,6 +2095,25 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDcAuditEvent(
 
 /********************************************************************************************
  *
+ * @function IsValidVirtualMachineType
+ * @brief Determine if a string represents a valid VM type for our platform
+ * @param[in] c_strVirtualMachineType The VM type to check
+ * @returns bool whether the name is a valid VM type or not
+ *
+ ********************************************************************************************/
+static bool IsValidVirtualMachineType(
+    _in const std::string& c_strVirtualMachineType
+    )
+{
+    return "Standard_D4s_v4" == c_strVirtualMachineType ||
+        "Standard_D8s_v4" == c_strVirtualMachineType ||
+        "Standard_B16ms" == c_strVirtualMachineType ||
+        "Standard_D8_v4" == c_strVirtualMachineType ||
+        "Standard_D48_v4" == c_strVirtualMachineType;
+}
+
+/********************************************************************************************
+ *
  * @class DigitalContractDatabase
  * @function ProvisionDigitalContract
  * @brief Create a Virutal Machine for the Digital Contract activation
@@ -2200,39 +2231,54 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                                 std::string strNetworkSecurityGroupId = ::CreateAzureResourceId(strSubscriptionID, strResourceGroup, "providers/Microsoft.Network", "networkSecurityGroups", strNetworkSecurityGroup);
 
                                 auto unNumberOfVirtualMachines = oDigitialContract.GetUnsignedInt64("NumberOfVirtualMachines");
-
+                                std::string strOptionalVirtualMachineType{""};
+                                if ( c_oRequest.IsElementPresent("VirtualMachineType", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+                                {
+                                    strOptionalVirtualMachineType = c_oRequest.GetString("VirtualMachineType");
+                                }
                                 // If the DataConnector is active, start the VM provisioning in a different async thread
                                 for (uint64_t unVmCounter = 0; unVmCounter < unNumberOfVirtualMachines; unVmCounter++)
                                 {
                                     Guid oNewVmGuid;
                                     StructuredBuffer oVirtualMachineCreateParameter;
                                     oVirtualMachineCreateParameter.PutString("vmName", oNewVmGuid.ToString(eRaw));
-                                    switch (oDigitialContract.GetUnsignedInt64("NumberOfVCPU"))
+                                    if ( !::IsValidVirtualMachineType(strOptionalVirtualMachineType) )
                                     {
-                                        case 4
-                                        :
-                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D4s_v4");
-                                            break;
-                                        case 8
-                                        :
-                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D8s_v4");
-                                            break;
-                                        case 16
-                                        :
-                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_B16ms");
-                                            break;
-                                        case 32
-                                        :
-                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D8_v4");
-                                            break;
-                                        case 48
-                                        :
-                                            oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D48_v4");
-                                            break;
-                                        default
-                                        :
-                                            _ThrowBaseException("Number Of CPUs not supported", nullptr);
-                                            break;
+
+                                        switch (oDigitialContract.GetUnsignedInt64("NumberOfVCPU"))
+                                        {
+                                            case 4
+                                            :
+                                                oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D4s_v4");
+                                                break;
+                                            case 8
+                                            :
+                                                oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D8s_v4");
+                                                break;
+                                            case 16
+                                            :
+                                                oVirtualMachineCreateParameter.PutString("vmSize", "Standard_B16ms");
+                                                break;
+                                            case 32
+                                            :
+                                                oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D8_v4");
+                                                break;
+                                            case 48
+                                            :
+                                                oVirtualMachineCreateParameter.PutString("vmSize", "Standard_D48_v4");
+                                                break;
+                                            default
+                                            :
+                                                _ThrowBaseException("Number Of CPUs not supported", nullptr);
+                                                break;
+                                        }
+                                        oResponse.PutString("Message",  "Unknown Virtual Machine type " + strOptionalVirtualMachineType + " using DC value " +
+                                            oVirtualMachineCreateParameter.GetString("vmSize")
+                                        );
+                                    }
+                                    else
+                                    {
+                                        oVirtualMachineCreateParameter.PutString("vmSize", strOptionalVirtualMachineType);
                                     }
                                     oVirtualMachineCreateParameter.PutString("vmImageId", strVirtualMachineImageId);
                                     oVirtualMachineCreateParameter.PutString("VirtualNetworkId", strVirtualNetworkId);
@@ -2258,13 +2304,19 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                                 // Return a VM provisioning start success response here.
                                 dwStatus = 200;
                             }
+                            else if ((Dword)DigitalContractProvisiongStatus::eReady == oDigitialContract.GetDword("ProvisioningStatus") )
+                            {
+                                // The contract is already provisioned so we should be good to go
+                                dwStatus = 201;
+                                std::cout << "DC Already provisioned " << std::endl;
+                            }
                         }
                     }
                 }
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -2274,10 +2326,14 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
         {
             dwStatus = 408;
         }
+        else
+        {
+            dwStatus = 404;
+        }
         strErrorMessage = c_oBaseException.GetExceptionMessage();
-        oResponse.PutString("Messsage: ", c_oBaseException.GetExceptionMessage());
+        oResponse.PutString("Message", c_oBaseException.GetExceptionMessage());
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -2291,7 +2347,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
 
     try
     {
-        if (200 != dwStatus)
+        if (200 != dwStatus && 201 != dwStatus)
         {
             // Update the Digital ContractStatus to Provisioning
             StructuredBuffer oUpdateProvisioningState;

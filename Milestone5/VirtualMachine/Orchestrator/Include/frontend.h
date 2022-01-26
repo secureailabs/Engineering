@@ -76,9 +76,10 @@ class Frontend : public Object{
 
         std::string __thiscall GetTables(void) const;
 
-        unsigned int __thiscall ProvisionDigitalContract(
+        std::string __thiscall ProvisionSecureComputationalNode(
             _in const std::string & c_strDigitalContractGUID,
-            _in const std::string & c_strDatasetGUID
+            _in const std::string & c_strDatasetGUID,
+            _in const std::string & c_strVmType
             );
 
         std::string __thiscall RunJob(
@@ -99,7 +100,7 @@ class Frontend : public Object{
             _in const std::vector<Byte>& c_stlIncomingData
             );
 
-        std::string __thiscall WaitForAllDigitalContractsToBeProvisioned(
+        std::string __thiscall WaitForAllSecureNodesToBeProvisioned(
             _in int nTimeoutInMs
             );
 
@@ -200,7 +201,7 @@ class Frontend : public Object{
         );
 
         DigitalContractProvisiongStatus __thiscall GetProvisionStatus(
-            const std::string& c_strDigitalContractGUID
+            const Guid& c_strDigitalContractGUID
             );
 
         std::string __thiscall GetIPServingDataset(
@@ -251,8 +252,7 @@ class Frontend : public Object{
         std::unordered_map<std::string, TableInformation> m_stlAvailableTables{};
         std::unordered_map<std::string, SecureNodeInformation> m_stlProvisionInformation{};
         std::unordered_map<std::string, std::unique_ptr<JobInformation> > m_stlJobInformation{};
-        std::unordered_map<std::string, std::vector<Byte>> m_stlPushedData;
-        std::unordered_map<std::string, std::string> m_stlDigitalContractStatus{};
+        std::unordered_map<std::string, std::vector<Byte>> m_stlPushedData{};
         StructuredBufferLockedQueue m_oJobMessageQueue{};
 
         std::map<std::string, std::shared_ptr<TlsNode>> m_stlConnectionMap;

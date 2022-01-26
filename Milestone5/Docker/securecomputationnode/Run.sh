@@ -24,7 +24,6 @@ fi
 docker run \
 -dit \
 -p 3500:3500 \
--p 9090:9090 \
 -p 6800:6800 \
 -v $(pwd)/Binary:/app \
 $imageName

@@ -34,7 +34,6 @@ void __stdcall InitVirtualMachine()
     __DebugFunction();
 
     TlsServer oTlsServer(9090);
-    TlsNode *poTlsNode = nullptr;
 
     StructuredBuffer oResponseStructuredBuffer;
     oResponseStructuredBuffer.PutString("Status", "Fail");
@@ -42,6 +41,7 @@ void __stdcall InitVirtualMachine()
     bool fSuccess = false;
     while (false == fSuccess)
     {
+        std::unique_ptr<TlsNode> poTlsNode(nullptr);
         try
         {
             // We will first try to download all the incoming package data that needs to be installed
@@ -49,33 +49,52 @@ void __stdcall InitVirtualMachine()
             if (true == oTlsServer.WaitForConnection(1000))
             {
                 std::cout << "New Connection" << std::endl;
-                poTlsNode = oTlsServer.Accept();
+                poTlsNode.reset(oTlsServer.Accept());
                 _ThrowIfNull(poTlsNode, "Cannot establish connection.", nullptr);
 
                 // Fetch the serialized Structure Buffer from the remote
-                std::vector<Byte> stlPayload = ::GetTlsTransaction(poTlsNode, 60 * 60 * 1000);
+                std::vector<Byte> stlPayload = ::GetTlsTransaction(poTlsNode.get(), 60 * 60 * 1000);
                 _ThrowBaseExceptionIf((0 == stlPayload.size()), "Bad Initialization data", nullptr);
 
                 StructuredBuffer oFilesStructuredBuffer(stlPayload);
                 // Read the package tarball and write it to the filesystem
                 ::WriteBytesAsFile(gc_strTarPackageFile, oFilesStructuredBuffer.GetBuffer(gc_strTarPackageFile.c_str()));
                 // Read the initialization vector and write it to the filesystem
-                ::WriteBytesAsFile(gc_strInitializationVectorFile, oFilesStructuredBuffer.GetBuffer(gc_strInitializationVectorFile.c_str()));
+                ::WriteStringAsFile(gc_strInitializationVectorFile, oFilesStructuredBuffer.GetString(gc_strInitializationVectorFile.c_str()));
 
+                oResponseStructuredBuffer.PutString("Status", "Success");
                 fSuccess = true;
             }
         }
-        
+
         catch (const BaseException & c_oBaseException)
         {
             oResponseStructuredBuffer.PutString("Status", "Fail");
             oResponseStructuredBuffer.PutString("Error", c_oBaseException.GetExceptionMessage());
         }
-        
+
         catch (const std::exception & c_oException)
         {
             oResponseStructuredBuffer.PutString("Status", "Fail");
             oResponseStructuredBuffer.PutString("Error", c_oException.what());
+        }
+
+        // We again try to send the Status response to the initializer tool so that it could know if the
+        // package was installed correctly without any error. But we don't want to risk a failure of this process
+        // while that happens and some exception occurs.
+        try
+        {
+            // Send the resposnse to the Remote Initializer Tool
+            // There is a chance that this transaction may fail but in that case, we will continue to the run the
+            // virtual machine and exit the init process and leave it on the discretion of the initialization tool
+            if (nullptr != poTlsNode)
+            {
+                bool fResponseStatus = ::PutTlsTransaction(poTlsNode.get(), oResponseStructuredBuffer);
+            }
+        }
+        catch(...)
+        {
+            std::cout << "Unexpected Error while sending init response.";
         }
     }
 }

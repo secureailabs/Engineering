@@ -95,3 +95,14 @@ az image create \
 --location $Location \
 --os-type "Linux" \
 --storage-sku "Standard_LRS"
+
+# Optionally to create a VM with the image
+# az vm create \
+# --resource-group $ResourceGroup \
+# --name "$imageName"Vm \
+# --image $imageName \
+# --admin-username saildeveloper \
+# --admin-password "Password@123"
+
+# Optionally upload the packages to the Virtual VirtualMachine
+# ./UploadPackageAndInitializationVector --IpAddress=<VmIp> --Package=PlatformServices.tar.gz --InitializationVector=InitializationVector.json

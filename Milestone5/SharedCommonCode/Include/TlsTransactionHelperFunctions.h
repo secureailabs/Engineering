@@ -33,11 +33,6 @@ extern std::vector<Byte> __stdcall PutTlsTransactionAndGetResponse(
     _in unsigned int unMillisecondTimeout
     );
 
-extern bool __stdcall PutHttpResponse(
-    _in TlsNode * poTlsNode,
-    _in const std::string & stlPayload
-    );
-
 extern bool __stdcall PutHttpHeaderOnlyResponse(
     _in TlsNode& oTlsNode,
     _in Dword dStatus,

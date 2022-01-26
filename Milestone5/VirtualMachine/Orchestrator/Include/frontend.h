@@ -12,8 +12,12 @@
 
 #include "EntityTypes.h"
 #include "EosbRotationManager.h"
+#include "JobInformation.h"
+#include "SecureNodeInformation.h"
 #include "StructuredBuffer.h"
+#include "StructuredBufferLockedQueue.h"
 #include "SafeObject.h"
+#include "TableInformation.h"
 #include "TlsNode.h"
 #include "TlsServer.h"
 #include <string>
@@ -25,30 +29,7 @@
 #include <unordered_set>
 
 /********************************************************************************************/
-enum class EngineRequest
-{
-    eVmShutdown = 0,
-    ePushSafeObject = 1,
-    eSubmitJob = 2,
-    ePullData = 3,
-    ePushdata = 4,
-    eSetParameters = 5,
-    eHaltAllJobs = 6,
-    eJobStatusSignal = 7,
-    eConnectVirtualMachine = 8,
-    eHeartBeatPong = 9
-};
 
-enum class JobStatusSignals
-{
-    eJobStart = 0,
-    eJobDone = 1,
-    eJobFail = 2,
-    ePostValue = 3,
-    eVmShutdown = 4,
-    ePrivacyViolation = 5,
-    eHeartBeatPing = 6
-};
 
 class Frontend : public Object{
 
@@ -61,7 +42,7 @@ class Frontend : public Object{
         Frontend& operator= (
             _in const Frontend&
         ) = delete;
-        ~Frontend(void);
+        virtual ~Frontend(void);
 
         void __thiscall SetFrontend
         (
@@ -99,6 +80,36 @@ class Frontend : public Object{
             _in const std::string & c_strDigitalContractGUID,
             _in const std::string & c_strDatasetGUID
             );
+
+        std::string __thiscall RunJob(
+            _in const std::string & c_strSafeFuncionGUID
+            );
+
+        std::string __thiscall GetJobStatus(
+            _in const std::string & c_strJobGUID
+            ) const;
+
+        std::string __thiscall SetParameter(
+            _in const std::string& strJobId,
+            _in const std::string& strInputParamId,
+            _in const std::string& strParamValue
+            );
+
+        std::string __thiscall PushUserData(
+            _in const std::vector<Byte>& c_stlIncomingData
+            );
+
+        std::string __thiscall WaitForAllDigitalContractsToBeProvisioned(
+            _in int nTimeoutInMs
+            );
+
+        std::string __thiscall PullJobData(
+            _in const std::string& c_strOutputParameter
+            ) throw();
+
+        std::string __thiscall WaitForData(
+            _in int nTimeoutInMs
+            ) throw();
 
         void __thiscall HandleSubmitJob
         (
@@ -188,12 +199,61 @@ class Frontend : public Object{
             _in unsigned long unServerPort
         );
 
+        DigitalContractProvisiongStatus __thiscall GetProvisionStatus(
+            const std::string& c_strDigitalContractGUID
+            );
+
+        std::string __thiscall GetIPServingDataset(
+            _in const Guid& oDatasetGuid
+            ) const;
+
+       std::string __thiscall GetIPServingTable(
+            _in const Guid& oDatasetGuid
+            ) const;
+
+        void __thiscall SendDataToJob(
+            _in JobInformation& c_oJob,
+            _in const StructuredBuffer& c_oStructuredBuffer
+            );
+
+        void __thiscall PushUserDataToJob(
+            _in JobInformation& oJob,
+            _in Guid& oUserParameter
+            );
+
+        void __thiscall SendSafeObjectToJobEngine(
+            _in JobInformation& oJob
+            );
+
+        void __thiscall SetParameterOnJob(
+            _in JobInformation& oJob,
+            _in Guid& oParameterGuid,
+            _in Guid& oParameterValueGuid
+            );
+
+        void __thiscall UpdateJobsWaitingForData(
+            _in const StructuredBuffer& oPushDataMessage
+            );
+
+        bool __thiscall StartJobRemoteExecution(
+            _in JobInformation& oJob
+            ) throw();
+
+        void __thiscall UpdateJobIPAddressForParameter(
+            _in JobInformation& oJob,
+            _in const Guid& oParameterGuid
+            );
+
         EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableDatasets{};
-        std::unordered_map<std::string, StructuredBuffer> m_stlAvailableTables{};
-        std::unordered_map<std::string, DigitalContractProvisiongStatus> m_stlDigitalContractProvisionStatus{};
+        std::unordered_map<std::string, TableInformation> m_stlAvailableTables{};
+        std::unordered_map<std::string, SecureNodeInformation> m_stlProvisionInformation{};
+        std::unordered_map<std::string, std::unique_ptr<JobInformation> > m_stlJobInformation{};
+        std::unordered_map<std::string, std::vector<Byte>> m_stlPushedData;
+        std::unordered_map<std::string, std::string> m_stlDigitalContractStatus{};
+        StructuredBufferLockedQueue m_oJobMessageQueue{};
 
         std::map<std::string, std::shared_ptr<TlsNode>> m_stlConnectionMap;
         std::map<std::string, std::shared_ptr<std::mutex>> m_stlConnectionMutexMap;

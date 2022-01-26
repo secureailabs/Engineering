@@ -1,3 +1,14 @@
+/*********************************************************************************************
+ *
+ * @file pyapi.cpp
+ * @author Jingwei Zhang
+ * @date 14 Jan 2022
+ * @License Private and Confidential. Internal Use Only.
+ * @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
+ * @brief Interop functions between C++ and python
+ *
+ ********************************************************************************************/
+
 #include <Python.h>
 #include <string>
 #include <vector>
@@ -10,9 +21,10 @@
 #include "frontend.h"
 #include "JsonValue.h"
 #include "ExceptionRegister.h"
+
 static Frontend& getFrontend()
 {
-    
+
     static Frontend oFrontend;
     return oFrontend;
 }
@@ -165,6 +177,202 @@ static PyObject* provision_digital_contract(
     return Py_BuildValue("i", returnVal);
 }
 
+static PyObject* run_job(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    char* pszSafeObjectGuid;
+
+    if(!PyArg_ParseTuple(args, "s", &pszSafeObjectGuid))
+    {
+        return nullptr;
+    }
+
+    std::string strSafeObjectGuid(pszSafeObjectGuid);
+
+    std::string strJobId = getFrontend().RunJob(strSafeObjectGuid);
+    PyObject* poPythonReturn;
+
+    if ( !strJobId.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strJobId.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
+static PyObject* wait_for_all_digital_contracts_to_be_provisioned(
+    _in PyObject * self,
+    _in PyObject * args
+    )
+{
+    int nTimeoutMs;
+ 
+    if(!PyArg_ParseTuple(args, "i", &nTimeoutMs))
+    {
+        return nullptr;
+    }
+    std::string strProvisionStatus = getFrontend().WaitForAllDigitalContractsToBeProvisioned(nTimeoutMs);
+    PyObject* poPythonReturn;
+    if ( !strProvisionStatus.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strProvisionStatus.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+
+    return poPythonReturn;
+ }
+
+
+static PyObject* push_user_data(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    PyObject* poUserData;
+
+    std::cout << "Trying to parse" << std::endl;
+    if(!PyArg_ParseTuple(args, "O", &poUserData))
+    {
+        std::cout << "Parse failure" << std::endl;
+        return NULL;
+    }
+
+    printf("%p\n", poUserData);
+    char* pcTempInput;
+    long nLen;
+    std::string strPushResponse{""};
+
+    if ( nullptr != poUserData)
+    {
+        std::cout << "Trying to get string and size " << std::endl;
+        PyBytes_AsStringAndSize(poUserData, &pcTempInput, &nLen);
+        std::cout << "Size " << nLen << std::endl;
+        std::vector<Byte> stlByteElement((Byte*)pcTempInput, (Byte*)pcTempInput + nLen);
+        strPushResponse = getFrontend().PushUserData(stlByteElement);
+    }
+
+    return Py_BuildValue("s", strPushResponse.c_str());
+}
+
+static PyObject* set_parameter(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    char* pszJobGuid;
+    char* pszParameterGuid;
+    char* pszParameterValueGuid;
+
+    if(!PyArg_ParseTuple(args, "sss", &pszJobGuid, &pszParameterGuid, &pszParameterValueGuid))
+    {
+        return nullptr;
+    }
+    std::string strJobGuid(pszJobGuid);
+    std::string strParameterGuid(pszParameterGuid);
+    std::string strParameterValueGuid(pszParameterValueGuid);
+
+    std::string strResponse = getFrontend().SetParameter(strJobGuid, strParameterGuid, strParameterValueGuid);
+
+    PyObject* poPythonReturn;
+    if ( !strResponse.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strResponse.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
+static PyObject* get_job_status(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    char* pszJobGuid;
+
+    if(!PyArg_ParseTuple(args, "s", &pszJobGuid))
+    {
+        return nullptr;
+    }
+    std::string strJobGuid(pszJobGuid);
+
+    std::string strResponse = getFrontend().GetJobStatus(strJobGuid);
+
+    PyObject* poPythonReturn;
+    if ( !strResponse.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strResponse.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
+static PyObject* pull_data(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    char* pszDataIdentifier;
+
+    if(!PyArg_ParseTuple(args, "s", &pszDataIdentifier))
+    {
+        return nullptr;
+    }
+    std::string strDataIdentifier(pszDataIdentifier);
+
+    std::string strResponse = getFrontend().PullJobData(strDataIdentifier);
+
+    PyObject* poPythonReturn;
+    if ( !strResponse.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strResponse.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
+static PyObject* wait_for_data(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    int nTimeoutInMilliseconds;
+
+    if(!PyArg_ParseTuple(args, "i", &nTimeoutInMilliseconds))
+    {
+        return nullptr;
+    }
+
+    std::string strResponse = getFrontend().WaitForData(nTimeoutInMilliseconds);
+
+    PyObject* poPythonReturn;
+    if ( !strResponse.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strResponse.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
 static PyObject* vmconnect(PyObject* self, PyObject* args)
 {
     char* serverIP;
@@ -217,7 +425,7 @@ static PyObject* pushdata(PyObject* self, PyObject* args)
 
     PyObject *iter = PyObject_GetIter(InputList);
     std::vector<std::vector<Byte>> stlInputs;
-    
+
     while (true) 
     {
         char* tmpInputs;
@@ -454,6 +662,13 @@ static PyMethodDef SAILAPIMethods [] =
     {"get_datasets", (PyCFunction)get_datasets, METH_NOARGS, NULL},
     {"get_tables", (PyCFunction)get_tables, METH_NOARGS, NULL},
     {"provision_digital_contract", (PyCFunction)provision_digital_contract, METH_VARARGS, NULL},
+    {"run_job", (PyCFunction)run_job, METH_VARARGS, NULL},
+    {"set_parameter", (PyCFunction)set_parameter, METH_VARARGS, NULL},
+    {"push_user_data", (PyCFunction)push_user_data, METH_VARARGS, NULL},
+    {"get_job_status", (PyCFunction)get_job_status, METH_VARARGS, NULL},
+    {"wait_for_all_digital_contracts_to_be_provisioned", (PyCFunction)wait_for_all_digital_contracts_to_be_provisioned, METH_VARARGS, NULL},
+    {"pull_data", (PyCFunction)pull_data, METH_VARARGS, NULL},
+    {"wait_for_data", (PyCFunction)wait_for_data, METH_VARARGS, NULL},
     {"connect", (PyCFunction)vmconnect, METH_VARARGS, NULL},
     {"pushdata", (PyCFunction)pushdata, METH_VARARGS, NULL},
     {"pulldata", (PyCFunction)pulldata, METH_VARARGS, NULL},

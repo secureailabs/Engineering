@@ -54,6 +54,14 @@ TlsNode * __stdcall TlsConnectToUnixDomainSocket(
 
 /********************************************************************************************/
 
+TlsNode* __stdcall TlsConnectToNetworkSocket(
+    _in const std::string& c_strTargetIpAddress,
+    _in Word wPortNumber
+    )
+{
+    return TlsConnectToNetworkSocket(c_strTargetIpAddress.c_str(), wPortNumber);
+}
+
 TlsNode * __stdcall TlsConnectToNetworkSocket(
     _in const char * c_szTargetIpAddress,
     _in Word wPortNumber

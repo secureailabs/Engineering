@@ -247,3 +247,6 @@ Milestone5/InternalTools/WindowsPlatformDeliverables/StringHashGenerator/obj/Deb
 Milestone5/InternalTools/WindowsPlatformDeliverables/WindowsRemoteDataConnector/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs
 Milestone5/InternalTools/WindowsPlatformDeliverables/WindowsRemoteDataConnector/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 Milestone5/InternalTools/WindowsPlatformDeliverables/WindowsRemoteDataConnector/obj/Debug/WindowsRemoteDataConnector.csproj.AssemblyReference.cache
+*.swp
+*.swo
+

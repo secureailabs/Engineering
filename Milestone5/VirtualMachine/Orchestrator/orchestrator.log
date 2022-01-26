@@ -1,0 +1,287 @@
+[I 08:35:19.563 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
+[I 08:35:19.675 NotebookApp] Serving notebooks from local directory: /app
+[I 08:35:19.675 NotebookApp] The Jupyter Notebook is running at:
+[I 08:35:19.675 NotebookApp] http://23f07cac4c4c:8080/?token=d4e182ceec91c4de05b69c47291cdb5162168c1f12f51905
+[I 08:35:19.675 NotebookApp]  or http://127.0.0.1:8080/?token=d4e182ceec91c4de05b69c47291cdb5162168c1f12f51905
+[I 08:35:19.675 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 08:35:19.677 NotebookApp] No web browser found: could not locate runnable browser.
+[C 08:35:19.677 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///root/.local/share/jupyter/runtime/nbserver-16-open.html
+    Or copy and paste one of these URLs:
+        http://23f07cac4c4c:8080/?token=d4e182ceec91c4de05b69c47291cdb5162168c1f12f51905
+     or http://127.0.0.1:8080/?token=d4e182ceec91c4de05b69c47291cdb5162168c1f12f51905
+[I 08:35:25.865 NotebookApp] 302 GET /?token=d4e182ceec91c4de05b69c47291cdb5162168c1f12f51905 (172.18.0.1) 0.58ms
+[I 08:35:51.068 NotebookApp] Writing notebook-signing key to /root/.local/share/jupyter/notebook_secret
+[W 08:35:51.069 NotebookApp] Notebook sail/orchestrator_demo.ipynb is not trusted
+[I 08:35:51.274 NotebookApp] Kernel started: 14de5e8a-4eb1-4067-97cb-ca67c57a742d
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 08:37:51.251 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 08:39:51.247 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DC 155D4D722106445EB66A461B5B142AC5 has IP 52.142.9.219
+[I 08:41:51.249 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Trying to parse
+0x1b66b00
+Trying to get string and size 
+Size 5
+Job {4925EE49-EBE4-4C42-912A-9130CCCFBD95} is ready to execute on IP 52.142.9.219
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/SocketClient.cpp
+               |Function = ConnectToNetworkSocket
+               |Line Number = 94
+               |Message = connect() failed with errno = 111
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/TlsClient.cpp
+               |Function = TlsConnectToNetworkSocket
+               |Line Number = 79
+Failed to connect to remote 52.142.9.219
+Looking for safe object 473001DB64AF456E971296418B6194FE
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {4925EE49-EBE4-4C42-912A-9130CCCFBD95} has sent all parameters 
+Job {4A4B6782-F2D3-4355-AC7C-82FAF51215F4} is ready to execute on IP 52.142.9.219
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/SocketClient.cpp
+               |Function = ConnectToNetworkSocket
+               |Line Number = 94
+               |Message = connect() failed with errno = 111
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/TlsClient.cpp
+               |Function = TlsConnectToNetworkSocket
+               |Line Number = 79
+Failed to connect to remote 52.142.9.219
+Looking for safe object 473001DB64AF456E971296418B6194FE
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {4A4B6782-F2D3-4355-AC7C-82FAF51215F4} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 08:42:31.105 NotebookApp] Kernel interrupted: 14de5e8a-4eb1-4067-97cb-ca67c57a742d
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 08:42:56.154 NotebookApp] Starting buffering for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+terminate called without an active exception
+[I 08:42:56.760 NotebookApp] Kernel restarted: 14de5e8a-4eb1-4067-97cb-ca67c57a742d
+[I 08:42:57.069 NotebookApp] Restoring connection for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+[I 08:42:57.069 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 08:43:01.736 NotebookApp] Starting buffering for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+[I 08:43:01.943 NotebookApp] Kernel restarted: 14de5e8a-4eb1-4067-97cb-ca67c57a742d
+[I 08:43:02.287 NotebookApp] Restoring connection for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+[I 08:43:02.288 NotebookApp] Replaying 6 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 08:43:51.253 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DC 155D4D722106445EB66A461B5B142AC5 has IP 52.142.9.219
+DC 155D4D722106445EB66A461B5B142AC5 already has an IP
+Trying to parse
+0x28808d0
+Trying to get string and size 
+Size 5
+Job {4B4C4800-8E95-4981-A34E-E2F42BCB2832} is ready to execute on IP 52.142.9.219
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/SocketClient.cpp
+               |Function = ConnectToNetworkSocket
+               |Line Number = 94
+               |Message = connect() failed with errno = 111
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/TlsClient.cpp
+               |Function = TlsConnectToNetworkSocket
+               |Line Number = 79
+Failed to connect to remote 52.142.9.219
+Looking for safe object 473001DB64AF456E971296418B6194FE
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {4B4C4800-8E95-4981-A34E-E2F42BCB2832} has sent all parameters 
+Job {4928DEF2-40DD-41DA-B453-543C8555F52B} is ready to execute on IP 52.142.9.219
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/SocketClient.cpp
+               |Function = ConnectToNetworkSocket
+               |Line Number = 94
+               |Message = connect() failed with errno = 111
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/TlsClient.cpp
+               |Function = TlsConnectToNetworkSocket
+               |Line Number = 79
+Failed to connect to remote 52.142.9.219
+Looking for safe object 473001DB64AF456E971296418B6194FE
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {4928DEF2-40DD-41DA-B453-543C8555F52B} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+terminate called without an active exception
+[I 08:45:01.946 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 14de5e8a-4eb1-4067-97cb-ca67c57a742d restarted
+[I 08:45:15.124 NotebookApp] Starting buffering for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+[I 08:45:15.333 NotebookApp] Kernel restarted: 14de5e8a-4eb1-4067-97cb-ca67c57a742d
+[I 08:45:15.636 NotebookApp] Restoring connection for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+[I 08:45:15.636 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DC 155D4D722106445EB66A461B5B142AC5 has IP 52.142.9.219
+[I 08:45:51.253 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 08:50:15.913 NotebookApp] Starting buffering for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+[I 08:50:16.622 NotebookApp] Kernel restarted: 14de5e8a-4eb1-4067-97cb-ca67c57a742d
+[I 08:50:16.887 NotebookApp] Restoring connection for 14de5e8a-4eb1-4067-97cb-ca67c57a742d:1e707338fe724748b8c8ae3453513b8f
+[I 08:50:16.888 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DC 155D4D722106445EB66A461B5B142AC5 has IP 52.142.9.219
+DC 155D4D722106445EB66A461B5B142AC5 already has an IP
+Trying to parse
+0x35c8890
+Trying to get string and size 
+Size 5
+Job {4A64610D-BF0D-4708-A7D9-4733CFC997C3} is ready to execute on IP 52.142.9.219
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/SocketClient.cpp
+               |Function = ConnectToNetworkSocket
+               |Line Number = 94
+               |Message = connect() failed with errno = 111
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/TlsClient.cpp
+               |Function = TlsConnectToNetworkSocket
+               |Line Number = 79
+Failed to connect to remote 52.142.9.219
+Looking for safe object 473001DB64AF456E971296418B6194FE
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {4A64610D-BF0D-4708-A7D9-4733CFC997C3} has sent all parameters 
+Job {4A181A90-37FE-435F-A32E-3B19F84E8677} is ready to execute on IP 52.142.9.219
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/SocketClient.cpp
+               |Function = ConnectToNetworkSocket
+               |Line Number = 94
+               |Message = connect() failed with errno = 111
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/TlsClient.cpp
+               |Function = TlsConnectToNetworkSocket
+               |Line Number = 79
+Failed to connect to remote 52.142.9.219
+Looking for safe object 473001DB64AF456E971296418B6194FE
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {4A181A90-37FE-435F-A32E-3B19F84E8677} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Timed out waiting for condition variable 
+[I 08:51:51.255 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb

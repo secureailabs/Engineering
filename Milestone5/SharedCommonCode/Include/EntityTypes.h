@@ -119,3 +119,11 @@ enum class AzureTemplateState
     eFailedCreatingImage = 10,
     eInternalError = 11
 };
+
+__stdcall DigitalContractProvisiongStatus ProvisioningStatusFromFloat(
+    float64_t fValue
+    );
+
+__stdcall std::string ProvisionStatusToString(
+    _in DigitalContractProvisiongStatus eProvisionStatus
+    );

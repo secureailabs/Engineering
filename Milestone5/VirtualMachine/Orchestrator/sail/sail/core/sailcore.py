@@ -33,6 +33,27 @@ def get_tables():
 def provision_digital_contract(digital_contract_guid, dataset_guid):
     return SAILPyAPI.provision_digital_contract(digital_contract_guid, dataset_guid)
 
+def run_job(safe_object_guid):
+    return SAILPyAPI.run_job(safe_object_guid)
+
+def wait_for_all_digital_contracts_to_be_provisioned(timeout):
+    return SAILPyAPI.wait_for_all_digital_contracts_to_be_provisioned(timeout)
+
+def set_parameter(job_guid, parameter_guid, str_value):
+    return SAILPyAPI.set_parameter(job_guid, parameter_guid, str_value)
+
+def push_user_data(user_data):
+    return SAILPyAPI.push_user_data(pickle.dumps(user_data))
+
+def get_job_status(job_guid):
+    return SAILPyAPI.get_job_status(job_guid)
+
+def pull_data(output_id):
+    return SAILPyAPI.pull_data(output_id)
+
+def wait_for_data(timeout_in_milliseconds):
+    return SAILPyAPI.wait_for_data(timeout_in_milliseconds)
+
 def newguid():
     return SAILPyAPI.createguid()
 

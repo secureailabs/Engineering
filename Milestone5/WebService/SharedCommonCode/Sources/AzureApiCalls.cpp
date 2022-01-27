@@ -839,7 +839,7 @@ StructuredBuffer CopyVirtualMachineImage(
 
         // Create a SAS token
         std::string strContainerName = "images";
-        std::string strExpiry = "2022-01-01";
+        std::string strExpiry = "2025-01-01";
         std::string strCommandToGetSAS = "/usr/bin/az storage container generate-sas -n " + strContainerName + " --account-name "+ strStorageAccountName +" --account-key "+ strBase64EncodedKey +" --https-only --permissions dlrw --expiry "+ strExpiry +" -o tsv";
         std::string strSASToken = ::ExecuteBashCommandAndGetResult(strCommandToGetSAS.c_str());
         _ThrowBaseExceptionIf((0 == strSASToken.length()), "Could not create SAS token.", nullptr);

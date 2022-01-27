@@ -22,6 +22,7 @@
 #include "TlsTransactionHelperFunctions.h"
 #include "Base64Encoder.h"
 #include "InitializationVector.h"
+#include "JsonParser.h"
 
 #include <algorithm>
 #include <thread>
@@ -31,6 +32,9 @@
 static DigitalContractDatabase * gs_oDigitalContractDatabase = nullptr;
 
 static SmartMemoryAllocator gs_oMemoryAllocator;
+
+static const std::string gsc_strTarPackageFile = "package.tar.gz";
+static const std::string gsc_strInitializationVectorFile = "InitializationVector.json";
 
 /********************************************************************************************
  *
@@ -2070,7 +2074,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDcAuditEvent(
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -2487,23 +2491,46 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             poIpcAzureManager->Release();
             poIpcAzureManager = nullptr;
 
+            // Read the Secure computation node package if not done already
+            static std::vector<Byte> s_stlSecureComputationNodePackage;
+            if (0 == s_stlSecureComputationNodePackage.size())
+            {
+                std::string strSecureComputationNodePackagePath = ::GetInitializationValue("SecureComputationNodePackageUrl");
+                _ThrowBaseExceptionIf((0 == strSecureComputationNodePackagePath.length()), "Secure computation node package not found", nullptr);
+
+                std::string strVerb = "GET";
+                std::string strContent = "";
+                std::string strApiUri = strSecureComputationNodePackagePath;
+                std::string strHost = ::GetInitializationValue("SecureComputationNodePackageHost");
+
+                std::vector<std::string> stlHeader;
+                stlHeader.push_back("Host: " + strHost);
+                stlHeader.push_back("Content-Length: " + std::to_string(strContent.length()));
+                long nResponseCode = 0;
+                s_stlSecureComputationNodePackage = ::RestApiCall(strHost, 443, strVerb, strApiUri, "", false, stlHeader, &nResponseCode);
+                _ThrowBaseExceptionIf((200 != nResponseCode), "Failed to get Binaries package. Response code: %d", nResponseCode);
+                _ThrowBaseExceptionIf((0 >= s_stlSecureComputationNodePackage.size()), "Invalid Package received.", nullptr);
+            }
+
+            // Create an empty initialization vector for now
+            StructuredBuffer oInitializationVector;
+            std::string strInitializationVector = ::ConvertStructuredBufferToJson(oInitializationVector);
+
+            // Send the installation package to the Virtual Machine
+            StructuredBuffer oStructuredBuffer;
+            oStructuredBuffer.PutBuffer(gsc_strTarPackageFile.c_str(), s_stlSecureComputationNodePackage);
+            oStructuredBuffer.PutString(gsc_strInitializationVectorFile.c_str(), strInitializationVector);
+
             // The installation package would be sent only to the Virutal Machines
             // that have been created with this process
-            TlsNode * poTlsNode = ::TlsConnectToNetworkSocketWithTimeout(strIpAddress.c_str(), 9090, 10*60*1000, 30*1000);
+            std::unique_ptr<TlsNode> poTlsNode(::TlsConnectToNetworkSocketWithTimeout(strIpAddress.c_str(), 9090, 10*60*1000, 30*1000));
             _ThrowIfNull(poTlsNode, "Failed to connect to the Virtual Machine", nullptr);
 
-            StructuredBuffer oBinaryPackageInstructions;
-            oBinaryPackageInstructions.PutString("Verb", "GET");
-            oBinaryPackageInstructions.PutString("Content", "");
-            oBinaryPackageInstructions.PutString("Uri", ::GetInitializationValue("SecureComputationNodePackageUrl"));
-            oBinaryPackageInstructions.PutString("Host", ::GetInitializationValue("SecureComputationNodePackageHost"));
-
-            // Send the url for the binary package and wait for a response on successful installation
-            std::vector<Byte> stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode, oBinaryPackageInstructions, 0);
+            // Send the package and initialization vector data to the Virtual Machine
+            std::vector<Byte> stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode.get(), oStructuredBuffer, 0);
             _ThrowBaseExceptionIf((0 >= stlSendPackageResponse.size()), "Invalid reponse to send package instructions.", nullptr);
             StructuredBuffer oSendPackageResponse(stlSendPackageResponse);
             _ThrowBaseExceptionIf(("Success" != oSendPackageResponse.GetString("Status")), "Sending package failed", nullptr);
-            poTlsNode = nullptr;
 
             oUpdateVmStateRequest.PutDword("TransactionType", 0x00000002);
             oUpdateVmStateRequest.PutBuffer("Eosb", c_stlEosb);
@@ -2533,10 +2560,10 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
 
             // The installation package would be sent only to the Virutal Machines
             // that have been created with this process
-            poTlsNode = ::TlsConnectToNetworkSocketWithTimeout(strIpAddress.c_str(), 6800, 10*60*1000, 30*1000);
+            poTlsNode.reset(::TlsConnectToNetworkSocketWithTimeout(strIpAddress.c_str(), 6800, 10*60*1000, 30*1000));
             _ThrowIfNull(poTlsNode, "Failed to connect to the Virtual Machine to send initialization data", nullptr);
             // Send the url for the binary package and wait for a response on successful installation
-            stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode, oInitializationParameters, 0);
+            stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode.get(), oInitializationParameters, 0);
             _ThrowBaseExceptionIf((0 >= stlSendPackageResponse.size()), "Invalid reponse to send init parameters.", nullptr);
             oSendPackageResponse = StructuredBuffer(stlSendPackageResponse);
             _ThrowBaseExceptionIf(("Success" != oSendPackageResponse.GetString("Status")), "Sending package failed", nullptr);
@@ -2555,13 +2582,13 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             fIsProvisioningSuccess = true;
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         strErrorMessage = c_oBaseException.GetExceptionMessage();
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

@@ -259,37 +259,6 @@ bool __stdcall PutTlsTransaction(
     return ::PutTlsTransaction(poTlsNode, c_oTransaction.GetSerializedBuffer());
 }
 
-/********************************************************************************************/
-
-/********************************************************************************************
- *
- * @function PutHttpResponse
- * @brief Temporary Function used to send a HTTP type Tls data packet over network
- * @param[in] poTlsNode Pointer to the TlsNode object connected to remote node
- * @param[in] stlPayload JSON type data to send
- * @return true on success, otherwise false
- *
- ********************************************************************************************/
-
-bool __stdcall PutHttpResponse(
-    TlsNode * poTlsNode,
-    const std::string & stlPayload
-    )
-{
-    __DebugFunction();
-    __DebugAssert(nullptr != poTlsNode);
-
-    std::string strResponseHeader = "HTTP/1.1 200 OK \r\nContent-Length: " + std::to_string(stlPayload.length()) + "\r\nConnection: close\r\nContent-Type: application/json\r\n\r\n";
-    std::string strResponseData(strResponseHeader);
-    strResponseData += stlPayload;
-    std::cout << "\n\nRest Response:\n\n" << strResponseData << std::endl;
-
-    // Send back response data
-    poTlsNode->Write((const Byte *) strResponseData.data(), strResponseData.size());
-
-    return true;
-}
-
 /********************************************************************************************
  *
  * @function PutHttpHeadOnlyResponse

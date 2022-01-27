@@ -540,21 +540,6 @@ void __thiscall DigitalContractDatabase::InitializePlugin(
 
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DigitalContractManager/Provision", oDcProvision, 1);
 
-    StructuredBuffer oInitializeVm;
-    oInitializeVm.PutStructuredBuffer("Eosb", oEosb);
-
-    StructuredBuffer oDatasetGuid;
-    oDatasetGuid.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
-    oDatasetGuid.PutBoolean("IsRequired", true);
-    oInitializeVm.PutStructuredBuffer("DatasetGuid", oDatasetGuid);
-
-    StructuredBuffer oVirtualMachineIp;
-    oVirtualMachineIp.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
-    oVirtualMachineIp.PutBoolean("IsRequired", true);
-    oInitializeVm.PutStructuredBuffer("VirtualMachineIp", oVirtualMachineIp);
-
-    m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DigitalContractManager/InitializeVm", oInitializeVm, 1);
-
     // Start the Ipc server
     // Start listening for Ipc connections
     ThreadManager * poThreadManager = ThreadManager::GetInstance();
@@ -701,10 +686,6 @@ uint64_t __thiscall DigitalContractDatabase::SubmitRequest(
         else if ("/SAIL/DigitalContractManager/Provision" == strResource)
         {
             stlResponseBuffer = this->ProvisionDigitalContract(c_oRequestStructuredBuffer);
-        }
-        else if ("/SAIL/DigitalContractManager/InitializeVm" == strResource)
-        {
-            stlResponseBuffer = this->InitializeVirtualMachine(c_oRequestStructuredBuffer);
         }
         else if ("/SAIL/DigitalContractManager/Deprovision" == strResource)
         {
@@ -2512,8 +2493,21 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
                 _ThrowBaseExceptionIf((0 >= s_stlSecureComputationNodePackage.size()), "Invalid Package received.", nullptr);
             }
 
-            // Create an empty initialization vector for now
+            // Send the Virtual Machine Initialization data
             StructuredBuffer oInitializationVector;
+            oInitializationVector.PutString("NameOfVirtualMachine", "Some nice name of Virtual machine");
+            oInitializationVector.PutString("IpAddressOfVirtualMachine", strIpAddress);
+            oInitializationVector.PutString("VirtualMachineIdentifier", c_szVirtualMachineIdentifier);
+            oInitializationVector.PutString("ClusterIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
+            oInitializationVector.PutString("DigitalContractIdentifier", c_oDigitalContract.GetString("DigitalContractGuid"));
+            oInitializationVector.PutString("RootOfTrustDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
+            oInitializationVector.PutString("ComputationalDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
+            oInitializationVector.PutString("DataConnectorDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
+            oInitializationVector.PutString("DatasetIdentifier", c_oDigitalContract.GetString("DatasetGuid"));
+            auto stlVmEosb = oVmRegisterResponse.GetBuffer("VmEosb");
+            oInitializationVector.PutString("VmEosb", ::Base64Encode(stlVmEosb.data(), stlVmEosb.size()));
+
+            // Convert the StructuredBuffer to Json string
             std::string strInitializationVector = ::ConvertStructuredBufferToJson(oInitializationVector);
 
             // Send the installation package to the Virtual Machine
@@ -2530,42 +2524,6 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             std::vector<Byte> stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode.get(), oStructuredBuffer, 0);
             _ThrowBaseExceptionIf((0 >= stlSendPackageResponse.size()), "Invalid reponse to send package instructions.", nullptr);
             StructuredBuffer oSendPackageResponse(stlSendPackageResponse);
-            _ThrowBaseExceptionIf(("Success" != oSendPackageResponse.GetString("Status")), "Sending package failed", nullptr);
-
-            oUpdateVmStateRequest.PutDword("TransactionType", 0x00000002);
-            oUpdateVmStateRequest.PutBuffer("Eosb", c_stlEosb);
-            oUpdateVmStateRequest.PutString("VirtualMachineGuid", c_szVirtualMachineIdentifier);
-            oUpdateVmStateRequest.PutDword("State", VirtualMachineState::eInitializing);
-            poIpcAzureManager = ::ConnectToUnixDomainSocket("/tmp/{4FBC17DA-81AF-449B-B842-E030E337720E}");
-            oUpdateVmStateResponse = StructuredBuffer(::PutIpcTransactionAndGetResponse(poIpcAzureManager, oUpdateVmStateRequest, false));
-            poIpcAzureManager->Release();
-            poIpcAzureManager = nullptr;
-
-            // Send the Virtual Machine Initialization data
-            // Send the initialization data except for the dataset
-            // First we need to build out the huge StructuredBuffer with all of the initialization parameters
-            bool fSuccess = false;
-            StructuredBuffer oInitializationParameters;
-            oInitializationParameters.PutString("NameOfVirtualMachine", "Some nice name of Virtual machine");
-            oInitializationParameters.PutString("IpAddressOfVirtualMachine", strIpAddress);
-            oInitializationParameters.PutString("VirtualMachineIdentifier", c_szVirtualMachineIdentifier);
-            oInitializationParameters.PutString("ClusterIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-            oInitializationParameters.PutString("DigitalContractIdentifier", c_oDigitalContract.GetString("DigitalContractGuid"));
-            oInitializationParameters.PutString("RootOfTrustDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-            oInitializationParameters.PutString("ComputationalDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-            oInitializationParameters.PutString("DataConnectorDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-            oInitializationParameters.PutString("DatasetIdentifier", c_oDigitalContract.GetString("DatasetGuid"));
-            auto stlVmEosb = oVmRegisterResponse.GetBuffer("VmEosb");
-            oInitializationParameters.PutString("VmEosb", ::Base64Encode(stlVmEosb.data(), stlVmEosb.size()));
-
-            // The installation package would be sent only to the Virutal Machines
-            // that have been created with this process
-            poTlsNode.reset(::TlsConnectToNetworkSocketWithTimeout(strIpAddress.c_str(), 6800, 10*60*1000, 30*1000));
-            _ThrowIfNull(poTlsNode, "Failed to connect to the Virtual Machine to send initialization data", nullptr);
-            // Send the url for the binary package and wait for a response on successful installation
-            stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode.get(), oInitializationParameters, 0);
-            _ThrowBaseExceptionIf((0 >= stlSendPackageResponse.size()), "Invalid reponse to send init parameters.", nullptr);
-            oSendPackageResponse = StructuredBuffer(stlSendPackageResponse);
             _ThrowBaseExceptionIf(("Success" != oSendPackageResponse.GetString("Status")), "Sending package failed", nullptr);
 
             // Update status to waiting_for_data. This call wil also update the remote data connector
@@ -2990,78 +2948,4 @@ void __thiscall DigitalContractDatabase::DeleteVirtualMachineResources(
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
-}
-
-/********************************************************************************************
- *
- * @class DigitalContractDatabase
- * @function ProvisionDigitalContract
- * @brief Create a Virutal Machine for the Digital Contract activation
- * @param[in] c_oRequest contains user Eosb for the researcher organization
- * @throw BaseException Error StructuredBuffer element not found
- * @returns status of the transaction and instructions of what happens next
- *
- ********************************************************************************************/
-
-std::vector<Byte> __thiscall DigitalContractDatabase::InitializeVirtualMachine(
-    _in const StructuredBuffer & c_oRequest
-)
-{
-    __DebugFunction();
-
-    StructuredBuffer oResponse;
-    Dword dwStatus = 400;
-
-    std::cout << "It is here" << std::endl;
-    std::vector<Byte> stlEosb = c_oRequest.GetBuffer("Eosb");
-    std::string strDatasetGuid = c_oRequest.GetString("DatasetGuid");
-    std::string strVirtualMachineIpAddress = c_oRequest.GetString("VirtualMachineIp");
-
-    bool fIsProvisioningSuccess = false;
-    std::string strErrorMessage = "";
-    try
-    {
-        // Send the Virtual Machine Initialization data
-        // Send the initialization data except for the dataset
-        // First we need to build out the huge StructuredBuffer with all of the initialization parameters
-        bool fSuccess = false;
-        StructuredBuffer oInitializationParameters;
-        oInitializationParameters.PutString("NameOfVirtualMachine", "Some nice name of Virtual machine");
-        oInitializationParameters.PutString("IpAddressOfVirtualMachine", strVirtualMachineIpAddress);
-        oInitializationParameters.PutString("VirtualMachineIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-        oInitializationParameters.PutString("ClusterIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-        oInitializationParameters.PutString("DigitalContractIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-        oInitializationParameters.PutString("RootOfTrustDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-        oInitializationParameters.PutString("ComputationalDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-        oInitializationParameters.PutString("DataConnectorDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-        oInitializationParameters.PutString("DatasetIdentifier", strDatasetGuid);
-        oInitializationParameters.PutString("VmEosb", ::Base64Encode(stlEosb.data(), stlEosb.size()));
-
-        // The installation package would be sent only to the Virutal Machines
-        // that have been created with this process
-        auto poTlsNode = ::TlsConnectToNetworkSocketWithTimeout(strVirtualMachineIpAddress.c_str(), 6800, 10*60*1000, 30*1000);
-        _ThrowIfNull(poTlsNode, "Failed to connect to the Virtual Machine to send initialization data", nullptr);
-        // Send the url for the binary package and wait for a response on successful installation
-        auto stlSendPackageResponse = ::PutTlsTransactionAndGetResponse(poTlsNode, oInitializationParameters, 0);
-        _ThrowBaseExceptionIf((0 >= stlSendPackageResponse.size()), "Invalid reponse to send init parameters.", nullptr);
-        auto oSendPackageResponse = StructuredBuffer(stlSendPackageResponse);
-        _ThrowBaseExceptionIf(("Success" != oSendPackageResponse.GetString("Status")), "Sending package failed", nullptr);
-
-        dwStatus = 200;
-    }
-    
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-    
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-
-    // Send back status of the transaction
-    oResponse.PutDword("Status", dwStatus);
-
-    return oResponse.GetSerializedBuffer();
 }

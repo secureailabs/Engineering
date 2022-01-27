@@ -19,11 +19,14 @@
 #include "TlsServer.h"
 #include "StructuredBuffer.h"
 #include "JsonValue.h"
+#include "InitializationVector.h"
+
 #include <iostream>
 #include <string>
 #include <thread>
 #include <chrono>
 #include <fstream>
+#include <memory>
 
 /********************************************************************************************/
 
@@ -33,45 +36,21 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
 
     StructuredBuffer oAllInitializationParameters;
 
-    TlsServer oTlsServer(6800);
-    while (false == oTlsServer.WaitForConnection(1000))
-    {
-        // Put the thread into efficient sleep to give a chance for the other process
-        // to connect. This reduces thread contention.
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-
-    // The first connection are the initialization parameters sent from the
-    // SAIL backend which include the digital contract and VM information
-    TlsNode * poTlsNode = oTlsServer.Accept();
-    _ThrowBaseExceptionIf((nullptr == poTlsNode), "Unexpected nullptr returned from TlsServer.Accept()", nullptr);
-
-    auto stlInitializationParameters = ::GetTlsTransaction(poTlsNode, 60*10*1000);
-    _ThrowBaseExceptionIf((0 == stlInitializationParameters.size()), "Unexpected empty initialization parameters", nullptr);
-
-    StructuredBuffer oBackendInitializationParameters(stlInitializationParameters);
-    oAllInitializationParameters.PutString("NameOfVirtualMachine", oBackendInitializationParameters.GetString("NameOfVirtualMachine"));
-    oAllInitializationParameters.PutString("IpAddressOfVirtualMachine", oBackendInitializationParameters.GetString("IpAddressOfVirtualMachine"));
-    oAllInitializationParameters.PutString("VirtualMachineIdentifier", oBackendInitializationParameters.GetString("VirtualMachineIdentifier"));
-    oAllInitializationParameters.PutString("ClusterIdentifier", oBackendInitializationParameters.GetString("ClusterIdentifier"));
-    oAllInitializationParameters.PutString("DigitalContractIdentifier", oBackendInitializationParameters.GetString("DigitalContractIdentifier"));
-    oAllInitializationParameters.PutString("DatasetIdentifier", oBackendInitializationParameters.GetString("DatasetIdentifier"));
-    oAllInitializationParameters.PutString("RootOfTrustDomainIdentifier", oBackendInitializationParameters.GetString("RootOfTrustDomainIdentifier"));
-    oAllInitializationParameters.PutString("ComputationalDomainIdentifier", oBackendInitializationParameters.GetString("ComputationalDomainIdentifier"));
-    oAllInitializationParameters.PutString("DataConnectorDomainIdentifier", oBackendInitializationParameters.GetString("DataConnectorDomainIdentifier"));
-    oAllInitializationParameters.PutString("VmEosb", oBackendInitializationParameters.GetString("VmEosb"));
-
-    StructuredBuffer oStructuredBufferResponse;
-    oStructuredBufferResponse.PutString("Status", "Success");
-    ::PutTlsTransaction(poTlsNode, oStructuredBufferResponse);
-    if (nullptr != poTlsNode)
-    {
-        poTlsNode->Release();
-        poTlsNode = nullptr;
-    }
+    // Read the initialization parameters from the InitializationVector.json file
+    oAllInitializationParameters.PutString("NameOfVirtualMachine", ::GetInitializationValue("NameOfVirtualMachine"));
+    oAllInitializationParameters.PutString("IpAddressOfVirtualMachine", ::GetInitializationValue("IpAddressOfVirtualMachine"));
+    oAllInitializationParameters.PutString("VirtualMachineIdentifier", ::GetInitializationValue("VirtualMachineIdentifier"));
+    oAllInitializationParameters.PutString("ClusterIdentifier", ::GetInitializationValue("ClusterIdentifier"));
+    oAllInitializationParameters.PutString("DigitalContractIdentifier", ::GetInitializationValue("DigitalContractIdentifier"));
+    oAllInitializationParameters.PutString("DatasetIdentifier", ::GetInitializationValue("DatasetIdentifier"));
+    oAllInitializationParameters.PutString("RootOfTrustDomainIdentifier", ::GetInitializationValue("RootOfTrustDomainIdentifier"));
+    oAllInitializationParameters.PutString("ComputationalDomainIdentifier", ::GetInitializationValue("ComputationalDomainIdentifier"));
+    oAllInitializationParameters.PutString("DataConnectorDomainIdentifier", ::GetInitializationValue("DataConnectorDomainIdentifier"));
+    oAllInitializationParameters.PutString("VmEosb", ::GetInitializationValue("VmEosb"));
 
     // Next step is to wait for the dataset from the Remote data connector, the process will wait for the dataset
     // and dataOwner information
+    TlsServer oTlsServer(6800);
     while (false == oTlsServer.WaitForConnection(1000))
     {
         // Put the thread into efficient sleep to give a chance for the other process
@@ -81,10 +60,10 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
 
     // The second connection are the initialization parameters sent from the
     // Remote data connector which has information about the dataowner and the dataset
-    poTlsNode = oTlsServer.Accept();
+    std::unique_ptr<TlsNode> poTlsNode(oTlsServer.Accept());
     _ThrowBaseExceptionIf((nullptr == poTlsNode), "Unexpected nullptr returned from TlsServer.Accept()", nullptr);
 
-    auto stlDatasetParameters = ::GetTlsTransaction(poTlsNode, 60*60*1000);
+    auto stlDatasetParameters = ::GetTlsTransaction(poTlsNode.get(), 60*60*1000);
     _ThrowBaseExceptionIf((0 == stlDatasetParameters.size()), "Unexpected empty dataset parameters", nullptr);
 
     StructuredBuffer oRemoteDatasetParameters(stlDatasetParameters);
@@ -94,12 +73,9 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     oAllInitializationParameters.PutString("Base64EncodedDataset", ::UnEscapeJsonString(oRemoteDatasetParameters.GetString("Base64EncodedDataset").c_str()));
     oAllInitializationParameters.PutString("DataOwnerOrganizationIdentifier", oRemoteDatasetParameters.GetString("DataOwnerOrganizationIdentifier"));
 
-    ::PutTlsTransaction(poTlsNode, oStructuredBufferResponse);
-    if (nullptr != poTlsNode)
-    {
-        poTlsNode->Release();
-        poTlsNode = nullptr;
-    }
+    StructuredBuffer oStructuredBufferResponse;
+    oStructuredBufferResponse.PutString("Status", "Success");
+    ::PutTlsTransaction(poTlsNode.get(), oStructuredBufferResponse);
 
     return oAllInitializationParameters.GetSerializedBuffer();
 }

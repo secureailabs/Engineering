@@ -10,6 +10,7 @@
 
 #include "DatabaseTools.h"
 #include "Base64Encoder.h"
+#include "ExceptionRegister.h"
 #include "InitializationVector.h"
 
 /********************************************************************************************/
@@ -115,10 +116,10 @@ void __thiscall DatabaseTools::InitializeMembers(void)
                                     "In the event that the Parties desire to change, add, or otherwise modify any terms, they shall do so in writing to be signed by both parties.";
     std::string strDescription = "The dataset will be used to train models for academic research purposes.";
     m_stlDigitalContracts.push_back(DigitalContractInformation{"Kidney Cancer Research Consortium", 10, strLegalAgreement, 16186603, strDescription, "Researcher", 2, 8, "East US"});
-    m_stlDigitalContracts.push_back(DigitalContractInformation{"Diabetes Re-admission Model Phase 1", 28, strLegalAgreement, 24117352, strDescription, "Data Owner", 4, 8, "East US"});
-    m_stlDigitalContracts.push_back(DigitalContractInformation{"Churn Prediction Project", 35, strLegalAgreement, 60768913, strDescription, "Researcher", 5, 8, "West Europe"});
-    m_stlDigitalContracts.push_back(DigitalContractInformation{"Harvest Model", 90, strLegalAgreement, 8090084, strDescription, "SAIL", 2, 8, "West Europe"});
-    m_stlDigitalContracts.push_back(DigitalContractInformation{"Obesity Model", 120, strLegalAgreement, 18605667, strDescription, "SAIL", 1, 8, "East US 2"});
+    //m_stlDigitalContracts.push_back(DigitalContractInformation{"Diabetes Re-admission Model Phase 1", 28, strLegalAgreement, 24117352, strDescription, "Data Owner", 4, 8, "East US"});
+    //m_stlDigitalContracts.push_back(DigitalContractInformation{"Churn Prediction Project", 35, strLegalAgreement, 60768913, strDescription, "Researcher", 5, 8, "West Europe"});
+    //m_stlDigitalContracts.push_back(DigitalContractInformation{"Harvest Model", 90, strLegalAgreement, 8090084, strDescription, "SAIL", 2, 8, "West Europe"});
+    //m_stlDigitalContracts.push_back(DigitalContractInformation{"Obesity Model", 120, strLegalAgreement, 18605667, strDescription, "SAIL", 1, 8, "East US 2"});
 }
 
 /********************************************************************************************/

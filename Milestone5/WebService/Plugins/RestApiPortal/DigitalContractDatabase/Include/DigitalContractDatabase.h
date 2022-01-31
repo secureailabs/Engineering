@@ -134,9 +134,9 @@ class DigitalContractDatabase : public Object
             );
         void __thiscall DeleteVirtualMachineResources(
             _in const std::vector<Byte> c_stlEosb,
-            _in const StructuredBuffer c_oTemplate,
             _in const std::string c_strVirtualMachineName
             )  const throw();
+
         std::vector<Byte> __thiscall DeprovisionDigitalContract(
             _in const StructuredBuffer & c_oRequest
             );
@@ -145,14 +145,8 @@ class DigitalContractDatabase : public Object
         void __thiscall ProvisionVirtualMachine(
             _in const StructuredBuffer c_oDigitalContract,
             _in const std::vector<Byte> c_stlEosb,
-            _in const std::string c_szApplicationIdentifier,
-            _in const std::string c_szSecret,
-            _in const std::string c_szTenantIdentifier,
-            _in const std::string c_szSubscriptionIdentifier,
-            _in const std::string c_szResourceGroup,
-            _in const std::string c_szVirtualMachineIdentifier,
-            _in const std::string c_szVirtualMachineSpecification,
-            _in const std::string c_szLocation
+            _in const Guid c_oNewVirtualMachineGuid,
+            _in const std::string c_strVirtualMachineSize
             );
 
         // Update the Provisioning Status of Digital Contract to

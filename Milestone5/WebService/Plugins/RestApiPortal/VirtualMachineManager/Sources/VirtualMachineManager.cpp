@@ -998,6 +998,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetVmInformation(
         StructuredBuffer oUserInfo(this->GetUserInfo(c_oRequest));
         if (200 == oUserInfo.GetDword("Status"))
         {
+            std::cout << "Querying for VM " << c_oRequest.GetString("VirtualMachineGuid") << std::endl;
             // Make a Tls connection with the database portal
             poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
             // Create a request to get the virtual machine information

@@ -164,6 +164,10 @@ class Orchestrator : public Object{
             _in const Guid& oParameterGuid
             );
 
+        VirtualMachineState __thiscall GetSecureComputationNodeInformation(
+            _in const Guid& oSecureNodeGuid
+            );
+
         EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};

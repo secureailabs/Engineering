@@ -23,8 +23,10 @@ void RunThreadedInserts(void)
     mongocxx::pool oPool{mongocxx::uri{::GetInitializationValue("MongoDbUrl").c_str()}};
     std::vector<std::thread> threads{};
 
-    for (auto i : {0, 1, 2, 3, 4, 5}) {
-        auto run = [&](std::int64_t j) {
+    for (auto i : {0, 1, 2, 3, 4, 5})
+    {
+        auto run = [&](std::int64_t j)
+        {
             // Each client and collection can only be used in a single thread.
             auto client = oPool.acquire();
             auto coll = (*client)["TestThreading"]["TestCase"];
@@ -38,7 +40,8 @@ void RunThreadedInserts(void)
         threads.push_back(std::move(runner));
     }
 
-    for (auto&& runner : threads) {
+    for (auto &&runner : threads)
+    {
         runner.join();
     }
 }
@@ -99,17 +102,17 @@ void __thiscall DatabaseTools::InitializeMembers(void)
     // Initialize to the number of other users that will be added for each organization
     m_unNumberOfOtherUsers = 2;
     // Add datasets information
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","Chronic Kidney Disease dataset","Data has 25 features which may predict a patient with chronic kidney disease","Health conditions",GetEpochTimeInSeconds(),1,"N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","Raman spectroscopy of Diabetes","Raman Spectroscopy to Screen Diabetes Mellitus with Machine Learning Tools","computer science,health,classification,diabetes,healthcare,nutrition,medicine",GetEpochTimeInSeconds(),1,"N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","Telco Customer Churn","Focused customer retention programs","business",GetEpochTimeInSeconds(),1,"N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","Harvest","A toolkit for extracting posts and post metadata from web forums","computer science,software,programming",GetEpochTimeInSeconds(),1,"N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","Obesity among adults by country, 1975-2016","Prevalence of obesity among adults","N/A",GetEpochTimeInSeconds(),1,"N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","KCA Breast Cancer Dataset - I","Predict whether the cancer is benign or malignant","breast cancer,cancer,healthcare,benign,malignant",GetEpochTimeInSeconds(),1,"N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","KCA Breast Cancer Dataset - II","Predict whether the cancer is benign or malignant","breast cancer,cancer,healthcare,benign,malignant",GetEpochTimeInSeconds(),1,"N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces),"0x00000001","KCA Breast Cancer Dataset - III","Predict whether the cancer is benign or malignant","breast cancer,cancer,healthcare,benign,malignant",GetEpochTimeInSeconds(),1,"N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Chronic Kidney Disease dataset", "Data has 25 features which may predict a patient with chronic kidney disease", "Health conditions", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Raman spectroscopy of Diabetes", "Raman Spectroscopy to Screen Diabetes Mellitus with Machine Learning Tools", "computer science,health,classification,diabetes,healthcare,nutrition,medicine", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Telco Customer Churn", "Focused customer retention programs", "business", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Harvest", "A toolkit for extracting posts and post metadata from web forums", "computer science,software,programming", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Obesity among adults by country, 1975-2016", "Prevalence of obesity among adults", "N/A", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "KCA Breast Cancer Dataset - I", "Predict whether the cancer is benign or malignant", "breast cancer,cancer,healthcare,benign,malignant", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "KCA Breast Cancer Dataset - II", "Predict whether the cancer is benign or malignant", "breast cancer,cancer,healthcare,benign,malignant", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "KCA Breast Cancer Dataset - III", "Predict whether the cancer is benign or malignant", "breast cancer,cancer,healthcare,benign,malignant", GetEpochTimeInSeconds(), 1, "N/A"));
     // Add digital contracts information
     std::string strLegalAgreement = "The Parties acknowledge and agree that this Agreement represents the entire agreement between the Parties. "
-    "In the event that the Parties desire to change, add, or otherwise modify any terms, they shall do so in writing to be signed by both parties.";
+                                    "In the event that the Parties desire to change, add, or otherwise modify any terms, they shall do so in writing to be signed by both parties.";
     std::string strDescription = "The dataset will be used to train models for academic research purposes.";
     m_stlDigitalContracts.push_back(DigitalContractInformation{"Kidney Cancer Research Consortium", 10, strLegalAgreement, 16186603, strDescription, "Researcher", 2, 8, "East US"});
     m_stlDigitalContracts.push_back(DigitalContractInformation{"Diabetes Re-admission Model Phase 1", 28, strLegalAgreement, 24117352, strDescription, "Data Owner", 4, 8, "East US"});
@@ -269,7 +272,7 @@ void __thiscall DatabaseTools::AcceptDigitalContracts(void)
     __DebugFunction();
 
     // Login to the web services as the data owner's dataset admin
-    // As the Rest API requires dataset admin privileges 
+    // As the Rest API requires dataset admin privileges
     unsigned int unDatasetAdminIndex = 1;
     std::string strEncodedEosb = Login(m_stlAdmins.at(unDatasetAdminIndex).m_strEmail, m_strPassword);
     _ThrowBaseExceptionIf((0 == strEncodedEosb.size()), "Exiting!", nullptr);
@@ -315,7 +318,7 @@ void __thiscall DatabaseTools::ActivateDigitalContracts(void)
     __DebugFunction();
 
     // Login to the web services as the researcher's digital contract admin
-    // As the Rest API requires digital contract admin privileges 
+    // As the Rest API requires digital contract admin privileges
     unsigned int unDcAdminIndex = 0;
     std::string strEncodedEosb = Login(m_stlAdmins.at(unDcAdminIndex).m_strEmail, m_strPassword);
     _ThrowBaseExceptionIf((0 == strEncodedEosb.size()), "Exiting!", nullptr);
@@ -371,13 +374,13 @@ void __thiscall DatabaseTools::AddDatasetFamilies(void)
 {
     __DebugFunction();
 
-    std::string strEncodedEosb = Login(m_stlUsers.at(0).m_strEmail, m_strPassword);
+    std::string strEncodedEosb = Login(m_stlUsers.at(4).m_strEmail, m_strPassword);
     _ThrowBaseExceptionIf(0 == strEncodedEosb.size(), "Failed to login, exiting!", nullptr);
 
     StructuredBuffer oFamilyInformation;
-    oFamilyInformation.PutString("DatasetFamilyTitle","Database Tools Dataset Family");
+    oFamilyInformation.PutString("DatasetFamilyTitle", "Database Tools Dataset Family");
     oFamilyInformation.PutString("DatasetFamilyDescription", "This is a test dataset family generated from the database tools");
-    oFamilyInformation.PutString("DatasetFamilyTags","DBTools, CMDLINE, TDD");
+    oFamilyInformation.PutString("DatasetFamilyTags", "DBTools, CMDLINE, TDD");
     oFamilyInformation.PutString("VersionNumber", "0x00000001");
     oFamilyInformation.PutString("Eosb", strEncodedEosb);
 
@@ -438,7 +441,7 @@ void __thiscall DatabaseTools::RegisterVmAfterDataUpload(
         oEvent.PutString("EncryptedEventData", ::Base64Encode(oEncryptedEventData.GetSerializedBufferRawDataPtr(), oEncryptedEventData.GetSerializedBufferRawDataSizeInBytes()));
         oLeafEvents.PutStructuredBuffer(std::to_string(unIndex).c_str(), oEvent);
     }
-    // Register leaf events for DOO 
+    // Register leaf events for DOO
     ::RegisterLeafEvents(strEncodedEosb, strVmEventGuid, oLeafEvents);
 }
 
@@ -494,7 +497,7 @@ void __thiscall DatabaseTools::RegisterVmForComputation(
         oEvent.PutString("EncryptedEventData", ::Base64Encode(oEncryptedEventData.GetSerializedBufferRawDataPtr(), oEncryptedEventData.GetSerializedBufferRawDataSizeInBytes()));
         oLeafEvents.PutStructuredBuffer(std::to_string(unIndex).c_str(), oEvent);
     }
-    // Register leaf events for DOO 
+    // Register leaf events for DOO
     ::RegisterLeafEvents(strEncodedEosb, strVmEventGuid, oLeafEvents);
 }
 
@@ -508,25 +511,25 @@ void __thiscall DatabaseTools::DeleteDatabase(void)
     try
     {
         bool fSuccess = false;
-        TlsNode * poTlsNode = nullptr;
+        TlsNode *poTlsNode = nullptr;
         poTlsNode = ::TlsConnectToNetworkSocket(g_szServerIpAddress, g_unPortNumber);
         _ThrowIfNull(poTlsNode, "TlsConnectToNetworkSocketWithTimeout failed.", nullptr);
 
         std::string strHttpLoginRequest = "DELETE /SAIL/AuthenticationManager/Admin/ResetDatabase HTTP/1.1\r\n"
-                                        "Accept: */*\r\n"
-                                        "Host: localhost:6200\r\n"
-                                        "Connection: keep-alive\r\n"
-                                        "Content-Length: 0\r\n"
-                                        "\r\n";
+                                          "Accept: */*\r\n"
+                                          "Host: localhost:6200\r\n"
+                                          "Connection: keep-alive\r\n"
+                                          "Content-Length: 0\r\n"
+                                          "\r\n";
 
         // Send request packet
-        poTlsNode->Write((Byte *) strHttpLoginRequest.data(), (strHttpLoginRequest.size()));
+        poTlsNode->Write((Byte *)strHttpLoginRequest.data(), (strHttpLoginRequest.size()));
 
         // Read Header of the Rest response one byte at a time
         bool fIsEndOfHeader = false;
         std::vector<Byte> stlHeaderData;
         while (false == fIsEndOfHeader)
-        {   
+        {
             std::vector<Byte> stlBuffer = poTlsNode->Read(1, 20000);
             // Check whether the read was successful or not
             if (0 < stlBuffer.size())
@@ -540,7 +543,7 @@ void __thiscall DatabaseTools::DeleteDatabase(void)
                     }
                 }
             }
-            else 
+            else
             {
                 fIsEndOfHeader = true;
             }

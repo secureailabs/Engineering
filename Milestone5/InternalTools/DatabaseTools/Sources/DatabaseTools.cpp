@@ -374,7 +374,7 @@ void __thiscall DatabaseTools::AddDatasetFamilies(void)
 {
     __DebugFunction();
 
-    std::string strEncodedEosb = Login(m_stlUsers.at(4).m_strEmail, m_strPassword);
+    std::string strEncodedEosb = Login(m_stlUsers.at(2).m_strEmail, m_strPassword);
     _ThrowBaseExceptionIf(0 == strEncodedEosb.size(), "Failed to login, exiting!", nullptr);
 
     StructuredBuffer oFamilyInformation;

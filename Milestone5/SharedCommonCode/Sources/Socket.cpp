@@ -18,8 +18,31 @@
 #include <sys/epoll.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 
 #include <iostream>
+
+/********************************************************************************************
+ *
+ * @function HandleSignal
+ * @brief Signal handler to handle the SIGPIPE signal
+ * @param[in] nSignal Signal number
+ *
+ ********************************************************************************************/
+void HandleSignal(
+    _in int nSignal
+    )
+{
+    __DebugFunction();
+
+    if (SIGPIPE == nSignal)
+    {
+        std::cout << "\n\n!! SIGPIPE signal received. Ignoring !!\n\n" << std::endl;
+    }
+}
 
 /********************************************************************************************
  *
@@ -53,6 +76,21 @@ Socket::Socket(
 
     // Persist incoming parameters to class data members
     m_nSocketDescriptor = nSocketDescriptor;
+
+    // When the remote side is closed and the socket write fails, the processs throws a SIGPIPE
+    // signal and kills the current process. We want to ignore this signal so that the process does not
+    // die and we can log the error. This will also casue the write to fail instead of the process dying.
+    ::signal(SIGPIPE, &HandleSignal);
+
+    // The default TCP timeout is huge and non-uniform across different environments and
+    // distros, which is not what we want. Setting a timout to a reasonable value
+    // will help us close unresponsive connections soon and will also make the system uniform.
+    // The timeout is set to 1 minute = 60*1000 milliseconds.
+    constexpr int nKeepAliveTimeInMillisecond = 60*1000;
+    if (0 != ::setsockopt(m_nSocketDescriptor, IPPROTO_TCP, TCP_USER_TIMEOUT, &nKeepAliveTimeInMillisecond, sizeof(nKeepAliveTimeInMillisecond)))
+    {
+        _ThrowBaseException("setsockopt() failed with errno = %d", errno);
+    }
 }
 
 /********************************************************************************************

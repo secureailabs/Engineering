@@ -1,16 +1,16 @@
 /*********************************************************************************************
  *
- * @file frontend.cpp
- * @author Jingwei Zhang
+ * @file Orchestrator.cpp
+ * @author David Gascon & Jingwei Zhang
  * @date 15 Jan 2021
  * @License Private and Confidential. Internal Use Only.
- * @copyright Copyright (C) 2021 Secure AI Labs, Inc. All Rights Reserved.
+ * @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
  * @brief Class used for single job related issues
  *
  ********************************************************************************************/
 
-#include "frontend.h"
 #include "JsonParser.h"
+#include "Orchestrator.h"
 #include "StructuredBuffer.h"
 #include "SocketClient.h"
 #include "TlsClient.h"
@@ -104,7 +104,7 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
             strJSON = GetJsonForStructuredBuffer(oBufferWithAllObjects);
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -167,35 +167,35 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
 }
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function Default constructor
  *
  ********************************************************************************************/
-Frontend::Frontend(void)
+Orchestrator::Orchestrator(void)
 {
     __DebugFunction();
 }
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function Destructor
  *
  ********************************************************************************************/
-Frontend::~Frontend(void)
+Orchestrator::~Orchestrator(void)
 {
     __DebugFunction();
 }
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function CacheDigitalContractsFromRemote
  * @brief Call to our remote server to get all our digital contracts, and cached their SBs
  *        in a class member map
  *
  ********************************************************************************************/
-void __thiscall Frontend::CacheDigitalContractsFromRemote(
+void __thiscall Orchestrator::CacheDigitalContractsFromRemote(
     _in const std::string& c_strServerIpAddress,
     _in unsigned long unServerPort
     )
@@ -223,7 +223,7 @@ void __thiscall Frontend::CacheDigitalContractsFromRemote(
             m_stlDigitalContracts.insert({strDcGuid, oDigitalContractRecord});
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -239,13 +239,13 @@ void __thiscall Frontend::CacheDigitalContractsFromRemote(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function CacheDatasetsFromRemote
  * @brief Call to our remote server to get all our datasets, and cached their SBs
  *        in a class member map
  *
  ********************************************************************************************/
-void Frontend::CacheDatasetsFromRemote(
+void Orchestrator::CacheDatasetsFromRemote(
     _in const std::string& c_strServerIpAddress,
     _in unsigned long unServerPort
     )
@@ -301,13 +301,13 @@ void Frontend::CacheDatasetsFromRemote(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetDatasets
  * @brief Lookup in our local cache for the datasets we have and return them as a JSON string
  * @return std::string - Containing a list of our datasets in the form: GUID:Metadata
  *
  ********************************************************************************************/
-std::string __thiscall Frontend::GetDatasets(void) const
+std::string __thiscall Orchestrator::GetDatasets(void) const
 {
     __DebugFunction();
 
@@ -318,13 +318,13 @@ std::string __thiscall Frontend::GetDatasets(void) const
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function Login
  * @brief Log into the remote with the email and password supplied to the port and IP
  * @return unsigned int - status code of the login operation
  *
  ********************************************************************************************/
-unsigned int Frontend::Login(
+unsigned int Orchestrator::Login(
     _in const std::string& c_strEmail,
     _in const std::string& c_strUserPassword,
     _in const int c_wordServerPort,
@@ -381,13 +381,13 @@ unsigned int Frontend::Login(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetDigitalContracts
  * @brief Lookup in our local cache for the digital contracts we have and return them as a JSON string
  * @return std::string - Containing a JSON dictionary of our DCs in the form: GUID:Metadata
  *
  ********************************************************************************************/
-std::string __thiscall Frontend::GetDigitalContracts(void) const
+std::string __thiscall Orchestrator::GetDigitalContracts(void) const
 {
     __DebugFunction();
 
@@ -396,13 +396,13 @@ std::string __thiscall Frontend::GetDigitalContracts(void) const
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetTables
  * @brief Lookup in our local cache for the digital contracts we have and return them as a JSON string
  * @return std::string - Containing a JSON dictionary of our DCs in the form: GUID:Metadata
  *
  ********************************************************************************************/
-std::string __thiscall Frontend::GetTables(void) const
+std::string __thiscall Orchestrator::GetTables(void) const
 {
     __DebugFunction();
 
@@ -411,13 +411,13 @@ std::string __thiscall Frontend::GetTables(void) const
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetCurrentEosb
  * @brief Return the EOSB currently being used
  * @return std::string - The value of the EOSB currently being used
  *
  ********************************************************************************************/
-std::string __thiscall Frontend::GetCurrentEosb(void) const
+std::string __thiscall Orchestrator::GetCurrentEosb(void) const
 {
     __DebugFunction();
 
@@ -426,12 +426,12 @@ std::string __thiscall Frontend::GetCurrentEosb(void) const
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function ExitCurrentSession
  * @brief Remove information related to our current lgoged in session, and stop EOSB rotation
  *
  ********************************************************************************************/
-void __thiscall Frontend::ExitCurrentSession(void)
+void __thiscall Orchestrator::ExitCurrentSession(void)
 {
     __DebugFunction();
 
@@ -453,12 +453,12 @@ void __thiscall Frontend::ExitCurrentSession(void)
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function LoadSafeObjects
  * @brief Cache all the safeobjects found in a local folder
  *
  ********************************************************************************************/
-int __thiscall Frontend::LoadSafeObjects(
+int __thiscall Orchestrator::LoadSafeObjects(
     _in const std::string& c_strSafeObjectDirectory
     )
 {
@@ -518,13 +518,13 @@ int __thiscall Frontend::LoadSafeObjects(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetSafeFunctions
  * @brief Build a list of safe functions available
  * @return std::string - Containing a list of our safe functions in the form: GUID:Metadata
  *
  ********************************************************************************************/
-std::string __thiscall Frontend::GetSafeFunctions(void) const
+std::string __thiscall Orchestrator::GetSafeFunctions(void) const
 {
     __DebugFunction();
 
@@ -533,7 +533,7 @@ std::string __thiscall Frontend::GetSafeFunctions(void) const
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function ProvisionSecureComputationalNode
  * @brief Send a request to provision a Secure Computational Node (SCN)
  * @param[in] c_strDigitalContractGUID The GUID of the digital contract to provision with the SCN
@@ -541,7 +541,7 @@ std::string __thiscall Frontend::GetSafeFunctions(void) const
  * @return std::string - Containing a list of our safe functions in the form: GUID:Metadata
  *
  ********************************************************************************************/
-std::string __thiscall Frontend::ProvisionSecureComputationalNode(
+std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     _in const std::string & c_strDigitalContractGUID,
     _in const std::string & c_strDatasetGUID,
     _in const std::string & c_strVmType
@@ -636,14 +636,14 @@ std::string __thiscall Frontend::ProvisionSecureComputationalNode(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function RunJob
  * @brief Start running a job for a given safe function
  * @param[in] c_strSafeFuncionGUID The GUID of the safe function to run
  * @return std::string - The GUID JobID
  *
  ********************************************************************************************/
-std::string Frontend::RunJob(
+std::string Orchestrator::RunJob(
     _in const std::string& c_strSafeFunctionId
     )
 {
@@ -691,14 +691,14 @@ std::string Frontend::RunJob(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetJobStatus
  * @brief Get the job status for a given job id
  * @param[in] c_strJobId The GUID of the safe function to run
  * @return std::string - The status of the current job
  *
  ********************************************************************************************/
-std::string Frontend::GetJobStatus(
+std::string Orchestrator::GetJobStatus(
     _in const std::string& c_strJobId
 ) const
 {
@@ -732,7 +732,7 @@ std::string Frontend::GetJobStatus(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function SetParameter
  * @brief Get the job status for a given job id
  * @param[in] c_strJobId The GUID of the job whose parameter to set
@@ -741,7 +741,7 @@ std::string Frontend::GetJobStatus(
  * @return std::string - The ID for the parameter if it was set, blank if it wasn't
  *
  ********************************************************************************************/
-std::string Frontend::SetParameter(
+std::string Orchestrator::SetParameter(
     _in const std::string& c_strJobId,
     _in const std::string& c_strInputParamId,
     _in const std::string& c_strParamValue
@@ -791,7 +791,7 @@ std::string Frontend::SetParameter(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function UpdateJobIPAddressForParameter
  * @brief Given a job and Guid, update the IP if it's available
  * @param[in] oJob The job information object for the IP address to update
@@ -799,7 +799,7 @@ std::string Frontend::SetParameter(
  * @return std::string - The ID for the parameter if it was set, blank if it wasn't
  *
  ********************************************************************************************/
-void __thiscall Frontend::UpdateJobIPAddressForParameter(
+void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
     _in JobInformation& oJob,
     _in const Guid& c_oParameterGuid
     )
@@ -836,12 +836,12 @@ void __thiscall Frontend::UpdateJobIPAddressForParameter(
 }
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function StartJobRemoteExecution
  * @brief Setup everything we need on the remote job engine to start a job
  *
  ********************************************************************************************/
-bool __thiscall Frontend::StartJobRemoteExecution(
+bool __thiscall Orchestrator::StartJobRemoteExecution(
     _in JobInformation& oJob
     ) throw()
 {
@@ -900,7 +900,7 @@ bool __thiscall Frontend::StartJobRemoteExecution(
 
  /********************************************************************************************
   *
-  * @class Frontend
+  * @class Orchestrator
 - * @function GetDigitalContractProvisionStatus
 - * @brief Get the provision status of a digital contract
 - * @param[in] std::string - The Digital contract's GUID
@@ -910,7 +910,7 @@ bool __thiscall Frontend::StartJobRemoteExecution(
 + * @return std::string - The ID for the parameter if it was set, blank if it wasn't
   *
   ********************************************************************************************/
-DigitalContractProvisiongStatus __thiscall Frontend::GetProvisionStatus(
+DigitalContractProvisiongStatus __thiscall Orchestrator::GetProvisionStatus(
     const Guid& c_oSecureNodeProvisionGUID
     )
 {
@@ -956,13 +956,13 @@ DigitalContractProvisiongStatus __thiscall Frontend::GetProvisionStatus(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function WaitForAllSecureNodesToBeProvisioned
  * @brief Wait on our SCNs to be provisioned
  * @return std::string - The provision status of the SCNs
  *
  ********************************************************************************************/
-std::string __thiscall Frontend::WaitForAllSecureNodesToBeProvisioned(
+std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
     _in int nTimeoutInMs
     )
 {
@@ -1072,13 +1072,13 @@ std::string __thiscall Frontend::WaitForAllSecureNodesToBeProvisioned(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function PushData
  * @brief Save user data in the orchestrator and generate an ID for it
  * @return std::string - The ID for the pushed data
  *
  ********************************************************************************************/
-std::string Frontend::PushUserData(
+std::string Orchestrator::PushUserData(
     _in const std::vector<Byte>& c_stlIncomingData
     )
 {
@@ -1095,13 +1095,13 @@ std::string Frontend::PushUserData(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetIPServingDataset
  * @brief Get the IP address of a VM serving a dataset's GUID
  * @param[in] Guid - The GUID of the dataset we're looking for
  * @return std::string - The IP address of the VM hosting the dataset, "" if we don't find it
  ********************************************************************************************/
-std::string Frontend::GetIPServingDataset(
+std::string Orchestrator::GetIPServingDataset(
     _in const Guid& oDatasetGuid
     ) const
 {
@@ -1123,13 +1123,13 @@ std::string Frontend::GetIPServingDataset(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function GetIPServingTable
  * @brief Get the IP address of a VM serving a table's GUID
  * @param[in] std::string - The GUID of the table we're looking for
  * @return std::string - The IP address of the VM hosting the table, "" if we don't find it
  ********************************************************************************************/
-std::string Frontend::GetIPServingTable(
+std::string Orchestrator::GetIPServingTable(
     _in const Guid& oTableGuid
     ) const
 {
@@ -1152,14 +1152,14 @@ std::string Frontend::GetIPServingTable(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function PullJobData
  * @brief Register against the job engine to pull data for a job
  * @param[in] std::string - The ID for the parameter pull in form: "JobGUID.OutputParameterGuid"
  * @return std::string - The result of the request to pull, "success" if it went well, error
  *                       message otherwise
  ********************************************************************************************/
-std::string __thiscall Frontend::PullJobData(
+std::string __thiscall Orchestrator::PullJobData(
         _in const std::string& c_strOutputParameter
     ) throw()
 {
@@ -1229,13 +1229,13 @@ std::string __thiscall Frontend::PullJobData(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function WaitForData
  * @brief Wait on any job to return data through a StructuredBuffer
  * @param[in] int - The timeout in ms for how long to wait for a StructuredBuffer
  * @return std::string - The data found, "" if we didn't find a StructuredBuffer
  ********************************************************************************************/
-std::string __thiscall Frontend::WaitForData(
+std::string __thiscall Orchestrator::WaitForData(
     _in int nTimeoutInMs
     ) throw()
 {
@@ -1275,14 +1275,14 @@ std::string __thiscall Frontend::WaitForData(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function UpdateJobsWaitingForData
  * @brief Update any jobs who may have been waiting for a data push
  * TODO Complete this when we are talking to SCNs
  * @param[in] c_oPushDataMessage - The timeout in ms for how long to wait for a StructuredBuffer
  *
  ********************************************************************************************/
-void __thiscall Frontend::UpdateJobsWaitingForData(
+void __thiscall Orchestrator::UpdateJobsWaitingForData(
     _in const StructuredBuffer& c_oPushDataMessage
     )
 {
@@ -1302,14 +1302,14 @@ void __thiscall Frontend::UpdateJobsWaitingForData(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function PushUserDataToJob
  * @brief Push cached user data to a job
  * @param[in] oJob - The job we want to push data to
  * @param[in] oUserParameter - The GUID of the user data to send to the job engine
  *
  ********************************************************************************************/
-void __thiscall Frontend::PushUserDataToJob(
+void __thiscall Orchestrator::PushUserDataToJob(
     _in JobInformation& oJob,
     _in Guid& oUserParameter
     )
@@ -1339,13 +1339,13 @@ void __thiscall Frontend::PushUserDataToJob(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function SendSafeObjectToJobEngine
  * @param [in] JobInformation The job to send this data to
  * @brief Send a structured buffer to a job that contains our safe object
  *
  ********************************************************************************************/
-void __thiscall Frontend::SendSafeObjectToJobEngine(
+void __thiscall Orchestrator::SendSafeObjectToJobEngine(
     _in JobInformation& oJob
     )
 {
@@ -1383,7 +1383,7 @@ void __thiscall Frontend::SendSafeObjectToJobEngine(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function SetParameterOnJob
  * @param [in] JobInformation The job to send this data to
  * @param [in] Guid The guid of the parameter to set
@@ -1392,7 +1392,7 @@ void __thiscall Frontend::SendSafeObjectToJobEngine(
  *        parameter is
  *
  ********************************************************************************************/
-void __thiscall Frontend::SetParameterOnJob(
+void __thiscall Orchestrator::SetParameterOnJob(
     _in JobInformation& oJob,
     _in Guid& oParameterGuid,
     _in Guid& oParameterValueGuid
@@ -1432,14 +1432,14 @@ void __thiscall Frontend::SetParameterOnJob(
 
 /********************************************************************************************
  *
- * @class Frontend
+ * @class Orchestrator
  * @function SendDataToJob
  * @param [in] JobInformation The job to send this data to
  * @param [in] StructuredBuffer The data to send
  * @brief Send a structured buffer to a job
  *
  ********************************************************************************************/
-void __thiscall Frontend::SendDataToJob(
+void __thiscall Orchestrator::SendDataToJob(
     _in JobInformation& oJob,
     _in const StructuredBuffer& c_oStructuredBuffer
     )

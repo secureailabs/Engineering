@@ -377,6 +377,50 @@ static PyObject* wait_for_data(
     return poPythonReturn;
 }
 
+static PyObject* get_ip_for_job(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    char* pszJobIdentifier;
+
+    if(!PyArg_ParseTuple(args, "s", &pszJobIdentifier))
+    {
+        return nullptr;
+    }
+    std::string strJobIdentifier(pszJobIdentifier);
+
+    std::string strReturn = getFrontend().GetIPAddressForJob(strJobIdentifier);
+    PyObject* poPythonReturn;
+    if ( !strReturn.empty() )
+    {
+        poPythonReturn = Py_BuildValue("s", strReturn.c_str());
+    }
+    else
+    {
+        poPythonReturn = Py_BuildValue("");
+    }
+    return poPythonReturn;
+}
+
+static PyObject* deprovision_digital_contract(
+    _in PyObject* self,
+    _in PyObject* args
+    )
+{
+    char* pszDigitalContractIdentifier;
+
+    if(!PyArg_ParseTuple(args, "s", &pszDigitalContractIdentifier))
+    {
+        return nullptr;
+    }
+    std::string strDigitalContractIdentifier(pszDigitalContractIdentifier);
+
+    bool fReturn = getFrontend().DeprovisionDigitalContract(strDigitalContractIdentifier);
+
+    return Py_BuildValue("i", fReturn);
+}
+
 static PyMethodDef SAILAPIMethods [] =
 {
     {"login", (PyCFunction)login, METH_VARARGS, NULL},
@@ -395,6 +439,8 @@ static PyMethodDef SAILAPIMethods [] =
     {"wait_for_all_secure_nodes_to_be_provisioned", (PyCFunction)wait_for_all_secure_nodes_to_be_provisioned, METH_VARARGS, NULL},
     {"pull_data", (PyCFunction)pull_data, METH_VARARGS, NULL},
     {"wait_for_data", (PyCFunction)wait_for_data, METH_VARARGS, NULL},
+    {"get_ip_for_job", (PyCFunction)get_ip_for_job, METH_VARARGS, NULL},
+    {"deprovision_digital_contract", (PyCFunction)deprovision_digital_contract, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}
 };
 

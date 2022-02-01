@@ -44,11 +44,13 @@ class JobInformation
             _in const std::string& c_strValue
         );
 
-        std::string __thiscall GetDatasetForExecution(void) const;
-
         void __thiscall  SetTargetIP(
             _in const std::string& c_strTargetIP
         );
+
+        bool __thiscall JobUsesDataset(
+            _in const Guid & c_oDatasetGuid
+        ) const;
 
         const __thiscall Guid& GetJobId() const;
 
@@ -64,6 +66,7 @@ class JobInformation
             _in const StructuredBuffer& c_oBufferToSend
             );
 
+        bool __thiscall IsRunning() const;
         // BasicLockable methods
         void __thiscall lock();
         void __thiscall unlock();

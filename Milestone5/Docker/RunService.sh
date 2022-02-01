@@ -37,8 +37,8 @@ if $detach; then
 fi
 
 # Check if the image exists
-imageNameFound=$(docker image ls --filter reference=$imageName --format {{.Repository}})
-echo $imageNameFound
+imageNameFound=$(docker image ls --filter reference="$imageName" --format {{.Repository}})
+echo "$imageNameFound"
 if [ "$imageNameFound" == "$imageName" ]
 then
     echo "Docker image exists"
@@ -48,7 +48,7 @@ else
 fi
 
 # Prepare the flags for the docker run command
-runtimeFlags="$detachFlags --network sailNetwork "
+runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
 if [ "orchestrator" == "$imageName" ]
 then
     runtimeFlags="$runtimeFlags -p 8080:8080 -v $(pwd)/../VirtualMachine/Orchestrator:/app $imageName"

@@ -8,23 +8,23 @@ USER root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install dependencies
-RUN apt-get update && apt-get -y upgrade
-RUN apt-get install -y sudo \
-wget \
-iproute2 \
-git \
-make \
-build-essential \
-libcurl4-gnutls-dev \
-python3-pip
+RUN apt-get update && \
+  apt-get -y upgrade && \
+  apt-get install -y \
+  sudo \
+  wget \
+  iproute2 \
+  git \
+  make \
+  build-essential \
+  libcurl4-gnutls-dev \
+  python3-pip && \
+  rm -rf /var/lib/apt/lists/*
 
 COPY install.sh /install.sh
-RUN chmod +x /install.sh
-RUN /install.sh
+RUN chmod +x /install.sh && /install.sh
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
-
-EXPOSE 6200
 
 CMD ["/bin/bash", "/Entrypoint.sh"]

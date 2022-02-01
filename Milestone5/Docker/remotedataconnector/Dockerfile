@@ -2,12 +2,7 @@ FROM ubuntu:20.04
 
 ENV TZ=America/Toronto
 LABEL authors="prawal@secureailabs.com"
-USER root
-# Set tzdata
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# Install dependencies
-RUN apt-get update && apt-get install -y build-essential
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

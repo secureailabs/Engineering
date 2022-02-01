@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /app
+cd /app || exit
 yarn --cwd client install && yarn cache clean && yarn --cwd client build
 
 yarn --cwd server install && yarn cache clean

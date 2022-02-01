@@ -11,7 +11,7 @@ fi
 
 # Check if the image exists
 imageNameFound=$(docker image ls --filter reference=$imageName --format {{.Repository}})
-echo $imageNameFound
+echo "$imageNameFound"
 if [ "$imageNameFound" == "$imageName" ]
 then
     echo "Docker image exists"

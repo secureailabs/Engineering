@@ -18,13 +18,13 @@
 #include <iterator>
 #include <iostream>
 #include "Guid.h"
-#include "frontend.h"
+#include "Orchestrator.h"
 #include "JsonValue.h"
 #include "ExceptionRegister.h"
 
-static Frontend& getFrontend()
+static Orchestrator& getFrontend()
 {
-    static Frontend oFrontend;
+    static Orchestrator oFrontend;
     return oFrontend;
 }
 

@@ -2933,12 +2933,12 @@ void __thiscall DigitalContractDatabase::DeleteVirtualMachineResources(
         poIpcAzureManager->Release();
         poIpcAzureManager = nullptr;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

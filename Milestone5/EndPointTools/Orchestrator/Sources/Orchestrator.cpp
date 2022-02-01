@@ -22,6 +22,7 @@
 #include "CurlRest.h"
 #include "JsonValue.h"
 #include "FileUtils.h"
+#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <fstream>
@@ -553,6 +554,7 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     StructuredBuffer oReturnStructuredBuffer;
     std::string strRawProvisionGuid{""};
     std::string strProvisionMessage{""};
+
     try
     {
         Guid oDatasetGuid(c_strDatasetGUID);
@@ -570,14 +572,7 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
         std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
 
-        if ( oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE) )
-        {
-            unStatus = oResponse.GetFloat64("Status");
-        }
-        else
-        {
-            std::cout << "No provision status?" << std::endl;
-        }
+        unStatus = static_cast<unsigned int>(oResponse.GetFloat64("Status"));
 
         if ( oResponse.IsElementPresent("Message", ANSI_CHARACTER_STRING_VALUE_TYPE) )
         {
@@ -588,10 +583,12 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
             fProvisionResult = true;
             Guid oProvisionGuid = Guid(oResponse.GetString("SecureNodeGuid"));
             strRawProvisionGuid = oProvisionGuid.ToString(eRaw);
-            m_stlProvisionInformation[strRawProvisionGuid].eProvisionStatus = DigitalContractProvisiongStatus::eProvisioning;
-            m_stlProvisionInformation[strRawProvisionGuid].strDatasetGUID = oDatasetGuid.ToString(eRaw);
+
+            __DebugAssert(m_stlProvisionInformation.end() == m_stlProvisionInformation.find(strRawProvisionGuid));
+
+            m_stlProvisionInformation[strRawProvisionGuid].eProvisionStatus = VirtualMachineState::eStarting;
+            m_stlProvisionInformation[strRawProvisionGuid].oHostedDataset.oDatsetGuid = oDatasetGuid;
             m_stlProvisionInformation[strRawProvisionGuid].strDigitalContractGUID = oDigitalContractGuid.ToString(eRaw);
-            std::cout << "Provisioned Secure Node " << strRawProvisionGuid << std::endl;
         }
 
     }
@@ -790,36 +787,116 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
     _in const Guid& c_oParameterGuid
     )
 {
-    if ( eDataset == c_oParameterGuid.GetObjectType() )
+    std::optional<Guid> oTargetSecureComputationalNode;
+    if ( eTable == c_oParameterGuid.GetObjectType() )
     {
-        std::string strTargetIP = GetIPServingDataset(c_oParameterGuid);
-        if ( "" != strTargetIP )
-        {
-            _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
-            oJob.SetTargetIP(strTargetIP);
-        }
-    }
-    else if ( eTable == c_oParameterGuid.GetObjectType() )
-    {
-        std::string strTargetIP = GetIPServingTable(c_oParameterGuid);
-
-        if ( "" != strTargetIP )
-        {
-            _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
-            oJob.SetTargetIP(strTargetIP);
-        }
+        oTargetSecureComputationalNode = GetSecureComputationalNodeServingTable(c_oParameterGuid);
     }
     else if ( eUserSuppliedData != c_oParameterGuid.GetObjectType() )
     {
-        // Try to see if this is a an old dataset
-        std::string strTargetIP = GetIPServingDataset(c_oParameterGuid);
-        if ( "" != strTargetIP )
-        {
-            _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
-            oJob.SetTargetIP(strTargetIP);
-        }
+        // Assume anything else is a dataset guid until we have the new types in the data annotation tool
+        oTargetSecureComputationalNode = GetSecureComputationalNodeServingDataset(c_oParameterGuid);
+    }
+
+    if ( oTargetSecureComputationalNode.has_value() )
+    {
+        auto oSecureNodeInformation = m_stlProvisionInformation.find(oTargetSecureComputationalNode.value().ToString(eRaw));
+        __DebugAssert(m_stlProvisionInformation.end() != oSecureNodeInformation);
+
+        std::string strTargetIP = oSecureNodeInformation->second.strRemoteIpAddress;
+        _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
+
+        std::cout << "Assinging IP " << strTargetIP << " to job " << oJob.GetJobId().ToString(eHyphensAndCurlyBraces) << std::endl;
+        oJob.SetTargetIP(strTargetIP);
+
+        // We've assigned this dataset to a job, increase its usage count
+        oSecureNodeInformation->second.oHostedDataset.unUsageCount++;
     }
 }
+
+bool __thiscall Orchestrator::DeprovisionDigitalContract(
+    _in const std::string& c_strDigitalContractGUID
+    )
+{
+    bool fRetrurnValue{false};
+    try
+    {
+
+        Guid oDigitalContractGuid(c_strDigitalContractGUID);
+
+        std::string strVerb = "POST";
+        std::string strApiUrl = "/SAIL/DigitalContractManager/Deprovision?Eosb=" + m_oEosbRotator.GetEosb();
+        StructuredBuffer oJsonRequest;
+        oJsonRequest.PutString("DigitalContractGuid", oDigitalContractGuid.ToString(eHyphensAndCurlyBraces));
+        std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
+
+        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+
+        if ( oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE) )
+        {
+            if ( 200 == static_cast<uint64_t>(oResponse.GetFloat64("Status")) )
+            {
+                fRetrurnValue = true;
+            }
+        }
+        else
+        {
+            _ThrowBaseException("No return status from deprovision call", nullptr);
+        }
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        fRetrurnValue = false;
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        fRetrurnValue = false;
+    }
+
+    return fRetrurnValue;
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function GetIPAddressForJob
+ * @brief Setup everything we need on the remote job engine to start a job
+ * @param[in] c_strJobGUID The job GUID whose IP address we want to get
+ * @return std::string - The IP address of the job, "" if none found or error
+ *
+ ********************************************************************************************/
+std::string __thiscall Orchestrator::GetIPAddressForJob(
+    _in const std::string& c_strJobGUID
+    )
+{
+    std::string strReturn{""};
+    try
+    {
+
+        Guid oJobGUID(c_strJobGUID);
+
+        auto oJobItr = m_stlJobInformation.find(oJobGUID.ToString(eRaw));
+        if ( m_stlJobInformation.end() != oJobItr )
+        {
+            strReturn = oJobItr->second->GetTargetIP();
+        }
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        strReturn = "";
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        strReturn = "";
+    }
+    return strReturn;
+}
+
 /********************************************************************************************
  *
  * @class Orchestrator
@@ -919,7 +996,7 @@ VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation
     if ( "0.0.0.0" != oVirtualMachine.GetString("IPAddress") && 
         (VirtualMachineState::eWaitingForData == eVirtualMachineState || VirtualMachineState::eReadyForComputation == eVirtualMachineState ))
     {
-        std::cout << "DS " << m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strDatasetGUID << 
+        std::cout << "DS " << m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].oHostedDataset.oDatsetGuid.ToString(eHyphensAndCurlyBraces) << 
             " being served on " << oVirtualMachine.GetString("IPAddress") << std::endl;
         m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress = oVirtualMachine.GetString("IPAddress");
     }
@@ -927,6 +1004,8 @@ VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation
     {
         m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strProvisionMessage = oVirtualMachine.GetString("Note");
     }
+
+    m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].eProvisionStatus = eVirtualMachineState;
     return eVirtualMachineState;
 }
 
@@ -974,7 +1053,8 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                             stlInProgressProvisions.erase(stlSecureComputationNodeItr.first);
                             stlFailedProvisions.erase(stlSecureComputationNodeItr.first);
                         }
-                        else if ( VirtualMachineState::eStarting == eProvisionStatus )
+                        else if ( VirtualMachineState::eStarting == eProvisionStatus ||
+                                  VirtualMachineState::eConfiguring == eProvisionStatus )
                         {
                             stlInProgressProvisions.insert(stlSecureComputationNodeItr.first);
                         }
@@ -1012,11 +1092,26 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
             StructuredBuffer oFailedProvisions;
             StructuredBuffer oInProgressProvisions;
             unsigned int unProvisionItr{0};
+
             for ( auto& oSucceededItr : stlSucceededProvisions )
             {
                 Guid oProvisionGuid(oSucceededItr);
                 oSucceededProvisions.PutString(oProvisionGuid.ToString(eHyphensAndCurlyBraces).c_str(), m_stlProvisionInformation[oSucceededItr].strProvisionMessage);
                 ++unProvisionItr;
+
+                // Any job that is waiting for this dataset should be assigned this IP
+                for ( auto& oPendingJob : m_stlJobInformation)
+                {
+                    if ( oPendingJob.second->JobUsesDataset(m_stlProvisionInformation[oSucceededItr].oHostedDataset.oDatsetGuid) )
+                    {
+                        oPendingJob.second->SetTargetIP(m_stlProvisionInformation[oSucceededItr].strRemoteIpAddress);
+                    }
+
+                    if ( oPendingJob.second->ReadyToExcute() && !oPendingJob.second->IsRunning() )
+                    {
+                        StartJobRemoteExecution(*oPendingJob.second);
+                    }
+                }
             }
             unProvisionItr = 0;
             for ( auto& oInProgressItr : stlInProgressProvisions )
@@ -1084,12 +1179,14 @@ std::string Orchestrator::PushUserData(
 /********************************************************************************************
  *
  * @class Orchestrator
- * @function GetIPServingDataset
+ * @function GetSecureComputationalNodeServingDataset
  * @brief Get the IP address of a VM serving a dataset's GUID
  * @param[in] Guid - The GUID of the dataset we're looking for
- * @return std::string - The IP address of the VM hosting the dataset, "" if we don't find it
+ * @return std::optional<Guid> - An option of a GUID of the SCN serving the dataset
+ * 
+ * We iterate through SCNs serving datasets, and pick the one which has been used the least
  ********************************************************************************************/
-std::string Orchestrator::GetIPServingDataset(
+std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingDataset(
     _in const Guid& oDatasetGuid
     ) const
 {
@@ -1097,27 +1194,34 @@ std::string Orchestrator::GetIPServingDataset(
     // Disabled until new data annotation tool is in place
     //__DebugAssert(eDataset == oDatasetGuid.GetObjectType());
 
-    std::string strIpAddress{""};
-
+    std::optional<Guid> oSecureComputationalNodeGuid;
+    unsigned int unMinUsageCount{UINT_MAX};
     for ( auto oDatasetItr : m_stlProvisionInformation)
     {
-        if ( oDatasetItr.second.strDatasetGUID == oDatasetGuid.ToString(eRaw))
+        // For now we allow use when we're ready for computation or waiting for data
+        // When the new data annotation tool produces datasets we can upload to an SCN
+        if ( oDatasetItr.second.oHostedDataset.oDatsetGuid == oDatasetGuid &&
+            ( oDatasetItr.second.eProvisionStatus == VirtualMachineState::eReadyForComputation ||oDatasetItr.second.eProvisionStatus == VirtualMachineState::eWaitingForData) )
         {
-            strIpAddress = oDatasetItr.second.strRemoteIpAddress;
+            if ( oDatasetItr.second.oHostedDataset.unUsageCount < unMinUsageCount )
+            {
+                oSecureComputationalNodeGuid = oDatasetItr.first;
+                unMinUsageCount = oDatasetItr.second.oHostedDataset.unUsageCount;
+            }
         }
     }
-    return strIpAddress;
+    return oSecureComputationalNodeGuid;
 }
 
 /********************************************************************************************
  *
  * @class Orchestrator
- * @function GetIPServingTable
+ * @function GetSecureComputationalNodeServingTable
  * @brief Get the IP address of a VM serving a table's GUID
  * @param[in] std::string - The GUID of the table we're looking for
  * @return std::string - The IP address of the VM hosting the table, "" if we don't find it
  ********************************************************************************************/
-std::string Orchestrator::GetIPServingTable(
+std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
     _in const Guid& oTableGuid
     ) const
 {
@@ -1125,17 +1229,18 @@ std::string Orchestrator::GetIPServingTable(
     // Disabled until new dataset annotation tool is in place
     //__DebugAssert(eTable == oTableGuid.GetObjectType());
 
-    std::string strIpAddress{""};
+    std::optional<Guid> oSecureComputationalNodeGuid;
     for ( auto oTableItr : m_stlAvailableTables )
     {
         if ( oTableGuid.ToString(eRaw) == oTableItr.second.m_strParentDataset )
         {
             Guid oDatasetGuid(oTableItr.second.m_strParentDataset);
-            strIpAddress = GetIPServingDataset(oDatasetGuid);
+            oSecureComputationalNodeGuid = GetSecureComputationalNodeServingDataset(oDatasetGuid);
+            break;
         }
     }
 
-    return strIpAddress;
+    return oSecureComputationalNodeGuid;
 }
 
 /********************************************************************************************

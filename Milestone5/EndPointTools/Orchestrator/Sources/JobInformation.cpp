@@ -90,6 +90,27 @@ bool __thiscall JobInformation::ReadyToExcute(
         [] ( const auto& value ) { return value.second.has_value(); } );
 }
 
+bool __thiscall JobInformation::JobUsesDataset(
+    _in const Guid & c_oDatasetGuid
+    ) const
+{
+    bool fUsesDataset{false};
+
+    for ( const auto& oInputParameter : m_stlInputParameterData )
+    {
+        if ( oInputParameter.second.has_value() )
+        {
+            if ( oInputParameter.second.value() == c_oDatasetGuid.ToString(eRaw) )
+            {
+                fUsesDataset = true;
+                break;
+            }
+            // TODO also handle tables
+        }
+    }
+    return fUsesDataset;
+}
+
 /********************************************************************************************
  *
  * @class JobInformation
@@ -359,6 +380,11 @@ std::string __thiscall JobInformation::GetJobStatus(void) const
     }
 
     return strJobStatus;
+}
+
+bool __thiscall JobInformation::IsRunning() const
+{
+    return nullptr != m_pstlListenerThread;
 }
 
 /********************************************************************************************

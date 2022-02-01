@@ -1,10 +1,10 @@
 /*********************************************************************************************
  *
- * @file frontend.h
- * @author Jingwei Zhang
+ * @file Orchestrator.h
+ * @author David Gascon & Jingwei Zhang
  * @date 15 Jan 2021
  * @License Private and Confidential. Internal Use Only.
- * @copyright Copyright (C) 2021 Secure AI Labs, Inc. All Rights Reserved.
+ * @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
  *
  ********************************************************************************************/
 
@@ -31,19 +31,19 @@
 /********************************************************************************************/
 
 
-class Frontend : public Object{
+class Orchestrator : public Object{
 
     public:
 
-        Frontend(void);
+        Orchestrator(void);
 
-        Frontend(
-            _in const Frontend& c_oFrontend
+        Orchestrator(
+            _in const Orchestrator& c_oFrontend
         ) = delete;
-        Frontend& operator= (
-            _in const Frontend&
+        Orchestrator& operator= (
+            _in const Orchestrator&
         ) = delete;
-        virtual ~Frontend(void);
+        virtual ~Orchestrator(void);
 
         unsigned int __thiscall Login(
             _in const std::string& c_strEmail,

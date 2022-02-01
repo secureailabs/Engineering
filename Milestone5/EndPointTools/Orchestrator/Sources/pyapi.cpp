@@ -22,9 +22,9 @@
 #include "JsonValue.h"
 #include "ExceptionRegister.h"
 
-static Frontend& getFrontend()
+static Orchestrator& getFrontend()
 {
-    static Frontend oFrontend;
+    static Orchestrator oFrontend;
     return oFrontend;
 }
 

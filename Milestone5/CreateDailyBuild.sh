@@ -7,7 +7,7 @@ declare -a StringArray=("BaseVmImageInit" "CommunicationPortal" "DataDomainProce
 declare -a StringArray2=("libDatabaseManager.so" "libAccountDatabase.so" "libAuditLogManager.so" "libAzureManager.so"
 "libCryptographicKeyManagement.so" "libDatasetDatabase.so" "libDigitalContractDatabase.so"
 "libRemoteDataConnectorManager.so" "libSailAuthentication.so" "libVirtualMachineManager.so"
-"libDatasetFamilyManager.so")
+"libDatasetFamilyManager.so" "SAILPyAPI.so")
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 set -x
@@ -23,6 +23,9 @@ cd $SCRIPT_DIR/VirtualMachine
 for d in $(echo ./*/);do (cd $d; make all -j && returncode=$? || returncode=$?; cd ..); done
 
 cd $SCRIPT_DIR/WebService
+for d in $(echo ./*/);do (cd $d; make all -j && returncode=$? || returncode=$?; cd ..); done
+
+cd $SCRIPT_DIR/EndPointTools
 for d in $(echo ./*/);do (cd $d; make all -j && returncode=$? || returncode=$?; cd ..); done
 
 cd $SCRIPT_DIR/InternalTools/PackageWebServiceAndComputeVm/

@@ -56,7 +56,7 @@ int main()
                     std::string strUserGuid = oUserInformation.GetString("UserGuid");
                     Qword qwAccessRights = oUserInformation.GetQword("AccessRights");
                     // Create a Virtual Machine Guid
-                    std::string strVmGuid = Guid(eVirtualMachine).ToString(eHyphensAndCurlyBraces);
+                    std::string strVmGuid = Guid(eSecureComputationalVirtualMachine).ToString(eHyphensAndCurlyBraces);
                     std::string strVmEosb;
 
                     bool fTerminatedSignalEncountered = false;

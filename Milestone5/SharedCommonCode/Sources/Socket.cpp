@@ -81,16 +81,6 @@ Socket::Socket(
     // signal and kills the current process. We want to ignore this signal so that the process does not
     // die and we can log the error. This will also casue the write to fail instead of the process dying.
     ::signal(SIGPIPE, &HandleSignal);
-
-    // The default TCP timeout is huge and non-uniform across different environments and
-    // distros, which is not what we want. Setting a timout to a reasonable value
-    // will help us close unresponsive connections soon and will also make the system uniform.
-    // The timeout is set to 1 minute = 60*1000 milliseconds.
-    constexpr int nKeepAliveTimeInMillisecond = 60*1000;
-    if (0 != ::setsockopt(m_nSocketDescriptor, IPPROTO_TCP, TCP_USER_TIMEOUT, &nKeepAliveTimeInMillisecond, sizeof(nKeepAliveTimeInMillisecond)))
-    {
-        _ThrowBaseException("setsockopt() failed with errno = %d", errno);
-    }
 }
 
 /********************************************************************************************

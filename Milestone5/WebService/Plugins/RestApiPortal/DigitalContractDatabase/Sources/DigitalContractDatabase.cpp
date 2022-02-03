@@ -1338,6 +1338,9 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             oSsb.PutUnsignedInt64("LastActivity", ::GetEpochTimeInSeconds());
             oSsb.PutDword("ProvisioningStatus", (Dword)DigitalContractProvisiongStatus::eUnprovisioned);
             oSsb.PutString("Note", "...");
+            // Putting a dummy value in for now until WebUI doesn't need an azure template to provision
+            std::string strAzureTemplateGuid = "{00000000-0000-0000-0000-000000000000}";
+            oSsb.PutString("AzureTemplateGuid", strAzureTemplateGuid);
             // Get Dataset name from the database
             // Make a Tls connection with the database portal
             poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
@@ -2185,30 +2188,17 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                             // Get the Guid of the user who's azure template are to be used to create Virtual Machine
                             std::string strHostForVirtualMachine = oDigitialContract.GetString("HostForVirtualMachines");
 
-                            // Get the Azure Template Uuid from the Digital Contract
-                            std::string strAzureTemplateUuid = oDigitialContract.GetString("AzureTemplateGuid");
-                            // Use the TemplateUuid to fetch the Azure Template
-                            // Call AzureManager plugin to validate the Azure template
-                            StructuredBuffer oAzureTemplate;
-                            oAzureTemplate.PutDword("TransactionType", 0x00000001);
-                            oAzureTemplate.PutBuffer("Eosb", stlEosb);
-                            oAzureTemplate.PutString("TemplateGuid", strAzureTemplateUuid);
-                            poIpcAzureManager = ::ConnectToUnixDomainSocket("/tmp/{4B56D0E0-7A38-40C1-839A-B9BBCDDFE521}");
-                            StructuredBuffer oAzureTemplateResponse(::PutIpcTransactionAndGetResponse(poIpcAzureManager, oAzureTemplate, false));
-                            poIpcAzureManager->Release();
-                            poIpcAzureManager = nullptr;
-                            if ((0 < oAzureTemplateResponse.GetSerializedBufferRawDataSizeInBytes())&&(200 == oAzureTemplateResponse.GetDword("Status")))
+                            if ((Dword)DigitalContractProvisiongStatus::eReady != oDigitialContract.GetDword("ProvisioningStatus") )
                             {
-                                StructuredBuffer oTemplateData = oAzureTemplateResponse.GetStructuredBuffer("Template");
-                                std::string strName = oTemplateData.GetString("Name");
-                                std::string strDescription = oTemplateData.GetString("Description");
-                                std::string strSubscriptionID = oTemplateData.GetString("SubscriptionID");
-                                std::string strSecret = oTemplateData.GetString("Secret");
-                                std::string strTenantID = oTemplateData.GetString("TenantID");
+                                StructuredBuffer oTemplateData = ::GetInitialziationStructuredBuffer("AzureSecureComputationalNodeTemplate");
+                                std::cout << oTemplateData.ToString() << std::endl;
                                 std::string strApplicationID = oTemplateData.GetString("ApplicationID");
-                                std::string strResourceGroup = oTemplateData.GetString("ResourceGroup");
-                                std::string strVirtualMachineImageName = oTemplateData.GetString("VirtualMachineImage");
                                 std::string strLocation = oTemplateData.GetString("HostRegion");
+                                std::string strResourceGroup = oTemplateData.GetString("ResourceGroup");
+                                std::string strSecret = oTemplateData.GetString("Secret");
+                                std::string strSubscriptionID = oTemplateData.GetString("SubscriptionID");
+                                std::string strTenantID = oTemplateData.GetString("TenantID");
+                                std::string strVirtualMachineImageName = oTemplateData.GetString("VirtualMachineImage");
                                 std::string strVirtualMachineImageId = ::CreateAzureResourceId(strSubscriptionID, strResourceGroup, "providers/Microsoft.Compute", "images", strVirtualMachineImageName);
                                 std::string strVirtualNetwork = oTemplateData.GetString("VirtualNetwork");
                                 std::string strVirtualNetworkId = ::CreateAzureResourceId(strSubscriptionID, strResourceGroup, "providers/Microsoft.Network", "virtualNetworks", strVirtualNetwork);
@@ -2274,13 +2264,13 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                                     std::string strParamterJson = ::CreateAzureParamterJson(::GetInitializationValue("AzureVirtualMachineTemplateUrl"), oVirtualMachineCreateParameter);
                                     // Create a thread which will keep updating the VM status on the database as it proceeds
                                     // This API will return the response, stating that the VM creation has started
-                                    std::thread oThreadCreateVirtualMachine(&DigitalContractDatabase::ProvisionVirtualMachine, this, oDigitialContract, oAzureTemplateResponse.GetBuffer("Eosb"), strApplicationID, strSecret, strTenantID, strSubscriptionID, strResourceGroup, oNewVmGuid.ToString(eRaw), strParamterJson, strLocation);
+                                    std::thread oThreadCreateVirtualMachine(&DigitalContractDatabase::ProvisionVirtualMachine, this, oDigitialContract, c_oRequest.GetBuffer("Eosb"), strApplicationID, strSecret, strTenantID, strSubscriptionID, strResourceGroup, oNewVmGuid.ToString(eRaw), strParamterJson, strLocation);
                                     oThreadCreateVirtualMachine.detach();
                                 }
 
                                 // Update the Digital ContractStatus to Provisioning
                                 StructuredBuffer oUpdateProvisioningState;
-                                oUpdateProvisioningState.PutBuffer("Eosb", oAzureTemplateResponse.GetBuffer("Eosb"));
+                                oUpdateProvisioningState.PutBuffer("Eosb", c_oRequest.GetBuffer("Eosb"));
                                 oUpdateProvisioningState.PutDword("ProvisioningStatus", (Dword)DigitalContractProvisiongStatus::eProvisioning);
                                 oUpdateProvisioningState.PutString("DigitalContractGuid", strDcGuid);
                                 StructuredBuffer oUpdateProvisioningStateResponse(this->UpdateDigitalContractProvisioningStatus(oUpdateProvisioningState));
@@ -2289,7 +2279,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                                 // Return a VM provisioning start success response here.
                                 dwStatus = 200;
                             }
-                            else if ((Dword)DigitalContractProvisiongStatus::eReady == oDigitialContract.GetDword("ProvisioningStatus") )
+                            else
                             {
                                 // The contract is already provisioned so we should be good to go
                                 dwStatus = 201;

@@ -11,7 +11,7 @@ fi
 
 # Check if the image exists
 imageNameFound=$(docker image ls --filter reference=$imageName --format {{.Repository}})
-echo $imageNameFound
+echo "$imageNameFound"
 if [ "$imageNameFound" == "$imageName" ]
 then
     echo "Docker image exists"
@@ -19,6 +19,9 @@ else
     echo "!!! Docker image not found !!!"
     exit 1
 fi
+
+# Move the InitializerVector to the Binary folder
+mv InitializationVector.json Orchestrator/
 
 # Run the docker container
 docker run \

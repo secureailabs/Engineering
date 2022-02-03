@@ -14,7 +14,7 @@ declare -a ListOfFiles=(
 
 for val in "${ListOfFiles[@]}"; do
     echo -e "\nSearching for ${val} ..."
-    find Binary | grep -x $val
+    find Binary | grep -x "$val"
     retVal=$?
     if [ $retVal -ne 0 ]; then
         echo "Error ${val} does not exist"

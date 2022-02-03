@@ -30,7 +30,6 @@ OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
 # All our build rules
 all: $(OUTPUT)
-	@cp $(ABSROOTDIR)/Docker/backend/InitializationVector.json $(ABSROOTDIR)/Binary/InitializationVector.json
 
 $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 	@mkdir -p $(@D)

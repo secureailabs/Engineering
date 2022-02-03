@@ -1,5 +1,16 @@
 {
     "PlatformServicesUrl":"https://127.0.0.1:6200",
     "TlsCertificate":"aaaa",
-    "TlsPrivateKey":"bbbb"
+    "TlsPrivateKey":"bbbb",
+
+    "VmEosb": "5iEQAhtloSN8tUHp3qPZTK0OOtQ2pH8aBejNOi+d/HztS+cFVl2ZoKgCToGZqRkIRxRmGzkDAABddVXIVt/L+nKdyFz8WwakgEN/cDCwrY8s5XnIRLgYqsPGczJa/1suyysPW9M6RpSPwa0jAShLUVx+rm7uVD63GW2jzOqgD+xGrOwN2ra4wDJ7sHbmkZ5wsed/zD+ndFnZDMvzM9bz0PfMA7JMTef1U7whuz8tBMhU3CCKJKybUOCZFM8nqJe8SWbG8ytDpGVjUyjITWMZqPOoWFbEeZlvy5mJKV+iKSa06erZ/PVVpa2nNAUtXqjyobO9qMMPVZlqDcCvWD77RCwXNXlzcg4uZhmtHg37ZdWTHolhU/Ba/iBvDPIx01kMEwdGC9ShHhv82huF+vJmzCImCK6po2XgHSLyapCse2JVcwUXA972dwqnDbmfARW+T/s/2E9oOpm3RXGA9rnljGQM2Ye0g+MRvWRzNSWOLFZvQaEi65r/nLTR7xf3IcPvr+LKGcuqBbacoXEc4mKJRDWEJUHn/oiMd658AJyJL5h3h8gKwlXmJ2aOOIA+0xJeCr+WuW1jgTFp/Xys255UkR83+PHqPSZvcuXGIUjfcPJAI1F0oByG9XRYqogkb2tFPpP0tdM4+vUzf86GW2h6dmiQHWEZ41CuW/Ij8lL2EoO9npvV2SIZ7cfmAu1rbFfwmBEG8Frm6Qa1UAW6qnXHuDJBSDH4rIz7saNPeDYgtMoap7muXePUPC9J+iRvlA7hHuO+z9UkgjKHmsD7YS04o6YanaSiGshtm5VnBUAzPvX+HKFf4gIvG8DL2kWv6lNt6ryqb3aIk8A1WwZJW//tFs/sXfkMlV+BWhWtYL7LuSPlRI6FH2/+ZO+aP8Dzc2f4ly/5q0TVV/eTuRlZOCRPD7FEhrSuGOQRGI2yM0ySj4StOHyiRWlD5ZNbXCvMFO6E90h8Sa9wjaoW5yaZq29nywUEY5aD3VQci2O8yyl3Xid75+DI3VjKt02vVW+aKr0ih1VfodU43G5x45/gt5ik4MLLCmKRRYfqNgC24a/OBJs5XwLqnOC4tNfmrH5JuOeZdb6vedlzJLeC/63k5PZBBO7wDJv/XhLKP3ie5NkfoG9Ku3xtplxd9/S6nBb4r09HFkjbRiol9NVHryyHJxBPIdIyGlaxKZESbg==",
+    "DataConnectorDomainIdentifier": "{0767BAF6-A1BF-48F6-ABFF-49C8A2B6288F}",
+    "ComputationalDomainIdentifier": "{584DA783-4954-4FAA-8A55-71E3B1BCAF03}",
+    "RootOfTrustDomainIdentifier": "{E0CA9BF8-C227-4B67-B6E7-6602B9874A49}",
+    "DigitalContractIdentifier": "{1784A90F-1D5F-49F9-9848-08B2688D0D0F}",
+    "VirtualMachineIdentifier": "40168C4BB5224F1C9A1E58C2E6F823DF",
+    "IpAddressOfVirtualMachine": "13.82.136.215",
+    "DatasetIdentifier": "{22A2FD2B-C1E1-47D5-B3A3-6FA3CE9A640A}",
+    "ClusterIdentifier": "{3B704C77-4626-461A-B601-8E6611913EAB}",
+    "NameOfVirtualMachine": "Some nice name of Virtual machine"
 }

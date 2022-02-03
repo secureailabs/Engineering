@@ -51,7 +51,7 @@ fi
 runtimeFlags="$detachFlags --network sailNetwork "
 if [ "orchestrator" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags -p 8080:8080 -v $(pwd)/../VirtualMachine/Orchestrator:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 8080:8080 -v $(pwd)/../EndPointTools/Orchestrator:/app $imageName"
 elif [ "backend" == "$imageName" ]
 then
     runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $(pwd)/../Binary:/app $imageName"

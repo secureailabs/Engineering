@@ -1,6 +1,12 @@
 /* groovylint-disable LineLength */
 pipeline {
     agent any
+    environment {
+        JENKINS_PAT = credentials('PAT_Jenkins')
+    }
+    triggers {
+        cron('H 0 * * 1-5')
+    }
     options {
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
         parallelsAlwaysFailFast()
@@ -15,6 +21,8 @@ pipeline {
                     'Step Builds',
                     script:'''
                     set -x
+                    pwd
+                    ls -l
                     ./Milestone5/CreateDailyBuild.sh
                     '''
                 }
@@ -38,6 +46,7 @@ pipeline {
                     sh label:
                     'Build Docker',
                     script:'''
+                    pwd
                     cd Milestone5/Docker/
                     ./BuildImages.sh -i backend
                     '''
@@ -45,25 +54,36 @@ pipeline {
                     sh label:
                     'Run Backend Docker',
                     script:'''
+                    pwd
                     cd Milestone5/Docker/
                     ./RunService.sh -s backend -d
+                    docker ps -q
+                    sleep 5
                     '''
                 }
                 script {
                     try {
                         echo 'Load Database'
                         sh '''
+                        docker exec -w /app backend sh -c "pwd"
                         docker exec -w /app backend sh -c "ls -l"
-                        docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
+                        docker exec -w /app backend sh -c "ps -ef"
                         docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     } catch (exception) {
                         echo getStackTrace(exception)
+                        echo 'Error detected, retrying...'
                         sh '''
                         docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
                         docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     }
+                }
+                echo 'Backend Portal Server is Deployed and Ready to use'
+                script {
+                    echo ' Copy Orchestrator Folder to tmp directory'
+
+                    sh 'cp -r Milestone5/EndPointTools/Orchestrator/ /datadrive/jenkins_workspace/workspace/tmp_engineering/'
                 }
             }
             post {
@@ -77,7 +97,7 @@ pipeline {
                 echo 'Starting to build docker image for test: SAILTAP'
                 sh 'ls -l'
                 script {
-                    docker.build('ubuntu-sailtap:1.0', '--build-arg git_personal_token=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 -f Nightly_Tests/Dockerfile.test .')
+                    docker.build('ubuntu-sailtap:1.0', "--build-arg git_personal_token=$JENKINS_PAT -f Jenkins/Nightly_Tests/Dockerfile.test .")
                     sh 'docker run --name ubuntu_tst_bash -dit -v /datadrive/jenkins_workspace/workspace/tmp_engineering:/tmp_engineering ubuntu-sailtap:1.0 /bin/bash'
                     echo ' Update Test Repo'
                     sh label:

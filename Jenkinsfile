@@ -4,9 +4,6 @@ pipeline {
     environment {
         JENKINS_PAT = credentials('PAT_Jenkins')
     }
-    triggers {
-        cron('H 0 * * 1-5')
-    }
     options {
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
         parallelsAlwaysFailFast()

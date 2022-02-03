@@ -31,7 +31,7 @@ done
 # Create sailNetwork if it does not exist
 networkName="sailNetwork"
 foundNetworkName=$(docker network ls --filter name=$networkName --format {{.Name}})
-echo $foundNetworkName
+echo "$foundNetworkName"
 if [ "$foundNetworkName" == "$networkName" ]
 then
     echo "Network already exists"
@@ -46,8 +46,8 @@ then
     echo "No image specified. Building all of them..."
 else
     echo "Building image $imageName"
-    pushd $imageName
-    docker build . -t $imageName
+    pushd "$imageName"
+    docker build . -t "$imageName"
     # TODO: Prawal
     # docker build . -t "$imageName:$(git rev-parse --short HEAD)"
     popd
@@ -65,7 +65,7 @@ declare -a ListOfDockerImages=(
 
 for val in "${ListOfDockerImages[@]}"; do
     echo -e "\nBuilding for ${val} ..."
-    pushd ${val}
-    docker build . -t ${val}
+    pushd "${val}"
+    docker build . -t "${val}"
     popd
 done

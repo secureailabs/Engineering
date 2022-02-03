@@ -48,9 +48,9 @@ echo "Installing MongoDB C Driver"
 
 wget https://github.com/mongodb/mongo-c-driver/releases/download/1.17.3/mongo-c-driver-1.17.3.tar.gz
 tar xzf mongo-c-driver-1.17.3.tar.gz
-cd mongo-c-driver-1.17.3
+cd mongo-c-driver-1.17.3 || exit
 mkdir cmake-build
-cd cmake-build
+cd cmake-build || exit
 cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
 cmake --build .
 sudo cmake --build . --target install
@@ -62,7 +62,7 @@ echo "Downloading MongoDB C++ Driver"
 # Download the latest version of mongocxx driver
 curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.6.2/mongo-cxx-driver-r3.6.2.tar.gz
 tar -xzf mongo-cxx-driver-r3.6.2.tar.gz
-cd mongo-cxx-driver-r3.6.2/build
+cd mongo-cxx-driver-r3.6.2/build || exit
 
 echo "Configuring MongoDB C++ Driver"
 

@@ -4,6 +4,6 @@ set -x
 SCRIPT_DIR=$(pwd)
 
 # Build and put stuff in the Binary folder
-pushd $SCRIPT_DIR/VirtualMachine
-for d in $(echo ./*/);do (pushd $d; make all -j; popd); done
-popd
+pushd "$SCRIPT_DIR"/VirtualMachine || exit
+for d in $(echo ./*/);do (pushd "$d" || exit; make all -j; popd || exit); done
+popd || exit

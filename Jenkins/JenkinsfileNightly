@@ -58,6 +58,7 @@ pipeline {
                     cd Milestone5/Docker/
                     ./RunService.sh -s backend -d
                     docker ps -q
+                    sleep 5
                     '''
                 }
                 script {

@@ -59,7 +59,7 @@ static void * GlobalMonitorRunThread(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -88,7 +88,7 @@ static void * GlobalMonitorHandleTransactionThread(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -201,7 +201,7 @@ void __thiscall GlobalMonitor::Run(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

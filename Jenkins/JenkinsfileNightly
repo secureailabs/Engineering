@@ -66,6 +66,7 @@ pipeline {
                         sh '''
                         docker exec -w /app backend sh -c "pwd"
                         docker exec -w /app backend sh -c "ls -l"
+                        docker exec -w /app backend sh -c "ps -ef"
                         docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     } catch (exception) {

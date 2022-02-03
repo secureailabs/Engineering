@@ -49,6 +49,7 @@ pipeline {
                     pwd
                     cd Milestone5/Docker/
                     ./RunService.sh -s backend -d
+                    docker ps -q
                     '''
                 }
                 script {
@@ -56,7 +57,6 @@ pipeline {
                         echo 'Load Database'
                         sh '''
                         docker exec -w /app backend sh -c "ls -l"
-                        docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
                         docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     } catch (exception) {

@@ -51,7 +51,7 @@ std::string __thiscall RootOfTrustCoreProperties::GetProperty(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -80,7 +80,7 @@ void __thiscall RootOfTrustCoreProperties::SetProperty(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

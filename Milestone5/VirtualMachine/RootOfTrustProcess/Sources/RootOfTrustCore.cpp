@@ -320,7 +320,7 @@ void __thiscall RootOfTrustCore::AuditEventDispatcher(void) throw()
             ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
 
-        catch (...)
+        catch(...)
         {
             ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         }
@@ -424,7 +424,7 @@ void __thiscall RootOfTrustCore::RunIpcListener(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -501,7 +501,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleRegisterResearcherTransactio
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -538,7 +538,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandlePutDatasetTransaction(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -574,7 +574,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleGetDatasetTransaction(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -612,12 +612,12 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleAuditEventTransaction(
         oResponseBuffer.PutBoolean("Success", true);
     }
 
-    catch (const BaseException & c_oBaseException)
+    catch (BaseException c_oBaseException)
     {
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -648,7 +648,7 @@ bool __thiscall RootOfTrustCore::RegisterVirtualMachine(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -677,7 +677,7 @@ bool __thiscall RootOfTrustCore::RegisterDataOwnerEosb(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -706,7 +706,7 @@ bool __thiscall RootOfTrustCore::RegisterResearcherEosb(void)
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -746,7 +746,7 @@ void __thiscall RootOfTrustCore::RecordInternalAuditEvent(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

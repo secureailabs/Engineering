@@ -165,6 +165,9 @@ int __cdecl main(
         // all monitored elements have terminated or, several minutes have passed
         GlobalMonitor * poGlobalMonitor = ::GetGlobalMonitor();
         poGlobalMonitor->Run(oCommandLineParameters.IsElementPresent("DisplayStatus", BOOLEAN_VALUE_TYPE));
+        // Get the initialization parameters
+        bool fInitialized = ::RunInitializerProcess();
+        _ThrowBaseExceptionIf((false == fInitialized), "Failed to initialize", nullptr);
         // First we need to run the Initializer Process and then wait for the initialization
         // parameters to come in. This will end up initializing the root of trust engine
         // before it is able to run
@@ -193,7 +196,7 @@ int __cdecl main(
         oStatusMonitor.SignalTermination("Unrecoverable exception");
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         // If there is an exception here, this means that the RootOfTrust process is

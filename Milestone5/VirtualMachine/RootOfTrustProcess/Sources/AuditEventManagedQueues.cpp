@@ -118,7 +118,7 @@ unsigned int AuditEventManagedQueues::GetQueuedAuditEventsCount(
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
@@ -167,7 +167,7 @@ std::queue<std::string> __thiscall AuditEventManagedQueues::GetQueuedAuditEvents
         ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
-    catch (...)
+    catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }

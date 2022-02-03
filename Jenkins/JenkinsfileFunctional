@@ -143,7 +143,7 @@ pipeline {
             set -x
             docker kill $(docker ps -q)
             docker rm $(docker ps -a -q)
-            cd /datadrive/jenkins_workspace/workspace/tmp_engineering/ && tar -cvf Nightly_Orchestrator.tar Orchestrator/
+            cd /datadrive/jenkins_workspace/workspace/tmp_engineering/ && tar -cvf Functional_Orchestrator.tar Orchestrator/
             test -d "/datadrive/jenkins_workspace/workspace/tmp_engineering/Orchestrator/" && rm -rf "/datadrive/jenkins_workspace/workspace/tmp_engineering/Orchestrator/"
             '''
             cleanWs()

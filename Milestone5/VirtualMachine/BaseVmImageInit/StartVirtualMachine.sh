@@ -13,8 +13,5 @@ fi
 # Unpack the tar package
 tar -xvf package.tar.gz
 
-# Move the InitializerVector to the Binary folder
-mv InitializationVector.json Binary/
-
 # Run the docker container
 ./Run.sh

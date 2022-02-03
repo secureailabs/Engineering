@@ -47,25 +47,32 @@ else
     exit 1
 fi
 
+# Set the root directory of the whole platform
+rootDir=$(pwd)/..
+
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
 if [ "orchestrator" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags -p 8080:8080 -v $(pwd)/../VirtualMachine/Orchestrator:/app $imageName"
+    cp orchestrator/InitializationVector.json $rootDir/VirtualMachine/Orchestrator
+    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/VirtualMachine/Orchestrator:/app $imageName"
 elif [ "backend" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $(pwd)/../Binary:/app $imageName"
+    cp backend/InitializationVector.json $rootDir/Binary
+    runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $rootDir/Binary:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags -p 3000:3000 -v $(pwd)/../WebFrontend:/app $imageName"
+    cp webfrontend/InitializationVector.json $rootDir/WebFrontend
+    runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/WebFrontend:/app $imageName"
 elif [ "securecomputationnode" == "$imageName" ]
 then
-    runtimeFlags="$runtimeFlags -p 3500:3500 -p 9090:9090 -p 6800:6800 -v $(pwd)/../Binary:/app $imageName"
+    cp securecomputationnode/InitializationVector.json $rootDir/Binary
+    runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6800 -v $rootDir/Binary:/app $imageName"
 elif [ "remotedataconnector" == "$imageName" ]
 then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1
-    # runtimeFlags="$runtimeFlags -v $(pwd)/../Binary:/Development $imageName"
+    # runtimeFlags="$runtimeFlags -v $rootDir/Binary:/Development $imageName"
 else
     echo "!!! Kindly provide correct service name !!!"
     PrintHelp

@@ -20,6 +20,9 @@ else
     exit 1
 fi
 
+# Move the InitializerVector to the Binary folder
+mv InitializationVector.json Orchestrator/
+
 # Run the docker container
 docker run \
 -dit \

@@ -55,7 +55,7 @@ runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
 if [ "orchestrator" == "$imageName" ]
 then
     cp orchestrator/InitializationVector.json $rootDir/VirtualMachine/Orchestrator
-    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/VirtualMachine/Orchestrator:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator:/app $imageName"
 elif [ "backend" == "$imageName" ]
 then
     cp backend/InitializationVector.json $rootDir/Binary

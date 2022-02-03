@@ -10,6 +10,7 @@
 
 #include "DebugLibrary.h"
 #include "Exceptions.h"
+#include "StructuredBuffer.h"
 
 #include <vector>
 #include <string>
@@ -17,3 +18,7 @@
 extern std::string __stdcall GetInitializationValue(
     _in const std::string & c_strParameter
 );
+
+extern StructuredBuffer __stdcall GetInitialziationStructuredBuffer(
+    _in const std::string & c_strStructuredBufferName
+    );

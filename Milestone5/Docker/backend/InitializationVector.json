@@ -7,5 +7,17 @@
     "SecureComputationNodePackageUrl":"/builds/SecureComputationNode.tar.gz?sp=r&st=2022-01-27T12:04:31Z&se=2024-03-31T20:04:31Z&spr=https&sv=2020-08-04&sr=b&sig=QbMNfC00WrhmtBCtOziyZ8r7sKuYJucUYg2aP5gaVFk%3D",
     "SecureComputationNodePackageHost":"sailcomputationimage9891.blob.core.windows.net",
     "TlsCertificate":"aaaa",
-    "TlsPrivateKey":"bbbb"
+    "TlsPrivateKey":"bbbb",
+    "AzureSecureComputationalNodeTemplate" :
+    {
+        "ApplicationID" :"4f909fab-ad4c-4685-b7a9-7ddaae4efb22",
+        "HostRegion" : "eastus",
+        "NetworkSecurityGroup" : "NsgTemp",
+        "ResourceGroup" : "ScratchpadRg",
+        "Secret" : "1YEn1Y.bVTVk-dzm9voTWyf7DrgQF29xL2",
+        "SubscriptionID": "3d2b9951-a0c8-4dc3-8114-2776b047b15c",
+        "TenantID" : "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8",
+        "VirtualMachineImage": "securecomputationnode",
+        "VirtualNetwork" :"vnet"
+    }
 }

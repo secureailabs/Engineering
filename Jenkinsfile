@@ -19,7 +19,7 @@ pipeline {
                 '''
                 echo 'Starting to build docker image: Backend Api Portal Server'
                 script {
-                    docker.build('ubuntu-development:1.0', "--build-arg git_personal_token=$JENKINS_PAT -f Dockerfile.development .")
+                    docker.build('ubuntu-development:1.0', '--build-arg git_personal_token=${JENKINS_PAT} -f Dockerfile.development .')
                     sh 'pwd'
                     sh 'docker run --name ubuntu_dev_CI -dit -p 6200:6200 -p 27017:27017 -v ${PWD}:/Workspace -w="/Workspace" ubuntu-development:1.0 /bin/bash'
                     sh label:

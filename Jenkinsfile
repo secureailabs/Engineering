@@ -1,9 +1,13 @@
+/* groovylint-disable LineLength */
 pipeline {
     agent any
+    environment {
+        JENKINS_PAT = credentials('PAT_Jenkins')
+    }
     options {
-    buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
-    parallelsAlwaysFailFast()
-    timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
+        parallelsAlwaysFailFast()
+        timestamps()
     }
     stages {
         stage('Git') {
@@ -15,10 +19,10 @@ pipeline {
                 '''
                 echo 'Starting to build docker image: Backend Api Portal Server'
                 script {
-                    docker.build('ubuntu-development:1.0', '--build-arg git_personal_token=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 -f Dockerfile.development .')
+                    docker.build('ubuntu-development:1.0', "--build-arg git_personal_token=$JENKINS_PAT -f Dockerfile.development .")
                     sh 'pwd'
                     sh 'docker run --name ubuntu_dev_CI -dit -p 6200:6200 -p 27017:27017 -v ${PWD}:/Workspace -w="/Workspace" ubuntu-development:1.0 /bin/bash'
-                    sh  label:
+                    sh label:
                     'Update Repo and start Mongod',
                     script:'''
                     echo "Update Repo and start Mongod"
@@ -35,72 +39,14 @@ pipeline {
             }
             post {
                 failure {
-                    echo "Failed during Git stage"
-                }
-            }
-        }
-        stage('Build Backend3') {
-            steps {
-                script {
-                    echo 'Build Binaries'
-                    sh label:
-                    'Build Binaries',
-                    script:'''
-                    set -x
-                    docker exec -w /Workspace/Milestone3/ ubuntu_dev_CI ./CreateDailyBuild.sh
-                    docker exec -w /Workspace/Milestone3/Binary ubuntu_dev_CI sh -c "ls -l"
-                    '''
-                }
-            }
-            post {
-                failure {
-                    echo "Failed during Build Backend stage"
-                }
-            }
-        }
-        stage ('Deploy Backend3') {
-            steps {
-                script {
-                    echo 'Deploy DatabaseGateway and RestApiPortal'
-                    sh '''
-                    docker exec -w /Workspace/Milestone3/Binary ubuntu_dev_CI sh -c "sudo ./DatabaseGateway  > database.log &"
-                    sleep 1
-                    docker exec -w /Workspace/Milestone3/Binary ubuntu_dev_CI sh -c "sudo ./RestApiPortal > portal.log &"
-                    sleep 1
-                    docker exec -w /Workspace/Milestone3/ ubuntu_dev_CI ps -ef
-                    '''
-                }
-                script {
-                    try {
-                        echo 'Load Database'
-                        sh 'docker exec -w /Workspace/Milestone3/Binary ubuntu_dev_CI sh -c "ls -l"'
-                        sh 'docker exec -w /Workspace/Milestone3/Binary ubuntu_dev_CI sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"'
-                    }catch (exception) {
-                        echo getStackTrace(exception)
-                        echo 'Error detected, retrying...'
-                        sh '''
-                        docker exec -w /Workspace/Milestone3/Binary ubuntu_dev_CI sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
-                        docker exec -w /Workspace/Milestone3/Binary ubuntu_dev_CI sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
-                        ''' 
-                    }
-                }
-                echo 'Backend Portal Server is Deployed and Ready to use'
-                echo 'Build Successful'
-                sh '''
-                ps -ef | egrep "DatabaseGateway|RestApiPortal"
-                killall -9 DatabaseGateway &&  killall -9 RestApiPortal
-                '''
-            }
-            post {
-                failure {
-                    echo "Failed during Deploy Backend stage"
+                    echo 'Failed during Git stage'
                 }
             }
         }
         stage('Build Backend5') {
             steps {
                 script {
-                    echo 'Build Binaries'
+                    echo 'CreateDailyBuilds'
                     sh label:
                     'Build Binaries',
                     script:'''
@@ -112,11 +58,11 @@ pipeline {
             }
             post {
                 failure {
-                    echo "Failed during Build Backend stage"
+                    echo 'Failed during Build Backend stage'
                 }
             }
         }
-        stage ('Deploy Backend5') {
+        stage('Deploy Backend5') {
             steps {
                 script {
                     echo 'Deploy DatabaseGateway and RestApiPortal'
@@ -139,7 +85,7 @@ pipeline {
                         sh '''
                         docker exec -w /Workspace/Milestone5/Binary ubuntu_dev_CI sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
                         docker exec -w /Workspace/Milestone5/Binary ubuntu_dev_CI sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
-                        ''' 
+                        '''
                     }
                 }
                 echo 'Backend Portal Server is Deployed and Ready to use'
@@ -151,14 +97,14 @@ pipeline {
             }
             post {
                 failure {
-                    echo "Failed during Deploy Backend stage"
+                    echo 'Failed during Deploy Backend stage'
                 }
             }
         }
     }
     post {
         always {
-            echo 'Teardown'
+            echo 'Tear down'
             sh label:
             'Teardown',
             script:'''

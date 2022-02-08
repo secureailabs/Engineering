@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^2.5.1",
+    "@secureailabs/web-ui": "^1.1.6",
     "@types/react-grid-layout": "^1.1.2",
     "@types/react-modal": "^3.12.0",
     "@types/react-table": "^7.7.2",

@@ -4,3 +4,6 @@ node_modules
 dist
 build/*
 src/.env
+
+# npm auth
+.npmrc

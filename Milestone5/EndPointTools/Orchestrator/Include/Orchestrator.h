@@ -119,10 +119,6 @@ class Orchestrator : public Object{
             _in unsigned long unServerPort
         );
 
-        DigitalContractProvisiongStatus __thiscall GetProvisionStatus(
-            const Guid& c_strDigitalContractGUID
-            );
-
         std::string __thiscall GetIPServingDataset(
             _in const Guid& oDatasetGuid
             ) const;

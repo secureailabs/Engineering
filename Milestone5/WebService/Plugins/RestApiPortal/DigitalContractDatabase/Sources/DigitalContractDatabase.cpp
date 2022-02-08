@@ -2233,9 +2233,17 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
                             );
                         }
 
+                        Guid oDatasetGuid(oDigitialContract.GetString("DatasetGuid"));
+                        /* Comment back in when we can deploy any data set
+                        if ( c_oRequest.IsElementPresent("DatasetGuid", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+                        {
+                            oDatasetGuid = Guid(c_oRequest.GetString("DatasetGuid"));
+                        }
+                        */
                         // Create a thread which will keep updating the VM status on the database as it proceeds
                         // This API will return the response, stating that the VM creation has started
-                        std::thread oThreadCreateVirtualMachine(&DigitalContractDatabase::ProvisionVirtualMachine, this, oDigitialContract, c_oRequest.GetBuffer("Eosb"), oNewVmGuid, strOptionalVirtualMachineType);
+                        std::thread oThreadCreateVirtualMachine(&DigitalContractDatabase::ProvisionVirtualMachine, this, oDigitialContract, c_oRequest.GetBuffer("Eosb"),
+                            oNewVmGuid, strOptionalVirtualMachineType, oDatasetGuid);
                         oThreadCreateVirtualMachine.detach();
 
                         // Update the Digital ContractStatus to Provisioning
@@ -2333,7 +2341,8 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
     _in const StructuredBuffer c_oDigitalContract,
     _in const std::vector<Byte> c_stlEosb,
     _in const Guid c_oNewVirtualMachineGuid,
-    _in const std::string c_strVirtualMachineSize
+    _in const std::string c_strVirtualMachineSize,
+    _in const Guid c_oDatasetGuid
 )
 {
     __DebugFunction();
@@ -2487,7 +2496,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             oInitializationVector.PutString("RootOfTrustDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
             oInitializationVector.PutString("ComputationalDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
             oInitializationVector.PutString("DataConnectorDomainIdentifier", Guid().ToString(eHyphensAndCurlyBraces));
-            oInitializationVector.PutString("DatasetIdentifier", c_oDigitalContract.GetString("DatasetGuid"));
+            oInitializationVector.PutString("DatasetIdentifier", c_oDatasetGuid.ToString(eHyphensAndCurlyBraces));
             auto stlVmEosb = oVmRegisterResponse.GetBuffer("VmEosb");
             oInitializationVector.PutString("VmEosb", ::Base64Encode(stlVmEosb.data(), stlVmEosb.size()));
 

@@ -146,7 +146,8 @@ class DigitalContractDatabase : public Object
             _in const StructuredBuffer c_oDigitalContract,
             _in const std::vector<Byte> c_stlEosb,
             _in const Guid c_oNewVirtualMachineGuid,
-            _in const std::string c_strVirtualMachineSize
+            _in const std::string c_strVirtualMachineSize,
+            _in const Guid c_oDatasetGuid
             );
 
         // Update the Provisioning Status of Digital Contract to

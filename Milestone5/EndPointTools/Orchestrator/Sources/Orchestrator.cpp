@@ -565,7 +565,6 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
         oJsonRequest.PutString("DigitalContractGuid", oDigitalContractGuid.ToString(eHyphensAndCurlyBraces));
         oJsonRequest.PutString("DatasetGuid", oDatasetGuid.ToString(eHyphensAndCurlyBraces));
         oJsonRequest.PutString("VirtualMachineType", c_strVmType);
-        std::cout << oJsonRequest.ToString() << std::endl;
         std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
 
         std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
@@ -885,59 +884,6 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
     return fJobStarted;
 }
 
- /********************************************************************************************
-  *
-  * @class Frontend
-  * @function GetProvisionStatus
-  * @brief Get the provision status of a digital contract
-  * @param[in] std::string - The Digital contract's GUID
-  * @return DigitalContractProvisioningStatus - The enum of the digital contract status
-  *
-  ********************************************************************************************/
-DigitalContractProvisiongStatus __thiscall Orchestrator::GetProvisionStatus(
-    const Guid& c_oSecureNodeProvisionGUID
-    )
-{
-    __DebugFunction();
-
-    const std::string c_strRawSecureNodeProvisionGuid{c_oSecureNodeProvisionGUID.ToString(eRaw)};
-    Guid oDigitalContractGuid(m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strDigitalContractGUID);
-    const std::string c_strRawDigitalContractGuid{oDigitalContractGuid.ToString(eRaw)};
-    std::string strVerb = "GET";
-    std::string strApiUrl = "/SAIL/DigitalContractManager/GetProvisioningStatus?Eosb=" + m_oEosbRotator.GetEosb();
-    std::string strContent = "{\n   \"DigitalContractGuid\":\"" + oDigitalContractGuid.ToString(eHyphensAndCurlyBraces) + "\"\n}";
-    std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
-    std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-    StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
-    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error retrieving digital contract provision status", nullptr);
-
-    DigitalContractProvisiongStatus eProvisionStatus = ::ProvisioningStatusFromFloat(oResponse.GetFloat64("ProvisioningStatus"));
-
-    m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].eProvisionStatus = eProvisionStatus;
-
-    if ( oResponse.IsElementPresent("VirtualMachines", INDEXED_BUFFER_VALUE_TYPE) )
-    {
-        if ( "" == m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress )
-        {
-            StructuredBuffer oVirtualMachines = oResponse.GetStructuredBuffer("VirtualMachines");
-
-            // We expect at most 1 VM per provision
-            __DebugAssert(oVirtualMachines.GetNamesOfElements().size() == 1);
-            m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strVMGUID = oVirtualMachines.GetNamesOfElements()[0];
-            m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress = oVirtualMachines.GetString(m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strVMGUID.c_str());
-            std::cout << "DC " << c_strRawDigitalContractGuid << " has IP " << m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress << std::endl;
-        }
-        else
-        {
-            std::cout << "DC " << c_strRawDigitalContractGuid << " already has an IP" << std::endl;
-        }
-    }
-
-    // We intentially do not catch exceptions here as we want to return a DigitalContractProvisioningStatus
-    // enum, and if we fail there's no proper enum value to return
-    return eProvisionStatus;
-}
-
 /********************************************************************************************
  *
  * @class Orchestrator
@@ -1016,8 +962,6 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
             {
                 for ( const auto& stlSecureComputationNodeItr : m_stlProvisionInformation )
                 {
-                    std::cout << "Checking status of " << stlSecureComputationNodeItr.first << std::endl;
-                    std::cout << "Checking DC of " << stlSecureComputationNodeItr.second.strDigitalContractGUID << std::endl;
                     if ( stlSucceededProvisions.end() == stlSucceededProvisions.find(stlSecureComputationNodeItr.first) )
                     {
                         Guid oDigitalContractGuid(stlSecureComputationNodeItr.second.strDigitalContractGUID);

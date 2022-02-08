@@ -23,13 +23,16 @@
 #include "Base64Encoder.h"
 #include "InitializationVector.h"
 #include "JsonParser.h"
+#include "FileUtils.h"
 
 #include <algorithm>
 #include <thread>
+#include <filesystem>
 
 #include <unistd.h>
 
 static DigitalContractDatabase * gs_oDigitalContractDatabase = nullptr;
+static std::mutex gs_stlScnPackageLock;
 
 static SmartMemoryAllocator gs_oMemoryAllocator;
 
@@ -2464,25 +2467,37 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
 
             // Read the Secure computation node package if not done already
             static std::vector<Byte> s_stlSecureComputationNodePackage;
-            if (0 == s_stlSecureComputationNodePackage.size())
             {
-                std::string strSecureComputationNodePackagePath = ::GetInitializationValue("SecureComputationNodePackageUrl");
-                _ThrowBaseExceptionIf((0 == strSecureComputationNodePackagePath.length()), "Secure computation node package not found", nullptr);
+                std::lock_guard<std::mutex> oLock(gs_stlScnPackageLock);
+                if (0 == s_stlSecureComputationNodePackage.size())
+                {
+                    const std::string c_strPackageFile = "SecureComputationNode.tar.gz";
+                    if (true == std::filesystem::exists(c_strPackageFile))
+                    {
+                        std::cout << "Reading the Secure computation node package from the file system." << std::endl;
+                        s_stlSecureComputationNodePackage = ::ReadFileAsByteBuffer(c_strPackageFile);
+                        _ThrowBaseExceptionIf((0 >= s_stlSecureComputationNodePackage.size()), "Invalid Package received.", nullptr);
+                    }
+                    else
+                    {
+                        std::string strSecureComputationNodePackagePath = ::GetInitializationValue("SecureComputationNodePackageUrl");
+                        _ThrowBaseExceptionIf((0 == strSecureComputationNodePackagePath.length()), "Secure computation node package not found", nullptr);
 
-                std::string strVerb = "GET";
-                std::string strContent = "";
-                std::string strApiUri = strSecureComputationNodePackagePath;
-                std::string strHost = ::GetInitializationValue("SecureComputationNodePackageHost");
+                        const std::string c_strVerb = "GET";
+                        const std::string c_strContent = "";
+                        const std::string c_strApiUri = strSecureComputationNodePackagePath;
+                        const std::string c_strHost = ::GetInitializationValue("SecureComputationNodePackageHost");
 
-                std::vector<std::string> stlHeader;
-                stlHeader.push_back("Host: " + strHost);
-                stlHeader.push_back("Content-Length: " + std::to_string(strContent.length()));
-                long nResponseCode = 0;
-                s_stlSecureComputationNodePackage = ::RestApiCall(strHost, 443, strVerb, strApiUri, "", false, stlHeader, &nResponseCode);
-                _ThrowBaseExceptionIf((200 != nResponseCode), "Failed to get Binaries package. Response code: %d", nResponseCode);
-                _ThrowBaseExceptionIf((0 >= s_stlSecureComputationNodePackage.size()), "Invalid Package received.", nullptr);
+                        std::vector<std::string> stlHeader;
+                        stlHeader.push_back("Host: " + c_strHost);
+                        stlHeader.push_back("Content-Length: " + std::to_string(c_strContent.length()));
+                        long nResponseCode = 0;
+                        s_stlSecureComputationNodePackage = ::RestApiCall(c_strHost, 443, c_strVerb, c_strApiUri, "", false, stlHeader, &nResponseCode);
+                        _ThrowBaseExceptionIf((200 != nResponseCode), "Failed to get Binaries package. Response code: %d", nResponseCode);
+                        _ThrowBaseExceptionIf((0 >= s_stlSecureComputationNodePackage.size()), "Invalid Package received.", nullptr);
+                    }
+                }
             }
-
             // Send the Virtual Machine Initialization data
             StructuredBuffer oInitializationVector;
             oInitializationVector.PutString("NameOfVirtualMachine", "Some nice name of Virtual machine");

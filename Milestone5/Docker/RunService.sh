@@ -78,5 +78,8 @@ else
     PrintHelp
 fi
 
+# Clean up existing non-running containers
+docker container rm -f $imageName
+
 # Run the docker container
 docker run $runtimeFlags

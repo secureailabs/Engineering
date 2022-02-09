@@ -611,7 +611,7 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     {
         oReturnStructuredBuffer.PutString("Message", strProvisionMessage);
     }
-    if ( "" != strRawProvisionGuid && true == fProvisionResult )
+    if ( ("" != strRawProvisionGuid) && (true == fProvisionResult) )
     {
         Guid oPrettyGuid(strRawProvisionGuid);
         oReturnStructuredBuffer.PutString("SCNGuid", oPrettyGuid.ToString(eHyphensAndCurlyBraces));
@@ -890,9 +890,8 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
  * @function GetSecureComputationNodeInformation
  * @brief Get the information about an SCN
  * @param[in] Guid - The SCN's GUID
- * @return DigitalContractProvisioningStatus - The enum of the digital contract status
+ * @return VirtualMachineState - The enum of the SCN VM status
  * @function SetParameter
- *
  *
  ********************************************************************************************/
 VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation(

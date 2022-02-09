@@ -119,10 +119,6 @@ class Orchestrator : public Object{
             _in unsigned long unServerPort
         );
 
-        DigitalContractProvisiongStatus __thiscall GetProvisionStatus(
-            const Guid& c_strDigitalContractGUID
-            );
-
         std::string __thiscall GetIPServingDataset(
             _in const Guid& oDatasetGuid
             ) const;
@@ -162,6 +158,10 @@ class Orchestrator : public Object{
         void __thiscall UpdateJobIPAddressForParameter(
             _in JobInformation& oJob,
             _in const Guid& oParameterGuid
+            );
+
+        VirtualMachineState __thiscall GetSecureComputationNodeInformation(
+            _in const Guid& oSecureNodeGuid
             );
 
         EosbRotationManager m_oEosbRotator{};

@@ -550,68 +550,50 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     __DebugFunction();
     unsigned int unStatus{404};
     bool fProvisionResult{false};
-    Guid oScnProvisionGuid(eOrchestratorProvisionTask);
     StructuredBuffer oReturnStructuredBuffer;
-    const std::string c_strRawProvisionGuid{oScnProvisionGuid.ToString(eRaw)};
-
+    std::string strRawProvisionGuid{""};
+    std::string strProvisionMessage{""};
     try
     {
         Guid oDatasetGuid(c_strDatasetGUID);
         Guid oDigitalContractGuid(c_strDigitalContractGUID);
         const std::string c_strRawDigitalContractGuid{oDigitalContractGuid.ToString(eRaw)};
-        m_stlProvisionInformation[c_strRawProvisionGuid].strDigitalContractGUID = c_strRawDigitalContractGuid;
-        DigitalContractProvisiongStatus eProvisionStatus = GetProvisionStatus(c_strRawProvisionGuid);
 
-        // First check if this DC is already provisioned
-        if ( (DigitalContractProvisiongStatus::eProvisioning == eProvisionStatus) || (DigitalContractProvisiongStatus::eReady == eProvisionStatus) )
+        std::string strVerb = "POST";
+        std::string strApiUrl = "/SAIL/DigitalContractManager/Provision?Eosb=" + m_oEosbRotator.GetEosb();
+        StructuredBuffer oJsonRequest;
+        oJsonRequest.PutString("DigitalContractGuid", oDigitalContractGuid.ToString(eHyphensAndCurlyBraces));
+        oJsonRequest.PutString("DatasetGuid", oDatasetGuid.ToString(eHyphensAndCurlyBraces));
+        oJsonRequest.PutString("VirtualMachineType", c_strVmType);
+        std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
+
+        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+
+        if ( oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE) )
         {
-            // Right now SCN provision and DC are linked 1:1, but we want to expand it to allow multiple
-            // SCNs to have the same DC
-            m_stlProvisionInformation[c_strRawProvisionGuid].eProvisionStatus = eProvisionStatus;
-
-            // Once we have DCs based more on families this will have to be changed
-            if ( (m_stlProvisionInformation[c_strRawProvisionGuid].strDatasetGUID != oDatasetGuid.ToString(eRaw)) &&
-                m_stlProvisionInformation[c_strRawProvisionGuid].strDatasetGUID != "" )
-            {
-                _ThrowBaseException("Digital contract already assigned to dataset %s", m_stlProvisionInformation[c_strRawProvisionGuid].strDatasetGUID);
-            }
-            m_stlProvisionInformation[c_strRawProvisionGuid].strProvisionMessage = "";
-            m_stlProvisionInformation[c_strRawProvisionGuid].strDatasetGUID = oDatasetGuid.ToString(eRaw);
-            unStatus = 200;
+            unStatus = oResponse.GetFloat64("Status");
         }
         else
         {
-            std::string strVerb = "POST";
-            std::string strApiUrl = "/SAIL/DigitalContractManager/Provision?Eosb=" + m_oEosbRotator.GetEosb();
-            StructuredBuffer oJsonRequest;
-            oJsonRequest.PutString("DigitalContractGuid", oDigitalContractGuid.ToString(eHyphensAndCurlyBraces));
-            oJsonRequest.PutString("DatasetGuid", oDatasetGuid.ToString(eHyphensAndCurlyBraces));
-            oJsonRequest.PutString("VirtualMachineType", c_strVmType);
-            std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
-
-            std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
-            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-
-            if ( oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE) )
-            {
-                unStatus = oResponse.GetFloat64("Status");
-            }
-            else
-            {
-                std::cout << "No provision status?" << std::endl;
-            }
-
-            if ( oResponse.IsElementPresent("Message", ANSI_CHARACTER_STRING_VALUE_TYPE) )
-            {
-                m_stlProvisionInformation[c_strRawProvisionGuid].strProvisionMessage = oResponse.GetString("Message");
-            }
-            if ( (200 == unStatus) || (201 == unStatus) )
-            {
-                fProvisionResult = true;
-                m_stlProvisionInformation[c_strRawProvisionGuid].eProvisionStatus = DigitalContractProvisiongStatus::eProvisioning;
-                m_stlProvisionInformation[c_strRawProvisionGuid].strDatasetGUID = oDatasetGuid.ToString(eRaw);
-            }
+            std::cout << "No provision status?" << std::endl;
         }
+
+        if ( oResponse.IsElementPresent("Message", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        {
+            strProvisionMessage = oResponse.GetString("Message");
+        }
+        if ( (200 == unStatus) || (201 == unStatus) )
+        {
+            fProvisionResult = true;
+            Guid oProvisionGuid = Guid(oResponse.GetString("SecureNodeGuid"));
+            strRawProvisionGuid = oProvisionGuid.ToString(eRaw);
+            m_stlProvisionInformation[strRawProvisionGuid].eProvisionStatus = DigitalContractProvisiongStatus::eProvisioning;
+            m_stlProvisionInformation[strRawProvisionGuid].strDatasetGUID = oDatasetGuid.ToString(eRaw);
+            m_stlProvisionInformation[strRawProvisionGuid].strDigitalContractGUID = oDigitalContractGuid.ToString(eRaw);
+            std::cout << "Provisioned Secure Node " << strRawProvisionGuid << std::endl;
+        }
+
     }
     catch(const BaseException& oBaseException )
     {
@@ -625,10 +607,14 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     }
 
     oReturnStructuredBuffer.PutBoolean("Status", fProvisionResult);
-    oReturnStructuredBuffer.PutString("Message", m_stlProvisionInformation[c_strRawProvisionGuid].strProvisionMessage);
-    if ( true == fProvisionResult )
+    if ( "" != strProvisionMessage )
     {
-        oReturnStructuredBuffer.PutString("ScnId", oScnProvisionGuid.ToString(eHyphensAndCurlyBraces));
+        oReturnStructuredBuffer.PutString("Message", strProvisionMessage);
+    }
+    if ( ("" != strRawProvisionGuid) && (true == fProvisionResult) )
+    {
+        Guid oPrettyGuid(strRawProvisionGuid);
+        oReturnStructuredBuffer.PutString("SCNGuid", oPrettyGuid.ToString(eHyphensAndCurlyBraces));
     }
 
     return GetJsonForStructuredBuffer(oReturnStructuredBuffer);
@@ -898,61 +884,51 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
     return fJobStarted;
 }
 
- /********************************************************************************************
-  *
-  * @class Orchestrator
-- * @function GetDigitalContractProvisionStatus
-- * @brief Get the provision status of a digital contract
-- * @param[in] std::string - The Digital contract's GUID
-- * @return DigitalContractProvisioningStatus - The enum of the digital contract status
-+ * @function SetParameter
-+ * @brief Get the job status for a given job id
-+ * @return std::string - The ID for the parameter if it was set, blank if it wasn't
-  *
-  ********************************************************************************************/
-DigitalContractProvisiongStatus __thiscall Orchestrator::GetProvisionStatus(
-    const Guid& c_oSecureNodeProvisionGUID
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function GetSecureComputationNodeInformation
+ * @brief Get the information about an SCN
+ * @param[in] Guid - The SCN's GUID
+ * @return VirtualMachineState - The enum of the SCN VM status
+ * @function SetParameter
+ *
+ ********************************************************************************************/
+VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation(
+    _in const Guid& c_oSecureNodeGuid
     )
 {
     __DebugFunction();
 
-    const std::string c_strRawSecureNodeProvisionGuid{c_oSecureNodeProvisionGUID.ToString(eRaw)};
-    Guid oDigitalContractGuid(m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strDigitalContractGUID);
-    const std::string c_strRawDigitalContractGuid{oDigitalContractGuid.ToString(eRaw)};
+    StructuredBuffer oJsonRequest;
+    oJsonRequest.PutString("VirtualMachineGuid", c_oSecureNodeGuid.ToString(eRaw));
+    std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
     std::string strVerb = "GET";
-    std::string strApiUrl = "/SAIL/DigitalContractManager/GetProvisioningStatus?Eosb=" + m_oEosbRotator.GetEosb();
-    std::string strContent = "{\n   \"DigitalContractGuid\":\"" + oDigitalContractGuid.ToString(eHyphensAndCurlyBraces) + "\"\n}";
+    std::string strApiUrl = "/SAIL/VirtualMachineManager/PullVirtualMachine?Eosb=" + m_oEosbRotator.GetEosb();
     std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
     std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
     StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
-    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error retrieving digital contract provision status", nullptr);
+    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error retrieving secure node provision status", nullptr);
 
-    DigitalContractProvisiongStatus eProvisionStatus = ::ProvisioningStatusFromFloat(oResponse.GetFloat64("ProvisioningStatus"));
+    const std::string c_strRawSecureNodeProvisionGuid = c_oSecureNodeGuid.ToString(eRaw);
 
-    m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].eProvisionStatus = eProvisionStatus;
+    StructuredBuffer oVirtualMachine = oResponse.GetStructuredBuffer("VirtualMachine");
+    VirtualMachineState eVirtualMachineState = static_cast<VirtualMachineState>(oVirtualMachine.GetFloat64("State"));
 
-    if ( oResponse.IsElementPresent("VirtualMachines", INDEXED_BUFFER_VALUE_TYPE) )
+    // Only extract the IP if this SCN is ready for use
+    if ( "0.0.0.0" != oVirtualMachine.GetString("IPAddress") && 
+        (VirtualMachineState::eWaitingForData == eVirtualMachineState || VirtualMachineState::eReadyForComputation == eVirtualMachineState ))
     {
-        if ( "" == m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress )
-        {
-            StructuredBuffer oVirtualMachines = oResponse.GetStructuredBuffer("VirtualMachines");
-
-            // We expect at most 1 VM per provision
-            __DebugAssert(oVirtualMachines.GetNamesOfElements().size() == 1);
-            m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strVMGUID = oVirtualMachines.GetNamesOfElements()[0];
-            m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress = oVirtualMachines.GetString(m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strVMGUID.c_str());
-            std::cout << "DC " << c_strRawDigitalContractGuid << " has IP " << m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress << std::endl;
-        }
-        else
-        {
-            std::cout << "DC " << c_strRawDigitalContractGuid << " already has an IP" << std::endl;
-        }
+        std::cout << "DS " << m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strDatasetGUID << 
+            " being served on " << oVirtualMachine.GetString("IPAddress") << std::endl;
+        m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress = oVirtualMachine.GetString("IPAddress");
     }
-
-    // We intentially do not catch exceptions here as we want to return a DigitalContractProvisioningStatus
-    // enum, and if we fail there's no proper enum value to return
-    return eProvisionStatus;
- }
+    if ( "..." != oVirtualMachine.GetString("Note") )
+    {
+        m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strProvisionMessage = oVirtualMachine.GetString("Note");
+    }
+    return eVirtualMachineState;
+}
 
 /********************************************************************************************
  *
@@ -977,6 +953,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
             std::set<std::string> stlSucceededProvisions;
             std::set<std::string> stlInProgressProvisions;
             std::set<std::string> stlFailedProvisions;
+            std::set<std::string> stlDeletedProvisions;
             bool fTimedOut{false};
 
             // We aren't ready, wait and check again
@@ -988,20 +965,26 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                     {
                         Guid oDigitalContractGuid(stlSecureComputationNodeItr.second.strDigitalContractGUID);
                         Guid oSecureComputationalNodeGuid(stlSecureComputationNodeItr.first);
-                        DigitalContractProvisiongStatus eProvisionStatus = GetProvisionStatus(oSecureComputationalNodeGuid);
-                        if ( DigitalContractProvisiongStatus::eReady == eProvisionStatus )
+                        VirtualMachineState eProvisionStatus = GetSecureComputationNodeInformation(oSecureComputationalNodeGuid);
+                        // TODO: Configuring should be in progress, but we have no data being served yet
+                        if ( VirtualMachineState::eWaitingForData == eProvisionStatus ||
+                             VirtualMachineState::eReadyForComputation == eProvisionStatus )
                         {
                             stlSucceededProvisions.insert(stlSecureComputationNodeItr.first);
                             stlInProgressProvisions.erase(stlSecureComputationNodeItr.first);
                             stlFailedProvisions.erase(stlSecureComputationNodeItr.first);
                         }
-                        else if ( DigitalContractProvisiongStatus::eProvisioning == eProvisionStatus )
+                        else if ( VirtualMachineState::eStarting == eProvisionStatus )
                         {
                             stlInProgressProvisions.insert(stlSecureComputationNodeItr.first);
                         }
-                        else
+                        else if ( VirtualMachineState::eProvisioningFailed == eProvisionStatus )
                         {
                             stlFailedProvisions.insert(stlSecureComputationNodeItr.first);
+                        }
+                        else if ( VirtualMachineState::eDeleted == eProvisionStatus )
+                        {
+                            stlDeletedProvisions.insert(stlSecureComputationNodeItr.first);
                         }
                     }
                 }
@@ -1046,8 +1029,13 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
             for ( auto& oFailedItr : stlFailedProvisions )
             {
                 Guid oProvisionGuid(oFailedItr);
-                oInProgressProvisions.PutString(oProvisionGuid.ToString(eHyphensAndCurlyBraces).c_str(), m_stlProvisionInformation[oFailedItr].strProvisionMessage);
+                oFailedProvisions.PutString(oProvisionGuid.ToString(eHyphensAndCurlyBraces).c_str(), m_stlProvisionInformation[oFailedItr].strProvisionMessage);
                 ++unProvisionItr;
+            }
+            // For any SCNs that have gone away, don't report their status any more
+            for ( auto& oDeletedItr : stlDeletedProvisions )
+            {
+                m_stlProvisionInformation.erase(oDeletedItr);
             }
 
             oProvisionStatus.PutBoolean("AllDone", fAllNodesReady);

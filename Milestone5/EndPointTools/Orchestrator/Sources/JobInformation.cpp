@@ -90,25 +90,44 @@ bool __thiscall JobInformation::ReadyToExcute(
         [] ( const auto& value ) { return value.second.has_value(); } );
 }
 
-bool __thiscall JobInformation::JobUsesDataset(
-    _in const Guid & c_oDatasetGuid
+bool __thiscall JobInformation::JobParameterUsesGuid(
+    _in const Guid & c_oParameterGuid
     ) const
 {
-    bool fUsesDataset{false};
+    bool fUsesParameter{false};
 
     for ( const auto& oInputParameter : m_stlInputParameterData )
     {
         if ( oInputParameter.second.has_value() )
         {
-            if ( oInputParameter.second.value() == c_oDatasetGuid.ToString(eRaw) )
+            if ( oInputParameter.second.value() == c_oParameterGuid.ToString(eRaw) )
             {
-                fUsesDataset = true;
+                fUsesParameter = true;
                 break;
             }
-            // TODO also handle tables
         }
     }
-    return fUsesDataset;
+    return fUsesParameter;
+}
+
+bool __thiscall JobInformation::JobParameterUsesJobOutputParameter(
+    _in const std::string & c_strJobOutputParameter
+    ) const
+{
+    bool fUsesParameter{false};
+
+    for ( const auto& oInputParameter : m_stlInputParameterData )
+    {
+        if ( oInputParameter.second.has_value() )
+        {
+            if ( oInputParameter.second.value() == c_strJobOutputParameter )
+            {
+                fUsesParameter = true;
+                break;
+            }
+        }
+    }
+    return fUsesParameter;
 }
 
 /********************************************************************************************
@@ -285,7 +304,7 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
     )
 {
     __DebugFunction();
-    __DebugAssert( nullptr != m_poTlsConnection );
+    //__DebugAssert( nullptr != m_poTlsConnection );
 
     bool fSent{false};
     try
@@ -295,12 +314,12 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
         if ( nullptr != m_poTlsConnection.get() )
         {
             ::PutTlsTransaction(m_poTlsConnection.get(), c_oBufferToSend);
+            fSent = true;
         }
         else
         {
             std::cout << "NO CONNECTION " << std::endl;
         }
-        fSent = true;
     }
     catch(const BaseException& oBaseException)
     {
@@ -465,6 +484,7 @@ void __thiscall JobInformation::JobEngineListener()
                             std::lock_guard<JobInformation> oLock(*this);
                             m_stlOutputResults[strDataId] = stlPushedData;
                             // Push to queue
+                            m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
                         }
                         else
                         {
@@ -510,6 +530,22 @@ void __thiscall JobInformation::JobEngineListener()
             {
                 // Ping pong a value to help test job status functions
                 m_eJobStatus = (nTestCounter & 0x01) ? JobStatusSignals::eJobStart : JobStatusSignals::ePrivacyViolation;
+            }
+
+            // Fake sending a result and shut down
+            if ( nTestCounter >= 10 )
+            {
+                std::vector<Byte> stlDummyResult{ 0xDE, 0xAD, 0xBE, 0xEF};
+                StructuredBuffer oResultBuffer;
+                // Output parameter is my dummy safe function output
+                std::string strOutputParamId = m_oJobId.ToString(eRaw) + "." + "51DD83834C2A41D6BB1F49889EA0A0AC";
+                oResultBuffer.PutByte("SignalType", (Byte)JobStatusSignals::ePostValue);
+                oResultBuffer.PutString("JobGuid", m_oJobId.ToString(eHyphensAndCurlyBraces));
+                // Fake guid of my dummy safe function
+                oResultBuffer.PutString("ValueName", strOutputParamId);
+                oResultBuffer.PutBuffer("FileData", stlDummyResult);
+                m_oQueueToOrchestrator.CopyAndPushMessage(oResultBuffer);
+                m_fStopRequest = true;
             }
         }
     }

@@ -48,8 +48,12 @@ class JobInformation
             _in const std::string& c_strTargetIP
         );
 
-        bool __thiscall JobUsesDataset(
+        bool __thiscall JobParameterUsesGuid(
             _in const Guid & c_oDatasetGuid
+        ) const;
+
+        bool __thiscall JobParameterUsesJobOutputParameter(
+            _in const std::string& c_strJobOutputParameter
         ) const;
 
         const __thiscall Guid& GetJobId() const;

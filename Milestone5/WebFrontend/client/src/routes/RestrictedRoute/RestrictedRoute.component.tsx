@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 
 import { IRestrictedRoutes } from './RestrictedRoute.types';
 
@@ -25,14 +25,17 @@ const RestrictedRoute: React.FC<IRestrictedRoutes> = ({
           // check if user finished loading, else run spinner
           if (userState !== 'isLoading' && userState !== null) {
             // if there is not user, render register page
-            if (userData === null || userData.AccessRights != requiredAccessRights) {
-              return <Redirect to={redirect} />;
+            if (
+              userData === null ||
+              userData.AccessRights != requiredAccessRights
+            ) {
+              return <Navigate replace to={redirect} />;
             }
             // if there is a user, redirect to dashboard dashboard
             return <>{children}</>;
           }
           if (userState == null && userData == null) {
-            return <Redirect to={redirect} />;
+            return <Navigate replace to={redirect} />;
           }
           return <Spinner />;
         }}
@@ -45,15 +48,18 @@ const RestrictedRoute: React.FC<IRestrictedRoutes> = ({
           // check if user finished loading, else run spinner
           if (userState !== 'isLoading' && userState !== null) {
             // if there is not user, render register page
-            if (userData === null || userData.AccessRights != requiredAccessRights) {
-              return <Redirect to={redirect} />;
+            if (
+              userData === null ||
+              userData.AccessRights != requiredAccessRights
+            ) {
+              return <Navigate replace to={redirect} />;
             }
             // if there is a user, redirect to dashboard dashboard
             return <>{children}</>;
           }
           //@ts-ignore
           if (userState === 'noUserSession') {
-            return <Redirect to={redirect} />;
+            return <Navigate replace to={redirect} />;
           }
           return <Spinner />;
         }}

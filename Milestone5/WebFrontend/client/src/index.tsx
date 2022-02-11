@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App.container';
 import './index.css';
+import '@secureailabs/web-ui/css/style.css';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+
 import { Provider } from 'react-redux';
 import { store, persistor } from './redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -17,7 +21,6 @@ ReactDOM.render(
         </BrowserRouter>
       </PersistGate>
     </Provider>
-    ,
   </React.StrictMode>,
   document.getElementById('root')
 );

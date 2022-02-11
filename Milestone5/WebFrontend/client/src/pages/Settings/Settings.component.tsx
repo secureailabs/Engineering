@@ -7,6 +7,7 @@ import accessRightsNumberToString from '@utils/accessRightsNumberToString';
 import UpdateUser from '@components/Settings/UpdateUser';
 import UpdatePassword from '@components/Settings/UpdatePassword';
 import Title from '@components/Title';
+import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 // import UpdateAccessRights from '@components/Settings/UpdateAccessRights';
 
 import InfoDisplay from '@components/InfoDisplay';
@@ -38,15 +39,21 @@ const Settings: React.FC<TSettings> = ({ userData }) => {
     ]);
     arrayData[3][1] = accessRightsNumberToString(arrayData[3][1]);
     return (
-      <>
-        <Title>Settings</Title>
-        <UpdateUser />
-        <UpdatePassword />
+      <StandardContent title="Settings">
+        <>
+          <Title>Settings</Title>
+          <UpdateUser />
+          <UpdatePassword />
+        </>
         {/* <InfoDisplay title="Settings" data={arrayData} /> */}
-      </>
+      </StandardContent>
     );
   }
-  return <>Unable to fetch user data</>;
+  return (
+    <StandardContent title="Settings">
+      Unable to fetch user data
+    </StandardContent>
+  );
 };
 
 export default Settings;

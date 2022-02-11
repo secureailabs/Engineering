@@ -2,14 +2,11 @@ import React from 'react';
 
 import Button from '@components/Button';
 
-import { useHistory } from 'react-router-dom';
-
 import type { TRegisterAccountSuccess } from './RegisterAccount.types';
 
 const RegisterAccountSuccess: React.FC<TRegisterAccountSuccess> = ({
   closeModal,
 }) => {
-  const history = useHistory();
   return (
     <>
       <h1>

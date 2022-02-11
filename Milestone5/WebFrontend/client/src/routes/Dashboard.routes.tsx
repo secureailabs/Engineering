@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Redirect, Switch } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import ProtectedRoute from './ProtectedRoute';
+import UnProtectedRoute from './UnProtectedRoute';
 import RestrictedRoute from './RestrictedRoute';
 import DatasetList from '@pages/Datasets';
 import DigitalContracts from '@pages/DigitalContracts';
@@ -12,9 +13,11 @@ import Organization from '@pages/Organization';
 import AzureTemplatesManager from '@pages/AzureTemplatesManager';
 import UnderConstruction from '@pages/UnderConstruction';
 import VirtualMachines from '@pages/VirtualMachines';
+import CustomizableDashboard from '@components/CustomizableDashboard';
+{
+  /*
+       *
 
-const DashboardRouter: React.FC = (): React.ReactElement => (
-  <Switch>
     <ProtectedRoute
       exact={false}
       path="/dashboard/virtualmachines"
@@ -71,11 +74,38 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       <UnderConstruction />
     </ProtectedRoute>
 
-    {/* Handle default routes */}
-    <ProtectedRoute exact={false} path="" redirect="/login">
+    <UnProtectedRoute exact={false} path="" redirect="/login">
       <MainMenu />
-    </ProtectedRoute>
-  </Switch>
+    </UnProtectedRoute>
+    */
+}
+const DashboardRouter: React.FC = (): React.ReactElement => (
+  <Routes>
+    <Route
+      path="/"
+      element={
+        // <ProtectedRoute redirect="/login">
+        <CustomizableDashboard />
+        // </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/virtual-machines"
+      element={
+        // <ProtectedRoute redirect="/login">
+        <VirtualMachines />
+        // </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/settings"
+      element={
+        // <ProtectedRoute redirect="/login">
+        <SettingsPage />
+        // </ProtectedRoute>
+      }
+    />
+  </Routes>
 );
 
 export default DashboardRouter;

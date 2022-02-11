@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 
 import Spinner from '@components/Spinner';
 
@@ -33,10 +33,10 @@ const UnprotectedRoute: React.FC<IUnProtectedRoutes> = ({
                 return <>{children}</>;
               }
               // if there is a user, redirect to dashboard dashboard
-              return <Redirect to={redirect} />;
+              return <Navigate replace to={redirect} />;
             }
             if (userState === 'success' && userData !== null) {
-              return <Redirect to={redirect} />;
+              return <Navigate replace to={redirect} />;
             }
             return <Spinner />;
           }}
@@ -57,10 +57,10 @@ const UnprotectedRoute: React.FC<IUnProtectedRoutes> = ({
                 return <>{children}</>;
               }
               // if there is a user, redirect to dashboard dashboard
-              return <Redirect to="/dashboard" />;
+              return <Navigate replace to="/dashboard" />;
             }
             if (userState === 'success' && userData !== null) {
-              return <Redirect to={redirect} />;
+              return <Navigate replace to={redirect} />;
             }
             return <Spinner />;
           }}

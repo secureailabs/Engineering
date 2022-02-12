@@ -41,6 +41,10 @@ static bool IsJobOutputParameter(
     _in const std::string& c_strParameter
 );
 
+static std::pair<Guid, Guid> ParseJobOutputToGuids(
+    _in const std::string& c_strJobOutputId
+);
+
 /********************************************************************************************
  *
  * @function GetJsonForStructuredBuffer
@@ -974,7 +978,17 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
             }
             else
             {
+                // We're assuming this is a job output
+                __DebugAssert( IsJobOutputParameter(oParameterItr.second.value()));
 
+                std::pair<Guid, Guid> oOutputParameters = ParseJobOutputToGuids(oParameterItr.second.value());
+                auto stlJobInformationItr = m_stlJobInformation.find(oOutputParameters.first.ToString(eRaw));
+
+                __DebugAssert(m_stlJobInformation.end() != stlJobInformationItr);
+                JobInformation& oOutputParameterJob = *stlJobInformationItr->second;
+
+                // Send the data to the job
+                PushJobOutputParameterToJob(oJob, oParameterItr.second.value(), oOutputParameterJob.GetOutputParameter(oOutputParameters.second));
             }
         }
 
@@ -1488,7 +1502,6 @@ void __thiscall Orchestrator::UpdateJobsWaitingForData(
     _in const StructuredBuffer& c_oPushDataMessage
     )
 {
-    std::cout << "Looking to update jobs for data " << c_oPushDataMessage.ToString() << std::endl;
     std::string strValueParameter(c_oPushDataMessage.GetString("ValueName"));
     __DebugAssert(true == IsJobOutputParameter(strValueParameter));
 
@@ -1500,7 +1513,7 @@ void __thiscall Orchestrator::UpdateJobsWaitingForData(
         // We only assign this to jobs that aren't already running
         if ( (oJobInformation.second->JobParameterUsesJobOutputParameter(strValueParameter)) && (false == oJobInformation.second->ReadyToExcute()) )
         {
-            PushJobOutputParameterToJob(*oJobInformation.second, strValueParameter, c_oPushDataMessage.GetBuffer("FileData"));
+            oJobInformation.second->SetOutputJobParameterReady(strValueParameter);
         }
     }
 }
@@ -1674,56 +1687,6 @@ void __thiscall Orchestrator::SetParameterOnJob(
 
 }
 
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function SetParameterOnJob
- * @param [in] JobInformation The job to send this data to
- * @param [in] Guid The guid of the parameter to set
- * @param [in] Guid The value of the parameter's guid to set to
- * @brief Send a structured buffer to a job that will tell the job what the GUID for an input
- *        parameter is
- *
- ********************************************************************************************/
-void __thiscall Orchestrator::SetJobParameterForJobOutput(
-    _in JobInformation& oJob,
-    _in Guid& oParameterGuid,
-    _in std::string& strParameterValue
-    )
-{
-    __DebugFunction();
-    __DebugAssert( true == IsJobOutputParameter(strParameterValue) );
-    try
-    {
-        StructuredBuffer oParameterSetBuffer;
-        oParameterSetBuffer.PutByte("RequestType", (Byte)EngineRequest::eSetParameters);
-        oParameterSetBuffer.PutString("EndPoint", "JobEngine");
-        oParameterSetBuffer.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
-        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eRaw));
-        oParameterSetBuffer.PutString("ValueUuid", strParameterValue);
-        oParameterSetBuffer.PutUnsignedInt32("ValuesExpected", 1);
-        oParameterSetBuffer.PutUnsignedInt32("ValueIndex", 0);
-
-        SendDataToJob(oJob, oParameterSetBuffer);
-    }
-
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-
-    catch (const std::exception & c_oException)
-    {
-        std::cout << "Exception: " << c_oException.what() << '\n';
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-
-}
 /********************************************************************************************
  *
  * @class Orchestrator

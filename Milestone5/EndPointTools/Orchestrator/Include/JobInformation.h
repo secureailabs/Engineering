@@ -70,6 +70,14 @@ class JobInformation
             _in const StructuredBuffer& c_oBufferToSend
             );
 
+        void __thiscall SetOutputJobParameterReady(
+            _in const std::string& c_strOutputParameterId
+            );
+
+        const std::vector<Byte>& GetOutputParameter(
+            _in const Guid& oParameterIdentifier
+            );
+
         bool __thiscall IsRunning() const;
         // BasicLockable methods
         void __thiscall lock();
@@ -84,6 +92,7 @@ class JobInformation
         const Guid m_oSafeFunctionId;
         std::string m_strTargetIP{""};
         std::unordered_map<std::string, std::optional<std::string>> m_stlInputParameterData;
+        std::unordered_map<std::string, bool> m_stlOutputJobParameterData;
         std::shared_ptr<TlsNode> m_poTlsConnection{nullptr};
         std::unique_ptr<std::thread> m_pstlListenerThread{nullptr};
         bool m_fStopRequest{false};

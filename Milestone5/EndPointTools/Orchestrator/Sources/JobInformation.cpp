@@ -546,6 +546,7 @@ void __thiscall JobInformation::JobEngineListener()
                 oResultBuffer.PutBuffer("FileData", stlDummyResult);
                 m_oQueueToOrchestrator.CopyAndPushMessage(oResultBuffer);
                 m_fStopRequest = true;
+                m_eJobStatus = JobStatusSignals::eJobDone;
             }
         }
     }

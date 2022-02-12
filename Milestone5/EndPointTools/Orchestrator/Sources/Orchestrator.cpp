@@ -739,26 +739,46 @@ std::string Orchestrator::SetParameter(
     std::string strParameterId{""};
     try
     {
+
         Guid oJobId(c_strJobId);
         auto stlJobInformation = m_stlJobInformation.find(oJobId.ToString(eRaw));
         if ( m_stlJobInformation.end() != stlJobInformation )
         {
             __DebugAssert( nullptr != stlJobInformation->second.get() );
-            Guid oParameterGuid(c_strParamValue);
-            Guid oInputParameterGuid(c_strInputParamId);
 
             JobInformation& oJobInformation = *stlJobInformation->second;
             std::lock_guard<JobInformation> stlLock(oJobInformation);
-            if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
+
+            Guid oInputParameterGuid(c_strInputParamId);
+
+            if ( !IsJobOutputParameter(c_strParamValue))
             {
-                strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+                Guid oParameterGuid(c_strParamValue);
 
-                UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
-
-                // We have everything we need to submit this job, start it up
-                if ( true == oJobInformation.ReadyToExcute() )
+                if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
                 {
-                    StartJobRemoteExecution(oJobInformation);
+                    strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+
+                    UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
+
+                    // We have everything we need to submit this job, start it up
+                    if ( true == oJobInformation.ReadyToExcute() )
+                    {
+                        StartJobRemoteExecution(oJobInformation);
+                    }
+                }
+            }
+            else
+            {
+                if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
+                {
+                    strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+
+                    // We have everything we need to submit this job, start it up
+                    if ( true == oJobInformation.ReadyToExcute() )
+                    {
+                        StartJobRemoteExecution(oJobInformation);
+                    }
                 }
             }
         }
@@ -766,12 +786,12 @@ std::string Orchestrator::SetParameter(
     catch(const BaseException& oBaseException)
     {
         ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        m_stlDigitalContracts.clear();
+        strParameterId = "";
     }
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        m_stlDigitalContracts.clear();
+        strParameterId = "";
     }
     return strParameterId;
 }

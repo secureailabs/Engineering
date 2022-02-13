@@ -12,12 +12,18 @@
 #include <string>
 #include "EntityTypes.h"
 
+struct HostedDatasetInformation
+{
+    Guid oDatsetGuid{};
+    unsigned int unUsageCount{0};
+};
+
 struct SecureNodeInformation
 {
-    DigitalContractProvisiongStatus eProvisionStatus{DigitalContractProvisiongStatus::eUnprovisioned};
+    VirtualMachineState eProvisionStatus{VirtualMachineState::eStarting};
     std::string strDigitalContractGUID{""};
     std::string strRemoteIpAddress{""};
     std::string strVMGUID{""};
-    std::string strDatasetGUID{""};
+    HostedDatasetInformation oHostedDataset{};
     std::string strProvisionMessage{""};
 };

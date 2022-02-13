@@ -68,3 +68,8 @@ def pull_data(output_id):
 def wait_for_data(timeout_in_milliseconds):
     return SAILPyAPI.wait_for_data(timeout_in_milliseconds)
 
+def get_ip_for_job(job_guid):
+    return SAILPyAPI.get_ip_for_job(job_guid)
+
+def deprovision_digital_contract(digital_contract_guid):
+    return SAILPyAPI.deprovision_digital_contract(digital_contract_guid)

@@ -80,8 +80,8 @@ extern "C" __declspec(dllexport) void __cdecl AddColumnToTablePackageFile(
     {
         unsigned int unColumnIndex = (unsigned int) gs_stlColumnProperties.size();
         gs_stlColumnProperties[unColumnIndex] = new StructuredBuffer();
-        gs_stlColumnProperties[unColumnIndex]->PutString("Identifier", c_szColumnIdentifier);
-        gs_stlColumnProperties[unColumnIndex]->PutString("Name", c_szColumnName);
+        gs_stlColumnProperties[unColumnIndex]->PutString("ColumnIdentifier", c_szColumnIdentifier);
+        gs_stlColumnProperties[unColumnIndex]->PutString("Title", c_szColumnName);
         gs_stlColumnProperties[unColumnIndex]->PutString("Description", c_szColumnDescription);
         gs_stlColumnProperties[unColumnIndex]->PutString("Tags", c_szColumnTags);
         gs_stlColumnProperties[unColumnIndex]->PutString("Units", c_szColumnUnits);
@@ -168,14 +168,14 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
         StructuredBuffer oColumnProperties;
         StructuredBuffer oCompressedData = ::CompressToStructuredBuffer((const void *) gs_stlTablePackageRecordsBuffer.data(), (uint64_t) gs_stlTablePackageRecordsBuffer.size());
         // Build the StructuredBuffer containing table properties
-        oTableProperties.PutGuid("Identifier", Guid(c_szTableIdentifier));
+        oTableProperties.PutGuid("TableIdentifier", Guid(c_szTableIdentifier));
         oTableProperties.PutString("Title", c_szTableTitle);
         oTableProperties.PutString("Description", c_szTableDescription);
         oTableProperties.PutString("Tags", c_szTableTags);
         oTableProperties.PutUnsignedInt32("NumberOfColumns", nNumberOfColumns);
         oTableProperties.PutUnsignedInt64("NumberOfRows", nNumberOfRows);
         oTableProperties.PutUnsignedInt64("DataSizeInBytes", oCompressedData.GetUnsignedInt64("OriginalSize"));
-        oTableProperties.PutUnsignedInt64("CompressedDataSizeInBytes", oCompressedData.GetUnsignedInt64("CompressedSize"));
+        oTableProperties.PutUnsignedInt64("CompressedDataSizeInBytes", oCompressedData.GetSerializedBufferRawDataSizeInBytes());
         // Build the StructuredBuffer containing column properties
         __DebugAssert(nNumberOfColumns == gs_stlColumnProperties.size());
         for (auto const & columnProperties : gs_stlColumnProperties)
@@ -187,7 +187,7 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
             oColumnProperties.PutStructuredBuffer(columnIndexAsString, *(columnProperties.second));
         }
         // Add the column properties to the table properties
-        oTableProperties.PutStructuredBuffer("ColumnProperties", oColumnProperties);
+        oTableProperties.PutStructuredBuffer("AllColumnProperties", oColumnProperties);
         //
         // Prepare to write everything to file. We need to figure out the size of both of the sections
         // Format is
@@ -340,7 +340,7 @@ extern "C" __declspec(dllexport) unsigned int __cdecl AddTablePackageFromFile(
         gs_ImportedTableFilename[gs_unTableIndex] = c_szTargetFilename;
         unReturnValue = gs_unTableIndex;
         // Reality checks
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("Identifier", GUID_VALUE_TYPE));
+        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("TableIdentifier", GUID_VALUE_TYPE));
         __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE));
         __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE));
         __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("NumberOfColumns", UINT32_VALUE_TYPE));
@@ -426,7 +426,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageIdentifierByIndex(
         _ThrowBaseExceptionIf((gs_ImportedTableMetadata.end() == gs_ImportedTableMetadata.find(unTableIndex)), "Table index not found %d (Exclusive Max = %d)", unTableIndex, gs_unTableIndex);
         __DebugAssert(gs_ImportedTableFilename.end() != gs_ImportedTableFilename.find(unTableIndex));
         // Fetch the identifier
-        strTablePackageIdentifier = gs_ImportedTableMetadata[unTableIndex]->GetGuid("Identifier").ToString(eHyphensOnly);
+        strTablePackageIdentifier = gs_ImportedTableMetadata[unTableIndex]->GetGuid("TableIdentifier").ToString(eHyphensOnly);
     }
 
     catch (const BaseException & c_oBaseException)
@@ -571,12 +571,13 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
         // The first part of generating a dataset is to build the StructuredBuffer which contains the dataset metadata
         StructuredBuffer oDatasetMetadata;
         // STEP 1: Generic dataset level metadata
-        oDatasetMetadata.PutGuid("Identifier", Guid(c_szDatasetIdentifier));
+        oDatasetMetadata.PutString("Version", "0.1.0");
+        oDatasetMetadata.PutGuid("DatasetIdentifier", Guid(c_szDatasetIdentifier));
+        oDatasetMetadata.PutGuid("PublisherIdentifier", Guid(::GetSailPlatformServicesUserOrganizationIdentifier().c_str()));
         oDatasetMetadata.PutString("Title", c_szDatasetTitle);
         oDatasetMetadata.PutString("Description", c_szDatasetDescription);
         oDatasetMetadata.PutString("Tags", c_szDatasetTags);
-        oDatasetMetadata.PutGuid("Organization", Guid(::GetSailPlatformServicesUserOrganizationIdentifier().c_str()));
-        oDatasetMetadata.PutUnsignedInt64("EpochCreationTime", ::GetEpochTimeInSeconds());
+        oDatasetMetadata.PutUnsignedInt64("EpochCreationTimeInSeconds", ::GetEpochTimeInSeconds());
         oDatasetMetadata.PutUnsignedInt32("TableCount", (unsigned int) gs_ImportedTableMetadata.size());
         if (0 < ::strnlen(c_szDatasetFamilyIdentifier, 2))
         {
@@ -586,7 +587,7 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
         StructuredBuffer oTablePackageMetadata;
         for (std::pair<unsigned int, StructuredBuffer *> tablePackageEntry : gs_ImportedTableMetadata)
         {
-            std::string tableIdentifier = tablePackageEntry.second->GetGuid("Identifier").ToString(eHyphensAndCurlyBraces);
+            std::string tableIdentifier = tablePackageEntry.second->GetGuid("TableIdentifier").ToString(eHyphensOnly);
             oTablePackageMetadata.PutStructuredBuffer(tableIdentifier.c_str(), *tablePackageEntry.second);
         }
         oDatasetMetadata.PutStructuredBuffer("Tables", oTablePackageMetadata);
@@ -667,11 +668,11 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
             _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(un64SerializedSizeInBytesOfCompressedData)), "Failed to read in the file header marker", nullptr);
             // Read in the compressed data from the file. There are a lot of reality checks here to ensure that
             // the table we are reading in is the correct table
-            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("Identifier", GUID_VALUE_TYPE));
+            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("TableIdentifier", GUID_VALUE_TYPE));
             __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("CompressedDataSizeInBytes", UINT64_VALUE_TYPE));
-            std::string tableIdentifier = oTableMetadata.GetGuid("Identifier").ToString(eHyphensAndCurlyBraces);
+            std::string tableIdentifier = oTableMetadata.GetGuid("TableIdentifier").ToString(eHyphensOnly);
             uint64_t un64CompressedDataSizeInBytes = oTableMetadata.GetUnsignedInt64("CompressedDataSizeInBytes");
-            _ThrowBaseExceptionIf((tableIdentifier != c_stlTablePackageEntry.second->GetGuid("Identifier").ToString(eHyphensAndCurlyBraces)), "ERROR: Table identifiers do not match %s != %s", tableIdentifier.c_str(), c_stlTablePackageEntry.second->GetGuid("Identifier").ToString(eHyphensAndCurlyBraces).c_str());
+            _ThrowBaseExceptionIf((tableIdentifier != c_stlTablePackageEntry.second->GetGuid("TableIdentifier").ToString(eHyphensOnly)), "ERROR: Table identifiers do not match %s != %s", tableIdentifier.c_str(), c_stlTablePackageEntry.second->GetGuid("TableIdentifier").ToString(eHyphensOnly).c_str());
             _ThrowBaseExceptionIf((un64CompressedDataSizeInBytes != c_stlTablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes")), "ERROR: Table compressed data sizes do not match %ld != %ld", un64CompressedDataSizeInBytes, c_stlTablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes"));
             stlBuffer.resize(un64SerializedSizeInBytesOfCompressedData);
             (void) ::ReadFile(hTableFileHandle, (void *) stlBuffer.data(), (unsigned int) stlBuffer.size(), (DWORD *) &unNumberOfBytesRead, nullptr);
@@ -687,7 +688,7 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
             (void) ::WriteFile(hFileHandle, (const void *) &qwFileMarker, (DWORD) sizeof(qwFileMarker), (DWORD *) &unNumberOfBytesWritten, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesWritten != sizeof(qwFileMarker)), "Failed to write the special header to file", nullptr);
             // Write the table identifier to file
-            (void) ::WriteFile(hFileHandle, (const void *) c_stlTablePackageEntry.second->GetGuid("Identifier").GetRawDataPtr(), (DWORD) 16, (DWORD *) &unNumberOfBytesWritten, nullptr);
+            (void) ::WriteFile(hFileHandle, (const void *) c_stlTablePackageEntry.second->GetGuid("TableIdentifier").GetRawDataPtr(), (DWORD) 16, (DWORD *) &unNumberOfBytesWritten, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesWritten != 16), "Failed to write the table identifier to file", nullptr);
             // Write the compressed table data size in bytes to file
             (void) ::WriteFile(hFileHandle, (const void *) &un64SerializedSizeInBytesOfCompressedData, (DWORD) sizeof(un64SerializedSizeInBytesOfCompressedData), (DWORD *) &unNumberOfBytesWritten, nullptr);

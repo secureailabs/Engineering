@@ -160,7 +160,7 @@ Guid::Guid(
  *
  ********************************************************************************************/
 Guid::Guid(
-    _in const std::string& c_strGuid
+    _in const std::string & c_strGuid
     )
 {
     __DebugFunction();

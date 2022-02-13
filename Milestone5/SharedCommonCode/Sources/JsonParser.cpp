@@ -18,6 +18,8 @@
 #include "StringHelperFunctions.h"
 #include "StructuredBuffer.h"
 
+#include <stdio.h>
+
 #include <string.h>
 
 // These are strings used to do easy character lookup while parsing. Helps simplify the
@@ -563,7 +565,7 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
         {
 			// If we are printing out an array, then the elements of the array do not
 			// get a <ElementName>: <ElementValue> format, all they get is <ElementValue>
-            std::string strElementName = (true == fIsArray) ? "" : ("\"" + c_strElementName + "\"" + ": ");
+            std::string strElementName = (true == fIsArray) ? "" : ("\"" + c_strElementName + "\": ");
             // If this is not the first time we iterate through this loop (i.e. not the
 			// first element), then before we print out a new element, we need to print
 			// out a comma (',')

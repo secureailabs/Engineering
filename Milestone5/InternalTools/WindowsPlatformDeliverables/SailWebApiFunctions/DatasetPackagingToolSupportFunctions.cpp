@@ -6,8 +6,9 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
+#include "RestApiHelperFunctions.h"
 #include "StructuredBuffer.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "SailApiBaseServices.h"
 #include "SharedUtilityFunctions.h"
 
@@ -736,11 +737,62 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
     __DebugFunction();
 
     bool fSuccess = true;
+    HANDLE hFileHandle = INVALID_HANDLE_VALUE;
 
     try
     {
-        // The first part required is to load up the metadata portion of the dataset
+        // Now that we have the dataset metadata, upload it all to the platform services
+        _ThrowBaseExceptionIf((false == ::IsLoggedOn()), "Cannot upload dataset if not logged on", nullptr);
+        // First, we load the file.
+        unsigned int unNumberOfBytesRead = 0;
+        Qword qwTableFileMarker;
+        // Open up the dataset file in order to extract the metadata
+        hFileHandle = ::CreateFileA(c_szDatasetFilename, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        _ThrowBaseExceptionIf((INVALID_HANDLE_VALUE == hFileHandle), "Failed to open file %s with GetLastError() = %d", c_szDatasetFilename, ::GetLastError());
+        // First we check the marker
+        (void) ::ReadFile(hFileHandle, (void *) &qwTableFileMarker, sizeof(qwTableFileMarker), (DWORD *) &unNumberOfBytesRead, nullptr);
+        _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(qwTableFileMarker)), "Failed to read in the file header marker", nullptr);
+        _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != (qwTableFileMarker)), "Invalid file marker (0x%08x%08x) found", HIDWORD(qwTableFileMarker), LODWORD(qwTableFileMarker));
+        // Load up the size of the serialized dataset metadata
+        unsigned int unSizeInBytesOfSerializedMetadata = 0;
+        (void) ::ReadFile(hFileHandle, (void *) &unSizeInBytesOfSerializedMetadata, sizeof(unSizeInBytesOfSerializedMetadata), (DWORD *) &unNumberOfBytesRead, nullptr);
+        _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(unSizeInBytesOfSerializedMetadata)), "Failed to read in the size in bytes of the serialized data", nullptr);
+        // Now we read the serialized dataset medata
+        std::vector<Byte> stlBuffer;
+        stlBuffer.resize(unSizeInBytesOfSerializedMetadata);
+        (void) ::ReadFile(hFileHandle, (void *) stlBuffer.data(), (DWORD) stlBuffer.size(), (DWORD *) &unNumberOfBytesRead, nullptr);
+        _ThrowBaseExceptionIf((unNumberOfBytesRead != stlBuffer.size()), "Failed to read dataset metadate", nullptr);
+        StructuredBuffer oDatasetMetadata(stlBuffer);
+        // Check the marker that proceeds the serialized dataset metadata
+        (void) ::ReadFile(hFileHandle, (void *) &qwTableFileMarker, sizeof(qwTableFileMarker), (DWORD *) &unNumberOfBytesRead, nullptr);
+        _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(qwTableFileMarker)), "Failed to read in the file header marker", nullptr);
+        _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != (qwTableFileMarker)), "Invalid file marker (0x%08x%08x) found", HIDWORD(qwTableFileMarker), LODWORD(qwTableFileMarker));
+        ::CloseHandle(hFileHandle);
+        hFileHandle = INVALID_HANDLE_VALUE;
 
+        // Build out the REST API call query
+        std::string strVerb = "POST";
+        std::string strApiUri = "/SAIL/DatasetManager/RegisterDataset?Eosb=" + ::GetSailPlatformServicesEosb();
+        StructuredBuffer oRestApiCall;
+        StructuredBuffer oDatasetMetadataToRegister;
+        oRestApiCall.PutString("DatasetGuid", oDatasetMetadata.GetGuid("DatasetIdentifier").ToString(eHyphensOnly));
+        oDatasetMetadataToRegister.PutString("VersionNumber", "0.1.0.0");
+        oDatasetMetadataToRegister.PutString("DatasetName", oDatasetMetadata.GetString("Title"));
+        oDatasetMetadataToRegister.PutString("Description", oDatasetMetadata.GetString("Description"));
+        oDatasetMetadataToRegister.PutString("Keywords", oDatasetMetadata.GetString("Tags"));
+        oDatasetMetadataToRegister.PutUnsignedInt64("PublishDate", oDatasetMetadata.GetUnsignedInt64("EpochCreationTimeInSeconds"));
+        oDatasetMetadataToRegister.PutByte("PrivacyLevel", 1);
+        oDatasetMetadataToRegister.PutString("JurisdictionalLimitations", "N/A");
+        oDatasetMetadataToRegister.PutStructuredBuffer("Tables", oDatasetMetadata.GetStructuredBuffer("Tables"));
+        oRestApiCall.PutStructuredBuffer("DatasetData", oDatasetMetadataToRegister);
+        // Send the REST API call to the SAIL Web Api Portal
+        std::string strJson = ::ConvertStructuredBufferToJson(oRestApiCall);
+        std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word) 6200, strVerb, strApiUri, strJson, true);
+        // Parse the returning value.
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+        // Did the transaction succeed?
+        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Failed to register dataset.", nullptr);
+        fSuccess = true;
     }
 
     catch (const BaseException & c_oBaseException)
@@ -751,6 +803,14 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
     catch (...)
     {
         ::RegisterUnknownException(__func__, __LINE__);
+    }
+
+    // Make sure to close the file. We have to put it here in case an exception gets thrown and we have to ensure the file
+    // handle gets closed properly
+    if (INVALID_HANDLE_VALUE != hFileHandle)
+    {
+        ::CloseHandle(hFileHandle);
+        hFileHandle = INVALID_HANDLE_VALUE;
     }
 
     return fSuccess;

@@ -269,7 +269,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         // send back error message
         unsigned int unErrorResponseSizeInBytes = sizeof(uint32_t) + strlen(c_oBaseException.GetExceptionMessage());
         std::vector<Byte> stlErrorMessage(unErrorResponseSizeInBytes);

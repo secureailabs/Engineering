@@ -88,7 +88,7 @@ static std::vector<Byte> __stdcall GetBinaryFileBuffer(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -134,7 +134,7 @@ static BSTR __cdecl ConvertToBSTR(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -213,7 +213,7 @@ static Dword __stdcall UploadDatasetToVirtualMachine(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -278,7 +278,7 @@ extern "C" __declspec(dllexport) bool __cdecl SetIpAddress(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
 
         // Reset global values to starting uninitialized values
         gs_strIpAddressOfSailWebApiPortal = "";
@@ -327,7 +327,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetIpAddress(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -446,7 +446,7 @@ extern "C" __declspec(dllexport) bool __cdecl Logout(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -497,7 +497,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetSailWebApiPortalImpostorEosb(vo
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -565,7 +565,7 @@ extern "C" __declspec(dllexport) unsigned int __cdecl LoadDigitalContracts(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -613,7 +613,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetDigitalContractIdentifierAtInde
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -703,7 +703,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetDigitalContractProperty(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -758,7 +758,7 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInstallationPackageToVirtual
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -855,7 +855,7 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInitializationParametersToVi
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -970,7 +970,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1056,7 +1056,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1126,7 +1126,7 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
 
                 catch (const BaseException & c_oBaseException)
                 {
-                    ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+                    ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
                     // Sleep for 5 seconds to give time for the dataset file to be fully copied to the folder
                     ::Sleep(5000);
                     unNumberOfRetries++;
@@ -1145,7 +1145,7 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorAddDataset(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1186,7 +1186,7 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorRemoveDataset(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

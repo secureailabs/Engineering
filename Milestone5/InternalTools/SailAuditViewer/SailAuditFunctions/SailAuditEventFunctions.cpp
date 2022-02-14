@@ -39,7 +39,7 @@ static unsigned int gs_unTotalEventsLoaded = 0;
 /// <param name="c_szFunctionName"></param>
 /// <param name="unLineNumber"></param>
 /// <returns></returns>
-static void __cdecl RegisterException(
+static void __cdecl RegisterBaseException(
     _in const BaseException & c_oBaseException,
     _in const char * c_szFunctionName,
     _in unsigned int unLineNumber
@@ -127,7 +127,7 @@ static BSTR __cdecl ConvertToBSTR(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -216,7 +216,7 @@ extern "C" __declspec(dllexport) bool __cdecl SetSailWebApiPortalIpAddress(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         gs_strEosb = "";
         gs_strOrganizationIdentifier = "";
     }
@@ -272,7 +272,7 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         gs_strEosb = "";
         gs_strOrganizationIdentifier = "";
     }
@@ -408,7 +408,7 @@ extern "C" __declspec(dllexport) void __cdecl ReloadLoadAllAuditEvents(
 
                 catch (const BaseException & c_oBaseException)
                 {
-                    ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+                    ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
                 }
 
                 catch (...)
@@ -421,7 +421,7 @@ extern "C" __declspec(dllexport) void __cdecl ReloadLoadAllAuditEvents(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -500,7 +500,7 @@ extern "C" __declspec(dllexport) bool __cdecl DesignateAuditEventsUsingParentIde
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -585,7 +585,7 @@ extern "C" __declspec(dllexport)  BSTR __cdecl GetDesignatedAuditEventIdentifier
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -624,7 +624,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventIdentifierByIndex(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -662,7 +662,7 @@ extern "C" __declspec(dllexport)  BSTR __cdecl GetAuditEventOrganizationalIdenti
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -704,7 +704,7 @@ extern "C" __declspec(dllexport)  BSTR __cdecl GetAuditEventParentIdentifier(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -741,7 +741,7 @@ extern "C" __declspec(dllexport) bool __cdecl IsBranchNodeEditEvent(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -778,7 +778,7 @@ extern "C" __declspec(dllexport) unsigned int __cdecl GetAuditEventSequenceNumbe
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -816,7 +816,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventDateGmt(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -854,7 +854,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventTimeWithMillisecondsG
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -891,7 +891,7 @@ extern "C" __declspec(dllexport) uint64_t GetAuditEventGmtEpochTimestampInMillis
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -940,7 +940,7 @@ extern "C" __declspec(dllexport) BSTR GetAuditEventEpochTimestampInMillisecondsG
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -981,7 +981,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventType(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1022,7 +1022,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventGeneralDetails(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1064,7 +1064,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetAuditEventAdditionalDataDetails
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

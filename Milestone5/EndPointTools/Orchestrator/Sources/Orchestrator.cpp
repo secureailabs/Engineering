@@ -22,7 +22,6 @@
 #include "CurlRest.h"
 #include "JsonValue.h"
 #include "FileUtils.h"
-#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <fstream>
@@ -58,7 +57,7 @@ std::string __stdcall GetJsonForStructuredBuffer(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strJSON.clear();
     }
     catch(...)
@@ -108,7 +107,7 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         strJSON.clear();
     }
 
@@ -154,7 +153,7 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strJSON.clear();
     }
 
@@ -227,7 +226,7 @@ void __thiscall Orchestrator::CacheDigitalContractsFromRemote(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         m_stlDigitalContracts.clear();
     }
 
@@ -287,7 +286,7 @@ void Orchestrator::CacheDatasetsFromRemote(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         m_stlAvailableDatasets.clear();
         m_stlAvailableTables.clear();
     }
@@ -369,7 +368,7 @@ unsigned int Orchestrator::Login(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -492,7 +491,7 @@ int __thiscall Orchestrator::LoadSafeObjects(
                 }
                 catch(const BaseException& oBaseException )
                 {
-                    ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+                    ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
                 }
 
                 catch( ... )
@@ -554,7 +553,6 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     StructuredBuffer oReturnStructuredBuffer;
     std::string strRawProvisionGuid{""};
     std::string strProvisionMessage{""};
-
     try
     {
         Guid oDatasetGuid(c_strDatasetGUID);
@@ -572,7 +570,14 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
         std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
 
-        unStatus = static_cast<unsigned int>(oResponse.GetFloat64("Status"));
+        if ( oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE) )
+        {
+            unStatus = oResponse.GetFloat64("Status");
+        }
+        else
+        {
+            std::cout << "No provision status?" << std::endl;
+        }
 
         if ( oResponse.IsElementPresent("Message", ANSI_CHARACTER_STRING_VALUE_TYPE) )
         {
@@ -583,18 +588,16 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
             fProvisionResult = true;
             Guid oProvisionGuid = Guid(oResponse.GetString("SecureNodeGuid"));
             strRawProvisionGuid = oProvisionGuid.ToString(eRaw);
-
-            __DebugAssert(m_stlProvisionInformation.end() == m_stlProvisionInformation.find(strRawProvisionGuid));
-
-            m_stlProvisionInformation[strRawProvisionGuid].eProvisionStatus = VirtualMachineState::eStarting;
-            m_stlProvisionInformation[strRawProvisionGuid].oHostedDataset.oDatsetGuid = oDatasetGuid;
+            m_stlProvisionInformation[strRawProvisionGuid].eProvisionStatus = DigitalContractProvisiongStatus::eProvisioning;
+            m_stlProvisionInformation[strRawProvisionGuid].strDatasetGUID = oDatasetGuid.ToString(eRaw);
             m_stlProvisionInformation[strRawProvisionGuid].strDigitalContractGUID = oDigitalContractGuid.ToString(eRaw);
+            std::cout << "Provisioned Secure Node " << strRawProvisionGuid << std::endl;
         }
 
     }
     catch(const BaseException& oBaseException )
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         unStatus = 404;
     }
     catch( ... )
@@ -661,7 +664,7 @@ std::string Orchestrator::RunJob(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -701,7 +704,7 @@ std::string Orchestrator::GetJobStatus(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strStatus = "Job not found";
     }
 
@@ -761,7 +764,7 @@ std::string Orchestrator::SetParameter(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         m_stlDigitalContracts.clear();
     }
     catch(...)
@@ -787,116 +790,36 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
     _in const Guid& c_oParameterGuid
     )
 {
-    std::optional<Guid> oTargetSecureComputationalNode;
-    if ( eTable == c_oParameterGuid.GetObjectType() )
+    if ( eDataset == c_oParameterGuid.GetObjectType() )
     {
-        oTargetSecureComputationalNode = GetSecureComputationalNodeServingTable(c_oParameterGuid);
+        std::string strTargetIP = GetIPServingDataset(c_oParameterGuid);
+        if ( "" != strTargetIP )
+        {
+            _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
+            oJob.SetTargetIP(strTargetIP);
+        }
+    }
+    else if ( eTable == c_oParameterGuid.GetObjectType() )
+    {
+        std::string strTargetIP = GetIPServingTable(c_oParameterGuid);
+
+        if ( "" != strTargetIP )
+        {
+            _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
+            oJob.SetTargetIP(strTargetIP);
+        }
     }
     else if ( eUserSuppliedData != c_oParameterGuid.GetObjectType() )
     {
-        // Assume anything else is a dataset guid until we have the new types in the data annotation tool
-        oTargetSecureComputationalNode = GetSecureComputationalNodeServingDataset(c_oParameterGuid);
-    }
-
-    if ( oTargetSecureComputationalNode.has_value() )
-    {
-        auto oSecureNodeInformation = m_stlProvisionInformation.find(oTargetSecureComputationalNode.value().ToString(eRaw));
-        __DebugAssert(m_stlProvisionInformation.end() != oSecureNodeInformation);
-
-        std::string strTargetIP = oSecureNodeInformation->second.strRemoteIpAddress;
-        _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
-
-        std::cout << "Assinging IP " << strTargetIP << " to job " << oJob.GetJobId().ToString(eHyphensAndCurlyBraces) << std::endl;
-        oJob.SetTargetIP(strTargetIP);
-
-        // We've assigned this dataset to a job, increase its usage count
-        oSecureNodeInformation->second.oHostedDataset.unUsageCount++;
-    }
-}
-
-bool __thiscall Orchestrator::DeprovisionDigitalContract(
-    _in const std::string& c_strDigitalContractGUID
-    )
-{
-    bool fRetrurnValue{false};
-    try
-    {
-
-        Guid oDigitalContractGuid(c_strDigitalContractGUID);
-
-        std::string strVerb = "POST";
-        std::string strApiUrl = "/SAIL/DigitalContractManager/Deprovision?Eosb=" + m_oEosbRotator.GetEosb();
-        StructuredBuffer oJsonRequest;
-        oJsonRequest.PutString("DigitalContractGuid", oDigitalContractGuid.ToString(eHyphensAndCurlyBraces));
-        std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
-
-        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-
-        if ( oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE) )
+        // Try to see if this is a an old dataset
+        std::string strTargetIP = GetIPServingDataset(c_oParameterGuid);
+        if ( "" != strTargetIP )
         {
-            if ( 200 == static_cast<uint64_t>(oResponse.GetFloat64("Status")) )
-            {
-                fRetrurnValue = true;
-            }
-        }
-        else
-        {
-            _ThrowBaseException("No return status from deprovision call", nullptr);
+            _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
+            oJob.SetTargetIP(strTargetIP);
         }
     }
-    catch(const BaseException& oBaseException)
-    {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        fRetrurnValue = false;
-    }
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        fRetrurnValue = false;
-    }
-
-    return fRetrurnValue;
 }
-
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function GetIPAddressForJob
- * @brief Setup everything we need on the remote job engine to start a job
- * @param[in] c_strJobGUID The job GUID whose IP address we want to get
- * @return std::string - The IP address of the job, "" if none found or error
- *
- ********************************************************************************************/
-std::string __thiscall Orchestrator::GetIPAddressForJob(
-    _in const std::string& c_strJobGUID
-    )
-{
-    std::string strReturn{""};
-    try
-    {
-
-        Guid oJobGUID(c_strJobGUID);
-
-        auto oJobItr = m_stlJobInformation.find(oJobGUID.ToString(eRaw));
-        if ( m_stlJobInformation.end() != oJobItr )
-        {
-            strReturn = oJobItr->second->GetTargetIP();
-        }
-    }
-    catch(const BaseException& oBaseException)
-    {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
-        strReturn = "";
-    }
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        strReturn = "";
-    }
-    return strReturn;
-}
-
 /********************************************************************************************
  *
  * @class Orchestrator
@@ -951,7 +874,7 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
 
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
     catch(...)
     {
@@ -996,7 +919,7 @@ VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation
     if ( "0.0.0.0" != oVirtualMachine.GetString("IPAddress") && 
         (VirtualMachineState::eWaitingForData == eVirtualMachineState || VirtualMachineState::eReadyForComputation == eVirtualMachineState ))
     {
-        std::cout << "DS " << m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].oHostedDataset.oDatsetGuid.ToString(eHyphensAndCurlyBraces) << 
+        std::cout << "DS " << m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strDatasetGUID << 
             " being served on " << oVirtualMachine.GetString("IPAddress") << std::endl;
         m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strRemoteIpAddress = oVirtualMachine.GetString("IPAddress");
     }
@@ -1004,8 +927,6 @@ VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation
     {
         m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].strProvisionMessage = oVirtualMachine.GetString("Note");
     }
-
-    m_stlProvisionInformation[c_strRawSecureNodeProvisionGuid].eProvisionStatus = eVirtualMachineState;
     return eVirtualMachineState;
 }
 
@@ -1053,8 +974,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                             stlInProgressProvisions.erase(stlSecureComputationNodeItr.first);
                             stlFailedProvisions.erase(stlSecureComputationNodeItr.first);
                         }
-                        else if ( VirtualMachineState::eStarting == eProvisionStatus ||
-                                  VirtualMachineState::eConfiguring == eProvisionStatus )
+                        else if ( VirtualMachineState::eStarting == eProvisionStatus )
                         {
                             stlInProgressProvisions.insert(stlSecureComputationNodeItr.first);
                         }
@@ -1092,26 +1012,11 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
             StructuredBuffer oFailedProvisions;
             StructuredBuffer oInProgressProvisions;
             unsigned int unProvisionItr{0};
-
             for ( auto& oSucceededItr : stlSucceededProvisions )
             {
                 Guid oProvisionGuid(oSucceededItr);
                 oSucceededProvisions.PutString(oProvisionGuid.ToString(eHyphensAndCurlyBraces).c_str(), m_stlProvisionInformation[oSucceededItr].strProvisionMessage);
                 ++unProvisionItr;
-
-                // Any job that is waiting for this dataset should be assigned this IP
-                for ( auto& oPendingJob : m_stlJobInformation)
-                {
-                    if ( oPendingJob.second->JobUsesDataset(m_stlProvisionInformation[oSucceededItr].oHostedDataset.oDatsetGuid) )
-                    {
-                        oPendingJob.second->SetTargetIP(m_stlProvisionInformation[oSucceededItr].strRemoteIpAddress);
-                    }
-
-                    if ( oPendingJob.second->ReadyToExcute() && !oPendingJob.second->IsRunning() )
-                    {
-                        StartJobRemoteExecution(*oPendingJob.second);
-                    }
-                }
             }
             unProvisionItr = 0;
             for ( auto& oInProgressItr : stlInProgressProvisions )
@@ -1141,7 +1046,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
         }
         catch(const BaseException& oBaseException )
         {
-            ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+            ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
             strProvisionStatus = "";
         }
         catch( ... )
@@ -1179,14 +1084,12 @@ std::string Orchestrator::PushUserData(
 /********************************************************************************************
  *
  * @class Orchestrator
- * @function GetSecureComputationalNodeServingDataset
+ * @function GetIPServingDataset
  * @brief Get the IP address of a VM serving a dataset's GUID
  * @param[in] Guid - The GUID of the dataset we're looking for
- * @return std::optional<Guid> - An option of a GUID of the SCN serving the dataset
- * 
- * We iterate through SCNs serving datasets, and pick the one which has been used the least
+ * @return std::string - The IP address of the VM hosting the dataset, "" if we don't find it
  ********************************************************************************************/
-std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingDataset(
+std::string Orchestrator::GetIPServingDataset(
     _in const Guid& oDatasetGuid
     ) const
 {
@@ -1194,34 +1097,27 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingDataset(
     // Disabled until new data annotation tool is in place
     //__DebugAssert(eDataset == oDatasetGuid.GetObjectType());
 
-    std::optional<Guid> oSecureComputationalNodeGuid;
-    unsigned int unMinUsageCount{UINT_MAX};
+    std::string strIpAddress{""};
+
     for ( auto oDatasetItr : m_stlProvisionInformation)
     {
-        // For now we allow use when we're ready for computation or waiting for data
-        // When the new data annotation tool produces datasets we can upload to an SCN
-        if ( oDatasetItr.second.oHostedDataset.oDatsetGuid == oDatasetGuid &&
-            ( oDatasetItr.second.eProvisionStatus == VirtualMachineState::eReadyForComputation ||oDatasetItr.second.eProvisionStatus == VirtualMachineState::eWaitingForData) )
+        if ( oDatasetItr.second.strDatasetGUID == oDatasetGuid.ToString(eRaw))
         {
-            if ( oDatasetItr.second.oHostedDataset.unUsageCount < unMinUsageCount )
-            {
-                oSecureComputationalNodeGuid = oDatasetItr.first;
-                unMinUsageCount = oDatasetItr.second.oHostedDataset.unUsageCount;
-            }
+            strIpAddress = oDatasetItr.second.strRemoteIpAddress;
         }
     }
-    return oSecureComputationalNodeGuid;
+    return strIpAddress;
 }
 
 /********************************************************************************************
  *
  * @class Orchestrator
- * @function GetSecureComputationalNodeServingTable
+ * @function GetIPServingTable
  * @brief Get the IP address of a VM serving a table's GUID
  * @param[in] std::string - The GUID of the table we're looking for
  * @return std::string - The IP address of the VM hosting the table, "" if we don't find it
  ********************************************************************************************/
-std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
+std::string Orchestrator::GetIPServingTable(
     _in const Guid& oTableGuid
     ) const
 {
@@ -1229,18 +1125,17 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
     // Disabled until new dataset annotation tool is in place
     //__DebugAssert(eTable == oTableGuid.GetObjectType());
 
-    std::optional<Guid> oSecureComputationalNodeGuid;
+    std::string strIpAddress{""};
     for ( auto oTableItr : m_stlAvailableTables )
     {
         if ( oTableGuid.ToString(eRaw) == oTableItr.second.m_strParentDataset )
         {
             Guid oDatasetGuid(oTableItr.second.m_strParentDataset);
-            oSecureComputationalNodeGuid = GetSecureComputationalNodeServingDataset(oDatasetGuid);
-            break;
+            strIpAddress = GetIPServingDataset(oDatasetGuid);
         }
     }
 
-    return oSecureComputationalNodeGuid;
+    return strIpAddress;
 }
 
 /********************************************************************************************
@@ -1308,7 +1203,7 @@ std::string __thiscall Orchestrator::PullJobData(
     }
     catch(const BaseException& oBaseException )
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strResult = "Error";
     }
     catch( ... )
@@ -1352,7 +1247,7 @@ std::string __thiscall Orchestrator::WaitForData(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         strReturn = "";
 
     }
@@ -1421,7 +1316,7 @@ void __thiscall Orchestrator::PushUserDataToJob(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -1461,7 +1356,7 @@ void __thiscall Orchestrator::SendSafeObjectToJobEngine(
     }
     catch(const BaseException& c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     catch(std::exception & e)
     {
@@ -1507,7 +1402,7 @@ void __thiscall Orchestrator::SetParameterOnJob(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (const std::exception & c_oException)
@@ -1552,7 +1447,7 @@ void __thiscall Orchestrator::SendDataToJob(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
     catch(std::exception & e)
     {

@@ -109,14 +109,6 @@ class Orchestrator : public Object{
             _in StructuredBuffer & c_oStructuredBuffer
         );
 
-        std::string __thiscall GetIPAddressForJob(
-            _in const std::string& c_strJobGUID
-            );
-
-        bool __thiscall DeprovisionDigitalContract(
-            _in const std::string& c_strDigitalContractGUID
-            );
-
     private:
         void __thiscall CacheDigitalContractsFromRemote(
             _in const std::string& c_strServerIpAddress,
@@ -127,11 +119,11 @@ class Orchestrator : public Object{
             _in unsigned long unServerPort
         );
 
-        std::optional<Guid> __thiscall GetSecureComputationalNodeServingDataset(
+        std::string __thiscall GetIPServingDataset(
             _in const Guid& oDatasetGuid
             ) const;
 
-       std::optional<Guid> __thiscall GetSecureComputationalNodeServingTable(
+       std::string __thiscall GetIPServingTable(
             _in const Guid& oDatasetGuid
             ) const;
 

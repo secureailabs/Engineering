@@ -65,29 +65,26 @@ namespace WindowsRemoteDataConnector
             }
             else
             {
-                if (true == SailWebApiPortalInterop.SetIpAddress(m_IpAddressTextBox.Text))
+                bool successfulLogin = SailWebApiPortalInterop.Login(m_IpAddressTextBox.Text, m_UsernameEditBox.Text, m_PasswordEditBox.Text);
+                if (false == successfulLogin)
                 {
-                    bool successfulLogin = SailWebApiPortalInterop.Login(m_UsernameEditBox.Text, m_PasswordEditBox.Text);
-                    if (false == successfulLogin)
-                    {
-                        MessageBox.Show(this, "Invalid credentials provided. Try again!!", "Authentication Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        // Persist some of the settings to the registry to make it easier to restart the
-                        // application later.
-                        RegistryKey registryKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\SAIL");
-                        registryKey.SetValue("DefaultSailWebApiPortalIpAddress", m_IpAddressTextBox.Text);
-                        registryKey.SetValue("DefaultSailWebApiPortalUsername", m_UsernameEditBox.Text);
-                        registryKey.Close();
-                        this.DialogResult = DialogResult.OK;
-                        this.m_RefreshTimer.Stop();
-                        this.Close();
-                        // Make sure that the successful login updates the valid username and password
-                        m_ValidIpAddress = m_IpAddressTextBox.Text;
-                        m_ValidUsername = m_UsernameEditBox.Text;
-                        m_ValidPassword = m_PasswordEditBox.Text;
-                    }
+                    MessageBox.Show(this, "Invalid credentials provided. Try again!!", "Authentication Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    // Persist some of the settings to the registry to make it easier to restart the
+                    // application later.
+                    RegistryKey registryKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\SAIL");
+                    registryKey.SetValue("DefaultSailWebApiPortalIpAddress", m_IpAddressTextBox.Text);
+                    registryKey.SetValue("DefaultSailWebApiPortalUsername", m_UsernameEditBox.Text);
+                    registryKey.Close();
+                    this.DialogResult = DialogResult.OK;
+                    this.m_RefreshTimer.Stop();
+                    this.Close();
+                    // Make sure that the successful login updates the valid username and password
+                    m_ValidIpAddress = m_IpAddressTextBox.Text;
+                    m_ValidUsername = m_UsernameEditBox.Text;
+                    m_ValidPassword = m_PasswordEditBox.Text;
                 }
             }
         }

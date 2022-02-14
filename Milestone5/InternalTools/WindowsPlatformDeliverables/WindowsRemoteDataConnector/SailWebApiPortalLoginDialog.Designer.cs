@@ -52,20 +52,20 @@ namespace WindowsRemoteDataConnector
             // m_UsernameLabel
             // 
             this.m_UsernameLabel.AutoSize = true;
-            this.m_UsernameLabel.Location = new System.Drawing.Point(151, 59);
+            this.m_UsernameLabel.Location = new System.Drawing.Point(148, 61);
             this.m_UsernameLabel.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.m_UsernameLabel.Name = "m_UsernameLabel";
-            this.m_UsernameLabel.Size = new System.Drawing.Size(60, 15);
+            this.m_UsernameLabel.Size = new System.Drawing.Size(63, 14);
             this.m_UsernameLabel.TabIndex = 0;
             this.m_UsernameLabel.Text = "Username";
             // 
             // m_PasswordLabel
             // 
             this.m_PasswordLabel.AutoSize = true;
-            this.m_PasswordLabel.Location = new System.Drawing.Point(154, 87);
+            this.m_PasswordLabel.Location = new System.Drawing.Point(148, 89);
             this.m_PasswordLabel.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.m_PasswordLabel.Name = "m_PasswordLabel";
-            this.m_PasswordLabel.Size = new System.Drawing.Size(57, 15);
+            this.m_PasswordLabel.Size = new System.Drawing.Size(63, 14);
             this.m_PasswordLabel.TabIndex = 1;
             this.m_PasswordLabel.Text = "Password";
             // 
@@ -73,7 +73,7 @@ namespace WindowsRemoteDataConnector
             // 
             this.m_UsernameEditBox.BackColor = System.Drawing.SystemColors.Info;
             this.m_UsernameEditBox.Font = new System.Drawing.Font("Consolas", 9F);
-            this.m_UsernameEditBox.Location = new System.Drawing.Point(213, 57);
+            this.m_UsernameEditBox.Location = new System.Drawing.Point(213, 58);
             this.m_UsernameEditBox.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.m_UsernameEditBox.Name = "m_UsernameEditBox";
             this.m_UsernameEditBox.Size = new System.Drawing.Size(375, 22);
@@ -83,7 +83,7 @@ namespace WindowsRemoteDataConnector
             // 
             this.m_PasswordEditBox.BackColor = System.Drawing.SystemColors.Info;
             this.m_PasswordEditBox.Font = new System.Drawing.Font("Consolas", 9F);
-            this.m_PasswordEditBox.Location = new System.Drawing.Point(213, 85);
+            this.m_PasswordEditBox.Location = new System.Drawing.Point(213, 86);
             this.m_PasswordEditBox.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.m_PasswordEditBox.Name = "m_PasswordEditBox";
             this.m_PasswordEditBox.PasswordChar = '*';
@@ -93,11 +93,11 @@ namespace WindowsRemoteDataConnector
             // m_InstructionsLabel
             // 
             this.m_InstructionsLabel.AutoSize = true;
-            this.m_InstructionsLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.m_InstructionsLabel.Location = new System.Drawing.Point(209, 7);
+            this.m_InstructionsLabel.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_InstructionsLabel.Location = new System.Drawing.Point(210, 10);
             this.m_InstructionsLabel.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.m_InstructionsLabel.Name = "m_InstructionsLabel";
-            this.m_InstructionsLabel.Size = new System.Drawing.Size(250, 15);
+            this.m_InstructionsLabel.Size = new System.Drawing.Size(308, 14);
             this.m_InstructionsLabel.TabIndex = 0;
             this.m_InstructionsLabel.Text = "Please enter your SAIL Web Api Credentials.";
             // 
@@ -128,7 +128,7 @@ namespace WindowsRemoteDataConnector
             // 
             this.m_IpAddressTextBox.BackColor = System.Drawing.SystemColors.Info;
             this.m_IpAddressTextBox.Font = new System.Drawing.Font("Consolas", 9F);
-            this.m_IpAddressTextBox.Location = new System.Drawing.Point(213, 29);
+            this.m_IpAddressTextBox.Location = new System.Drawing.Point(213, 30);
             this.m_IpAddressTextBox.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.m_IpAddressTextBox.Name = "m_IpAddressTextBox";
             this.m_IpAddressTextBox.Size = new System.Drawing.Size(375, 22);
@@ -137,10 +137,10 @@ namespace WindowsRemoteDataConnector
             // m_IpAddressLabel
             // 
             this.m_IpAddressLabel.AutoSize = true;
-            this.m_IpAddressLabel.Location = new System.Drawing.Point(149, 31);
+            this.m_IpAddressLabel.Location = new System.Drawing.Point(134, 33);
             this.m_IpAddressLabel.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.m_IpAddressLabel.Name = "m_IpAddressLabel";
-            this.m_IpAddressLabel.Size = new System.Drawing.Size(62, 15);
+            this.m_IpAddressLabel.Size = new System.Drawing.Size(77, 14);
             this.m_IpAddressLabel.TabIndex = 8;
             this.m_IpAddressLabel.Text = "IP Address";
             // 
@@ -216,14 +216,14 @@ namespace WindowsRemoteDataConnector
             this.Controls.Add(this.m_UsernameEditBox);
             this.Controls.Add(this.m_PasswordLabel);
             this.Controls.Add(this.m_UsernameLabel);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
             this.Name = "SailWebApiPortalLoginDialog";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "SAIL Remote Data Connector";
+            this.Text = "SAIL Dataset Publishing Tool";
             this.Load += new System.EventHandler(this.SailWebApiPortalLoginDialog_Load);
             ((System.ComponentModel.ISupportInitialize)(this.m_SailLogoPictureBox)).EndInit();
             this.m_StatusStrip.ResumeLayout(false);

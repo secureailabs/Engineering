@@ -54,7 +54,7 @@ namespace WindowsRemoteDataConnector
                         // instance try to restart it.
                         if (0x13131313 == exitCode)
                         {
-                            ConnectToApiWebServices connectToApiWebServicesDialog = new ConnectToApiWebServices(username, password);
+                            ConnectToApiWebServices connectToApiWebServicesDialog = new ConnectToApiWebServices(ipAddress, username, password);
                             if (DialogResult.Abort == connectToApiWebServicesDialog.ShowDialog())
                             {
                                 // Normal exit since the user chose to manually abort retrying to connect
@@ -86,10 +86,8 @@ namespace WindowsRemoteDataConnector
                     string username = System.Text.Encoding.Default.GetString(decodedUsername);
                     byte[] decodedPassword = System.Convert.FromBase64String(arguments[2]);
                     string password = System.Text.Encoding.Default.GetString(decodedPassword);
-                    // Make sure to register the IP Address
-                    SailWebApiPortalInterop.SetIpAddress(ipAddress);
                     // Now, try to login. If it doesn't work, send the "no connection" error
-                    if (false == SailWebApiPortalInterop.Login(username, password))
+                    if (false == SailWebApiPortalInterop.Login(ipAddress, username, password))
                     {
                         // Return an error which denotes that the RemoteDataConnector was either
                         // 1. Not able to login

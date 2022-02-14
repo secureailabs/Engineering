@@ -82,7 +82,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullVirtualMachine(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -171,7 +171,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListOfVmsAssociatedWithDc(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -267,7 +267,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListOfVmIpAddressesAssociatedWithD
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -346,7 +346,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetVmsWaitingForData(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -478,7 +478,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterVirtualMachine(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -576,7 +576,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateVirtualMachine(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -655,7 +655,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterVmAsWaitingForData(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -719,7 +719,7 @@ std::vector<Byte> __thiscall DatabaseManager::RemoveVmAsWaitingForData(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     

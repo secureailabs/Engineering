@@ -18,8 +18,8 @@
 class EosbRotationManager
 {
     public:
+    
         explicit EosbRotationManager(void);
-
         virtual ~EosbRotationManager(void);
 
         // No copying allowed

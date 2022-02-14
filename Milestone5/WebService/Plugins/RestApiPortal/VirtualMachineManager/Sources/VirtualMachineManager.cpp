@@ -782,7 +782,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetListOfOrganizationVMs(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -873,7 +873,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetListOfVmIpAddressesAssoci
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -949,7 +949,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetUserInfo(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -1039,7 +1039,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetVmInformation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -1138,7 +1138,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::VerifyDigitalContract(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -1270,7 +1270,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -1377,7 +1377,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmAfterDataUpload(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -1474,7 +1474,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmForComputation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -1571,7 +1571,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmAuditEvent(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -1751,7 +1751,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::UpdateVirtualMachineStatus(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -1845,7 +1845,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::AddVirtualMachineIpAddress(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)

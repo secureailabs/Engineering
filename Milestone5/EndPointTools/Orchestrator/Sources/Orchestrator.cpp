@@ -57,7 +57,7 @@ std::string __stdcall GetJsonForStructuredBuffer(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strJSON.clear();
     }
     catch(...)
@@ -107,7 +107,7 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         strJSON.clear();
     }
 
@@ -153,7 +153,7 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strJSON.clear();
     }
 
@@ -226,7 +226,7 @@ void __thiscall Orchestrator::CacheDigitalContractsFromRemote(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         m_stlDigitalContracts.clear();
     }
 
@@ -286,7 +286,7 @@ void Orchestrator::CacheDatasetsFromRemote(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         m_stlAvailableDatasets.clear();
         m_stlAvailableTables.clear();
     }
@@ -368,7 +368,7 @@ unsigned int Orchestrator::Login(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -491,7 +491,7 @@ int __thiscall Orchestrator::LoadSafeObjects(
                 }
                 catch(const BaseException& oBaseException )
                 {
-                    ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+                    ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
                 }
 
                 catch( ... )
@@ -597,7 +597,7 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     }
     catch(const BaseException& oBaseException )
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         unStatus = 404;
     }
     catch( ... )
@@ -664,7 +664,7 @@ std::string Orchestrator::RunJob(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -704,7 +704,7 @@ std::string Orchestrator::GetJobStatus(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strStatus = "Job not found";
     }
 
@@ -764,7 +764,7 @@ std::string Orchestrator::SetParameter(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         m_stlDigitalContracts.clear();
     }
     catch(...)
@@ -874,7 +874,7 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
 
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
     catch(...)
     {
@@ -1046,7 +1046,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
         }
         catch(const BaseException& oBaseException )
         {
-            ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+            ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
             strProvisionStatus = "";
         }
         catch( ... )
@@ -1203,7 +1203,7 @@ std::string __thiscall Orchestrator::PullJobData(
     }
     catch(const BaseException& oBaseException )
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         strResult = "Error";
     }
     catch( ... )
@@ -1247,7 +1247,7 @@ std::string __thiscall Orchestrator::WaitForData(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         strReturn = "";
 
     }
@@ -1316,7 +1316,7 @@ void __thiscall Orchestrator::PushUserDataToJob(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -1356,7 +1356,7 @@ void __thiscall Orchestrator::SendSafeObjectToJobEngine(
     }
     catch(const BaseException& c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     catch(std::exception & e)
     {
@@ -1402,7 +1402,7 @@ void __thiscall Orchestrator::SetParameterOnJob(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (const std::exception & c_oException)
@@ -1447,7 +1447,7 @@ void __thiscall Orchestrator::SendDataToJob(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
     catch(std::exception & e)
     {

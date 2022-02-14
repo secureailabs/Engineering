@@ -222,7 +222,7 @@ void __thiscall RestFramework::RunServer(void)
         
         catch (const BaseException & c_oBaseException)
         {
-            ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+            ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
         
         catch (...)
@@ -285,7 +285,7 @@ void __thiscall RestFramework::LoadPlugins(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         // Close all plugin handles
         for (void * pPluginHandle : m_stlPluginHandles)
         {
@@ -337,7 +337,7 @@ bool __stdcall PutDatabaseGatewayResponse(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         fResult = false;
     }
     

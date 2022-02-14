@@ -24,6 +24,7 @@
 #include <mutex>
 #include <queue>
 #include <string>
+#include <thread>
 #include <unordered_map>
 
 static uint64_t gs_un64NextAvailableExceptionIdentier = 0;
@@ -32,7 +33,16 @@ static std::unordered_map<std::thread::id, std::queue<uint64_t>> gs_stlRegistere
 static std::queue<std::thread::id> gs_stlQueueOfExceptionsForAllThreads;
 static std::mutex gs_stlMutex;
 
-static __stdcall RegisterException(
+/// <summary>
+/// Register a BaseException in the internal queue
+/// </summary>
+/// <param name="c_oBaseException"></param>
+/// <param name="c_szFunctionName"></param>
+/// <param name="c_szFilename"></param>
+/// <param name="unLineNumber"></param>
+/// <returns></returns>
+
+static void __stdcall RegisterException(
     _in const std::string & c_strExceptionMessage
     ) throw()
 {
@@ -46,7 +56,7 @@ static __stdcall RegisterException(
         // Get the next available registered exception identifier, then increment
         uint64_t un64RegisteredExceptionIdentifier = gs_un64NextAvailableExceptionIdentier++;
         // Register the exception, make sure it is tracked per thread as well
-        gs_stlAllRegisteredExceptions[un64RegisteredExceptionIdentifier] = strExceptionMessage;
+        gs_stlAllRegisteredExceptions[un64RegisteredExceptionIdentifier] = c_strExceptionMessage;
         gs_stlQueueOfExceptionsForAllThreads.push(std::this_thread::get_id());
         gs_stlRegisteredExceptionsPerThread[std::this_thread::get_id()].push(un64RegisteredExceptionIdentifier);
     }
@@ -94,8 +104,6 @@ void __stdcall RegisterBaseException(
         strExceptionMessage += c_szFunctionName;
         strExceptionMessage += "\r\n               |Line Number = ";
         strExceptionMessage += std::to_string(unLineNumber);
-        strExceptionMessage += "\r\n               |Thread = ";
-        strExceptionMessage += std::to_string(std::this_thread::get_id());
         
         ::RegisterException(strExceptionMessage);
         
@@ -118,7 +126,7 @@ void __stdcall RegisterBaseException(
 /// <param name="unLineNumber"></param>
 /// <returns></returns>
 void __stdcall RegisterStandardException(
-    _in const std::exception & c_oStandardException
+    _in const std::exception & c_oStandardException,
     _in const char * c_szFunctionName,
     _in const char * c_szFileName,
     _in unsigned int unLineNumber
@@ -139,8 +147,6 @@ void __stdcall RegisterStandardException(
         strExceptionMessage += c_szFunctionName;
         strExceptionMessage += "\r\n               |Line Number = ";
         strExceptionMessage += std::to_string(unLineNumber);
-        strExceptionMessage += "\r\n               |Thread = ";
-        strExceptionMessage += std::to_string(std::this_thread::get_id());
 
         ::RegisterException(strExceptionMessage);
         
@@ -180,8 +186,6 @@ void __stdcall RegisterUnknownException(
         strExceptionMessage += c_szFunctionName;
         strExceptionMessage += "\r\n               |Line Number = ";
         strExceptionMessage += std::to_string(unLineNumber);
-        strExceptionMessage += "\r\n               |Thread = ";
-        strExceptionMessage += std::to_string(std::this_thread::get_id());
         
         ::RegisterException(strExceptionMessage);
         

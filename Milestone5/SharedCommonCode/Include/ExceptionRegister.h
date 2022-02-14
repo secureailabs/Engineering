@@ -20,6 +20,7 @@
 #include "CoreTypes.h"
 #include "Exceptions.h"
 
+#include <exception>
 #include <string>
 
 /********************************************************************************************/
@@ -32,7 +33,7 @@ extern void __stdcall RegisterBaseException(
     ) throw();
     
 extern void __stdcall RegisterStandardException(
-    _in const std::exception & c_oStandardException
+    _in const std::exception & c_oStandardException,
     _in const char * c_szFunctionName,
     _in const char * c_szFileName,
     _in unsigned int unLineNumber
@@ -45,6 +46,6 @@ extern void __stdcall RegisterUnknownException(
     ) throw();
     
 extern unsigned int __stdcall GetRegisteredExceptionsCount(void) throw();
-extern unsigned int __stdcall GetRegisteredExceptionsCountForCurrentThread(void) throw()
+extern unsigned int __stdcall GetRegisteredExceptionsCountForCurrentThread(void) throw();
 
 extern std::string __stdcall GetNextRegisteredException(void) throw();

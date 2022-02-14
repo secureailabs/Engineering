@@ -70,7 +70,7 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInstallationPackageToVirtual
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -163,7 +163,7 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInitializationParametersToVi
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

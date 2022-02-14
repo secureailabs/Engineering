@@ -283,7 +283,7 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
     catch(std::exception & e)
     {
@@ -462,7 +462,7 @@ void __thiscall JobInformation::JobEngineListener()
             }
             catch(const BaseException& oBaseException)
             {
-                ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+                ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
             }
 
             catch(...)

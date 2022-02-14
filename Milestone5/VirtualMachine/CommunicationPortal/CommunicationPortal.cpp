@@ -212,7 +212,7 @@ void __thiscall CommunicationPortal::HandleConnection(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (const std::exception & c_oBaseException)
@@ -305,7 +305,7 @@ void __thiscall CommunicationPortal::PersistantConnectionTlsToIpc(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (const std::exception & c_oBaseException)
@@ -422,7 +422,7 @@ void __thiscall CommunicationPortal::OneTimeConnectionHandler(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (const std::exception & c_oBaseException)

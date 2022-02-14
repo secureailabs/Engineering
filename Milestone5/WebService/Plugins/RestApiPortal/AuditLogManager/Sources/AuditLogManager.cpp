@@ -684,7 +684,7 @@ std::vector<Byte> __thiscall AuditLogManager::GetUserInfo(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -761,7 +761,7 @@ std::vector<Byte> __thiscall AuditLogManager::AddNonLeafEvent(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -849,7 +849,7 @@ std::vector<Byte> __thiscall AuditLogManager::AddLeafEvent(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oStatus.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -938,7 +938,7 @@ std::vector<Byte> __thiscall AuditLogManager::GetListOfEvents(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oAuditLogs.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -1020,7 +1020,7 @@ std::vector<Byte> __thiscall AuditLogManager::DigitalContractBranchExists(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oAuditLog.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)

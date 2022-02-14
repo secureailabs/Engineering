@@ -167,7 +167,7 @@ std::string Login(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -211,7 +211,7 @@ std::vector<Byte> GetBasicUserInformation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -248,7 +248,7 @@ std::string GetIEosb(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -362,7 +362,7 @@ bool RegisterLeafEvents(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -432,7 +432,7 @@ bool RegisterDatasetFamily(
     }
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -478,7 +478,7 @@ std::string RegisterVirtualMachine(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -519,7 +519,7 @@ std::string RegisterVmAfterDataUpload(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -560,7 +560,7 @@ std::string RegisterVmForComputation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -613,7 +613,7 @@ bool UpdateVirtualMachineStatus(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -684,7 +684,7 @@ bool ListVirtualMachines(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -750,7 +750,7 @@ std::vector<Byte> PullVirtualMachine(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -813,7 +813,7 @@ bool GetListOfEvents(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -933,7 +933,7 @@ bool RegisterOrganizationAndSuperUser(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1026,7 +1026,7 @@ bool RegisterUser(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1105,7 +1105,7 @@ bool UpdateOrganizationInformation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1152,7 +1152,7 @@ bool UpdateUserAccessRights(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1210,7 +1210,7 @@ bool UpdateUserInformation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1259,7 +1259,7 @@ bool UpdatePassword(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1309,7 +1309,7 @@ bool GetOrganizationInformation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1364,7 +1364,7 @@ bool ListOrganizations(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1417,7 +1417,7 @@ bool ListAllUsers(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1478,7 +1478,7 @@ bool ListOrganizationUsers(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1524,7 +1524,7 @@ bool DeleteUser(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1570,7 +1570,7 @@ bool RecoverUser(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1617,7 +1617,7 @@ bool DeleteOrganization(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1714,7 +1714,7 @@ bool RegisterDigitalContract(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1814,7 +1814,7 @@ bool AcceptDigitalContract(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1896,7 +1896,7 @@ bool ActivateDigitalContract(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -1933,7 +1933,7 @@ std::vector<Byte> ListDigitalContracts(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2055,7 +2055,7 @@ std::vector<Byte> PullDigitalContract(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2113,7 +2113,7 @@ bool GetDigitalContractProvisioningStatus(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2194,7 +2194,7 @@ bool RegisterDataset(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2248,7 +2248,7 @@ bool ListDatasets(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2306,7 +2306,7 @@ bool PullDataset(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2353,7 +2353,7 @@ bool DeleteDataset(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2426,7 +2426,7 @@ bool RegisterAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2481,7 +2481,7 @@ bool ListAzureTemplates(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2540,7 +2540,7 @@ bool PullAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2616,7 +2616,7 @@ bool UpdateAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2663,7 +2663,7 @@ bool DeleteAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2730,7 +2730,7 @@ bool AssociateDigitalContractWithAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2795,7 +2795,7 @@ bool RegisterRemoteDataConnector(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2851,7 +2851,7 @@ bool ListRemoteDataConnectors(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2911,7 +2911,7 @@ bool PullRemoteDataConnector(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -2977,7 +2977,7 @@ bool UpdateRemoteDataConnector(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -3033,7 +3033,7 @@ bool SendRemoteDataConnectoHeartBeat(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -3078,7 +3078,7 @@ std::vector<Byte> GetRemoteAttestationCertificate(void)
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -3112,7 +3112,7 @@ void ShutdownPortal(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

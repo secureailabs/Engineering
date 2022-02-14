@@ -48,7 +48,7 @@ std::string __thiscall RootOfTrustCoreProperties::GetProperty(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -77,7 +77,7 @@ void __thiscall RootOfTrustCoreProperties::SetProperty(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)

@@ -360,7 +360,7 @@ std::vector<Byte> __thiscall DatasetFamilyManager::RegisterDatasetFamily(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -442,7 +442,7 @@ std::vector<Byte> __thiscall DatasetFamilyManager::ListDatasetFamilies(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -531,7 +531,7 @@ std::vector<Byte> __thiscall DatasetFamilyManager::PullDatasetFamily(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -636,7 +636,7 @@ std::vector<Byte> __thiscall DatasetFamilyManager::EditDatasetFamilyInformation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -770,7 +770,7 @@ std::vector<Byte> __thiscall DatasetFamilyManager::DeleteDatasetFamily(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)

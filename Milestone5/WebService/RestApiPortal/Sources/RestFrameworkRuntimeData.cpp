@@ -361,7 +361,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         // create error message
         if (strcmp("Resource not found.", c_oBaseException.GetExceptionMessage()) == 0)
         {
@@ -390,7 +390,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)

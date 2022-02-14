@@ -98,7 +98,7 @@ bool __thiscall PluginDictionaryManager::RegisterPlugin(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)

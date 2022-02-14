@@ -115,7 +115,7 @@ unsigned int AuditEventManagedQueues::GetQueuedAuditEventsCount(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -164,7 +164,7 @@ std::queue<std::string> __thiscall AuditEventManagedQueues::GetQueuedAuditEvents
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)

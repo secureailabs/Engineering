@@ -185,7 +185,7 @@ void __thiscall RemoteDataConnector::NewDatasetFoundCallback(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -285,7 +285,7 @@ void __thiscall RemoteDataConnector::SendDataConnectorHeartbeat(void) throw()
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -406,7 +406,7 @@ void __thiscall RemoteDataConnector::UploadDataSetToVirtualMachine(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -536,7 +536,7 @@ StructuredBuffer __thiscall RemoteDataConnector::VerifyDataset(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oDatasetInformation.Clear();
     }
     
@@ -599,7 +599,7 @@ void __thiscall RemoteDataConnector::ManualUploadDataSetToVirtualMachine(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)

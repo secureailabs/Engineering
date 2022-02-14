@@ -50,7 +50,7 @@ static BSTR __cdecl ConvertToBSTR(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -85,7 +85,7 @@ extern "C" __declspec(dllexport) uint64_t __cdecl Get64BitHashOfString(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -116,7 +116,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GenerateIdentifier(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -155,7 +155,7 @@ extern "C" __declspec(dllexport) void __cdecl OpenTablePackageFile(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -187,7 +187,7 @@ extern "C" __declspec(dllexport) void __cdecl AddRecordToTablePackageFile(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -242,7 +242,7 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

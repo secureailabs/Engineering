@@ -106,7 +106,7 @@ StructuredBuffer __stdcall GetSailWebApiPortalBasicUserInformation(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -149,7 +149,7 @@ bool __stdcall TransmitAuditEventsToSailWebApiPortal(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -191,7 +191,7 @@ StructuredBuffer __stdcall GetListOfDigitalContracts(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -235,7 +235,7 @@ StructuredBuffer __stdcall GetDigitalContract(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oDigitalContract.Clear();
     }
     
@@ -282,7 +282,7 @@ StructuredBuffer __stdcall RegisterVirtualMachineAfterInitialization(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -321,7 +321,7 @@ StructuredBuffer __stdcall RegisterVirtualMachineDataOwner(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -360,7 +360,7 @@ StructuredBuffer __stdcall RegisterVirtualMachineResearchUser(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -414,7 +414,7 @@ bool __stdcall VirtualMachineStatusUpdate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)

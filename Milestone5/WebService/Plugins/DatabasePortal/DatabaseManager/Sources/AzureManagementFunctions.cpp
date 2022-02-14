@@ -86,7 +86,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListAzureTemplates(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -166,7 +166,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -308,7 +308,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -441,7 +441,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -537,7 +537,7 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteAzureTemplate(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     

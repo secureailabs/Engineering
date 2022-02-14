@@ -58,7 +58,7 @@ std::string __stdcall LoginToMicrosoftAzureApiPortal(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
@@ -233,7 +233,7 @@ StructuredBuffer __stdcall CreateResourceGroup(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.PutString("error", c_oBaseException.GetExceptionMessage());
     }
     
@@ -408,7 +408,7 @@ StructuredBuffer DeployVirtualMachineAndWait(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.PutString("error", c_oBaseException.GetExceptionMessage());
     }
     
@@ -539,7 +539,7 @@ StructuredBuffer CreateAzureDeployment(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oDeploymentResult.PutString("error", c_oBaseException.GetExceptionMessage());
     }
     
@@ -940,7 +940,7 @@ StructuredBuffer CopyVirtualMachineImage(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oCopyImageResult.PutString("error", c_oBaseException.GetExceptionMessage());
     }
     

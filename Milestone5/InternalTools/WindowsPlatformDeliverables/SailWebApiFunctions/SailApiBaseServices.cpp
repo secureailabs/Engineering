@@ -109,7 +109,7 @@ static Dword __stdcall EosbMaintenanceThread(
                 }
                 else
                 {
-                    ::RegisterException(BaseException(__FILE__, __func__, __LINE__, "Unexpected return values from CheckEosb"), __func__, __FILE__, __LINE__);
+                    ::RegisterBaseException(BaseException(__FILE__, __func__, __LINE__, "Unexpected return values from CheckEosb"), __func__, __FILE__, __LINE__);
                 }
             }
         }
@@ -118,7 +118,7 @@ static Dword __stdcall EosbMaintenanceThread(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -275,7 +275,7 @@ static bool __cdecl SetIpAndPortAddress(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -344,7 +344,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetIpAddress(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -409,7 +409,7 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -451,7 +451,7 @@ extern "C" __declspec(dllexport) bool __cdecl Logout(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -498,7 +498,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetSailWebApiPortalImpostorEosb(vo
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

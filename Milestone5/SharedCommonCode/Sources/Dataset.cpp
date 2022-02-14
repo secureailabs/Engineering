@@ -84,7 +84,7 @@ Dataset::Dataset(
 /********************************************************************************************/
 
 Dataset::Dataset(
-    _in const std::vector<Byte> c_stlSerializedMetadata
+    _in const std::vector<Byte> & c_stlSerializedMetadata
     )
 {
     __DebugFunction();

@@ -14,6 +14,7 @@
 #include "Dataset.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
+#include "ExceptionRegister.h"
 
 #include <iostream>
 
@@ -65,9 +66,9 @@ int main(
             std::cout << "+======================================================================================+" << std::endl;
             // Now loop through all of the tables
             std::vector<std::string> stlListOfTables = oDataset.GetTableIdentifiers();
-            for (std::string strTableIdentifier: stlListOfTables)
+            for (const std::string & c_strTableIdentifier: stlListOfTables)
             {
-                DatasetTable oDatasetTable = oDataset.GetDatasetTable(strTableIdentifier.c_str());
+                DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_strTableIdentifier.c_str());
                 std::cout << "Table Identifier = " << oDatasetTable.GetTableIdentifier() << std::endl;
                 std::cout << "Title = " << oDatasetTable.GetTitle() << std::endl;
                 std::cout << "Description = " << oDatasetTable.GetDescription() << std::endl;
@@ -80,9 +81,9 @@ int main(
                 std::cout << "Offset to first byte of compressed data = " << std::to_string(oInformationForDataAccess.GetUnsignedInt64("OffsetToFirstByteOfCompressedData")) << std::endl;
                 std::cout << "Filename = " << oInformationForDataAccess.GetString("DatasetFilename") << std::endl << std::endl;
                 std::vector<std::string> stlListOfColumns = oDatasetTable.GetColumnIdentifiers();
-                for (std::string strColumnIdentifier: stlListOfColumns)
+                for (const std::string & c_strColumnIdentifier: stlListOfColumns)
                 {
-                    DatasetTableColumn oDatasetTableColumn(oDatasetTable.GetTableColumn(strColumnIdentifier.c_str()));
+                    DatasetTableColumn oDatasetTableColumn(oDatasetTable.GetTableColumn(c_strColumnIdentifier.c_str()));
                     std::cout << "     Column Identifier = " << oDatasetTableColumn.GetColumnIdentifier() << std::endl;
                     std::cout << "     Title = " << oDatasetTableColumn.GetTitle() << std::endl;
                     std::cout << "     Description = " << oDatasetTableColumn.GetDescription() << std::endl;
@@ -97,9 +98,9 @@ int main(
             // Should we print the actual data? This prints a whole lot of crap
             if (true == oCommandLineArguments.IsElementPresent("printdata", BOOLEAN_VALUE_TYPE))
             {
-                for (std::string strTableIdentifier: stlListOfTables)
+                for (const std::string & c_strTableIdentifier: stlListOfTables)
                 {
-                    DatasetTable oDatasetTable = oDataset.GetDatasetTable(strTableIdentifier.c_str());
+                    DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_strTableIdentifier.c_str());
                     StructuredBuffer oInformationForDataAccess(oDatasetTable.GetInformationForDataAccess());
                     BinaryFileReader oBinaryFileReader(oInformationForDataAccess.GetString("DatasetFilename"));
                     oBinaryFileReader.Seek(eFromBeginningOfFile, oInformationForDataAccess.GetUnsignedInt64("OffsetToFirstByteOfCompressedData"));
@@ -114,13 +115,24 @@ int main(
     
     catch (const BaseException & c_oBaseException)
     {
-        std::cout << "Exception: " << std::endl;
-        std::cout << c_oBaseException.GetExceptionMessage() << std::endl;
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+    }
+    
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
     }
     
     catch (...)
     {
-        std::cout << "Error: Unknown exception caught." << std::endl;
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    
+    // Print out any lingered exceptions before exiting
+    while (0 < ::GetRegisteredExceptionCount())
+    {
+        std::string strRegisteredException = ::GetNextRegisteredException();
+        std::cout << strRegisteredException << std::endl << std::endl;
     }
 
     return 0;

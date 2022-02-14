@@ -86,7 +86,7 @@ class Dataset : public Object
             _in const char * c_szFullFilename
             );
         Dataset(
-            _in const std::vector<Byte> c_stlSerializedMetadata
+            _in const std::vector<Byte> & c_stlSerializedMetadata
             );
         virtual ~Dataset(void) throw();
 

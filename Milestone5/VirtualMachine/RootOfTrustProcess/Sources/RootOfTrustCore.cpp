@@ -317,7 +317,7 @@ void __thiscall RootOfTrustCore::AuditEventDispatcher(void) throw()
 
         catch (const BaseException & c_oBaseException)
         {
-            ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+            ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
 
         catch(...)
@@ -421,7 +421,7 @@ void __thiscall RootOfTrustCore::RunIpcListener(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -498,7 +498,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleRegisterResearcherTransactio
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -535,7 +535,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandlePutDatasetTransaction(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -571,7 +571,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleGetDatasetTransaction(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -614,7 +614,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleAuditEventTransaction(
 
     catch (BaseException c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -645,7 +645,7 @@ bool __thiscall RootOfTrustCore::RegisterVirtualMachine(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -674,7 +674,7 @@ bool __thiscall RootOfTrustCore::RegisterDataOwnerEosb(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -703,7 +703,7 @@ bool __thiscall RootOfTrustCore::RegisterResearcherEosb(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)
@@ -743,7 +743,7 @@ void __thiscall RootOfTrustCore::RecordInternalAuditEvent(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)

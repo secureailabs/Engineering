@@ -85,7 +85,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListRemoteDataConnectors(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -166,7 +166,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullRemoteDataConnector(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -296,7 +296,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterRemoteDataConnector(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     
@@ -410,7 +410,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateRemoteDataConnector(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
     

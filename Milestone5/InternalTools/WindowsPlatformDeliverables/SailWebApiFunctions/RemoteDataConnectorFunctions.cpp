@@ -67,7 +67,7 @@ static Dword __stdcall UploadDatasetToVirtualMachine(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -193,7 +193,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -270,7 +270,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -362,7 +362,7 @@ extern "C" __declspec(dllexport) bool __cdecl RemoteDataConnectorAddDataset(
 
                 catch (const BaseException & c_oBaseException)
                 {
-                    ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+                    ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
                     // Sleep for 5 seconds to give time for the dataset file to be fully copied to the folder
                     ::Sleep(5000);
                     unNumberOfRetries++;
@@ -381,7 +381,7 @@ extern "C" __declspec(dllexport) bool __cdecl RemoteDataConnectorAddDataset(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -424,7 +424,7 @@ extern "C" __declspec(dllexport) void __cdecl RemoteDataConnectorRemoveDataset(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)

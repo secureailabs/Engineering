@@ -98,7 +98,7 @@ std::vector<Byte> __stdcall GetUserInfoFromEosb(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)

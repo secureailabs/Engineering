@@ -42,12 +42,12 @@
     <ClCompile Include="DatasetFamilySupportFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExceptionsUtilityFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SharedUtilityFunctions.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ExceptionsUtilityFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="SailApiBaseServices.h">

@@ -30,7 +30,7 @@
     <ClCompile Include="SharedUtilityFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ExceptionsUtilityFunctions.cpp" />
+    <ClCompile Include="ExceptionsUtilityFunctions.cpp" />
     <ClInclude Include="SailApiBaseServices.h" />
     <ClInclude Include="SharedUtilityFunctions.h" />
   </ItemGroup>

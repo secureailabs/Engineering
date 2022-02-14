@@ -117,18 +117,22 @@ public class SailWebApiPortalInterop
     [DllImport("SailSupportLibrary.dll", CallingConvention = CallingConvention.Cdecl)]
     static extern public void RemoteDataConnectorRemoveDataset(string datasetFile);
 
+    #region Exception Reporting Support Functions
+
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    [DllImport("SailSupportLibrary.dll", CallingConvention = CallingConvention.Cdecl )]
+    [DllImport("SailSupportLibrary.dll", CallingConvention = CallingConvention.Cdecl)]
     static extern public uint GetExceptionCount();
 
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    [DllImport("SailSupportLibrary.dll", CallingConvention = CallingConvention.Cdecl )]
+    [DllImport("SailSupportLibrary.dll", CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.BStr)]
     static extern public string GetNextException();
+
+    #endregion
 }

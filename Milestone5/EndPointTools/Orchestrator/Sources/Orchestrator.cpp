@@ -1343,7 +1343,7 @@ static bool IsJobOutputParameter(
     }
     catch(const BaseException& oBaseException )
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
         fIsJobParameter = false;
     }
     catch( ... )
@@ -1585,7 +1585,7 @@ void __thiscall Orchestrator::PushJobOutputParameterToJob(
     }
     catch(const BaseException& oBaseException)
     {
-        ::RegisterException(oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch(...)

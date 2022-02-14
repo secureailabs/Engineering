@@ -98,13 +98,13 @@ int main(
             // Add other users for the organizations
             oDatabaseTools.AddOtherUsers();
             // Register dataset metadata
-            oDatabaseTools.AddDatasets();
+            //oDatabaseTools.AddDatasets();
             // Register digital contracts for the organizations
-            oDatabaseTools.AddDigitalContracts();
+            //oDatabaseTools.AddDigitalContracts();
             // Accept digital contracts
-            oDatabaseTools.AcceptDigitalContracts();
+            //oDatabaseTools.AcceptDigitalContracts();
             // Activate digital contracts
-            oDatabaseTools.ActivateDigitalContracts();
+            //oDatabaseTools.ActivateDigitalContracts();
 
             oDatabaseTools.AddDatasetFamilies();
         }

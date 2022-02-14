@@ -13,12 +13,14 @@ namespace WindowsRemoteDataConnector
     public partial class ConnectToApiWebServices : Form
     {
         public ConnectToApiWebServices(
+            string ipAddress,
             string username,
             string password
             )
         {
             InitializeComponent();
 
+            m_IpAddress = ipAddress;
             m_Username = username;
             m_Password = password;
         }
@@ -47,7 +49,7 @@ namespace WindowsRemoteDataConnector
             EventArgs e
             )
         {
-            if (true == SailWebApiPortalInterop.Login(m_Username, m_Password))
+            if (true == SailWebApiPortalInterop.Login(m_IpAddress, m_Username, m_Password))
             {
                 this.m_RetryTimer.Enabled = false;
                 this.DialogResult = DialogResult.OK;
@@ -68,6 +70,7 @@ namespace WindowsRemoteDataConnector
             
         }
 
+        private string m_IpAddress;
         private string m_Username;
         private string m_Password;
     }

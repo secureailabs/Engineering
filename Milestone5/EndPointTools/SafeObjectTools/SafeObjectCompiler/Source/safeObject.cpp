@@ -67,7 +67,7 @@ static PyObject* parameterConvert(StructuredBuffer& oBuffer, PyObject* oUuids, P
         
         catch (const BaseException & c_oBaseException)
         {
-            ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+            ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         } 
         
         catch (...) 
@@ -224,7 +224,7 @@ static PyObject* writeSafeObject(PyObject* self, PyObject* args)
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     } 
     
     catch (...) 

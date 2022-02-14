@@ -687,7 +687,7 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::GetUserInfo(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -785,7 +785,7 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::GetListOfRemoteDataConn
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -876,7 +876,7 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::PullRemoteDataConnector
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -971,7 +971,7 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::RegisterRemoteDataConne
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -1063,7 +1063,7 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::UpdateRemoteDataConnect
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
@@ -1176,7 +1176,7 @@ std::vector<Byte> __thiscall RemoteDataConnectorManager::ConnectorHeartBeat(
     
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
         // Add status if it was a dead packet
         if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)

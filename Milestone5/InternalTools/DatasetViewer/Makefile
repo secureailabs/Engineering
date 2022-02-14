@@ -10,13 +10,16 @@ endif
 
 # The Root directory containing all the code
 ROOTDIR=../..
+
 include $(ROOTDIR)/Common.mk
 
 # Add the new include folders here
-INCLUDE+=-I$(shell realpath .)
+INCLUDE+=-I$(shell realpath ./Include)
+#INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
 
 # Add the new source directory here
-SRCDIRS+=$(shell realpath .)
+SRCDIRS+=$(shell realpath ./Sources)
+#SRCDIRS+=$(shell realpath ../SharedComponents/Sources)
 
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 
@@ -25,6 +28,7 @@ OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
 .PHONY: all, clean, cleanall
+
 all: $(OUTPUT)
 
 $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp

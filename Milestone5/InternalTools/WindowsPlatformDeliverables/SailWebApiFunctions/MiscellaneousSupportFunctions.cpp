@@ -32,7 +32,7 @@ extern "C" __declspec(dllexport) uint64_t __cdecl Get64BitHashOfString(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -63,7 +63,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GenerateIdentifier(
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
     catch (...)
@@ -100,7 +100,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl TestConvertJsonStringToStructuredB
 
     catch (const BaseException & c_oBaseException)
     {
-        ::RegisterException(c_oBaseException, __func__, __FILE__, __LINE__);
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         strStructureBufferStringRepresentation = c_oBaseException.GetExceptionMessage();
     }
 

@@ -28,9 +28,6 @@ for d in $(echo ./*/);do (cd "$d"; make all -j && returncode=$? || returncode=$?
 cd "$SCRIPT_DIR"/EndPointTools
 for d in $(echo ./*/);do (cd "$d"; make all -j && returncode=$? || returncode=$?; cd ..); done
 
-cd "$SCRIPT_DIR"/InternalTools/PackageWebServiceAndComputeVm/
-make all -j && returncode=$? || returncode=$?
-
 cd "$SCRIPT_DIR"/InternalTools/DatabaseTools/
 make all -j && returncode=$? || returncode=$?
 
@@ -57,9 +54,3 @@ for val in "${StringArray2[@]}"; do
     fi
 done
 set -e
-
-cd "$SCRIPT_DIR"/Binary
-./PackageWebServiceAndComputeVm
-
-cd "$SCRIPT_DIR"
-

@@ -35,7 +35,7 @@ static std::mutex gs_stlMutex;
 /// <param name="c_szFunctionName"></param>
 /// <param name="unLineNumber"></param>
 /// <returns></returns>
-void __cdecl RegisterException(
+void __cdecl RegisterBaseException(
     _in const BaseException & c_oBaseException,
     _in const char * c_szFunctionName,
     _in unsigned int unLineNumber

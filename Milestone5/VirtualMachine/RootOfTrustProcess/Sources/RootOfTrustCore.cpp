@@ -96,15 +96,16 @@ void __thiscall RootOfTrustCore::Initialize(
     StructuredBuffer oInitializationParameters(c_stlSerializedInitializationParameters);
     // Reality check, to make sure that everything is where it is supposed to be
     m_oRootOfTrustCoreProperties.SetProperty("SailPlatformServicesIpAddress", oInitializationParameters.GetString("SailPlatformServicesIpAddress"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineName", oInitializationParameters.GetString("VirtualMachineName"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIpAddress", oInitializationParameters.GetString("VirtualMachineIpAddress"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineName", oInitializationParameters.GetString("NameOfVirtualMachine"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIpAddress", oInitializationParameters.GetString("IpAddressOfVirtualMachine"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIdentifier", oInitializationParameters.GetString("VirtualMachineIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineClusterIdentifier", oInitializationParameters.GetString("VirtualMachineClusterIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineClusterIdentifier", oInitializationParameters.GetString("ClusterIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustDomainIdentifier", oInitializationParameters.GetString("RootOfTrustDomainIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIdentifier", oInitializationParameters.GetString("VirtualMachineName"));
-    m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataDomainIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIdentifier", oInitializationParameters.GetString("ComputationalDomainIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataConnectorDomainIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DigitalContractIdentifier", oInitializationParameters.GetString("DigitalContractIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DatasetIdentifier", oInitializationParameters.GetString("DatasetIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineEosb", oInitializationParameters.GetString("VmEosb"));
     // Add some values to RootOfTrustCoreProperties which were not sent in by the
     // remote initializer
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustIpcPath", Guid().ToString(eRaw));

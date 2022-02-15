@@ -47,6 +47,7 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     oAllInitializationParameters.PutString("ComputationalDomainIdentifier", ::GetInitializationValue("ComputationalDomainIdentifier"));
     oAllInitializationParameters.PutString("DataConnectorDomainIdentifier", ::GetInitializationValue("DataConnectorDomainIdentifier"));
     oAllInitializationParameters.PutString("VmEosb", ::GetInitializationValue("VmEosb"));
+    oAllInitializationParameters.PutString("SailPlatformServicesIpAddress", ::GetInitializationValue("PlatformServicesUrl"));
 
     // Next step is to wait for the dataset from the Remote data connector, the process will wait for the dataset
     // and dataOwner information

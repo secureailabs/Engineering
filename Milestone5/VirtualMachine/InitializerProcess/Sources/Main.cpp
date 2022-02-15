@@ -47,7 +47,6 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     oAllInitializationParameters.PutString("ComputationalDomainIdentifier", ::GetInitializationValue("ComputationalDomainIdentifier"));
     oAllInitializationParameters.PutString("DataConnectorDomainIdentifier", ::GetInitializationValue("DataConnectorDomainIdentifier"));
     oAllInitializationParameters.PutString("VmEosb", ::GetInitializationValue("VmEosb"));
-    oAllInitializationParameters.PutString("SailPlatformServicesIpAddress", ::GetInitializationValue("PlatformServicesUrl"));
 
     // Next step is to wait for the dataset from the Remote data connector, the process will wait for the dataset
     // and dataOwner information
@@ -69,7 +68,7 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
 
     StructuredBuffer oRemoteDatasetParameters(stlDatasetParameters);
     oAllInitializationParameters.PutString("DataOwnerAccessToken", ::UnEscapeJsonString(oRemoteDatasetParameters.GetString("DataOwnerAccessToken").c_str()));
-    oAllInitializationParameters.PutString("SailWebApiPortalIpAddress", oRemoteDatasetParameters.GetString("SailWebApiPortalIpAddress"));
+    oAllInitializationParameters.PutString("SailPlatformServicesIpAddress", oRemoteDatasetParameters.GetString("SailWebApiPortalIpAddress"));
     oAllInitializationParameters.PutString("DataOwnerUserIdentifier", oRemoteDatasetParameters.GetString("DataOwnerUserIdentifier"));
     oAllInitializationParameters.PutString("Base64EncodedDataset", ::UnEscapeJsonString(oRemoteDatasetParameters.GetString("Base64EncodedDataset").c_str()));
     oAllInitializationParameters.PutString("DataOwnerOrganizationIdentifier", oRemoteDatasetParameters.GetString("DataOwnerOrganizationIdentifier"));

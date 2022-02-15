@@ -130,12 +130,11 @@ std::vector<Byte> __thiscall TlsNode::Read(
         // In case there was no sufficient data in the cache, attempt is made to read from socket
         if ((0 == stlDestinationBuffer.size()) && (0 < unMillisecondTimeout))
         {
-            int nBytesRead = 0;
             Chronometer oChronometer;
             oChronometer.Start();
 
             bool fReadTimedOut = false;
-            while ((nBytesRead < unNumberOfDesiredBytes) && ((unMillisecondTimeout > oChronometer.GetElapsedTimeWithPrecision(Millisecond))))
+            while ((m_oDecryptedBytesCache.GetBytesInBuffer() < unNumberOfDesiredBytes) && ((unMillisecondTimeout > oChronometer.GetElapsedTimeWithPrecision(Millisecond))))
             {
                 // The SSL header is always cached to prevent the data loss in case the data read
                 // times out and the socket FIFO buffer is only left with the data without header.
@@ -181,7 +180,6 @@ std::vector<Byte> __thiscall TlsNode::Read(
                             // SSL_read will process and decrypt the record and read the bytes
                             int nBytesActualRead = ::SSL_read(m_poSSL.get(), pbCircularBufferDestination, nEncryptedDataSize);
                             _ThrowBaseExceptionIf((0 > nBytesActualRead), "TLS Read failed: Reading from readBIO failed", nullptr);
-                            nBytesRead += nBytesActualRead;
                             // WriteUnlock will put the data into the FIFO buffer.
                             m_oDecryptedBytesCache.WriteUnlock(nBytesActualRead);
                         }

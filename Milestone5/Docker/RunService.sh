@@ -4,19 +4,22 @@ set -e
 PrintHelp()
 {
     echo ""
-    echo "Usage: $0 -s [Service Name] -d"
+    echo "Usage: $0 -s [Service Name] -d -c"
     echo -e "\t-s Service Name: backend | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
     echo -e "\t-d Run docker container detached"
+    echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
 }
 
 # Parese the input parameters
 detach=false
-while getopts "s:d opt:" opt
+cleanDatabase=false
+while getopts "s:d opt:c opt:" opt
 do
     case "$opt" in
         s ) imageName="$OPTARG" ;;
         d ) detach=true ;;
+        c ) cleanDatabase=true ;;
         ? ) PrintHelp ;;
     esac
 done
@@ -28,6 +31,7 @@ then
 fi
 echo "Running $imageName"
 echo "Detach: $detach"
+echo "Clean Database: $cleanDatabase"
 
 # If the detach flag exists, run the container in the background
 # Default behaviour is to run the container in the foreground
@@ -47,8 +51,21 @@ else
     exit 1
 fi
 
+# Clean up existing non-running containers
+echo "Cleaning existing non-running containers"
+docker container rm -f $imageName
+
 # Set the root directory of the whole platform
 rootDir=$(pwd)/..
+
+# Sail Database volume name
+sailDatabaseVolumeName="sailDatabase"
+
+# Clean the database if the cleanDatabase flag exists
+if $cleanDatabase; then
+    echo "Cleaning database"
+    docker volume rm -f $sailDatabaseVolumeName
+fi
 
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
@@ -58,8 +75,19 @@ then
     runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator:/app $imageName"
 elif [ "backend" == "$imageName" ]
 then
+    # Create database volume if it does not exist
+    foundVolumeName=$(docker volume ls --filter name=$sailDatabaseVolumeName --format {{.Name}})
+    echo "$foundVolumeName"
+    if [ "$foundVolumeName" == "$sailDatabaseVolumeName" ]
+    then
+        echo "Database Volume already exists"
+    else
+        echo "Creating database volume"
+        docker volume create $sailDatabaseVolumeName
+    fi
+    # Copy InitializationVector.json to the backend
     cp backend/InitializationVector.json $rootDir/Binary
-    runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $rootDir/Binary:/app $imageName"
+    runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]
 then
     cp webfrontend/InitializationVector.json $rootDir/WebFrontend
@@ -77,9 +105,6 @@ else
     echo "!!! Kindly provide correct service name !!!"
     PrintHelp
 fi
-
-# Clean up existing non-running containers
-docker container rm -f $imageName
 
 # Run the docker container
 docker run $runtimeFlags

@@ -275,6 +275,38 @@ void __thiscall JobInformation::StartJobEngineListenerThread()
     m_fStopRequest = false;
 }
 
+bool __thiscall JobInformation::SendCachedMessages(void)
+{
+    __DebugFunction();
+    __DebugAssert(nullptr != m_poTlsConnection.get() );
+
+    bool fSent{false};
+    try
+    {
+        std::lock_guard<JobInformation> jobLock(*this);
+        for ( auto c_oBufferToSend : m_stlCachedStructuredBuffers )
+        {
+            ::PutTlsTransaction(m_poTlsConnection.get(), c_oBufferToSend);
+        }
+        m_stlCachedStructuredBuffers.clear();
+        fSent = true;
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+    catch(std::exception & e)
+    {
+        std::cout << "Exception: " << e.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    return fSent;
+}
+
 /********************************************************************************************
  *
  * @class JobInformation
@@ -287,7 +319,6 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
     )
 {
     __DebugFunction();
-    __DebugAssert( nullptr != m_poTlsConnection );
 
     bool fSent{false};
     try
@@ -300,7 +331,8 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
         }
         else
         {
-            std::cout << "NO CONNECTION " << std::endl;
+            std::cout << "NO CONNECTION CACHING" << std::endl;
+            m_stlCachedStructuredBuffers.push_back(c_oBufferToSend);
         }
         fSent = true;
     }
@@ -408,7 +440,7 @@ void __thiscall JobInformation::JobEngineListener()
     }
     constexpr unsigned int unWaitOnMessageTimeoutInMilliseconds{1000};
     int nTestCounter{0};
-    std::cout << "Listener has started " << std::endl;
+    std::cout << "Listener has started for job " << m_oJobId.ToString(eRaw) << std::endl;
     while( !m_fStopRequest )
     {
         std::vector<Byte> stlJobEngineMessage;

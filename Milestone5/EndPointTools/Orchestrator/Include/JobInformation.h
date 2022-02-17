@@ -66,6 +66,8 @@ class JobInformation
             _in const StructuredBuffer& c_oBufferToSend
             );
 
+        bool __thiscall SendCachedMessages(void);
+
         bool __thiscall IsRunning() const;
         // BasicLockable methods
         void __thiscall lock();
@@ -89,4 +91,5 @@ class JobInformation
         StructuredBufferLockedQueue& m_oQueueToOrchestrator;
 
         std::unordered_map<std::string, std::vector<Byte>> m_stlOutputResults{};
+        std::vector<StructuredBuffer> m_stlCachedStructuredBuffers{};
 };

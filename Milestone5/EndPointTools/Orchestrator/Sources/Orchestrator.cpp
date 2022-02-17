@@ -926,11 +926,15 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
         {
             oJob.SetConnection(poJobEngineSocket);
         }
+
         // TODO Put this back in once we can talk to SCNs
         //_ThrowBaseExceptionIf((nullptr == poJobEngineSocket), "Failed to connect to remote job engine", nullptr);
 
         // Start the listener thread for the job
         oJob.StartJobEngineListenerThread();
+
+        // Send any data we had cached
+        oJob.SendCachedMessages();
 
         SendSafeObjectToJobEngine(oJob);
 
@@ -1309,15 +1313,13 @@ std::string __thiscall Orchestrator::PullJobData(
                  //   strResult = "Parameter is confidential";
                 //}
                 //else
-                {
-                    StructuredBuffer oPushBuffer;
-                    oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::ePullData));
-                    oPushBuffer.PutString("EndPoint", "JobEngine");
-                    oPushBuffer.PutString("Filename", strParameterToPull);
+                StructuredBuffer oPushBuffer;
+                oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::ePullData));
+                oPushBuffer.PutString("EndPoint", "JobEngine");
+                oPushBuffer.PutString("Filename", strParameterToPull);
 
-                    oStlJobInformationItr->second->SendStructuredBufferToJobEngine(oPushBuffer);
-                    strResult = "Success";
-                }
+                oStlJobInformationItr->second->SendStructuredBufferToJobEngine(oPushBuffer);
+                strResult = "Success";
             }
         }
     }

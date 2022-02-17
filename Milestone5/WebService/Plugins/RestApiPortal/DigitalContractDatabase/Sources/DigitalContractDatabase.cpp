@@ -2416,6 +2416,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         poIpcAzureManager = nullptr;
         if ((0 < oUpdateVmStateResponse.GetSerializedBufferRawDataSizeInBytes())&&(200 == oUpdateVmStateResponse.GetDword("Status")))
         {
+            // HACK-DG Commented out to allow us to run a local SCN
             // Start the VM provisioning step. This step will be
             // StructuredBuffer oDeployResponse = ::DeployVirtualMachineAndWait(c_strApplicationIdentifier, c_strSecret, c_strTenantIdentifier, c_strSubscriptionIdentifier, c_strResourceGroup,
             //     c_oNewVirtualMachineGuid.ToString(eRaw), c_strVirtualMachineSpecification, c_strLocation);

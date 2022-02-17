@@ -750,6 +750,7 @@ std::string Orchestrator::SetParameter(
                 strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
 
                 UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
+                // HACK-DG This is hardcoding a local SCN
                 oJobInformation.SetTargetIP("192.168.0.244");
                 // We have everything we need to submit this job, start it up
                 if ( true == oJobInformation.ReadyToExcute() )
@@ -1295,6 +1296,7 @@ std::string __thiscall Orchestrator::PullJobData(
             __DebugAssert(m_stlAvailableSafeFunctions.end() != oSafeFunctionItr);
             const StructuredBuffer& c_oOutputParameters = oSafeFunctionItr->second.GetStructuredBuffer("OutputParameters");
             std::cout << c_oOutputParameters.ToString() << std::endl;
+            // HACK-DG This is commented out for now, output parsing was failing
             //if ( false == c_oOutputParameters.IsElementPresent(c_strParameterId.c_str(), INDEXED_BUFFER_VALUE_TYPE) )
             //{
               //  strResult = "Parameter not found in safe function " + c_strParameterId;

@@ -269,12 +269,13 @@ StructuredBuffer __stdcall RegisterVirtualMachineAfterInitialization(
         // Build the HTTP request string
         StructuredBuffer oApiBodyContent;
         std::string strVerb = "POST";
-        // TODO DG - Confirm when we need the EOSB/IEOSB?
+        // HACK-DG - Confirm when we need the EOSB/IEOSB?
         std::string strApiUrl = "/SAIL/VirtualMachineManager/RegisterVM?Eosb="+ c_strEosb;
         oApiBodyContent.PutString("DigitalContractGuid", c_strDigitalContractIdentifier);
         oApiBodyContent.PutString("VirtualMachineGuid", c_strVirtualMachineIdentifier);
         oApiBodyContent.PutString("HeartbeatBroadcastTime", std::to_string(::GetEpochTimeInSeconds()));
         oApiBodyContent.PutString("IPAddress", c_strIpAddress);
+        // HACK-DG - Hardcoded these values that aren't passed in and the remote expects
         oApiBodyContent.PutUnsignedInt64("NumberOfVCPU", 1);
         oApiBodyContent.PutString("HostRegion", "USEast");
         oApiBodyContent.PutUnsignedInt64("StartTime", 1);

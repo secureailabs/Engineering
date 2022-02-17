@@ -1224,6 +1224,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
             oRequest.PutString("Verb", "POST");
             oRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterVirtualMachine");
             oRequest.PutString("VirtualMachineGuid", strVmGuid);
+            // HACK-DG Put a hardcoded title here
             oRequest.PutString("DigitalContractTitle", "DG Test title");
             oRequest.PutString("DigitalContractGuid", strDcGuid);
             oRequest.PutUnsignedInt64("RegistrationTime", ::GetEpochTimeInSeconds());

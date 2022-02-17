@@ -162,6 +162,7 @@ void __thiscall JobInformation::SetTargetIP(
     _in const std::string& c_strTargetIP
     )
 {
+    // HACK-DG Hardcoded an IP address here
     m_strTargetIP = "192.168.0.244";
     __DebugFunction();
     //__DebugAssert("" == m_strTargetIP);
@@ -498,7 +499,7 @@ void __thiscall JobInformation::JobEngineListener()
                 ::RegisterUnknownException(__func__, __FILE__, __LINE__);
             }
         }
-        // This is temporary code to produce messages until we can talk to an SCN
+        // This is temporary code to test message passing if we can't talk to an SCN
         /*else
         {
             StructuredBuffer oTestBuffer;

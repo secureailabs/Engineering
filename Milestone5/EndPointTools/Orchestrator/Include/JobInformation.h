@@ -78,6 +78,7 @@ class JobInformation
         mutable std::recursive_mutex m_stlLock;
         const Guid m_oJobId;
         const Guid m_oSafeFunctionId;
+        // HACK-DG Hardcoded an IP address of local SCN here
         std::string m_strTargetIP{"192.168.0.244"};
         std::unordered_map<std::string, std::optional<std::string>> m_stlInputParameterData;
         std::shared_ptr<TlsNode> m_poTlsConnection{nullptr};

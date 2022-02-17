@@ -313,7 +313,9 @@ void __thiscall JobEngine::PushSafeObject(
             else
             {
                 poSafeObject = m_stlMapOfSafeObjects.at(strSafeObjectUuid);
-                poSafeObject->Setup(c_oStructuredBuffer);
+                // HACK-DG Don't setup a safe object that already exists, this causes
+                // its parameter list to be set again and again
+                //poSafeObject->Setup(c_oStructuredBuffer);
 
                 fIsSafeObjectNew = false;
             }

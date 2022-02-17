@@ -1056,15 +1056,15 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                         Guid oSecureComputationalNodeGuid(stlSecureComputationNodeItr.first);
                         VirtualMachineState eProvisionStatus = GetSecureComputationNodeInformation(oSecureComputationalNodeGuid);
                         // TODO: Configuring should be in progress, but we have no data being served yet
-                        if ( VirtualMachineState::eWaitingForData == eProvisionStatus ||
-                             VirtualMachineState::eReadyForComputation == eProvisionStatus )
+                        if ( VirtualMachineState::eReadyForComputation == eProvisionStatus )
                         {
                             stlSucceededProvisions.insert(stlSecureComputationNodeItr.first);
                             stlInProgressProvisions.erase(stlSecureComputationNodeItr.first);
                             stlFailedProvisions.erase(stlSecureComputationNodeItr.first);
                         }
                         else if ( VirtualMachineState::eStarting == eProvisionStatus ||
-                                  VirtualMachineState::eConfiguring == eProvisionStatus )
+                                  VirtualMachineState::eConfiguring == eProvisionStatus ||
+                                  VirtualMachineState::eWaitingForData == eProvisionStatus )
                         {
                             stlInProgressProvisions.insert(stlSecureComputationNodeItr.first);
                         }

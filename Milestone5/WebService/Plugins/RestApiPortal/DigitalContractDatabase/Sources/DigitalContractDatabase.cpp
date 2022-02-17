@@ -2417,35 +2417,36 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         if ((0 < oUpdateVmStateResponse.GetSerializedBufferRawDataSizeInBytes())&&(200 == oUpdateVmStateResponse.GetDword("Status")))
         {
             // Start the VM provisioning step. This step will be
-            StructuredBuffer oDeployResponse = ::DeployVirtualMachineAndWait(c_strApplicationIdentifier, c_strSecret, c_strTenantIdentifier, c_strSubscriptionIdentifier, c_strResourceGroup,
-                c_oNewVirtualMachineGuid.ToString(eRaw), c_strVirtualMachineSpecification, c_strLocation);
-            // TODO: Prawal add a check if the VM creation fails and mark the Digital contract as fail too possibly with an error message
-            if("Success" != oDeployResponse.GetString("Status"))
-            {
-                // Delete the resources associated with the VM
-                std::vector<std::string> stlListOfResourcesToDelete = ::AzureResourcesAssociatedWithVirtualMachine(c_strApplicationIdentifier, c_strResourceGroup, c_oNewVirtualMachineGuid.ToString(eRaw));
-                if (false == ::DeleteAzureResources(c_strApplicationIdentifier, c_strTenantIdentifier, c_strSecret, stlListOfResourcesToDelete))
-                {
-                    if (true == oDeployResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE))
-                    {
-                        _ThrowBaseException("Delete Azure resources failed. It may have to be done manually on the portal. %s", oDeployResponse.GetString("error").c_str());
-                    }
-                    else
-                    {
-                        _ThrowBaseException("Delete Azure resources failed. It may have to be done manually on the portal. Virtual Machine provisioning failed with unknown error.", nullptr);
-                    }
-                }
+            // StructuredBuffer oDeployResponse = ::DeployVirtualMachineAndWait(c_strApplicationIdentifier, c_strSecret, c_strTenantIdentifier, c_strSubscriptionIdentifier, c_strResourceGroup,
+            //     c_oNewVirtualMachineGuid.ToString(eRaw), c_strVirtualMachineSpecification, c_strLocation);
+            // // TODO: Prawal add a check if the VM creation fails and mark the Digital contract as fail too possibly with an error message
+            // if("Success" != oDeployResponse.GetString("Status"))
+            // {
+            //     // Delete the resources associated with the VM
+            //     std::vector<std::string> stlListOfResourcesToDelete = ::AzureResourcesAssociatedWithVirtualMachine(c_strApplicationIdentifier, c_strResourceGroup, c_oNewVirtualMachineGuid.ToString(eRaw));
+            //     if (false == ::DeleteAzureResources(c_strApplicationIdentifier, c_strTenantIdentifier, c_strSecret, stlListOfResourcesToDelete))
+            //     {
+            //         if (true == oDeployResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            //         {
+            //             _ThrowBaseException("Delete Azure resources failed. It may have to be done manually on the portal. %s", oDeployResponse.GetString("error").c_str());
+            //         }
+            //         else
+            //         {
+            //             _ThrowBaseException("Delete Azure resources failed. It may have to be done manually on the portal. Virtual Machine provisioning failed with unknown error.", nullptr);
+            //         }
+            //     }
 
-                if (true == oDeployResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE))
-                {
-                    _ThrowBaseException("%s", oDeployResponse.GetString("error").c_str());
-                }
-                else
-                {
-                    _ThrowBaseException("Virtual Machine provisioning failed with unknown error.", nullptr);
-                }
-            }
-            std::string strIpAddress = oDeployResponse.GetString("IpAddress");
+            //     if (true == oDeployResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            //     {
+            //         _ThrowBaseException("%s", oDeployResponse.GetString("error").c_str());
+            //     }
+            //     else
+            //     {
+            //         _ThrowBaseException("Virtual Machine provisioning failed with unknown error.", nullptr);
+            //     }
+            // }
+            // std::string strIpAddress = oDeployResponse.GetString("IpAddress");
+            std::string strIpAddress = "192.168.0.244";
 
             // Update the IpAddress of the Virtual Machine
             StructuredBuffer oVmIpAddressRequest;
@@ -2483,6 +2484,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
                     }
                     else
                     {
+                        std::cout << "Pulling SCN tar gz from the remote" << std::endl;
                         std::string strSecureComputationNodePackagePath = ::GetInitializationValue("SecureComputationNodePackageUrl");
                         _ThrowBaseExceptionIf((0 == strSecureComputationNodePackagePath.length()), "Secure computation node package not found", nullptr);
 

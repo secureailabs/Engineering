@@ -1,61 +1,6161 @@
-[I 10:00:03.070 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
-[I 10:00:03.290 NotebookApp] Serving notebooks from local directory: /app
-[I 10:00:03.290 NotebookApp] The Jupyter Notebook is running at:
-[I 10:00:03.290 NotebookApp] http://05dd91385812:8080/?token=4e4275e66fc63a18a921e5ffcfaad62ff9ba6551ba1793e1
-[I 10:00:03.290 NotebookApp]  or http://127.0.0.1:8080/?token=4e4275e66fc63a18a921e5ffcfaad62ff9ba6551ba1793e1
-[I 10:00:03.290 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-[W 10:00:03.293 NotebookApp] No web browser found: could not locate runnable browser.
-[C 10:00:03.293 NotebookApp] 
+[I 11:12:55.513 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
+[I 11:12:55.657 NotebookApp] Serving notebooks from local directory: /app
+[I 11:12:55.657 NotebookApp] The Jupyter Notebook is running at:
+[I 11:12:55.657 NotebookApp] http://9c67b78d6bae:8080/?token=1bd84992c051cea32aebad5e3e5f44a95a139df5a068862b
+[I 11:12:55.657 NotebookApp]  or http://127.0.0.1:8080/?token=1bd84992c051cea32aebad5e3e5f44a95a139df5a068862b
+[I 11:12:55.657 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 11:12:55.659 NotebookApp] No web browser found: could not locate runnable browser.
+[C 11:12:55.659 NotebookApp] 
     
     To access the notebook, open this file in a browser:
         file:///root/.local/share/jupyter/runtime/nbserver-16-open.html
     Or copy and paste one of these URLs:
-        http://05dd91385812:8080/?token=4e4275e66fc63a18a921e5ffcfaad62ff9ba6551ba1793e1
-     or http://127.0.0.1:8080/?token=4e4275e66fc63a18a921e5ffcfaad62ff9ba6551ba1793e1
-[I 10:00:08.165 NotebookApp] 302 GET /?token=4e4275e66fc63a18a921e5ffcfaad62ff9ba6551ba1793e1 (172.18.0.1) 0.45ms
-[I 10:00:12.472 NotebookApp] Writing notebook-signing key to /root/.local/share/jupyter/notebook_secret
-[W 10:00:12.473 NotebookApp] Notebook sail/orchestrator_demo.ipynb is not trusted
-[I 10:00:12.834 NotebookApp] Kernel started: b14394ab-194d-4556-afca-01ad5280bb9d
+        http://9c67b78d6bae:8080/?token=1bd84992c051cea32aebad5e3e5f44a95a139df5a068862b
+     or http://127.0.0.1:8080/?token=1bd84992c051cea32aebad5e3e5f44a95a139df5a068862b
+[I 11:14:09.827 NotebookApp] 302 GET /?token=1bd84992c051cea32aebad5e3e5f44a95a139df5a068862b (172.18.0.1) 0.56ms
+[I 11:14:14.256 NotebookApp] Writing notebook-signing key to /root/.local/share/jupyter/notebook_secret
+[W 11:14:14.257 NotebookApp] Notebook sail/orchestrator_demo.ipynb is not trusted
+[I 11:14:14.556 NotebookApp] Kernel started: 95a7648a-661e-44f9-a492-1a54879ed2f9
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 12:55:15.961 NotebookApp] Starting buffering for b14394ab-194d-4556-afca-01ad5280bb9d:16e1cfd118cc450bb109b471782de2c4
-[W 12:55:16.239 NotebookApp] Notebook sail/orchestrator_demo.ipynb is not trusted
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+[I 11:16:14.529 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Trying to parse
+0x296f450
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {4B023805-4774-4D2E-B882-9395E1B1F16D}
+Job {4B023805-4774-4D2E-B882-9395E1B1F16D} is ready to execute on IP 192.168.0.244
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {4B023805-4774-4D2E-B882-9395E1B1F16D} has sent all parameters 
+Assinging IP 192.168.0.244 to job {48F67F0B-DFD0-42CD-AD43-BD23D0E5EA02}
+Job {48F67F0B-DFD0-42CD-AD43-BD23D0E5EA02} is ready to execute on IP 192.168.0.244
+No connection to job engine
+Listener has started 
+Waiting on message 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+NO CONNECTION TO JOB ENGINE 
+Job {48F67F0B-DFD0-42CD-AD43-BD23D0E5EA02} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 52
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 53
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 54
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 55
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 56
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 57
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 58
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 59
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 60
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 61
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 62
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 63
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 64
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 65
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 66
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 67
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 68
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 69
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 70
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 71
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 72
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 73
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 74
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 75
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 76
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 77
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 78
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 79
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 80
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 81
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 82
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 83
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 84
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 85
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 86
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 87
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 88
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 89
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 90
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 91
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 92
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 93
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 94
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 95
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 96
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 97
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 98
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 99
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 100
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 101
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 102
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 103
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 104
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 105
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 106
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 107
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 108
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 109
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 110
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 111
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 112
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 113
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 114
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 115
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 116
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 117
+No message, sending dummy to orchestrator 
+Pushed message Waiting on message 
+118
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 119
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 120
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 121
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 122
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 123
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 124
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 125
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 126
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 127
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 128
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 129
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 130
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 131
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 132
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 133
+No message, sending dummy to orchestrator 
+Pushed message 134
+No message, sending dummy to orchestrator 
+Waiting on message 
+Waiting on message 
+Pushed message 135
+No message, sending dummy to orchestrator 
+Pushed message 136
+No message, sending dummy to orchestrator 
+Waiting on message 
+Waiting on message 
+Pushed message 137
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 138
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 139
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 140
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 141
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 142
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 143
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 144
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 145
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 146
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 147
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 148
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 149
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 150
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 151
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 152
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 153
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 154
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 155
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 156
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 157
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 158
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 159
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 160
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 161
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 162
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 163
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 164
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 165
+No message, sending dummy to orchestrator 
+Pushed message Waiting on message 
+166
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 167
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 168
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 169
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 170
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 171
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 172
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 173
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 174
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 175
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 176
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 177
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 178
+No message, sending dummy to orchestrator 
+Waiting on message 
+Timed out waiting for condition variable 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 11:18:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Pushed message 14
+No message, sending dummy to orchestrator 
+[I 11:20:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:22:14.048 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:22:16.662 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:22:16.985 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:22:16.985 NotebookApp] Replaying 3 buffered messages
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 12:55:49.328 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[W 12:55:49.328 NotebookApp] Notebook sail/orchestrator_demo.ipynb is not trusted
-[I 12:57:00.832 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel b14394ab-194d-4556-afca-01ad5280bb9d restarted
-[I 12:57:06.102 NotebookApp] Starting buffering for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 12:57:06.307 NotebookApp] Kernel restarted: b14394ab-194d-4556-afca-01ad5280bb9d
-[I 12:57:06.644 NotebookApp] Restoring connection for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 12:57:06.644 NotebookApp] Replaying 6 buffered messages
+[I 11:22:30.153 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:22:35.363 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:22:45.184 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:24:14.526 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:24:39.729 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:24:40.037 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:24:40.333 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:24:40.333 NotebookApp] Replaying 3 buffered messages
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 12:57:16.440 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 13:11:48.049 NotebookApp] Starting buffering for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 13:11:48.655 NotebookApp] Kernel restarted: b14394ab-194d-4556-afca-01ad5280bb9d
-[I 13:11:48.907 NotebookApp] Restoring connection for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 13:11:48.908 NotebookApp] Replaying 3 buffered messages
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x2cf08d0
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {4A90BEF9-1917-4D57-8E2A-6AF408465E5A}
+Job {4A90BEF9-1917-4D57-8E2A-6AF408465E5A} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Job {4A90BEF9-1917-4D57-8E2A-6AF408465E5A} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 11:26:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Timed out waiting for condition variable 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+[I 11:28:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:30:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:31:43.699 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:31:44.307 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:31:44.626 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:31:44.627 NotebookApp] Replaying 6 buffered messages
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 13:13:16.438 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 13:16:21.656 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel b14394ab-194d-4556-afca-01ad5280bb9d restarted
-[I 13:16:25.827 NotebookApp] Starting buffering for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 13:16:26.033 NotebookApp] Kernel restarted: b14394ab-194d-4556-afca-01ad5280bb9d
-[I 13:16:26.307 NotebookApp] Restoring connection for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 13:16:26.308 NotebookApp] Replaying 3 buffered messages
+[I 11:32:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:33:19.570 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:33:19.780 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:33:20.141 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:33:20.141 NotebookApp] Replaying 3 buffered messages
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 13:17:16.439 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 13:19:16.436 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 13:26:03.675 NotebookApp] Starting buffering for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 13:26:03.983 NotebookApp] Kernel restarted: b14394ab-194d-4556-afca-01ad5280bb9d
-[I 13:26:04.382 NotebookApp] Restoring connection for b14394ab-194d-4556-afca-01ad5280bb9d:d0944d17b46347efa702076ab4d93eec
-[I 13:26:04.382 NotebookApp] Replaying 5 buffered messages
+[I 11:34:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x2bdcf00
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {4AE27568-C147-40DC-BE6A-5D1411FC629D}
+Job {4AE27568-C147-40DC-BE6A-5D1411FC629D} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/StructuredBuffer.cpp
+               |Function = CheckForElement
+               |Line Number = 888
+               |Message = Element Payload of type 13 not found.
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/EndPointTools/Orchestrator/Sources/Orchestrator.cpp
+               |Function = SendSafeObjectToJobEngine
+               |Line Number = 1469
+Job {4AE27568-C147-40DC-BE6A-5D1411FC629D} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Timed out waiting for condition variable 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+[I 11:36:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:40:28.781 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 11:40:33.013 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:40:33.222 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:40:33.529 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:40:33.529 NotebookApp] Replaying 3 buffered messages
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 13:27:16.439 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 13:37:16.444 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 14:57:16.452 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 15:05:16.453 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 15:17:16.455 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 15:23:16.456 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 15:33:16.457 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 15:53:16.460 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:42:14.523 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:43:55.001 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:43:55.209 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:43:55.524 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:43:55.524 NotebookApp] Replaying 6 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 11:44:14.525 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x1aa58b0
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {49F4F13F-1433-4F07-BD08-090FFC9416C9}
+Job {49F4F13F-1433-4F07-BD08-090FFC9416C9} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Job {49F4F13F-1433-4F07-BD08-090FFC9416C9} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 11:44:37.210 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 11:44:52.400 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:44:52.610 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:44:52.916 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:44:52.916 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 11:46:14.525 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 11:49:28.497 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:49:28.704 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:49:29.131 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:49:29.132 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x38a8c60
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {48D170F9-0FFD-403D-BBEA-D8460D4FCE0A}
+Job {48D170F9-0FFD-403D-BBEA-D8460D4FCE0A} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Job {48D170F9-0FFD-403D-BBEA-D8460D4FCE0A} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 11:50:14.527 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 52
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 53
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 54
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 55
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 56
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 57
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 58
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 59
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 60
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 61
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 62
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 63
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 64
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 65
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 66
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 67
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 68
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 69
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 70
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 71
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 72
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 73
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 74
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 75
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 76
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 77
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 78
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 79
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 80
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 81
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 82
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 83
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 84
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 85
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 86
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 87
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 88
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 89
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 90
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 91
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 11:51:34.705 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 11:54:50.887 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:54:51.101 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 11:54:51.518 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 11:54:51.519 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x234ec80
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {491E6472-19F0-46BF-B540-AECB3671F9EC}
+Job {491E6472-19F0-46BF-B540-AECB3671F9EC} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Job {491E6472-19F0-46BF-B540-AECB3671F9EC} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 52
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 53
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 54
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 55
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 56
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 57
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 58
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 59
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 60
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 11:56:14.528 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 61
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 62
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 63
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 64
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 65
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 66
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 67
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 68
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 69
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 70
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 71
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 72
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 73
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 74
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 75
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 76
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 77
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 78
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 79
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 80
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 81
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 82
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 83
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 84
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 85
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 86
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 87
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 88
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 89
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 90
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 91
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 92
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 93
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 94
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 95
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 96
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 97
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 98
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 99
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 100
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 101
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 102
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 103
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 104
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 105
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 106
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 107
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 108
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 109
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 110
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 111
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 112
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 113
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 114
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 115
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 116
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 117
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 118
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 119
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 120
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 121
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 122
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 123
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 124
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 125
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 126
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 127
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 128
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 129
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 130
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 131
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 132
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 133
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 134
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 135
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 136
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 137
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 138
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 139
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 140
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 141
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 142
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 143
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 144
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 145
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 146
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 147
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 148
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 149
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 150
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 151
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 152
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 153
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 154
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 155
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 156
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 157
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 158
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 159
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 160
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 161
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 162
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 163
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 164
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 165
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 166
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 167
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 168
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 169
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 170
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 171
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 172
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 173
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 174
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 175
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 176
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 177
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 178
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 179
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 180
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 181
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 182
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 183
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 184
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 185
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 186
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 187
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 188
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 189
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 190
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 191
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 192
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 193
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 194
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 195
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 196
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 197
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 198
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 199
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 200
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 201
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 202
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 203
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 204
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 205
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 206
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 207
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 208
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 209
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 210
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 211
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 212
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 213
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 214
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 215
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 216
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 217
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 218
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 219
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 220
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 221
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 222
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 223
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 224
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 225
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 226
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 227
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 228
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 229
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 230
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 231
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 232
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 233
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 234
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 235
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 236
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 237
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 238
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 239
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 240
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 241
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 242
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 243
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 244
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 245
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 246
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 247
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 248
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 249
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 250
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 251
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 11:59:27.102 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 12:00:11.829 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:00:12.044 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:00:12.382 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:00:12.382 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 12:00:14.528 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x3757c80
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {49DA5014-4AE4-4E7E-BC51-74FBBCC0F0E4}
+Job {49DA5014-4AE4-4E7E-BC51-74FBBCC0F0E4} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 563017F2D09F4E11AA595AB6439EE7FE
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 206C30B6EE45CF4F80C1A7DCDB2E3EC3
+Job {49DA5014-4AE4-4E7E-BC51-74FBBCC0F0E4} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 52
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 53
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 54
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 55
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 56
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 57
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 58
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 59
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:02:14.527 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 60
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 61
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 62
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 63
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 64
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 65
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 66
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 67
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 68
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 69
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 70
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 71
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 72
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 73
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 74
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 75
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 76
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 77
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 78
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 79
+No message, sending dummy to orchestrator 
+[I 12:04:14.528 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 12:06:24.765 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:06:25.473 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:06:25.855 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:06:25.855 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x265af00
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {4906D1DC-CC00-4171-A768-5CB5D9A9A8C2}
+Job {4906D1DC-CC00-4171-A768-5CB5D9A9A8C2} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/EndPointTools/Orchestrator/Sources/Orchestrator.cpp
+               |Function = PushUserDataToJob
+               |Line Number = 1419
+               |Message = User parameter not filled in
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/EndPointTools/Orchestrator/Sources/Orchestrator.cpp
+               |Function = PushUserDataToJob
+               |Line Number = 1430
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 5441CE64BCE1494BBE186F7E2DF278F3
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 206C30B6EE45CF4F80C1A7DCDB2E3EC3
+Job {4906D1DC-CC00-4171-A768-5CB5D9A9A8C2} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:08:14.529 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 52
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 53
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 54
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 55
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 56
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 57
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 58
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 59
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 60
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 61
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 62
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:08:28.475 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 12:09:19.817 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:09:20.027 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:09:20.458 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:09:20.458 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 12:10:14.529 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x382e070
+Trying to get string and size 
+Size 5
+Assinging IP 192.168.0.244 to job {4BA7BD59-AE5C-41D1-A3AB-35FD990A36B2}
+Job {4BA7BD59-AE5C-41D1-A3AB-35FD990A36B2} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 578B0BCE7D0148EFA2DDB059A460F7E5
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 206C30B6EE45CF4F80C1A7DCDB2E3EC3
+Job {4BA7BD59-AE5C-41D1-A3AB-35FD990A36B2} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 52
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 53
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 54
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 55
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 56
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 57
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 58
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 59
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 60
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 61
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 62
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 63
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 64
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 65
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 66
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 67
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 68
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 69
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 70
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 71
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 72
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 73
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 74
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 75
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 76
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 77
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 78
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 79
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:12:14.531 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 80
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 81
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 82
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 83
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 84
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 85
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 86
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 87
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 88
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 89
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 90
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 91
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 92
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 93
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 94
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 95
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 96
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 97
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 98
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 99
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 100
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 101
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 102
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 103
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 104
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 105
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 106
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 107
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 108
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 109
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 110
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 111
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 112
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 113
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 114
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 115
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 116
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 117
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 118
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 119
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 120
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 121
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 122
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 123
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 124
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 125
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 126
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 127
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 128
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 129
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 130
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 131
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 132
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 133
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 134
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 135
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 136
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 137
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 138
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 139
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 140
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 141
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 142
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 143
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 144
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 145
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 146
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 147
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 148
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 149
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 150
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:13:25.539 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 151
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 152
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 153
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 154
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 155
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 156
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 157
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 158
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 159
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 160
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 161
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 162
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 163
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 164
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 165
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:13:44.028 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 12:19:17.301 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:19:17.611 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:19:17.957 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[I 12:19:17.957 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x23215a0
+Trying to get string and size 
+Size 5
+[I 12:20:14.531 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 12:21:33.523 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:393a134542dc42659ba3122567d75d85
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 12:21:36.700 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:21:37.508 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:21:37.816 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:21:37.816 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 12:22:14.397 NotebookApp] Kernel interrupted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:22:18.267 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:22:23.290 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:22:23.638 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:22:23.638 NotebookApp] Replaying 12 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 12:23:34.100 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 12:23:46.610 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:23:46.919 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:23:47.246 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:23:47.247 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x23278b0
+Trying to get string and size 
+Size 5
+Job {49D3BA9D-5000-482A-8006-D038977265B9} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 57EA0335CDB8408995FF91BB2126627F
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 57EA0335CDB8408995FF91BB2126627F
+Job {49D3BA9D-5000-482A-8006-D038977265B9} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:25:34.097 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Timed out waiting for condition variable 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+[I 12:27:34.098 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 12:30:04.716 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:30:05.525 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:30:05.836 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:30:05.836 NotebookApp] Replaying 6 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x2c97d80
+Trying to get string and size 
+Size 5
+Job {494D8B98-F8A8-4202-BB34-BFD86B7A853A} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 5439053B0CB4466B821509080523773B
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 5439053B0CB4466B821509080523773B
+Job {494D8B98-F8A8-4202-BB34-BFD86B7A853A} has sent all parameters 
+Pushed message 1
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 2
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 3
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 4
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 5
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 6
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 7
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 8
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 9
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 10
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 11
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 12
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 13
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 14
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 15
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 16
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 17
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 18
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 19
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 20
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 21
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 22
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 23
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 24
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 25
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 26
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 27
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 28
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 29
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 30
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 31
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 32
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 33
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 34
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 35
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 36
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 37
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 38
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 39
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 40
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 41
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 42
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 43
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 44
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 45
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 46
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 47
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 48
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 49
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 50
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 51
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 52
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 53
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 54
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 55
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 56
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 57
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 58
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 59
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 60
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:31:34.096 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Pushed message 61
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 62
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 63
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 64
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 65
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 66
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 67
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 68
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 69
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 70
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 71
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 72
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 73
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 74
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 75
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 76
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 77
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 78
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 79
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 80
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 81
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 82
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 83
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 84
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 85
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 86
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 87
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 88
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 89
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 90
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 91
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 92
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 93
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 94
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 95
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 96
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 97
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 98
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 99
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 100
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 101
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 102
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 103
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 104
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 105
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 106
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 107
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 108
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 109
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 110
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 111
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 112
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 113
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 114
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 115
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 116
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 117
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 118
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 119
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 120
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 121
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 122
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 123
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 124
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 125
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 126
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 127
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 128
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 129
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 130
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 131
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 132
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 133
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 134
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 135
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 136
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 137
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 138
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 139
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 140
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 141
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 142
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 143
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 144
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 145
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 146
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 147
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 148
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 149
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 150
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 151
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 152
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 153
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 154
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 155
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 156
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 157
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 158
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 159
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 160
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 161
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 162
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 163
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 164
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 165
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 166
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 167
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 168
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 169
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 170
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 171
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 172
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 173
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 174
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 175
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 176
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 177
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 178
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 179
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 180
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 181
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 182
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 183
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 184
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 185
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 186
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 187
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 188
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 189
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 190
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 191
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 192
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 193
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 194
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 195
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 196
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 197
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 198
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 199
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 200
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 201
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 202
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 203
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 204
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 205
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 206
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 207
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 208
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 209
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 210
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 211
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 212
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 213
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 214
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 215
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 216
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 217
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 218
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 219
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 220
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 221
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 222
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 223
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 224
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 225
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 226
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 227
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 228
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 229
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 230
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 231
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 232
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 233
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 234
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 235
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 236
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 237
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 238
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 239
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 240
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 241
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 242
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 243
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 244
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 245
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 246
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 247
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 248
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 249
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 250
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 251
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 252
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 253
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 254
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 255
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 256
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 257
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 258
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 259
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 260
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 261
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 262
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 263
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 264
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 265
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 266
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 267
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 268
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 269
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 270
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 271
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 272
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 273
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 274
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 275
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 276
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 277
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 278
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 279
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 280
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 281
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 282
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 283
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 284
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 285
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 286
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 287
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 288
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 289
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 290
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 291
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 292
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 293
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 294
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 295
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 296
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 297
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 298
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 299
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 300
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 301
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 302
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 303
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 304
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 305
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 306
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 307
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 308
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 309
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 310
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 311
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 312
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 313
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 314
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 315
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 316
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 317
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 318
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 319
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 320
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 321
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 322
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 323
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 324
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 325
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 326
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 327
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 328
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 329
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 330
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 331
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 332
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 333
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 334
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 335
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 336
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 337
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 338
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 339
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 340
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 341
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 342
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 343
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 344
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 345
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 346
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 347
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 348
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 349
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 350
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 351
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 352
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 353
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 354
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 355
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 356
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 357
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 358
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 359
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 360
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 361
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 362
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 363
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 364
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 365
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 366
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 367
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 368
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 369
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 370
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 371
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 372
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 373
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 374
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 375
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 376
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 377
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 378
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 379
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 380
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 381
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 382
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 383
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 384
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 385
+No message, sending dummy to orchestrator 
+Waiting on message 
+Pushed message 386
+No message, sending dummy to orchestrator 
+Waiting on message 
+[I 12:37:02.527 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 12:38:46.974 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:38:47.183 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:38:47.638 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:38:47.638 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+[I 12:39:34.097 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Trying to parse
+0x2e538e0
+Trying to get string and size 
+Size 5
+Job {4AADAC80-4047-44B9-9BD8-4C073633E1D9} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 56E056BB514E4C53B894DB09945A5961
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 56E056BB514E4C53B894DB09945A5961
+Job {4AADAC80-4047-44B9-9BD8-4C073633E1D9} has sent all parameters 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:41:34.097 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:43:34.099 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:43:54.387 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job {4AADAC80-4047-44B9-9BD8-4C073633E1D9} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job {4AADAC80-4047-44B9-9BD8-4C073633E1D9} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:45:00.257 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job 4AADAC80404744B99BD84C073633E1D9 parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/StructuredBuffer.cpp
+               |Function = CheckForElement
+               |Line Number = 887
+               |Message = Element OutputParamters of type 13 not found.
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/EndPointTools/Orchestrator/Sources/Orchestrator.cpp
+               |Function = PullJobData
+               |Line Number = 1320
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:45:34.101 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:46:38.184 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 12:47:46.252 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:47:46.461 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:47:46.790 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:47:46.791 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x1e8b9c0
+Trying to get string and size 
+Size 5
+Job {4B580476-E243-4150-91AF-77588CE6892A} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 568F402ACF884DA29D285CC97E13DB04
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 568F402ACF884DA29D285CC97E13DB04
+Job {4B580476-E243-4150-91AF-77588CE6892A} has sent all parameters 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job 4B580476E243415091AF77588CE6892A parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job 4B580476E243415091AF77588CE6892A parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:49:34.099 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:51:28.464 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 12:52:46.255 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:52:46.464 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:52:46.776 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:52:46.777 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+[I 12:53:34.100 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Trying to parse
+0x3810dc0
+Trying to get string and size 
+Size 5
+Job {4A7220D8-16AC-4975-9F3D-CC3362C7F3CA} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 5492DC04629B4530877306D1CD70DE23
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 5492DC04629B4530877306D1CD70DE23
+Job {4A7220D8-16AC-4975-9F3D-CC3362C7F3CA} has sent all parameters 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job 4B580476E243415091AF77588CE6892A parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:54:32.836 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Pulling data for job 4A7220D816AC49759F3DCC3362C7F3CA parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:55:25.466 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 12:55:34.100 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 12:57:47.859 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:57:48.068 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 12:57:48.424 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 12:57:48.424 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x346e260
+Trying to get string and size 
+Size 5
+Job {48B717C1-449D-49FD-A16D-12BFE71ADB86} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 55A54FD2B3F345388728AD49B360D512
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 55A54FD2B3F345388728AD49B360D512
+Job {48B717C1-449D-49FD-A16D-12BFE71ADB86} has sent all parameters 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job 48B717C1449D49FDA16D12BFE71ADB86 parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+Received a message 229
+Pushed message 1
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 12:59:34.099 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Looking to update jobs for data
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 13:01:34.100 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 13:01:56.847 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job 48B717C1449D49FDA16D12BFE71ADB86 parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Trying to parse
+0x23ebbf0
+Trying to get string and size 
+Size 5
+Waiting on message 
+Waiting on message 
+Job {4855B81C-4FB2-48BE-A8DE-BD8D67E56F57} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 553EE8162DE04F8A8433283EABE5A371
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 553EE8162DE04F8A8433283EABE5A371
+Job {4855B81C-4FB2-48BE-A8DE-BD8D67E56F57} has sent all parameters 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 13:03:20.774 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+Waiting on message 
+Waiting on message 
+[I 13:03:22.284 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 13:03:22.592 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:03:22.592 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+Trying to parse
+0x34930b0
+Trying to get string and size 
+Size 5
+Job {4AF61D5D-F30E-4958-90B7-22E0D6D16E15} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 5684F9F08C45479A8CD256088DDBA341
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 5684F9F08C45479A8CD256088DDBA341
+Job {4AF61D5D-F30E-4958-90B7-22E0D6D16E15} has sent all parameters 
+Waiting on message 
+Waiting on message 
+[I 13:03:34.099 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 13:06:22.850 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 13:06:31.288 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 13:06:59.237 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:06:59.445 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 13:06:59.750 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:06:59.750 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 13:07:34.285 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 13:33:34.106 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 13:33:42.636 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 13:35:55.259 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 13:48:49.880 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:48:50.089 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 13:48:50.428 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:48:50.428 NotebookApp] Replaying 6 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x339a790
+Trying to get string and size 
+Size 5
+Pulling data for job {49A384B5-0F2A-41B5-9A57-EFFDF46F8979} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+[I 13:49:34.111 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 13:51:01.886 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:51:02.695 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 13:51:03.018 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:51:03.019 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 13:51:34.109 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Pulling data for job {4928DBAD-4B71-4059-ACD0-CDF6C5378456} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+python3: /home/david-g-sail/code/SAIL/Engineering/Milestone5/EndPointTools/Orchestrator/Sources/JobInformation.cpp:289: bool JobInformation::SendStructuredBufferToJobEngine(const StructuredBuffer&): Assertion `nullptr != m_poTlsConnection' failed.
+[I 13:52:38.697 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 95a7648a-661e-44f9-a492-1a54879ed2f9 restarted
+[I 13:53:00.147 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:53:00.561 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 13:53:01.024 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:53:01.024 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 13:53:34.107 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x21c0f90
+Trying to get string and size 
+Size 5
+Job {497DC484-669A-45BA-9A5E-43DDE77133CC} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 56A8AF2ACE53411C9F40D0EA45663E64
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 56A8AF2ACE53411C9F40D0EA45663E64
+Job {497DC484-669A-45BA-9A5E-43DDE77133CC} has sent all parameters 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job {497DC484-669A-45BA-9A5E-43DDE77133CC} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+Received a message 229
+Pushed message 3
+Waiting on message 
+Waiting on message 
+Looking to update jobs for data
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job {497DC484-669A-45BA-9A5E-43DDE77133CC} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 13:57:32.063 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:57:33.073 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 13:57:33.390 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 13:57:33.390 NotebookApp] Replaying 3 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 13:57:34.847 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+[I 14:01:42.539 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 14:01:42.746 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 14:01:43.169 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 14:01:43.169 NotebookApp] Replaying 5 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 14:03:34.848 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x1df6eb0
+Trying to get string and size 
+Size 5
+Job {496AE79F-3F67-4153-BEBF-EE9DE1D9BA05} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 57272CB3AD4D4865AA2EF18AB99C10FB
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 57272CB3AD4D4865AA2EF18AB99C10FB
+Job {496AE79F-3F67-4153-BEBF-EE9DE1D9BA05} has sent all parameters 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Pulling data for job {496AE79F-3F67-4153-BEBF-EE9DE1D9BA05} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+Received a message 229
+Pushed message 3
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Looking to update jobs for data
+Waiting on message 
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 14:05:29.675 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 14:05:42.453 NotebookApp] Starting buffering for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 14:05:42.963 NotebookApp] Kernel restarted: 95a7648a-661e-44f9-a492-1a54879ed2f9
+[I 14:05:43.302 NotebookApp] Restoring connection for 95a7648a-661e-44f9-a492-1a54879ed2f9:47ebde39fd334a24a40e995deddccbe7
+[I 14:05:43.303 NotebookApp] Replaying 6 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+DS {206C30B6-EE45-CF4F-80C1-A7DCDB2E3EC3} being served on 192.168.0.244
+Trying to parse
+0x2e0b7e0
+Trying to get string and size 
+Size 5
+Job {4B1FF260-A518-460C-9003-5DDDD788EFE4} is ready to execute on IP 192.168.0.244
+Listener has started 
+Waiting on message 
+Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
+Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 55CC2DAB1DFA479E8AC9666297C48078
+Pushing user data 4C8041B4513A44FAA5409662E014519C
+Setting parameter 4C8041B4513A44FAA5409662E014519C to 55CC2DAB1DFA479E8AC9666297C48078
+Job {4B1FF260-A518-460C-9003-5DDDD788EFE4} has sent all parameters 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Waiting on message 
+Pulling data for job {4B1FF260-A518-460C-9003-5DDDD788EFE4} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
+    Type (STRING) = <class 'int'>
+}
+
+Received a message 229
+Pushed message 3
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Looking to update jobs for data
+Timed out waiting for condition variable 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 14:07:34.846 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 14:09:34.848 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 14:09:54.018 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 14:11:34.849 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb

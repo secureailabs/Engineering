@@ -83,8 +83,10 @@ void __thiscall SafeObject::Setup(
     // Get the safe object UUID
     m_strSafeObjectIdentifier = c_oStructuredBuffer.GetString("SafeObjectUuid");
 
+    std::cout << "Safe object " << c_oStructuredBuffer.ToString() << std::endl;
+
     // Write the executable file to file system to run
-    ::WriteBytesAsFile(m_strSafeObjectIdentifier, c_oStructuredBuffer.GetBuffer("Payload"));
+    ::WriteStringAsFile(m_strSafeObjectIdentifier, c_oStructuredBuffer.GetString("Payload"));
 
     // Make the file executable
     ::chmod(m_strSafeObjectIdentifier.c_str(), S_IRWXU);

@@ -283,10 +283,12 @@ bool __thiscall Job::AreAllParametersSet(void)
     if (nullptr == m_poSafeObject)
     {
         fIsComplete = false;
+        std::cout << "Job is nullptr" << std::endl;
     }
     else if (true == m_oParameters.GetBoolean("AllParametersSet"))
     {
         fIsComplete = true;
+        std::cout << "M parameters tells me all is set" << std::endl;
     }
     else
     {

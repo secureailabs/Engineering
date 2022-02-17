@@ -78,7 +78,7 @@ class JobInformation
         mutable std::recursive_mutex m_stlLock;
         const Guid m_oJobId;
         const Guid m_oSafeFunctionId;
-        std::string m_strTargetIP{""};
+        std::string m_strTargetIP{"192.168.0.244"};
         std::unordered_map<std::string, std::optional<std::string>> m_stlInputParameterData;
         std::shared_ptr<TlsNode> m_poTlsConnection{nullptr};
         std::unique_ptr<std::thread> m_pstlListenerThread{nullptr};

@@ -269,22 +269,28 @@ StructuredBuffer __stdcall RegisterVirtualMachineAfterInitialization(
         // Build the HTTP request string
         StructuredBuffer oApiBodyContent;
         std::string strVerb = "POST";
-        std::string strApiUrl = "/SAIL/VirtualMachineManager/RegisterVM?IEosb="+ c_strEosb;
+        // TODO DG - Confirm when we need the EOSB/IEOSB?
+        std::string strApiUrl = "/SAIL/VirtualMachineManager/RegisterVM?Eosb="+ c_strEosb;
         oApiBodyContent.PutString("DigitalContractGuid", c_strDigitalContractIdentifier);
         oApiBodyContent.PutString("VirtualMachineGuid", c_strVirtualMachineIdentifier);
         oApiBodyContent.PutString("HeartbeatBroadcastTime", std::to_string(::GetEpochTimeInSeconds()));
         oApiBodyContent.PutString("IPAddress", c_strIpAddress);
+        oApiBodyContent.PutUnsignedInt64("NumberOfVCPU", 1);
+        oApiBodyContent.PutString("HostRegion", "USEast");
+        oApiBodyContent.PutUnsignedInt64("StartTime", 1);
+        oApiBodyContent.PutString("DigitalContractTitle", "Test title");
         // Make the API call and get REST response
+        std::cout << "Submitting request " << oApiBodyContent.ToString() << " to " << strApiUrl << std::endl;
         std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfWebPortalGateway, (Word) gs_unPortAddressOfWebPortalGateway, strVerb, strApiUrl, ::ConvertStructuredBufferToJson(oApiBodyContent), true);
         oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
         _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error while processing the transaction.", nullptr);
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

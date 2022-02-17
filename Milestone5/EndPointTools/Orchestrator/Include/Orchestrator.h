@@ -172,6 +172,10 @@ class Orchestrator : public Object{
             _in const Guid& oSecureNodeGuid
             );
 
+        void __thiscall SubmitJob(
+            _in JobInformation& oJob
+            );
+
         EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};

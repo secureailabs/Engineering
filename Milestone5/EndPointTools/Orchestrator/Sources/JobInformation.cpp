@@ -162,9 +162,10 @@ void __thiscall JobInformation::SetTargetIP(
     _in const std::string& c_strTargetIP
     )
 {
+    m_strTargetIP = "192.168.0.244";
     __DebugFunction();
-    __DebugAssert("" == m_strTargetIP);
-    m_strTargetIP = c_strTargetIP;
+    //__DebugAssert("" == m_strTargetIP);
+    //m_strTargetIP = c_strTargetIP;
 }
 
 /********************************************************************************************
@@ -459,6 +460,7 @@ void __thiscall JobInformation::JobEngineListener()
                     {
                         std::vector<Byte> stlPushedData = oJobEngineMessage.GetBuffer("FileData");
                         std::string strDataId = oJobEngineMessage.GetString("ValueName");
+                        oJobEngineMessage.PutString("JobUuid", m_oJobId.ToString(eRaw));
                         // We haven't seen this before
                         if ( m_stlOutputResults.end() == m_stlOutputResults.find(strDataId) )
                         {
@@ -497,7 +499,7 @@ void __thiscall JobInformation::JobEngineListener()
             }
         }
         // This is temporary code to produce messages until we can talk to an SCN
-        else
+        /*else
         {
             StructuredBuffer oTestBuffer;
             oTestBuffer.PutString("TestMessage", "Hello");
@@ -511,6 +513,6 @@ void __thiscall JobInformation::JobEngineListener()
                 // Ping pong a value to help test job status functions
                 m_eJobStatus = (nTestCounter & 0x01) ? JobStatusSignals::eJobStart : JobStatusSignals::ePrivacyViolation;
             }
-        }
+        }*/
     }
 }

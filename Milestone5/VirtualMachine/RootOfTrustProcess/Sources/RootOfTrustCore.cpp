@@ -106,6 +106,8 @@ void __thiscall RootOfTrustCore::Initialize(
     m_oRootOfTrustCoreProperties.SetProperty("DigitalContractIdentifier", oInitializationParameters.GetString("DigitalContractIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DatasetIdentifier", oInitializationParameters.GetString("DatasetIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineEosb", oInitializationParameters.GetString("VmEosb"));
+    m_oRootOfTrustCoreProperties.SetProperty("DatasetFilename", "Placeholder");
+
     // Add some values to RootOfTrustCoreProperties which were not sent in by the
     // remote initializer
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustIpcPath", Guid().ToString(eRaw));
@@ -525,6 +527,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandlePutDatasetTransaction(
 
     try
     {
+        std::cout << "RUNNING IN PUT DATASET TRANSACTION " << std::endl;
         oResponseBuffer.PutBoolean("Success", false);
         m_oRootOfTrustCoreProperties.SetProperty("DataOwnerEosb", c_oTransactionParameters.GetString("DataOwnerEosb"));
         m_oRootOfTrustCoreProperties.SetProperty("DatasetFilename", c_oTransactionParameters.GetString("DatasetFilename"));
@@ -562,6 +565,7 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleGetDatasetTransaction(
 
     try
     {
+        std::cout << "RUNNING IN GET DATASET TRANSACTION " << std::endl;
         oResponseBuffer.PutBoolean("Success", false);
         if (c_oTransactionParameters.GetGuid("DomainIdentifier") == Guid(m_oRootOfTrustCoreProperties.GetProperty("DataDomainIdentifier")))
         {

@@ -381,7 +381,7 @@ void __thiscall VirtualMachineManager::InitializePlugin(
     StructuredBuffer oEosb;
     oEosb.PutByte("ElementType", BUFFER_VALUE_TYPE);
     oEosb.PutBoolean("IsRequired", true);
-    oRegisterVmParameters.PutStructuredBuffer("IEosb", oEosb);
+    oRegisterVmParameters.PutStructuredBuffer("Eosb", oEosb);
     StructuredBuffer oDcGuid;
     oDcGuid.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oDcGuid.PutBoolean("IsRequired", true);
@@ -1224,7 +1224,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
             oRequest.PutString("Verb", "POST");
             oRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterVirtualMachine");
             oRequest.PutString("VirtualMachineGuid", strVmGuid);
-            oRequest.PutString("DigitalContractTitle", c_oRequest.GetString("DigitalContractTitle"));
+            oRequest.PutString("DigitalContractTitle", "DG Test title");
             oRequest.PutString("DigitalContractGuid", strDcGuid);
             oRequest.PutUnsignedInt64("RegistrationTime", ::GetEpochTimeInSeconds());
             oRequest.PutUnsignedInt64("HeartbeatBroadcastTime", c_oRequest.GetUnsignedInt64("HeartbeatBroadcastTime"));
@@ -1263,6 +1263,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
                 // Throw base exception if transaction was unsuccessful
                 _ThrowBaseExceptionIf(((0 == oUpdatedEosb.GetSerializedBufferRawDataSizeInBytes())&&(200 != oUpdatedEosb.GetDword("Status"))), "Error updating the Eosb", nullptr);
                 oResponse.PutBuffer("VmEosb", oUpdatedEosb.GetBuffer("UpdatedEosb"));
+                oResponse.PutString("VirtualMachineAuditEventParentBranchNodeIdentifier", "FILL_IN_AUDIT_EVENT_IDENTIFIER_HERE");
                 dwStatus = 201;
             }
         }

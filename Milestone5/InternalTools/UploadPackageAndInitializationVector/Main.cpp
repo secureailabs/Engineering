@@ -57,7 +57,7 @@ void UploadPackage(
     oStructuredBuffer.PutString(gsc_strInitializationVectorFile.c_str(), strInitializationVectorFileData);
 
     // Connect to the Virtual Machine
-    std::unique_ptr<TlsNode> poTlsNode(::TlsConnectToNetworkSocket(c_strVirtualMachineIpAddress, 9090));
+    std::unique_ptr<TlsNode> poTlsNode(::TlsConnectToNetworkSocketWithTimeout(c_strVirtualMachineIpAddress.c_str(), 9090, 5*60*1000, 5000));
     _ThrowIfNull(poTlsNode, "Cannot establish connection.", nullptr);
 
     // Send the package and initialization vector data to the Virtual Machine

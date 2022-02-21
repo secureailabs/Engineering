@@ -223,7 +223,7 @@ namespace WindowsRemoteDataConnector
             this.Name = "SailWebApiPortalLoginDialog";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "SAIL Dataset Publishing Tool";
+            this.Text = "SAIL Remote Data Connector";
             this.Load += new System.EventHandler(this.SailWebApiPortalLoginDialog_Load);
             ((System.ComponentModel.ISupportInitialize)(this.m_SailLogoPictureBox)).EndInit();
             this.m_StatusStrip.ResumeLayout(false);

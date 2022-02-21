@@ -38,6 +38,12 @@ namespace SailDatasetPackager
                 m_TableIndexAssociation.Add(listBoxDisplayStringHash, tablePackageIndex);
                 m_TablesListBox.Items.Add(listBoxDisplayString);
             }
+
+            if (false == ApiInterop.IsLoggedOn())
+            {
+                SailWebApiPortalLoginDialog sailWebApiPortalLoginDialog = new SailWebApiPortalLoginDialog();
+                sailWebApiPortalLoginDialog.ShowDialog();
+            }
         }
 
         /// <summary>
@@ -78,7 +84,6 @@ namespace SailDatasetPackager
                 string commaDelimitedListOfDatasetFamilyIdentifiers = ApiInterop.GetListOfDatasetFamilyIdentifiers();
                 string[] datasetFamilyIdentifiers = commaDelimitedListOfDatasetFamilyIdentifiers.Split(new string[] { "," }, StringSplitOptions.None);
                 m_DatasetFamilyComboBox.Items.Clear();
-                m_DatasetFamilyComboBox.Items.Add("None");
                 foreach (string datasetFamilyIdentifier in datasetFamilyIdentifiers)
                 {
                     string datasetFamilyTitle = ApiInterop.GetDatasetFamilyTitle(datasetFamilyIdentifier);

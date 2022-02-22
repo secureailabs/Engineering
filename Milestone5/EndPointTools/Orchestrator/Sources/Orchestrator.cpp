@@ -924,14 +924,12 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
         }
         else
         {
-            oJob.SetConnection(poJobEngineSocket);
+            oJob.SetConnection(poJobEngineSocket, m_oEosbRotator.GetEosb());
+            oJob.StartJobEngineListenerThread();
         }
 
         // TODO Put this back in once we can talk to SCNs
         //_ThrowBaseExceptionIf((nullptr == poJobEngineSocket), "Failed to connect to remote job engine", nullptr);
-
-        // Start the listener thread for the job
-        oJob.StartJobEngineListenerThread();
 
         // Send any data we had cached
         oJob.SendCachedMessages();

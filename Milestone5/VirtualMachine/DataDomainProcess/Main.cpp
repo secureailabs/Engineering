@@ -58,6 +58,7 @@ static void __cdecl InitDataConnector(void)
     unsigned int unSpinner = 0;
     do
     {
+        fflush(stdout);
         if (true == oSocketServer.WaitForConnection(1000))
         {
             Socket * poSocket = oSocketServer.Accept();

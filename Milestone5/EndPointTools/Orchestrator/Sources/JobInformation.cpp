@@ -189,10 +189,21 @@ std::string __thiscall JobInformation::GetTargetIP(void) const
  * @brief Sets the TLS connection pointer for this job
  * @param[in] poTlsConnection The TLS connection for this job
  ********************************************************************************************/
-void __thiscall JobInformation::SetConnection(std::shared_ptr<TlsNode> poTlsConnection)
+void __thiscall JobInformation::SetConnection(
+    _in std::shared_ptr<TlsNode> poTlsConnection,
+    _in const std::string& c_strEosb )
 {
     __DebugFunction();
     m_poTlsConnection = poTlsConnection;
+
+    // Send a connect message to the JobEngine
+    StructuredBuffer oPushBuffer;
+    oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::eConnectVirtualMachine));
+    oPushBuffer.PutString("Username", "TEST_USERNAME");
+    oPushBuffer.PutString("Eosb", c_strEosb);
+    oPushBuffer.PutString("EndPoint", "JobEngine");
+
+    ::PutTlsTransaction(m_poTlsConnection.get(), oPushBuffer);
 }
 
 /********************************************************************************************
@@ -466,59 +477,66 @@ void __thiscall JobInformation::JobEngineListener()
 
                 // We have a message, load it into a StructuredBuffer
                 StructuredBuffer oJobEngineMessage(stlJobEngineMessage);
-                JobStatusSignals eJobEngineStatus = static_cast<JobStatusSignals>(oJobEngineMessage.GetByte("SignalType"));
-
-                switch (eJobEngineStatus)
+                if ( oJobEngineMessage.IsElementPresent("SignalType", BYTE_VALUE_TYPE))
                 {
-                    case JobStatusSignals::eJobFail:
-                    case JobStatusSignals::eJobDone:
-                    case JobStatusSignals::eJobStart:
+                    JobStatusSignals eJobEngineStatus = static_cast<JobStatusSignals>(oJobEngineMessage.GetByte("SignalType"));
+
+                    switch (eJobEngineStatus)
                     {
-                        std::lock_guard<JobInformation> oLock(*this);
-                        m_eJobStatus = eJobEngineStatus;
-                        // Push to queue
-                        m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
-                        break;
-                    }
-                    case JobStatusSignals::eHeartBeatPing:
-                    {
-                        // Reply to the ping to keep the connection alive
-                        StructuredBuffer oHeartBeatPong;
-                        oHeartBeatPong.PutString("EndPoint", "JobEngine");
-                        oHeartBeatPong.PutByte("RequestType", static_cast<Byte>(EngineRequest::eHeartBeatPong));
-                        SendStructuredBufferToJobEngine(oHeartBeatPong);
-                        break;
-                    }
-                    case JobStatusSignals::ePostValue:
-                    {
-                        std::vector<Byte> stlPushedData = oJobEngineMessage.GetBuffer("FileData");
-                        std::string strDataId = oJobEngineMessage.GetString("ValueName");
-                        oJobEngineMessage.PutString("JobUuid", m_oJobId.ToString(eRaw));
-                        // We haven't seen this before
-                        if ( m_stlOutputResults.end() == m_stlOutputResults.find(strDataId) )
+                        case JobStatusSignals::eJobFail:
+                        case JobStatusSignals::eJobDone:
+                        case JobStatusSignals::eJobStart:
                         {
                             std::lock_guard<JobInformation> oLock(*this);
-                            m_stlOutputResults[strDataId] = stlPushedData;
+                            m_eJobStatus = eJobEngineStatus;
                             // Push to queue
+                            m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
+                            break;
                         }
-                        else
+                        case JobStatusSignals::eHeartBeatPing:
                         {
-                            std::cout << "Got post value for existing data " << strDataId << std::endl;
+                            // Reply to the ping to keep the connection alive
+                            StructuredBuffer oHeartBeatPong;
+                            oHeartBeatPong.PutString("EndPoint", "JobEngine");
+                            oHeartBeatPong.PutByte("RequestType", static_cast<Byte>(EngineRequest::eHeartBeatPong));
+                            SendStructuredBufferToJobEngine(oHeartBeatPong);
+                            break;
                         }
-                        m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
-                        break;
+                        case JobStatusSignals::ePostValue:
+                        {
+                            std::vector<Byte> stlPushedData = oJobEngineMessage.GetBuffer("FileData");
+                            std::string strDataId = oJobEngineMessage.GetString("ValueName");
+                            oJobEngineMessage.PutString("JobUuid", m_oJobId.ToString(eRaw));
+                            // We haven't seen this before
+                            if ( m_stlOutputResults.end() == m_stlOutputResults.find(strDataId) )
+                            {
+                                std::lock_guard<JobInformation> oLock(*this);
+                                m_stlOutputResults[strDataId] = stlPushedData;
+                                // Push to queue
+                            }
+                            else
+                            {
+                                std::cout << "Got post value for existing data " << strDataId << std::endl;
+                            }
+                            m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
+                            break;
+                        }
+                        case JobStatusSignals::eVmShutdown:
+                        {
+                            std::cout << "Job " << m_oJobId.ToString(eHyphensAndCurlyBraces) << " has shutdown " << std::endl;
+                            // Push to queue
+                            m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
+                            break;
+                        }
+                        default:
+                        {
+                            std::cout << "Unknown state " << static_cast<Byte>(eJobEngineStatus) << std::endl;
+                        }
                     }
-                    case JobStatusSignals::eVmShutdown:
-                    {
-                        std::cout << "Job " << m_oJobId.ToString(eHyphensAndCurlyBraces) << " has shutdown " << std::endl;
-                        // Push to queue
-                        m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
-                        break;
-                    }
-                    default:
-                    {
-                        std::cout << "Unknown state " << static_cast<Byte>(eJobEngineStatus) << std::endl;
-                    }
+                }
+                else
+                {
+                    std::cout << "Message without signal type " << oJobEngineMessage.ToString() << std::endl;
                 }
             }
             catch(const BaseException& oBaseException)

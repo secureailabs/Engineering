@@ -57,7 +57,11 @@ class JobInformation
         std::string __thiscall GetTargetIP(void) const;
         std::string __thiscall GetSafeFunctionId(void) const;
         const std::unordered_map<std::string, std::optional<std::string>>& __thiscall GetInputParameterMap() const;
-        void __thiscall SetConnection(std::shared_ptr<TlsNode> poTlsConnection);
+
+        void __thiscall SetConnection(
+            _in std::shared_ptr<TlsNode> poTlsConnection,
+            _in const std::string& c_strEosb
+            );
         std::shared_ptr<TlsNode> __thiscall GetConnection() const;
 
         void __thiscall StartJobEngineListenerThread();

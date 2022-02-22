@@ -153,6 +153,7 @@ void __thiscall JobEngine::ListenToRequests(void)
 
         // Get the type of request
         EngineRequest eRequestType = (EngineRequest)oNewRequest.GetByte("RequestType");
+        std::cout << "Job engine received request " << static_cast<int>(eRequestType) << std::endl;
         switch (eRequestType)
         {
             case EngineRequest::eConnectVirtualMachine

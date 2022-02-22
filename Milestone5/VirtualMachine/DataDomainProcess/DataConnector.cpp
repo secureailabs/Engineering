@@ -106,6 +106,7 @@ bool __thiscall DataConnector::LoadAndVerify(
     // Persist the RootOfTrustNode
     m_poRootOfTrustNode = poRootOfTrustNode;
     // Load the dataset from file
+    std::cout << "Loading dataset " << m_poRootOfTrustNode->GetDatasetFilename() << std::endl;
     Dataset oDataset(m_poRootOfTrustNode->GetDatasetFilename().c_str());
     // Initialize m_oDatasetMetadata
     m_oDatasetMetadata.PutString("DatasetIdentifier", oDataset.GetDatasetIdentifier());
@@ -122,8 +123,10 @@ bool __thiscall DataConnector::LoadAndVerify(
     // Seek to each tables metadata and store the StructuredBuffer into the class member
     std::vector<std::string> stlListOfTableIdentifiers = oDataset.GetTableIdentifiers();
     __DebugAssert(stlListOfTableIdentifiers.size() == oDataset.GetTableCount());
+    std::cout << "Iterating through tables " << std::endl;
     for (const std::string c_strTableIdentifier: stlListOfTableIdentifiers)
     {
+        std::cout << "Table name " << c_strTableIdentifier << std::endl;
         DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_strTableIdentifier.c_str());
         // Build the metadata blob for the current table
         StructuredBuffer oTableMedata;
@@ -190,6 +193,7 @@ bool __thiscall DataConnector::LoadAndVerify(
     oEventData.PutStructuredBuffer("DatasetMetadata", m_oDatasetMetadata);
     m_poRootOfTrustNode->RecordAuditEvent("LOAD_DATASET", 0x1111, 0x05, oEventData);
 
+    std::cout << "DONE READING DATASET " << std::endl;
     return true;
 }
 

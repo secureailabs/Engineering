@@ -39,12 +39,13 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     StructuredBuffer oAllInitializationParameters;
 
     // Read the initialization parameters from the InitializationVector.json file
-    oAllInitializationParameters.PutString("NameOfVirtualMachine", ::GetInitializationValue("NameOfVirtualMachine"));
-    oAllInitializationParameters.PutString("IpAddressOfVirtualMachine", ::GetInitializationValue("IpAddressOfVirtualMachine"));
+    oAllInitializationParameters.PutString("VirtualMachineName", ::GetInitializationValue("NameOfVirtualMachine"));
+    oAllInitializationParameters.PutString("VirtualMachineIpAddress", ::GetInitializationValue("IpAddressOfVirtualMachine"));
     oAllInitializationParameters.PutString("VirtualMachineIdentifier", ::GetInitializationValue("VirtualMachineIdentifier"));
-    oAllInitializationParameters.PutString("ClusterIdentifier", ::GetInitializationValue("ClusterIdentifier"));
+    oAllInitializationParameters.PutString("VirtualMachineClusterIdentifier", ::GetInitializationValue("ClusterIdentifier"));
     oAllInitializationParameters.PutString("DigitalContractIdentifier", ::GetInitializationValue("DigitalContractIdentifier"));
     oAllInitializationParameters.PutString("DatasetIdentifier", ::GetInitializationValue("DatasetIdentifier"));
+    oAllInitializationParameters.PutString("DataDomainIdentifier", ::GetInitializationValue("DataConnectorDomainIdentifier"));
     oAllInitializationParameters.PutString("RootOfTrustDomainIdentifier", ::GetInitializationValue("RootOfTrustDomainIdentifier"));
     oAllInitializationParameters.PutString("ComputationalDomainIdentifier", ::GetInitializationValue("ComputationalDomainIdentifier"));
     oAllInitializationParameters.PutString("DataConnectorDomainIdentifier", ::GetInitializationValue("DataConnectorDomainIdentifier"));

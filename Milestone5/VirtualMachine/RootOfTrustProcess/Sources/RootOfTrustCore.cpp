@@ -95,7 +95,7 @@ void __thiscall RootOfTrustCore::Initialize(
 
     StructuredBuffer oInitializationParameters(c_stlSerializedInitializationParameters);
     // Reality check, to make sure that everything is where it is supposed to be
-    m_oRootOfTrustCoreProperties.SetProperty("SailPlatformServicesIpAddress", oInitializationParameters.GetString("SailPlatformServicesIpAddress"));
+    m_oRootOfTrustCoreProperties.SetProperty("SailWebApiPortalIpAddress", oInitializationParameters.GetString("SailWebApiPortalIpAddress"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineName", oInitializationParameters.GetString("VirtualMachineName"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIpAddress", oInitializationParameters.GetString("VirtualMachineIpAddress"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIdentifier", oInitializationParameters.GetString("VirtualMachineIdentifier"));
@@ -106,6 +106,7 @@ void __thiscall RootOfTrustCore::Initialize(
     m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataDomainIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DigitalContractIdentifier", oInitializationParameters.GetString("DigitalContractIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DatasetIdentifier", oInitializationParameters.GetString("DatasetIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineEosb", oInitializationParameters.GetString("VmEosb"));
     m_oRootOfTrustCoreProperties.SetProperty("DatasetFilename", oInitializationParameters.GetString("DatasetFilename"));
 
     // Add some values to RootOfTrustCoreProperties which were not sent in by the
@@ -114,7 +115,7 @@ void __thiscall RootOfTrustCore::Initialize(
     m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIpcPath", Guid().ToString(eRaw));
     m_oRootOfTrustCoreProperties.SetProperty("DataDomainIpcPath", Guid().ToString(eRaw));
     // Make sure to register the IP address of the SAIL Platform Services API Portal before we start
-    ::SetIpAddressOfSailWebApiPortalGateway(m_oRootOfTrustCoreProperties.GetProperty("SailPlatformServicesIpAddress"), 6200);
+    ::SetIpAddressOfSailWebApiPortalGateway(m_oRootOfTrustCoreProperties.GetProperty("SailWebApiPortalIpAddress"), 6200);
     // Okay, we are fully initialized
     m_fIsInitialized = true;
     // Let's initialize this virtual machine (causes API call into SAIL Platform Services API Portal)

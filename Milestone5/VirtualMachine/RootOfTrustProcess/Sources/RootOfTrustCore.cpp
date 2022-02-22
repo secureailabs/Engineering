@@ -101,7 +101,7 @@ void __thiscall RootOfTrustCore::Initialize(
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIdentifier", oInitializationParameters.GetString("VirtualMachineIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineClusterIdentifier", oInitializationParameters.GetString("VirtualMachineClusterIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustDomainIdentifier", oInitializationParameters.GetString("RootOfTrustDomainIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIdentifier", oInitializationParameters.GetString("VirtualMachineName"));
+    m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIdentifier", oInitializationParameters.GetString("ComputationalDomainIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DataOwnerEosb", oInitializationParameters.GetString("DataOwnerEosb"));
     m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataDomainIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DigitalContractIdentifier", oInitializationParameters.GetString("DigitalContractIdentifier"));
@@ -566,17 +566,29 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleAuditEventTransaction(
 
     try
     {
-        // By default
-        oResponseBuffer.PutBoolean("Success", false);
-        // Make a local copy of the transaction parameters since we are going to be making
-        // modifications to the parameters
-        // Make a copy of the target channels
-        std::string strEventName = c_oTransactionParameters.GetString("EventName");
-        Word wTargetChannelsBitMask = c_oTransactionParameters.GetWord("TargetChannelsBitMask");
-        Dword dwEventType = c_oTransactionParameters.GetDword("EventType");
-        StructuredBuffer oEventData = c_oTransactionParameters.GetStructuredBuffer("EventData");
-        // Register the event
-        m_oAuditEventManagedQueues.AddAuditEvent(strEventName, wTargetChannelsBitMask, dwEventType, oEventData);
+        std::cout << "IGNORING AUDIT EVENT FOR NOW" << std::endl;
+        // HACK-DG We have two conflicting formats incoming here, ignore for now
+        if ( 1 == 0 )
+        {
+            // By default
+            oResponseBuffer.PutBoolean("Success", false);
+            // Make a local copy of the transaction parameters since we are going to be making
+            // modifications to the parameters
+            // Make a copy of the target channels
+            std::cout << c_oTransactionParameters.ToString() << std::endl;
+            // HACK-DG EventName isn't filled in, using a dummy for now
+            //std::string strEventName = c_oTransactionParameters.GetString("EventName");
+            std::string strEventName{"PLACEHOLDER_NAME"};
+            Word wTargetChannelsBitMask = c_oTransactionParameters.GetWord("TargetChannelsBitMask");
+            // HACK-DG EventType is given as a Qword
+            //Dword dwEventType = c_oTransactionParameters.GetDword("EventType");
+            Qword dwEventType = c_oTransactionParameters.GetQword("EventType");
+            // HACK-DG The name we get sent is EncryptedEventData
+            //StructuredBuffer oEventData = c_oTransactionParameters.GetStructuredBuffer("EventData");
+            StructuredBuffer oEventData = c_oTransactionParameters.GetStructuredBuffer("EncryptedEventData");
+            // Register the event
+            m_oAuditEventManagedQueues.AddAuditEvent(strEventName, wTargetChannelsBitMask, dwEventType, oEventData);
+        }
         // If we get here, the audit event was recorded
         oResponseBuffer.PutBoolean("Success", true);
     }
@@ -636,8 +648,11 @@ bool __thiscall RootOfTrustCore::RegisterDataOwnerEosb(void)
     try
     {
         StructuredBuffer oResponse(::RegisterVirtualMachineDataOwner(m_oRootOfTrustCoreProperties.GetProperty("DataOwnerEosb"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier")));
-        m_oRootOfTrustCoreProperties.SetProperty("DataOwnerUserIdentifier", oResponse.GetString("DataOwnerUserIdentifier"));
-        m_oRootOfTrustCoreProperties.SetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier", oResponse.GetString("DataOrganizationAuditEventParentBranchNodeIdentifier"));
+        // HACK-DG Filling in random data for now
+        //m_oRootOfTrustCoreProperties.SetProperty("DataOwnerUserIdentifier", oResponse.GetString("DataOwnerUserIdentifier"));
+        //m_oRootOfTrustCoreProperties.SetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier", oResponse.GetString("DataOrganizationAuditEventParentBranchNodeIdentifier"));
+        m_oRootOfTrustCoreProperties.SetProperty("DataOwnerUserIdentifier","{00000000-0000-0000-0000-000000000000}");
+        m_oRootOfTrustCoreProperties.SetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier", "{00000000-0000-0000-0000-000000000000}");
         fSuccess = true;
     }
 

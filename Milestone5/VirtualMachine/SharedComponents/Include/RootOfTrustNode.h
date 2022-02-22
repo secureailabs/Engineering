@@ -31,7 +31,7 @@ class RootOfTrustNode : public Object
         virtual ~RootOfTrustNode(void);
         
         Guid __thiscall GetDomainIdentifier(void) const;
-        std::vector<Byte> __thiscall GetDataset(void) const;
+        std::string __thiscall GetDatasetFilename(void) const;
         
         void __thiscall RecordAuditEvent(
             _in const char * c_szEventName,

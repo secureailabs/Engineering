@@ -96,16 +96,17 @@ void __thiscall RootOfTrustCore::Initialize(
     StructuredBuffer oInitializationParameters(c_stlSerializedInitializationParameters);
     // Reality check, to make sure that everything is where it is supposed to be
     m_oRootOfTrustCoreProperties.SetProperty("SailPlatformServicesIpAddress", oInitializationParameters.GetString("SailPlatformServicesIpAddress"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineName", oInitializationParameters.GetString("NameOfVirtualMachine"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIpAddress", oInitializationParameters.GetString("IpAddressOfVirtualMachine"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineName", oInitializationParameters.GetString("VirtualMachineName"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIpAddress", oInitializationParameters.GetString("VirtualMachineIpAddress"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIdentifier", oInitializationParameters.GetString("VirtualMachineIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineClusterIdentifier", oInitializationParameters.GetString("ClusterIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineClusterIdentifier", oInitializationParameters.GetString("VirtualMachineClusterIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustDomainIdentifier", oInitializationParameters.GetString("RootOfTrustDomainIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIdentifier", oInitializationParameters.GetString("ComputationalDomainIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataConnectorDomainIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIdentifier", oInitializationParameters.GetString("VirtualMachineName"));
+    m_oRootOfTrustCoreProperties.SetProperty("DataOwnerEosb", oInitializationParameters.GetString("DataOwnerEosb"));
+    m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataDomainIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DigitalContractIdentifier", oInitializationParameters.GetString("DigitalContractIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DatasetIdentifier", oInitializationParameters.GetString("DatasetIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineEosb", oInitializationParameters.GetString("VmEosb"));
+    m_oRootOfTrustCoreProperties.SetProperty("DatasetFilename", oInitializationParameters.GetString("DatasetFilename"));
     // Add some values to RootOfTrustCoreProperties which were not sent in by the
     // remote initializer
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustIpcPath", Guid().ToString(eRaw));
@@ -118,6 +119,10 @@ void __thiscall RootOfTrustCore::Initialize(
     // Let's initialize this virtual machine (causes API call into SAIL Platform Services API Portal)
     this->RegisterVirtualMachine();
     __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineAuditEventParentBranchNodeIdentifier").size());
+    // Since we have the DataOwnerEosb and the DatasetFilename, we can also register the Data Owner Eosb
+    this->RegisterDataOwnerEosb();
+    __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier").size());
+    __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier").size());
     // Now, we initialize our threads
     m_fIsRunning = true;
     ThreadManager * poThreadManager = ThreadManager::GetInstance();
@@ -452,9 +457,6 @@ void __thiscall RootOfTrustCore::HandleIncomingTransaction(
         case 0x00000004 //  "RegisterResearcher"
         :   stlSerializedResponse = this->HandleRegisterResearcherTransaction(oTransactionParameters);
             break;
-        case 0x00000005 //  "RegisterDataset"
-        :   stlSerializedResponse = this->HandlePutDatasetTransaction(oTransactionParameters);
-            break;
         case 0x00000006 //  "GetDataSet"
         :   stlSerializedResponse = this->HandleGetDatasetTransaction(oTransactionParameters);
             break;
@@ -495,43 +497,6 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleRegisterResearcherTransactio
             __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("ResearchOrganizationAuditEventParentBranchNodeIdentifier").size());
             oResponseBuffer.PutBoolean("Success", this->RegisterResearcherEosb());
         }
-    }
-
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-
-    return oResponseBuffer.GetSerializedBuffer();
-}
-
-/********************************************************************************************/
-
-std::vector<Byte> __thiscall RootOfTrustCore::HandlePutDatasetTransaction(
-    _in const StructuredBuffer & c_oTransactionParameters
-    ) throw()
-{
-    __DebugFunction();
-    __DebugAssert(this == ms_RootOfTrustCoreSingletonInstance);
-    __DebugAssert(true == m_fIsInitialized);
-    __DebugAssert(true == m_fIsRunning);
-
-    StructuredBuffer oResponseBuffer;
-
-    try
-    {
-        oResponseBuffer.PutBoolean("Success", false);
-        m_oRootOfTrustCoreProperties.SetProperty("DataOwnerEosb", c_oTransactionParameters.GetString("DataOwnerEosb"));
-        m_oRootOfTrustCoreProperties.SetProperty("DatasetFilename", c_oTransactionParameters.GetString("DatasetFilename"));
-        this->RegisterDataOwnerEosb();
-        __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier").size());
-        __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier").size());
-        oResponseBuffer.PutBoolean("Success", this->RegisterResearcherEosb());
     }
 
     catch (const BaseException & c_oBaseException)

@@ -102,7 +102,7 @@ Guid __thiscall RootOfTrustNode::GetDomainIdentifier(void) const
 
 /********************************************************************************************/
 
-std::vector<Byte> __thiscall RootOfTrustNode::GetDataset(void) const
+std::string __thiscall RootOfTrustNode::GetDatasetFilename(void) const
 {
     __DebugFunction();
     
@@ -112,8 +112,10 @@ std::vector<Byte> __thiscall RootOfTrustNode::GetDataset(void) const
     oTransactionData.PutDword("Transaction", 0x00000006);
     StructuredBuffer oTransactionResponse(::PutIpcTransactionAndGetResponse(poSocket, oTransactionData, false));
     poSocket->Release();
+    _ThrowBaseExceptionIf((false == oTransactionResponse.GetBoolean("Success")), "ERROR: GetDatasetFilename has failed.", nullptr);
+    _ThrowBaseExceptionIf((false == oTransactionResponse.IsElementPresent("DatasetFilename", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Unexpected missing return value of DatasetFilename.", nullptr);
 
-    return oTransactionResponse.GetBuffer("Dataset");
+    return oTransactionResponse.GetString("DatasetFilename");
 }
 
 /********************************************************************************************/

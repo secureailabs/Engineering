@@ -60,8 +60,10 @@ static Dword __stdcall UploadDatasetToVirtualMachine(
         // Add notification to mark the beginning of the upload transaction
         ::RegisterExceptionalMessage("Began uploading dataset %s to %s", strDatasetFilename.c_str(), strVirtualMachineIpAddress.c_str());
         // Execute the upload transaction
-        auto stlRestResponse = ::RestApiCall(strVirtualMachineIpAddress, (Word) 6200, "PUT", "/something", strJson, false);
+        auto stlRestResponse = ::RestApiCall(strVirtualMachineIpAddress, (Word) 6800, "PUT", "/something", strJson, false);
         // Parse the returning value.
+
+
         fSuccess = true;
     }
 

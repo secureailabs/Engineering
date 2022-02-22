@@ -18,30 +18,11 @@
 #include "Exceptions.h"
 #include "InteractiveClient.h"
 
-#include <bsoncxx/json.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/stdx.hpp>
-#include <mongocxx/uri.hpp>
-#include <bsoncxx/builder/stream/helpers.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/stream/array.hpp>
-
 #include <iostream>
 
-using bsoncxx::builder::stream::close_array;
-using bsoncxx::builder::stream::close_document;
-using bsoncxx::builder::stream::document;
-using bsoncxx::builder::stream::finalize;
-using bsoncxx::builder::stream::open_array;
-using bsoncxx::builder::stream::open_document;
-
-// For testing mongocxx::pool
 #include <sstream>
 #include <thread>
 #include <vector>
-#include <mongocxx/pool.hpp>
-using bsoncxx::builder::basic::kvp;
 
 /********************************************************************************************/
 
@@ -55,9 +36,9 @@ typedef struct UserInformation
     Qword m_qwAccessRights;
 
     UserInformation(
-        _in const std::string & c_strEmail, 
-        _in const std::string & c_strName, 
-        _in const std::string c_strTitle, 
+        _in const std::string & c_strEmail,
+        _in const std::string & c_strName,
+        _in const std::string c_strTitle,
         _in const std::string c_strPhoneNumber,
         _in Qword qwAccessRights
         )
@@ -68,7 +49,7 @@ typedef struct UserInformation
         m_strPhoneNumber = c_strPhoneNumber;
         m_qwAccessRights = qwAccessRights;
     }
-} 
+}
 UserInformation;
 
 typedef struct OrganizationInformation
@@ -86,13 +67,13 @@ typedef struct OrganizationInformation
     std::string m_strSecondaryContactPhoneNumber;
 
     OrganizationInformation(
-        _in const std::string & c_strName, 
-        _in const std::string & c_strAddress, 
+        _in const std::string & c_strName,
+        _in const std::string & c_strAddress,
         _in const std::string c_strPrimaryContactName, 
         _in const std::string c_strPrimaryContactTitle,
         _in const std::string c_strPrimaryContactEmail, 
         _in const std::string c_strPrimaryContactPhoneNumber,
-        _in const std::string c_strSecondaryContactName, 
+        _in const std::string c_strSecondaryContactName,
         _in const std::string c_strSecondaryContactTitle,
         _in const std::string c_strSecondaryContactEmail, 
         _in const std::string c_strSecondaryContactPhoneNumber
@@ -109,7 +90,7 @@ typedef struct OrganizationInformation
         m_strSecondaryContactEmail = c_strSecondaryContactEmail;
         m_strSecondaryContactPhoneNumber = c_strSecondaryContactPhoneNumber;
     }
-} 
+}
 OrganizationInformation;
 
 typedef struct DigitalContractInformation
@@ -126,7 +107,7 @@ typedef struct DigitalContractInformation
 
     DigitalContractInformation(
         _in const std::string & c_strTitle,
-        _in uint64_t unSubscriptionDays, 
+        _in uint64_t unSubscriptionDays,
         _in const std::string & c_strLegalAgreement,
         _in uint64_t unRetentionTime,
         _in const std::string & c_strDescription,
@@ -146,7 +127,7 @@ typedef struct DigitalContractInformation
         m_un64NoOfVCPU = un64NoOfVCPU;
         m_strHostRegion = c_strHostRegion;
     }
-} 
+}
 DigitalContractInformation;
 
 typedef struct DatasetInformation
@@ -162,7 +143,7 @@ typedef struct DatasetInformation
 
     DatasetInformation(
         _in const std::string & c_strDatasetGuid,
-        _in const std::string & c_strVersionNumber, 
+        _in const std::string & c_strVersionNumber,
         _in const std::string & c_strName,
         _in const std::string & c_strDescription,
         _in const std::string & c_strKeywords,
@@ -244,6 +225,3 @@ class DatabaseTools : public Object
         std::vector<DigitalContractInformation> m_stlDigitalContracts;
         std::vector<std::string> m_stlDigitalContractGuids;
 };
-
-// Testing mongocxx::pool
-extern void RunThreadedInserts(void);

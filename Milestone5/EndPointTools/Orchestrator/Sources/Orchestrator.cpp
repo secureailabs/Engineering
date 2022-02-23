@@ -750,8 +750,7 @@ std::string Orchestrator::SetParameter(
                 strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
 
                 UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
-                // HACK-DG This is hardcoding a local SCN
-                oJobInformation.SetTargetIP("192.168.0.193");
+
                 // We have everything we need to submit this job, start it up
                 if ( true == oJobInformation.ReadyToExcute() )
                 {
@@ -789,6 +788,8 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
     )
 {
     std::optional<Guid> oTargetSecureComputationalNode;
+    std::cout << "Checking IP for parameter " << c_oParameterGuid.ToString(eHyphensAndCurlyBraces) << std::endl;
+
     if ( eTable == c_oParameterGuid.GetObjectType() )
     {
         oTargetSecureComputationalNode = GetSecureComputationalNodeServingTable(c_oParameterGuid);
@@ -1259,16 +1260,18 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
     ) const
 {
     __DebugFunction();
-    // Disabled until new dataset annotation tool is in place
-    //__DebugAssert(eTable == oTableGuid.GetObjectType());
+    __DebugAssert(eTable == oTableGuid.GetObjectType());
 
     std::optional<Guid> oSecureComputationalNodeGuid;
     for ( auto oTableItr : m_stlAvailableTables )
     {
-        if ( oTableGuid.ToString(eRaw) == oTableItr.second.m_strParentDataset )
+        Guid oTableItrGuid(oTableItr.second.m_oInformation.GetString("TableIdentifier"));
+        std::cout << "Comparing " << oTableGuid.ToString(eHyphensAndCurlyBraces) << " " << oTableGuid.ToString(eHyphensAndCurlyBraces) << std::endl;
+        if ( oTableGuid == oTableItrGuid )
         {
             Guid oDatasetGuid(oTableItr.second.m_strParentDataset);
             oSecureComputationalNodeGuid = GetSecureComputationalNodeServingDataset(oDatasetGuid);
+            std::cout << "Got node for dataset " << oDatasetGuid.ToString(eHyphensAndCurlyBraces) << std::endl;
             break;
         }
     }

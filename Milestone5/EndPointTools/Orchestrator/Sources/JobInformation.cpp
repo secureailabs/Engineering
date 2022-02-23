@@ -163,11 +163,9 @@ void __thiscall JobInformation::SetTargetIP(
     _in const std::string& c_strTargetIP
     )
 {
-    // HACK-DG Hardcoded an IP address here
-    m_strTargetIP = "192.168.0.193";
     __DebugFunction();
-    //__DebugAssert("" == m_strTargetIP);
-    //m_strTargetIP = c_strTargetIP;
+    __DebugAssert("" == m_strTargetIP);
+    m_strTargetIP = c_strTargetIP;
 }
 
 /********************************************************************************************

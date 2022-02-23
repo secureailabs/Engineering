@@ -81,7 +81,7 @@ class JobInformation
         const Guid m_oJobId;
         const Guid m_oSafeFunctionId;
         // HACK-DG Hardcoded an IP address of local SCN here
-        std::string m_strTargetIP{"192.168.0.244"};
+        std::string m_strTargetIP;
         std::unordered_map<std::string, std::optional<std::string>> m_stlInputParameterData;
         std::shared_ptr<JobEngineConnection> m_poJobEngineConnection;
         std::unique_ptr<std::thread> m_pstlListenerThread{nullptr};

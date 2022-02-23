@@ -185,6 +185,7 @@ class Orchestrator : public Object{
         std::unordered_map<std::string, SecureNodeInformation> m_stlProvisionInformation{};
         std::unordered_map<std::string, std::unique_ptr<JobInformation> > m_stlJobInformation{};
         std::unordered_map<std::string, std::vector<Byte>> m_stlPushedData{};
+        std::unordered_map<std::string, std::vector<Byte>> m_stlJobResults{};
         std::unordered_map<std::string, std::shared_ptr<JobEngineConnection>> m_stlSecureNodeConnections{};
         StructuredBufferLockedQueue m_oJobMessageQueue{};
 };

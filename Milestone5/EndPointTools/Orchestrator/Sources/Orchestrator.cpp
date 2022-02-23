@@ -1379,6 +1379,7 @@ std::string __thiscall Orchestrator::WaitForData(
             {
                 if ( static_cast<Byte>(JobStatusSignals::ePostValue) == oDataResult->GetByte("SignalType"))
                 {
+                    m_stlJobResults[oDataResult->GetString("ValueName")] = oDataResult->GetBuffer("FileData");
                     UpdateJobsWaitingForData(*oDataResult);
                 }
             }
@@ -1424,7 +1425,13 @@ void __thiscall Orchestrator::UpdateJobsWaitingForData(
         std::lock_guard<JobInformation> stlLock(*oJobInformation.second);
         if ( oJobInformation.second->GetInputParameterMap().end() != oJobInformation.second->GetInputParameterMap().find(c_oPushDataMessage.GetString("ValueName") ) )
         {
-            std::cout << "Found a parameter that needs an implicit push " << std::endl;
+            StructuredBuffer oPushDataBuffer;
+            oPushDataBuffer.PutByte("RequestType", (Byte)EngineRequest::ePushdata);
+            oPushDataBuffer.PutString("EndPoint", "JobEngine");
+            oPushDataBuffer.PutString("DataId", c_oPushDataMessage.GetString("ValueName"));
+            oPushDataBuffer.PutBuffer("Data", m_stlJobResults[c_oPushDataMessage.GetString("ValueName")]);
+
+            SendDataToJob(*oJobInformation.second, oPushDataBuffer);
         }
     }
 }

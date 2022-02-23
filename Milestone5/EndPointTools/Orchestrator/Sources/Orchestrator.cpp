@@ -1450,7 +1450,7 @@ void __thiscall Orchestrator::PushUserDataToJob(
         StructuredBuffer oPushDataBuffer;
         oPushDataBuffer.PutByte("RequestType", (Byte)EngineRequest::ePushdata);
         oPushDataBuffer.PutString("EndPoint", "JobEngine");
-        oPushDataBuffer.PutString("DataId", oUserParameter.ToString(eHyphensOnly));
+        oPushDataBuffer.PutString("DataId", oUserParameter.ToString(eRaw));
         oPushDataBuffer.PutBuffer("Data", m_stlPushedData[oUserParameter.ToString(eHyphensAndCurlyBraces)]);
 
         SendDataToJob(oJob, oPushDataBuffer);
@@ -1494,7 +1494,7 @@ void __thiscall Orchestrator::SendSafeObjectToJobEngine(
         oSafeFunctionBuffer.PutStructuredBuffer("OutputParameters", oCachedSafeFunction.GetStructuredBuffer("OutputParameters"));
         oSafeFunctionBuffer.PutString("Payload", oCachedSafeFunction.GetString("Payload"));
 
-        SendDataToJob(oJob, oSafeFunctionBuffer);
+        oJob.SendStructuredBufferToJobEngine(oSafeFunctionBuffer);
     }
     catch(const BaseException& c_oBaseException)
     {

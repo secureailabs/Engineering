@@ -262,20 +262,9 @@ const Guid& __thiscall JobInformation::GetJobId() const
     return m_oJobId;
 }
 
-/********************************************************************************************
- *
- * @class JobInformation
- * @function StartJobEngineListenerThread
- * @brief Starts the listening thread for the job engine communication
-
- ********************************************************************************************/
-void __thiscall JobInformation::StartJobEngineListenerThread()
+bool __thiscall JobInformation::IsRunning() const
 {
-    __DebugFunction();
-    __DebugAssert(nullptr == m_pstlListenerThread.get());
-
-    m_pstlListenerThread.reset(new std::thread(&JobInformation::JobEngineListener, this));
-    m_fStopRequest = false;
+    return m_eJobStatus.has_value();
 }
 
 bool __thiscall JobInformation::SendCachedMessages(void)
@@ -326,8 +315,15 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
     try
     {
         std::lock_guard<JobInformation> jobLock(*this);
-        // TODO Remove this check when we can talk to an SCN
-        m_poJobEngineConnection->SendStructuredBufferToJobEngine(c_oBufferToSend);
+        if ( m_poJobEngineConnection != nullptr )
+        {
+            // TODO Remove this check when we can talk to an SCN
+            m_poJobEngineConnection->SendStructuredBufferToJobEngine(c_oBufferToSend);
+        }
+        else
+        {
+            m_stlCachedStructuredBuffers.push_back(c_oBufferToSend);
+        }
     }
     catch(const BaseException& oBaseException)
     {

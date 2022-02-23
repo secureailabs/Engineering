@@ -11,6 +11,18 @@
 #include <vector>
 
 
+JobEngineConnection::JobEngineConnection(
+    std::shared_ptr<TlsNode> stlConnectionPointer,
+    StructuredBufferLockedQueue& oQueueToOrchestrator
+    ) :
+    m_stlConnectionPointer{stlConnectionPointer},
+    m_oStructuredBufferQueue{oQueueToOrchestrator}
+{
+    __DebugFunction();
+
+    m_pstlListenerThread.reset(new std::thread(&JobEngineConnection::JobEngineConnectionThread, this));
+    m_fStopRequest = false;
+}
 /********************************************************************************************
  *
  * @class JobInformation

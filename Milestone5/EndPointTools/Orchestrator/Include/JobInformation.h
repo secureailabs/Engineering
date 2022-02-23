@@ -63,8 +63,6 @@ class JobInformation
             );
         std::shared_ptr<TlsNode> __thiscall GetConnection() const;
 
-        void __thiscall StartJobEngineListenerThread();
-
         bool __thiscall SendStructuredBufferToJobEngine(
             _in const StructuredBuffer& c_oBufferToSend
             );
@@ -72,13 +70,12 @@ class JobInformation
         bool __thiscall SendCachedMessages(void);
 
         bool __thiscall IsRunning() const;
+
         // BasicLockable methods
         void __thiscall lock();
         void __thiscall unlock();
 
     private:
-
-        void __thiscall JobEngineListener();
 
         mutable std::recursive_mutex m_stlLock;
         const Guid m_oJobId;

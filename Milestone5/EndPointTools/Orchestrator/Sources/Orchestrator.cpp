@@ -916,16 +916,37 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
     bool fJobStarted{false};
     try
     {
+        std::shared_ptr<JobEngineConnection> poJobEngineSocket;
+        if ( m_stlSecureNodeConnections.end() == m_stlSecureNodeConnections.find(oJob.GetTargetIP()) )
+        {
+            std::shared_ptr<TlsNode> poNewSocketConnection{::TlsConnectToNetworkSocket(oJob.GetTargetIP(), REMOTE_JOB_PORT)};
+
+            m_stlSecureNodeConnections.emplace(oJob.GetTargetIP(), new JobEngineConnection(poNewSocketConnection, m_oJobMessageQueue));
+            poJobEngineSocket = m_stlSecureNodeConnections[oJob.GetTargetIP()];
+
+            // Send a connect message to the JobEngine
+            StructuredBuffer oPushBuffer;
+            oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::eConnectVirtualMachine));
+            oPushBuffer.PutString("Username", "TEST_USERNAME");
+            oPushBuffer.PutString("Eosb", m_oEosbRotator.GetEosb());
+            oPushBuffer.PutString("EndPoint", "JobEngine");
+
+            ::PutTlsTransaction(poNewSocketConnection.get(), oPushBuffer);
+        }
+        else
+        {
+            std::cout << "Re-using existing connection" << std::endl;
+            poJobEngineSocket = m_stlSecureNodeConnections[oJob.GetTargetIP()];
+        }
+
         // Establish connection with the remote
-        std::shared_ptr<TlsNode> poJobEngineSocket{::TlsConnectToNetworkSocket(oJob.GetTargetIP(), REMOTE_JOB_PORT)};
         if ( nullptr == poJobEngineSocket )
         {
             std::cout << "Failed to connect to remote " << oJob.GetTargetIP() << std::endl;
         }
         else
         {
-            oJob.SetConnection(poJobEngineSocket, m_oEosbRotator.GetEosb());
-            oJob.StartJobEngineListenerThread();
+            oJob.SetConnection(poJobEngineSocket);
         }
 
         // TODO Put this back in once we can talk to SCNs

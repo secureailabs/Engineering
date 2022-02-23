@@ -59,8 +59,7 @@ class JobInformation
         const std::unordered_map<std::string, std::optional<std::string>>& __thiscall GetInputParameterMap() const;
 
         void __thiscall SetConnection(
-            _in std::shared_ptr<TlsNode> poTlsConnection,
-            _in const std::string& c_strEosb
+            _in std::shared_ptr<JobEngineConnection> poTlsConnection
             );
         std::shared_ptr<TlsNode> __thiscall GetConnection() const;
 
@@ -87,7 +86,7 @@ class JobInformation
         // HACK-DG Hardcoded an IP address of local SCN here
         std::string m_strTargetIP{"192.168.0.244"};
         std::unordered_map<std::string, std::optional<std::string>> m_stlInputParameterData;
-        std::shared_ptr<TlsNode> m_poTlsConnection{nullptr};
+        std::shared_ptr<JobEngineConnection> m_poJobEngineConnection;
         std::unique_ptr<std::thread> m_pstlListenerThread{nullptr};
         bool m_fStopRequest{false};
         std::optional<JobStatusSignals> m_eJobStatus{};

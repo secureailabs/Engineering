@@ -12,6 +12,7 @@
 
 #include "EntityTypes.h"
 #include "EosbRotationManager.h"
+#include "JobEngineConnection.h"
 #include "JobInformation.h"
 #include "SecureNodeInformation.h"
 #include "StructuredBuffer.h"
@@ -184,5 +185,6 @@ class Orchestrator : public Object{
         std::unordered_map<std::string, SecureNodeInformation> m_stlProvisionInformation{};
         std::unordered_map<std::string, std::unique_ptr<JobInformation> > m_stlJobInformation{};
         std::unordered_map<std::string, std::vector<Byte>> m_stlPushedData{};
+        std::unordered_map<std::string, std::shared_ptr<JobEngineConnection>> m_stlSecureNodeConnections{};
         StructuredBufferLockedQueue m_oJobMessageQueue{};
 };

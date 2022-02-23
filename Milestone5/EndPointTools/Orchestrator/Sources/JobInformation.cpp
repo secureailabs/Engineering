@@ -10,6 +10,7 @@
 #include "DebugLibrary.h"
 #include "ExceptionRegister.h"
 #include "Guid.h"
+#include "JobEngineConnection.h"
 #include "JobInformation.h"
 #include "OrchestratorTypes.h"
 #include "StructuredBuffer.h"
@@ -190,20 +191,11 @@ std::string __thiscall JobInformation::GetTargetIP(void) const
  * @param[in] poTlsConnection The TLS connection for this job
  ********************************************************************************************/
 void __thiscall JobInformation::SetConnection(
-    _in std::shared_ptr<TlsNode> poTlsConnection,
-    _in const std::string& c_strEosb )
+    _in std::shared_ptr<JobEngineConnection> poTlsConnection)
 {
     __DebugFunction();
-    m_poTlsConnection = poTlsConnection;
 
-    // Send a connect message to the JobEngine
-    StructuredBuffer oPushBuffer;
-    oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::eConnectVirtualMachine));
-    oPushBuffer.PutString("Username", "TEST_USERNAME");
-    oPushBuffer.PutString("Eosb", c_strEosb);
-    oPushBuffer.PutString("EndPoint", "JobEngine");
-
-    ::PutTlsTransaction(m_poTlsConnection.get(), oPushBuffer);
+    m_poJobEngineConnection = poTlsConnection;
 }
 
 /********************************************************************************************
@@ -216,7 +208,7 @@ void __thiscall JobInformation::SetConnection(
 std::shared_ptr<TlsNode> __thiscall JobInformation::GetConnection() const
 {
     __DebugFunction();
-    return m_poTlsConnection;
+    return m_poJobEngineConnection->GetConnection();
 }
 
 /********************************************************************************************
@@ -289,7 +281,6 @@ void __thiscall JobInformation::StartJobEngineListenerThread()
 bool __thiscall JobInformation::SendCachedMessages(void)
 {
     __DebugFunction();
-    __DebugAssert(nullptr != m_poTlsConnection.get() );
 
     bool fSent{false};
     try
@@ -297,7 +288,7 @@ bool __thiscall JobInformation::SendCachedMessages(void)
         std::lock_guard<JobInformation> jobLock(*this);
         for ( auto c_oBufferToSend : m_stlCachedStructuredBuffers )
         {
-            ::PutTlsTransaction(m_poTlsConnection.get(), c_oBufferToSend);
+            m_poJobEngineConnection->SendStructuredBufferToJobEngine(c_oBufferToSend);
         }
         m_stlCachedStructuredBuffers.clear();
         fSent = true;
@@ -336,16 +327,7 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
     {
         std::lock_guard<JobInformation> jobLock(*this);
         // TODO Remove this check when we can talk to an SCN
-        if ( nullptr != m_poTlsConnection.get() )
-        {
-            ::PutTlsTransaction(m_poTlsConnection.get(), c_oBufferToSend);
-        }
-        else
-        {
-            std::cout << "NO CONNECTION CACHING" << std::endl;
-            m_stlCachedStructuredBuffers.push_back(c_oBufferToSend);
-        }
-        fSent = true;
+        m_poJobEngineConnection->SendStructuredBufferToJobEngine(c_oBufferToSend);
     }
     catch(const BaseException& oBaseException)
     {
@@ -425,145 +407,4 @@ std::string __thiscall JobInformation::GetJobStatus(void) const
     }
 
     return strJobStatus;
-}
-
-bool __thiscall JobInformation::IsRunning() const
-{
-    return nullptr != m_pstlListenerThread;
-}
-
-/********************************************************************************************
- *
- * @class JobInformation
- * @function JobEngineListener
- * @brief The listen function for a job engine connection, intended to be run on a thread.
- *        To stop the thread set m_fStopRequest to true
- ********************************************************************************************/
-void __thiscall JobInformation::JobEngineListener()
-{
-    __DebugFunction();
-    // TODO - Re-enable when we can talk to an SCN
-    //__DebugAssert(nullptr != m_poTlsConnection.get());
-
-    if ( nullptr == m_poTlsConnection.get() )
-    {
-        std::cout << "No connection to job engine" << std::endl;
-    }
-    constexpr unsigned int unWaitOnMessageTimeoutInMilliseconds{1000};
-    int nTestCounter{0};
-    std::cout << "Listener has started for job " << m_oJobId.ToString(eRaw) << std::endl;
-    while( !m_fStopRequest )
-    {
-        std::vector<Byte> stlJobEngineMessage;
-        {
-            std::cout << "Waiting on message " << std::endl;
-            std::lock_guard<JobInformation>(*this);
-            if ( nullptr != m_poTlsConnection.get() )
-            {
-                stlJobEngineMessage = ::GetTlsTransaction( m_poTlsConnection.get(), unWaitOnMessageTimeoutInMilliseconds);
-            }
-            else
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(unWaitOnMessageTimeoutInMilliseconds));
-            }
-        }
-        // Not getting a message is not an error, we have short timeouts to allow other users
-        // to take ownershipe of the JobInformation if needed
-        if ( 0 != stlJobEngineMessage.size() )
-        {
-            std::cout << "Received a message " << stlJobEngineMessage.size() << std::endl;
-            try
-            {
-
-                // We have a message, load it into a StructuredBuffer
-                StructuredBuffer oJobEngineMessage(stlJobEngineMessage);
-                if ( oJobEngineMessage.IsElementPresent("SignalType", BYTE_VALUE_TYPE))
-                {
-                    JobStatusSignals eJobEngineStatus = static_cast<JobStatusSignals>(oJobEngineMessage.GetByte("SignalType"));
-
-                    switch (eJobEngineStatus)
-                    {
-                        case JobStatusSignals::eJobFail:
-                        case JobStatusSignals::eJobDone:
-                        case JobStatusSignals::eJobStart:
-                        {
-                            std::lock_guard<JobInformation> oLock(*this);
-                            m_eJobStatus = eJobEngineStatus;
-                            // Push to queue
-                            m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
-                            break;
-                        }
-                        case JobStatusSignals::eHeartBeatPing:
-                        {
-                            // Reply to the ping to keep the connection alive
-                            StructuredBuffer oHeartBeatPong;
-                            oHeartBeatPong.PutString("EndPoint", "JobEngine");
-                            oHeartBeatPong.PutByte("RequestType", static_cast<Byte>(EngineRequest::eHeartBeatPong));
-                            SendStructuredBufferToJobEngine(oHeartBeatPong);
-                            break;
-                        }
-                        case JobStatusSignals::ePostValue:
-                        {
-                            std::vector<Byte> stlPushedData = oJobEngineMessage.GetBuffer("FileData");
-                            std::string strDataId = oJobEngineMessage.GetString("ValueName");
-                            oJobEngineMessage.PutString("JobUuid", m_oJobId.ToString(eRaw));
-                            // We haven't seen this before
-                            if ( m_stlOutputResults.end() == m_stlOutputResults.find(strDataId) )
-                            {
-                                std::lock_guard<JobInformation> oLock(*this);
-                                m_stlOutputResults[strDataId] = stlPushedData;
-                                // Push to queue
-                            }
-                            else
-                            {
-                                std::cout << "Got post value for existing data " << strDataId << std::endl;
-                            }
-                            m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
-                            break;
-                        }
-                        case JobStatusSignals::eVmShutdown:
-                        {
-                            std::cout << "Job " << m_oJobId.ToString(eHyphensAndCurlyBraces) << " has shutdown " << std::endl;
-                            // Push to queue
-                            m_oQueueToOrchestrator.CopyAndPushMessage(oJobEngineMessage);
-                            break;
-                        }
-                        default:
-                        {
-                            std::cout << "Unknown state " << static_cast<Byte>(eJobEngineStatus) << std::endl;
-                        }
-                    }
-                }
-                else
-                {
-                    std::cout << "Message without signal type " << oJobEngineMessage.ToString() << std::endl;
-                }
-            }
-            catch(const BaseException& oBaseException)
-            {
-                ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-            }
-
-            catch(...)
-            {
-                ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-            }
-        }
-        // This is temporary code to test message passing if we can't talk to an SCN
-        /*else
-        {
-            StructuredBuffer oTestBuffer;
-            oTestBuffer.PutString("TestMessage", "Hello");
-            oTestBuffer.PutString("JobGuid", m_oJobId.ToString(eHyphensAndCurlyBraces));
-            oTestBuffer.PutInt32("TestValue", nTestCounter);
-            m_oQueueToOrchestrator.CopyAndPushMessage(oTestBuffer);
-            ++nTestCounter;
-            std::cout << "No message, sending dummy to orchestrator " << std::endl;
-            if ( false == m_eJobStatus.has_value() )
-            {
-                // Ping pong a value to help test job status functions
-                m_eJobStatus = (nTestCounter & 0x01) ? JobStatusSignals::eJobStart : JobStatusSignals::ePrivacyViolation;
-            }
-        }*/
-    }
 }

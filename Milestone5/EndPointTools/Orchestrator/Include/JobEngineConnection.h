@@ -25,6 +25,8 @@ class JobEngineConnection
 
         JobEngineConnection() = delete;
 
+        virtual ~JobEngineConnection();
+
         bool __thiscall SendStructuredBufferToJobEngine(
             _in const StructuredBuffer& c_oBufferToSend
             );

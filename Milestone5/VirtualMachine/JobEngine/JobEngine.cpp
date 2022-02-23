@@ -309,6 +309,7 @@ void __thiscall JobEngine::PushSafeObject(
                 poSafeObject->Setup(c_oStructuredBuffer);
 
                 // Push the safe object to the list of safeObjects in the engine
+                std::cout << "Inserted safe object " << strSafeObjectUuid << std::endl;
                 m_stlMapOfSafeObjects.insert(std::make_pair(strSafeObjectUuid, poSafeObject));
             }
             else

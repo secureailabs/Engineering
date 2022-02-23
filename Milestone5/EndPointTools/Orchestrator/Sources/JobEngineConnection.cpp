@@ -23,6 +23,17 @@ JobEngineConnection::JobEngineConnection(
     m_pstlListenerThread.reset(new std::thread(&JobEngineConnection::JobEngineConnectionThread, this));
     m_fStopRequest = false;
 }
+
+JobEngineConnection::~JobEngineConnection()
+{
+    m_fStopRequest = true;
+    if ( nullptr != m_pstlListenerThread.get() )
+    {
+        m_pstlListenerThread->join();
+    }
+    m_stlConnectionPointer.reset();
+}
+
 /********************************************************************************************
  *
  * @class JobInformation

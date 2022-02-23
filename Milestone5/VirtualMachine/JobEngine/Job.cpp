@@ -127,12 +127,16 @@ void __thiscall Job::TryRunJob(void)
         }
         else
         {
-            std::cout << "Dependencies" << std::endl;
+            std::cout << "Dependencies to be written" << std::endl;
             for ( std::string strDep : m_stlSetOfDependencies)
             {
                 std::cout << strDep << std::endl;
             }
         }
+    }
+    else
+    {
+        std::cout << "Failed to run job - waiting on inputs " << std::endl;
     }
 
     // TODO: Get the JobEngine to perform a cleanup and remove this object

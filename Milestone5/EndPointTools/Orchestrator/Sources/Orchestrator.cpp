@@ -450,6 +450,7 @@ void __thiscall Orchestrator::ExitCurrentSession(void)
 
     m_stlJobInformation.clear();
     m_oJobMessageQueue.ClearAllMessages();
+    m_stlSecureNodeConnections.clear();
 }
 
 /********************************************************************************************

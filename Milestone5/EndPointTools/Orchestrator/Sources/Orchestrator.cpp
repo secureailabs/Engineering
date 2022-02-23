@@ -1545,8 +1545,8 @@ void __thiscall Orchestrator::SetParameterOnJob(
         oParameterSetBuffer.PutByte("RequestType", (Byte)EngineRequest::eSetParameters);
         oParameterSetBuffer.PutString("EndPoint", "JobEngine");
         oParameterSetBuffer.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
-        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eHyphensOnly));
-        oParameterSetBuffer.PutString("ValueUuid", oParameterValueGuid.ToString(eHyphensOnly));
+        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eRaw));
+        oParameterSetBuffer.PutString("ValueUuid", oParameterValueGuid.ToString(eRaw));
         oParameterSetBuffer.PutUnsignedInt32("ValuesExpected", 1);
         oParameterSetBuffer.PutUnsignedInt32("ValueIndex", 0);
 

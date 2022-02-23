@@ -1,113 +1,53 @@
-[I 22:00:05.265 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
-[I 22:00:05.498 NotebookApp] Serving notebooks from local directory: /app
-[I 22:00:05.498 NotebookApp] The Jupyter Notebook is running at:
-[I 22:00:05.498 NotebookApp] http://4591f051d568:8080/?token=51a46cc7f98b0f01dcf700138a4015247d06051d335039ac
-[I 22:00:05.498 NotebookApp]  or http://127.0.0.1:8080/?token=51a46cc7f98b0f01dcf700138a4015247d06051d335039ac
-[I 22:00:05.498 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-[W 22:00:05.501 NotebookApp] No web browser found: could not locate runnable browser.
-[C 22:00:05.501 NotebookApp] 
+[I 09:02:51.629 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
+[I 09:02:51.750 NotebookApp] Serving notebooks from local directory: /app
+[I 09:02:51.750 NotebookApp] The Jupyter Notebook is running at:
+[I 09:02:51.750 NotebookApp] http://81e82bd51e27:8080/?token=2b5166aa6b6cadebd154a6470bd1c125cb63f451ae73a4ed
+[I 09:02:51.750 NotebookApp]  or http://127.0.0.1:8080/?token=2b5166aa6b6cadebd154a6470bd1c125cb63f451ae73a4ed
+[I 09:02:51.750 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 09:02:51.752 NotebookApp] No web browser found: could not locate runnable browser.
+[C 09:02:51.752 NotebookApp] 
     
     To access the notebook, open this file in a browser:
         file:///root/.local/share/jupyter/runtime/nbserver-15-open.html
     Or copy and paste one of these URLs:
-        http://4591f051d568:8080/?token=51a46cc7f98b0f01dcf700138a4015247d06051d335039ac
-     or http://127.0.0.1:8080/?token=51a46cc7f98b0f01dcf700138a4015247d06051d335039ac
-[I 22:00:08.530 NotebookApp] 302 GET /?token=51a46cc7f98b0f01dcf700138a4015247d06051d335039ac (172.18.0.1) 0.39ms
-[I 22:00:11.496 NotebookApp] Writing notebook-signing key to /root/.local/share/jupyter/notebook_secret
-[W 22:00:11.496 NotebookApp] Notebook sail/orchestrator_demo.ipynb is not trusted
-[I 22:00:11.787 NotebookApp] Kernel started: ee01758c-abc7-428d-a385-d400523f2613
+        http://81e82bd51e27:8080/?token=2b5166aa6b6cadebd154a6470bd1c125cb63f451ae73a4ed
+     or http://127.0.0.1:8080/?token=2b5166aa6b6cadebd154a6470bd1c125cb63f451ae73a4ed
+[I 09:02:54.837 NotebookApp] 302 GET /?token=2b5166aa6b6cadebd154a6470bd1c125cb63f451ae73a4ed (172.18.0.1) 0.46ms
+[I 09:02:59.494 NotebookApp] Writing notebook-signing key to /root/.local/share/jupyter/notebook_secret
+[W 09:02:59.495 NotebookApp] Notebook sail/orchestrator_demo.ipynb is not trusted
+[I 09:02:59.751 NotebookApp] Kernel started: 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:00:16.186 NotebookApp] Kernel interrupted: ee01758c-abc7-428d-a385-d400523f2613
-Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/StructuredBuffer.cpp
-               |Function = DeSerialize
-               |Line Number = 1056
-               |Message = Invalid parameters passed in
-Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/EndPointTools/Orchestrator/Sources/Orchestrator.cpp
-               |Function = Login
-               |Line Number = 372
-[I 22:02:11.774 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 22:08:01.607 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:08:04.521 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:08:04.838 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:08:04.838 NotebookApp] Replaying 6 buffered messages
+[W 09:03:12.047 NotebookApp] 404 GET /api/contents/sail/orchestrator_real_dataset.ipynb?type=notebook&content=0&_=1645624979378 (172.18.0.1): No such file or directory: sail/orchestrator_real_dataset.ipynb
+[W 09:03:12.047 NotebookApp] No such file or directory: sail/orchestrator_real_dataset.ipynb
+[W 09:03:12.047 NotebookApp] 404 GET /api/contents/sail/orchestrator_real_dataset.ipynb?type=notebook&content=0&_=1645624979378 (172.18.0.1) 1.22ms referer=http://127.0.0.1:8080/notebooks/sail/orchestrator_demo.ipynb
+[I 09:03:12.054 NotebookApp] Uploading file to /sail/orchestrator_real_dataset.ipynb
+[W 09:03:12.054 NotebookApp] Notebook sail/orchestrator_real_dataset.ipynb is not trusted
+[I 09:05:11.073 NotebookApp] Starting buffering for 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e:24fd93ffde5b467e87e00265575b1f55
+[I 09:05:11.278 NotebookApp] Kernel restarted: 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e
+[I 09:05:11.572 NotebookApp] Restoring connection for 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e:24fd93ffde5b467e87e00265575b1f55
+[I 09:05:11.572 NotebookApp] Replaying 3 buffered messages
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:08:11.770 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 22:10:11.768 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 22:10:52.685 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 22:13:10.522 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel ee01758c-abc7-428d-a385-d400523f2613 restarted
-[I 22:13:16.664 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:13:16.872 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:13:17.304 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:13:17.304 NotebookApp] Replaying 5 buffered messages
+[I 09:06:53.381 NotebookApp] Starting buffering for 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e:24fd93ffde5b467e87e00265575b1f55
+[I 09:06:53.493 NotebookApp] Saving file at /sail/orchestrator_real_dataset.ipynb
 [IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:14:11.769 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 22:14:37.096 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:14:37.402 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:14:37.737 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:14:37.737 NotebookApp] Replaying 3 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:15:17.952 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:15:18.260 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:15:18.523 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:15:18.523 NotebookApp] Replaying 3 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:16:11.774 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Trying to parse
-0x208e040
-Trying to get string and size 
-Size 15
-Job {4829AFCD-BEA3-47F1-A8C0-D16222C32908} is ready to execute on IP 192.168.0.193
-Listener has started for job 4829AFCDBEA347F1A8C0D16222C32908
+Pulling data for job {49D9BFA8-5D1A-47CF-A530-CF963BE23AF3} parameter 52A2698D65C44433BEDDFEE508C9065F
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 52A2698D65C44433BEDDFEE508C9065F
+    Type (STRING) = <class 'pandas.core.frame.DataFrame'>
+}
+
+NO CONNECTION CACHING
+[I 09:08:02.427 NotebookApp] Saving file at /sail/orchestrator_real_dataset.ipynb
+Job {49D9BFA8-5D1A-47CF-A530-CF963BE23AF3} is ready to execute on IP 192.168.0.193
+Setting parameter 4DC7BEC15B384FBD9BD721B7BF36A984 to 2534C8FA0E1AD44295A68ECB11A39746
+Job {49D9BFA8-5D1A-47CF-A530-CF963BE23AF3} has sent all parameters 
+Listener has started for job 49D9BFA85D1A47CFA530CF963BE23AF3
 Waiting on message 
-Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
-Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 57B7C86B057547A393581533201E4530
-Pushing user data 4C8041B4513A44FAA5409662E014519C
-Setting parameter 4C8041B4513A44FAA5409662E014519C to 57B7C86B057547A393581533201E4530
-Job {4829AFCD-BEA3-47F1-A8C0-D16222C32908} has sent all parameters 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:18:03.262 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel ee01758c-abc7-428d-a385-d400523f2613 restarted
-[I 22:18:11.772 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 22:19:46.521 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:19:46.727 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:19:47.069 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:19:47.069 NotebookApp] Replaying 6 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:20:11.776 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Trying to parse
-0x24713c0
-Trying to get string and size 
-Size 15
-Job {484B43AF-9194-4810-A7D6-1E31DBA7ABC7} is ready to execute on IP 192.168.0.193
-Listener has started for job 484B43AF91944810A7D61E31DBA7ABC7
-Waiting on message 
-Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
-Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 56A0EC55B0F743DB8685007BF131500F
-Pushing user data 4C8041B4513A44FAA5409662E014519C
-Setting parameter 4C8041B4513A44FAA5409662E014519C to 56A0EC55B0F743DB8685007BF131500F
-Job {484B43AF-9194-4810-A7D6-1E31DBA7ABC7} has sent all parameters 
 Received a message 480
 Message without signal type Success (BOOLEAN) = TRUE
-VirtualMachineUuid (STRING) = {FDC60400-9359-4174-8689-3C29B59CDEC5}
+VirtualMachineUuid (STRING) = {3072E3A8-2E39-4567-B126-AB0411430B86}
 Dataset (STRUCTURED_BUFFER) = {
     DatasetUuid (STRING) = 2014A98D-99DB-714C-8EE9-31CA6C2B5781
     Tables (STRUCTURED_BUFFER) = {
@@ -121,6 +61,115 @@ Pushed message 1
 Waiting on message 
 Received a message 147
 Pushed message 2
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 09:08:53.986 NotebookApp] Saving file at /sail/orchestrator_real_dataset.ipynb
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
 Waiting on message 
 Waiting on message 
 Waiting on message 
@@ -179,15 +228,838 @@ Waiting on message
 Waiting on message 
 Waiting on message 
 Waiting on message 
-Pulling data for job {484B43AF-9194-4810-A7D6-1E31DBA7ABC7} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
-0 (STRUCTURED_BUFFER) = {
-    confidentiality (STRING) = 1
-    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
-    Type (STRING) = <class 'int'>
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Received a message 73
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+[I 09:18:29.281 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
+WARNING:root:kernel 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e restarted
+[I 09:18:39.350 NotebookApp] Starting buffering for 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e:bcf8e75fa76046e9b092ccddcb7cb20e
+[I 09:18:39.556 NotebookApp] Kernel restarted: 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e
+[I 09:18:39.894 NotebookApp] Restoring connection for 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e:bcf8e75fa76046e9b092ccddcb7cb20e
+[I 09:18:39.894 NotebookApp] Replaying 6 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 09:18:53.987 NotebookApp] Saving file at /sail/orchestrator_real_dataset.ipynb
+Thrown from -> |File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/SharedCommonCode/Sources/JsonParser.cpp
+               |Function = ConvertJsonStringToStructuredBuffer
+               |Line Number = 569
+               |Message = Invalid JSON string. Invalid character found at offset 0
+Caught in ---->|File = /home/david-g-sail/code/SAIL/Engineering/Milestone5/EndPointTools/Orchestrator/Sources/Orchestrator.cpp
+               |Function = ProvisionSecureComputationalNode
+               |Line Number = 597
+[I 09:20:01.700 NotebookApp] Starting buffering for 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e:bcf8e75fa76046e9b092ccddcb7cb20e
+[I 09:20:02.009 NotebookApp] Kernel restarted: 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e
+[I 09:20:02.312 NotebookApp] Restoring connection for 4b15b0f6-49c1-4e5c-b6cf-9e2f2879101e:bcf8e75fa76046e9b092ccddcb7cb20e
+[I 09:20:02.312 NotebookApp] Replaying 6 buffered messages
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[I 09:20:21.008 NotebookApp] Saving file at /sail/orchestrator_real_dataset.ipynb
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+[I 09:20:53.987 NotebookApp] Saving file at /sail/orchestrator_real_dataset.ipynb
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+DS {2014A98D-99DB-714C-8EE9-31CA6C2B5781} being served on 192.168.0.193
+Job {48E620BA-1C88-48B0-9381-A6CF7BC67591} is ready to execute on IP 192.168.0.193
+Listener has started for job 48E620BA1C8848B09381A6CF7BC67591
+Waiting on message 
+Setting parameter 4DC7BEC15B384FBD9BD721B7BF36A984 to 2534C8FA0E1AD44295A68ECB11A39746
+Job {48E620BA-1C88-48B0-9381-A6CF7BC67591} has sent all parameters 
+Received a message 476
+Message without signal type Success (BOOLEAN) = TRUE
+VirtualMachineUuid (STRING) = {22B1C805-B9A7-4D4F-BF35-92F61482DAF8}
+Dataset (STRUCTURED_BUFFER) = {
+    DatasetUuid (STRING) = 2014A98D-99DB-714C-8EE9-31CA6C2B5781
+    Tables (STRUCTURED_BUFFER) = {
+        EDIT ME <This is a new table> (STRING) = 2534C8FA0E1AD44295A68ECB11A39746
+    }
 }
 
-Received a message 239
+Waiting on message 
+Received a message 147
+Pushed message 1
+Waiting on message 
+Received a message 147
+Pushed message 2
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Waiting on message 
+Pulling data for job {48E620BA-1C88-48B0-9381-A6CF7BC67591} parameter 52A2698D65C44433BEDDFEE508C9065F
+0 (STRUCTURED_BUFFER) = {
+    confidentiality (STRING) = 1
+    Uuid (STRING) = 52A2698D65C44433BEDDFEE508C9065F
+    Type (STRING) = <class 'pandas.core.frame.DataFrame'>
+}
+
+Received a message 22774
 Pushed message 3
+Waiting on message 
+Waiting on message 
 Waiting on message 
 Waiting on message 
 Looking to update jobs for data
@@ -239,76 +1111,6 @@ Waiting on message
 Waiting on message 
 Waiting on message 
 Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:22:11.776 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:22:23.688 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
 Received a message 73
 Waiting on message 
 Waiting on message 
@@ -332,975 +1134,7 @@ Waiting on message
 Waiting on message 
 Waiting on message 
 Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:23:35.613 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-Waiting on message 
-[I 22:23:36.821 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:23:37.073 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:23:37.073 NotebookApp] Replaying 6 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:24:11.790 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Trying to parse
-0x23a84c0
-Trying to get string and size 
-Size 15
-Job {49189798-AEAD-4827-B841-8924F6878EA0} is ready to execute on IP 192.168.0.193
-Listener has started for job 49189798AEAD4827B8418924F6878EA0
-Waiting on message 
-Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
-Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 5738FB6F1C6C418297727EAEA6E85D13
-Setting parameter 4C8041B4513A44FAA5409662E014519C to 2534C8FA0E1AD44295A68ECB11A39746
-Job {49189798-AEAD-4827-B841-8924F6878EA0} has sent all parameters 
-Received a message 480
-Message without signal type Success (BOOLEAN) = TRUE
-VirtualMachineUuid (STRING) = {6CEDB336-1B20-4B24-9ADF-058F276A25D9}
-Dataset (STRUCTURED_BUFFER) = {
-    DatasetUuid (STRING) = 2014A98D-99DB-714C-8EE9-31CA6C2B5781
-    Tables (STRUCTURED_BUFFER) = {
-        EDIT ME <This is a new table> (STRING) = 2534C8FA-0E1A-D442-95A6-8ECB11A39746
-    }
-}
-
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Pulling data for job {49189798-AEAD-4827-B841-8924F6878EA0} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
-0 (STRUCTURED_BUFFER) = {
-    confidentiality (STRING) = 1
-    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
-    Type (STRING) = <class 'int'>
-}
-
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Timed out waiting for condition variable 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:26:11.780 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Timed out waiting for condition variable 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:27:33.821 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel ee01758c-abc7-428d-a385-d400523f2613 restarted
-[I 22:27:40.263 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:27:40.469 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:27:40.815 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:27:40.816 NotebookApp] Replaying 5 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:28:11.772 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Trying to parse
-0x37f3470
-Trying to get string and size 
-Size 15
-Job {49D166F3-8D5B-410F-961E-BEE677AE0BAF} is ready to execute on IP 192.168.0.193
-Listener has started for job 49D166F38D5B410F961EBEE677AE0BAF
-Waiting on message 
-Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
-Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 55C0BA577FAF404A8CC77C03FC841C82
-Setting parameter 4C8041B4513A44FAA5409662E014519C to 2534C8FA0E1AD44295A68ECB11A39746
-Job {49D166F3-8D5B-410F-961E-BEE677AE0BAF} has sent all parameters 
-Received a message 480
-Message without signal type Success (BOOLEAN) = TRUE
-VirtualMachineUuid (STRING) = {708356F7-B2D9-47B8-9E17-B0F5EC5426EA}
-Dataset (STRUCTURED_BUFFER) = {
-    DatasetUuid (STRING) = 2014A98D-99DB-714C-8EE9-31CA6C2B5781
-    Tables (STRUCTURED_BUFFER) = {
-        EDIT ME <This is a new table> (STRING) = 2534C8FA-0E1A-D442-95A6-8ECB11A39746
-    }
-}
-
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Pulling data for job {49D166F3-8D5B-410F-961E-BEE677AE0BAF} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
-0 (STRUCTURED_BUFFER) = {
-    confidentiality (STRING) = 1
-    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
-    Type (STRING) = <class 'int'>
-}
-
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Timed out waiting for condition variable 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:30:11.772 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:32:07.472 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel ee01758c-abc7-428d-a385-d400523f2613 restarted
-[I 22:32:11.774 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-[I 22:32:47.393 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:32:47.599 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:32:47.894 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:32:47.894 NotebookApp] Replaying 5 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:33:27.323 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:33:27.531 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:33:27.807 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:33:27.807 NotebookApp] Replaying 6 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-Trying to parse
-0x2072eb0
-Trying to get string and size 
-Size 15
-Job {4B7463C3-4873-4045-B6A1-E70C12D5FF5D} is ready to execute on IP 192.168.0.193
-Listener has started for job 4B7463C348734045B6A1E70C12D5FF5D
-Waiting on message 
-Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
-Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 54CB5244B0344B7F9A5F3170AE33BABA
-Setting parameter 4C8041B4513A44FAA5409662E014519C to 2534C8FA0E1AD44295A68ECB11A39746
-Job {4B7463C3-4873-4045-B6A1-E70C12D5FF5D} has sent all parameters 
-Received a message 480
-Message without signal type Success (BOOLEAN) = TRUE
-VirtualMachineUuid (STRING) = {A109CF91-44E5-4040-A533-0AD6B9FEA698}
-Dataset (STRUCTURED_BUFFER) = {
-    DatasetUuid (STRING) = 2014A98D-99DB-714C-8EE9-31CA6C2B5781
-    Tables (STRUCTURED_BUFFER) = {
-        EDIT ME <This is a new table> (STRING) = 2534C8FA-0E1A-D442-95A6-8ECB11A39746
-    }
-}
-
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:34:11.785 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Pulling data for job {4B7463C3-4873-4045-B6A1-E70C12D5FF5D} parameter 51DD83834C2A41D6BB1F49889EA0A0AC
-0 (STRUCTURED_BUFFER) = {
-    confidentiality (STRING) = 1
-    Uuid (STRING) = 51DD83834C2A41D6BB1F49889EA0A0AC
-    Type (STRING) = <class 'int'>
-}
-
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Timed out waiting for condition variable 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:36:11.774 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:36:21.533 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel ee01758c-abc7-428d-a385-d400523f2613 restarted
-[I 22:36:23.620 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:36:23.826 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:36:24.161 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:36:24.161 NotebookApp] Replaying 6 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:36:58.517 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:36:58.822 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:36:59.141 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:36:59.141 NotebookApp] Replaying 5 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-Replacing existing session
-[I 22:38:04.882 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:38:05.191 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:38:05.500 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:38:05.500 NotebookApp] Replaying 3 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:38:11.776 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Trying to parse
-0x22c33a0
-Trying to get string and size 
-Size 15
-Job {490C562B-4847-420F-9BEC-6D16E783459F} is ready to execute on IP 192.168.0.193
-Listener has started for job 490C562B4847420F9BEC6D16E783459F
-Waiting on message 
-Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
-Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 56C2763312CD4CAB974C3A304A34F066
-Setting parameter 4C8041B4513A44FAA5409662E014519C to 2534C8FA0E1AD44295A68ECB11A39746
-Job {490C562B-4847-420F-9BEC-6D16E783459F} has sent all parameters 
-Received a message 480
-Message without signal type Success (BOOLEAN) = TRUE
-VirtualMachineUuid (STRING) = {481A4DD3-A5BC-4B6E-9BB0-81E47A760B2E}
-Dataset (STRUCTURED_BUFFER) = {
-    DatasetUuid (STRING) = 2014A98D-99DB-714C-8EE9-31CA6C2B5781
-    Tables (STRUCTURED_BUFFER) = {
-        EDIT ME <This is a new table> (STRING) = 2534C8FA-0E1A-D442-95A6-8ECB11A39746
-    }
-}
-
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:40:11.774 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Received a message 73
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-[I 22:41:20.191 NotebookApp] KernelRestarter: restarting kernel (1/5), keep random ports
-WARNING:root:kernel ee01758c-abc7-428d-a385-d400523f2613 restarted
-[I 22:41:24.198 NotebookApp] Starting buffering for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:41:24.406 NotebookApp] Kernel restarted: ee01758c-abc7-428d-a385-d400523f2613
-[I 22:41:24.688 NotebookApp] Restoring connection for ee01758c-abc7-428d-a385-d400523f2613:5f308274fb33404b98c84db75e80ac0a
-[I 22:41:24.688 NotebookApp] Replaying 3 buffered messages
-[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
-[I 22:42:11.776 NotebookApp] Saving file at /sail/orchestrator_demo.ipynb
-Trying to parse
-0x1d3bf50
-Trying to get string and size 
-Size 15
-Job {4B60BBA4-ABA1-44A5-BC07-60E5A2E979CA} is ready to execute on IP 192.168.0.193
-Listener has started for job 4B60BBA4ABA144A5BC0760E5A2E979CA
-Waiting on message 
-Pushing user data 4C21EDF165AB4EF68853FA05FB805A03
-Setting parameter 4C21EDF165AB4EF68853FA05FB805A03 to 5750402834D14A51AF082061C421E44D
-Setting parameter 4C8041B4513A44FAA5409662E014519C to 2534C8FA0E1AD44295A68ECB11A39746
-Job {4B60BBA4-ABA1-44A5-BC07-60E5A2E979CA} has sent all parameters 
-Received a message 480
-Message without signal type Success (BOOLEAN) = TRUE
-VirtualMachineUuid (STRING) = {C57ED6BE-CA3A-4EA1-9C4C-82A3BEFC0814}
-Dataset (STRUCTURED_BUFFER) = {
-    DatasetUuid (STRING) = 2014A98D-99DB-714C-8EE9-31CA6C2B5781
-    Tables (STRUCTURED_BUFFER) = {
-        EDIT ME <This is a new table> (STRING) = 2534C8FA-0E1A-D442-95A6-8ECB11A39746
-    }
-}
-
-Waiting on message 
-Received a message 147
-Pushed message 1
-Waiting on message 
-Received a message 147
-Pushed message 2
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Timed out waiting for condition variable 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
-Waiting on message 
+[I 09:22:53.988 NotebookApp] Saving file at /sail/orchestrator_real_dataset.ipynb
 Waiting on message 
 Waiting on message 
 Waiting on message 

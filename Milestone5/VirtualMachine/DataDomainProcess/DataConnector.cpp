@@ -137,7 +137,10 @@ bool __thiscall DataConnector::LoadAndVerify(
         oTableMedata.PutUnsignedInt64("RowCount", oDatasetTable.GetRowCount());
         oTableMedata.PutUnsignedInt32("ColumnCount", oDatasetTable.GetColumnCount());
         m_stlTableMetaData.push_back(StructuredBuffer(oTableMedata));
-        oAllTablesMetadata.PutString(oDatasetTable.GetTitle().c_str(), oDatasetTable.GetTableIdentifier());
+
+        // HACK-DG We want to store everything as eRaw
+        Guid oDatasetIdentifier(oDatasetTable.GetTableIdentifier());
+        oAllTablesMetadata.PutString(oDatasetTable.GetTitle().c_str(), oDatasetIdentifier.ToString(eRaw));
     }
     m_oAllDatasetIds.PutStructuredBuffer("Tables", oAllTablesMetadata);
 

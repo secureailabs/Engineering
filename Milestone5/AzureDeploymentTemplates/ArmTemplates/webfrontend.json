@@ -117,23 +117,6 @@
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []
             }
-          },
-          {
-            "name": "OutboundDeny_All",
-            "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "destinationPortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Deny",
-              "priority": 200,
-              "direction": "Outbound",
-              "sourcePortRanges": [],
-              "destinationPortRanges": [],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": []
-            }
           }
         ]
       }

@@ -286,7 +286,7 @@ void __thiscall DataConnector::HandleRequest(
                 }
                 else if (eGetTable == requestType)
                 {
-                    StructuredBuffer oTempResponse = GetTableRowRange(unTableIndex, 0, m_stlTableMetaData[unTableIndex].GetInt32("NumberRows")-1);
+                    StructuredBuffer oTempResponse = GetTableRowRange(unTableIndex, 0, m_stlTableMetaData[unTableIndex].GetUnsignedInt64("RowCount")-1);
                     oDataResponse.PutBoolean("Status", oTempResponse.GetBoolean("Status"));
                     oDataResponse.PutString("ResponseString", oTempResponse.GetString("ResponseString"));
 
@@ -389,7 +389,7 @@ StructuredBuffer __thiscall DataConnector::GetTableRowRange(
     StructuredBuffer oResponseStructuredBuffer;
     std::string strResponseString;
 
-    if ((m_oDatasetMetadata.GetInt32("NumberTables") <= unTableIndex) || (m_stlTableMetaData[unTableIndex].GetInt32("NumberRows") <= unEndRowNumber) || (unStartRowNumber > unEndRowNumber))
+    if ((m_oDatasetMetadata.GetUnsignedInt32("TableCount") <= unTableIndex) || (m_stlTableMetaData[unTableIndex].GetUnsignedInt64("RowCount") <= unEndRowNumber) || (unStartRowNumber > unEndRowNumber))
     {
         oResponseStructuredBuffer.PutBoolean("Status", false);
         oResponseStructuredBuffer.PutString("ResponseString", "Out of Bounds Request");

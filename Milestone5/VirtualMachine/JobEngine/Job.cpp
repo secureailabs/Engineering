@@ -125,6 +125,14 @@ void __thiscall Job::TryRunJob(void)
             // The SafeObject just requires the JobId and BaseFolder name to run
             nProcessExitStatus = m_poSafeObject->Run(m_strJobUuid);
         }
+        else
+        {
+            std::cout << "Dependencies" << std::endl;
+            for ( std::string strDep : m_stlSetOfDependencies)
+            {
+                std::cout << strDep << std::endl;
+            }
+        }
     }
 
     // TODO: Get the JobEngine to perform a cleanup and remove this object

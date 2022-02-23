@@ -2447,7 +2447,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             //     }
             // }
             // std::string strIpAddress = oDeployResponse.GetString("IpAddress");
-            std::string strIpAddress = "192.168.0.244";
+            std::string strIpAddress = "192.168.0.193";
 
             // Update the IpAddress of the Virtual Machine
             StructuredBuffer oVmIpAddressRequest;

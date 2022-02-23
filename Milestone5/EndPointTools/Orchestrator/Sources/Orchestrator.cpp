@@ -751,7 +751,7 @@ std::string Orchestrator::SetParameter(
 
                 UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
                 // HACK-DG This is hardcoding a local SCN
-                oJobInformation.SetTargetIP("192.168.0.244");
+                oJobInformation.SetTargetIP("192.168.0.193");
                 // We have everything we need to submit this job, start it up
                 if ( true == oJobInformation.ReadyToExcute() )
                 {
@@ -1429,7 +1429,7 @@ void __thiscall Orchestrator::PushUserDataToJob(
         StructuredBuffer oPushDataBuffer;
         oPushDataBuffer.PutByte("RequestType", (Byte)EngineRequest::ePushdata);
         oPushDataBuffer.PutString("EndPoint", "JobEngine");
-        oPushDataBuffer.PutString("DataId", oUserParameter.ToString(eRaw));
+        oPushDataBuffer.PutString("DataId", oUserParameter.ToString(eHyphensOnly));
         oPushDataBuffer.PutBuffer("Data", m_stlPushedData[oUserParameter.ToString(eHyphensAndCurlyBraces)]);
 
         SendDataToJob(oJob, oPushDataBuffer);
@@ -1545,8 +1545,8 @@ void __thiscall Orchestrator::SetParameterOnJob(
         oParameterSetBuffer.PutByte("RequestType", (Byte)EngineRequest::eSetParameters);
         oParameterSetBuffer.PutString("EndPoint", "JobEngine");
         oParameterSetBuffer.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
-        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eRaw));
-        oParameterSetBuffer.PutString("ValueUuid", oParameterValueGuid.ToString(eRaw));
+        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eHyphensOnly));
+        oParameterSetBuffer.PutString("ValueUuid", oParameterValueGuid.ToString(eHyphensOnly));
         oParameterSetBuffer.PutUnsignedInt32("ValuesExpected", 1);
         oParameterSetBuffer.PutUnsignedInt32("ValueIndex", 0);
 

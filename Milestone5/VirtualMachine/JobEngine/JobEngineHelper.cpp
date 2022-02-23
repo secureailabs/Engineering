@@ -128,6 +128,7 @@ std::string DataConnectorGetTable(
     {
         StructuredBuffer oResponse(stlResponse);
         strResponse = oResponse.GetString("ResponseString");
+        std::cout << "Table response" << oResponse.ToString() << std::endl;
     }
     else
     {

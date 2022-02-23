@@ -195,7 +195,8 @@ void __thiscall RootOfTrustCore::AuditEventDispatcher(void) throw()
 
     StatusMonitor oStatusMonitor("void __thiscall RootOfTrustCore::AuditEventDispatcher(void)");
     bool fIsShuttingDown = false;
-    bool fIsDone = false;
+    // HACK-DG We don't allow this loop to run for now
+    bool fIsDone = true;
     uint64_t un64StartTimestampInMilliseconds = ::GetEpochTimeInMilliseconds();
 
     // Keep on looping until all of the event queues are empty and fIsShutdown = true

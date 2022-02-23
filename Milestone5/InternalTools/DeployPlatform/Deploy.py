@@ -65,7 +65,7 @@ def deploy_backend(account_credentials, deployment_name):
 
     # Run database tools for the backend server
     database_tools_run = subprocess.run(
-        ["./DatabaseTools", "--PortalIp=" + platform_services_ip, "--Port=6200"],
+        ["./DemoDatabaseTools", "--PortalIp=" + platform_services_ip, "--Port=6200"],
         stdout=subprocess.PIPE,
     )
     print("database_tools_run: ", database_tools_run)
@@ -147,6 +147,13 @@ if __name__ == "__main__":
     # Deploy the frontend server
     frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip)
     print("Frontend server: ", frontend_ip)
+
+    print("\n\n===============================================================")
+    print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip + ":3000")
+    print("SAIL Platorm Services is hosted on: https://" + platform_services_ip + ":6200")
+    print("Deployment ID: ", deployment_id)
+    print("Kindly delete all the resource group created on azure with the deployment ID.")
+    print("===============================================================\n\n")
 
     # TODO: Prawal re-enable this once the orchestrator package is ready
     # Deploy the orchestro server

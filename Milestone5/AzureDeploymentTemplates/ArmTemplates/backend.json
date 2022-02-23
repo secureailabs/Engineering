@@ -106,7 +106,6 @@
               "description": "Interact with Azure and SAIL SCNs",
               "protocol": "TCP",
               "sourcePortRange": "*",
-              "destinationPortRange": "*",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",

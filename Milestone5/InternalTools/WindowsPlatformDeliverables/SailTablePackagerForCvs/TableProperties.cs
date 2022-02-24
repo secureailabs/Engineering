@@ -176,13 +176,16 @@ namespace SailTablePackagerForCsv
             )
         {
             ulong hashOfPropertyName = ApiInterop.Get64BitHashOfString(propertyName, false);
-            if (true == m_ColumnPropertyNames[columnIndex].ContainsKey(hashOfPropertyName))
+            if (columnIndex < m_ColumnPropertyNames.Count)
             {
-                m_ColumnPropertyNames[columnIndex].Remove(hashOfPropertyName);
-            }
-            if (true == m_ColumnProperties[columnIndex].ContainsKey(hashOfPropertyName))
-            {
-                m_ColumnProperties[columnIndex].Remove(hashOfPropertyName);
+                if (true == m_ColumnPropertyNames[columnIndex].ContainsKey(hashOfPropertyName))
+                {
+                    m_ColumnPropertyNames[columnIndex].Remove(hashOfPropertyName);
+                }
+                if (true == m_ColumnProperties[columnIndex].ContainsKey(hashOfPropertyName))
+                {
+                    m_ColumnProperties[columnIndex].Remove(hashOfPropertyName);
+                }
             }
         }
 

@@ -147,6 +147,7 @@ namespace SailTablePackagerForCsv
                 m_ValueSeparatorCharacterTextBox.Text = m_ValueSeparatorCharacterTextBox.Text.Substring(1);
             }
 
+            this.UpdateColumnNames();
             this.RefreshDataGridView();
         }
 
@@ -337,7 +338,7 @@ namespace SailTablePackagerForCsv
                 // Figure out the column count
                 m_ColumnCount = csvReader.HeaderRecord.Length;
 
-                if (0 == m_TableProperties.ColumnCount)
+                if ((0 == m_TableProperties.ColumnCount)||(m_ColumnCount != m_TableProperties.ColumnCount))
                 {
                     m_TableProperties.ColumnCount = m_ColumnCount;
                 }

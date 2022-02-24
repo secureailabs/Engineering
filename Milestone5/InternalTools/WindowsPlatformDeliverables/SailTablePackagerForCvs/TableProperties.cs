@@ -397,6 +397,8 @@ namespace SailTablePackagerForCsv
                     }
                 }
             }
+
+            streamReader.Close();
         }
 
         /// <summary>

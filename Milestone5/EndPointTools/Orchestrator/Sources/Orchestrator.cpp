@@ -1126,6 +1126,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                         Guid oDigitalContractGuid(stlSecureComputationNodeItr.second.strDigitalContractGUID);
                         Guid oSecureComputationalNodeGuid(stlSecureComputationNodeItr.first);
                         VirtualMachineState eProvisionStatus = GetSecureComputationNodeInformation(oSecureComputationalNodeGuid);
+                        std::cout << "SCN Status " << int(eProvisionStatus) << std::endl;
                         // TODO: Configuring should be in progress, but we have no data being served yet
                         if ( VirtualMachineState::eReadyForComputation == eProvisionStatus )
                         {
@@ -1457,9 +1458,10 @@ std::string __thiscall Orchestrator::PullJobData(
                // else
                 //{
                     StructuredBuffer oPushBuffer;
+                    std::string strFilename = stlJobGuids.first.ToString(eRaw) + "." + stlJobGuids.second.ToString(eRaw);
                     oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::ePullData));
                     oPushBuffer.PutString("EndPoint", "JobEngine");
-                    oPushBuffer.PutString("Filename", stlJobGuids.second.ToString(eRaw).c_str());
+                    oPushBuffer.PutString("Filename", strFilename.c_str());
 
                     oStlJobInformationItr->second->SendStructuredBufferToJobEngine(oPushBuffer);
                     strResult = "Success";

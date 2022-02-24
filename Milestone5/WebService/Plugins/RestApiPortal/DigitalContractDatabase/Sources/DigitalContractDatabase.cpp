@@ -2150,8 +2150,6 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
 
                     if (eActive == oDigitialContract.GetDword("ContractStage"))
                     {
-                        Guid oSecureNodeProvisionJobGuid(eOrchestratorProvisionTask);
-
                         uint64_t unCurrentTime = ::GetEpochTimeInSeconds();
                         // Calculate expiration time and check if the contact is still active
                         uint64_t unExpirationTime = oDigitialContract.GetUnsignedInt64("ExpirationTime");

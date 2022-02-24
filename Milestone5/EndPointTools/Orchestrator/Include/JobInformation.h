@@ -48,8 +48,12 @@ class JobInformation
             _in const std::string& c_strTargetIP
         );
 
-        bool __thiscall JobUsesDataset(
+        bool __thiscall JobParameterUsesGuid(
             _in const Guid & c_oDatasetGuid
+        ) const;
+
+        bool __thiscall JobParameterUsesJobOutputParameter(
+            _in const std::string& c_strJobOutputParameter
         ) const;
 
         const __thiscall Guid& GetJobId() const;
@@ -69,6 +73,14 @@ class JobInformation
 
         bool __thiscall SendCachedMessages(void);
 
+        void __thiscall SetOutputJobParameterReady(
+            _in const std::string& c_strOutputParameterId
+            );
+
+        const std::vector<Byte>& GetOutputParameter(
+            _in const Guid& oParameterIdentifier
+            );
+
         bool __thiscall IsRunning() const;
 
         // BasicLockable methods
@@ -84,6 +96,7 @@ class JobInformation
         std::string m_strTargetIP;
         std::unordered_map<std::string, std::optional<std::string>> m_stlInputParameterData;
         std::shared_ptr<JobEngineConnection> m_poJobEngineConnection;
+        std::unordered_map<std::string, bool> m_stlOutputJobParameterData;
         std::unique_ptr<std::thread> m_pstlListenerThread{nullptr};
         bool m_fStopRequest{false};
         std::optional<JobStatusSignals> m_eJobStatus{};

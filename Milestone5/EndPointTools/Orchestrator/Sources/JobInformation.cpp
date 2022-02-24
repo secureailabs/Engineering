@@ -87,29 +87,54 @@ bool __thiscall JobInformation::ReadyToExcute(
 
     // Iterate through all our input parameters and make sure they have values, if they
     // do and we know where we have to execute this job is ready to execute
-    return fHasIp && std::all_of(m_stlInputParameterData.begin(), m_stlInputParameterData.end(),
+    bool fAllParametersSet = std::all_of(m_stlInputParameterData.begin(), m_stlInputParameterData.end(),
         [] ( const auto& value ) { return value.second.has_value(); } );
+
+    // For any outputs that are waiting on output from another job, make sure they are set
+    bool fAllJobOutputsReady = std::all_of(m_stlOutputJobParameterData.begin(), m_stlOutputJobParameterData.end(),
+        [] (const auto& value) { return value.second;} );
+
+    return fHasIp && fAllParametersSet && fAllJobOutputsReady;
 }
 
-bool __thiscall JobInformation::JobUsesDataset(
-    _in const Guid & c_oDatasetGuid
+bool __thiscall JobInformation::JobParameterUsesGuid(
+    _in const Guid & c_oParameterGuid
     ) const
 {
-    bool fUsesDataset{false};
+    bool fUsesParameter{false};
 
     for ( const auto& oInputParameter : m_stlInputParameterData )
     {
         if ( oInputParameter.second.has_value() )
         {
-            if ( oInputParameter.second.value() == c_oDatasetGuid.ToString(eRaw) )
+            if ( oInputParameter.second.value() == c_oParameterGuid.ToString(eRaw) )
             {
-                fUsesDataset = true;
+                fUsesParameter = true;
                 break;
             }
-            // TODO also handle tables
         }
     }
-    return fUsesDataset;
+    return fUsesParameter;
+}
+
+bool __thiscall JobInformation::JobParameterUsesJobOutputParameter(
+    _in const std::string & c_strJobOutputParameter
+    ) const
+{
+    bool fUsesParameter{false};
+
+    for ( const auto& oInputParameter : m_stlInputParameterData )
+    {
+        if ( oInputParameter.second.has_value() )
+        {
+            if ( oInputParameter.second.value() == c_strJobOutputParameter )
+            {
+                fUsesParameter = true;
+                break;
+            }
+        }
+    }
+    return fUsesParameter;
 }
 
 /********************************************************************************************
@@ -317,6 +342,7 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
         {
             // TODO Remove this check when we can talk to an SCN
             m_poJobEngineConnection->SendStructuredBufferToJobEngine(c_oBufferToSend);
+            fSent = true;
         }
         else
         {
@@ -402,3 +428,34 @@ std::string __thiscall JobInformation::GetJobStatus(void) const
 
     return strJobStatus;
 }
+
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function SetOutputJobParameterData
+ * @brief For a job's output parameter cached the data in the job to be pushed when the
+ *        job runs
+ * @param[in] c_strOutputParameterId The ID of the parameter
+ * @param[in] c_oOutputParameterData
+ ********************************************************************************************/
+void __thiscall JobInformation::SetOutputJobParameterReady(
+    _in const std::string& c_strOutputParameterId
+    )
+{
+    __DebugFunction();
+
+    if ( m_stlOutputJobParameterData.end() != m_stlOutputJobParameterData.find(c_strOutputParameterId) )
+    {
+        m_stlOutputJobParameterData[c_strOutputParameterId] = true;
+    }
+}
+
+const std::vector<Byte>& JobInformation::GetOutputParameter(
+    _in const Guid& oParameterIdentifier
+    )
+{
+    __DebugFunction();
+
+    return m_stlOutputResults.at(oParameterIdentifier.ToString(eRaw));
+}
+

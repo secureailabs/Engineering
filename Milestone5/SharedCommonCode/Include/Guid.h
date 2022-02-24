@@ -90,7 +90,6 @@ typedef enum
 	eAuditEvent_VirtualMachineBranchNode = 0x64,
 	eAuditEvent_EncryptedLeafNode = 0x68,
 	eAuditEvent_PlainTextLeafNode = 0x6C,
-    eOrchestratorProvisionTask = 0x70,
 	eGuidTypeBitMask = 0xFC,
 	eNegativeGuidTypeMask = 0x03
 }

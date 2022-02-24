@@ -156,6 +156,18 @@ class Orchestrator : public Object{
             _in Guid& oParameterValueGuid
             );
 
+        void __thiscall SetJobParameterForJobOutput(
+            _in JobInformation& oJob,
+            _in Guid& oParameterGuid,
+            _in std::string& strParameterValue
+            );
+
+        void __thiscall PushJobOutputParameterToJob(
+            _in JobInformation& oJob,
+            _in const std::string& strParameterIdentifier,
+            _in const std::vector<Byte>& oOutputParameterData
+            );
+
         void __thiscall UpdateJobsWaitingForData(
             _in const StructuredBuffer& oPushDataMessage
             );

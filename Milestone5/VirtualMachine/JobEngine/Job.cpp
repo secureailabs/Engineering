@@ -118,6 +118,7 @@ void __thiscall Job::TryRunJob(void)
             auto oJsonBody = JsonValue::ParseStructuredBufferToJson(m_oParameters);
             std::string strInputsJson = oJsonBody->ToString();
             std::ofstream out(m_strJobUuid + ".inputs");
+            std::cout << "Inputs " << strInputsJson << std::endl;
             out << strInputsJson;
             out.close();
             oJsonBody->Release();

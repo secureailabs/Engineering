@@ -994,11 +994,11 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
         {
             __DebugAssert(oParameterItr.second.has_value());
 
+            Guid oParameterGuid(oParameterItr.first);
 
             // Parameters that aren't the result of an output parameter can be run
             if ( !IsJobOutputParameter(oParameterItr.second.value()) )
             {
-                Guid oParameterGuid(oParameterItr.first);
                 Guid oParameterValueGuid(oParameterItr.second.value());
 
                 // We need to push this to the remote job engine
@@ -1015,13 +1015,13 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
                 __DebugAssert( IsJobOutputParameter(oParameterItr.second.value()));
 
                 std::pair<Guid, Guid> oOutputParameters = ParseJobOutputToGuids(oParameterItr.second.value());
+                std::string strParameterString = oOutputParameters.first.ToString(eRaw) + "." + oOutputParameters.second.ToString(eRaw);
                 auto stlJobInformationItr = m_stlJobInformation.find(oOutputParameters.first.ToString(eRaw));
 
                 __DebugAssert(m_stlJobInformation.end() != stlJobInformationItr);
                 JobInformation& oOutputParameterJob = *stlJobInformationItr->second;
 
-                // Send the data to the job
-                PushJobOutputParameterToJob(oJob, oParameterItr.second.value(), oOutputParameterJob.GetOutputParameter(oOutputParameters.second));
+                SetJobParameterForJobOutput(oJob, oParameterGuid, strParameterString);
             }
         }
 
@@ -1033,6 +1033,11 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
     catch(const BaseException& oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+    catch(std::exception & e)
+    {
+        std::cout << "Exception: " << e.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
     catch(...)
     {
@@ -1720,6 +1725,7 @@ void __thiscall Orchestrator::SubmitJob(
     }
 
 }
+
 /********************************************************************************************
  *
  * @class Orchestrator
@@ -1769,6 +1775,67 @@ void __thiscall Orchestrator::SetParameterOnJob(
 
 }
 
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function SetJobParameterForJobOutput
+ * @param [in] JobInformation The job to send this data to
+ * @param [in] Guid The guid of the parameter to set
+ * @param [in] std::string The value of the parameter's guid to set to
+ * @brief Send a structured buffer to a job that will tell the job what the output parameter
+ *        is for a job
+ *
+ ********************************************************************************************/
+void __thiscall Orchestrator::SetJobParameterForJobOutput(
+    _in JobInformation& oJob,
+    _in Guid& oParameterGuid,
+    _in std::string& strParameterValue
+    )
+{
+    __DebugFunction();
+    __DebugAssert(true == IsJobOutputParameter(strParameterValue));
+    __DebugAssert(m_stlJobResults.end() != m_stlJobResults.find(strParameterValue));
+
+    try
+    {
+        // Set the parameter, then send the data
+        StructuredBuffer oParameterSetBuffer;
+        oParameterSetBuffer.PutByte("RequestType", (Byte)EngineRequest::eSetParameters);
+        oParameterSetBuffer.PutString("EndPoint", "JobEngine");
+        oParameterSetBuffer.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
+        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eRaw));
+        oParameterSetBuffer.PutString("ValueUuid", strParameterValue);
+        oParameterSetBuffer.PutUnsignedInt32("ValuesExpected", 1);
+        oParameterSetBuffer.PutUnsignedInt32("ValueIndex", 0);
+
+        SendDataToJob(oJob, oParameterSetBuffer);
+
+        // Send the job data
+        StructuredBuffer oPushDataBuffer;
+        oPushDataBuffer.PutByte("RequestType", (Byte)EngineRequest::ePushdata);
+        oPushDataBuffer.PutString("EndPoint", "JobEngine");
+        oPushDataBuffer.PutString("DataId", strParameterValue);
+        oPushDataBuffer.PutBuffer("Data", m_stlJobResults[strParameterValue]);
+
+        SendDataToJob(oJob, oPushDataBuffer);
+    }
+
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch (const std::exception & c_oException)
+    {
+        std::cout << "Exception: " << c_oException.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+}
 /********************************************************************************************
  *
  * @class Orchestrator

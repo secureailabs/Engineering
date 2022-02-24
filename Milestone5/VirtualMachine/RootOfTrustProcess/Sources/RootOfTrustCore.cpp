@@ -125,6 +125,9 @@ void __thiscall RootOfTrustCore::Initialize(
     this->RegisterDataOwnerEosb();
     __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier").size());
     __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier").size());
+
+    ::VirtualMachineStatusUpdate(m_oRootOfTrustCoreProperties.GetProperty("DataOwnerEosb"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier"), 0x00000005, m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier"));
+
     // Now, we initialize our threads
     m_fIsRunning = true;
     ThreadManager * poThreadManager = ThreadManager::GetInstance();

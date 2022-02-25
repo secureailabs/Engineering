@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import SingleFormViewBG from '@assets/SingleFormViewBG.png';
 import { yupResolver } from '@hookform/resolvers/yup';
-import login_background from '@assets/SingleFormViewBG.png';
-import LoginScheme from '../../formSchemes/LoginScheme';
-import Logo from '@components/Logo';
+import login_background from '@assets/login_background.jpg';
 import ImageBackground from '@secureailabs/web-ui/components/ImageBackground';
 import Form from '@components/Form';
 // import FormFieldsRenderer from '@components/FormFieldsRenderer';
@@ -22,7 +19,7 @@ import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRender
 import Margin from '@secureailabs/web-ui/components/Margin';
 import Page from '@secureailabs/web-ui/layout/Page';
 
-import SailLogo from '@assets/SailLargeLogo.png';
+import SailLogo from '@assets/newLogo.png';
 
 const Login: React.FC<TLoginFormProps> = ({ signInReset, signInStart }) => {
   const { register, handleSubmit, formState, trigger } = useForm({
@@ -61,6 +58,7 @@ const Login: React.FC<TLoginFormProps> = ({ signInReset, signInStart }) => {
               >
                 <p
                   style={{
+                    width: '100%',
                     textAlign: 'right',
                     marginTop: '-1rem',
                     marginBottom: '2rem',

@@ -51,6 +51,8 @@ namespace SailTablePackagerForCsv
             // We need to figure out whether or not the table property "DestinationIntermediateFile" already exists. If
             // it does, we do not present the save file dialog
             string[] tableProperties = m_TableProperties.GetTableProperties();
+            this.m_SaveFileDialog.Filter = "Packaged Table|*.sailtable";
+            this.m_SaveFileDialog.Title = "Select the name of the SAIL Table Package file to save to...";
             if ((false == tableProperties.Contains("DestinationIntermediateFile")) && (DialogResult.OK == m_SaveFileDialog.ShowDialog()))
             {
                 // Update the m_TableProperties structure with the destination file
@@ -110,6 +112,7 @@ namespace SailTablePackagerForCsv
                 if (null != newNotification)
                 {
                     m_NotificationsListBox.Items.Add(newNotification);
+                    m_NotificationsListBox.SelectedIndex = m_NotificationsListBox.Items.Count - 1;
                 }
             }
             while (null != newNotification);
@@ -120,7 +123,15 @@ namespace SailTablePackagerForCsv
             {
                 m_RefreshTimer.Enabled = false;
                 m_ExitButton.Enabled = true;
-                m_TableProperties.SaveTemplateToDisk("Template.stpt");
+                // Ask for the name of the file to save the template to
+                this.m_SaveFileDialog.Filter = "Packaged Table Template|*.stpt";
+                this.m_SaveFileDialog.Title = "Select the name of the template file to save to...";
+                if (DialogResult.OK == m_SaveFileDialog.ShowDialog())
+                {
+                    m_TableProperties.SaveTemplateToDisk(m_SaveFileDialog.FileName);
+                    m_NotificationsListBox.Items.Add("Saved template file to " + m_SaveFileDialog.FileName);
+                    m_NotificationsListBox.SelectedIndex = m_NotificationsListBox.Items.Count - 1;
+                }
             }
         }
 

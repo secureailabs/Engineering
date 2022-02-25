@@ -364,6 +364,21 @@ namespace SailTablePackagerForCsv
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void m_NextButton_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+            m_TableProperties.SetTableProperty("Title", m_TableTitleTextBox.Text);
+            m_TableProperties.SetTableProperty("Description", m_TableDescriptionTextBox.Text);
+            m_TableProperties.SetTableProperty("Tags", m_TableTagsTextBox.Text);
+        }
+
         private TableProperties m_TableProperties;
         private string m_SelectedPropertyName;
         private string[] m_ListOfPropertiesWeCannotDelete = { "Description", "Identifier", "SourceFileHeaderName", "Name", "Units", "Type", "PrivacyLevel", "UnitCategories" };

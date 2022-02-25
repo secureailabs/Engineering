@@ -336,21 +336,34 @@ extern "C" __declspec(dllexport) unsigned int __cdecl AddTablePackageFromFile(
         (void) ::ReadFile(hFileHandle, (void *) &qwMarker, sizeof(qwMarker), (DWORD *) &unNumberOfBytesRead, nullptr);
         _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(qwMarker)), "Failed to read in the file header marker", nullptr);
         _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != qwMarker), "Invalid file marker (0x%08x%08x) found", HIDWORD(qwMarker), LODWORD(qwMarker));
-        // Now persist the Table Metadata
-        gs_ImportedTableMetadata[gs_unTableIndex] = new StructuredBuffer(stlSerializedTableMetadata);
-        gs_ImportedTableFilename[gs_unTableIndex] = c_szTargetFilename;
-        unReturnValue = gs_unTableIndex;
+        // Now we make sure the table doesn't already exist within our existing list of tables
+        bool fDuplicate = false;
+        StructuredBuffer oNewTableMetadata(stlSerializedTableMetadata);
         // Reality checks
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("TableIdentifier", GUID_VALUE_TYPE));
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE));
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE));
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("NumberOfColumns", UINT32_VALUE_TYPE));
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("NumberOfRows", UINT64_VALUE_TYPE));
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE));
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("DataSizeInBytes", UINT64_VALUE_TYPE));
-        __DebugAssert(true == gs_ImportedTableMetadata[gs_unTableIndex]->IsElementPresent("CompressedDataSizeInBytes", UINT64_VALUE_TYPE));
-        // Increase the table index
-        unReturnValue = gs_unTableIndex++;
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("TableIdentifier", GUID_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("NumberOfColumns", UINT32_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("NumberOfRows", UINT64_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("DataSizeInBytes", UINT64_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("CompressedDataSizeInBytes", UINT64_VALUE_TYPE));
+        // Now go through the existing table and check to see if any of them have the same identifier
+        for (const auto stlElement: gs_ImportedTableMetadata)
+        {
+            if (stlElement.second->GetGuid("TableIdentifier") == oNewTableMetadata.GetGuid("TableIdentifier"))
+            {
+                fDuplicate = true;
+            }
+        }
+        if (false == fDuplicate)
+        {
+            // Now persist the Table Metadata
+            gs_ImportedTableMetadata[gs_unTableIndex] = new StructuredBuffer(stlSerializedTableMetadata);
+            gs_ImportedTableFilename[gs_unTableIndex] = c_szTargetFilename;
+            // Increase the table index
+            unReturnValue = gs_unTableIndex++;
+        }
     }
 
     catch (const BaseException & c_oBaseException)

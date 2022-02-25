@@ -102,12 +102,20 @@ namespace SailDatasetPackager
             if (DialogResult.OK == m_OpenFileDialog.ShowDialog())
             {
                 uint tablePackageIndex = m_DatasetProperties.AddTablePackageToDataset(m_OpenFileDialog.FileName);
-                string tablePackageIdentifier = m_DatasetProperties.GetTablePackageIdentifierByIndex(tablePackageIndex);
-                string tablePackageTitle = m_DatasetProperties.GetTablePackageTitleByIndex(tablePackageIndex);
-                string listBoxDisplayString = tablePackageTitle + ",{" + tablePackageIdentifier + "}";
-                ulong listBoxDisplayStringHash = ApiInterop.Get64BitHashOfString(listBoxDisplayString, false);
-                m_TableIndexAssociation.Add(listBoxDisplayStringHash, tablePackageIndex);
-                m_TablesListBox.Items.Add(listBoxDisplayString);
+                if (0xFFFFFFFF != tablePackageIndex)
+                {
+                    string tablePackageIdentifier = m_DatasetProperties.GetTablePackageIdentifierByIndex(tablePackageIndex);
+                    string tablePackageTitle = m_DatasetProperties.GetTablePackageTitleByIndex(tablePackageIndex);
+                    string listBoxDisplayString = tablePackageTitle + ",{" + tablePackageIdentifier + "}";
+                    ulong listBoxDisplayStringHash = ApiInterop.Get64BitHashOfString(listBoxDisplayString, false);
+                    // Check to make sure the item doesn't already exist
+                    if (true == m_TableIndexAssociation.ContainsKey(listBoxDisplayStringHash))
+                    {
+                        m_TableIndexAssociation.Remove(listBoxDisplayStringHash);
+                    }
+                    m_TableIndexAssociation.Add(listBoxDisplayStringHash, tablePackageIndex);
+                    m_TablesListBox.Items.Add(listBoxDisplayString);
+                }
             }
         }
 

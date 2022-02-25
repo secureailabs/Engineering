@@ -146,6 +146,10 @@ namespace SailTablePackagerForCsv
             {
                 m_ValueSeparatorCharacterTextBox.Text = m_ValueSeparatorCharacterTextBox.Text.Substring(1);
             }
+            else if (0 == m_ValueSeparatorCharacterTextBox.Text.Length)
+            {
+                m_ValueSeparatorCharacterTextBox.Text = ",";
+            }
 
             this.UpdateColumnNames();
             this.RefreshDataGridView();
@@ -261,7 +265,7 @@ namespace SailTablePackagerForCsv
             if (null == m_TableProperties.GetTableProperty("ColumnCount")) m_TableProperties.SetTableProperty("ColumnCount", m_ColumnCount);
             if (null == m_TableProperties.GetTableProperty("Title")) m_TableProperties.SetTableProperty("Title", "EDIT ME <This is a new table>");
             if (null == m_TableProperties.GetTableProperty("Description")) m_TableProperties.SetTableProperty("Description", "EDIT ME <This is the description of a new table>");
-            if (null == m_TableProperties.GetTableProperty("Tags")) m_TableProperties.SetTableProperty("Tags", "EDIT ME <#Column>");
+            if (null == m_TableProperties.GetTableProperty("Tags")) m_TableProperties.SetTableProperty("Tags", "EDIT ME <Tags for table>");
             // Now make sure to initialize all of the mandatory columns with default values
             for (int index = 0; index < m_ColumnCount; index++)
             {

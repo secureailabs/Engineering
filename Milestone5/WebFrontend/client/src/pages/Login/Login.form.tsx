@@ -26,7 +26,7 @@ import SailLogo from '@assets/SailLargeLogo.png';
 
 const Login: React.FC<TLoginFormProps> = ({ signInReset, signInStart }) => {
   const { register, handleSubmit, formState, trigger } = useForm({
-    resolver: yupResolver(LoginScheme),
+    // resolver: yupResolver(LoginScheme),
     mode: 'onSubmit',
   });
   useEffect(() => {
@@ -41,18 +41,18 @@ const Login: React.FC<TLoginFormProps> = ({ signInReset, signInStart }) => {
       <ImageBackground image={login_background}>
         <CardForm image={SailLogo}>
           <>
-            <form className="form">
+            <form onSubmit={handleSubmit(onSubmit)} className="form">
               <FormFieldsRenderer
                 register={register}
                 button_text="Login"
                 formState={formState}
                 fields={{
-                  Email: {
+                  email: {
                     label: 'Email',
                     placeholder: 'Email',
                     type: 'text',
                   },
-                  access_duration: {
+                  password: {
                     label: 'Password',
                     placeholder: 'Password',
                     type: 'password',

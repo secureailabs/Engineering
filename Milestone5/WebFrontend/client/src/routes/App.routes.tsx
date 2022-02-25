@@ -29,7 +29,14 @@ import UnProtectedRoute from './UnProtectedRoute';
 }
 const AppRouter: React.FC = (): React.ReactElement => (
   <Routes>
-    <Route path="/login" element={<Login />} />
+    <Route
+      path="/login"
+      element={
+        <UnProtectedRoute redirect="/dashboard">
+          <Login />
+        </UnProtectedRoute>
+      }
+    />
     <Route path="/dashboard/*" element={<Dashboard />} />
   </Routes>
 );

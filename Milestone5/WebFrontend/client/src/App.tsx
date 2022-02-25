@@ -24,7 +24,7 @@ const App: React.FC<AppProps> = ({
     // });
 
     checkUserSession();
-    setInterval(() => checkUserSessionAsync(), 30000);
+    // setInterval(() => checkUserSessionAsync(), 30000);
   }, []);
   // Return the App component.
   //

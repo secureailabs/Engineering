@@ -7,6 +7,33 @@ import {
   takeLatest,
 } from 'redux-saga/effects';
 
+const demo_data = {
+  DigitalContracts: {
+    uuid1: {
+      Title: 'temp',
+      VersionNumber: '1',
+      ContractStage: 1,
+      SubscriptionDays: 7,
+      Description: 'test',
+      DatasetGuid: '123',
+      DatasetName: 'name',
+      ActivationTime: 0,
+      ExpirationTime: 100,
+      Eula: '',
+      LegalAgreement: '',
+      DataOwnerOrganization: '',
+      DOOName: '',
+      ResearcherOrganization: '',
+      ROName: '',
+      LastActivity: 0,
+      ProvisioningStatus: 1,
+      HostForVirtualMachines: 'localhost',
+      NumberOfVCPU: 10,
+      Note: '',
+    },
+  },
+};
+
 import {
   // GET ALL
   getAllDigitalContractsFailure,
@@ -179,17 +206,18 @@ export function* onPatchAcceptDigitalContractStart() {
 // GET ALL
 
 export function* getAllDigitalContractsSaga() {
-  try {
-    const {
-      data,
-    } = (yield getAllDigitalContractsAPI()) as AxiosResponse<TGetAllDigitalContractsSuccess>;
+  yield put(getAllDigitalContractsSuccess(demo_data));
+  // try {
+  //   const {
+  //     data,
+  //   } = (yield getAllDigitalContractsAPI()) as AxiosResponse<TGetAllDigitalContractsSuccess>;
 
-    yield put(getAllDigitalContractsSuccess(data));
-  } catch (err) {
-    console.log(err);
-    // tslint:disable-next-line: no-unsafe-any
-    yield put(getAllDigitalContractsFailure(err.response));
-  }
+  //   yield put(getAllDigitalContractsSuccess(data));
+  // } catch (err) {
+  //   console.log(err);
+  //   // tslint:disable-next-line: no-unsafe-any
+  //   yield put(getAllDigitalContractsFailure(err.response));
+  // }
 }
 
 export function* onGetAllDigitalContractsStart() {

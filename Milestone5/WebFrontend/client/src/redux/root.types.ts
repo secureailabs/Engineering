@@ -3,13 +3,13 @@ import { digitalContractActions } from './digitalContract/digitalContract.action
 import { datasetActions } from './dataset/dataset.actions';
 import { AccountManagerActions } from './accountManager/accountManager.actions';
 import { OrganizationActions } from './organization/organization.actions';
-import { AzureTemplatesManagerActions } from './azureTemplatesManager/azureTemplatesManager.actions';
+import { AzureTemplateActions } from './azureTemplate/azureTemplate.actions';
 type RootAction =
   | userAction
   | digitalContractActions
   | datasetActions
   | AccountManagerActions
   | OrganizationActions
-  | AzureTemplatesManagerActions
+  | AzureTemplateActions;
 
 export type { RootAction };

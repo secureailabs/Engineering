@@ -8,6 +8,10 @@ import UpdateUser from '@components/Settings/UpdateUser';
 import UpdatePassword from '@components/Settings/UpdatePassword';
 import Title from '@components/Title';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
+import Card from '@secureailabs/web-ui/components/Card';
+import Text from '@secureailabs/web-ui/components/Text';
+import Button from '@secureailabs/web-ui/components/Button';
+import Margin from '@secureailabs/web-ui/components/Margin';
 // import UpdateAccessRights from '@components/Settings/UpdateAccessRights';
 
 import InfoDisplay from '@components/InfoDisplay';
@@ -38,20 +42,49 @@ const Settings: React.FC<TSettings> = ({ userData }) => {
       'Access Rights',
     ]);
     arrayData[3][1] = accessRightsNumberToString(arrayData[3][1]);
-    return (
-      <StandardContent title="Settings">
-        <>
-          <Title>Settings</Title>
-          <UpdateUser />
-          <UpdatePassword />
-        </>
-        {/* <InfoDisplay title="Settings" data={arrayData} /> */}
-      </StandardContent>
-    );
+    return <></>;
   }
   return (
     <StandardContent title="Settings">
-      Unable to fetch user data
+      <Card primaryText="My Profile">
+        <div className="my-profile">
+          <Text>
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry&apos;s standard dummy
+            text ever since the 1500s, when an unknown.
+          </Text>
+          <Button full={false} button_type="secondary">
+            Edit My Profile
+          </Button>
+        </div>
+      </Card>
+
+      <Margin size={8} />
+      <Card primaryText="Users">
+        <div className="my-profile">
+          <Text>
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry&apos;s standard dummy
+            text ever since the 1500s, when an unknown.
+          </Text>
+          <Button full={false} button_type="secondary">
+            Add User
+          </Button>
+        </div>
+      </Card>
+      <Margin size={8} />
+      <Card primaryText="My Organization">
+        <div className="my-profile">
+          <Text>
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry&apos;s standard dummy
+            text ever since the 1500s, when an unknown.
+          </Text>
+          <Button full={false} button_type="secondary">
+            Edit My Organization
+          </Button>
+        </div>
+      </Card>
     </StandardContent>
   );
 };

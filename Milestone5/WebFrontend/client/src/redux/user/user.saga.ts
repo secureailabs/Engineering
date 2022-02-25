@@ -16,10 +16,12 @@ import {
   signUpSuccess,
 } from './user.actions';
 
+import { demo_data } from './user.data';
+
 import { userLogin, checkAuth, userSignup, logOut, me } from './user.apis';
 
 import { setToken, removeToken, fetchToken } from './user.utils';
-
+import _ from 'lodash';
 import { IUserData } from './user.typeDefs';
 import { AxiosResponse } from 'axios';
 
@@ -47,17 +49,25 @@ export function* onSignUpStart() {
 export function* signIn({
   payload: { email, password },
 }: ReturnType<typeof signInStart>) {
-  try {
-    (yield userLogin(email, password)) as AxiosResponse<{
-      data: { user: IUserData };
-      token: string;
-    }>;
-    const { data } = yield checkAuth();
-    yield put(signInSuccess(data));
-  } catch (error) {
-    console.log(error);
-    yield put(signInFailure(error?.response?.data));
+  console.log('EMAIL: ', email);
+  const result = _.find(demo_data, { Email: email });
+  console.log(result);
+  if (result) {
+    yield put(signInSuccess(result));
+  } else {
+    yield put(signInFailure('Invalid credentials'));
   }
+  // try {
+  //   (yield userLogin(email, password)) as AxiosResponse<{
+  //     data: { user: IUserData };
+  //     token: string;
+  //   }>;
+  //   const { data } = yield checkAuth();
+  //   yield put(signInSuccess(data));
+  // } catch (error) {
+  //   console.log(error);
+  //   yield put(signInFailure(error?.response?.data));
+  // }
 }
 export function* onSignInStart() {
   yield takeLatest(signInStart, signIn);

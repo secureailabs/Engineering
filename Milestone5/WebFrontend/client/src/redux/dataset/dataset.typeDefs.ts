@@ -38,6 +38,8 @@ export type TGetDatasetSuccess = {
     DatasetGuid: string;
     DatasetName: string;
     Description: string;
+    Versions?: Record<string, TGetDatasetSuccess>;
+    Version?: number;
     JurisdictionalLimitations: string;
     Keywords: string;
     OrganizationName: string;
@@ -48,4 +50,10 @@ export type TGetDatasetSuccess = {
 
 export type TGetDatasetStart = {
   DatasetGuid: string;
+};
+
+export type TGetDatasetVersionSuccess = TGetDatasetSuccess;
+
+export type TGetDatasetVersionStart = TGetDatasetStart & {
+  Version: string;
 };

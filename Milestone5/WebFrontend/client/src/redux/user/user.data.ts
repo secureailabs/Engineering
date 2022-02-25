@@ -1,0 +1,32 @@
+export const demo_data = [
+  {
+    AccessRights: 6,
+    AccountStatus: 3,
+    Email: 'datafederation@igr.com',
+    PhoneNumber: '123-456-7890',
+    TimeOfAccountCreation: new Date(),
+    Title: 'title',
+    UserGuid: 'uuid1',
+    Username: 'datafederation@igr.com',
+  },
+  {
+    AccessRights: 5,
+    AccountStatus: 3,
+    Email: 'datauser@igr.com',
+    PhoneNumber: '123-456-7890',
+    TimeOfAccountCreation: new Date(),
+    Title: 'title',
+    UserGuid: 'uuid2',
+    Username: 'datauser@igr.com',
+  },
+  {
+    AccessRights: 4,
+    AccountStatus: 3,
+    Email: 'dataowner@igr.com',
+    PhoneNumber: '123-456-7890',
+    TimeOfAccountCreation: new Date(),
+    Title: 'title',
+    UserGuid: 'uuid3',
+    Username: 'dataowner@igr.com',
+  },
+];

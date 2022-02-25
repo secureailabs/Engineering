@@ -19,6 +19,8 @@ import { HiOutlineDesktopComputer } from 'react-icons/hi';
 
 import { CgTemplate } from 'react-icons/cg';
 
+import default_profile_image from '@assets/user.png';
+
 import { FaServer } from 'react-icons/fa';
 const Dashboard = () => {
   const primary = [
@@ -37,7 +39,7 @@ const Dashboard = () => {
     {
       text: 'Azure Templates Manager',
       Icon: CgTemplate,
-      link: '/dashboard/templates',
+      link: '/dashboard/azure-templates',
     },
     {
       text: 'Unified Registries',
@@ -71,6 +73,7 @@ const Dashboard = () => {
           <Header
             search={() => {}}
             username="User_name"
+            profile_image={default_profile_image}
             organization="Mayo Clinic"
           />
           <DashboardRouter />

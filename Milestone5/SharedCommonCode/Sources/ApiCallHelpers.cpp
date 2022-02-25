@@ -404,8 +404,8 @@ bool __stdcall VirtualMachineStatusUpdate(
     {
         // Build the HTTP request string
         StructuredBuffer oApiCallContent;
-        std::string strVerb = "POST";
-        std::string strApiUrl = "/SAIL/VirtualMachineManager/Researcher/RegisterVM?Eosb=" + c_strEosb;
+        std::string strVerb = "PUT";
+        std::string strApiUrl = "/SAIL/VirtualMachineManager/UpdateStatus?Eosb=" + c_strEosb;
 		oApiCallContent.PutString("VirtualMachineGuid", c_strVirtualMachineIdentifier);
 		oApiCallContent.PutDword("State", dwState);
 		oApiCallContent.PutString("VMLoggedInUser", c_strLoggedOnUserIdentifier);
@@ -418,12 +418,12 @@ bool __stdcall VirtualMachineStatusUpdate(
 		// Api call has succeeded if we get here
 		fSuccess = true;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

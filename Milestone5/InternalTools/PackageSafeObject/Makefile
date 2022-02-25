@@ -1,6 +1,6 @@
 BUILD_MODE?=debug
 CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -fPIC
-LDFLAGS=-lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
+LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
 
 ifeq ($(BUILD_MODE), debug)
 	CXXFLAGS+= -ggdb
@@ -13,13 +13,14 @@ ROOTDIR=../..
 ABSROOTDIR=$(shell realpath $(ROOTDIR))
 OBJDIR=$(ABSROOTDIR)/Binary/Objects
 
+include $(ROOTDIR)/Common.mk
+
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath .)
-INCLUDE+=-I$(shell realpath ../../SharedCommonCode/Include)
+#INCLUDE+=-I$(shell realpath ../../SharedCommonCode/Include)
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath .)
-SRCDIRS+=$(shell realpath ../../SharedCommonCode/Sources)
 
 FINDFILES = $(wildcard $(DIR)/*.cpp)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))

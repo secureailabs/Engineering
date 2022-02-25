@@ -1,2 +1,5 @@
 Identifier=5ADD14CB-CA71-465C-A0D8-3EFAF36144AE
+Name=Job Engine (Secure Computational Node)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

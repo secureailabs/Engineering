@@ -22,7 +22,7 @@ INCLUDE += -isystem$(PYTHONINC)
 INCLUDE+=-I$(shell realpath ./Include)
 INCLUDE+=-I$(shell realpath ../../WebService/SharedCommonCode/Include)
 INCLUDE+=-I$(shell realpath ../../WebService/RestApiPortal/Include)
-INCLUDE+=-I$(shell realpath ../../VirtualMachine/ComputationalDomainProcess/Include)
+#INCLUDE+=-I$(shell realpath ../../VirtualMachine/ComputationalDomainProcess/Include)
 INCLUDE+=-I$(shell realpath ../../VirtualMachine/SharedComponents/Include)
 
 # Add the new source directory here
@@ -49,6 +49,9 @@ $(OUTPUT): $(OBJS) SharedCommonCode
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS) $(LDLIBS)
 	@cp $@ ./sail/sail/
+
+clean:
+	rm -rf $(OUTPUT) $(OBJS)
 
 cleanall:
 	rm -rf $(ABSROOTDIR)/Binary

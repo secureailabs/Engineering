@@ -129,7 +129,7 @@ int main(
     }
     
     // Print out any lingered exceptions before exiting
-    while (0 < ::GetRegisteredExceptionCount())
+    while (0 < ::GetRegisteredExceptionsCount())
     {
         std::string strRegisteredException = ::GetNextRegisteredException();
         std::cout << strRegisteredException << std::endl << std::endl;

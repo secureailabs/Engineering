@@ -1,2 +1,5 @@
 Identifier=CBEA2239-A28C-4ED6-BCC8-9F7E5868C0AE
+Name=DatabaseTools (Tools)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

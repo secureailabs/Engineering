@@ -1,2 +1,5 @@
 Identifier=70B08836-B07D-48FD-B654-F7B6543A12FF
+Name=Virtual Machine Manager Plugin (SAIL Platform Services)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

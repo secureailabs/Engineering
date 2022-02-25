@@ -15,10 +15,11 @@ include $(ROOTDIR)/Common.mk
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
-INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
+#INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)
+#SRCDIRS+=$(shell realpath ../SharedComponents/Sources)
 
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 

@@ -1,2 +1,5 @@
 Identifier=E6D9D5A7-3F5F-4986-A01B-901990178C96
+Name=Audit Event Generator (Tools)
+Os=linux
+Type=skip
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

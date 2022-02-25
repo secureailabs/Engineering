@@ -1,2 +1,5 @@
 Identifier=E96B6B12-BF20-40CB-9B6E-5CA945EC23CB
+Name=Account Manager Plugin (SAIL Platform Services)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

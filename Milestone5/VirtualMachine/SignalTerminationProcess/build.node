@@ -1,2 +1,5 @@
 Identifier=CDCA6E5C-9C6C-40D4-974F-41D081B97237
+Name=Signal Termination Process (Secure Computational Node)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

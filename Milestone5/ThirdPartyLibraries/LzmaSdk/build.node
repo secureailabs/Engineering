@@ -1,2 +1,5 @@
-Identifier=D996A50B-7256-421D-A27D-EA68ED757686
-Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9
+Identifier=42727001-F5AE-4512-A0D8-3299CD11FE84
+Name=7 Zip Compression Library
+Os=linux
+Type=make
+Dependencies=

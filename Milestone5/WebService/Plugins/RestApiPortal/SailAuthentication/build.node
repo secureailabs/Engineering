@@ -1,2 +1,5 @@
 Identifier=66BD4739-5ECE-422A-B405-F49B218246CD
+Name=Sail Authentication Plugin (SAIL Platform Services)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

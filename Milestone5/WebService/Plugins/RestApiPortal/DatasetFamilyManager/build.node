@@ -1,2 +1,5 @@
 Identifier=6D8CFAAB-8FAB-4A1E-BF41-0C4CEA22202B
+Name=Data Family Plugin (SAIL Platform Services)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

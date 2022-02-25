@@ -1,2 +1,5 @@
 Identifier=2E6A1844-997A-4005-A732-6052B62558D4
+Name=Root of Trust Process (Secure Computational Node)
+Os=linux
+Type=make
 Dependency=DB52FE0E-2A78-40CD-A82F-5C95C3291DE9

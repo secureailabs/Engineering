@@ -429,6 +429,15 @@ std::string __thiscall JobInformation::GetJobStatus(void) const
     return strJobStatus;
 }
 
+void __thiscall JobInformation::SetStatus(
+    _in JobStatusSignals eJobStatus
+)
+{
+    __DebugFunction();
+
+    m_eJobStatus = eJobStatus;
+}
+
 /********************************************************************************************
  *
  * @class JobInformation

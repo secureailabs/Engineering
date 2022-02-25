@@ -83,6 +83,10 @@ class JobInformation
 
         bool __thiscall IsRunning() const;
 
+        void __thiscall SetStatus(
+            _in JobStatusSignals eJobStatus
+            );
+
         // BasicLockable methods
         void __thiscall lock();
         void __thiscall unlock();

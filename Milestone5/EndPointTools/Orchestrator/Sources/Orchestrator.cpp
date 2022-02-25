@@ -1019,7 +1019,6 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
                 auto stlJobInformationItr = m_stlJobInformation.find(oOutputParameters.first.ToString(eRaw));
 
                 __DebugAssert(m_stlJobInformation.end() != stlJobInformationItr);
-                JobInformation& oOutputParameterJob = *stlJobInformationItr->second;
 
                 SetJobParameterForJobOutput(oJob, oParameterGuid, strParameterString);
             }
@@ -1509,10 +1508,22 @@ std::string __thiscall Orchestrator::WaitForData(
         {
             if ( oDataResult->IsElementPresent("SignalType", BYTE_VALUE_TYPE) )
             {
-                if ( static_cast<Byte>(JobStatusSignals::ePostValue) == oDataResult->GetByte("SignalType"))
+                JobStatusSignals eStatusSignal = static_cast<JobStatusSignals>(oDataResult->GetByte("SignalType"));
+                if ( JobStatusSignals::ePostValue == eStatusSignal)
                 {
                     m_stlJobResults[oDataResult->GetString("ValueName")] = oDataResult->GetBuffer("FileData");
                     UpdateJobsWaitingForData(*oDataResult);
+                }
+                else if ( JobStatusSignals::eJobFail == eStatusSignal ||
+                    JobStatusSignals::eJobDone == eStatusSignal ||
+                    JobStatusSignals::eJobStart == eStatusSignal )
+                {
+                    Guid oJobIdentifier(oDataResult->GetString("JobUuid"));
+                    auto oJobInformation = m_stlJobInformation.find(oJobIdentifier.ToString(eRaw));
+                    if ( m_stlJobInformation.end() != oJobInformation )
+                    {
+                        oJobInformation->second->SetStatus(eStatusSignal);
+                    }
                 }
             }
             strReturn = GetJsonForStructuredBuffer(*oDataResult);

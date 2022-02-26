@@ -21,6 +21,8 @@ import { CgTemplate } from 'react-icons/cg';
 
 import default_profile_image from '@assets/user.png';
 
+import newLogo from '@assets/newLogo.png';
+
 import { FaServer } from 'react-icons/fa';
 const Dashboard = () => {
   const primary = [
@@ -68,7 +70,7 @@ const Dashboard = () => {
   // <DashboardRouter />
   return (
     <>
-      <Sidebar primary={primary} secondary={secondary}>
+      <Sidebar primary={primary} secondary={secondary} logo={newLogo}>
         <div className="standard-grid-row">
           <Header
             search={() => {}}

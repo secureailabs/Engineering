@@ -14,12 +14,35 @@
 
 /********************************************************************************************/
 
-static std::string gs_strCurrentFolder;
 static std::unordered_map<Qword, StructuredBuffer> gs_stlListOfNodes;
 static std::unordered_set<Qword> gs_stlListOfNodesThatHaveBeenCleaned;
 static std::unordered_set<Qword> gs_stlListOfNodesThatHaveBeenBuilt;
+static std::string gs_strRootFolder;
+static std::string gs_strCurrentFolder;
 static std::string gs_strBuildMode{"debug"};
 static std::string gs_strVersionString{"0.0.0"};
+
+/********************************************************************************************/
+
+static void __stdcall PrintUsage(void)
+{
+    __DebugFunction();
+    
+    std::cout << "Usage: BuiltTool --all <--clean> <--cleanonly>" << std::endl
+              << "   or: BuiltTool --this <--clean> <--cleanonly>" << std::endl
+              << "   or: BuiltTool --cleanall" << std::endl
+              << "   or: BuiltTool --printnodes" << std::endl
+              << "   or: BuiltTool --help" << std::endl << std::endl
+              << "Where:" << std::endl
+              << "       --all,         Instructs the build tool to build everything." << std::endl
+              << "       --this,        Instructs the build tool to build only the project within the current." << std::endl
+              << "                      folder, and all associated dependencies." << std::endl
+              << "       --clean,       Instructs the build tool to clean all target projects before building." << std::endl
+              << "       --cleanonly,   Instructs the build tool to clean all target projects and NOT build anything." << std::endl
+              << "       --cleanall,    Instructs the build tool to clean everything and remove the build folder." << std::endl
+              << "       --printnodes,  Instructs the build tool to print all build nodes everywhere." << std::endl
+              << "       --help,        Instructs the build tool to print these instructions." << std::endl;
+}
 
 /********************************************************************************************/
 
@@ -70,8 +93,47 @@ static void __stdcall CleanNode(
             if (::Get64BitHashOfNullTerminatedString("make", false) == ::Get64BitHashOfNullTerminatedString(c_oCurrentBuildNode.GetString("Type").c_str(), false))
             {
                 std::filesystem::current_path(c_oCurrentBuildNode.GetString("BuildNodeHostFolder"));
-                ::system("make clean --silent");
+                std::string strCommandLine = "make clean --silent ROOT=\"" + gs_strRootFolder + "\"";
+                ::system(strCommandLine.c_str());
                 std::cout << "Cleaned --> " << c_oCurrentBuildNode.GetString("Name") << std::endl;
+            }
+        }
+        
+        // Now we need to delete all published header files and libraries (if any)
+        // First we start with include files
+        if (true == c_oCurrentBuildNode.IsElementPresent("HeaderFilesToPublish", INDEXED_BUFFER_VALUE_TYPE))
+        {
+            std::vector<std::string> stlListOfIncludeFilesToPublish = c_oCurrentBuildNode.GetStructuredBuffer("HeaderFilesToPublish").GetNamesOfElements();
+            for (const std::string & c_strIncludeFileName: stlListOfIncludeFilesToPublish)
+            {
+                // Build up for source and destination filenames
+                std::string strTargetFilename = gs_strRootFolder + "/Build/Include/" + c_strIncludeFileName;
+                if (true == std::filesystem::exists(strTargetFilename))
+                {
+                    // Build the string for the copy operation
+                    std::string strDeleteOperation = "rm -f " + strTargetFilename + " 2>/dev/null || :";
+                    ::system(strDeleteOperation.c_str());
+                    // Now make sure the file is there
+                    _ThrowBaseExceptionIf((true == std::filesystem::exists(strTargetFilename)), "UNEXPECTED ERROR: The include file %s failed to get deleted.", strTargetFilename.c_str());
+                }
+            }
+        }
+        // Now we delete the library files
+        if (true == c_oCurrentBuildNode.IsElementPresent("LibrariesToPublish", INDEXED_BUFFER_VALUE_TYPE))
+        {
+            std::vector<std::string> stlListOfLibraryFilesToPublish = c_oCurrentBuildNode.GetStructuredBuffer("LibrariesToPublish").GetNamesOfElements();
+            for (const std::string & c_strLibraryFileName: stlListOfLibraryFilesToPublish)
+            {
+                // Build up for source and destination filenames
+                std::string strTargetFilename = gs_strRootFolder + "/Build/Libraries/" + c_strLibraryFileName;
+                if (true == std::filesystem::exists(strTargetFilename))
+                {
+                    // Build the string for the copy operation
+                    std::string strDeleteOperation = "rm -f " + strTargetFilename + " 2>/dev/null || :";
+                    ::system(strDeleteOperation.c_str());
+                    // Now make sure the file is there
+                    _ThrowBaseExceptionIf((true == std::filesystem::exists(strTargetFilename)), "UNEXPECTED ERROR: The library file %s failed to get deleted.", strTargetFilename.c_str());
+                }
             }
         }
     }
@@ -140,8 +202,42 @@ static void __stdcall BuildNode(
             {
                 std::cout << "Building --> " << c_oCurrentBuildNode.GetString("Name") << " ... ";
                 std::filesystem::current_path(c_oCurrentBuildNode.GetString("BuildNodeHostFolder"));
-                _ThrowBaseExceptionIf((0 != ::system("make all --silent")), "CRAP", nullptr);
+                std::string strCommandLine = "make all --silent -j 16 Version=" + gs_strVersionString + " MODE=" + gs_strBuildMode + " ROOT=\"" + gs_strRootFolder + "\"";
+                _ThrowBaseExceptionIf((0 != ::system(strCommandLine.c_str())), "CRAP", nullptr);
                 std::cout << "Done!" << std::endl;
+            }
+        }
+        // If we get here, we are ready to publish include files and libraries
+        // First we start with include files
+        if (true == c_oCurrentBuildNode.IsElementPresent("HeaderFilesToPublish", INDEXED_BUFFER_VALUE_TYPE))
+        {
+            std::vector<std::string> stlListOfIncludeFilesToPublish = c_oCurrentBuildNode.GetStructuredBuffer("HeaderFilesToPublish").GetNamesOfElements();
+            for (const std::string & c_strIncludeFileName: stlListOfIncludeFilesToPublish)
+            {
+                // Build up for source and destination filenames
+                std::string strSourceFilename = c_oCurrentBuildNode.GetString("BuildNodeHostFolder") + "/Include/" + c_strIncludeFileName;
+                std::string strDestinationFilename = gs_strRootFolder + "/Build/Include/" + c_strIncludeFileName;
+                // Build the string for the copy operation
+                std::string strCopyOperation = "cp -f -T " + strSourceFilename + " " + strDestinationFilename + " 2>/dev/null || :";
+                ::system(strCopyOperation.c_str());
+                // Now make sure the file is there
+                _ThrowBaseExceptionIf((false == std::filesystem::exists(strDestinationFilename)), "UNEXPECTED ERROR: The include file %s failed to get published.", strDestinationFilename.c_str());
+            }
+        }
+        // Now we publish the library files
+        if (true == c_oCurrentBuildNode.IsElementPresent("LibrariesToPublish", INDEXED_BUFFER_VALUE_TYPE))
+        {
+            std::vector<std::string> stlListOfLibraryFilesToPublish = c_oCurrentBuildNode.GetStructuredBuffer("LibrariesToPublish").GetNamesOfElements();
+            for (const std::string & c_strLibraryFileName: stlListOfLibraryFilesToPublish)
+            {
+                // Build up for source and destination filenames
+                std::string strSourceFilename = gs_strRootFolder + "/Build/Binaries/" + c_strLibraryFileName;
+                std::string strDestinationFilename = gs_strRootFolder + "/Build/Libraries/" + c_strLibraryFileName;
+                // Build the string for the copy operation
+                std::string strCopyOperation = "cp -f -T " + strSourceFilename + " " + strDestinationFilename + " 2>/dev/null || :";
+                ::system(strCopyOperation.c_str());
+                // Now make sure the file is there
+                _ThrowBaseExceptionIf((false == std::filesystem::exists(strDestinationFilename)), "UNEXPECTED ERROR: The library file %s failed to get published.", strDestinationFilename.c_str());
             }
         }
     }
@@ -200,6 +296,8 @@ static StructuredBuffer __stdcall GetNode(
     
     StructuredBuffer oCurrentBuildNode;
     StructuredBuffer oCurrentBuildNodeDependencies;
+    StructuredBuffer oCurrentBuildNodePublishIncludes;
+    StructuredBuffer oCurrentBuildNodePublishLibraries;
     // Only get the node if the current folder contains a 'build.node' file, otherwise
     // return an empty StructuredBuffer object
     std::string strBuildNodeFilename = c_strCurrentFolder + "/build.node";
@@ -234,12 +332,30 @@ static StructuredBuffer __stdcall GetNode(
                 {
                     oCurrentBuildNode.PutString("Type", stlLineElements[1]);
                 }
-                else if (::Get64BitHashOfNullTerminatedString("Dependencies", false) == ::Get64BitHashOfNullTerminatedString(stlLineElements[0].c_str(), false))
+                else if (::Get64BitHashOfNullTerminatedString("Dependency", false) == ::Get64BitHashOfNullTerminatedString(stlLineElements[0].c_str(), false))
                 {
                     if (0 < stlLineElements[1].size())
                     {
                         oCurrentBuildNodeDependencies.PutBoolean(stlLineElements[1].c_str(), true);
                     }
+                }
+                else if (::Get64BitHashOfNullTerminatedString("PublishInclude", false) == ::Get64BitHashOfNullTerminatedString(stlLineElements[0].c_str(), false))
+                {
+                    if (0 < stlLineElements[1].size())
+                    {
+                        oCurrentBuildNodePublishIncludes.PutBoolean(stlLineElements[1].c_str(), true);
+                    }
+                }
+                else if (::Get64BitHashOfNullTerminatedString("PublishLibrary", false) == ::Get64BitHashOfNullTerminatedString(stlLineElements[0].c_str(), false))
+                {
+                    if (0 < stlLineElements[1].size())
+                    {
+                        oCurrentBuildNodePublishLibraries.PutBoolean(stlLineElements[1].c_str(), true);
+                    }
+                }
+                else
+                {
+                    _ThrowBaseException("ERROR: Unexpected specification %s found in file %s", strLineOfText, strBuildNodeFilename);
                 }
             }
         }
@@ -248,6 +364,18 @@ static StructuredBuffer __stdcall GetNode(
         if (0 < oCurrentBuildNodeDependencies.GetNamesOfElements().size())
         {
             oCurrentBuildNode.PutStructuredBuffer("Dependencies", oCurrentBuildNodeDependencies);
+        }
+        
+        // See if we need to attach the oCurrentBuildNodePublishIncludes to the oCurrentBuildNode
+        if (0 < oCurrentBuildNodePublishIncludes.GetNamesOfElements().size())
+        {
+            oCurrentBuildNode.PutStructuredBuffer("HeaderFilesToPublish", oCurrentBuildNodePublishIncludes);
+        }
+        
+        // See if we need to attach the oCurrentBuildNodePublishLibraries to the oCurrentBuildNode
+        if (0 < oCurrentBuildNodePublishLibraries.GetNamesOfElements().size())
+        {
+            oCurrentBuildNode.PutStructuredBuffer("LibrariesToPublish", oCurrentBuildNodePublishLibraries);
         }
     }
     
@@ -292,13 +420,72 @@ static void __stdcall LoadAllNodes(
 /********************************************************************************************/
 
 static void __stdcall LoadBuildRootFile(
-    _in const std::string & c_strBuildRootFile
+    _in const std::string & c_strRootFolder
     )
 {
     __DebugFunction();
     
+    std::string strBuildRootNodeFilename = c_strRootFolder + "/build.root";
     // Right now, there really isn't anything in the build.root file to load or parse
-    _ThrowBaseExceptionIf((false == std::filesystem::exists(c_strBuildRootFile)), "ERROR: Build root file %s failed to load properly", c_strBuildRootFile.c_str());
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(strBuildRootNodeFilename)), "ERROR: Build root file %s failed to load properly", strBuildRootNodeFilename.c_str());
+    // Open the file for reading text
+    TextFileReader oTextFileReader(strBuildRootNodeFilename);
+    while (false == oTextFileReader.EndOfFileReached())
+    {
+        // Get the next line of text from the text file
+        std::string strLineOfText = oTextFileReader.Read();
+        if (0 < strLineOfText.size())
+        {
+            // Now split the line of text. it should generate two elements only
+            std::vector<std::string> stlLineElements{::SplitString(strLineOfText, '=')};
+            _ThrowBaseExceptionIf((2 != stlLineElements.size()), "ERROR, unexpected build node line of text = %s in file %s", strLineOfText.c_str(), strBuildRootNodeFilename.c_str());
+            if (::Get64BitHashOfNullTerminatedString("Version", false) == ::Get64BitHashOfNullTerminatedString(stlLineElements[0].c_str(), false))
+            {
+                gs_strVersionString = stlLineElements[1];
+            }
+            else
+            {
+                _ThrowBaseException("ERROR: Unexpected specification %s found in file %s", strLineOfText, strBuildRootNodeFilename);
+            }
+        }
+    }
+    // Now we look into making sure the build folders are make
+    std::string strBuildFolder = c_strRootFolder + "/Build";
+    std::string strBinariesFolder = strBuildFolder + "/Binaries";
+    std::string strIncludeFolder = strBuildFolder + "/Include";
+    std::string strLibrariesFolder = strBuildFolder + "/Libraries";
+    std::string strArtifactsFolder = strBuildFolder + "/Artifacts";
+    
+    if (false == std::filesystem::exists(strBuildFolder))
+    {
+        std::string strCommand = "mkdir " + strBuildFolder + " 2>/dev/null || :";
+        ::system(strCommand.c_str());
+    }
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(strBuildFolder)), "UNEXPECTED ERROR: The folder %s failed to be created.", strBuildFolder.c_str());
+    if (false == std::filesystem::exists(strBinariesFolder))
+    {
+        std::string strCommand = "mkdir " + strBinariesFolder + " 2>/dev/null || :";
+        ::system(strCommand.c_str());
+    }
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(strBinariesFolder)), "UNEXPECTED ERROR: The folder %s failed to be created.", strBinariesFolder.c_str());
+    if (false == std::filesystem::exists(strIncludeFolder))
+    {
+        std::string strCommand = "mkdir " + strIncludeFolder + " 2>/dev/null || :";
+        ::system(strCommand.c_str());
+    }
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(strIncludeFolder)), "UNEXPECTED ERROR: The folder %s failed to be created.", strIncludeFolder.c_str());
+    if (false == std::filesystem::exists(strLibrariesFolder))
+    {
+        std::string strCommand = "mkdir " + strLibrariesFolder + " 2>/dev/null || :";
+        ::system(strCommand.c_str());
+    }
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(strLibrariesFolder)), "UNEXPECTED ERROR: The folder %s failed to be created.", strLibrariesFolder.c_str());
+    if (false == std::filesystem::exists(strArtifactsFolder))
+    {
+        std::string strCommand = "mkdir " + strArtifactsFolder + " 2>/dev/null || :";
+        ::system(strCommand.c_str());
+    }
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(strArtifactsFolder)), "UNEXPECTED ERROR: The folder %s failed to be created.", strArtifactsFolder.c_str());
 }
 
 /********************************************************************************************/
@@ -333,11 +520,11 @@ static std::string __stdcall FindBuildRootFolder(
     
     // First we look in the current folder to see if we can spot the 'build.node' file. If
     // so, we load it
-    std::string strBuildRootFilename = c_strCurrentFolder + "/build.root";
-    if (true == std::filesystem::exists(strBuildRootFilename))
+    std::string strRootFolderFilename = c_strCurrentFolder + "/build.root";
+    if (true == std::filesystem::exists(strRootFolderFilename))
     {
-        ::LoadBuildRootFile(strBuildRootFilename);
-        strRootFolder = c_strCurrentFolder;
+        ::LoadBuildRootFile(c_strCurrentFolder);
+        strRootFolder = ::RemoveTrailingPathCharacter(c_strCurrentFolder);
     }
     else
     {
@@ -346,10 +533,11 @@ static std::string __stdcall FindBuildRootFolder(
         // the current folder is '/'
         _ThrowBaseExceptionIf(("/" == c_strCurrentFolder), "ERROR: Failed to find the build.root file. Operation failed.", nullptr);
         std::filesystem::path stlCurrentFolder{c_strCurrentFolder};
-        strRootFolder = ::FindBuildRootFolder(stlCurrentFolder.parent_path().string());
+        std::string strParentFolder = stlCurrentFolder.parent_path().string();
+        strRootFolder = ::FindBuildRootFolder(strParentFolder);
     }
     
-    return ::RemoveTrailingPathCharacter(strRootFolder);
+    return strRootFolder;
 }
 
 /********************************************************************************************/
@@ -382,93 +570,113 @@ int __cdecl main(
     try
     {
         std::cout << "+======================================================================================+" << std::endl;
-        std::cout << "| BuildIt, Copyright (C) 2022 Secure AI Labs, Inc., All Rights Reserved.               |" << std::endl;
+        std::cout << "| BuildTool, Copyright (C) 2022 Secure AI Labs, Inc., All Rights Reserved.             |" << std::endl;
         std::cout << "| by Luis Miguel Huapaya                                                               |" << std::endl;
         std::cout << "+======================================================================================+" << std::endl;
         // Parse the command line arguments if any exist   
         StructuredBuffer oCommandLineArguments(ParseCommandLineParameters(nNumberOfArguments, pszCommandLineArguments));
         // Figure out the current folder
         gs_strCurrentFolder = ::GetCurrentFolder();
-        std::cout << "Working Folder = " << gs_strCurrentFolder << std::endl;
-        // First thing we do is load up the current node in the current folder, IF it exists.
-        // If it doesn't exist, then we will need a '-buildall' flag or else the build
-        // fails
-        StructuredBuffer oCurrentBuildNode(::GetNode(gs_strCurrentFolder));
         // Let's figure out where the build root is
-        std::string strBuildRoot = ::FindBuildRootFolder(gs_strCurrentFolder);
-        std::cout << "Root Folder = " << strBuildRoot << std::endl;
-        // Load the version number if available
-        //::LoadVersionString(strBuildRoot);
-        // Now that we know where the root is, load up all of the nodes in the build tree
-        ::LoadAllNodes(strBuildRoot);
-        std::cout << "Number of Nodes Loaded = " << std::to_string(gs_stlListOfNodes.size()) << std::endl;
-        // Do we just want to print the metadata of all the nodes
-        if (true == oCommandLineArguments.IsElementPresent("printnodes", BOOLEAN_VALUE_TYPE))
+        gs_strRootFolder = ::FindBuildRootFolder(gs_strCurrentFolder);
+        // Now do some quick checks to see if we want to print usage or just cleanall
+        if (true == oCommandLineArguments.IsElementPresent("help", BOOLEAN_VALUE_TYPE))
         {
-            // Print all the build node metadata
-            for (const auto & c_stlElement: gs_stlListOfNodes)
-            {
-                std::cout << "----------------------------------------------------------------------------------------" << std::endl;
-                std::cout << c_stlElement.second.ToString() << std::endl;
-            }
+            ::PrintUsage();
+        }
+        else if (true == oCommandLineArguments.IsElementPresent("cleanall", BOOLEAN_VALUE_TYPE))
+        {
+            std::string strBuildFolder = gs_strRootFolder + "/Build";
+            std::string strCommandLine = "rm -Rfd " + strBuildFolder + " 2>/dev/null || :";
+            ::system(strCommandLine.c_str());
+            _ThrowBaseExceptionIf((true == std::filesystem::exists(strBuildFolder)), "UNEXPECTED ERROR: The build folder %s failed to be removed.", strBuildFolder.c_str());
+            std::cout << strBuildFolder << " and all subdirectories have been deleted." << std::endl;            
         }
         else
-        {
-            // Now let's figure out if we are looking to clean things first
-            if ((true == oCommandLineArguments.IsElementPresent("clean", BOOLEAN_VALUE_TYPE))||(true == oCommandLineArguments.IsElementPresent("cleanonly", BOOLEAN_VALUE_TYPE)))
+        {    
+            std::cout << "Working Folder = " << gs_strCurrentFolder << std::endl;
+            std::cout << "Root Folder = " << gs_strRootFolder << std::endl;
+            // First thing we do is load up the current node in the current folder, IF it exists.
+            // If it doesn't exist, then we will need a '-buildall' flag or else the build
+            // fails
+            StructuredBuffer oCurrentBuildNode(::GetNode(gs_strCurrentFolder));
+            // Load the version number if available
+            //::LoadVersionString(gs_strRootFolder);
+            // Now that we know where the root is, load up all of the nodes in the build tree
+            ::LoadAllNodes(gs_strRootFolder);
+            std::cout << "Number of Nodes Loaded = " << std::to_string(gs_stlListOfNodes.size()) << std::endl << std::endl;
+            // Do we just want to print the metadata of all the nodes
+            if (true == oCommandLineArguments.IsElementPresent("printnodes", BOOLEAN_VALUE_TYPE))
             {
-                // Are we looking to clean only the stuff relating to building the current folder, or everything?
-                if (true == oCommandLineArguments.IsElementPresent("all", BOOLEAN_VALUE_TYPE))
+                // Print all the build node metadata
+                for (const auto & c_stlElement: gs_stlListOfNodes)
                 {
-                    // nReturnValue = 0 if no errors or warnings, -2 otherwise
-                    ::CleanAll();
-                }
-                else if (true == oCommandLineArguments.IsElementPresent("this", BOOLEAN_VALUE_TYPE))
-                {
-                    // There's a chance that the current folder didn't have a build.node file, in which_open_mode
-                    // case, specifying 'this' does nothing.
-                    if (false == oCurrentBuildNode.IsElementPresent("Identifier", GUID_VALUE_TYPE))
-                    {
-                        std::cout << "No build.node in current folder. Nothing to clean!" << std::endl;
-                        nReturnValue = -2;
-                    }
-                    else
-                    {
-                        // nReturnValue = 0 if no errors or warnings, -2 otherwise
-                        ::CleanNode(oCurrentBuildNode);
-                        // If we get here, we were completely successful
-                        nReturnValue = 0;
-                    }
+                    std::cout << "----------------------------------------------------------------------------------------" << std::endl;
+                    std::cout << c_stlElement.second.ToString() << std::endl;
                 }
             }
-            
-            // Now let's figure out if we want to build. It 'cleanonly' is specified, the we are not looking to build
-            if (false == oCommandLineArguments.IsElementPresent("cleanonly", BOOLEAN_VALUE_TYPE))
+            else
             {
-                // By default
-                nReturnValue = -1;
-                // Are we building everything or just the current folder? To determine, look
-                // for the boolean value "buildall" within the command line arguments
-                if (true == oCommandLineArguments.IsElementPresent("all", BOOLEAN_VALUE_TYPE))
+                // Now let's figure out if we are looking to clean things first
+                if ((true == oCommandLineArguments.IsElementPresent("clean", BOOLEAN_VALUE_TYPE))||(true == oCommandLineArguments.IsElementPresent("cleanonly", BOOLEAN_VALUE_TYPE)))
                 {
-                    // nReturnValue = 0 if no errors or warnings, -2 otherwise
-                    ::BuildAll();
-                }
-                else if (true == oCommandLineArguments.IsElementPresent("this", BOOLEAN_VALUE_TYPE))
-                {
-                    // There's a chance that the current folder didn't have a build.node file, in which_open_mode
-                    // case, specifying 'this' does nothing.
-                    if (false == oCurrentBuildNode.IsElementPresent("Identifier", GUID_VALUE_TYPE))
-                    {
-                        std::cout << "No build.node in current folder. Nothing to clean!" << std::endl;
-                        nReturnValue = -2;
-                    }
-                    else
+                    // Are we looking to clean only the stuff relating to building the current folder, or everything?
+                    if (true == oCommandLineArguments.IsElementPresent("all", BOOLEAN_VALUE_TYPE))
                     {
                         // nReturnValue = 0 if no errors or warnings, -2 otherwise
-                        ::BuildNode(oCurrentBuildNode);
+                        ::CleanAll();
                         // If we get here, we were completely successful
                         nReturnValue = 0;
+                    }
+                    else if (true == oCommandLineArguments.IsElementPresent("this", BOOLEAN_VALUE_TYPE))
+                    {
+                        // There's a chance that the current folder didn't have a build.node file, in which_open_mode
+                        // case, specifying 'this' does nothing.
+                        if (false == oCurrentBuildNode.IsElementPresent("Identifier", GUID_VALUE_TYPE))
+                        {
+                            std::cout << "No build.node in current folder. Nothing to clean!" << std::endl;
+                            nReturnValue = -2;
+                        }
+                        else
+                        {
+                            // nReturnValue = 0 if no errors or warnings, -2 otherwise
+                            ::CleanNode(oCurrentBuildNode);
+                            // If we get here, we were completely successful
+                            nReturnValue = 0;
+                        }
+                    }
+                }
+                
+                // Now let's figure out if we want to build. It 'cleanonly' is specified, the we are not looking to build
+                if (false == oCommandLineArguments.IsElementPresent("cleanonly", BOOLEAN_VALUE_TYPE))
+                {
+                    // By default
+                    nReturnValue = -1;
+                    // Are we building everything or just the current folder? To determine, look
+                    // for the boolean value "buildall" within the command line arguments
+                    if (true == oCommandLineArguments.IsElementPresent("all", BOOLEAN_VALUE_TYPE))
+                    {
+                        // nReturnValue = 0 if no errors or warnings, -2 otherwise
+                        ::BuildAll();
+                        // If we get here, we were completely successful
+                        nReturnValue = 0;
+                    }
+                    else if (true == oCommandLineArguments.IsElementPresent("this", BOOLEAN_VALUE_TYPE))
+                    {
+                        // There's a chance that the current folder didn't have a build.node file, in which_open_mode
+                        // case, specifying 'this' does nothing.
+                        if (false == oCurrentBuildNode.IsElementPresent("Identifier", GUID_VALUE_TYPE))
+                        {
+                            std::cout << "No build.node in current folder. Nothing to clean!" << std::endl;
+                            nReturnValue = -2;
+                        }
+                        else
+                        {
+                            // nReturnValue = 0 if no errors or warnings, -2 otherwise
+                            ::BuildNode(oCurrentBuildNode);
+                            // If we get here, we were completely successful
+                            nReturnValue = 0;
+                        }
                     }
                 }
             }

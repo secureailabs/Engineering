@@ -1,33 +1,30 @@
-BUILD_MODE?=debug
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -fPIC
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
-
+# Because of the way make is called, the variables $(BUILD_MODE) and $(ROOTDIR)
+# should already be defined
+CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
+LDFLAGS=-lSharedCommonCode -lSailCompression -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
+# The $(BUILD_MODE) value is set as a command line parameter into make by BuiltTool
+BUILD_MODE?=$(MODE)
 ifeq ($(BUILD_MODE), debug)
 	CXXFLAGS+= -ggdb
 else
 	CXXFLAGS+= -O3
 endif
 
-# The Root directory containing all the code
-ROOTDIR=../..
+ABSROOTDIR=$(ROOT)
+OBJDIR=$(ABSROOTDIR)/Build/Binaries/Objects
 
-include $(ROOTDIR)/Common.mk
+INCLUDE :=-I$(shell realpath ./Include/)
+INCLUDE +=-I$(shell realpath $(ABSROOTDIR)/Build/Include)
+SRCDIRS :=$(shell realpath ./Sources/)
+LDFLAGS +=-L$(shell realpath $(ABSROOTDIR)/Build/Libraries)
 
-# Add the new include folders here
-INCLUDE+=-I$(shell realpath ./Include)
-#INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
+CPP_FINDFILES=$(wildcard $(DIR)/*.cpp)
+CPP_SOURCES := $(foreach DIR,$(SRCDIRS),$(CPP_FINDFILES))
 
-# Add the new source directory here
-SRCDIRS+=$(shell realpath ./Sources)
-#SRCDIRS+=$(shell realpath ../SharedComponents/Sources)
+OBJS=$(CPP_SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
+OUTPUT=$(ABSROOTDIR)/Build/Binaries/$(notdir $(shell pwd))
 
-SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
-
-OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-
-OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
-
-.PHONY: all, clean, cleanall
+.PHONY: all, clean
 
 all: $(OUTPUT)
 
@@ -35,12 +32,9 @@ $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $^ -o $@
 
-$(OUTPUT): $(OBJS) SharedCommonCode
+$(OUTPUT): $(OBJS)
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 
 clean:
-	rm -rf $(OUTPUT) $(OBJS)
-
-cleanall:
-	rm -rf $(ABSROOTDIR)/Binary
+	@rm $(OUTPUT) $(OBJS) 2>/dev/null || :

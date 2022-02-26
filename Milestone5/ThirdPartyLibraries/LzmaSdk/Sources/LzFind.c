@@ -1592,7 +1592,7 @@ void LzFindPrepare()
   {
     if (CPU_IsSupported_NEON())
     {
-      #pragma message ("=== LzFind NEON")
+      //#pragma message ("=== LzFind NEON")
       _PRF(printf("\n=== LzFind NEON\n"));
       f = LzFind_SaturSub_128;
     }
@@ -1601,14 +1601,14 @@ void LzFindPrepare()
   #else // MY_CPU_ARM_OR_ARM64
   if (CPU_IsSupported_SSE41())
   {
-    #pragma message ("=== LzFind SSE41")
+    //#pragma message ("=== LzFind SSE41")
     _PRF(printf("\n=== LzFind SSE41\n"));
     f = LzFind_SaturSub_128;
 
     #ifdef USE_AVX2
     if (CPU_IsSupported_AVX2())
     {
-      #pragma message ("=== LzFind AVX2")
+      //#pragma message ("=== LzFind AVX2")
       _PRF(printf("\n=== LzFind AVX2\n"));
       f = LzFind_SaturSub_256;
     }

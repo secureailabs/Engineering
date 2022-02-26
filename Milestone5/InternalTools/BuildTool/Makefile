@@ -1,6 +1,6 @@
 BUILD_MODE?=debug
 CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -fPIC
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
+LDFLAGS=-lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
 
 ifeq ($(BUILD_MODE), debug)
 	CXXFLAGS+= -ggdb
@@ -10,24 +10,29 @@ endif
 
 # The Root directory containing all the code
 ROOTDIR=../..
+ABSROOTDIR=$(shell realpath $(ROOTDIR))
+OBJDIR=$(ABSROOTDIR)/Build/Binaries/Objects
 
-include $(ROOTDIR)/Common.mk
+FINDFILES = $(wildcard $(DIR)/*.cpp)
+C_FINDFILES = $(wildcard $(DIR)/*.c)
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
-#INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
+INCLUDE+=-I$(shell realpath $(ABSROOTDIR)/SharedCommonCode/Include)
+INCLUDE+=-I$(shell realpath $(ABSROOTDIR)/ThirdPartyLibraries/LzmaSdk/Include)
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)
-#SRCDIRS+=$(shell realpath ../SharedComponents/Sources)
+SRCDIRS+=$(shell realpath $(ABSROOTDIR)/SharedCommonCode/Sources)
+SRCDIRS+=$(shell realpath $(ABSROOTDIR)/ThirdPartyLibraries/LzmaSdk/Sources)
 
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
+C_SOURCES := $(foreach DIR,$(SRCDIRS),$(C_FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
+OBJS+=$(C_SOURCES:$(ABSROOTDIR)%.c=$(OBJDIR)%.o)
 
-OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
-
-.PHONY: all, clean, cleanall
+OUTPUT=$(ABSROOTDIR)/Build/Binaries/$(notdir $(shell pwd))
 
 all: $(OUTPUT)
 
@@ -35,12 +40,13 @@ $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $^ -o $@
 
-$(OUTPUT): $(OBJS) SharedCommonCode
+$(OBJDIR)%.o: $(ABSROOTDIR)%.c
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $^ -o $@
+
+$(OUTPUT): $(OBJS)
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $^ -o $@ $(LDFLAGS)
 
 clean:
 	rm -rf $(OUTPUT) $(OBJS)
-
-cleanall:
-	rm -rf $(ABSROOTDIR)/Binary

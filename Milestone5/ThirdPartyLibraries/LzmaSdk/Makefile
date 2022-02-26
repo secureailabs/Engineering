@@ -1,41 +1,37 @@
-LZMA_CFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
-
-BUILD_MODE?=debug
+# Because of the way make is called, the variables $(BUILD_MODE) and $(ROOTDIR)
+# should already be defined
+CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
+# The $(BUILD_MODE) value is set as a command line parameter into make by BuiltTool
+BUILD_MODE?=$(MODE)
 ifeq ($(BUILD_MODE), debug)
-	SHARED_COMMON_CXXFLAGS+= -ggdb
+	CXXFLAGS+= -ggdb
 else
-	SHARED_COMMON_CXXFLAGS+= -O3
+	CXXFLAGS+= -O3
 endif
 
-ROOTDIR:=../../
+ABSROOTDIR=$(ROOT)
+OBJDIR=$(ABSROOTDIR)/Build/Binaries/Objects
 
-ABSROOTDIR=$(shell realpath $(ROOTDIR))
-OBJDIR=$(ABSROOTDIR)/Binary/Objects
+INCLUDE :=-I$(shell realpath ./Include/)
+SRCDIRS :=$(shell realpath ./Sources/)
 
-FINDFILES = $(wildcard $(DIR)/*.c)
+C_FINDFILES = $(wildcard $(DIR)/*.c)
+C_SOURCES := $(foreach DIR,$(SRCDIRS),$(C_FINDFILES))
 
-# Add the new include folders here
-LZMA_INCLUDE :=-I$(shell realpath ./Include/)
-
-LZMA_SRCDIRS :=$(shell realpath ./Sources/)
-
-LZMA_SOURCES := $(foreach DIR,$(LZMA_SRCDIRS),$(FINDFILES))
-
-LZMA_OBJS=$(LZMA_SOURCES:$(ABSROOTDIR)%.c=$(OBJDIR)%.o)
-LZMA_LIBRARY=$(ABSROOTDIR)/Binary/StaticLibraries/liblzma-sail.a
+OBJS=$(C_SOURCES:$(ABSROOTDIR)%.c=$(OBJDIR)%.o)
+OUTPUT=$(ABSROOTDIR)/Build/Binaries/libSailCompression.a
 
 .PHONY: all, clean
 
-all: $(LZMA_LIBRARY)
+all: $(OUTPUT)
 
 $(OBJDIR)%.o: $(ABSROOTDIR)%.c
 	@mkdir -p $(@D)
-	$(CXX) $(LZMA_CFLAGS) $(LZMA_INCLUDE) -c $^ -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $^ -o $@
 
-$(LZMA_LIBRARY): $(LZMA_OBJS)
-	@echo $(LZMA_OBJS)
+$(OUTPUT): $(OBJS)
 	@mkdir -p $(@D)
 	@ar rcs $@ $^
 
 clean:
-	@rm $(LZMA_LIBRARY) $(LZMA_OBJS)
+	@rm -f $(OUTPUT) $(OBJS) 2>/dev/null || :

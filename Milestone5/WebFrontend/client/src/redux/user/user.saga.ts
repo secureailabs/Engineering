@@ -105,8 +105,8 @@ export function* onCheckUserSessionAsync() {
 
 export function* signOut() {
   try {
-    yield logOut();
-    yield removeToken();
+    // yield logOut();
+    // yield removeToken();
     yield put(signOutSuccess());
   } catch (error) {
     yield put(signOutFailure(error));

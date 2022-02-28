@@ -10,6 +10,7 @@ import {
   MdViewColumn,
   MdSettings,
   MdHelpOutline,
+  MdLaunch,
   MdLogout,
 } from 'react-icons/md';
 
@@ -24,9 +25,9 @@ import default_profile_image from '@assets/user.png';
 import newLogo from '@assets/newLogo.png';
 
 import { FaServer } from 'react-icons/fa';
-const Dashboard = () => {
+const Dashboard = ({ logout }) => {
   const primary = [
-    { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard' },
+    { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },
     { text: 'Datasets', Icon: MdViewColumn, link: '/dashboard/datasets' },
     {
       text: 'Digital Contracts',
@@ -39,9 +40,9 @@ const Dashboard = () => {
       link: '/dashboard/virtual-machines',
     },
     {
-      text: 'Azure Templates Manager',
-      Icon: CgTemplate,
-      link: '/dashboard/azure-templates',
+      text: 'Launch Notebook',
+      Icon: MdLaunch,
+      onClick: () => {},
     },
     {
       text: 'Unified Registries',
@@ -63,7 +64,7 @@ const Dashboard = () => {
     {
       text: 'Logout',
       Icon: MdLogout,
-      onClick: () => {},
+      onClick: logout,
     },
   ];
 

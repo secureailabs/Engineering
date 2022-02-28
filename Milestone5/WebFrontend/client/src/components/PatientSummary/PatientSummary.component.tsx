@@ -6,6 +6,7 @@ import Measure from 'react-measure';
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { Range, getTrackBackground } from 'react-range';
 
 import HighlightedValue from '@secureailabs/web-ui/components/HighlightedValue';
 
@@ -14,7 +15,10 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 import Card from '@secureailabs/web-ui/components/Card';
 
 import Select from 'react-select';
-
+const STEP = 0.1;
+const MIN = 0;
+const MAX = 100;
+const rtl = false;
 export const gender_data = {
   labels: ['Male', 'Female', 'Unkown'],
   datasets: [
@@ -77,6 +81,7 @@ export const disease_data = {
 };
 
 const PatientSummary = () => {
+  const [values, setValues] = useState([11, 20]);
   const [dimensions, setDimensions] = useState({ width: 150, height: 150 });
   return (
     <Measure
@@ -113,6 +118,86 @@ const PatientSummary = () => {
                     ]}
                   />
                 </div>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Text>Age&nbsp;&nbsp;&nbsp;</Text>
+                <Range
+                  step={0.1}
+                  min={0}
+                  max={100}
+                  values={[11, 20]}
+                  onChange={() => {}}
+                  renderTrack={({ props, children }) => (
+                    <div
+                      onMouseDown={props.onMouseDown}
+                      onTouchStart={props.onTouchStart}
+                      style={{
+                        ...props.style,
+                        height: '36px',
+                        display: 'flex',
+                        width: '100%',
+                      }}
+                    >
+                      <div
+                        ref={props.ref}
+                        style={{
+                          height: '5px',
+                          width: '100%',
+                          borderRadius: '4px',
+                          background: getTrackBackground({
+                            values,
+                            colors: ['#ccc', '#F37324', '#ccc'],
+                            min: MIN,
+                            max: MAX,
+                            rtl,
+                          }),
+                          alignSelf: 'center',
+                        }}
+                      >
+                        {children}
+                      </div>
+                    </div>
+                  )}
+                  renderThumb={({ index, props, isDragged }) => (
+                    <div
+                      {...props}
+                      style={{
+                        ...props.style,
+                        height: '15px',
+                        width: '15px',
+                        borderRadius: '50%',
+                        backgroundColor: '#FFF',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        border: '2px solid #F37324',
+                        boxShadow: '0px 2px 6px #AAA',
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-28px',
+                          color: '#fff',
+                          fontWeight: 'bold',
+                          fontSize: '14px',
+                          fontFamily:
+                            'Arial,Helvetica Neue,Helvetica,sans-serif',
+                          padding: '4px',
+                          borderRadius: '4px',
+                          backgroundColor: '#F37324',
+                        }}
+                      >
+                        {values[index].toFixed(1)}
+                      </div>
+                    </div>
+                  )}
+                />
               </div>
               <div className="patient-summary__bottom">
                 <div className="patient-summary__charts">

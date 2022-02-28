@@ -65,8 +65,8 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
                 type: 'text',
               },
               DatasetName: {
-                label: 'Dataset',
-                placeholder: 'Dataset',
+                label: 'Data Federation',
+                placeholder: 'Data Federation',
                 type: 'text',
               },
               Status: {
@@ -89,19 +89,10 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
                 placeholder: 'Data Owner',
                 type: 'text',
               },
-              HostForVirtualMachines: {
-                label: 'Virtual Machine Host',
-                placeholder: 'Virtual Machine Host',
-                type: 'text',
-              },
+
               HostRegion: {
-                label: 'Host Region',
-                placeholder: 'Host Region',
-                type: 'text',
-              },
-              NumberOfVirtualMachines: {
-                label: 'Number of Virtual Machines',
-                placeholder: 'Number of Virtual Machines',
+                label: 'Allowable Host Regions',
+                placeholder: 'Allowable Host Regions',
                 type: 'text',
               },
               NumberOfVCPU: {
@@ -110,20 +101,16 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
                 type: 'text',
               },
               ActivationTime: {
-                label: 'Activation Time',
-                placeholder: 'Activation Time',
+                label: 'Start Date',
+                placeholder: 'Start Date',
                 type: 'text',
               },
               ExpirationTime: {
-                label: 'Expiration Time',
-                placeholder: 'Expiraton Time',
+                label: 'Data Retention Time',
+                placeholder: 'Data Retention Time',
                 type: 'text',
               },
-              AzureTemplate: {
-                label: 'Azure Template',
-                placeholder: 'Azure Template',
-                type: 'text',
-              },
+
               ContractDuration: {
                 label: 'Contract Duration',
                 placeholder: 'Contract Duration',

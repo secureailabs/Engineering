@@ -74,7 +74,7 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
   });
   return (
     <div>
-      <StandardContent title={getDatasetData?.Dataset?.DatasetName}>
+      <StandardContent back={true} title={getDatasetData?.Dataset?.DatasetName}>
         <Card primaryText="">
           <div className="form-double">
             <FormFieldsRenderer

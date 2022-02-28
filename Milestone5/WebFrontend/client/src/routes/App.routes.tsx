@@ -6,6 +6,17 @@ import Signup from '@pages/Signup';
 
 import ProtectedRoute from './ProtectedRoute';
 import UnProtectedRoute from './UnProtectedRoute';
+<<<<<<< HEAD
+=======
+
+{
+  /*
+      *
+      *
+    <UnProtectedRoute exact path="/login" redirect="/dashboard">
+      <Login />
+    </UnProtectedRoute>
+>>>>>>> b41571f88d730ba2c67b769937b1ee6251f27ee9
 
 const AppRouter: React.FC = (): React.ReactElement => (
   <Routes>
@@ -19,6 +30,7 @@ const AppRouter: React.FC = (): React.ReactElement => (
       }
     />
     <Route path="/dashboard/*" element={<Dashboard />} />
+    <Route path="*" element={<Navigate to="/login" />}/>
   </Routes>
 );
 

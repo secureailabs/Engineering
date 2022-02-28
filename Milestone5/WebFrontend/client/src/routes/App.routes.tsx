@@ -7,6 +7,7 @@ import Signup from '@pages/Signup';
 
 import ProtectedRoute from './ProtectedRoute';
 import UnProtectedRoute from './UnProtectedRoute';
+
 {
   /*
       *
@@ -38,6 +39,7 @@ const AppRouter: React.FC = (): React.ReactElement => (
       }
     />
     <Route path="/dashboard/*" element={<Dashboard />} />
+    <Route path="*" element={<Navigate to="/login" />}/>
   </Routes>
 );
 

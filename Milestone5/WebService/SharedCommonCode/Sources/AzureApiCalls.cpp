@@ -584,6 +584,11 @@ bool DoesAzureResourceExist(
     {
         strApiUri = c_strResourceId + "?api-version=2021-04-01";
     }
+    else
+    {
+        // This is a resource Group
+        strApiUri = c_strResourceId + "?api-version=2021-04-01";
+    }
     _ThrowBaseExceptionIf((0 == strApiUri.length()), "Incorrect resource type", nullptr);
 
     std::string strHost = "management.azure.com";
@@ -965,108 +970,95 @@ StructuredBuffer CopyVirtualMachineImage(
  *
  ********************************************************************************************/
 
-bool DeleteAzureResources(
+bool DeleteAzureResourceGroup(
     _in const std::string & c_strApplicationIdentifier,
     _in const std::string & c_strTenantIdentifier,
     _in const std::string & c_strSecret,
-    _in const std::vector<std::string> & c_stlResourceId
+    _in const std::string & c_strSubscriptionId,
+    _in const std::string & c_stlResourceGroupName
 )
 {
     __DebugFunction();
 
-    bool fResourcesDeleted = false;
+    bool fResourceGroupDeleted = false;
 
     // Login to the Microsoft Azure API Portal
     const std::string c_strMicrosoftAzureAccessToken = ::LoginToMicrosoftAzureApiPortal(c_strApplicationIdentifier, c_strSecret, c_strTenantIdentifier);
     _ThrowBaseExceptionIf((0 == c_strMicrosoftAzureAccessToken.length()), "Azure Authentication failed...", nullptr);
 
-    for (auto strResourceId : c_stlResourceId)
+    // Resouce group Id
+    std::string strResourceGroupId = "/subscriptions/" + c_strSubscriptionId + "/resourceGroups/" + c_stlResourceGroupName;
+
+    if (true == ::DoesAzureResourceExist(c_strMicrosoftAzureAccessToken, strResourceGroupId))
     {
-        if (true == ::DoesAzureResourceExist(c_strMicrosoftAzureAccessToken, strResourceId))
+        std::string strVerb = "DELETE";
+        std::string strContent = "";
+        std::string strApiUri = strResourceGroupId + "?api-version=2021-04-01";
+        std::string strHost = "management.azure.com";
+
+        std::vector<std::string> stlHeader;
+        stlHeader.push_back("Host: " + strHost);
+        stlHeader.push_back("Authorization: Bearer " + c_strMicrosoftAzureAccessToken);
+        stlHeader.push_back("Content-Length: " + std::to_string(strContent.length()));
+
+        long nResponseCode = 0;
+        bool fResourceDeleted = false;
+        do
         {
-            std::string strVerb = "DELETE";
-            std::string strContent = "";
-            std::string strApiUri = "";
-            if (std::string::npos != strResourceId.find("Microsoft.Network"))
+            std::vector<Byte> stlResponse = ::RestApiCall(strHost, 443, strVerb, strApiUri, "", false, stlHeader, &nResponseCode);
+            if ((200 == nResponseCode) || (202 == nResponseCode) || (204 == nResponseCode))
             {
-                strApiUri = strResourceId + "?api-version=2021-03-01";
+                fResourceDeleted = true;
             }
-            else if (std::string::npos != strResourceId.find("Microsoft.Compute"))
+            else
             {
-                strApiUri = strResourceId + "?api-version=2021-04-01";
-            }
-            _ThrowBaseExceptionIf((0 == strApiUri.length()), "Incorrect resource type", nullptr);
-
-            std::string strHost = "management.azure.com";
-
-            std::vector<std::string> stlHeader;
-            stlHeader.push_back("Host: " + strHost);
-            stlHeader.push_back("Authorization: Bearer " + c_strMicrosoftAzureAccessToken);
-            stlHeader.push_back("Content-Length: " + std::to_string(strContent.length()));
-
-            long nResponseCode = 0;
-            bool fResourceDeleted = false;
-            do
-            {
-                std::vector<Byte> stlResponse = ::RestApiCall(strHost, 443, strVerb, strApiUri, "", false, stlHeader, &nResponseCode);
-                if ((200 == nResponseCode) || (202 == nResponseCode) || (204 == nResponseCode))
+                if (0 < stlResponse.size())
                 {
-                    fResourceDeleted = true;
-                }
-                else
-                {
-                    if (0 < stlResponse.size())
+                    stlResponse.push_back(0);
+                    StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+                    if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                     {
-                        stlResponse.push_back(0);
-                        StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
-                        if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+                        if (false == ::IsServerTimeoutError(oResponse))
                         {
-                            if (false == ::IsServerTimeoutError(oResponse))
-                            {
-                                _ThrowBaseExceptionIf((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)), "Resource deletion: %s", oResponse.GetStructuredBuffer("error").ToString().c_str());
-                                _ThrowBaseExceptionIf((true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Resource deletion: %s", oResponse.GetString("error").c_str());
-                                _ThrowBaseException("Should never be thrown. Something is horribly wrong.", nullptr);
-                            }
-                        }
-                        else
-                        {
-                            std::cout << "DeleteAzureResources. Unexpected response from server. Response: " << oResponse.ToString() << std::endl;
+                            _ThrowBaseExceptionIf((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)), "Resource deletion: %s", oResponse.GetStructuredBuffer("error").ToString().c_str());
+                            _ThrowBaseExceptionIf((true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Resource deletion: %s", oResponse.GetString("error").c_str());
+                            _ThrowBaseException("Should never be thrown. Something is horribly wrong.", nullptr);
                         }
                     }
                     else
                     {
-                        std::cout << "DeleteAzureResources. No response from server. Response code: " << nResponseCode << std::endl;
+                        std::cout << "DeleteAzureResourceGroup. Unexpected response from server. Response: " << oResponse.ToString() << std::endl;
                     }
-                }
-            }
-            while (false == fResourceDeleted);
-
-            fResourceDeleted = false;
-            // Wait for the resource to be deleted so that no depenedency is blocked or fails later
-            while (false == fResourceDeleted)
-            {
-                if (true == ::DoesAzureResourceExist(c_strMicrosoftAzureAccessToken, strResourceId))
-                {
-                    ::sleep(5);
                 }
                 else
                 {
-                    fResourceDeleted = true;
+                    std::cout << "DeleteAzureResourceGroup. No response from server. Response code: " << nResponseCode << std::endl;
                 }
+            }
+        }
+        while (false == fResourceDeleted);
+
+        fResourceDeleted = false;
+        // Wait for the resource to be deleted so that no depenedency is blocked or fails later
+        while (false == fResourceDeleted)
+        {
+            if (true == ::DoesAzureResourceExist(c_strMicrosoftAzureAccessToken, strResourceGroupId))
+            {
+                ::sleep(5);
+            }
+            else
+            {
+                fResourceDeleted = true;
             }
         }
     }
 
-    // Check again if all the resources are deleted
-    fResourcesDeleted = true;
-    for (auto strResourceId : c_stlResourceId)
+    // Check again if the resourceGroup is deleted
+    fResourceGroupDeleted = true;
+    if (true == ::DoesAzureResourceExist(c_strMicrosoftAzureAccessToken, strResourceGroupId))
     {
-        if (true == ::DoesAzureResourceExist(c_strMicrosoftAzureAccessToken, strResourceId))
-        {
-            fResourcesDeleted = false;
-            break;
-        }
+        fResourceGroupDeleted = false;
     }
 
-    return fResourcesDeleted;
+    return fResourceGroupDeleted;
 }

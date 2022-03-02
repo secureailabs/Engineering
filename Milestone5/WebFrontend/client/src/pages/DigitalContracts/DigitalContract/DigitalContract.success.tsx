@@ -12,6 +12,7 @@ import getPartnerOrg from '@utils/getPartnerOrg';
 
 const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
   getDigitalContractData,
+  //@ts-ignore
   userData,
 }) => {
   let provisioning_status;

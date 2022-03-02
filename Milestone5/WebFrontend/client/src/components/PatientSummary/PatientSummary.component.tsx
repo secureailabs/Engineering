@@ -42,7 +42,7 @@ export const gender_data = {
 
 const plugins = [
   {
-    beforeDraw: function (chart) {
+    beforeDraw: function (chart: any) {
       var width = chart.width,
         height = chart.height,
         ctx = chart.ctx;
@@ -86,7 +86,7 @@ const PatientSummary = () => {
   return (
     <Measure
       bounds
-      onResize={(contentRect) => {
+      onResize={(contentRect: any) => {
         setDimensions(contentRect.bounds);
         console.log(dimensions.width / 2);
       }}
@@ -212,6 +212,7 @@ const PatientSummary = () => {
                     </Text>
                     <Doughnut
                       data={gender_data}
+                      //@ts-ignore
                       plugins={plugins}
                       options={{
                         maintainAspectRatio: true,
@@ -235,6 +236,7 @@ const PatientSummary = () => {
                     </Text>
                     <Doughnut
                       data={disease_data}
+                      //@ts-ignore
                       plugins={plugins}
                       options={{
                         maintainAspectRatio: true,

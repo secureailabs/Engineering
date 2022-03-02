@@ -6,9 +6,9 @@ import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 import Card from '@secureailabs/web-ui/components/Card';
 
-import { TVirtualMachinesSuccessProps } from './VirtualMachine.types';
+import { TVirtualMachineSuccessProps } from './VirtualMachine.types';
 
-const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
+const VirtualMachineSuccess: React.FC<TVirtualMachineSuccessProps> = ({
   getVirtualMachineData,
 }) => {
   const { register, handleSubmit, formState, trigger } = useForm({

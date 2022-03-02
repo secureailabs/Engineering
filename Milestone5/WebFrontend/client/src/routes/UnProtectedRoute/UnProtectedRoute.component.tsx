@@ -2,11 +2,11 @@ import React, { ReactElement } from 'react';
 
 import { Route, Navigate } from 'react-router-dom';
 
-import { IProtectedRoutes } from './ProtectedRoute.types';
+import { IUnProtectedRoutes } from './UnProtectedRoute.types';
 
 import Spinner from '@components/Spinner';
 
-const ProtectedRoute: React.FC<IProtectedRoutes> = ({
+const ProtectedRoute: React.FC<IUnProtectedRoutes> = ({
   userState,
   children,
   redirect,

@@ -53,7 +53,7 @@ const Table: React.FC<TTable> = ({
         ))}
       </thead>
       <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
+        {rows.map((row: any, i) => {
           prepareRow(row);
           return (
             <tr
@@ -62,7 +62,7 @@ const Table: React.FC<TTable> = ({
                 navigate(`${base_url}/${row.original[id_accessor]}`);
               }}
             >
-              {row.cells.map((cell) => {
+              {row.cells.map((cell: any) => {
                 return (
                   <td {...cell.getCellProps()} onClick={() => {}}>
                     <Text fontSize="12px" fontWeight={500}>

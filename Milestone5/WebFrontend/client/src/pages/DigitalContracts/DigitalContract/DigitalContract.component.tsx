@@ -39,6 +39,7 @@ const DigitalContract: React.FC<TDigitalContractProps> = () => {
       ROName: '',
       LastActivity: 0,
       ProvisioningStatus: 1,
+      //@ts-ignore
       HostForDigitalContract: 'localhost',
       NumberOfVCPU: 10,
       Note: '',
@@ -61,6 +62,7 @@ const DigitalContract: React.FC<TDigitalContractProps> = () => {
           success={() => (
             <DigitalContractSuccess getDigitalContractData={temp_data} />
           )}
+          //@ts-ignore
           failure={<>Failure</>}
           Loading={
             <>

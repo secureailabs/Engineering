@@ -8,9 +8,11 @@ export type TFeedProps = {
   getAllFeedsState: IDefaults['state'];
   getAllFeedsData: TGetAllFeedsSuccess;
   limit?: number;
+  containerHeight?: boolean;
 };
 
 export type TFeedSuccessProps = {
   getAllFeedsData: TGetAllFeedsSuccess;
   limit?: number;
+  containerHeight?: boolean;
 };

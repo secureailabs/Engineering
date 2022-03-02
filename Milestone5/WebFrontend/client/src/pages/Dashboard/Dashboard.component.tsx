@@ -25,6 +25,7 @@ import default_profile_image from '@assets/user.png';
 import newLogo from '@assets/newLogo.png';
 
 import { FaServer } from 'react-icons/fa';
+//@ts-ignore
 const Dashboard = ({ logout }) => {
   const primary = [
     { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },

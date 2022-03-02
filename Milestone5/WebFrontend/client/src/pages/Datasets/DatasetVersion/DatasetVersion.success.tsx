@@ -7,7 +7,7 @@ import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRender
 import Card from '@secureailabs/web-ui/components/Card';
 import stageNumberToString from '@utils/stageNumberToString';
 
-import { TDatasetSuccessProps } from './DatasetVersion.types';
+import { TDatasetVersionSuccessProps } from './DatasetVersion.types';
 
 import Margin from '@secureailabs/web-ui/components/Margin';
 
@@ -15,7 +15,7 @@ import Button from '@secureailabs/web-ui/components/Button';
 
 import Table from '@components/Table';
 
-const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({
+const DatasetSuccess: React.FC<TDatasetVersionSuccessProps> = ({
   getDatasetVersionData,
 }) => {
   const { register, handleSubmit, formState, trigger } = useForm({

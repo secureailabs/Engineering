@@ -23,6 +23,7 @@ const Dataset: React.FC<TDatasetProps> = ({
   const params = useParams();
   useEffect(() => {
     getDatasetReset();
+    //@ts-ignore
     getDatasetStart({ DatasetGuid: params.id });
   }, []);
   const { register, handleSubmit, formState, trigger } = useForm({
@@ -36,6 +37,7 @@ const Dataset: React.FC<TDatasetProps> = ({
         //@ts-ignore
         state={getDatasetState}
         success={() => <DatasetSuccess getDatasetData={getDatasetData} />}
+        //@ts-ignore
         failure={<>Failure</>}
         Loading={
           <>

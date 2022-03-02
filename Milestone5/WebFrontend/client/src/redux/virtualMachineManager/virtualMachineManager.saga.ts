@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   all,
   AllEffect,
@@ -76,7 +77,7 @@ import {
   getAllVirtualMachinesAPI,
 } from './virtualMachineManager.apis';
 
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import {
   TGetVirtualMachineSuccess,
   TPutVirtualMachineStart,
@@ -91,10 +92,8 @@ export function* putVirtualMachine({
 }: ReturnType<typeof putVirtualMachineStart>) {
   try {
     yield putVirtualMachineAPI({ data: payload });
-    console.log('here');
     yield put(putVirtualMachineSuccess());
-  } catch (error) {
-    // tslint:disable-next-line: no-unsafe-any
+  } catch (error: any) {
     yield put(putVirtualMachineFailure(error.response.data));
   }
 }
@@ -127,9 +126,7 @@ export function* getVirtualMachineSaga({
     data['VirtualMachine']['DigitalContract'] = digitalContract.data;
 
     yield put(getVirtualMachineSuccess(data['VirtualMachine']));
-  } catch (err) {
-    console.log('ERROR: ', err);
-    // tslint:disable-next-line: no-unsafe-any
+  } catch (err: any) {
     yield put(getVirtualMachineFailure(err.response.data));
   }
 }

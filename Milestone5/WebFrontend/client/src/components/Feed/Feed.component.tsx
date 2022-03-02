@@ -32,7 +32,11 @@ const Feed: React.FC<TFeedProps> = ({
       // state={getAllFeedsState}
       state={getAllFeedsState}
       success={() => (
-        <FeedsSuccess limit={limit} getAllFeedsData={getAllFeedsData} />
+        <FeedsSuccess
+          containerHeight={containerHeight}
+          limit={limit}
+          getAllFeedsData={getAllFeedsData}
+        />
       )}
       failure={FeedsFailure}
       Loading={

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import Table from '@components/Table';
 
-import { TUnifiedRegistrysSuccessProps } from './UnifiedRegistries.types';
+import { TUnifiedRegistriesSuccessProps } from './UnifiedRegistries.types';
 
 import { TGetAllUnifiedRegistriesSuccess } from '@redux/unifiedRegistry/unifiedRegistry.types';
 
@@ -18,7 +18,7 @@ import en from 'javascript-time-ago/locale/en.json';
 TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en');
 
-const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrysSuccessProps> = ({
+const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
   getAllUnifiedRegistriesData,
 }) => {
   const columns = React.useMemo(
@@ -54,7 +54,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrysSuccessProps> = ({
         accessor: 'NumberOfDataOwner',
         width: 100,
         Cell: ({ value }: { value: number }) => {
-          return <HighlightedValue>{value}</HighlightedValue>;
+          return <HighlightedValue>{value.toString()}</HighlightedValue>;
         },
       },
 
@@ -63,13 +63,12 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrysSuccessProps> = ({
         accessor: 'NumberOfPatients',
         width: 200,
         Cell: ({ value }: { value: number }) => {
-          return <HighlightedValue>{value}</HighlightedValue>;
+          return <HighlightedValue>{value.toString()}</HighlightedValue>;
         },
       },
     ],
     []
   );
-  console.log(getAllUnifiedRegistriesData);
   const parsedData = Object.entries(
     getAllUnifiedRegistriesData.UnifiedRegistries
   ).map(([key, value]) => {
@@ -82,12 +81,11 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrysSuccessProps> = ({
       ...value,
     };
   });
-  console.log(parsedData);
   return (
     <>
       <Margin size={5} />
       <Table
-        base_url="/dashboard/virtual-machines"
+        base_url="/dashboard/registries"
         id_accessor="key"
         columns={columns}
         data={parsedData}

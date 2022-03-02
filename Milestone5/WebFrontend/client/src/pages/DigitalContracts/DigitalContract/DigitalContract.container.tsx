@@ -32,5 +32,6 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => ({
 });
 
 export default compose(connect(mapStateToProps, mapDispatchToProps))(
+  //@ts-ignore
   DigitalContract
 );

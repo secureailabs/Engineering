@@ -62,6 +62,7 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
     return {
       key,
       ...value,
+      //@ts-ignore
       PublishDate: new Date(value.PublishDate * 1000).toLocaleDateString(
         'en-US',
         {

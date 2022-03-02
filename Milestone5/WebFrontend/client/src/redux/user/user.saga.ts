@@ -37,7 +37,7 @@ export function* signUp({ payload }: ReturnType<typeof signUpStart>) {
     // The backend returns status 204 when the fields are valid but the org already exists
 
     yield put(signUpSuccess());
-  } catch (error) {
+  } catch (error: any) {
     yield put(signUpFailure(error?.response?.data));
   }
 }

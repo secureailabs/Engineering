@@ -38,10 +38,12 @@ const VirtualMachine: React.FC<TVirtualMachineProps> = () => {
       ROName: '',
       LastActivity: 0,
       ProvisioningStatus: 1,
+      //@ts-ignore
       HostForVirtualMachine: 'localhost',
       NumberOfVCPU: 10,
       Note: '',
     },
+    //@ts-ignore
     State: 4,
     RegistrationTime: 20,
     HeartbeatBroadcastTime: 10,

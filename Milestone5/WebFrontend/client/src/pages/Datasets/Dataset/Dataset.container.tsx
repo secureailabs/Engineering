@@ -27,5 +27,5 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => ({
   getDatasetStart: (data: TGetDatasetStart) => dispatch(getDatasetStart(data)),
   getDatasetReset: () => dispatch(getDatasetReset()),
 });
-
+//@ts-ignore
 export default compose(connect(mapStateToProps, mapDispatchToProps))(Dataset);

@@ -16,7 +16,6 @@ const UnifiedRegistries: React.FC<TUnifiedRegistriesProps> = ({
   getAllUnifiedRegistriesStart,
   getAllUnifiedRegistriesState,
   getAllUnifiedRegistriesData,
-  userData,
 }) => {
   useEffect(() => {
     getAllUnifiedRegistriesReset();

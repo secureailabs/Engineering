@@ -2,13 +2,13 @@ import { TGetAllUnifiedRegistriesSuccess } from '@redux/unifiedRegistry/unifiedR
 import { IUserData } from '@redux/user/user.typeDefs';
 import { IDefaults } from '@redux/typedefs';
 
-export type TUnifiedRegistrysProps = {
+export type TUnifiedRegistriesProps = {
   getAllUnifiedRegistriesStart(): void;
   getAllUnifiedRegistriesReset(): void;
   getAllUnifiedRegistriesState: IDefaults['state'];
   getAllUnifiedRegistriesData: TGetAllUnifiedRegistriesSuccess;
 };
 
-export type TUnifiedRegistrysSuccessProps = {
+export type TUnifiedRegistriesSuccessProps = {
   getAllUnifiedRegistriesData: TGetAllUnifiedRegistriesSuccess;
 };

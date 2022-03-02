@@ -30,6 +30,7 @@ const FeedSuccess: React.FC<TFeedSuccessProps> = ({
       title="Feed"
       seconday="Show all"
       containerHeight={containerHeight}
+      //@ts-ignore
       feed={parsed_data}
     />
   );

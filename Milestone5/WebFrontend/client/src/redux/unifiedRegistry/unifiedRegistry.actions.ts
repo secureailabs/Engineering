@@ -30,10 +30,10 @@ export type unifiedRegistryActions =
   | ActionType<typeof putUnifiedRegistryFailure>
   | ActionType<typeof putUnifiedRegistryReset>
   // GET ALL
-  | ActionType<typeof getAllUnifiedRegistrysStart>
-  | ActionType<typeof getAllUnifiedRegistrysSuccess>
-  | ActionType<typeof getAllUnifiedRegistrysFailure>
-  | ActionType<typeof getAllUnifiedRegistrysReset>
+  | ActionType<typeof getAllUnifiedRegistriesStart>
+  | ActionType<typeof getAllUnifiedRegistriesSuccess>
+  | ActionType<typeof getAllUnifiedRegistriesFailure>
+  | ActionType<typeof getAllUnifiedRegistriesReset>
   // GET
   | ActionType<typeof getUnifiedRegistryStart>
   | ActionType<typeof getUnifiedRegistrySuccess>
@@ -87,10 +87,10 @@ export const getAllUnifiedRegistriesStart = createAction(
   'unifiedRegistry/GET_ALL_UNIFIED_REGISTRIES_START'
 )();
 export const getAllUnifiedRegistriesSuccess: (
-  data: TGetAllUnifiedRegistrysSuccess
-) => PayloadAction<string, TGetAllUnifiedRegistrysSuccess> = createAction(
+  data: TGetAllUnifiedRegistriesSuccess
+) => PayloadAction<string, TGetAllUnifiedRegistriesSuccess> = createAction(
   'unifiedRegistry/GET_ALL_UNIFIED_REGISTRIES_SUCCESS',
-  (data: TGetAllUnifiedRegistrysSuccess) => data
+  (data: TGetAllUnifiedRegistriesSuccess) => data
 )();
 export const getAllUnifiedRegistriesFailure: (
   error: IDefaults['errorMessage']
@@ -129,6 +129,7 @@ export const deleteUnifiedRegistryStart = createAction(
   'unifiedRegistry/DELETE_UNIFIED_REGISTRY_START',
   (data: TDeleteUnifiedRegistryStart) => data
 )();
+//@ts-ignore
 export const deleteUnifiedRegistrySuccess: (
   data: TDeleteUnifiedRegistryStart
 ) => PayloadAction<string, TDeleteUnifiedRegistrySuccess> = createAction(

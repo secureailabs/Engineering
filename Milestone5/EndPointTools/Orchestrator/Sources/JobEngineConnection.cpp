@@ -1,3 +1,12 @@
+/*********************************************************************************************
+ *
+ * @file JobEngineConnection.cpp
+ * @author David Gascon
+ * @date 02 March, 2022
+ * @License Private and Confidential. Internal Use Only.
+ * @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
+ *
+ ********************************************************************************************/
 #include "DebugLibrary.h"
 #include "ExceptionRegister.h"
 #include "JobEngineConnection.h"
@@ -10,7 +19,15 @@
 #include <thread>
 #include <vector>
 
-
+/********************************************************************************************
+ *
+ * @class JobEngineConnection
+ * @function JobEngineConnection
+ * @brief Constructor
+ * @param[in] std::shared_ptr<TlsNode> - A pointer to the connection object to the JobEngine
+ * @param[in] StructuredBufferLockedQueue& - A reference to a queue to send messages back on
+ *
+ ********************************************************************************************/
 JobEngineConnection::JobEngineConnection(
     std::shared_ptr<TlsNode> stlConnectionPointer,
     StructuredBufferLockedQueue& oQueueToOrchestrator
@@ -24,6 +41,13 @@ JobEngineConnection::JobEngineConnection(
     m_fStopRequest = false;
 }
 
+/********************************************************************************************
+ *
+ * @class JobEngineConnection
+ * @function ~JobEngineConnection
+ * @brief Destructor - We'll stop the thread, wait for it to finish, and cleanup our pointers
+ *
+ ********************************************************************************************/
 JobEngineConnection::~JobEngineConnection()
 {
     m_fStopRequest = true;
@@ -97,21 +121,17 @@ bool __thiscall JobEngineConnection::IsRunning() const
 void __thiscall JobEngineConnection::JobEngineConnectionThread()
 {
     __DebugFunction();
-    // TODO - Re-enable when we can talk to an SCN
-    //__DebugAssert(nullptr != m_poTlsConnection.get());
+    __DebugAssert(nullptr != m_stlConnectionPointer.get());
 
-    if ( nullptr == m_stlConnectionPointer )
-    {
-        std::cout << "No connection to job engine" << std::endl;
-    }
     constexpr unsigned int unWaitOnMessageTimeoutInMilliseconds{1000};
-    int nTestCounter{0};
 
     while( !m_fStopRequest )
     {
         std::vector<Byte> stlJobEngineMessage;
         {
+#ifdef DEBUG_PRINTS
             std::cout << "Waiting on message " << std::endl;
+#endif
             if ( nullptr != m_stlConnectionPointer.get() )
             {
                 stlJobEngineMessage = ::GetTlsTransaction( m_stlConnectionPointer.get(), unWaitOnMessageTimeoutInMilliseconds);
@@ -121,7 +141,9 @@ void __thiscall JobEngineConnection::JobEngineConnectionThread()
         // to take ownershipe of the JobInformation if needed
         if ( 0 != stlJobEngineMessage.size() )
         {
+#ifdef DEBUG_PRINTS
             std::cout << "Received a message " << stlJobEngineMessage.size() << std::endl;
+#endif
             try
             {
 

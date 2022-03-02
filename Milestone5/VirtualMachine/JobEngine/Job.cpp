@@ -118,7 +118,7 @@ void __thiscall Job::TryRunJob(void)
             auto oJsonBody = JsonValue::ParseStructuredBufferToJson(m_oParameters);
             std::string strInputsJson = oJsonBody->ToString();
             std::ofstream out(m_strJobUuid + ".inputs");
-            std::cout << "Inputs " << strInputsJson << std::endl;
+
             out << strInputsJson;
             out.close();
             oJsonBody->Release();
@@ -126,6 +126,7 @@ void __thiscall Job::TryRunJob(void)
             // The SafeObject just requires the JobId and BaseFolder name to run
             nProcessExitStatus = m_poSafeObject->Run(m_strJobUuid);
         }
+#ifdef DEBUG_PRINTS
         else
         {
             std::cout << "Dependencies to be written" << std::endl;
@@ -134,6 +135,7 @@ void __thiscall Job::TryRunJob(void)
                 std::cout << strDep << std::endl;
             }
         }
+#endif
     }
     else
     {
@@ -296,12 +298,16 @@ bool __thiscall Job::AreAllParametersSet(void)
     if (nullptr == m_poSafeObject)
     {
         fIsComplete = false;
+#ifdef DEBUG_PRINTS
         std::cout << "Job is nullptr" << std::endl;
+#endif
     }
     else if (true == m_oParameters.GetBoolean("AllParametersSet"))
     {
         fIsComplete = true;
+#ifdef DEBUG_PRINTS
         std::cout << "M parameters tells me all is set" << std::endl;
+#endif
     }
     else
     {

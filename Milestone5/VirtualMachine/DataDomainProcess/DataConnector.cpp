@@ -143,7 +143,7 @@ bool __thiscall DataConnector::LoadAndVerify(
 
     unsigned int unTableIndex = 0;
     // Read each table and store it in a 3D vector of tables
-    for (const std::string c_strTableIdentifier: stlListOfTableIdentifiers)
+    for (const std::string & c_strTableIdentifier: stlListOfTableIdentifiers)
     {
         // Where to store your individual table.
         std::vector<std::vector<std::string>> stlIndividualTable;

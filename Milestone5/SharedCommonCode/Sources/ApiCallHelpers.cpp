@@ -281,7 +281,6 @@ StructuredBuffer __stdcall RegisterVirtualMachineAfterInitialization(
         oApiBodyContent.PutUnsignedInt64("StartTime", 1);
         oApiBodyContent.PutString("DigitalContractTitle", "Test title");
         // Make the API call and get REST response
-        std::cout << "Submitting request " << oApiBodyContent.ToString() << " to " << strApiUrl << std::endl;
         std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfWebPortalGateway, (Word) gs_unPortAddressOfWebPortalGateway, strVerb, strApiUrl, ::ConvertStructuredBufferToJson(oApiBodyContent), true);
         oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
         _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error while processing the transaction.", nullptr);

@@ -816,7 +816,6 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
     )
 {
     std::optional<Guid> oTargetSecureComputationalNode;
-    std::cout << "Checking IP for parameter " << c_oParameterGuid.ToString(eHyphensAndCurlyBraces) << std::endl;
 
     if ( eTable == c_oParameterGuid.GetObjectType() )
     {
@@ -941,11 +940,14 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
     __DebugFunction();
     __DebugAssert(oJob.ReadyToExcute());
 
+#ifdef DEBUG_PRINTS
     std::cout << "Job " << oJob.GetJobId().ToString(eHyphensAndCurlyBraces) << " is ready to execute on IP " << oJob.GetTargetIP() << std::endl;
+#endif
 
     bool fJobStarted{false};
     try
     {
+        _ThrowBaseExceptionIf((false == oJob.ReadyToExcute()), "Job is not ready to execute", nullptr);
         std::shared_ptr<JobEngineConnection> poJobEngineSocket;
         if ( m_stlSecureNodeConnections.end() == m_stlSecureNodeConnections.find(oJob.GetTargetIP()) )
         {
@@ -965,7 +967,9 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
         }
         else
         {
+#ifdef DEBUG_PRINTS
             std::cout << "Re-using existing connection" << std::endl;
+#endif
             poJobEngineSocket = m_stlSecureNodeConnections[oJob.GetTargetIP()];
         }
 
@@ -976,11 +980,9 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
         }
         else
         {
+            _ThrowBaseExceptionIf((nullptr == poJobEngineSocket), "Failed to connect to remote job engine", nullptr);
             oJob.SetConnection(poJobEngineSocket);
         }
-
-        // TODO Put this back in once we can talk to SCNs
-        //_ThrowBaseExceptionIf((nullptr == poJobEngineSocket), "Failed to connect to remote job engine", nullptr);
 
         // Send any data we had cached
         oJob.SendCachedMessages();
@@ -1129,8 +1131,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                         Guid oDigitalContractGuid(stlSecureComputationNodeItr.second.strDigitalContractGUID);
                         Guid oSecureComputationalNodeGuid(stlSecureComputationNodeItr.first);
                         VirtualMachineState eProvisionStatus = GetSecureComputationNodeInformation(oSecureComputationalNodeGuid);
-                        std::cout << "SCN Status " << int(eProvisionStatus) << std::endl;
-                        // TODO: Configuring should be in progress, but we have no data being served yet
+
                         if ( VirtualMachineState::eReadyForComputation == eProvisionStatus )
                         {
                             stlSucceededProvisions.insert(stlSecureComputationNodeItr.first);
@@ -1317,12 +1318,11 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
     for ( auto oTableItr : m_stlAvailableTables )
     {
         Guid oTableItrGuid(oTableItr.second.m_oInformation.GetString("TableIdentifier"));
-        std::cout << "Comparing " << oTableGuid.ToString(eHyphensAndCurlyBraces) << " " << oTableGuid.ToString(eHyphensAndCurlyBraces) << std::endl;
+
         if ( oTableGuid == oTableItrGuid )
         {
             Guid oDatasetGuid(oTableItr.second.m_strParentDataset);
             oSecureComputationalNodeGuid = GetSecureComputationalNodeServingDataset(oDatasetGuid);
-            std::cout << "Got node for dataset " << oDatasetGuid.ToString(eHyphensAndCurlyBraces) << std::endl;
             break;
         }
     }
@@ -1413,8 +1413,6 @@ std::string __thiscall Orchestrator::PullJobData(
     try
     {
         std::pair<Guid, Guid> stlJobGuids = ParseJobOutputToGuids(c_strOutputParameter);
-        std::cout << "Pulling data for job " << stlJobGuids.first.ToString(eHyphensAndCurlyBraces) << 
-            " parameter " << stlJobGuids.second.ToString(eHyphensAndCurlyBraces) << std::endl;
 
         auto oStlJobInformationItr = m_stlJobInformation.find(stlJobGuids.first.ToString(eRaw));
 
@@ -1447,8 +1445,7 @@ std::string __thiscall Orchestrator::PullJobData(
 
             if ( !oOutputParameterBuffer.has_value() )
             {
-                strResult = "Parameter not found in safe function";
-                std::cout << "Failed to find " << stlJobGuids.second.ToString(eRaw) << std::endl;
+                strResult = "Parameter not found in safe function: " + stlJobGuids.second.ToString(eHyphensAndCurlyBraces);
             }
             else
             {
@@ -1703,6 +1700,14 @@ void __thiscall Orchestrator::SendSafeObjectToJobEngine(
     }
 }
 
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function SubmitJob
+ * @param [in] JobInformation The job to send this data to
+ * @brief Send a structured buffer to a job that contains the submit job message
+ *
+ ********************************************************************************************/
 void __thiscall Orchestrator::SubmitJob(
     _in JobInformation& oJob
     )

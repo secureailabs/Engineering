@@ -77,10 +77,6 @@ class JobInformation
             _in const std::string& c_strOutputParameterId
             );
 
-        const std::vector<Byte>& GetOutputParameter(
-            _in const Guid& oParameterIdentifier
-            );
-
         bool __thiscall IsRunning() const;
 
         void __thiscall SetStatus(
@@ -96,7 +92,6 @@ class JobInformation
         mutable std::recursive_mutex m_stlLock;
         const Guid m_oJobId;
         const Guid m_oSafeFunctionId;
-        // HACK-DG Hardcoded an IP address of local SCN here
         std::string m_strTargetIP;
         std::unordered_map<std::string, std::optional<std::string>> m_stlInputParameterData;
         std::shared_ptr<JobEngineConnection> m_poJobEngineConnection;

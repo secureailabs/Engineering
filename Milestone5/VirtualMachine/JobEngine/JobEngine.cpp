@@ -153,7 +153,9 @@ void __thiscall JobEngine::ListenToRequests(void)
 
         // Get the type of request
         EngineRequest eRequestType = (EngineRequest)oNewRequest.GetByte("RequestType");
+#ifdef DEBUG_PRINTS
         std::cout << "Job engine received request " << static_cast<int>(eRequestType) << std::endl;
+#endif
         switch (eRequestType)
         {
             case EngineRequest::eConnectVirtualMachine
@@ -591,7 +593,9 @@ void __thiscall JobEngine::SetJobParameter(
         // Check if the requested data is a dataset from the DataConnector.
         if (m_stlMapOfDataConnectorGuidsToName.end() != m_stlMapOfDataConnectorGuidsToName.find(c_oStructuredBuffer.GetString("ValueUuid")))
         {
+#ifdef DEBUG_PRINT
             std::cout << "This is a table dataset I know about " << c_oStructuredBuffer.GetString("ValueUuid") << std::endl;
+#endif
             // This means that the valueId is to be fetched from the DataConnector
             // and written to the file system
             ::DataConnectorGetTable(c_oStructuredBuffer.GetString("ValueUuid"), m_stlMapOfDataConnectorGuidsToName.at(c_oStructuredBuffer.GetString("ValueUuid")));

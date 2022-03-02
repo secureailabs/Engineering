@@ -97,6 +97,14 @@ bool __thiscall JobInformation::ReadyToExcute(
     return fHasIp && fAllParametersSet && fAllJobOutputsReady;
 }
 
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function JobParameterUsesGuid
+ * @brief Determine if this job uses the passed in parameter value
+ * @param[in] Guid - The guid value to check against
+ * @return bool - True if the parameter is used or not
+ ********************************************************************************************/
 bool __thiscall JobInformation::JobParameterUsesGuid(
     _in const Guid & c_oParameterGuid
     ) const
@@ -117,6 +125,14 @@ bool __thiscall JobInformation::JobParameterUsesGuid(
     return fUsesParameter;
 }
 
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function JobParameterUsesJobOutputParameter
+ * @brief Determine if this job uses a given output parameter
+ * @param[in] Guid - The guid value to check against
+ * @return bool - True if the parameter is used or not
+ ********************************************************************************************/
 bool __thiscall JobInformation::JobParameterUsesJobOutputParameter(
     _in const std::string & c_strJobOutputParameter
     ) const
@@ -285,11 +301,25 @@ const Guid& __thiscall JobInformation::GetJobId() const
     return m_oJobId;
 }
 
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function IsRunning
+ * @brief Determine if the current job is running
+ * @return bool - Whether the Job is running or not
+ ********************************************************************************************/
 bool __thiscall JobInformation::IsRunning() const
 {
     return m_eJobStatus.has_value();
 }
 
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function SendCachedMessages
+ * @brief Send the messages we have cached for this job
+ * @return bool - Whether the cached messages were sent
+ ********************************************************************************************/
 bool __thiscall JobInformation::SendCachedMessages(void)
 {
     __DebugFunction();
@@ -340,7 +370,6 @@ bool __thiscall JobInformation::SendStructuredBufferToJobEngine(
         std::lock_guard<JobInformation> jobLock(*this);
         if ( m_poJobEngineConnection != nullptr )
         {
-            // TODO Remove this check when we can talk to an SCN
             m_poJobEngineConnection->SendStructuredBufferToJobEngine(c_oBufferToSend);
             fSent = true;
         }
@@ -429,6 +458,13 @@ std::string __thiscall JobInformation::GetJobStatus(void) const
     return strJobStatus;
 }
 
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function SetStatus
+ * @brief Set the current status of this job
+ * @param[in] JobStatusSignals The Status of the job
+ ********************************************************************************************/
 void __thiscall JobInformation::SetStatus(
     _in JobStatusSignals eJobStatus
 )
@@ -445,7 +481,6 @@ void __thiscall JobInformation::SetStatus(
  * @brief For a job's output parameter cached the data in the job to be pushed when the
  *        job runs
  * @param[in] c_strOutputParameterId The ID of the parameter
- * @param[in] c_oOutputParameterData
  ********************************************************************************************/
 void __thiscall JobInformation::SetOutputJobParameterReady(
     _in const std::string& c_strOutputParameterId
@@ -458,13 +493,3 @@ void __thiscall JobInformation::SetOutputJobParameterReady(
         m_stlOutputJobParameterData[c_strOutputParameterId] = true;
     }
 }
-
-const std::vector<Byte>& JobInformation::GetOutputParameter(
-    _in const Guid& oParameterIdentifier
-    )
-{
-    __DebugFunction();
-
-    return m_stlOutputResults.at(oParameterIdentifier.ToString(eRaw));
-}
-

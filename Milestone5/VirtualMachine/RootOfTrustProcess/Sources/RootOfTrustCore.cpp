@@ -533,7 +533,6 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleGetDatasetTransaction(
 
     try
     {
-        std::cout << "RUNNING IN GET DATASET TRANSACTION " << std::endl;
         oResponseBuffer.PutBoolean("Success", false);
         if (c_oTransactionParameters.GetGuid("DomainIdentifier") == Guid(m_oRootOfTrustCoreProperties.GetProperty("DataDomainIdentifier")))
         {

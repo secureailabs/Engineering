@@ -2128,7 +2128,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
     std::vector<Byte> stlEosb = c_oRequest.GetBuffer("Eosb");
     std::string strDcGuid = "";
     std::string strSecureComputationNodeGuid = "";
-    std::cout << "Provision request " << c_oRequest.ToString() << std::endl;
+
     try
     {
         // Get digital contract guid
@@ -2358,31 +2358,21 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         StructuredBuffer oTemplateData = ::GetInitialziationStructuredBuffer("AzureSecureComputationalNodeTemplate");
 
         const std::string c_strApplicationIdentifier = oTemplateData.GetString("ApplicationID");
-        const std::string c_strLocation = oTemplateData.GetString("HostRegion");
-        const std::string c_strResourceGroup = oTemplateData.GetString("ResourceGroup");
         const std::string c_strSecret = oTemplateData.GetString("Secret");
         const std::string c_strSubscriptionIdentifier = oTemplateData.GetString("SubscriptionID");
         const std::string c_strTenantIdentifier = oTemplateData.GetString("TenantID");
+        const std::string c_strLocation = oTemplateData.GetString("HostRegion");
+        const std::string c_strVirtualMachineImageId = oTemplateData.GetString("VirtualMachineImageId");
 
-        const std::string c_strVirtualMachineImageName = oTemplateData.GetString("VirtualMachineImage");
-        const std::string c_strVirtualMachineImageId = ::CreateAzureResourceId(c_strSubscriptionIdentifier, c_strResourceGroup, "providers/Microsoft.Compute", "images", c_strVirtualMachineImageName);
-
-        const std::string c_strVirtualNetwork = oTemplateData.GetString("VirtualNetwork");
-        const std::string c_strVirtualNetworkId = ::CreateAzureResourceId(c_strSubscriptionIdentifier , c_strResourceGroup, "providers/Microsoft.Network", "virtualNetworks", c_strVirtualNetwork );
-
-        const std::string c_strNetworkSecurityGroup = oTemplateData.GetString("NetworkSecurityGroup");
-        const std::string c_strNetworkSecurityGroupId = ::CreateAzureResourceId(c_strSubscriptionIdentifier, c_strResourceGroup, "providers/Microsoft.Network", "networkSecurityGroups", c_strNetworkSecurityGroup);
-
+        const std::string c_strResourceGroup = c_oNewVirtualMachineGuid.ToString(eRaw) + "-scn";
 
         StructuredBuffer oVirtualMachineSpecification;
-
-        oVirtualMachineSpecification.PutString("vmSize", c_strVirtualMachineSize);
         oVirtualMachineSpecification.PutString("vmName", c_oNewVirtualMachineGuid.ToString(eRaw));
-        oVirtualMachineSpecification.PutString("vmImageId", c_strVirtualMachineImageId);
-        oVirtualMachineSpecification.PutString("VirtualNetworkId", c_strVirtualNetworkId);
-        oVirtualMachineSpecification.PutString("NetworkSecurityGroupId", c_strNetworkSecurityGroupId);
-        oVirtualMachineSpecification.PutString("adminUsername", "saildeveloper");
+        oVirtualMachineSpecification.PutString("vmSize", c_strVirtualMachineSize);
+        oVirtualMachineSpecification.PutString("vmImageResourceId", c_strVirtualMachineImageId);
+        oVirtualMachineSpecification.PutString("adminUserName", "saildeveloper");
         oVirtualMachineSpecification.PutString("adminPassword", "Iw2btin2AC+beRl&dir!");
+        oVirtualMachineSpecification.PutString("subnetIpPrefix", "10.0.1.0/24");
 
         const std::string c_strVirtualMachineSpecification = ::CreateAzureParamterJson(::GetInitializationValue("AzureVirtualMachineTemplateUrl"), oVirtualMachineSpecification);
 
@@ -2424,7 +2414,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
             {
                 // Delete the resources associated with the VM
                 std::vector<std::string> stlListOfResourcesToDelete = ::AzureResourcesAssociatedWithVirtualMachine(c_strApplicationIdentifier, c_strResourceGroup, c_oNewVirtualMachineGuid.ToString(eRaw));
-                if (false == ::DeleteAzureResources(c_strApplicationIdentifier, c_strTenantIdentifier, c_strSecret, stlListOfResourcesToDelete))
+                if (false == ::DeleteAzureResourceGroup(c_strApplicationIdentifier, c_strTenantIdentifier, c_strSecret, c_strSubscriptionIdentifier, c_strResourceGroup))
                 {
                     if (true == oDeployResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE))
                     {
@@ -2911,16 +2901,13 @@ void __thiscall DigitalContractDatabase::DeleteVirtualMachineResources(
         std::string strSecret = c_oTemplateData.GetString("Secret");
         std::string strTenantID = c_oTemplateData.GetString("TenantID");
         std::string strApplicationID = c_oTemplateData.GetString("ApplicationID");
-        std::string strResourceGroup = c_oTemplateData.GetString("ResourceGroup");
-
-        std::vector<std::string> stlListOfResourcesToDelete = ::AzureResourcesAssociatedWithVirtualMachine(strSubscriptionID, strResourceGroup, c_strVirtualMachineName);
 
         // Update the Virtual machine status to eShutingDown.
         StructuredBuffer oUpdateVmStateRequest;
         oUpdateVmStateRequest.PutDword("TransactionType", 0x00000002);
         oUpdateVmStateRequest.PutBuffer("Eosb", c_stlEosb);
         oUpdateVmStateRequest.PutString("VirtualMachineGuid", c_strVirtualMachineName);
-        if (true == ::DeleteAzureResources(strApplicationID, strTenantID, strSecret, stlListOfResourcesToDelete))
+        if (true == ::DeleteAzureResourceGroup(strApplicationID, strTenantID, strSecret, strSubscriptionID, c_strVirtualMachineName + "-scn"))
         {
             oUpdateVmStateRequest.PutDword("State", VirtualMachineState::eDeleted);
         }

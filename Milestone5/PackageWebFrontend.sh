@@ -9,4 +9,4 @@ rm -rf node_modules
 popd
 
 # Compress and package all the files
-tar -czvf WebFrontend.tar.gz WebFrontend
+tar -czvf webfrontend.tar.gz WebFrontend

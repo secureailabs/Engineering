@@ -66,11 +66,12 @@ StructuredBuffer __stdcall DeployVirtualMachineAndWait(
     _in const std::string & c_strLocation
     ) throw();
 
-bool __stdcall DeleteAzureResources(
+bool __stdcall DeleteAzureResourceGroup(
     _in const std::string & c_strApplicationIdentifier,
     _in const std::string & c_strTenantIdentifier,
     _in const std::string & c_strSecret,
-    _in const std::vector<std::string> & c_stlResourceId
+    _in const std::string & c_strSubscriptionIdentifier,
+    _in const std::string & c_stlResourceGroupName
     );
 
 std::vector<std::string> __stdcall AzureResourcesAssociatedWithVirtualMachine(

@@ -1,45 +1,53 @@
 # Readme
 
 ## Build all the docker images
+```
 ./BuildImage.sh
+```
 
 ## Run the services
 
 ### Backend Api Services Portal
+```
 ./RunService.sh -s backend
-
+```
 ### Orchestrator
+```
 ./RunService.sh -s orchestrator
-
+```
 ### Remote Data Connector
+```
 ./RunService.sh -s remoteDataConnector
+```
 
 ### Secure Computation Node
+```
 ./RunService.sh -s securecomputationnode
-
+```
 ### Web Frontend
+```
 ./RunService.sh -s webfrontend
-
-### Shutdown services running in detached mode
+```
+### Shutdown and Deprovision services
 #### Backend
 ```
-docker stop $(docker ps -q --filter ancestor=backend)
+./DeprovisionService.sh -s backend
 ```
 #### Orchestrator
 ```
-docker stop $(docker ps -q --filter ancestor=orchestrator)
+./DeprovisionService.sh -s orchestrator
 ```
 #### Remote Data Connector
 ```
-docker stop $(docker ps -q --filter ancestor=remotedataconnector)
+./DeprovisionService.sh -s remotedataconnector
 ```
 #### Secure Computation Node
 ```
-docker stop $(docker ps -q --filter ancestor=securecomputationnode)
+./DeprovisionService.sh -s securecomputationnode
 ```
 #### Web Frontend
 ```
-docker stop $(docker ps -q --filter ancestor=webfrontend)
+./DeprovisionService.sh -s webfrontend
 ```
 
 #### Note:

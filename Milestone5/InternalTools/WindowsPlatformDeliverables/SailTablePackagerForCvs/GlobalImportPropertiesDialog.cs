@@ -41,6 +41,54 @@ namespace SailTablePackagerForCsv
         }
 
         /// <summary>
+        /// This method is used to check and make sure that the user input provided
+        /// in one of the input fields is unique to that input field. This is to
+        /// prevent the same input value specifier from being used in more than
+        /// one specification
+        /// </summary>
+        /// <param name="inputCharacter"></param>
+        /// <param name="stringFieldName"></param>
+        /// <returns></returns>
+        private bool CheckInputValueUniqueness(
+            char inputCharacter,
+            string stringFieldName
+            )
+        {
+            bool isUnique = true;
+
+            if ("EscapeCharacter" != stringFieldName)
+            { 
+                if (inputCharacter == m_EscapeCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+            if ("LineCommentCharacter" != stringFieldName)
+            {
+                if (inputCharacter == m_LineCommentCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+            if ("QuoteCharacter" != stringFieldName)
+            {
+                if (inputCharacter == m_QuoteCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+            if ("ValueSeparator" != stringFieldName)
+            {
+                if (inputCharacter == m_ValueSeparatorCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+
+            return isUnique;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
@@ -50,7 +98,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar))&&('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field
@@ -58,7 +106,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_ValueSeparatorCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, "ValueSeparator"))
+                {
+                    m_ValueSeparatorCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }
@@ -81,7 +138,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_QuoteCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, "QuoteCharacter"))
+                {
+                    m_QuoteCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }
@@ -104,7 +170,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_LineCommentCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, ""))
+                {
+                    m_LineCommentCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }
@@ -127,7 +202,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_EscapeCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, "EscapeCharacter"))
+                {
+                    m_EscapeCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }

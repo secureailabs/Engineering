@@ -130,7 +130,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar)) && ('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field
@@ -162,7 +162,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar)) && ('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field
@@ -194,7 +194,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar)) && ('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field

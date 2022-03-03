@@ -91,12 +91,15 @@ void __thiscall SafeObject::Setup(
     // Make the file executable
     ::chmod(m_strSafeObjectIdentifier.c_str(), S_IRWXU);
 
-    // Get List of parameters
-    StructuredBuffer oStructuredBufferParameter = c_oStructuredBuffer.GetStructuredBuffer("ParameterList");
-    std::vector<std::string> stlListOfParameters = oStructuredBufferParameter.GetNamesOfElements();
-    for (std::string strParameterName : stlListOfParameters)
+    // Get List of parameters if we haven't filled them in yet
+    if ( 0 == m_stlListOfParameters.size() )
     {
-        m_stlListOfParameters.push_back(strParameterName);
+        StructuredBuffer oStructuredBufferParameter = c_oStructuredBuffer.GetStructuredBuffer("ParameterList");
+        std::vector<std::string> stlListOfParameters = oStructuredBufferParameter.GetNamesOfElements();
+        for (std::string strParameterName : stlListOfParameters)
+        {
+            m_stlListOfParameters.push_back(strParameterName);
+        }
     }
 
     // Get the Output Parameters

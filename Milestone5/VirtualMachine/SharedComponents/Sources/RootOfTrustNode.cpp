@@ -102,7 +102,7 @@ Guid __thiscall RootOfTrustNode::GetDomainIdentifier(void) const
 
 /********************************************************************************************/
 
-std::vector<Byte> __thiscall RootOfTrustNode::GetDataset(void) const
+std::string __thiscall RootOfTrustNode::GetDatasetFilename(void) const
 {
     __DebugFunction();
     
@@ -112,8 +112,10 @@ std::vector<Byte> __thiscall RootOfTrustNode::GetDataset(void) const
     oTransactionData.PutDword("Transaction", 0x00000006);
     StructuredBuffer oTransactionResponse(::PutIpcTransactionAndGetResponse(poSocket, oTransactionData, false));
     poSocket->Release();
+    _ThrowBaseExceptionIf((false == oTransactionResponse.GetBoolean("Success")), "ERROR: GetDatasetFilename has failed.", nullptr);
+    _ThrowBaseExceptionIf((false == oTransactionResponse.IsElementPresent("DatasetFilename", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Unexpected missing return value of DatasetFilename.", nullptr);
 
-    return oTransactionResponse.GetBuffer("Dataset");
+    return oTransactionResponse.GetString("DatasetFilename");
 }
 
 /********************************************************************************************/
@@ -126,37 +128,40 @@ void __thiscall RootOfTrustNode::RecordAuditEvent(
     ) const
 {
     __DebugFunction();
-    
-    try
-    {   // Construct the transaction packet
-        StructuredBuffer oTransactionData;
-        StructuredBuffer oEncryptedEventData(c_oEventData.GetBase64SerializedBuffer().c_str());
-        Guid oEventGuid;
-        // Internal elements only. These will be deleted before to transmitting the audit event
-        oTransactionData.PutGuid("DomainIdentifier", m_oDomainIdentifier);
-        oTransactionData.PutDword("Transaction", 0x00000009);
-        oTransactionData.PutWord("TargetChannelsBitMask", wTargetChannelsBitMask);
-        // Persistent properties of audit event
-        oTransactionData.PutString("EventGuid", oEventGuid.ToString(eHyphensAndCurlyBraces));
-        oTransactionData.PutQword("EventType", dwEventType);
-        oTransactionData.PutUnsignedInt64("Timestamp", ::GetEpochTimeInMilliseconds());
-        // Make sure that the encrypted data contains the EventName property
-        oEncryptedEventData.PutString("EventName", c_szEventName);
-        // Add the encrypted event data to the audit event
-        oTransactionData.PutString("EncryptedEventData", oEncryptedEventData.GetBase64SerializedBuffer());
-        // Send the transaction
-        Socket * poSocket = ::ConnectToUnixDomainSocket(m_strRootOfTrustIpcPath.c_str());
-        StructuredBuffer oTransactionResponse(::PutIpcTransactionAndGetResponse(poSocket, oTransactionData, false));
-        poSocket->Release();
-    }
+    // HACK-DG This doesn't work for now, ignoring it
+    if ( 1 == 0 )
+    {
+        try
+        {   // Construct the transaction packet
+            StructuredBuffer oTransactionData;
+            StructuredBuffer oEncryptedEventData(c_oEventData.GetBase64SerializedBuffer().c_str());
+            Guid oEventGuid;
+            // Internal elements only. These will be deleted before to transmitting the audit event
+            oTransactionData.PutGuid("DomainIdentifier", m_oDomainIdentifier);
+            oTransactionData.PutDword("Transaction", 0x00000009);
+            oTransactionData.PutWord("TargetChannelsBitMask", wTargetChannelsBitMask);
+            // Persistent properties of audit event
+            oTransactionData.PutString("EventGuid", oEventGuid.ToString(eHyphensAndCurlyBraces));
+            oTransactionData.PutQword("EventType", dwEventType);
+            oTransactionData.PutUnsignedInt64("Timestamp", ::GetEpochTimeInMilliseconds());
+            // Make sure that the encrypted data contains the EventName property
+            oEncryptedEventData.PutString("EventName", c_szEventName);
+            // Add the encrypted event data to the audit event
+            oTransactionData.PutString("EncryptedEventData", oEncryptedEventData.GetBase64SerializedBuffer());
+            // Send the transaction
+            Socket * poSocket = ::ConnectToUnixDomainSocket(m_strRootOfTrustIpcPath.c_str());
+            StructuredBuffer oTransactionResponse(::PutIpcTransactionAndGetResponse(poSocket, oTransactionData, false));
+            poSocket->Release();
+        }
 
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-    
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        catch (const BaseException & c_oBaseException)
+        {
+            ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        }
+        
+        catch (...)
+        {
+            ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        }
     }
 }

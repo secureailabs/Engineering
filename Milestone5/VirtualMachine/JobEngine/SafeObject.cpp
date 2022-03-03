@@ -83,18 +83,23 @@ void __thiscall SafeObject::Setup(
     // Get the safe object UUID
     m_strSafeObjectIdentifier = c_oStructuredBuffer.GetString("SafeObjectUuid");
 
+    std::cout << "Safe object " << c_oStructuredBuffer.ToString() << std::endl;
+
     // Write the executable file to file system to run
-    ::WriteBytesAsFile(m_strSafeObjectIdentifier, c_oStructuredBuffer.GetBuffer("Payload"));
+    ::WriteStringAsFile(m_strSafeObjectIdentifier, c_oStructuredBuffer.GetString("Payload"));
 
     // Make the file executable
     ::chmod(m_strSafeObjectIdentifier.c_str(), S_IRWXU);
 
-    // Get List of parameters
-    StructuredBuffer oStructuredBufferParameter = c_oStructuredBuffer.GetStructuredBuffer("ParameterList");
-    std::vector<std::string> stlListOfParameters = oStructuredBufferParameter.GetNamesOfElements();
-    for (std::string strParameterName : stlListOfParameters)
+    // Get List of parameters if we haven't filled them in yet
+    if ( 0 == m_stlListOfParameters.size() )
     {
-        m_stlListOfParameters.push_back(strParameterName);
+        StructuredBuffer oStructuredBufferParameter = c_oStructuredBuffer.GetStructuredBuffer("ParameterList");
+        std::vector<std::string> stlListOfParameters = oStructuredBufferParameter.GetNamesOfElements();
+        for (std::string strParameterName : stlListOfParameters)
+        {
+            m_stlListOfParameters.push_back(strParameterName);
+        }
     }
 
     // Get the Output Parameters

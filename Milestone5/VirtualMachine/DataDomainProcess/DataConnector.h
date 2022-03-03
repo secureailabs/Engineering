@@ -46,7 +46,6 @@ class DataConnector : public Object
         virtual ~DataConnector(void);
 
         bool __thiscall LoadAndVerify(
-            _in const std::vector<Byte> c_stlDataset,
             _in RootOfTrustNode * poRootOfTrustNode
             );
         void __thiscall HandleRequest(
@@ -74,7 +73,7 @@ class DataConnector : public Object
         // Private data members
         StructuredBuffer m_oAllDatasetIds;
         RootOfTrustNode * m_poRootOfTrustNode;
-        StructuredBuffer * m_poDataSetMetaDataStructuredBuffer;
+        StructuredBuffer m_oDatasetMetadata;
         std::vector<StructuredBuffer> m_stlTableMetaData;
         std::vector<std::vector<std::vector<std::string>>> m_stlTableData;
         std::map<std::string, int> m_stlMapOfTableNameToId;

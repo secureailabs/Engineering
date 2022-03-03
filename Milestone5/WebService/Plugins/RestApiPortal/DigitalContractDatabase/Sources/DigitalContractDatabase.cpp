@@ -2150,8 +2150,6 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
 
                     if (eActive == oDigitialContract.GetDword("ContractStage"))
                     {
-                        Guid oSecureNodeProvisionJobGuid(eOrchestratorProvisionTask);
-
                         uint64_t unCurrentTime = ::GetEpochTimeInSeconds();
                         // Calculate expiration time and check if the contact is still active
                         uint64_t unExpirationTime = oDigitialContract.GetUnsignedInt64("ExpirationTime");
@@ -2406,6 +2404,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         poIpcAzureManager = nullptr;
         if ((0 < oUpdateVmStateResponse.GetSerializedBufferRawDataSizeInBytes())&&(200 == oUpdateVmStateResponse.GetDword("Status")))
         {
+
             // Start the VM provisioning step. This step will be
             StructuredBuffer oDeployResponse = ::DeployVirtualMachineAndWait(c_strApplicationIdentifier, c_strSecret, c_strTenantIdentifier, c_strSubscriptionIdentifier, c_strResourceGroup,
                 c_oNewVirtualMachineGuid.ToString(eRaw), c_strVirtualMachineSpecification, c_strLocation);
@@ -2473,6 +2472,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
                     }
                     else
                     {
+                        std::cout << "Pulling SCN tar gz from the remote" << std::endl;
                         std::string strSecureComputationNodePackagePath = ::GetInitializationValue("SecureComputationNodePackageUrl");
                         _ThrowBaseExceptionIf((0 == strSecureComputationNodePackagePath.length()), "Secure computation node package not found", nullptr);
 
@@ -2515,6 +2515,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
 
             // The installation package would be sent only to the Virutal Machines
             // that have been created with this process
+            std::cout << "Trying to send IV to SCN " << strIpAddress << std::endl;
             std::unique_ptr<TlsNode> poTlsNode(::TlsConnectToNetworkSocketWithTimeout(strIpAddress.c_str(), 9090, 10*60*1000, 30*1000));
             _ThrowIfNull(poTlsNode, "Failed to connect to the Virtual Machine", nullptr);
 

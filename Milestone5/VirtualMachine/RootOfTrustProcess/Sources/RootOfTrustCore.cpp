@@ -95,29 +95,43 @@ void __thiscall RootOfTrustCore::Initialize(
 
     StructuredBuffer oInitializationParameters(c_stlSerializedInitializationParameters);
     // Reality check, to make sure that everything is where it is supposed to be
-    m_oRootOfTrustCoreProperties.SetProperty("SailPlatformServicesIpAddress", oInitializationParameters.GetString("SailPlatformServicesIpAddress"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineName", oInitializationParameters.GetString("NameOfVirtualMachine"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIpAddress", oInitializationParameters.GetString("IpAddressOfVirtualMachine"));
+    m_oRootOfTrustCoreProperties.SetProperty("SailWebApiPortalIpAddress", oInitializationParameters.GetString("SailWebApiPortalIpAddress"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineName", oInitializationParameters.GetString("VirtualMachineName"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIpAddress", oInitializationParameters.GetString("VirtualMachineIpAddress"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineIdentifier", oInitializationParameters.GetString("VirtualMachineIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineClusterIdentifier", oInitializationParameters.GetString("ClusterIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineClusterIdentifier", oInitializationParameters.GetString("VirtualMachineClusterIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustDomainIdentifier", oInitializationParameters.GetString("RootOfTrustDomainIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIdentifier", oInitializationParameters.GetString("ComputationalDomainIdentifier"));
-    m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataConnectorDomainIdentifier"));
+    m_oRootOfTrustCoreProperties.SetProperty("DataOwnerEosb", oInitializationParameters.GetString("DataOwnerEosb"));
+    m_oRootOfTrustCoreProperties.SetProperty("DataDomainIdentifier", oInitializationParameters.GetString("DataDomainIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DigitalContractIdentifier", oInitializationParameters.GetString("DigitalContractIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("DatasetIdentifier", oInitializationParameters.GetString("DatasetIdentifier"));
     m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineEosb", oInitializationParameters.GetString("VmEosb"));
+    m_oRootOfTrustCoreProperties.SetProperty("DatasetFilename", oInitializationParameters.GetString("DatasetFilename"));
+
     // Add some values to RootOfTrustCoreProperties which were not sent in by the
     // remote initializer
     m_oRootOfTrustCoreProperties.SetProperty("RootOfTrustIpcPath", Guid().ToString(eRaw));
     m_oRootOfTrustCoreProperties.SetProperty("ComputationalDomainIpcPath", Guid().ToString(eRaw));
     m_oRootOfTrustCoreProperties.SetProperty("DataDomainIpcPath", Guid().ToString(eRaw));
     // Make sure to register the IP address of the SAIL Platform Services API Portal before we start
-    ::SetIpAddressOfSailWebApiPortalGateway(m_oRootOfTrustCoreProperties.GetProperty("SailPlatformServicesIpAddress"), 6200);
+    ::SetIpAddressOfSailWebApiPortalGateway(m_oRootOfTrustCoreProperties.GetProperty("SailWebApiPortalIpAddress"), 6200);
     // Okay, we are fully initialized
     m_fIsInitialized = true;
     // Let's initialize this virtual machine (causes API call into SAIL Platform Services API Portal)
-    this->RegisterVirtualMachine();
+    //this->RegisterVirtualMachine();
+
+    // TODO: We're hacking in an identifier for now until we have a proper audit system
+    m_oRootOfTrustCoreProperties.SetProperty("VirtualMachineAuditEventParentBranchNodeIdentifier", "{00000000-0000-0000-0000-000000000000}");
     __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineAuditEventParentBranchNodeIdentifier").size());
+
+    // Since we have the DataOwnerEosb and the DatasetFilename, we can also register the Data Owner Eosb
+    this->RegisterDataOwnerEosb();
+    __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier").size());
+    __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier").size());
+
+    ::VirtualMachineStatusUpdate(m_oRootOfTrustCoreProperties.GetProperty("DataOwnerEosb"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier"), 0x00000005, m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier"));
+
     // Now, we initialize our threads
     m_fIsRunning = true;
     ThreadManager * poThreadManager = ThreadManager::GetInstance();
@@ -188,7 +202,8 @@ void __thiscall RootOfTrustCore::AuditEventDispatcher(void) throw()
 
     StatusMonitor oStatusMonitor("void __thiscall RootOfTrustCore::AuditEventDispatcher(void)");
     bool fIsShuttingDown = false;
-    bool fIsDone = false;
+    // HACK-DG We don't allow this loop to run for now
+    bool fIsDone = true;
     uint64_t un64StartTimestampInMilliseconds = ::GetEpochTimeInMilliseconds();
 
     // Keep on looping until all of the event queues are empty and fIsShutdown = true
@@ -452,9 +467,6 @@ void __thiscall RootOfTrustCore::HandleIncomingTransaction(
         case 0x00000004 //  "RegisterResearcher"
         :   stlSerializedResponse = this->HandleRegisterResearcherTransaction(oTransactionParameters);
             break;
-        case 0x00000005 //  "RegisterDataset"
-        :   stlSerializedResponse = this->HandlePutDatasetTransaction(oTransactionParameters);
-            break;
         case 0x00000006 //  "GetDataSet"
         :   stlSerializedResponse = this->HandleGetDatasetTransaction(oTransactionParameters);
             break;
@@ -495,43 +507,6 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleRegisterResearcherTransactio
             __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("ResearchOrganizationAuditEventParentBranchNodeIdentifier").size());
             oResponseBuffer.PutBoolean("Success", this->RegisterResearcherEosb());
         }
-    }
-
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-
-    return oResponseBuffer.GetSerializedBuffer();
-}
-
-/********************************************************************************************/
-
-std::vector<Byte> __thiscall RootOfTrustCore::HandlePutDatasetTransaction(
-    _in const StructuredBuffer & c_oTransactionParameters
-    ) throw()
-{
-    __DebugFunction();
-    __DebugAssert(this == ms_RootOfTrustCoreSingletonInstance);
-    __DebugAssert(true == m_fIsInitialized);
-    __DebugAssert(true == m_fIsRunning);
-
-    StructuredBuffer oResponseBuffer;
-
-    try
-    {
-        oResponseBuffer.PutBoolean("Success", false);
-        m_oRootOfTrustCoreProperties.SetProperty("DataOwnerEosb", c_oTransactionParameters.GetString("DataOwnerEosb"));
-        m_oRootOfTrustCoreProperties.SetProperty("DatasetFilename", c_oTransactionParameters.GetString("DatasetFilename"));
-        this->RegisterDataOwnerEosb();
-        __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier").size());
-        __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier").size());
-        oResponseBuffer.PutBoolean("Success", this->RegisterResearcherEosb());
     }
 
     catch (const BaseException & c_oBaseException)
@@ -598,17 +573,29 @@ std::vector<Byte> __thiscall RootOfTrustCore::HandleAuditEventTransaction(
 
     try
     {
-        // By default
-        oResponseBuffer.PutBoolean("Success", false);
-        // Make a local copy of the transaction parameters since we are going to be making
-        // modifications to the parameters
-        // Make a copy of the target channels
-        std::string strEventName = c_oTransactionParameters.GetString("EventName");
-        Word wTargetChannelsBitMask = c_oTransactionParameters.GetWord("TargetChannelsBitMask");
-        Dword dwEventType = c_oTransactionParameters.GetDword("EventType");
-        StructuredBuffer oEventData = c_oTransactionParameters.GetStructuredBuffer("EventData");
-        // Register the event
-        m_oAuditEventManagedQueues.AddAuditEvent(strEventName, wTargetChannelsBitMask, dwEventType, oEventData);
+        std::cout << "IGNORING AUDIT EVENT FOR NOW" << std::endl;
+        // HACK-DG We have two conflicting formats incoming here, ignore for now
+        if ( 1 == 0 )
+        {
+            // By default
+            oResponseBuffer.PutBoolean("Success", false);
+            // Make a local copy of the transaction parameters since we are going to be making
+            // modifications to the parameters
+            // Make a copy of the target channels
+            std::cout << c_oTransactionParameters.ToString() << std::endl;
+            // HACK-DG EventName isn't filled in, using a dummy for now
+            //std::string strEventName = c_oTransactionParameters.GetString("EventName");
+            std::string strEventName{"PLACEHOLDER_NAME"};
+            Word wTargetChannelsBitMask = c_oTransactionParameters.GetWord("TargetChannelsBitMask");
+            // HACK-DG EventType is given as a Qword
+            //Dword dwEventType = c_oTransactionParameters.GetDword("EventType");
+            Qword dwEventType = c_oTransactionParameters.GetQword("EventType");
+            // HACK-DG The name we get sent is EncryptedEventData
+            //StructuredBuffer oEventData = c_oTransactionParameters.GetStructuredBuffer("EventData");
+            StructuredBuffer oEventData = c_oTransactionParameters.GetStructuredBuffer("EncryptedEventData");
+            // Register the event
+            m_oAuditEventManagedQueues.AddAuditEvent(strEventName, wTargetChannelsBitMask, dwEventType, oEventData);
+        }
         // If we get here, the audit event was recorded
         oResponseBuffer.PutBoolean("Success", true);
     }
@@ -668,8 +655,11 @@ bool __thiscall RootOfTrustCore::RegisterDataOwnerEosb(void)
     try
     {
         StructuredBuffer oResponse(::RegisterVirtualMachineDataOwner(m_oRootOfTrustCoreProperties.GetProperty("DataOwnerEosb"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier")));
-        m_oRootOfTrustCoreProperties.SetProperty("DataOwnerUserIdentifier", oResponse.GetString("DataOwnerUserIdentifier"));
-        m_oRootOfTrustCoreProperties.SetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier", oResponse.GetString("DataOrganizationAuditEventParentBranchNodeIdentifier"));
+        // HACK-DG Filling in random data for now
+        //m_oRootOfTrustCoreProperties.SetProperty("DataOwnerUserIdentifier", oResponse.GetString("DataOwnerUserIdentifier"));
+        //m_oRootOfTrustCoreProperties.SetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier", oResponse.GetString("DataOrganizationAuditEventParentBranchNodeIdentifier"));
+        m_oRootOfTrustCoreProperties.SetProperty("DataOwnerUserIdentifier","{00000000-0000-0000-0000-000000000000}");
+        m_oRootOfTrustCoreProperties.SetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier", "{00000000-0000-0000-0000-000000000000}");
         fSuccess = true;
     }
 

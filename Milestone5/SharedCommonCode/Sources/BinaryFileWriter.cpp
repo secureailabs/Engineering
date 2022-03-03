@@ -1,6 +1,6 @@
 /*********************************************************************************************
  *
- * @file BinaryFileReader.cpp
+ * @file BinaryFileWriter.cpp
  * @author Luis Miguel Huapaya
  * @date 30 Sep 2020
  * @License Private and Confidential. Internal Use Only.
@@ -16,7 +16,7 @@
 
 /********************************************************************************************/
 
-BinaryFileReader::BinaryFileReader(
+BinaryFileWriter::BinaryFileWriter(
     _in const std::string & c_strTargetFilename
     )
 {
@@ -28,7 +28,7 @@ BinaryFileReader::BinaryFileReader(
 
 /********************************************************************************************/
 
-BinaryFileReader::BinaryFileReader(
+BinaryFileWriter::BinaryFileWriter(
     _in const char * c_szTargetFilename
     )
 {
@@ -41,7 +41,7 @@ BinaryFileReader::BinaryFileReader(
 
 /********************************************************************************************/
 
-BinaryFileReader::~BinaryFileReader(void)
+BinaryFileWriter::~BinaryFileWriter(void)
 {
     __DebugFunction();
 
@@ -50,7 +50,7 @@ BinaryFileReader::~BinaryFileReader(void)
 
 /********************************************************************************************/
 
-std::string __thiscall BinaryFileReader::GetFilename(void) const throw()
+std::string __thiscall BinaryFileWriter::GetFilename(void) const throw()
 {
     __DebugFunction();
 
@@ -59,7 +59,7 @@ std::string __thiscall BinaryFileReader::GetFilename(void) const throw()
 
 /********************************************************************************************/
 
-uint64_t __thiscall BinaryFileReader::GetSizeInBytes(void) const throw()
+uint64_t __thiscall BinaryFileWriter::GetSizeInBytes(void) const throw()
 {
     __DebugFunction();
 
@@ -68,18 +68,18 @@ uint64_t __thiscall BinaryFileReader::GetSizeInBytes(void) const throw()
 
 /********************************************************************************************/
 
-uint64_t __thiscall BinaryFileReader::GetFilePointer(void) const throw()
+uint64_t __thiscall BinaryFileWriter::GetFilePointer(void) const throw()
 {
     __DebugFunction();
 
-    const auto stlCurrentPosition = m_stlFileStream.tellg();
+    const auto stlCurrentPosition = m_stlFileStream.tellp();
 
     return (stlCurrentPosition - m_stlStartingPosition);
 }
 
 /********************************************************************************************/
 
-void __thiscall BinaryFileReader::Seek(
+void __thiscall BinaryFileWriter::Seek(
     _in FileOffsetType eOffsetType,
     _in uint64_t un64OffsetInBytes
     )
@@ -102,59 +102,54 @@ void __thiscall BinaryFileReader::Seek(
     }
 
     // Change the file pointer
-    m_stlFileStream.seekg(un64OffsetInBytes, stlSeekDirection);
+    m_stlFileStream.seekp(un64OffsetInBytes, stlSeekDirection);
 }
 
 /********************************************************************************************/
-
-void __thiscall BinaryFileReader::Read(
-    _in void * pDestinationBuffer,
-    _in uint64_t un64NumberOfBytesToRead
+    
+void __thiscall BinaryFileWriter::Write(
+    _in const void * c_pSourceBuffer,
+    _in uint64_t un64NumberOfBytesToWrite
     )
 {
     __DebugFunction();
-    __DebugAssert(nullptr != pDestinationBuffer);
+    __DebugAssert(nullptr != c_pSourceBuffer);
 
-    if (0 < un64NumberOfBytesToRead)
+    if (0 < un64NumberOfBytesToWrite)
     {
-        m_stlFileStream.read((char *) pDestinationBuffer, un64NumberOfBytesToRead);
+        m_stlFileStream.write((const char *) c_pSourceBuffer, un64NumberOfBytesToWrite);
     }
 }
 
 /********************************************************************************************/
 
-std::vector<Byte> __thiscall BinaryFileReader::Read(
-    _in uint64_t un64NumberOfBytesToRead
+void __thiscall BinaryFileWriter::Write(
+    _in const std::vector<Byte> & c_stlSourceBuffer
     )
 {
     __DebugFunction();
 
-    std::vector<Byte> stlDestinationBuffer;
-
-    if (0 < un64NumberOfBytesToRead)
+    if (0 < c_stlSourceBuffer.size())
     {
-        stlDestinationBuffer.resize(un64NumberOfBytesToRead);
-        this->Read((void *) stlDestinationBuffer.data(), un64NumberOfBytesToRead);
+        m_stlFileStream.write((const char *) c_stlSourceBuffer.data(), c_stlSourceBuffer.size());
     }
-
-    return stlDestinationBuffer;
 }
 
 /********************************************************************************************/
 
-void __thiscall BinaryFileReader::Load(void)
+void __thiscall BinaryFileWriter::Load(void)
 {
     __DebugFunction();
     __DebugAssert(0 < m_strFilename.size());
 
-    m_stlFileStream.open(m_strFilename.c_str(), (std::ifstream::in | std::ifstream::binary));
+    m_stlFileStream.open(m_strFilename.c_str(), (std::ofstream::out | std::ofstream::binary));
     // Record the starting position.
-    m_stlFileStream.seekg(0, std::ios::beg);
-    m_stlStartingPosition = m_stlFileStream.tellg();
+    m_stlFileStream.seekp(0, std::ios::beg);
+    m_stlStartingPosition = m_stlFileStream.tellp();
     // Determine the file size
-    m_stlFileStream.seekg(0, std::ios::end);
-    const auto stlEndingPosition = m_stlFileStream.tellg();
+    m_stlFileStream.seekp(0, std::ios::end);
+    const auto stlEndingPosition = m_stlFileStream.tellp();
     m_un64SizeInBytes = (stlEndingPosition - m_stlStartingPosition);
     // Reset the file pointer at the starting
-    m_stlFileStream.seekg(0, std::ios::beg);
+    m_stlFileStream.seekp(0, std::ios::beg);
 }

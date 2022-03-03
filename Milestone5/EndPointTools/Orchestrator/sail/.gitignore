@@ -1,3 +1,5 @@
 SafeObjects/
 SAILPyAPI.so
 **/__pycache__/
+.ipynb_check
+*.log

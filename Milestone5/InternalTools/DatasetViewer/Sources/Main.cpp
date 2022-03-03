@@ -27,7 +27,27 @@ static void __stdcall PrintUsage(void)
     std::cout << "+======================================================================================+" << std::endl;
     std::cout << "| DatasetViewer, Copyright (C) 2022 Secure AI Labs, Inc., All Rights Reserved.         |" << std::endl;
     std::cout << "+======================================================================================+" << std::endl;
-    std::cout << "Usage: DatasetViewer.exe --dataset <filename>" << std::endl;
+    std::cout << "Usage: DatasetViewer.exe --dataset <filename> <--printdata>" << std::endl;
+}
+
+/********************************************************************************************/
+
+static void __stdcall PrintData(
+    _in const std::vector<Byte> & c_stlDecompressedSerializedData
+    )
+{
+    for (const Byte & c_bCharacter: c_stlDecompressedSerializedData)
+    {
+        if (0x1F == c_bCharacter)
+        {
+            std::cout << ",";
+        }
+        else
+        {
+            std::cout << (char) c_bCharacter;
+        }
+    }
+    std::cout << std::endl;
 }
 
 /********************************************************************************************/
@@ -107,7 +127,8 @@ int main(
                     std::vector<Byte> stlCompressedSerializedData = oBinaryFileReader.Read(oInformationForDataAccess.GetUnsignedInt64("CompressedSizeInBytes"));
                     StructuredBuffer oCompressedSerializedData(stlCompressedSerializedData);
                     std::vector<Byte> stlDecompressedSerializedData = ::DecompressStructuredBuffer(oCompressedSerializedData);
-                    std::cout << (const char *) stlDecompressedSerializedData.data() << std::endl;
+                    ::PrintData(stlDecompressedSerializedData);
+                    //std::cout << (const char *) stlDecompressedSerializedData.data() << std::endl;
                 }
             }
         }
@@ -129,7 +150,7 @@ int main(
     }
     
     // Print out any lingered exceptions before exiting
-    while (0 < ::GetRegisteredExceptionCount())
+    while (0 < ::GetRegisteredExceptionsCount())
     {
         std::string strRegisteredException = ::GetNextRegisteredException();
         std::cout << strRegisteredException << std::endl << std::endl;

@@ -8,6 +8,8 @@
  *
  ********************************************************************************************/
 
+#include "Base64Encoder.h"
+#include "BinaryFileHandlers.h"
 #include "CommandLine.h"
 #include "CoreTypes.h"
 #include "DebugLibrary.h"
@@ -37,12 +39,13 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     StructuredBuffer oAllInitializationParameters;
 
     // Read the initialization parameters from the InitializationVector.json file
-    oAllInitializationParameters.PutString("NameOfVirtualMachine", ::GetInitializationValue("NameOfVirtualMachine"));
-    oAllInitializationParameters.PutString("IpAddressOfVirtualMachine", ::GetInitializationValue("IpAddressOfVirtualMachine"));
+    oAllInitializationParameters.PutString("VirtualMachineName", ::GetInitializationValue("NameOfVirtualMachine"));
+    oAllInitializationParameters.PutString("VirtualMachineIpAddress", ::GetInitializationValue("IpAddressOfVirtualMachine"));
     oAllInitializationParameters.PutString("VirtualMachineIdentifier", ::GetInitializationValue("VirtualMachineIdentifier"));
-    oAllInitializationParameters.PutString("ClusterIdentifier", ::GetInitializationValue("ClusterIdentifier"));
+    oAllInitializationParameters.PutString("VirtualMachineClusterIdentifier", ::GetInitializationValue("ClusterIdentifier"));
     oAllInitializationParameters.PutString("DigitalContractIdentifier", ::GetInitializationValue("DigitalContractIdentifier"));
     oAllInitializationParameters.PutString("DatasetIdentifier", ::GetInitializationValue("DatasetIdentifier"));
+    oAllInitializationParameters.PutString("DataDomainIdentifier", ::GetInitializationValue("DataConnectorDomainIdentifier"));
     oAllInitializationParameters.PutString("RootOfTrustDomainIdentifier", ::GetInitializationValue("RootOfTrustDomainIdentifier"));
     oAllInitializationParameters.PutString("ComputationalDomainIdentifier", ::GetInitializationValue("ComputationalDomainIdentifier"));
     oAllInitializationParameters.PutString("DataConnectorDomainIdentifier", ::GetInitializationValue("DataConnectorDomainIdentifier"));
@@ -66,13 +69,22 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     auto stlDatasetParameters = ::GetTlsTransaction(poTlsNode.get(), 60*60*1000);
     _ThrowBaseExceptionIf((0 == stlDatasetParameters.size()), "Unexpected empty dataset parameters", nullptr);
 
+    std::string stlDatasetFilename = "//tmp//" + Guid().ToString(eHyphensOnly) + ".csvp";
     StructuredBuffer oRemoteDatasetParameters(stlDatasetParameters);
-    oAllInitializationParameters.PutString("DataOwnerAccessToken", ::UnEscapeJsonString(oRemoteDatasetParameters.GetString("DataOwnerAccessToken").c_str()));
-    oAllInitializationParameters.PutString("SailPlatformServicesIpAddress", oRemoteDatasetParameters.GetString("SailWebApiPortalIpAddress"));
+    oAllInitializationParameters.PutString("DataOwnerEosb", ::UnEscapeJsonString(oRemoteDatasetParameters.GetString("DataOwnerAccessToken").c_str()));
+    oAllInitializationParameters.PutString("SailWebApiPortalIpAddress", oRemoteDatasetParameters.GetString("SailWebApiPortalIpAddress"));
     oAllInitializationParameters.PutString("DataOwnerUserIdentifier", oRemoteDatasetParameters.GetString("DataOwnerUserIdentifier"));
-    oAllInitializationParameters.PutString("Base64EncodedDataset", ::UnEscapeJsonString(oRemoteDatasetParameters.GetString("Base64EncodedDataset").c_str()));
     oAllInitializationParameters.PutString("DataOwnerOrganizationIdentifier", oRemoteDatasetParameters.GetString("DataOwnerOrganizationIdentifier"));
-
+    oAllInitializationParameters.PutString("DatasetFilename", stlDatasetFilename);
+    // At this point, we need to extract the Base64 encoded dataset and write the contents to a file on disk, since it's\033
+    // possible for the dataset to be very big, so passing this along in memory would create multiple copies of a large
+    // dataset in memory.
+    // TODO: In the future, we should deliver the dataset in chunk instead of trying to put everything into memory. This
+    // needs to be done at the Data Annocation Tool level (i.e. a single table is actually compressed in separate chunks)
+    std::vector<Byte> stlUnencodedData = ::Base64Decode(::UnEscapeJsonString(oRemoteDatasetParameters.GetString("Base64EncodedDataset")).c_str());    
+    BinaryFileWriter oBinaryFileWriter(stlDatasetFilename);
+    oBinaryFileWriter.Write(stlUnencodedData);
+    // Now return the status to the caller
     StructuredBuffer oStructuredBufferResponse;
     oStructuredBufferResponse.PutString("Status", "Success");
     ::PutTlsTransaction(poTlsNode.get(), oStructuredBufferResponse);

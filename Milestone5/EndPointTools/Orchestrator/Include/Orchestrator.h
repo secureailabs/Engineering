@@ -12,6 +12,7 @@
 
 #include "EntityTypes.h"
 #include "EosbRotationManager.h"
+#include "JobEngineConnection.h"
 #include "JobInformation.h"
 #include "SecureNodeInformation.h"
 #include "StructuredBuffer.h"
@@ -155,6 +156,18 @@ class Orchestrator : public Object{
             _in Guid& oParameterValueGuid
             );
 
+        void __thiscall SetJobParameterForJobOutput(
+            _in JobInformation& oJob,
+            _in Guid& oParameterGuid,
+            _in std::string& strParameterValue
+            );
+
+        void __thiscall PushJobOutputParameterToJob(
+            _in JobInformation& oJob,
+            _in const std::string& strParameterIdentifier,
+            _in const std::vector<Byte>& oOutputParameterData
+            );
+
         void __thiscall UpdateJobsWaitingForData(
             _in const StructuredBuffer& oPushDataMessage
             );
@@ -172,6 +185,10 @@ class Orchestrator : public Object{
             _in const Guid& oSecureNodeGuid
             );
 
+        void __thiscall SubmitJob(
+            _in JobInformation& oJob
+            );
+
         EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};
@@ -180,5 +197,7 @@ class Orchestrator : public Object{
         std::unordered_map<std::string, SecureNodeInformation> m_stlProvisionInformation{};
         std::unordered_map<std::string, std::unique_ptr<JobInformation> > m_stlJobInformation{};
         std::unordered_map<std::string, std::vector<Byte>> m_stlPushedData{};
+        std::unordered_map<std::string, std::vector<Byte>> m_stlJobResults{};
+        std::unordered_map<std::string, std::shared_ptr<JobEngineConnection>> m_stlSecureNodeConnections{};
         StructuredBufferLockedQueue m_oJobMessageQueue{};
 };

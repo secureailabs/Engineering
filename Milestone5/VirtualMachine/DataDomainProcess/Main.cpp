@@ -47,10 +47,8 @@ static void __cdecl InitDataConnector(void)
     // Get the singleton DataConnector object
     DataConnector * poDataConnector = ::GetDataConnector();
     __DebugAssert(nullptr != poDataConnector);
-    // Pull the dataset from the Root of Trust
-    std::vector<Byte> c_stlDataset = gs_poRootOfTrustNode->GetDataset();
     // Load and Verify the contents of the dataset
-    _ThrowBaseExceptionIf((false == poDataConnector->LoadAndVerify(c_stlDataset, gs_poRootOfTrustNode)), "Failed to verify the integrity of the DataSet", nullptr);
+    _ThrowBaseExceptionIf((false == poDataConnector->LoadAndVerify(gs_poRootOfTrustNode)), "Failed to verify the integrity of the DataSet", nullptr);
     // Get ready to wait for incoming connections. This includes setting up the
     // TerminationSignal object, the ThreadManager object as well as starting up
     // the SocketServer
@@ -60,6 +58,7 @@ static void __cdecl InitDataConnector(void)
     unsigned int unSpinner = 0;
     do
     {
+        fflush(stdout);
         if (true == oSocketServer.WaitForConnection(1000))
         {
             Socket * poSocket = oSocketServer.Accept();

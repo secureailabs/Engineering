@@ -381,7 +381,7 @@ void __thiscall VirtualMachineManager::InitializePlugin(
     StructuredBuffer oEosb;
     oEosb.PutByte("ElementType", BUFFER_VALUE_TYPE);
     oEosb.PutBoolean("IsRequired", true);
-    oRegisterVmParameters.PutStructuredBuffer("IEosb", oEosb);
+    oRegisterVmParameters.PutStructuredBuffer("Eosb", oEosb);
     StructuredBuffer oDcGuid;
     oDcGuid.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oDcGuid.PutBoolean("IsRequired", true);
@@ -1187,6 +1187,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
     Dword dwStatus = 204;
     TlsNode * poTlsNode = nullptr;
     Socket * poIpcCryptographicManager = nullptr;
+    Socket * poIpcDigitalContractManager = nullptr;
 
     try
     {
@@ -1213,6 +1214,15 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
             _ThrowBaseExceptionIf((200 != oVerificationStatus.GetDword("Status")), "Digital contract could not be verified.", nullptr);
             _ThrowBaseExceptionIf((true != oVerificationStatus.GetBoolean("IsEqual")), "Digital contract is not associated to the user's organization.", nullptr);
 
+            // Call DigitalContractDatabase plugin to get the digital contract associated with the digital contract guid
+            StructuredBuffer oDigitalContractRequest;
+            oDigitalContractRequest.PutDword("TransactionType", 0x00000001);
+            oDigitalContractRequest.PutString("DigitalContractGuid", c_oRequest.GetString("DigitalContractGuid"));
+            oDigitalContractRequest.PutBuffer("Eosb", c_oRequest.GetBuffer("Eosb"));
+            poIpcDigitalContractManager = ::ConnectToUnixDomainSocket("/tmp/{BC5AEAAF-E37E-4605-B074-F9DF2E82CD34}");
+            StructuredBuffer oDigitalContractResponse(::PutIpcTransactionAndGetResponse(poIpcDigitalContractManager, oDigitalContractRequest, false));
+            _ThrowBaseExceptionIf((200 != oDigitalContractResponse.GetDword("Status")), "Failed to pull digital contract", nullptr);
+
             // TODO: Check if the Eosb is an imposter Eosb
             // TODO: Add a check and Register Vm only if it is an imposter Eosb
             // Register the Virtual Machine
@@ -1224,7 +1234,8 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
             oRequest.PutString("Verb", "POST");
             oRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterVirtualMachine");
             oRequest.PutString("VirtualMachineGuid", strVmGuid);
-            oRequest.PutString("DigitalContractTitle", c_oRequest.GetString("DigitalContractTitle"));
+
+            oRequest.PutString("DigitalContractTitle", oDigitalContractResponse.GetString("Title"));
             oRequest.PutString("DigitalContractGuid", strDcGuid);
             oRequest.PutUnsignedInt64("RegistrationTime", ::GetEpochTimeInSeconds());
             oRequest.PutUnsignedInt64("HeartbeatBroadcastTime", c_oRequest.GetUnsignedInt64("HeartbeatBroadcastTime"));
@@ -1263,6 +1274,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
                 // Throw base exception if transaction was unsuccessful
                 _ThrowBaseExceptionIf(((0 == oUpdatedEosb.GetSerializedBufferRawDataSizeInBytes())&&(200 != oUpdatedEosb.GetDword("Status"))), "Error updating the Eosb", nullptr);
                 oResponse.PutBuffer("VmEosb", oUpdatedEosb.GetBuffer("UpdatedEosb"));
+                oResponse.PutString("VirtualMachineAuditEventParentBranchNodeIdentifier", "FILL_IN_AUDIT_EVENT_IDENTIFIER_HERE");
                 dwStatus = 201;
             }
         }

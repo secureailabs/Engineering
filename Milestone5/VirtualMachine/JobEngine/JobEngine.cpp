@@ -153,6 +153,9 @@ void __thiscall JobEngine::ListenToRequests(void)
 
         // Get the type of request
         EngineRequest eRequestType = (EngineRequest)oNewRequest.GetByte("RequestType");
+#ifdef DEBUG_PRINTS
+        std::cout << "Job engine received request " << static_cast<int>(eRequestType) << std::endl;
+#endif
         switch (eRequestType)
         {
             case EngineRequest::eConnectVirtualMachine
@@ -224,7 +227,7 @@ void __thiscall JobEngine::ConnectVirtualMachine(
 
     if (false == m_fIsInitialized)
     {
-        std::cout << "The Virtual Machine Uuid is " << m_GuidVmId.ToString(eHyphensAndCurlyBraces);
+        std::cout << "The Virtual Machine Uuid is " << m_GuidVmId.ToString(eHyphensAndCurlyBraces) << std::endl;
 
         // Get the Set of available Guids from the DataConnector
         m_oDataConnectorAvailableGuids = ::DataConnectorGetFetchableUuid();
@@ -308,6 +311,7 @@ void __thiscall JobEngine::PushSafeObject(
                 poSafeObject->Setup(c_oStructuredBuffer);
 
                 // Push the safe object to the list of safeObjects in the engine
+                std::cout << "Inserted safe object " << strSafeObjectUuid << std::endl;
                 m_stlMapOfSafeObjects.insert(std::make_pair(strSafeObjectUuid, poSafeObject));
             }
             else
@@ -587,6 +591,9 @@ void __thiscall JobEngine::SetJobParameter(
         // Check if the requested data is a dataset from the DataConnector.
         if (m_stlMapOfDataConnectorGuidsToName.end() != m_stlMapOfDataConnectorGuidsToName.find(c_oStructuredBuffer.GetString("ValueUuid")))
         {
+#ifdef DEBUG_PRINT
+            std::cout << "This is a table dataset I know about " << c_oStructuredBuffer.GetString("ValueUuid") << std::endl;
+#endif
             // This means that the valueId is to be fetched from the DataConnector
             // and written to the file system
             ::DataConnectorGetTable(c_oStructuredBuffer.GetString("ValueUuid"), m_stlMapOfDataConnectorGuidsToName.at(c_oStructuredBuffer.GetString("ValueUuid")));

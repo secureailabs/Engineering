@@ -8,6 +8,7 @@
  *
  ********************************************************************************************/
 
+#include "Base64Encoder.h"
 #include "RestFrameworkRuntimeData.h"
 #include "ExceptionRegister.h"
 #include "HttpRequestParser.h"
@@ -779,8 +780,7 @@ bool __thiscall RestFrameworkRuntimeData::ValidateParameter(
             try
             {
                 std::string strValue = c_oSerializedRequest.GetString(c_szRequireParameterName);
-                std::string strDecodedValue = ::Base64Decode(strValue);
-                std::vector<Byte> stlValue(strDecodedValue.begin(), strDecodedValue.end());
+                std::vector<Byte> stlValue{::Base64Decode(strValue.c_str())};
                 poRequestStructuredBuffer->PutBuffer(c_szRequireParameterName, stlValue);
             }
             catch (const std::exception& e)

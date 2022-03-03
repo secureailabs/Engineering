@@ -37,6 +37,14 @@
 
 constexpr Word REMOTE_JOB_PORT{3500};
 
+static bool IsJobOutputParameter(
+    _in const std::string& c_strParameter
+);
+
+static std::pair<Guid, Guid> ParseJobOutputToGuids(
+    _in const std::string& c_strJobOutputId
+);
+
 /********************************************************************************************
  *
  * @function GetJsonForStructuredBuffer
@@ -450,6 +458,7 @@ void __thiscall Orchestrator::ExitCurrentSession(void)
 
     m_stlJobInformation.clear();
     m_oJobMessageQueue.ClearAllMessages();
+    m_stlSecureNodeConnections.clear();
 }
 
 /********************************************************************************************
@@ -642,20 +651,19 @@ std::string Orchestrator::RunJob(
             Guid oSafeFunctionGuid(c_strSafeFunctionId);
             if ( m_stlAvailableSafeFunctions.end() != m_stlAvailableSafeFunctions.find(oSafeFunctionGuid.ToString(eRaw)) )
             {
+                std::vector<std::string> stlInputParameters;
+                Guid oJobId(eJobIdentifier);
+                StructuredBuffer oSafeFunction = m_stlAvailableSafeFunctions[oSafeFunctionGuid.ToString(eRaw)];
+                StructuredBuffer oInputParameters = oSafeFunction.GetStructuredBuffer("InputParameters");
+                for (const std::string& strInputParameterId : oInputParameters.GetNamesOfElements() )
+                {
+                    stlInputParameters.push_back(oInputParameters.GetStructuredBuffer(strInputParameterId.c_str()).GetString("Uuid"));
+                }
+                // When returning GUIDs to the user we return human readable versions
+                strNewJobId = oJobId.ToString(eHyphensAndCurlyBraces);
 
-                    std::vector<std::string> stlInputParameters;
-                    Guid oJobId(eJobIdentifier);
-                    StructuredBuffer oSafeFunction = m_stlAvailableSafeFunctions[oSafeFunctionGuid.ToString(eRaw)];
-                    StructuredBuffer oInputParameters = oSafeFunction.GetStructuredBuffer("InputParameters");
-                    for (const std::string& strInputParameterId : oInputParameters.GetNamesOfElements() )
-                    {
-                        stlInputParameters.push_back(oInputParameters.GetStructuredBuffer(strInputParameterId.c_str()).GetString("Uuid"));
-                    }
-                    // When returning GUIDs to the user we return human readable versions
-                    strNewJobId = oJobId.ToString(eHyphensAndCurlyBraces);
-
-                    // We make a unique pointer because mutexes are not trivially copyable
-                    m_stlJobInformation.emplace(oJobId.ToString(eRaw), new JobInformation(oJobId, oSafeFunctionGuid, stlInputParameters, m_oJobMessageQueue));
+                // We make a unique pointer because mutexes are not trivially copyable
+                m_stlJobInformation.emplace(oJobId.ToString(eRaw), new JobInformation(oJobId, oSafeFunctionGuid, stlInputParameters, m_oJobMessageQueue));
             }
         }
     }
@@ -735,26 +743,46 @@ std::string Orchestrator::SetParameter(
     std::string strParameterId{""};
     try
     {
+
         Guid oJobId(c_strJobId);
         auto stlJobInformation = m_stlJobInformation.find(oJobId.ToString(eRaw));
         if ( m_stlJobInformation.end() != stlJobInformation )
         {
             __DebugAssert( nullptr != stlJobInformation->second.get() );
-            Guid oParameterGuid(c_strParamValue);
-            Guid oInputParameterGuid(c_strInputParamId);
 
             JobInformation& oJobInformation = *stlJobInformation->second;
             std::lock_guard<JobInformation> stlLock(oJobInformation);
-            if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
+
+            Guid oInputParameterGuid(c_strInputParamId);
+
+            if ( !IsJobOutputParameter(c_strParamValue))
             {
-                strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+                Guid oParameterGuid(c_strParamValue);
 
-                UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
-
-                // We have everything we need to submit this job, start it up
-                if ( true == oJobInformation.ReadyToExcute() )
+                if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
                 {
-                    StartJobRemoteExecution(oJobInformation);
+                    strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+
+                    UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
+
+                    // We have everything we need to submit this job, start it up
+                    if ( true == oJobInformation.ReadyToExcute() )
+                    {
+                        StartJobRemoteExecution(oJobInformation);
+                    }
+                }
+            }
+            else
+            {
+                if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
+                {
+                    strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+
+                    // We have everything we need to submit this job, start it up
+                    if ( true == oJobInformation.ReadyToExcute() )
+                    {
+                        StartJobRemoteExecution(oJobInformation);
+                    }
                 }
             }
         }
@@ -762,12 +790,12 @@ std::string Orchestrator::SetParameter(
     catch(const BaseException& oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-        m_stlDigitalContracts.clear();
+        strParameterId = "";
     }
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        m_stlDigitalContracts.clear();
+        strParameterId = "";
     }
     return strParameterId;
 }
@@ -788,6 +816,7 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
     )
 {
     std::optional<Guid> oTargetSecureComputationalNode;
+
     if ( eTable == c_oParameterGuid.GetObjectType() )
     {
         oTargetSecureComputationalNode = GetSecureComputationalNodeServingTable(c_oParameterGuid);
@@ -909,49 +938,106 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
     ) throw()
 {
     __DebugFunction();
+    __DebugAssert(oJob.ReadyToExcute());
 
+#ifdef DEBUG_PRINTS
     std::cout << "Job " << oJob.GetJobId().ToString(eHyphensAndCurlyBraces) << " is ready to execute on IP " << oJob.GetTargetIP() << std::endl;
+#endif
 
     bool fJobStarted{false};
     try
     {
+        _ThrowBaseExceptionIf((false == oJob.ReadyToExcute()), "Job is not ready to execute", nullptr);
+        std::shared_ptr<JobEngineConnection> poJobEngineSocket;
+        if ( m_stlSecureNodeConnections.end() == m_stlSecureNodeConnections.find(oJob.GetTargetIP()) )
+        {
+            std::shared_ptr<TlsNode> poNewSocketConnection{::TlsConnectToNetworkSocket(oJob.GetTargetIP(), REMOTE_JOB_PORT)};
+
+            m_stlSecureNodeConnections.emplace(oJob.GetTargetIP(), new JobEngineConnection(poNewSocketConnection, m_oJobMessageQueue));
+            poJobEngineSocket = m_stlSecureNodeConnections[oJob.GetTargetIP()];
+
+            // Send a connect message to the JobEngine
+            StructuredBuffer oPushBuffer;
+            oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::eConnectVirtualMachine));
+            oPushBuffer.PutString("Username", "TEST_USERNAME");
+            oPushBuffer.PutString("Eosb", m_oEosbRotator.GetEosb());
+            oPushBuffer.PutString("EndPoint", "JobEngine");
+
+            ::PutTlsTransaction(poNewSocketConnection.get(), oPushBuffer);
+        }
+        else
+        {
+#ifdef DEBUG_PRINTS
+            std::cout << "Re-using existing connection" << std::endl;
+#endif
+            poJobEngineSocket = m_stlSecureNodeConnections[oJob.GetTargetIP()];
+        }
+
         // Establish connection with the remote
-        TlsNode* poJobEngineSocket =::TlsConnectToNetworkSocket(oJob.GetTargetIP(), REMOTE_JOB_PORT);
         if ( nullptr == poJobEngineSocket )
         {
             std::cout << "Failed to connect to remote " << oJob.GetTargetIP() << std::endl;
         }
-        // TODO Put this back in once we can talk to SCNs
-        //_ThrowBaseExceptionIf((nullptr == poJobEngineSocket), "Failed to connect to remote job engine", nullptr);
+        else
+        {
+            _ThrowBaseExceptionIf((nullptr == poJobEngineSocket), "Failed to connect to remote job engine", nullptr);
+            oJob.SetConnection(poJobEngineSocket);
+        }
 
-        // Start the listener thread for the job
-        oJob.StartJobEngineListenerThread();
+        // Send any data we had cached
+        oJob.SendCachedMessages();
 
         SendSafeObjectToJobEngine(oJob);
+
+        SubmitJob(oJob);
 
         for ( auto oParameterItr : oJob.GetInputParameterMap() )
         {
             __DebugAssert(oParameterItr.second.has_value());
+
             Guid oParameterGuid(oParameterItr.first);
-            Guid oParameterValueGuid(oParameterItr.second.value());
 
-            // We need to push this to the remote job engine
-            if ( eUserSuppliedData == oParameterGuid.GetObjectType() )
+            // Parameters that aren't the result of an output parameter can be run
+            if ( !IsJobOutputParameter(oParameterItr.second.value()) )
             {
-                PushUserDataToJob(oJob, oParameterGuid);
-            }
+                Guid oParameterValueGuid(oParameterItr.second.value());
 
-            // Set the input parameters on the job engine
-            SetParameterOnJob(oJob, oParameterGuid, oParameterValueGuid);
+                // We need to push this to the remote job engine
+                if ( eUserSuppliedData == oParameterValueGuid.GetObjectType() )
+                {
+                    PushUserDataToJob(oJob, oParameterValueGuid);
+                }
+                // Set the input parameters on the job engine
+                SetParameterOnJob(oJob, oParameterGuid, oParameterValueGuid);
+            }
+            else
+            {
+                // We're assuming this is a job output
+                __DebugAssert( IsJobOutputParameter(oParameterItr.second.value()));
+
+                std::pair<Guid, Guid> oOutputParameters = ParseJobOutputToGuids(oParameterItr.second.value());
+                std::string strParameterString = oOutputParameters.first.ToString(eRaw) + "." + oOutputParameters.second.ToString(eRaw);
+                auto stlJobInformationItr = m_stlJobInformation.find(oOutputParameters.first.ToString(eRaw));
+
+                __DebugAssert(m_stlJobInformation.end() != stlJobInformationItr);
+
+                SetJobParameterForJobOutput(oJob, oParameterGuid, strParameterString);
+            }
         }
 
         std::cout << "Job " << oJob.GetJobId().ToString(eHyphensAndCurlyBraces) << " has sent all parameters " << std::endl;
+
         fJobStarted = true;
     }
 
     catch(const BaseException& oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+    catch(std::exception & e)
+    {
+        std::cout << "Exception: " << e.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
     catch(...)
     {
@@ -1045,16 +1131,16 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                         Guid oDigitalContractGuid(stlSecureComputationNodeItr.second.strDigitalContractGUID);
                         Guid oSecureComputationalNodeGuid(stlSecureComputationNodeItr.first);
                         VirtualMachineState eProvisionStatus = GetSecureComputationNodeInformation(oSecureComputationalNodeGuid);
-                        // TODO: Configuring should be in progress, but we have no data being served yet
-                        if ( VirtualMachineState::eWaitingForData == eProvisionStatus ||
-                             VirtualMachineState::eReadyForComputation == eProvisionStatus )
+
+                        if ( VirtualMachineState::eReadyForComputation == eProvisionStatus )
                         {
                             stlSucceededProvisions.insert(stlSecureComputationNodeItr.first);
                             stlInProgressProvisions.erase(stlSecureComputationNodeItr.first);
                             stlFailedProvisions.erase(stlSecureComputationNodeItr.first);
                         }
                         else if ( VirtualMachineState::eStarting == eProvisionStatus ||
-                                  VirtualMachineState::eConfiguring == eProvisionStatus )
+                                  VirtualMachineState::eConfiguring == eProvisionStatus ||
+                                  VirtualMachineState::eWaitingForData == eProvisionStatus )
                         {
                             stlInProgressProvisions.insert(stlSecureComputationNodeItr.first);
                         }
@@ -1102,7 +1188,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                 // Any job that is waiting for this dataset should be assigned this IP
                 for ( auto& oPendingJob : m_stlJobInformation)
                 {
-                    if ( oPendingJob.second->JobUsesDataset(m_stlProvisionInformation[oSucceededItr].oHostedDataset.oDatsetGuid) )
+                    if ( oPendingJob.second->JobParameterUsesGuid(m_stlProvisionInformation[oSucceededItr].oHostedDataset.oDatsetGuid) )
                     {
                         oPendingJob.second->SetTargetIP(m_stlProvisionInformation[oSucceededItr].strRemoteIpAddress);
                     }
@@ -1226,13 +1312,14 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
     ) const
 {
     __DebugFunction();
-    // Disabled until new dataset annotation tool is in place
-    //__DebugAssert(eTable == oTableGuid.GetObjectType());
+    __DebugAssert(eTable == oTableGuid.GetObjectType());
 
     std::optional<Guid> oSecureComputationalNodeGuid;
     for ( auto oTableItr : m_stlAvailableTables )
     {
-        if ( oTableGuid.ToString(eRaw) == oTableItr.second.m_strParentDataset )
+        Guid oTableItrGuid(oTableItr.second.m_oInformation.GetString("TableIdentifier"));
+
+        if ( oTableGuid == oTableItrGuid )
         {
             Guid oDatasetGuid(oTableItr.second.m_strParentDataset);
             oSecureComputationalNodeGuid = GetSecureComputationalNodeServingDataset(oDatasetGuid);
@@ -1241,6 +1328,71 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
     }
 
     return oSecureComputationalNodeGuid;
+}
+
+/********************************************************************************************
+ *
+ * @function ParseJobOutputToGuids
+ * @brief Parse out an output parameter identifier to its two guids: JobGUID.OutputParamGuid
+ *        Throws an exception on error
+ * @param[in] std::string - The ID for the parameter pull in form: "JobGUID.OutputParameterGuid"
+ * @return std::pair<Guid, Guid> - The Guids of the Job and Output Param
+ ********************************************************************************************/
+static std::pair<Guid, Guid> ParseJobOutputToGuids(
+    _in const std::string& c_strJobOutputId
+)
+{
+    size_t unFirstPeriod = c_strJobOutputId.find_first_of(".");
+    size_t unLastPeriod = c_strJobOutputId.find_last_of(".");
+    _ThrowBaseExceptionIf( (std::string::npos == unFirstPeriod) || (unFirstPeriod != unLastPeriod),
+        "Invalid parameter specifier", nullptr);
+    const std::string& c_strJobId = c_strJobOutputId.substr(0, unFirstPeriod);
+    const std::string& c_strParameterId = c_strJobOutputId.substr(unFirstPeriod + 1, std::string::npos);
+
+    return std::make_pair(Guid(c_strJobId), Guid(c_strParameterId));
+}
+
+/********************************************************************************************
+ *
+ * @function IsJobOutputParameter
+ * @brief Determine if a string holds a job output parameter in the form: JobGUID.OutputParameterGuid
+ * @param[in] std::string - The ID for the parameter pull in form: "JobGUID.OutputParameterGuid"
+ * @return True if this is a JobOutputParameter, false otherwise
+ ********************************************************************************************/
+static bool IsJobOutputParameter(
+    _in const std::string& c_strParameter
+)
+{
+    bool fIsJobParameter{false};
+
+    try
+    {
+        size_t unFirstPeriod = c_strParameter.find_first_of(".");
+        size_t unLastPeriod = c_strParameter.find_last_of(".");
+        if ( std::string::npos != unFirstPeriod && (std::string::npos != unLastPeriod) )
+        {
+            const std::string& c_strJobId = c_strParameter.substr(0, unFirstPeriod);
+            const std::string& c_strParameterId = c_strParameter.substr(unFirstPeriod + 1, std::string::npos);
+
+            // If these two values are no GUIDs, these calls with  throw
+            Guid oJobGuid(c_strJobId);
+            Guid oParameterGuid(c_strParameterId);
+
+            fIsJobParameter = (eJobIdentifier == oJobGuid.GetObjectType()) && ( eOutputParameterIdentifier == oParameterGuid.GetObjectType());
+        }
+    }
+    catch(const BaseException& oBaseException )
+    {
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
+        fIsJobParameter = false;
+    }
+    catch( ... )
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        fIsJobParameter = false;
+    }
+
+    return fIsJobParameter;
 }
 
 /********************************************************************************************
@@ -1260,15 +1412,10 @@ std::string __thiscall Orchestrator::PullJobData(
     std::string strResult{"Invalid parameter"};
     try
     {
-        size_t unFirstPeriod = c_strOutputParameter.find_first_of(".");
-        size_t unLastPeriod = c_strOutputParameter.find_last_of(".");
-        _ThrowBaseExceptionIf( (std::string::npos == unFirstPeriod) || (unFirstPeriod != unLastPeriod),
-            "Invalid parameter specifier", nullptr);
-        const std::string& c_strJobId = c_strOutputParameter.substr(0, unFirstPeriod);
-        const std::string& c_strParameterId = c_strOutputParameter.substr(unFirstPeriod + 1, std::string::npos);
-        std::cout << "Pulling data for job " << c_strJobId << " parameter " << c_strParameterId << std::endl;
+        std::pair<Guid, Guid> stlJobGuids = ParseJobOutputToGuids(c_strOutputParameter);
 
-        auto oStlJobInformationItr = m_stlJobInformation.find(c_strJobId);
+        auto oStlJobInformationItr = m_stlJobInformation.find(stlJobGuids.first.ToString(eRaw));
+
         if ( m_stlJobInformation.end() == oStlJobInformationItr )
         {
             strResult = "Job not found";
@@ -1281,28 +1428,44 @@ std::string __thiscall Orchestrator::PullJobData(
             const std::string& c_strSafeFunctionId = oStlJobInformationItr->second->GetSafeFunctionId();
             auto oSafeFunctionItr = m_stlAvailableSafeFunctions.find(c_strSafeFunctionId);
             __DebugAssert(m_stlAvailableSafeFunctions.end() != oSafeFunctionItr);
-            const StructuredBuffer& c_oOutputParameters = oSafeFunctionItr->second.GetStructuredBuffer("OutputParamters");
-            if ( false == c_oOutputParameters.IsElementPresent(c_strParameterId.c_str(), INDEXED_BUFFER_VALUE_TYPE) )
+            const StructuredBuffer& c_oOutputParameters = oSafeFunctionItr->second.GetStructuredBuffer("OutputParameters");
+
+            auto oOutputParameterNames = c_oOutputParameters.GetNamesOfElements();
+            std::optional<StructuredBuffer> oOutputParameterBuffer;
+
+            for ( auto oOutputParameter : oOutputParameterNames )
             {
-                strResult = "Parameter not found in safe function";
+                const StructuredBuffer c_currentOutput = c_oOutputParameters.GetStructuredBuffer(oOutputParameter.c_str());
+                if ( stlJobGuids.second.ToString(eRaw) == c_currentOutput.GetString("Uuid") )
+                {
+                    oOutputParameterBuffer = c_currentOutput;
+                    break;
+                }
+            }
+
+            if ( !oOutputParameterBuffer.has_value() )
+            {
+                strResult = "Parameter not found in safe function: " + stlJobGuids.second.ToString(eHyphensAndCurlyBraces);
             }
             else
             {
-                const StructuredBuffer& c_oOutputParameter = c_oOutputParameters.GetStructuredBuffer(c_strParameterId.c_str());
-                if ( c_oOutputParameter.GetString("Confidentiality") == "1" )
+                std::cout << oOutputParameterBuffer.value().ToString() << std::endl;
+                if ( oOutputParameterBuffer.value().GetString("confidentiality") == "1" )
                 {
                     strResult = "Parameter is confidential";
                 }
-                else
-                {
+                // TODO - We still let confidential parameters in so we can test things
+               // else
+                //{
                     StructuredBuffer oPushBuffer;
+                    std::string strFilename = stlJobGuids.first.ToString(eRaw) + "." + stlJobGuids.second.ToString(eRaw);
                     oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::ePullData));
                     oPushBuffer.PutString("EndPoint", "JobEngine");
-                    oPushBuffer.PutString("Filename", c_strOutputParameter);
+                    oPushBuffer.PutString("Filename", strFilename.c_str());
 
                     oStlJobInformationItr->second->SendStructuredBufferToJobEngine(oPushBuffer);
                     strResult = "Success";
-                }
+              //  }
             }
         }
     }
@@ -1341,9 +1504,22 @@ std::string __thiscall Orchestrator::WaitForData(
         {
             if ( oDataResult->IsElementPresent("SignalType", BYTE_VALUE_TYPE) )
             {
-                if ( static_cast<Byte>(JobStatusSignals::ePostValue) == oDataResult->GetByte("SignalType"))
+                JobStatusSignals eStatusSignal = static_cast<JobStatusSignals>(oDataResult->GetByte("SignalType"));
+                if ( JobStatusSignals::ePostValue == eStatusSignal)
                 {
+                    m_stlJobResults[oDataResult->GetString("ValueName")] = oDataResult->GetBuffer("FileData");
                     UpdateJobsWaitingForData(*oDataResult);
+                }
+                else if ( JobStatusSignals::eJobFail == eStatusSignal ||
+                    JobStatusSignals::eJobDone == eStatusSignal ||
+                    JobStatusSignals::eJobStart == eStatusSignal )
+                {
+                    Guid oJobIdentifier(oDataResult->GetString("JobUuid"));
+                    auto oJobInformation = m_stlJobInformation.find(oJobIdentifier.ToString(eRaw));
+                    if ( m_stlJobInformation.end() != oJobInformation )
+                    {
+                        oJobInformation->second->SetStatus(eStatusSignal);
+                    }
                 }
             }
             strReturn = GetJsonForStructuredBuffer(*oDataResult);
@@ -1372,23 +1548,33 @@ std::string __thiscall Orchestrator::WaitForData(
  * @function UpdateJobsWaitingForData
  * @brief Update any jobs who may have been waiting for a data push
  * TODO Complete this when we are talking to SCNs
- * @param[in] c_oPushDataMessage - The timeout in ms for how long to wait for a StructuredBuffer
+ * @param[in] c_oPushDataMessage - The result of a parameter pushed to us
  *
  ********************************************************************************************/
 void __thiscall Orchestrator::UpdateJobsWaitingForData(
     _in const StructuredBuffer& c_oPushDataMessage
     )
 {
-    std::cout << "Looking to update jobs for data" << std::endl;
+    std::string strValueParameter(c_oPushDataMessage.GetString("ValueName"));
+    __DebugAssert(true == IsJobOutputParameter(strValueParameter));
 
     for ( auto& oJobInformation : m_stlJobInformation )
     {
         __DebugAssert(nullptr != oJobInformation.second.get());
-
         std::lock_guard<JobInformation> stlLock(*oJobInformation.second);
-        if ( oJobInformation.second->GetInputParameterMap().end() != oJobInformation.second->GetInputParameterMap().find(c_oPushDataMessage.GetString("ValueName") ) )
+
+        // We only assign this to jobs that aren't already running
+        if ( (oJobInformation.second->JobParameterUsesJobOutputParameter(strValueParameter)) && (false == oJobInformation.second->ReadyToExcute()) )
         {
-            std::cout << "Found a parameter that needs an implicit push " << std::endl;
+
+            StructuredBuffer oPushDataBuffer;
+            oPushDataBuffer.PutByte("RequestType", (Byte)EngineRequest::ePushdata);
+            oPushDataBuffer.PutString("EndPoint", "JobEngine");
+            oPushDataBuffer.PutString("DataId", c_oPushDataMessage.GetString("ValueName"));
+            oPushDataBuffer.PutBuffer("Data", m_stlJobResults[c_oPushDataMessage.GetString("ValueName")]);
+
+            SendDataToJob(*oJobInformation.second, oPushDataBuffer);
+            oJobInformation.second->SetOutputJobParameterReady(strValueParameter);
         }
     }
 }
@@ -1433,6 +1619,45 @@ void __thiscall Orchestrator::PushUserDataToJob(
 /********************************************************************************************
  *
  * @class Orchestrator
+ * @function PushUserDataToJob
+ * @brief Push cached user data to a job
+ * @param[in] oJob - The job we want to push data to
+ * @param[in] oUserParameter - The GUID of the user data to send to the job engine
+ *
+ ********************************************************************************************/
+void __thiscall Orchestrator::PushJobOutputParameterToJob(
+    _in JobInformation& oJob,
+    _in const std::string& strParameterIdentifier,
+    _in const std::vector<Byte>& oOutputParameterData
+    )
+{
+    __DebugFunction();
+    __DebugAssert(IsJobOutputParameter(strParameterIdentifier));
+    try
+    {
+        std::pair<Guid, Guid> oParameterGuids = ParseJobOutputToGuids(strParameterIdentifier);
+        StructuredBuffer oPushDataBuffer;
+        oPushDataBuffer.PutByte("RequestType", (Byte)EngineRequest::ePushdata);
+        oPushDataBuffer.PutString("EndPoint", "JobEngine");
+        oPushDataBuffer.PutString("DataId", oParameterGuids.first.ToString(eRaw) + "." + oParameterGuids.second.ToString(eRaw));
+        oPushDataBuffer.PutBuffer("Data", oOutputParameterData);
+
+        SendDataToJob(oJob, oPushDataBuffer);
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
  * @function SendSafeObjectToJobEngine
  * @param [in] JobInformation The job to send this data to
  * @brief Send a structured buffer to a job that contains our safe object
@@ -1454,10 +1679,11 @@ void __thiscall Orchestrator::SendSafeObjectToJobEngine(
         oSafeFunctionBuffer.PutString("SafeObjectUuid", oCachedSafeFunction.GetString("Uuid"));
         oSafeFunctionBuffer.PutString("Title", oCachedSafeFunction.GetString("Title"));
         oSafeFunctionBuffer.PutString("Description", oCachedSafeFunction.GetString("Description"));
-        oSafeFunctionBuffer.PutStructuredBuffer("InputParameters", oCachedSafeFunction.GetStructuredBuffer("InputParameters"));
+        oSafeFunctionBuffer.PutStructuredBuffer("ParameterList", oCachedSafeFunction.GetStructuredBuffer("InputParameters"));
         oSafeFunctionBuffer.PutStructuredBuffer("OutputParameters", oCachedSafeFunction.GetStructuredBuffer("OutputParameters"));
+        oSafeFunctionBuffer.PutString("Payload", oCachedSafeFunction.GetString("Payload"));
 
-        SendDataToJob(oJob, oSafeFunctionBuffer);
+        oJob.SendStructuredBufferToJobEngine(oSafeFunctionBuffer);
     }
     catch(const BaseException& c_oBaseException)
     {
@@ -1472,6 +1698,47 @@ void __thiscall Orchestrator::SendSafeObjectToJobEngine(
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function SubmitJob
+ * @param [in] JobInformation The job to send this data to
+ * @brief Send a structured buffer to a job that contains the submit job message
+ *
+ ********************************************************************************************/
+void __thiscall Orchestrator::SubmitJob(
+    _in JobInformation& oJob
+    )
+{
+    try
+    {
+        StructuredBuffer oParameterSubmitJob;
+        oParameterSubmitJob.PutByte("RequestType", (Byte)EngineRequest::eSubmitJob);
+        oParameterSubmitJob.PutString("EndPoint", "JobEngine");
+        oParameterSubmitJob.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
+        oParameterSubmitJob.PutString("SafeObjectUuid", oJob.GetSafeFunctionId());
+
+        SendDataToJob(oJob, oParameterSubmitJob);
+    }
+
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch (const std::exception & c_oException)
+    {
+        std::cout << "Exception: " << c_oException.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
 }
 
 /********************************************************************************************
@@ -1523,6 +1790,67 @@ void __thiscall Orchestrator::SetParameterOnJob(
 
 }
 
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function SetJobParameterForJobOutput
+ * @param [in] JobInformation The job to send this data to
+ * @param [in] Guid The guid of the parameter to set
+ * @param [in] std::string The value of the parameter's guid to set to
+ * @brief Send a structured buffer to a job that will tell the job what the output parameter
+ *        is for a job
+ *
+ ********************************************************************************************/
+void __thiscall Orchestrator::SetJobParameterForJobOutput(
+    _in JobInformation& oJob,
+    _in Guid& oParameterGuid,
+    _in std::string& strParameterValue
+    )
+{
+    __DebugFunction();
+    __DebugAssert(true == IsJobOutputParameter(strParameterValue));
+    __DebugAssert(m_stlJobResults.end() != m_stlJobResults.find(strParameterValue));
+
+    try
+    {
+        // Set the parameter, then send the data
+        StructuredBuffer oParameterSetBuffer;
+        oParameterSetBuffer.PutByte("RequestType", (Byte)EngineRequest::eSetParameters);
+        oParameterSetBuffer.PutString("EndPoint", "JobEngine");
+        oParameterSetBuffer.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
+        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eRaw));
+        oParameterSetBuffer.PutString("ValueUuid", strParameterValue);
+        oParameterSetBuffer.PutUnsignedInt32("ValuesExpected", 1);
+        oParameterSetBuffer.PutUnsignedInt32("ValueIndex", 0);
+
+        SendDataToJob(oJob, oParameterSetBuffer);
+
+        // Send the job data
+        StructuredBuffer oPushDataBuffer;
+        oPushDataBuffer.PutByte("RequestType", (Byte)EngineRequest::ePushdata);
+        oPushDataBuffer.PutString("EndPoint", "JobEngine");
+        oPushDataBuffer.PutString("DataId", strParameterValue);
+        oPushDataBuffer.PutBuffer("Data", m_stlJobResults[strParameterValue]);
+
+        SendDataToJob(oJob, oPushDataBuffer);
+    }
+
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch (const std::exception & c_oException)
+    {
+        std::cout << "Exception: " << c_oException.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+}
 /********************************************************************************************
  *
  * @class Orchestrator

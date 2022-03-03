@@ -31,7 +31,9 @@ def deploy_module(account_credentials, deployment_name, module_name):
         + "VirtualMachineImageStorageRg/providers/Microsoft.Compute/images/" + module_name,
         "adminUserName": "saildeveloper",
         "adminPassword": "SailPassword@123",
-        "subnetIpPrefix": "10.0.1.0/24",
+        "subnetName": "PlatformService_eastus",
+        "virtualNetworkId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/"
+        + "ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet"
     }
     deploy_status = sailazure.deploy_template(
         account_credentials, resource_group_name, template, parameters

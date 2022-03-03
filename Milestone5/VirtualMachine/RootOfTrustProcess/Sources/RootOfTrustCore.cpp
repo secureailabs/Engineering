@@ -119,8 +119,8 @@ void __thiscall RootOfTrustCore::Initialize(
     // Okay, we are fully initialized
     m_fIsInitialized = true;
     // Let's initialize this virtual machine (causes API call into SAIL Platform Services API Portal)
-    this->RegisterVirtualMachine();
-    __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineAuditEventParentBranchNodeIdentifier").size());
+    //this->RegisterVirtualMachine();
+    //__DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineAuditEventParentBranchNodeIdentifier").size());
     // Since we have the DataOwnerEosb and the DatasetFilename, we can also register the Data Owner Eosb
     this->RegisterDataOwnerEosb();
     __DebugAssert(0 < m_oRootOfTrustCoreProperties.GetProperty("DataOwnerUserIdentifier").size());

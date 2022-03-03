@@ -2406,11 +2406,11 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         {
 
             // Start the VM provisioning step. This step will be
-             StructuredBuffer oDeployResponse = ::DeployVirtualMachineAndWait(c_strApplicationIdentifier, c_strSecret, c_strTenantIdentifier, c_strSubscriptionIdentifier, c_strResourceGroup,
-                 c_oNewVirtualMachineGuid.ToString(eRaw), c_strVirtualMachineSpecification, c_strLocation);
-             // TODO: Prawal add a check if the VM creation fails and mark the Digital contract as fail too possibly with an error message
-             if("Success" != oDeployResponse.GetString("Status"))
-             {
+            StructuredBuffer oDeployResponse = ::DeployVirtualMachineAndWait(c_strApplicationIdentifier, c_strSecret, c_strTenantIdentifier, c_strSubscriptionIdentifier, c_strResourceGroup,
+                c_oNewVirtualMachineGuid.ToString(eRaw), c_strVirtualMachineSpecification, c_strLocation);
+            // TODO: Prawal add a check if the VM creation fails and mark the Digital contract as fail too possibly with an error message
+            if("Success" != oDeployResponse.GetString("Status"))
+            {
                 // Delete the resources associated with the VM
                 std::vector<std::string> stlListOfResourcesToDelete = ::AzureResourcesAssociatedWithVirtualMachine(c_strApplicationIdentifier, c_strResourceGroup, c_oNewVirtualMachineGuid.ToString(eRaw));
                 if (false == ::DeleteAzureResourceGroup(c_strApplicationIdentifier, c_strTenantIdentifier, c_strSecret, c_strSubscriptionIdentifier, c_strResourceGroup))

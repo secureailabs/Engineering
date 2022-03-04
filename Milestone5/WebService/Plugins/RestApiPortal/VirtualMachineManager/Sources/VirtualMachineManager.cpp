@@ -1235,7 +1235,7 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
             oRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterVirtualMachine");
             oRequest.PutString("VirtualMachineGuid", strVmGuid);
 
-            oRequest.PutString("DigitalContractTitle", oDigitalContractResponse.GetString("Title"));
+            oRequest.PutString("DigitalContractTitle", oDigitalContractResponse.GetStructuredBuffer("DigitalContract").GetString("Title"));
             oRequest.PutString("DigitalContractGuid", strDcGuid);
             oRequest.PutUnsignedInt64("RegistrationTime", ::GetEpochTimeInSeconds());
             oRequest.PutUnsignedInt64("HeartbeatBroadcastTime", c_oRequest.GetUnsignedInt64("HeartbeatBroadcastTime"));

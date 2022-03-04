@@ -24,6 +24,9 @@ pipeline {
                     pwd
                     ls -l
                     ./Milestone5/CreateDailyBuild.sh
+                    ./Milestone5/BuildSecureComputation.sh
+                    ./Milestone5/PackageSecureComputation.sh
+                    cp ./Milestone5/SecureComputationNode.tar.gz ./Milestone5/Binary/
                     '''
                 }
             }

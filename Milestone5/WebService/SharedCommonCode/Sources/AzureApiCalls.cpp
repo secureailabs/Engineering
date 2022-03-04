@@ -11,11 +11,12 @@
 #include "AzureHelper.h"
 #include "DebugLibrary.h"
 #include "CurlRest.h"
-#include "JsonValue.h"
 #include "ExceptionRegister.h"
 #include "InitializationVector.h"
+#include "JsonParser.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include <unistd.h>
 
@@ -51,7 +52,7 @@ std::string __stdcall LoginToMicrosoftAzureApiPortal(
         stlHeader.push_back("Content-Type: application/x-www-form-urlencoded");
         stlHeader.push_back("Accept: */*");
         std::vector<Byte> stlResponse = ::RestApiCall("login.microsoftonline.com", 443, strVerb, strApiUri, strApiContentBody, false, stlHeader);
-        StructuredBuffer oMicrosoftAzureResponse = JsonValue::ParseDataToStructuredBuffer((const char*) stlResponse.data());
+        StructuredBuffer oMicrosoftAzureResponse = ::ConvertJsonStringToStructuredBuffer((const char*) stlResponse.data());
         _ThrowBaseExceptionIf((false == oMicrosoftAzureResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Microsoft Azure authentication failed. Response JSON is:\r\n%s", (const char *) oMicrosoftAzureResponse.ToString().c_str());
         strAccessToken = oMicrosoftAzureResponse.GetString("access_token");
     }
@@ -213,7 +214,7 @@ StructuredBuffer __stdcall CreateResourceGroup(
             std::vector<Byte> stlResponse = ::RestApiCall(strHost, 443, strVerb, strApiUri, strContent, false, stlHeader);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Failed to create a Microsoft Azure Resource Group", nullptr);
             stlResponse.push_back(0);
-            StructuredBuffer oAzureVmDeployResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+            StructuredBuffer oAzureVmDeployResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             if ((true == oAzureVmDeployResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oAzureVmDeployResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 if (false == IsServerTimeoutError(oAzureVmDeployResponse))
@@ -287,7 +288,7 @@ std::string GetVirtualMachineIpAddress(
         if (std::string::npos != strResponse.find("\"error\""))
         {
             stlResponse.push_back(0);
-            StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 if (false == IsServerTimeoutError(oResponse))
@@ -363,7 +364,7 @@ StructuredBuffer DeployVirtualMachineAndWait(
             auto stlResponse = ::MakeMicrosoftAzureApiCall(c_strMicrosoftAzureAccessToken, strVerb, strResource, strHost, strContent, strApiVersionDate, c_szSubscriptionIdentifier, c_szResourceGroup);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Failed to get the status of a virtual machine being provisioned", nullptr);
             stlResponse.push_back(0);
-            StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 if (false == ::IsServerTimeoutError(oResponse))
@@ -470,7 +471,7 @@ StructuredBuffer CreateAzureDeployment(
             std::vector<Byte> stlResponse = ::MakeMicrosoftAzureApiCall(c_strMicrosoftAzureAccessToken, strVerb, strResource, strHost, c_strDeploymentParameters, strApiVersionDate, c_strSubscriptionIdentifier, c_strResourceGroup);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Failed to create a Microsoft Azure public IP address", nullptr);
             stlResponse.push_back(0);
-            StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 if (true == IsServerTimeoutError(oResponse))
@@ -498,7 +499,7 @@ StructuredBuffer CreateAzureDeployment(
             auto stlResponse = ::MakeMicrosoftAzureApiCall(c_strMicrosoftAzureAccessToken, strVerb, strResource, strHost, "", strApiVersionDate, c_strSubscriptionIdentifier, c_strResourceGroup);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Failed to create a Microsoft Azure Deployment", nullptr);
             stlResponse.push_back(0);
-            StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 if (false == IsServerTimeoutError(oResponse))
@@ -613,7 +614,7 @@ bool DoesAzureResourceExist(
             if (0 < stlResponse.size())
             {
                 stlResponse.push_back(0);
-                StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+                StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
                 if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                 {
                     if (true == ::IsServerTimeoutError(oResponse))
@@ -689,9 +690,7 @@ StructuredBuffer CopyVirtualMachineImage(
             StructuredBuffer oRequest;
             oRequest.PutString("name", strStorageAccountName);
             oRequest.PutString("type", "Microsoft.Storage/storageAccounts");
-            auto oJsonResponse = JsonValue::ParseStructuredBufferToJson(oRequest);
-            std::string strContent = oJsonResponse->ToString();
-            oJsonResponse->Release();
+            auto strContent = ::ConvertStructuredBufferToJson(oRequest);
             std::string strApiUri = "/subscriptions/" + c_strSubscriptionId + "/providers/Microsoft.Storage/checkNameAvailability?api-version=2021-04-01";
             std::string strHost = "management.azure.com";
 
@@ -704,7 +703,7 @@ StructuredBuffer CopyVirtualMachineImage(
             std::vector<Byte> stlResponse = ::RestApiCall(strHost, 443, strVerb, strApiUri, strContent, false, stlHeader, &nResponseCode);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Failed to create a Microsoft Azure Deployment", nullptr);
             stlResponse.push_back(0);
-            StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 if (false == IsServerTimeoutError(oResponse))
@@ -729,9 +728,7 @@ StructuredBuffer CopyVirtualMachineImage(
         oRequest.PutStructuredBuffer("sku", oSku);
         oRequest.PutString("kind", "StorageV2");
         oRequest.PutString("location", c_strLocation);
-        auto oJsonResponse = JsonValue::ParseStructuredBufferToJson(oRequest);
-        std::string strContent = oJsonResponse->ToString();
-        oJsonResponse->Release();
+        auto strContent = ::ConvertStructuredBufferToJson(oRequest);
 
         // Keep making the same request every 5 seconds until the reposne code is 200 or the reponse is not empty
         std::vector<Byte> stlResponse;
@@ -746,7 +743,7 @@ StructuredBuffer CopyVirtualMachineImage(
                 fStorageAccountCreated = true;
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Unexpected response code %d with no string response", nResponseCode, nullptr);
                 stlResponse.push_back(0);
-                oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+                oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             }
             else if (202 == nResponseCode)
             {
@@ -756,7 +753,7 @@ StructuredBuffer CopyVirtualMachineImage(
             {
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Unexpected response code %d with no string response", nResponseCode, nullptr);
                 stlResponse.push_back(0);
-                oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+                oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
                 if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                 {
                     if (false == IsServerTimeoutError(oResponse))
@@ -780,7 +777,7 @@ StructuredBuffer CopyVirtualMachineImage(
             stlResponse = ::MakeMicrosoftAzureApiCall(c_strMicrosoftAzureAccessToken, "POST", "Microsoft.Storage/storageAccounts/"+ strStorageAccountName + "/listKeys", "management.azure.com", strContent, "2021-04-01", c_strSubscriptionId, c_strResourceGroupName);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Cannot fetch storage account keys", nullptr);
             stlResponse.push_back(0);
-            oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+            oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
             if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 if (false == IsServerTimeoutError(oResponse))
@@ -819,7 +816,7 @@ StructuredBuffer CopyVirtualMachineImage(
                 if (0 < stlResponse.size())
                 {
                     stlResponse.push_back(0);
-                    oResponse = JsonValue::ParseDataToStructuredBuffer((char *)stlResponse.data());
+                    oResponse = ::ConvertJsonStringToStructuredBuffer((char *)stlResponse.data());
                     if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                     {
                         if (false == IsServerTimeoutError(oResponse))
@@ -892,9 +889,7 @@ StructuredBuffer CopyVirtualMachineImage(
         oStorageProfile.PutStructuredBuffer("osDisk", oOsDisk);
         oProperties.PutStructuredBuffer("storageProfile", oStorageProfile);
         oImageCreateRequest.PutStructuredBuffer("properties", oProperties);
-        oJsonResponse = JsonValue::ParseStructuredBufferToJson(oImageCreateRequest);
-        std::string strConvertVhdToImageRequest = oJsonResponse->ToString();
-        oJsonResponse->Release();
+        std::string strConvertVhdToImageRequest = ::ConvertStructuredBufferToJson(oImageCreateRequest);
 
         strApiUri = "/subscriptions/" + c_strSubscriptionId + "/resourceGroups/" + c_strResourceGroupName + "/providers/Microsoft.Compute/images/"+ c_strImageName + "?api-version=2021-07-01";
         stlHeader.clear();
@@ -917,7 +912,7 @@ StructuredBuffer CopyVirtualMachineImage(
                 if (0 < stlResponse.size())
                 {
                     stlResponse.push_back(0);
-                    oResponse = JsonValue::ParseDataToStructuredBuffer((char *)stlResponse.data());
+                    oResponse = ::ConvertJsonStringToStructuredBuffer((char *)stlResponse.data());
                     if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                     {
                         if (false == IsServerTimeoutError(oResponse))
@@ -942,13 +937,13 @@ StructuredBuffer CopyVirtualMachineImage(
         oCopyImageResult.PutString("VirtualImageId", oResponse.GetString("id"));
         oCopyImageResult.PutString("Status", "Success");
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oCopyImageResult.PutString("error", c_oBaseException.GetExceptionMessage());
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1015,7 +1010,7 @@ bool DeleteAzureResourceGroup(
                 if (0 < stlResponse.size())
                 {
                     stlResponse.push_back(0);
-                    StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+                    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
                     if ((true == oResponse.IsElementPresent("error", INDEXED_BUFFER_VALUE_TYPE)) || (true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                     {
                         if (false == ::IsServerTimeoutError(oResponse))

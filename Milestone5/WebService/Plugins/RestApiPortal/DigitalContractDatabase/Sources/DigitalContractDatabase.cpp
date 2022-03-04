@@ -2370,7 +2370,15 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         oVirtualMachineSpecification.PutString("vmImageResourceId", c_strVirtualMachineImageId);
         oVirtualMachineSpecification.PutString("adminUserName", "saildeveloper");
         oVirtualMachineSpecification.PutString("adminPassword", "Iw2btin2AC+beRl&dir!");
-        oVirtualMachineSpecification.PutString("subnetIpPrefix", "10.0.1.0/24");
+        if (oTemplateData.IsElementPresent("virtualNetworkId", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        {
+            oVirtualMachineSpecification.PutString("virtualNetworkId", oTemplateData.GetString("virtualNetworkId"));
+            oVirtualMachineSpecification.PutString("subnetName", oTemplateData.GetString("subnetName"));
+        }
+        else
+        {
+            oVirtualMachineSpecification.PutString("subnetIpPrefix", "10.0.1.0/24");
+        }
 
         const std::string c_strVirtualMachineSpecification = ::CreateAzureParamterJson(::GetInitializationValue("AzureVirtualMachineTemplateUrl"), oVirtualMachineSpecification);
 

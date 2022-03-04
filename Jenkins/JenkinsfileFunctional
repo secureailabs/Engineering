@@ -25,7 +25,7 @@ pipeline {
                     ls -l
                     ./Milestone5/CreateDailyBuild.sh
                     ./Milestone5/BuildSecureComputation.sh
-                    ./Milestone5/PackageSecureComputation.sh
+                    ./Milestone5/PackageSecureComputationNode.sh
                     cp ./Milestone5/SecureComputationNode.tar.gz ./Milestone5/Binary/
                     '''
                 }

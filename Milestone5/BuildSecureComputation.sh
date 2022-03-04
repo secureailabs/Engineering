@@ -1,7 +1,9 @@
 #!/bin/bash
+# Build SCN Binaries
+# Precursor to PackageSecureConputationNode.sh 
 set -x
 
-SCRIPT_DIR=$(pwd)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Build and put stuff in the Binary folder
 pushd "$SCRIPT_DIR"/VirtualMachine || exit

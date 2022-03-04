@@ -1,4 +1,9 @@
 #!/bin/bash
+# Package Binaries for Platform Services into Tarball
+# Postcursor to BuildPlatformServices.sh
+# Deployed by DeployPlatform.sh
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Check if all the required files are present on the machine
 declare -a ListOfFiles=(
@@ -19,7 +24,7 @@ declare -a ListOfFiles=(
 
 for val in "${ListOfFiles[@]}"; do
     echo -e "\nSearching for ${val} ..."
-    find Binary | grep -x "$val"
+    find "${SCRIPT_DIR}/Binary" | grep -x "${SCRIPT_DIR}/${val}"
     retVal=$?
     if [ $retVal -ne 0 ]; then
         echo "Error ${val} does not exist"
@@ -29,6 +34,7 @@ done
 
 set -e
 # Compress and package all the files
+cd "${SCRIPT_DIR}"
 tar -czvf PlatformServices.tar.gz "${ListOfFiles[@]}"
 
 echo "Success!!"

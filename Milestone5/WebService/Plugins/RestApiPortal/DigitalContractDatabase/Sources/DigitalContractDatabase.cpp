@@ -2138,6 +2138,9 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
         StructuredBuffer oUserInfo(this->GetUserInfo(c_oRequest));
         if (200 == oUserInfo.GetDword("Status"))
         {
+            // Add the updated Eosb
+            oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
+
             // Get the digital contract blob
             StructuredBuffer oDcBlob(this->PullDigitalContract(c_oRequest));
             if (200 == oDcBlob.GetDword("Status"))

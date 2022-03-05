@@ -20,6 +20,6 @@ pushd "${SCRIPT_DIR}/WebService/Plugins/RestApiPortal"
 for d in $(echo ./*/);do (pushd "$d"; make all -j; popd); done
 popd
 
-pushd "${SCRIPT_DIR}\/WebService/Plugins/DatabasePortal"
+pushd "${SCRIPT_DIR}/WebService/Plugins/DatabasePortal"
 for d in $(echo ./*/);do (cd "$d"; make all -j; popd); done
 popd

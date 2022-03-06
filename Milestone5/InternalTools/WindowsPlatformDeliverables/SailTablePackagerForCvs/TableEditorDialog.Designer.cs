@@ -316,6 +316,7 @@
             this.m_BackButton.TabIndex = 15;
             this.m_BackButton.Text = "Back";
             this.m_BackButton.UseVisualStyleBackColor = true;
+            this.m_BackButton.Click += new System.EventHandler(this.m_BackButton_Click);
             // 
             // TableEditDialog
             // 

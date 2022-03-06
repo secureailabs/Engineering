@@ -190,6 +190,16 @@ namespace SailTablePackagerForCsv
         }
 
         /// <summary>
+        /// Deletes all existing column properties
+        /// </summary>
+        /// <param name=""></param>
+        public void DeleteColumnProperties()
+        {
+            m_ColumnPropertyNames = new List<Dictionary<ulong, string>>();
+            m_ColumnProperties = new List<Dictionary<ulong, dynamic>>();
+        }
+
+        /// <summary>
         /// Get the names of all the properties associated with a specific column
         /// </summary>
         /// <param name="columnIndex"></param>

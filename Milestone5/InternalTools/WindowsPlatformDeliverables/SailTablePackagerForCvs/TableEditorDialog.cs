@@ -369,6 +369,21 @@ namespace SailTablePackagerForCsv
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void m_BackButton_Click(
+            object sender,
+            EventArgs e
+            )
+        {
+            m_TableProperties.SetTableProperty("Title", m_TableTitleTextBox.Text);
+            m_TableProperties.SetTableProperty("Description", m_TableDescriptionTextBox.Text);
+            m_TableProperties.SetTableProperty("Tags", m_TableTagsTextBox.Text);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void m_NextButton_Click(
             object sender,
             EventArgs e

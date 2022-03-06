@@ -35,6 +35,37 @@ namespace SailTablePackagerForCsv
             m_LineCommentCharacterTextBox.KeyPress += m_LineCommentCharacterTextBox_KeyPress;
             m_QuoteCharacterTextBox.KeyPress += m_QuoteCharacterTextBox_KeyPress;
             m_EscapeCharacterTextBox.KeyPress += m_EscapeCharacterTextBox_KeyPress;
+            // Now we need to initialize the text field with the tableProperties passed in
+            if (null != m_TableProperties.GetTableProperty("ValueSeparatorCharacter"))
+            {
+                m_ValueSeparatorCharacterTextBox.Text = m_TableProperties.GetTableProperty("ValueSeparatorCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("AllowComments"))
+            {
+                m_ParseCommentLinesCheckBox.Checked = m_TableProperties.GetTableProperty("AllowComments");
+            }
+            if (null != m_TableProperties.GetTableProperty("CommentCharacter"))
+            {
+                m_LineCommentCharacterTextBox.Text = m_TableProperties.GetTableProperty("CommentCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("HeadersOnFirstLine"))
+            {
+                m_FirstLineHeadersCheckBox.Checked = m_TableProperties.GetTableProperty("HeadersOnFirstLine");
+            }
+            if (null != m_TableProperties.GetTableProperty("QuoteCharacter"))
+            {
+                m_QuoteCharacterTextBox.Text = m_TableProperties.GetTableProperty("QuoteCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("EscapeCharacter"))
+            {
+                m_EscapeCharacterTextBox.Text = m_TableProperties.GetTableProperty("EscapeCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("ColumnCount"))
+            {
+                m_ColumnCount = m_TableProperties.GetTableProperty("ColumnCount");
+            }
+            // Starting default
+            m_FirstLineHeaderHasChanged = true;
             // Do the initial load and view
             this.UpdateColumnNames();
             this.RefreshDataGridView();
@@ -303,6 +334,7 @@ namespace SailTablePackagerForCsv
             EventArgs e
             )
         {
+            m_FirstLineHeaderHasChanged = true;
             this.UpdateColumnNames();
             this.RefreshDataGridView();
         }
@@ -340,13 +372,13 @@ namespace SailTablePackagerForCsv
             )
         {
             // Record all of the settings selected and then move on
-            if (null == m_TableProperties.GetTableProperty("ValueSeparatorCharacter")) m_TableProperties.SetTableProperty("ValueSeparatorCharacter", m_ValueSeparatorCharacterTextBox.Text);
-            if (null == m_TableProperties.GetTableProperty("AllowComments")) m_TableProperties.SetTableProperty("AllowComments", m_ParseCommentLinesCheckBox.Checked);
-            if (null == m_TableProperties.GetTableProperty("CommentCharacter")) m_TableProperties.SetTableProperty("CommentCharacter", m_LineCommentCharacterTextBox.Text[0]);
-            if (null == m_TableProperties.GetTableProperty("HeadersOnFirstLine")) m_TableProperties.SetTableProperty("HeadersOnFirstLine", m_FirstLineHeadersCheckBox.Checked);
-            if (null == m_TableProperties.GetTableProperty("QuoteCharacter")) m_TableProperties.SetTableProperty("QuoteCharacter", m_QuoteCharacterTextBox.Text[0]);
-            if (null == m_TableProperties.GetTableProperty("EscapeCharacter")) m_TableProperties.SetTableProperty("EscapeCharacter", m_EscapeCharacterTextBox.Text[0]);
-            if (null == m_TableProperties.GetTableProperty("ColumnCount")) m_TableProperties.SetTableProperty("ColumnCount", m_ColumnCount);
+            m_TableProperties.SetTableProperty("ValueSeparatorCharacter", m_ValueSeparatorCharacterTextBox.Text);
+            m_TableProperties.SetTableProperty("AllowComments", m_ParseCommentLinesCheckBox.Checked);
+            m_TableProperties.SetTableProperty("CommentCharacter", m_LineCommentCharacterTextBox.Text[0]);
+            m_TableProperties.SetTableProperty("HeadersOnFirstLine", m_FirstLineHeadersCheckBox.Checked);
+            m_TableProperties.SetTableProperty("QuoteCharacter", m_QuoteCharacterTextBox.Text[0]);
+            m_TableProperties.SetTableProperty("EscapeCharacter", m_EscapeCharacterTextBox.Text[0]);
+            m_TableProperties.SetTableProperty("ColumnCount", m_ColumnCount);
             if (null == m_TableProperties.GetTableProperty("Title")) m_TableProperties.SetTableProperty("Title", "EDIT ME <This is a new table>");
             if (null == m_TableProperties.GetTableProperty("Description")) m_TableProperties.SetTableProperty("Description", "EDIT ME <This is the description of a new table>");
             if (null == m_TableProperties.GetTableProperty("Tags")) m_TableProperties.SetTableProperty("Tags", "EDIT ME <Tags for table>");
@@ -418,7 +450,11 @@ namespace SailTablePackagerForCsv
             var csvReader = new CsvReader(streamReader, csvConfigurationSettings);
             var dataReader = new CsvDataReader(csvReader);
             // Update the column count
-            
+            if (true == m_FirstLineHeaderHasChanged)
+            {
+                m_TableProperties.DeleteColumnProperties();
+                m_FirstLineHeaderHasChanged = false;
+            }
             if (true == m_FirstLineHeadersCheckBox.Checked)
             {
                 int columnIndex = 0;
@@ -426,7 +462,7 @@ namespace SailTablePackagerForCsv
                 // Figure out the column count
                 m_ColumnCount = csvReader.HeaderRecord.Length;
 
-                if ((0 == m_TableProperties.ColumnCount)||(m_ColumnCount != m_TableProperties.ColumnCount))
+                if (m_ColumnCount != m_TableProperties.ColumnCount)
                 {
                     m_TableProperties.ColumnCount = m_ColumnCount;
                 }
@@ -445,7 +481,7 @@ namespace SailTablePackagerForCsv
                 // Figure out the column count
                 m_ColumnCount = csvReader.Parser.Record.Length;
 
-                if (0 == m_TableProperties.ColumnCount)
+                if (m_ColumnCount != m_TableProperties.ColumnCount)
                 {
                     m_TableProperties.ColumnCount = m_ColumnCount;
                 }
@@ -454,8 +490,9 @@ namespace SailTablePackagerForCsv
                 {
                     m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnPosition", columnIndex);
                     m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnName", columnIndex.ToString());
+                    m_TableProperties.SetColumnProperty(columnIndex, "Name", columnIndex.ToString());
                     m_TableProperties.SetColumnProperty(columnIndex, "DestinationFileColumnName", columnIndex.ToString());
-                    ++columnIndex;
+                    //++columnIndex;
                 }
             }
         }
@@ -566,5 +603,6 @@ namespace SailTablePackagerForCsv
 
         private TableProperties m_TableProperties;
         private int m_ColumnCount;
+        private bool m_FirstLineHeaderHasChanged;
     }
 }

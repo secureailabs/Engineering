@@ -764,12 +764,6 @@ std::string Orchestrator::SetParameter(
                     strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
 
                     UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
-
-                    // We have everything we need to submit this job, start it up
-                    if ( true == oJobInformation.ReadyToExcute() )
-                    {
-                        StartJobRemoteExecution(oJobInformation);
-                    }
                 }
             }
             else
@@ -777,13 +771,22 @@ std::string Orchestrator::SetParameter(
                 if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
                 {
                     strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
-
-                    // We have everything we need to submit this job, start it up
-                    if ( true == oJobInformation.ReadyToExcute() )
-                    {
-                        StartJobRemoteExecution(oJobInformation);
-                    }
                 }
+            }
+
+            // All our parameters are set, none require a dataset, and we don't have an IP try
+            // to get one
+            if ( (true == oJobInformation.AllInputParametersSet()) &&
+                ( false == oJobInformation.RequiresDataset()) &&
+                ("" == oJobInformation.GetTargetIP()))
+            {
+                UpdateJobIPAddressForAnySecureComputationalNode(oJobInformation);
+            }
+
+            // We have everything we need to submit this job, start it up
+            if ( true == oJobInformation.ReadyToExcute() )
+            {
+                StartJobRemoteExecution(oJobInformation);
             }
         }
     }
@@ -807,7 +810,6 @@ std::string Orchestrator::SetParameter(
  * @brief Given a job and Guid, update the IP if it's available
  * @param[in] oJob The job information object for the IP address to update
  * @param[in] c_oParameterGuid The value of the parameter whose IP address we want to update
- * @return std::string - The ID for the parameter if it was set, blank if it wasn't
  *
  ********************************************************************************************/
 void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
@@ -843,6 +845,45 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
     }
 }
 
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function UpdateJobIPAddressForAnySecureComputationalNode
+ * @brief Try to find an IP of any SCN that can execute this job
+ * @param[in] oJob The job information object for the IP address to update
+ *
+ ********************************************************************************************/
+void Orchestrator::UpdateJobIPAddressForAnySecureComputationalNode(
+    _in JobInformation& oJob
+    )
+{
+    std::optional<Guid> oTargetSecureComputationalNode{GetSecureComputationalNodeWithoutDataset()};
+
+    if ( oTargetSecureComputationalNode.has_value() )
+    {
+        auto oSecureNodeInformation = m_stlProvisionInformation.find(oTargetSecureComputationalNode.value().ToString(eRaw));
+        __DebugAssert(m_stlProvisionInformation.end() != oSecureNodeInformation);
+
+        std::string strTargetIP = oSecureNodeInformation->second.strRemoteIpAddress;
+        _ThrowBaseExceptionIf(((oJob.GetTargetIP() != "") && (oJob.GetTargetIP() != strTargetIP)), "Job already has an IP target", nullptr);
+
+        std::cout << "Assinging IP " << strTargetIP << " to job " << oJob.GetJobId().ToString(eHyphensAndCurlyBraces) << std::endl;
+        oJob.SetTargetIP(strTargetIP);
+
+        // We've assigned this dataset to a job, increase its usage count
+        oSecureNodeInformation->second.oHostedDataset.unUsageCount++;
+    }
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function DeprovisionDigitalContract
+ * @brief Deprovision the passed in digital contract GUID
+ * @param[in] oJob The job information object for the IP address to update
+ * @return Wether the deprovision was successful or not
+ *
+ ********************************************************************************************/
 bool __thiscall Orchestrator::DeprovisionDigitalContract(
     _in const std::string& c_strDigitalContractGUID
     )
@@ -1284,10 +1325,8 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingDataset(
     unsigned int unMinUsageCount{UINT_MAX};
     for ( auto oDatasetItr : m_stlProvisionInformation)
     {
-        // For now we allow use when we're ready for computation or waiting for data
-        // When the new data annotation tool produces datasets we can upload to an SCN
         if ( oDatasetItr.second.oHostedDataset.oDatsetGuid == oDatasetGuid &&
-            ( oDatasetItr.second.eProvisionStatus == VirtualMachineState::eReadyForComputation ||oDatasetItr.second.eProvisionStatus == VirtualMachineState::eWaitingForData) )
+            ( oDatasetItr.second.eProvisionStatus == VirtualMachineState::eReadyForComputation ) )
         {
             if ( oDatasetItr.second.oHostedDataset.unUsageCount < unMinUsageCount )
             {
@@ -1296,6 +1335,35 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingDataset(
             }
         }
     }
+    return oSecureComputationalNodeGuid;
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function GetSecureComputationalNodeWithoutDataset
+ * @brief Get the IP address of a VM without a dataset to run a job on
+ * @param[in] Guid - The GUID of the dataset we're looking for
+ * @return std::optional<Guid> - An option of a GUID of the SCN serving the dataset
+ * 
+ * We iterate through SCNs serving datasets, and pick the one which has been used the least
+ ********************************************************************************************/
+std::optional<Guid> Orchestrator::GetSecureComputationalNodeWithoutDataset() const
+{
+    std::optional<Guid> oSecureComputationalNodeGuid;
+    unsigned int unMinUsageCount{UINT_MAX};
+    for ( auto oDatasetItr : m_stlProvisionInformation )
+    {
+        if ( ( oDatasetItr.second.eProvisionStatus == VirtualMachineState::eReadyForComputation) )
+        {
+            if ( oDatasetItr.second.oHostedDataset.unUsageCount < unMinUsageCount )
+            {
+                oSecureComputationalNodeGuid = oDatasetItr.first;
+                unMinUsageCount = oDatasetItr.second.oHostedDataset.unUsageCount;
+            }
+        }
+    }
+
     return oSecureComputationalNodeGuid;
 }
 

@@ -83,6 +83,9 @@ class JobInformation
             _in JobStatusSignals eJobStatus
             );
 
+        bool __thiscall AllInputParametersSet() const;
+        bool __thiscall RequiresDataset() const;
+
         // BasicLockable methods
         void __thiscall lock();
         void __thiscall unlock();

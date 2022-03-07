@@ -136,6 +136,12 @@ class Orchestrator : public Object{
             _in const Guid& oDatasetGuid
             ) const;
 
+        std::optional<Guid> GetSecureComputationalNodeWithoutDataset() const;
+
+        void UpdateJobIPAddressForAnySecureComputationalNode(
+            _in JobInformation& oJob
+            );
+
         void __thiscall SendDataToJob(
             _in JobInformation& c_oJob,
             _in const StructuredBuffer& c_oStructuredBuffer

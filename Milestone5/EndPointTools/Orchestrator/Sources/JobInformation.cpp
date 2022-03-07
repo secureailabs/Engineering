@@ -85,16 +85,72 @@ bool __thiscall JobInformation::ReadyToExcute(
     __DebugFunction();
     bool fHasIp = ( "" != m_strTargetIP );
 
-    // Iterate through all our input parameters and make sure they have values, if they
-    // do and we know where we have to execute this job is ready to execute
-    bool fAllParametersSet = std::all_of(m_stlInputParameterData.begin(), m_stlInputParameterData.end(),
-        [] ( const auto& value ) { return value.second.has_value(); } );
-
     // For any outputs that are waiting on output from another job, make sure they are set
     bool fAllJobOutputsReady = std::all_of(m_stlOutputJobParameterData.begin(), m_stlOutputJobParameterData.end(),
         [] (const auto& value) { return value.second;} );
 
-    return fHasIp && fAllParametersSet && fAllJobOutputsReady;
+    return fHasIp && AllInputParametersSet() && fAllJobOutputsReady;
+}
+
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function AllInputParametersSet
+ * @brief Determine if all the input parameters for a job are set
+ * @return bool - True if this job's input parameters are all set
+ ********************************************************************************************/
+bool __thiscall JobInformation::AllInputParametersSet() const
+{
+    return std::all_of(m_stlInputParameterData.begin(), m_stlInputParameterData.end(),
+        [] ( const auto& value ) { return value.second.has_value(); } );
+}
+
+/********************************************************************************************
+ *
+ * @class JobInformation
+ * @function RequiresDataset
+ * @brief Determine if any of this job's parameters
+ * @return bool - True if this job's input parameters are all set
+ ********************************************************************************************/
+bool __thiscall JobInformation::RequiresDataset() const
+{
+    // Construct a lambda function to pass into the any_of algorithm to determine
+    // if any of our parameters are datasets or tables
+    auto oCheckForDatasetFunc = [] ( const auto& value)
+    {
+        bool fIsDataset{false};
+        if ( value.second.has_value() )
+        {
+
+            Guid oValueIdentifier{value.second.value()};
+            fIsDataset = ( eDataset == oValueIdentifier.GetObjectType() ) || (eTable == oValueIdentifier.GetObjectType());
+        }
+
+        return fIsDataset;
+    };
+
+    bool fRequiresDataset{false};
+
+    try
+    {
+        // Check that any of our input parameters are a dataset
+        fRequiresDataset = std::any_of(m_stlInputParameterData.begin(), m_stlInputParameterData.end(), oCheckForDatasetFunc);
+    }
+    catch(const BaseException& oBaseException)
+    {
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
+    }
+    catch(std::exception & e)
+    {
+        std::cout << "Exception: " << e.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    catch(...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
+    return fRequiresDataset;
 }
 
 /********************************************************************************************

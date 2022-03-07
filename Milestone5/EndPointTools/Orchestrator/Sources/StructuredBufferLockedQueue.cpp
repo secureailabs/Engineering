@@ -47,6 +47,8 @@ void __thiscall StructuredBufferLockedQueue::CopyAndPushMessage(
     _in const StructuredBuffer& oMessageToPush
     )
 {
+
+    std::cout << "Before Pushed message " << m_stlMessageQueue.size() << std::endl;
     std::shared_ptr<StructuredBuffer> oMessageCopy{new StructuredBuffer(oMessageToPush)};
     {
         std::lock_guard<std::mutex> stlLock(m_stlLock);

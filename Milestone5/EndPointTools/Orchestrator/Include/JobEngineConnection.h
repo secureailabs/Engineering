@@ -36,6 +36,7 @@ class JobEngineConnection
 
         bool __thiscall IsRunning() const;
 
+        void __thiscall PrintSize() const;
     private:
         void JobEngineConnectionThread();
 

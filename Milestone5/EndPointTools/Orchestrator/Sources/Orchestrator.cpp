@@ -1580,7 +1580,8 @@ std::string __thiscall Orchestrator::WaitForData(
                 }
                 else if ( JobStatusSignals::eJobFail == eStatusSignal ||
                     JobStatusSignals::eJobDone == eStatusSignal ||
-                    JobStatusSignals::eJobStart == eStatusSignal )
+                    JobStatusSignals::eJobStart == eStatusSignal ||
+                    JobStatusSignals::ePrivacyViolation == eStatusSignal )
                 {
                     Guid oJobIdentifier(oDataResult->GetString("JobUuid"));
                     auto oJobInformation = m_stlJobInformation.find(oJobIdentifier.ToString(eRaw));

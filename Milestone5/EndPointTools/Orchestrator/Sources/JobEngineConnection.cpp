@@ -158,6 +158,7 @@ void __thiscall JobEngineConnection::JobEngineConnectionThread()
                         case JobStatusSignals::eJobFail:
                         case JobStatusSignals::eJobDone:
                         case JobStatusSignals::eJobStart:
+                        case JobStatusSignals::ePrivacyViolation:
                         {
                             // Push to queue
                             m_oStructuredBufferQueue.CopyAndPushMessage(oJobEngineMessage);

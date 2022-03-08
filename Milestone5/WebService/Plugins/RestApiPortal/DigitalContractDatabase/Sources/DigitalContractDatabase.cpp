@@ -2371,8 +2371,8 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         oVirtualMachineSpecification.PutString("vmName", c_oNewVirtualMachineGuid.ToString(eRaw));
         oVirtualMachineSpecification.PutString("vmSize", c_strVirtualMachineSize);
         oVirtualMachineSpecification.PutString("vmImageResourceId", c_strVirtualMachineImageId);
-        oVirtualMachineSpecification.PutString("adminUserName", "saildeveloper");
-        oVirtualMachineSpecification.PutString("adminPassword", "Iw2btin2AC+beRl&dir!");
+        oVirtualMachineSpecification.PutString("adminUserName", oTemplateData.GetString("ScnUsername"));
+        oVirtualMachineSpecification.PutString("adminPassword", oTemplateData.GetString("ScnPassword"));
         if (oTemplateData.IsElementPresent("virtualNetworkId", ANSI_CHARACTER_STRING_VALUE_TYPE))
         {
             oVirtualMachineSpecification.PutString("virtualNetworkId", oTemplateData.GetString("virtualNetworkId"));

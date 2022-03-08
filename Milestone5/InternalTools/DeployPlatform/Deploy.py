@@ -29,7 +29,7 @@ def deploy_module(account_credentials, deployment_name, module_name):
         "vmSize": "Standard_B4ms",
         "vmImageResourceId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/"
         + "VirtualMachineImageStorageRg/providers/Microsoft.Compute/images/" + module_name,
-        "adminUserName": "saildeveloper",
+        "adminUserName": "sailuser",
         "adminPassword": "SailPassword@123",
         "subnetName": "PlatformService_eastus",
         "virtualNetworkId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/"

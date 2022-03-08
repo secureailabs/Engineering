@@ -132,8 +132,10 @@ if __name__ == "__main__":
     AZURE_TENANT_ID = os.environ.get('AZURE_TENANT_ID')
     AZURE_CLIENT_ID = os.environ.get('AZURE_CLIENT_ID')
     AZURE_CLIENT_SECRET = os.environ.get('AZURE_CLIENT_SECRET')
+    OWNER = os.environ.get('OWNER')
+    PURPOSE = os.environ.get('PURPOSE')
 
-    deployment_id = str(uuid.uuid1())
+    deployment_id = OWNER + "-" + str(uuid.uuid1()) + "-" + PURPOSE
 
     # Authenticate the azure credentials
     account_credentials = sailazure.authenticate(

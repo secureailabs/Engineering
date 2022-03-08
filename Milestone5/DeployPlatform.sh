@@ -1,6 +1,42 @@
 #!/bin/bash
 export tempDeployDir=$(mktemp -d --tmpdir=.)
 
+PrintHelp()
+{
+    echo ""
+    echo "Usage: $0 -p [Purpose:[Nightly, Bugfix, etc..]] -o [Owner: [Prawal, Stanley]]"
+    echo -e "\t-p Purpose: purpose of deployment. No spaces. "
+    echo -e "\t-o Triggered By: deployment owner name. No spaces."
+    exit 1 # Exit script after printing help
+}
+
+# Check if docker is installed
+docker --version
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    echo "Error docker does not exist"
+    exit $retVal
+fi
+
+# Parse the input parameters
+while getopts "p:o:" opt
+do
+    echo "opt: $opt $OPTARG"
+    case "$opt" in
+        p ) purpose="$OPTARG" ;;
+        o ) owner="$OPTARG" ;;
+        ? ) PrintHelp ;;
+    esac
+done
+
+# Print Help in case parameters are not correct
+if [ -z "$purpose" ] || [ -z "$owner" ]
+then
+    PrintHelp
+fi
+echo "Purpose: $purpose"
+echo "Owner: $owner"
+
 # Check for Azure environment variables
 if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
   echo "environment variable AZURE_SUBSCRIPTION_ID is undefined"
@@ -68,6 +104,8 @@ docker run \
   --env AZURE_TENANT_ID=$AZURE_TENANT_ID \
   --env AZURE_CLIENT_ID=$AZURE_CLIENT_ID \
   --env AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET \
+  --env OWNER=$owner \
+  --env PURPOSE=$purpose \
   azuredeploymenttools
 popd
 

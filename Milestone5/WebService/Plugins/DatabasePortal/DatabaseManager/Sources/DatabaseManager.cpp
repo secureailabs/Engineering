@@ -294,6 +294,8 @@ void __thiscall DatabaseManager::InitializePlugin(void)
     m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/DatasetFamilies");
     // Reset the database
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/ResetDatabase");
+    // Add metadata of a data federation to the database
+    m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterDataFederation");
 }
 
 /********************************************************************************************
@@ -475,8 +477,13 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             {
                 stlResponseBuffer = this->RegisterDatasetFamily(c_oRequestStructuredBuffer);
             }
+            else if ("/SAIL/DatabaseManager/RegisterDataFederation" == strResource)
+            {
+                stlResponseBuffer = this->RegisterDataFederation(c_oRequestStructuredBuffer);
+            }
             else
             {
+                std::cout << "Failed to find " << strResource << std::endl;
                 _ThrowBaseException("Invalid resource.", nullptr);
             }
         }
@@ -576,6 +583,7 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
     }
     catch (...)
     {
+        std::cout << "DATABASE CAUGHT ERROR";
         StructuredBuffer oError;
         oError.PutDword("Status", 404);
         stlResponseBuffer = oError.GetSerializedBuffer();

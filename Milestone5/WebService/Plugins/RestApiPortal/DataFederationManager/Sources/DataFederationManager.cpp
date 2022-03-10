@@ -8,6 +8,8 @@
  * @brief
  ********************************************************************************************/
 
+#include <DataFederation.h>
+
 #include "DataFederationManager.h"
 #include "64BitHashes.h"
 #include "IpcTransactionHelperFunctions.h"
@@ -211,12 +213,25 @@ void __thiscall DataFederationManager::InitializePlugin(const StructuredBuffer& 
 {
     __DebugFunction();
 
+    StructuredBuffer oRequiredStringElement;
+    oRequiredStringElement.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
+    oRequiredStringElement.PutBoolean("IsRequired", true);
+
+    StructuredBuffer oRequriedBufferElement;
+    oRequriedBufferElement.PutByte("ElementType", BUFFER_VALUE_TYPE);
+    oRequriedBufferElement.PutBoolean("IsRequired", true);
+
+    StructuredBuffer oRegisterNewDataFederationParameters;
+    oRegisterNewDataFederationParameters.PutStructuredBuffer("Eosb", oRequriedBufferElement);
+    oRegisterNewDataFederationParameters.PutStructuredBuffer("DataFederationName",oRequiredStringElement);
+    oRegisterNewDataFederationParameters.PutStructuredBuffer("DataFederationDescription", oRequiredStringElement);
+
+    m_oDictionary.AddDictionaryEntry("POST","/SAIL/DataFederationManager/RegisterDataFederation",oRegisterNewDataFederationParameters, 1);
+
     m_strDatabaseServiceIpAddr = oInitializationVectors.GetString("DatabaseServerIp");
     m_unDatabaseServiceIpPort = oInitializationVectors.GetUnsignedInt32("DatabaseServerPort");
 
 }
-
-
 
 /********************************************************************************************
  *
@@ -256,7 +271,10 @@ uint64_t __thiscall DataFederationManager::SubmitRequest(
     }
     else if ("POST" == strVerb)
     {
-
+        if ("/SAIL/DataFederationManager/RegisterDataFederation" == strResource)
+        {
+            stlResponseBuffer = RegisterDataFederation(c_oRequestStructuredBuffer);
+        }
     }
     else if ("PUT" == strVerb)
     {
@@ -325,3 +343,106 @@ bool __thiscall DataFederationManager::GetResponse(
     return fSuccess;
 }
 
+
+/********************************************************************************************
+ *
+ * @class DataFederationManager
+ * @function RegisterDataFederation
+ * @brief Method called by flat function SubmitRequest when a client requests for the plugin's resource
+ * @param[in] c_oRequest the structued buffer that contains the request's information
+ * @throw BaseException Element not found
+ * @throw BaseException Error generating challenge nonce
+ * @returns std::vector<Byte> stores the serialized response
+ *
+ ********************************************************************************************/
+std::vector<Byte> __thiscall DataFederationManager::RegisterDataFederation(
+    _in const StructuredBuffer & c_oRequest
+    )
+{
+    __DebugFunction();
+
+    StructuredBuffer oResponse;
+    TlsNode* poTlsNode{nullptr};
+    Dword dwStatus{400};
+
+    try
+    {
+        StructuredBuffer oUserInfo = ::GetUserInfoFromEosb(c_oRequest);
+        if (200 == oUserInfo.GetDword("Status"))
+        {
+            // Create indentifiers for this new object
+            Guid oNewFederationIdentifier{eDataFederation};
+            Guid oDataFederationOwnerIdentifier{oUserInfo.GetGuid("OrganizationGuid")};
+            std::string strDatasetFamilyOwner = oDataFederationOwnerIdentifier.ToString(eHyphensAndCurlyBraces);
+            std::string strNewFederationIdentifier{oNewFederationIdentifier.ToString(eHyphensAndCurlyBraces)};
+
+            // Validate the request
+            std::string strNewFederationName = c_oRequest.GetString("DataFederationName");
+            std::string strNewFederationDescription = c_oRequest.GetString("DataFederationDescription");
+
+            _ThrowBaseExceptionIf(1 >= strNewFederationName.size(), "New name too small", nullptr);
+            _ThrowBaseExceptionIf(255 < strNewFederationName.size(), "New name too large (255 max)", nullptr);
+            _ThrowBaseExceptionIf(1 >= strNewFederationDescription.size(), "New description too small", nullptr);
+            _ThrowBaseExceptionIf(1000 < strNewFederationDescription.size(), "New description too large (1000 max)", nullptr);
+
+            // Build the new Data Federation Object
+            DataFederation oNewDataFederation{oNewFederationIdentifier,
+                oDataFederationOwnerIdentifier,
+                strNewFederationName,
+                strNewFederationDescription};
+
+            // Submit the request to the database for storage
+            StructuredBuffer oDatabaseRequest;
+            oDatabaseRequest.PutString("PluginName", "DatabaseManager");
+            oDatabaseRequest.PutString("Verb", "POST");
+            oDatabaseRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterDataFederation");
+            oDatabaseRequest.PutStructuredBuffer("DataFederation", oNewDataFederation.ToStructuredBuffer());
+
+            std::vector<Byte> stlRequest = ::CreateRequestPacketFromStructuredBuffer(oDatabaseRequest);
+
+            // Make a Tls connection with the database portal
+            poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
+            // Send request packet
+            poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
+
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
+            unsigned int unResponseDataSizeInBytes = *((uint32_t *)stlRestResponseLength.data());
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
+
+            poTlsNode->Release();
+            poTlsNode = nullptr;
+
+            // Check if DatabaseManager registered the dataset or not
+            StructuredBuffer oDatabaseResponse(stlResponse);
+            if (201 == oDatabaseResponse.GetDword("Status") )
+            {
+                oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
+                dwStatus = 201;
+            }
+            else
+            {
+                dwStatus = oDatabaseResponse.GetDword("Status");
+            }
+        }
+    }
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oResponse.Clear();
+    }
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        oResponse.Clear();
+    }
+    if ( nullptr != poTlsNode )
+    {
+        poTlsNode->Release();
+        poTlsNode = nullptr;
+    }
+
+    oResponse.PutDword("Status", dwStatus);
+    return oResponse.GetSerializedBuffer();
+}

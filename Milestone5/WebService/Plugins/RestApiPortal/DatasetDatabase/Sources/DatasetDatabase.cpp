@@ -733,10 +733,14 @@ std::vector<Byte> __thiscall DatasetDatabase::RegisterDataset(
             
             // Check if DatabaseManager registered the dataset or not
             StructuredBuffer oDatabaseResponse(stlResponse);
-            if (204 != oDatabaseResponse.GetDword("Status"))
+            if (201 == oDatabaseResponse.GetDword("Status") )
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
                 dwStatus = 201;
+            }
+            else
+            {
+                dwStatus = oDatabaseResponse.GetDword("Status");
             }
         }
     }

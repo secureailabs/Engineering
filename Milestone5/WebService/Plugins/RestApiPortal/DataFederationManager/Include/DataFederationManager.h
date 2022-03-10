@@ -63,7 +63,10 @@ class DataFederationManager : public Object
 
     private:
 
-        // FILL IN API CALLS HERE
+        // Register data federation
+        std::vector<Byte> __thiscall RegisterDataFederation(
+            _in const StructuredBuffer & c_oRequest
+            );
 
         // Private data members
         mutable pthread_mutex_t m_sMutex;

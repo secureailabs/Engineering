@@ -356,6 +356,11 @@ class DatabaseManager : public Object
             _in const StructuredBuffer &c_oRequest
             );
 
+        // Register a dataset family
+        std::vector<Byte> __thiscall RegisterDataFederation(
+            _in const StructuredBuffer & c_oRequest
+            );
+
         // Shutdown the server
         std::vector<Byte> __thiscall ShutdownPortal(
             _in const StructuredBuffer & c_oRequest

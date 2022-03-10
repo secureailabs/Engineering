@@ -4,10 +4,12 @@ All the plugins can run independently and without the need of any other service 
 
 ## Run the test devops console
 ```
-./RunDevops.sh
+cd Docker
+./BuildImages.sh -i devopsconsole
+./RunService.sh -s devopsconsole
 ```
 To test open the following URL in your browser:
-https://localhost:8080/SamplePlugin/Hello
+https://localhost:5050/SamplePlugin/Hello
 
 Accept the self-signed certificate and you must see the following message on the browser:
 ```
@@ -32,13 +34,13 @@ location /<Plugin Name> {
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx-selfsigned.key -out nginx-selfsigned.crt
 
 ## TODO
-- Add more plugins
 - Each plugin can have its own docker container
 - Add real certificates
 - Add a self deploy script
 - Create an Azure VM image to run this
+- Add more plugins
 - Add authentication at the nginx level
-- Run it on 443 instead of 8080
+- Run it on 443 instead of 5050
 - Run the production version of flask
 - Deploy best practices from https://www.cyberciti.biz/tips/linux-unix-bsd-nginx-webserver-security.html
 - Add a version of everything in the docker files

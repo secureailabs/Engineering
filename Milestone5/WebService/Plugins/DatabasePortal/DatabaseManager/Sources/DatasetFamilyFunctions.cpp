@@ -418,13 +418,13 @@ std::vector<Byte> __thiscall DatabaseManager::PullDatasetFamily(
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -514,13 +514,13 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteDatasetFamily(
             std::cout << "Transaction exception: " << e.what() << std::endl;
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -530,4 +530,44 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteDatasetFamily(
     oResponse.PutDword("Status", dwStatus);
 
     return oResponse.GetSerializedBuffer();
+}
+
+/********************************************************************************************
+ *
+ * @class DatabaseManager
+ * @function GetDatasetFamilyTitle
+ * @brief Given a dataset family identifier retrieve the title of the dataset family
+ * @param[in] c_oRequest contains dataset family guid
+ * @returns string representing the dataset family title
+ *
+ ********************************************************************************************/
+std::string __thiscall DatabaseManager::GetDatasetFamilyTitle(
+    _in const Guid& c_oDatasetFamilyIdentifier
+    )
+{
+    __DebugFunction();
+    __DebugAssert(eDatasetFamily == c_oDatasetFamilyIdentifier.GetObjectType());
+
+    std::string strDatasetFamilyTitle{""};
+    try
+    {
+        StructuredBuffer oRequest;
+        oRequest.PutString("DatasetFamilyGuid", c_oDatasetFamilyIdentifier.ToString(eHyphensAndCurlyBraces));
+        StructuredBuffer oDatasetFamily = this->PullDatasetFamily(oRequest);
+        if ( 200 == oDatasetFamily.GetDword("Status") )
+        {
+            strDatasetFamilyTitle = oDatasetFamily.GetString("DatasetFamilyTitle");
+        }
+    }
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        strDatasetFamilyTitle = "";
+    }
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        strDatasetFamilyTitle = "";
+    }
+    return strDatasetFamilyTitle;
 }

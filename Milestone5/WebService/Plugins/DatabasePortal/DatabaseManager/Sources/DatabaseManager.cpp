@@ -290,8 +290,8 @@ void __thiscall DatabaseManager::InitializePlugin(void)
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/RemoveVmAsWaitingForData");
     // Add metadata of a dataset family to the database
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterDatasetFamily");
-    // Add metadata of a dataset family to the database
-    m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/DatasetFamilies");
+    // List the dataset family entries in the database
+    m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/DataFederations");
     // Reset the database
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/ResetDatabase");
     // Add metadata of a data federation to the database
@@ -422,6 +422,10 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             {
                 stlResponseBuffer = this->PullDatasetFamily(c_oRequestStructuredBuffer);
             }
+            else if ("/SAIL/DatabaseManager/DataFederations" == strResource)
+            {
+                stlResponseBuffer = this->ListActiveDataFederations(c_oRequestStructuredBuffer);
+            }
             else
             {
                 _ThrowBaseException("Invalid resource.", nullptr);
@@ -532,7 +536,7 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             {
                 stlResponseBuffer = this->UpdateDigitalContract(c_oRequestStructuredBuffer);
             }
-            if ("/SAIL/DatabaseManager/User/Password" == strResource)
+            else if ("/SAIL/DatabaseManager/User/Password" == strResource)
             {
                 stlResponseBuffer = this->UpdatePassword(c_oRequestStructuredBuffer);
             }
@@ -581,9 +585,18 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             _ThrowBaseException("Invalid resource.", nullptr);
         }
     }
+    catch (const BaseException & c_oBaseException)
+    {
+        std::cout << "Exception on route " << strResource << std::endl;
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        StructuredBuffer oError;
+        oError.PutDword("Status", 404);
+        stlResponseBuffer = oError.GetSerializedBuffer();
+    }
     catch (...)
     {
-        std::cout << "DATABASE CAUGHT ERROR";
+        std::cout << "Exception on route " << strResource << std::endl;
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         StructuredBuffer oError;
         oError.PutDword("Status", 404);
         stlResponseBuffer = oError.GetSerializedBuffer();

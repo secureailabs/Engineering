@@ -14,13 +14,12 @@
  *
  * @class DatabaseManager
  * @function RegisterDataFederation
- * @brief Save a Dataset family in the database
- * @param[in] c_oRequest contains the information for the new dataset
+ * @brief Save a Data Federation in the database
+ * @param[in] c_oRequest contains the information for the new data federation
  * @throw BaseException Error StructuredBuffer element not found
  * @returns Serialized StructuredBuffer containing the response
  *
  ********************************************************************************************/
-// Register a dataset family
 std::vector<Byte> __thiscall DatabaseManager::RegisterDataFederation(
     _in const StructuredBuffer & c_oRequest
     )
@@ -40,7 +39,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterDataFederation(
         bsoncxx::document::value oDataFederationDocumentView = bsoncxx::builder::stream::document{}
         << "PlainTextObjectBlobGuid" << oPlainTextObjectBlobGuid.ToString(eHyphensAndCurlyBraces)
         << "DataFederationIdentifier" << oObject.GetGuid("DataFederationIdentifier").ToString(eHyphensAndCurlyBraces)
-        << "DataFederationOwnerOrganizationIdentifier" << oObject.GetGuid("DataFederationOwnerIdentifier").ToString(eHyphensAndCurlyBraces)
+        << "DataFederationOwnerOrganizationIdentifier" << oObject.GetGuid("DataFederationOwnerOrganizationIdentifier").ToString(eHyphensAndCurlyBraces)
         << finalize;
 
         // Create a blob for the serialized structured buffer
@@ -117,7 +116,6 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterDataFederation(
         }
 
     }
-
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -131,6 +129,154 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterDataFederation(
     }
 
     // Send back the status of the transaction
+    oResponse.PutDword("Status", dwStatus);
+
+    return oResponse.GetSerializedBuffer();
+}
+
+/********************************************************************************************
+ *
+ * @class DatabaseManager
+ * @function ListDataFederations
+ * @brief List the data federations that are active in the database
+ * @param[in] c_oRequest contains the information for the new data federation
+ * @throw BaseException Error StructuredBuffer element not found
+ * @returns Serialized StructuredBuffer containing the response
+ *
+ ********************************************************************************************/
+std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
+    _in const StructuredBuffer & c_oRequest
+    )
+{
+    __DebugFunction();
+
+    StructuredBuffer oResponse;
+    Dword dwStatus;
+
+    // Each client and transaction can only be used in a single thread
+    mongocxx::pool::entry oClient = m_poMongoPool->acquire();
+    // Access SailDatabase
+    mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+    // Fetch all digital contract records associated with a researcher's or data owner's organization
+    mongocxx::cursor oDatasetFamilyRecords = oSailDatabase["DataFederation"].find({});
+
+    // Loop through returned documents and add information to the list
+    StructuredBuffer oListOfDataFederations;
+    try
+    {
+        for (auto&& oDocumentView : oDatasetFamilyRecords)
+        {
+            bsoncxx::document::element oDataFederationIdentifier = oDocumentView["DataFederationIdentifier"];
+            bsoncxx::document::element oDataFederationOwnerIdentifier = oDocumentView["DataFederationOwnerOrganizationIdentifier"];
+            if ((oDataFederationIdentifier && oDataFederationIdentifier.type() == type::k_utf8) && (oDataFederationOwnerIdentifier && oDataFederationOwnerIdentifier.type() == type::k_utf8) )
+            {
+                std::string strDataFederationIdentifier = oDataFederationIdentifier.get_utf8().value.to_string();
+                std::string strDataFederationOwnerIdentifier = oDataFederationOwnerIdentifier.get_utf8().value.to_string();
+
+                bsoncxx::document::element oPlainTextObjectBlobGuid = oDocumentView["PlainTextObjectBlobGuid"];
+                if (oPlainTextObjectBlobGuid && oPlainTextObjectBlobGuid.type() == type::k_utf8)
+                {
+                    std::string strPlainTextObjectBlobGuid = oPlainTextObjectBlobGuid.get_utf8().value.to_string();
+                    bsoncxx::stdx::optional<bsoncxx::document::value> oPlainTextObjectBlobDocument = oSailDatabase["PlainTextObjectBlob"].find_one(document{}
+                                                                                                                                                << "PlainTextObjectBlobGuid" << strPlainTextObjectBlobGuid
+                                                                                                                                                << finalize);
+
+                    if (bsoncxx::stdx::nullopt != oPlainTextObjectBlobDocument)
+                    {
+                        bsoncxx::document::element oObjectGuid = oPlainTextObjectBlobDocument->view()["ObjectGuid"];
+                        if (oObjectGuid && oObjectGuid.type() == type::k_utf8)
+                        {
+                            std::string strObjectGuid = oObjectGuid.get_utf8().value.to_string();
+                            bsoncxx::stdx::optional<bsoncxx::document::value> oObjectDocument = oSailDatabase["Object"].find_one(document{} << "ObjectGuid" << strObjectGuid << finalize);
+                            if (bsoncxx::stdx::nullopt != oObjectDocument)
+                            {
+                                bsoncxx::document::element oObjectBlob = oObjectDocument->view()["ObjectBlob"];
+                                if (oObjectBlob && oObjectBlob.type() == type::k_binary)
+                                {
+                                    StructuredBuffer oObject(oObjectBlob.get_binary().bytes, oObjectBlob.get_binary().size);
+                                    // Only return federations that are active
+                                    if ( true == oObject.GetBoolean("DataFederationActive"))
+                                    {
+                                        StructuredBuffer oDataFederationInformation;
+                                        oDataFederationInformation.PutString("Name", oObject.GetString("DataFederationName"));
+                                        oDataFederationInformation.PutString("Description", oObject.GetString("DataFederationDescription"));
+                                        oDataFederationInformation.PutString("Identifier", oObject.GetGuid("DataFederationIdentifier").ToString(eHyphensAndCurlyBraces));
+                                        oDataFederationInformation.PutString("OrganizationIdentifier", oObject.GetGuid("DataFederationOwnerOrganizationIdentifier").ToString(eHyphensAndCurlyBraces));
+
+                                        StructuredBuffer oOrganizationName = this->GetOrganizationName(oDataFederationInformation.GetString("OrganizationIdentifier"));
+                                        if ( 200 == oOrganizationName.GetDword("Status") )
+                                        {
+                                            oDataFederationInformation.PutString("OrganizationName", oOrganizationName.GetString("OrganizationName"));
+                                        }
+                                        else
+                                        {
+                                            oDataFederationInformation.PutString("OrganizationName", "");
+                                        }
+                                        StructuredBuffer oDataFederationSubmitters = oObject.GetStructuredBuffer("DataFederationDataSubmitterList");
+                                        StructuredBuffer oNamedSubmitters;
+                                        for ( auto strName : oDataFederationSubmitters.GetNamesOfElements() )
+                                        {
+                                            Guid oOrganizationGuid = oDataFederationSubmitters.GetGuid(strName.c_str());
+                                            StructuredBuffer oOrganizationName = this->GetOrganizationName(oOrganizationGuid.ToString(eHyphensAndCurlyBraces));
+                                            std::string strOrganizationName{""};
+                                            if ( 200 == oOrganizationName.GetDword("Status") )
+                                            {
+                                                strOrganizationName = oOrganizationName.GetString("OrganizationName");
+                                            }
+                                            oNamedSubmitters.PutString(oOrganizationGuid.ToString(eHyphensAndCurlyBraces).c_str(), strOrganizationName);
+                                        }
+                                        oDataFederationInformation.PutStructuredBuffer("DataSubmitterOrganizations", oNamedSubmitters);
+
+                                        StructuredBuffer oDataFederationResearchers = oObject.GetStructuredBuffer("DataFederationResearcherList");
+                                        StructuredBuffer oNamedResearchers;
+                                        for ( auto strName : oDataFederationResearchers.GetNamesOfElements() )
+                                        {
+                                            Guid oOrganizationGuid = oDataFederationResearchers.GetGuid(strName.c_str());
+                                            StructuredBuffer oOrganizationName = this->GetOrganizationName(oOrganizationGuid.ToString(eHyphensAndCurlyBraces));
+                                            std::string strOrganizationName{""};
+                                            if ( 200 == oOrganizationName.GetDword("Status") )
+                                            {
+                                                strOrganizationName = oOrganizationName.GetString("OrganizationName");
+                                            }
+                                            oNamedResearchers.PutString(oOrganizationGuid.ToString(eHyphensAndCurlyBraces).c_str(), strOrganizationName);
+                                        }
+                                        oDataFederationInformation.PutStructuredBuffer("ResearcherOrganizations", oNamedResearchers);
+
+                                        StructuredBuffer oDataFederationDatasetFamilies = oObject.GetStructuredBuffer("DataFederationDatasetFamilyList");
+                                        StructuredBuffer oNamedDatasetFamilies;
+                                        for ( auto strName : oDataFederationDatasetFamilies.GetNamesOfElements() )
+                                        {
+                                            Guid oDatasetFamiliyIdentifier = oDataFederationDatasetFamilies.GetGuid(strName.c_str());
+                                            std::string strDatasetFamilyName = this->GetDatasetFamilyTitle(oDatasetFamiliyIdentifier);
+                                            oNamedDatasetFamilies.PutString(oDatasetFamiliyIdentifier.ToString(eHyphensAndCurlyBraces).c_str(), strDatasetFamilyName);
+                                        }
+                                        oDataFederationInformation.PutStructuredBuffer("DatasetFamilies", oNamedDatasetFamilies);
+                                        oListOfDataFederations.PutStructuredBuffer(strDataFederationIdentifier.c_str(), oDataFederationInformation);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oResponse.Clear();
+    }
+    catch(std::exception & e)
+    {
+        std::cout << "Exception: " << e.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    oResponse.PutStructuredBuffer("DataFederations", oListOfDataFederations);
+    dwStatus = 200;
     oResponse.PutDword("Status", dwStatus);
 
     return oResponse.GetSerializedBuffer();

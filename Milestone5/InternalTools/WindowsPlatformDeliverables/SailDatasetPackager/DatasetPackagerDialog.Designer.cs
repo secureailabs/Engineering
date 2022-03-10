@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DatasetPackagerDialog));
             this.m_NotificationsListBox = new System.Windows.Forms.ListBox();
             this.m_DoneButton = new System.Windows.Forms.Button();
             this.m_RefreshTimer = new System.Windows.Forms.Timer(this.components);
@@ -69,10 +70,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 465);
-            this.ControlBox = false;
             this.Controls.Add(this.m_DoneButton);
             this.Controls.Add(this.m_NotificationsListBox);
             this.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "DatasetPackagerDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

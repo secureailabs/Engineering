@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainDialog));
             this.m_TablesListBox = new System.Windows.Forms.ListBox();
             this.m_TablesListBoxContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.m_AddExistingItemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,10 +74,10 @@
             this.m_TablesListBox.FormattingEnabled = true;
             this.m_TablesListBox.IntegralHeight = false;
             this.m_TablesListBox.ItemHeight = 14;
-            this.m_TablesListBox.Location = new System.Drawing.Point(21, 44);
+            this.m_TablesListBox.Location = new System.Drawing.Point(21, 58);
             this.m_TablesListBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.m_TablesListBox.Name = "m_TablesListBox";
-            this.m_TablesListBox.Size = new System.Drawing.Size(823, 187);
+            this.m_TablesListBox.Size = new System.Drawing.Size(823, 217);
             this.m_TablesListBox.Sorted = true;
             this.m_TablesListBox.TabIndex = 0;
             this.m_TablesListBox.SelectedIndexChanged += new System.EventHandler(this.m_TablesListBox_SelectedIndexChanged);
@@ -199,7 +200,7 @@
             this.m_TablesGroupBox.Controls.Add(this.m_TablesListBox);
             this.m_TablesGroupBox.Location = new System.Drawing.Point(10, 241);
             this.m_TablesGroupBox.Name = "m_TablesGroupBox";
-            this.m_TablesGroupBox.Size = new System.Drawing.Size(872, 252);
+            this.m_TablesGroupBox.Size = new System.Drawing.Size(872, 292);
             this.m_TablesGroupBox.TabIndex = 11;
             this.m_TablesGroupBox.TabStop = false;
             this.m_TablesGroupBox.Text = "Tables";
@@ -208,11 +209,12 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(18, 27);
+            this.label6.Location = new System.Drawing.Point(22, 27);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(553, 14);
+            this.label6.Size = new System.Drawing.Size(469, 28);
             this.label6.TabIndex = 12;
-            this.label6.Text = "Use the right click context menu to Add/Edit/Remove tables from the list below";
+            this.label6.Text = "Right-click inside the yellow area below to Load a new table entry\r\nRight-click o" +
+    "n a specific table to remove table entry";
             // 
             // m_MainMenuStrip
             // 
@@ -305,7 +307,7 @@
             // m_AboutToolStripMenuItem
             // 
             this.m_AboutToolStripMenuItem.Name = "m_AboutToolStripMenuItem";
-            this.m_AboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.m_AboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.m_AboutToolStripMenuItem.Text = "A&bout";
             this.m_AboutToolStripMenuItem.Click += new System.EventHandler(this.m_AboutToolStripMenuItem_Click);
             // 
@@ -333,8 +335,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(897, 504);
-            this.ControlBox = false;
+            this.ClientSize = new System.Drawing.Size(897, 545);
             this.Controls.Add(this.m_RefreshDatasetFamiliesLinkLabel);
             this.Controls.Add(this.m_TablesGroupBox);
             this.Controls.Add(this.m_DatasetFamilyComboBox);
@@ -350,6 +351,7 @@
             this.Controls.Add(this.m_MainMenuStrip);
             this.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.m_MainMenuStrip;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "MainDialog";

@@ -176,14 +176,27 @@ namespace SailTablePackagerForCsv
             )
         {
             ulong hashOfPropertyName = ApiInterop.Get64BitHashOfString(propertyName, false);
-            if (true == m_ColumnPropertyNames[columnIndex].ContainsKey(hashOfPropertyName))
+            if (columnIndex < m_ColumnPropertyNames.Count)
             {
-                m_ColumnPropertyNames[columnIndex].Remove(hashOfPropertyName);
+                if (true == m_ColumnPropertyNames[columnIndex].ContainsKey(hashOfPropertyName))
+                {
+                    m_ColumnPropertyNames[columnIndex].Remove(hashOfPropertyName);
+                }
+                if (true == m_ColumnProperties[columnIndex].ContainsKey(hashOfPropertyName))
+                {
+                    m_ColumnProperties[columnIndex].Remove(hashOfPropertyName);
+                }
             }
-            if (true == m_ColumnProperties[columnIndex].ContainsKey(hashOfPropertyName))
-            {
-                m_ColumnProperties[columnIndex].Remove(hashOfPropertyName);
-            }
+        }
+
+        /// <summary>
+        /// Deletes all existing column properties
+        /// </summary>
+        /// <param name=""></param>
+        public void DeleteColumnProperties()
+        {
+            m_ColumnPropertyNames = new List<Dictionary<ulong, string>>();
+            m_ColumnProperties = new List<Dictionary<ulong, dynamic>>();
         }
 
         /// <summary>
@@ -394,6 +407,8 @@ namespace SailTablePackagerForCsv
                     }
                 }
             }
+
+            streamReader.Close();
         }
 
         /// <summary>

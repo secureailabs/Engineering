@@ -31,6 +31,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GlobalImportPropertiesDialog));
             this.label1 = new System.Windows.Forms.Label();
             this.m_SettingsGroupBox = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -64,11 +65,11 @@
             this.label1.Location = new System.Drawing.Point(10, 8);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(1183, 28);
+            this.label1.Size = new System.Drawing.Size(714, 28);
             this.label1.TabIndex = 0;
             this.label1.Text = "STEP 2: Select the settings to use for data importation. Different files might us" +
-    "e different setting, so make sure to specify the correct settings here or the fi" +
-    "le will\r\nnot be imported properly.";
+    "e different setting,\r\nso make sure to specify the correct settings here or the f" +
+    "ile will not be imported properly.";
             // 
             // m_SettingsGroupBox
             // 
@@ -89,9 +90,9 @@
             this.m_SettingsGroupBox.Controls.Add(this.label3);
             this.m_SettingsGroupBox.Controls.Add(this.m_ValueSeparatorCharacterTextBox);
             this.m_SettingsGroupBox.Controls.Add(this.label2);
-            this.m_SettingsGroupBox.Location = new System.Drawing.Point(13, 45);
+            this.m_SettingsGroupBox.Location = new System.Drawing.Point(13, 42);
             this.m_SettingsGroupBox.Name = "m_SettingsGroupBox";
-            this.m_SettingsGroupBox.Size = new System.Drawing.Size(837, 175);
+            this.m_SettingsGroupBox.Size = new System.Drawing.Size(858, 175);
             this.m_SettingsGroupBox.TabIndex = 1;
             this.m_SettingsGroupBox.TabStop = false;
             this.m_SettingsGroupBox.Text = "Settings";
@@ -100,7 +101,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Segoe UI Semilight", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(193, 146);
+            this.label10.Location = new System.Drawing.Point(279, 146);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(563, 15);
             this.label10.TabIndex = 16;
@@ -125,15 +126,15 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(68, 147);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(119, 14);
+            this.label9.Size = new System.Drawing.Size(210, 14);
             this.label9.TabIndex = 14;
-            this.label9.Text = "Escape Character";
+            this.label9.Text = "Escape Character used in file";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Segoe UI Semilight", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(199, 92);
+            this.label8.Location = new System.Drawing.Point(287, 92);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(252, 15);
             this.label8.TabIndex = 13;
@@ -143,7 +144,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Segoe UI Semilight", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(186, 119);
+            this.label7.Location = new System.Drawing.Point(273, 119);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(574, 15);
             this.label7.TabIndex = 12;
@@ -168,9 +169,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(68, 120);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(112, 14);
+            this.label6.Size = new System.Drawing.Size(203, 14);
             this.label6.TabIndex = 10;
-            this.label6.Text = "Quote Character";
+            this.label6.Text = "Quote Character used in file";
             // 
             // m_ParseCommentLinesCheckBox
             // 
@@ -203,9 +204,9 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(67, 93);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(126, 14);
+            this.label5.Size = new System.Drawing.Size(217, 14);
             this.label5.TabIndex = 7;
-            this.label5.Text = "Comment Character";
+            this.label5.Text = "Comment Character used in file";
             // 
             // label4
             // 
@@ -234,7 +235,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Segoe UI Semilight", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(255, 43);
+            this.label3.Location = new System.Drawing.Point(343, 43);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(252, 15);
             this.label3.TabIndex = 3;
@@ -258,9 +259,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(67, 44);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(182, 14);
+            this.label2.Size = new System.Drawing.Size(273, 14);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Value Separator Character";
+            this.label2.Text = "Value Separator Character used in file";
             // 
             // m_LoadSettingsFromTemplateFileDialog
             // 
@@ -272,9 +273,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.m_DatasetViewPanel.Controls.Add(this.m_PreviewDataGrid);
-            this.m_DatasetViewPanel.Location = new System.Drawing.Point(13, 225);
+            this.m_DatasetViewPanel.Location = new System.Drawing.Point(13, 223);
             this.m_DatasetViewPanel.Name = "m_DatasetViewPanel";
-            this.m_DatasetViewPanel.Size = new System.Drawing.Size(837, 393);
+            this.m_DatasetViewPanel.Size = new System.Drawing.Size(858, 404);
             this.m_DatasetViewPanel.TabIndex = 2;
             // 
             // m_PreviewDataGrid
@@ -284,7 +285,7 @@
             this.m_PreviewDataGrid.AllowUserToResizeRows = false;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -293,7 +294,7 @@
             this.m_PreviewDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Info;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -307,7 +308,7 @@
             this.m_PreviewDataGrid.ReadOnly = true;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -315,13 +316,15 @@
             this.m_PreviewDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.m_PreviewDataGrid.RowHeadersWidth = 23;
             this.m_PreviewDataGrid.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this.m_PreviewDataGrid.Size = new System.Drawing.Size(837, 393);
+            this.m_PreviewDataGrid.Size = new System.Drawing.Size(858, 404);
             this.m_PreviewDataGrid.TabIndex = 0;
             // 
             // m_NextButton
             // 
+            this.m_NextButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.m_NextButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_NextButton.Location = new System.Drawing.Point(434, 632);
+            this.m_NextButton.Location = new System.Drawing.Point(444, 636);
             this.m_NextButton.Name = "m_NextButton";
             this.m_NextButton.Size = new System.Drawing.Size(75, 21);
             this.m_NextButton.TabIndex = 3;
@@ -331,8 +334,10 @@
             // 
             // m_BackButton
             // 
+            this.m_BackButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.m_BackButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_BackButton.Location = new System.Drawing.Point(353, 632);
+            this.m_BackButton.Location = new System.Drawing.Point(363, 636);
             this.m_BackButton.Name = "m_BackButton";
             this.m_BackButton.Size = new System.Drawing.Size(75, 21);
             this.m_BackButton.TabIndex = 4;
@@ -345,15 +350,16 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.m_BackButton;
-            this.ClientSize = new System.Drawing.Size(862, 665);
-            this.ControlBox = false;
+            this.ClientSize = new System.Drawing.Size(883, 664);
             this.Controls.Add(this.m_BackButton);
             this.Controls.Add(this.m_NextButton);
             this.Controls.Add(this.m_DatasetViewPanel);
             this.Controls.Add(this.m_SettingsGroupBox);
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MinimumSize = new System.Drawing.Size(899, 701);
             this.Name = "GlobalImportPropertiesDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SAIL Table Packager for CSV Files";

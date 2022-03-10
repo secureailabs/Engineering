@@ -35,9 +35,88 @@ namespace SailTablePackagerForCsv
             m_LineCommentCharacterTextBox.KeyPress += m_LineCommentCharacterTextBox_KeyPress;
             m_QuoteCharacterTextBox.KeyPress += m_QuoteCharacterTextBox_KeyPress;
             m_EscapeCharacterTextBox.KeyPress += m_EscapeCharacterTextBox_KeyPress;
+            // Now we need to initialize the text field with the tableProperties passed in
+            if (null != m_TableProperties.GetTableProperty("ValueSeparatorCharacter"))
+            {
+                m_ValueSeparatorCharacterTextBox.Text = m_TableProperties.GetTableProperty("ValueSeparatorCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("AllowComments"))
+            {
+                m_ParseCommentLinesCheckBox.Checked = m_TableProperties.GetTableProperty("AllowComments");
+            }
+            if (null != m_TableProperties.GetTableProperty("CommentCharacter"))
+            {
+                m_LineCommentCharacterTextBox.Text = m_TableProperties.GetTableProperty("CommentCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("HeadersOnFirstLine"))
+            {
+                m_FirstLineHeadersCheckBox.Checked = m_TableProperties.GetTableProperty("HeadersOnFirstLine");
+            }
+            if (null != m_TableProperties.GetTableProperty("QuoteCharacter"))
+            {
+                m_QuoteCharacterTextBox.Text = m_TableProperties.GetTableProperty("QuoteCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("EscapeCharacter"))
+            {
+                m_EscapeCharacterTextBox.Text = m_TableProperties.GetTableProperty("EscapeCharacter").ToString();
+            }
+            if (null != m_TableProperties.GetTableProperty("ColumnCount"))
+            {
+                m_ColumnCount = m_TableProperties.GetTableProperty("ColumnCount");
+            }
+            // Starting default
+            m_FirstLineHeaderHasChanged = true;
             // Do the initial load and view
             this.UpdateColumnNames();
             this.RefreshDataGridView();
+        }
+
+        /// <summary>
+        /// This method is used to check and make sure that the user input provided
+        /// in one of the input fields is unique to that input field. This is to
+        /// prevent the same input value specifier from being used in more than
+        /// one specification
+        /// </summary>
+        /// <param name="inputCharacter"></param>
+        /// <param name="stringFieldName"></param>
+        /// <returns></returns>
+        private bool CheckInputValueUniqueness(
+            char inputCharacter,
+            string stringFieldName
+            )
+        {
+            bool isUnique = true;
+
+            if ("EscapeCharacter" != stringFieldName)
+            { 
+                if (inputCharacter == m_EscapeCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+            if ("LineCommentCharacter" != stringFieldName)
+            {
+                if (inputCharacter == m_LineCommentCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+            if ("QuoteCharacter" != stringFieldName)
+            {
+                if (inputCharacter == m_QuoteCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+            if ("ValueSeparator" != stringFieldName)
+            {
+                if (inputCharacter == m_ValueSeparatorCharacterTextBox.Text[0])
+                {
+                    isUnique = false;
+                }
+            }
+
+            return isUnique;
         }
 
         /// <summary>
@@ -50,7 +129,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar))&&('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field
@@ -58,7 +137,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_ValueSeparatorCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, "ValueSeparator"))
+                {
+                    m_ValueSeparatorCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }
@@ -73,7 +161,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar)) && ('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field
@@ -81,7 +169,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_QuoteCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, "QuoteCharacter"))
+                {
+                    m_QuoteCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }
@@ -96,7 +193,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar)) && ('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field
@@ -104,7 +201,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_LineCommentCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, ""))
+                {
+                    m_LineCommentCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }
@@ -119,7 +225,7 @@ namespace SailTablePackagerForCsv
             KeyPressEventArgs e
             )
         {
-            if (false == char.IsPunctuation(e.KeyChar))
+            if ((false == char.IsPunctuation(e.KeyChar)) && ('|' != e.KeyChar))
             {
                 // Prevent any characters that are not punctuation characters from being entered in the
                 // m_ValueSeparatorCharacterTextBox field
@@ -127,7 +233,16 @@ namespace SailTablePackagerForCsv
             }
             else
             {
-                m_EscapeCharacterTextBox.Text = e.KeyChar.ToString();
+                // We need to make sure that the new value being proposed isn't
+                // a value used in another field
+                if (true == this.CheckInputValueUniqueness(e.KeyChar, "EscapeCharacter"))
+                {
+                    m_EscapeCharacterTextBox.Text = e.KeyChar.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(this, "Cannot specify a value which exists in another field", "Invalid Value Specified", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 e.Handled = true;
             }
         }
@@ -146,7 +261,12 @@ namespace SailTablePackagerForCsv
             {
                 m_ValueSeparatorCharacterTextBox.Text = m_ValueSeparatorCharacterTextBox.Text.Substring(1);
             }
+            else if (0 == m_ValueSeparatorCharacterTextBox.Text.Length)
+            {
+                m_ValueSeparatorCharacterTextBox.Text = ",";
+            }
 
+            this.UpdateColumnNames();
             this.RefreshDataGridView();
         }
 
@@ -214,6 +334,7 @@ namespace SailTablePackagerForCsv
             EventArgs e
             )
         {
+            m_FirstLineHeaderHasChanged = true;
             this.UpdateColumnNames();
             this.RefreshDataGridView();
         }
@@ -251,16 +372,16 @@ namespace SailTablePackagerForCsv
             )
         {
             // Record all of the settings selected and then move on
-            if (null == m_TableProperties.GetTableProperty("ValueSeparatorCharacter")) m_TableProperties.SetTableProperty("ValueSeparatorCharacter", m_ValueSeparatorCharacterTextBox.Text);
-            if (null == m_TableProperties.GetTableProperty("AllowComments")) m_TableProperties.SetTableProperty("AllowComments", m_ParseCommentLinesCheckBox.Checked);
-            if (null == m_TableProperties.GetTableProperty("CommentCharacter")) m_TableProperties.SetTableProperty("CommentCharacter", m_LineCommentCharacterTextBox.Text[0]);
-            if (null == m_TableProperties.GetTableProperty("HeadersOnFirstLine")) m_TableProperties.SetTableProperty("HeadersOnFirstLine", m_FirstLineHeadersCheckBox.Checked);
-            if (null == m_TableProperties.GetTableProperty("QuoteCharacter")) m_TableProperties.SetTableProperty("QuoteCharacter", m_QuoteCharacterTextBox.Text[0]);
-            if (null == m_TableProperties.GetTableProperty("EscapeCharacter")) m_TableProperties.SetTableProperty("EscapeCharacter", m_EscapeCharacterTextBox.Text[0]);
-            if (null == m_TableProperties.GetTableProperty("ColumnCount")) m_TableProperties.SetTableProperty("ColumnCount", m_ColumnCount);
+            m_TableProperties.SetTableProperty("ValueSeparatorCharacter", m_ValueSeparatorCharacterTextBox.Text);
+            m_TableProperties.SetTableProperty("AllowComments", m_ParseCommentLinesCheckBox.Checked);
+            m_TableProperties.SetTableProperty("CommentCharacter", m_LineCommentCharacterTextBox.Text[0]);
+            m_TableProperties.SetTableProperty("HeadersOnFirstLine", m_FirstLineHeadersCheckBox.Checked);
+            m_TableProperties.SetTableProperty("QuoteCharacter", m_QuoteCharacterTextBox.Text[0]);
+            m_TableProperties.SetTableProperty("EscapeCharacter", m_EscapeCharacterTextBox.Text[0]);
+            m_TableProperties.SetTableProperty("ColumnCount", m_ColumnCount);
             if (null == m_TableProperties.GetTableProperty("Title")) m_TableProperties.SetTableProperty("Title", "EDIT ME <This is a new table>");
             if (null == m_TableProperties.GetTableProperty("Description")) m_TableProperties.SetTableProperty("Description", "EDIT ME <This is the description of a new table>");
-            if (null == m_TableProperties.GetTableProperty("Tags")) m_TableProperties.SetTableProperty("Tags", "EDIT ME <#Column>");
+            if (null == m_TableProperties.GetTableProperty("Tags")) m_TableProperties.SetTableProperty("Tags", "EDIT ME <Tags for table>");
             // Now make sure to initialize all of the mandatory columns with default values
             for (int index = 0; index < m_ColumnCount; index++)
             {
@@ -329,7 +450,11 @@ namespace SailTablePackagerForCsv
             var csvReader = new CsvReader(streamReader, csvConfigurationSettings);
             var dataReader = new CsvDataReader(csvReader);
             // Update the column count
-            
+            if (true == m_FirstLineHeaderHasChanged)
+            {
+                m_TableProperties.DeleteColumnProperties();
+                m_FirstLineHeaderHasChanged = false;
+            }
             if (true == m_FirstLineHeadersCheckBox.Checked)
             {
                 int columnIndex = 0;
@@ -337,7 +462,7 @@ namespace SailTablePackagerForCsv
                 // Figure out the column count
                 m_ColumnCount = csvReader.HeaderRecord.Length;
 
-                if (0 == m_TableProperties.ColumnCount)
+                if (m_ColumnCount != m_TableProperties.ColumnCount)
                 {
                     m_TableProperties.ColumnCount = m_ColumnCount;
                 }
@@ -356,7 +481,7 @@ namespace SailTablePackagerForCsv
                 // Figure out the column count
                 m_ColumnCount = csvReader.Parser.Record.Length;
 
-                if (0 == m_TableProperties.ColumnCount)
+                if (m_ColumnCount != m_TableProperties.ColumnCount)
                 {
                     m_TableProperties.ColumnCount = m_ColumnCount;
                 }
@@ -365,8 +490,9 @@ namespace SailTablePackagerForCsv
                 {
                     m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnPosition", columnIndex);
                     m_TableProperties.SetColumnProperty(columnIndex, "SourceFileColumnName", columnIndex.ToString());
+                    m_TableProperties.SetColumnProperty(columnIndex, "Name", columnIndex.ToString());
                     m_TableProperties.SetColumnProperty(columnIndex, "DestinationFileColumnName", columnIndex.ToString());
-                    ++columnIndex;
+                    //++columnIndex;
                 }
             }
         }
@@ -477,5 +603,6 @@ namespace SailTablePackagerForCsv
 
         private TableProperties m_TableProperties;
         private int m_ColumnCount;
+        private bool m_FirstLineHeaderHasChanged;
     }
 }

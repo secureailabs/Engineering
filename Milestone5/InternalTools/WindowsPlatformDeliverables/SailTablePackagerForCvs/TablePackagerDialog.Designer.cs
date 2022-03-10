@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TablePackagerDialog));
             this.label1 = new System.Windows.Forms.Label();
             this.m_ExecutionGroupBox = new System.Windows.Forms.GroupBox();
             this.m_ProgressTextBox = new System.Windows.Forms.TextBox();
             this.m_GoButton = new System.Windows.Forms.Button();
             this.m_NotificationsListBox = new System.Windows.Forms.ListBox();
-            this.m_RefreshTimer = new System.Windows.Forms.Timer();
+            this.m_RefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.m_ExitButton = new System.Windows.Forms.Button();
             this.m_SaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.m_ExecutionGroupBox.SuspendLayout();
@@ -53,6 +54,9 @@
             // 
             // m_ExecutionGroupBox
             // 
+            this.m_ExecutionGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.m_ExecutionGroupBox.Controls.Add(this.m_ProgressTextBox);
             this.m_ExecutionGroupBox.Controls.Add(this.m_GoButton);
             this.m_ExecutionGroupBox.Controls.Add(this.m_NotificationsListBox);
@@ -85,6 +89,9 @@
             // 
             // m_NotificationsListBox
             // 
+            this.m_NotificationsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.m_NotificationsListBox.BackColor = System.Drawing.SystemColors.Info;
             this.m_NotificationsListBox.FormattingEnabled = true;
             this.m_NotificationsListBox.IntegralHeight = false;
@@ -101,6 +108,7 @@
             // 
             // m_ExitButton
             // 
+            this.m_ExitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.m_ExitButton.Location = new System.Drawing.Point(666, 446);
             this.m_ExitButton.Name = "m_ExitButton";
             this.m_ExitButton.Size = new System.Drawing.Size(75, 23);
@@ -118,13 +126,14 @@
             this.AcceptButton = this.m_GoButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(762, 481);
-            this.ControlBox = false;
+            this.ClientSize = new System.Drawing.Size(762, 504);
             this.Controls.Add(this.m_ExitButton);
             this.Controls.Add(this.m_ExecutionGroupBox);
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MinimumSize = new System.Drawing.Size(778, 520);
             this.Name = "TablePackagerDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SAIL Table Packager for CSV Files";

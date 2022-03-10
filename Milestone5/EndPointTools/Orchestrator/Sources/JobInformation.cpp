@@ -122,11 +122,12 @@ bool __thiscall JobInformation::RequiresDataset() const
         bool fIsDataset{false};
         if ( value.second.has_value() )
         {
-
-            Guid oValueIdentifier{value.second.value()};
-            fIsDataset = ( eDataset == oValueIdentifier.GetObjectType() ) || (eTable == oValueIdentifier.GetObjectType());
+            if ( false == IsJobOutputParameter(value.second.value()) )
+            {
+                Guid oValueIdentifier{value.second.value()};
+                fIsDataset = ( eDataset == oValueIdentifier.GetObjectType() ) || (eTable == oValueIdentifier.GetObjectType());
+            }
         }
-
         return fIsDataset;
     };
 

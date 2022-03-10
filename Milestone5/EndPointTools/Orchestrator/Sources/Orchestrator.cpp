@@ -771,7 +771,8 @@ std::string Orchestrator::SetParameter(
                 // We aren't aware of this parameter yet, pull it
                 if ( m_stlJobResults.end() == m_stlJobResults.find(strRawOutputParam))
                 {
-                    PullJobData(strRawOutputParam);
+                    // Sent an implicit pull to ensure the job engine encrypts the data sent back
+                    PullJobData(strRawOutputParam, false);
                     m_stlOutstandingImplicitPullRequests.insert(strRawOutputParam);
                 }
                 else
@@ -1423,7 +1424,8 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
  *                       message otherwise
  ********************************************************************************************/
 std::string __thiscall Orchestrator::PullJobData(
-        _in const std::string& c_strOutputParameter
+        _in const std::string& c_strOutputParameter,
+        _in bool fExplicitPull
     ) throw()
 {
     __DebugFunction();
@@ -1482,6 +1484,7 @@ std::string __thiscall Orchestrator::PullJobData(
                     oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::ePullData));
                     oPushBuffer.PutString("EndPoint", "JobEngine");
                     oPushBuffer.PutString("Filename", strFilename.c_str());
+                    oPushBuffer.PutBoolean("Explicit", fExplicitPull);
 
 #ifdef DEBUG_PRINTS
                     std::cout << "Sent pull request for " << strFilename << std::endl;

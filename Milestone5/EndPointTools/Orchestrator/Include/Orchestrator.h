@@ -99,7 +99,8 @@ class Orchestrator : public Object{
             );
 
         std::string __thiscall PullJobData(
-            _in const std::string& c_strOutputParameter
+            _in const std::string& c_strOutputParameter,
+            _in bool fExplicitPull = true
             ) throw();
 
         std::string __thiscall WaitForData(

@@ -65,17 +65,17 @@ fi
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir
 
-# Build the DatabaseTools and UploadPackageAndInitializationVector
+# Build the DemoDatabaseTools and UploadPackageAndInitializationVector
 pushd InternalTools/UploadPackageAndInitializationVector
 make all -j
 popd
 
-pushd InternalTools/DatabaseTools
+pushd InternalTools/DemoDatabaseTools
 make all -j
 popd
 
 # Copy the files to the temporary directory
-cp Binary/DatabaseTools $tempDeployDir
+cp Binary/DemoDatabaseTools $tempDeployDir
 cp Binary/UploadPackageAndInitializationVector $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 mv webfrontend.tar.gz $tempDeployDir

@@ -15,6 +15,7 @@
 #include "JsonValue.h"
 #include "PluginVersion.h"
 #include "Utils.h"
+#include "JsonParser.h"
 
 #include <utility>
 
@@ -273,7 +274,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
                 {
                     // Parse Json
                     std::string strUnEscapseJsonString = ::UnEscapeJsonString(strRequestBody);
-                    stlSerializedParameters = JsonValue::ParseDataToStructuredBuffer(strUnEscapseJsonString.c_str());
+                    stlSerializedParameters = ::ConvertJsonStringToStructuredBuffer(strUnEscapseJsonString.c_str()).GetSerializedBuffer();
                     fIsJson = true;
                 }
                 else if ("application/x-www-form-urlencoded" == strContentType)

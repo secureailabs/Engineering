@@ -11,6 +11,7 @@
 #include "InteractiveClient.h"
 #include "Base64Encoder.h"
 #include "ExceptionRegister.h"
+#include "JsonParser.h"
 
 #include <openssl/rand.h>
 
@@ -42,7 +43,7 @@ static std::string __stdcall _GetEpochTimeInMilliseconds(void)
     
     ::sprintf(szString, "%ld", un64EpochTimeInMilliseconds);
     strEpochTimeInMilliseconds = szString;
-    
+
     return strEpochTimeInMilliseconds;
 }
 
@@ -1134,7 +1135,7 @@ bool UpdateUserAccessRights(
 
     __DebugAssert(38 == strUserGuid.size())
 
-    try 
+    try
     {
         // Create rest request
         std::string strVerb = "PUT";
@@ -1446,7 +1447,7 @@ bool ListOrganizationUsers(
 
     __DebugAssert(38 == strOrganizationGuid.size())
 
-    try 
+    try
     {
         // Create rest request
         std::string strVerb = "GET";
@@ -1694,24 +1695,28 @@ bool RegisterDigitalContract(
         // Create rest request
         std::string strVerb = "POST";
         std::string strApiUrl = "/SAIL/DigitalContractManager/Applications?Eosb="+ c_strEncodedEosb;
-        std::string strContent = "{\n   \"DataOwnerOrganization\": \""+ c_oDcInformation.GetString("DOOGuid") +"\","
-                                "\n    \"Title\": \""+ c_oDcInformation.GetString("Title") +"\","
-                                "\n    \"Description\": \""+ c_oDcInformation.GetString("Description") +"\","
-                                "\n    \"VersionNumber\": \""+ strVersionNumber +"\","
-                                "\n    \"SubscriptionDays\": "+ std::to_string(c_oDcInformation.GetUnsignedInt64("SubscriptionDays")) +","
-                                "\n    \"DatasetGuid\": \""+ strDatasetGuid +"\","
-                                "\n    \"LegalAgreement\": \""+ c_oDcInformation.GetString("LegalAgreement") +"\","
-                                "\n    \"DatasetDRMMetadataSize\": "+ std::to_string(0) +","
-                                "\n    \"DatasetDRMMetadata\":{}"
-                                "\n}";
+
+        StructuredBuffer oRequest;
+        oRequest.PutString("DataOwnerOrganization", c_oDcInformation.GetString("DOOGuid"));
+        oRequest.PutString("Title", c_oDcInformation.GetString("Title"));
+        oRequest.PutString("Description", c_oDcInformation.GetString("Description"));
+        oRequest.PutString("VersionNumber", strVersionNumber);
+        oRequest.PutFloat64("SubscriptionDays", c_oDcInformation.GetUnsignedInt64("SubscriptionDays"));
+        oRequest.PutString("DatasetGuid", strDatasetGuid);
+        oRequest.PutString("LegalAgreement", c_oDcInformation.GetString("LegalAgreement"));
+        oRequest.PutFloat64("DatasetDRMMetadataSize", 0);
+        StructuredBuffer oEmpty;
+        oRequest.PutStructuredBuffer("DatasetDRMMetadata", oEmpty);
+
+        std::string strContent = ::ConvertStructuredBufferToJson(oRequest);
+
         // Make the API call and get REST response
         std::vector<Byte> stlRestResponse = ::RestApiCall(g_szServerIpAddress, (Word) g_unPortNumber, strVerb, strApiUrl, strContent, true);
-        std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-        StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((char *)stlRestResponse.data());
         _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error registering new digital contract.", nullptr);
         fSuccess = true;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);

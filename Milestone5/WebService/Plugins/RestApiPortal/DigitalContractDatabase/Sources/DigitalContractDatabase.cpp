@@ -2365,7 +2365,7 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         const std::string c_strLocation = oTemplateData.GetString("HostRegion");
         const std::string c_strVirtualMachineImageId = oTemplateData.GetString("VirtualMachineImageId");
 
-        const std::string c_strResourceGroup = c_oNewVirtualMachineGuid.ToString(eRaw) + "-scn";
+        const std::string c_strResourceGroup = ::GetInitializationValue("Owner") + "-" + c_oNewVirtualMachineGuid.ToString(eRaw) + "-scn";
 
         StructuredBuffer oVirtualMachineSpecification;
         oVirtualMachineSpecification.PutString("vmName", c_oNewVirtualMachineGuid.ToString(eRaw));
@@ -2919,7 +2919,7 @@ void __thiscall DigitalContractDatabase::DeleteVirtualMachineResources(
         oUpdateVmStateRequest.PutDword("TransactionType", 0x00000002);
         oUpdateVmStateRequest.PutBuffer("Eosb", c_stlEosb);
         oUpdateVmStateRequest.PutString("VirtualMachineGuid", c_strVirtualMachineName);
-        if (true == ::DeleteAzureResourceGroup(strApplicationID, strTenantID, strSecret, strSubscriptionID, c_strVirtualMachineName + "-scn"))
+        if (true == ::DeleteAzureResourceGroup(strApplicationID, strTenantID, strSecret, strSubscriptionID, ::GetInitializationValue("Owner") + "-" + c_strVirtualMachineName + "-scn"))
         {
             oUpdateVmStateRequest.PutDword("State", VirtualMachineState::eDeleted);
         }

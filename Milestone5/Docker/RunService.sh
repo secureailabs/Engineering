@@ -5,7 +5,7 @@ PrintHelp()
 {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: backend | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
+    echo -e "\t-s Service Name: backend | orchestrator | remotedataconnector | webfrontend | securecomputationnode | devopsconsole"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
@@ -69,10 +69,15 @@ fi
 
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
+
 if [ "orchestrator" == "$imageName" ]
 then
-    cp orchestrator/InitializationVector.json $rootDir/VirtualMachine/Orchestrator
+    cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator
     runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator:/app $imageName"
+elif [ "devopsconsole" == "$imageName" ]
+then
+    cp devopsconsole/InitializationVector.json $rootDir/DevopsConsole
+    runtimeFlags="$runtimeFlags -v $rootDir/DevopsConsole:/app -v $rootDir/DevopsConsole/nginx:/etc/nginx/conf.d -v $rootDir/DevopsConsole/certs:/etc/nginx/certs -p 5050:443 $imageName"
 elif [ "backend" == "$imageName" ]
 then
     # Create database volume if it does not exist

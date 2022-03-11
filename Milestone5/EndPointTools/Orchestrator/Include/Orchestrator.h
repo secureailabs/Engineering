@@ -21,6 +21,7 @@
 #include "TableInformation.h"
 #include "TlsNode.h"
 #include "TlsServer.h"
+#include <set>
 #include <string>
 #include <stack>
 #include <map>
@@ -98,7 +99,8 @@ class Orchestrator : public Object{
             );
 
         std::string __thiscall PullJobData(
-            _in const std::string& c_strOutputParameter
+            _in const std::string& c_strOutputParameter,
+            _in bool fExplicitPull = true
             ) throw();
 
         std::string __thiscall WaitForData(
@@ -195,6 +197,8 @@ class Orchestrator : public Object{
             _in JobInformation& oJob
             );
 
+
+        std::set<std::string> m_stlOutstandingImplicitPullRequests{};
         EosbRotationManager m_oEosbRotator{};
         std::unordered_map<std::string, StructuredBuffer> m_stlAvailableSafeFunctions{};
         std::unordered_map<std::string, StructuredBuffer> m_stlDigitalContracts{};
@@ -206,4 +210,5 @@ class Orchestrator : public Object{
         std::unordered_map<std::string, std::vector<Byte>> m_stlJobResults{};
         std::unordered_map<std::string, std::shared_ptr<JobEngineConnection>> m_stlSecureNodeConnections{};
         StructuredBufferLockedQueue m_oJobMessageQueue{};
+        const Guid m_oOrchestratorIdentifier{eOrchestratorIdentifier};
 };

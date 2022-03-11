@@ -9,6 +9,9 @@
  *
  ********************************************************************************************/
 
+#include <utility>
+#include "Guid.h"
+
 #pragma once
 
 enum class EngineRequest

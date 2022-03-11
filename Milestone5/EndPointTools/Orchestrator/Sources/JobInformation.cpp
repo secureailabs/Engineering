@@ -12,6 +12,7 @@
 #include "Guid.h"
 #include "JobEngineConnection.h"
 #include "JobInformation.h"
+#include "JobOutputParameter.h"
 #include "OrchestratorTypes.h"
 #include "StructuredBuffer.h"
 #include "StructuredBufferLockedQueue.h"
@@ -85,11 +86,7 @@ bool __thiscall JobInformation::ReadyToExcute(
     __DebugFunction();
     bool fHasIp = ( "" != m_strTargetIP );
 
-    // For any outputs that are waiting on output from another job, make sure they are set
-    bool fAllJobOutputsReady = std::all_of(m_stlOutputJobParameterData.begin(), m_stlOutputJobParameterData.end(),
-        [] (const auto& value) { return value.second;} );
-
-    return fHasIp && AllInputParametersSet() && fAllJobOutputsReady;
+    return fHasIp && AllInputParametersSet();
 }
 
 /********************************************************************************************
@@ -101,7 +98,11 @@ bool __thiscall JobInformation::ReadyToExcute(
  ********************************************************************************************/
 bool __thiscall JobInformation::AllInputParametersSet() const
 {
-    return std::all_of(m_stlInputParameterData.begin(), m_stlInputParameterData.end(),
+    // For any outputs that are waiting on output from another job, make sure they are set
+    bool fAllJobOutputsReady = std::all_of(m_stlOutputJobParameterData.begin(), m_stlOutputJobParameterData.end(),
+        [] (const auto& value) { return value.second;} );
+
+    return fAllJobOutputsReady && std::all_of(m_stlInputParameterData.begin(), m_stlInputParameterData.end(),
         [] ( const auto& value ) { return value.second.has_value(); } );
 }
 
@@ -121,11 +122,12 @@ bool __thiscall JobInformation::RequiresDataset() const
         bool fIsDataset{false};
         if ( value.second.has_value() )
         {
-
-            Guid oValueIdentifier{value.second.value()};
-            fIsDataset = ( eDataset == oValueIdentifier.GetObjectType() ) || (eTable == oValueIdentifier.GetObjectType());
+            if ( false == IsJobOutputParameter(value.second.value()) )
+            {
+                Guid oValueIdentifier{value.second.value()};
+                fIsDataset = ( eDataset == oValueIdentifier.GetObjectType() ) || (eTable == oValueIdentifier.GetObjectType());
+            }
         }
-
         return fIsDataset;
     };
 
@@ -230,6 +232,11 @@ bool __thiscall JobInformation::SetInputParameter(
     {
         m_stlInputParameterData[strInputParameterId] = strValue;
         fSetValue = true;
+
+        if ( ::IsJobOutputParameter(strValue) )
+        {
+            m_stlOutputJobParameterData.emplace(strValue, false);
+        }
     }
     return fSetValue;
 }

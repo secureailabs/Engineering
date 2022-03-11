@@ -14,7 +14,7 @@ export AZURE_TENANT_ID="3e74e5ef-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 export AZURE_CLIENT_ID="4f909fab-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 export AZURE_CLIENT_SECRET="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
-Then run `sudo -E ./DeployPlatform.sh` from the root directory of the repository.
+Then run `sudo -E ./DeployPlatform.sh -p [Purpose:[Nightly, Bugfix, etc..]] -o [Owner: [Prawal, Stanley]]` from the root directory of the repository.
 -E is needed to inherit the environment variables from the current user(non-root) shell.
 
 ## This script will

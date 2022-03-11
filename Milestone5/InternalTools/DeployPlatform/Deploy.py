@@ -47,9 +47,17 @@ def deploy_module(account_credentials, deployment_name, module_name):
     return virtual_machine_public_ip
 
 
-def deploy_backend(account_credentials, deployment_name):
+def deploy_backend(account_credentials, deployment_name, owner):
     # Deploy the backend server
     platform_services_ip = deploy_module(account_credentials, deployment_name, "backend")
+
+    # Read backend json from file
+    with open("backend.json", "r") as backend_json_fd:
+        backend_json = json.load(backend_json_fd)
+        backend_json["Owner"] = owner
+
+    with open("backend.json", "w") as outfile:
+        json.dump(backend_json, outfile)
 
     upload_status = subprocess.run(
         [
@@ -145,7 +153,7 @@ if __name__ == "__main__":
     # TODO: Prawal deploy the VMs in parallel and initialize them sequesntially
 
     # Deploy the backend server
-    platform_services_ip = deploy_backend(account_credentials, deployment_id)
+    platform_services_ip = deploy_backend(account_credentials, deployment_id, OWNER)
     print("Backend server: ", platform_services_ip)
 
     # Deploy the frontend server

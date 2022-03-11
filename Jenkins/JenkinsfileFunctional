@@ -23,6 +23,7 @@ pipeline {
                     set -x
                     pwd
                     ls -l
+                    sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Milestone5/Docker/backend/InitializationVector.json
                     ./Milestone5/CreateDailyBuild.sh
                     ./Milestone5/BuildSecureComputation.sh
                     ./Milestone5/PackageSecureComputationNode.sh

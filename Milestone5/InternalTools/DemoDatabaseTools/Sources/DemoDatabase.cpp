@@ -62,9 +62,9 @@ void __thiscall DemoDatabase::InitializeMembers(void)
     std::string strLegalAgreement = "The Parties acknowledge and agree that this Agreement represents the entire agreement between the Parties. "
                                     "In the event that the Parties desire to change, add, or otherwise modify any terms, they shall do so in writing to be signed by both parties.";
     std::string strDescription = "The dataset will be used to train models for academic research purposes.";
-    m_stlDigitalContracts.push_back(DigitalContractInformation{"KCA Consortium - MGH", 90, strLegalAgreement, 16186603, strDescription, "SAIL", 1, 8, "East US"});
-    m_stlDigitalContracts.push_back(DigitalContractInformation{"KCA Consortium - KCA", 90, strLegalAgreement, 24117352, strDescription, "SAIL", 1, 8, "East US"});
-    m_stlDigitalContracts.push_back(DigitalContractInformation{"KCA Consortium - CRH", 90, strLegalAgreement, 60768913, strDescription, "SAIL", 1, 8, "East US"});
+    m_stlDigitalContracts.push_back(DigitalContractInformation{"KCA Consortium - MGH", 90, strLegalAgreement, 16186603, strDescription, "SAIL", 1, "East US"});
+    m_stlDigitalContracts.push_back(DigitalContractInformation{"KCA Consortium - KCA", 90, strLegalAgreement, 24117352, strDescription, "SAIL", 1, "East US"});
+    m_stlDigitalContracts.push_back(DigitalContractInformation{"KCA Consortium - CRH", 90, strLegalAgreement, 60768913, strDescription, "SAIL", 1, "East US"});
 }
 
 /********************************************************************************************/
@@ -238,7 +238,6 @@ void __thiscall DemoDatabase::AcceptDigitalContracts(void)
         oDcInformation.PutString("DigitalContractGuid", m_stlDigitalContractGuids[unIndex]);
         oDcInformation.PutString("HostForVirtualMachines", m_stlDigitalContracts.at(unIndex).m_strHostForVM);
         oDcInformation.PutUnsignedInt64("NumberOfVirtualMachines", m_stlDigitalContracts.at(unIndex).m_un64NoOfVM);
-        oDcInformation.PutUnsignedInt64("NumberOfVCPU", m_stlDigitalContracts.at(unIndex).m_un64NoOfVCPU);
         oDcInformation.PutString("HostRegion", m_stlDigitalContracts.at(unIndex).m_strHostRegion);
         // Accept digital contract
         ::AcceptDigitalContract(strEncodedEosb, oDcInformation);

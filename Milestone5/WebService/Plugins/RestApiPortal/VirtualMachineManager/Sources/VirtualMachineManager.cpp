@@ -398,10 +398,6 @@ void __thiscall VirtualMachineManager::InitializePlugin(
     oIpAddress.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oIpAddress.PutBoolean("IsRequired", true);
     oRegisterVmParameters.PutStructuredBuffer("IPAddress", oIpAddress);
-    StructuredBuffer oNumberOfVCPUs;
-    oNumberOfVCPUs.PutByte("ElementType", UINT64_VALUE_TYPE);
-    oNumberOfVCPUs.PutBoolean("IsRequired", true);
-    oRegisterVmParameters.PutStructuredBuffer("NumberOfVCPU", oNumberOfVCPUs);
     StructuredBuffer oHostRegion;
     oHostRegion.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oHostRegion.PutBoolean("IsRequired", true);
@@ -1240,7 +1236,6 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
             oRequest.PutUnsignedInt64("RegistrationTime", ::GetEpochTimeInSeconds());
             oRequest.PutUnsignedInt64("HeartbeatBroadcastTime", c_oRequest.GetUnsignedInt64("HeartbeatBroadcastTime"));
             oRequest.PutString("IPAddress", c_oRequest.GetString("IPAddress"));
-            oRequest.PutUnsignedInt64("NumberOfVCPU", c_oRequest.GetUnsignedInt64("NumberOfVCPU"));
             oRequest.PutString("HostRegion", c_oRequest.GetString("HostRegion"));
             oRequest.PutUnsignedInt64("StartTime", c_oRequest.GetUnsignedInt64("StartTime"));
             oRequest.PutString("Note", "...");

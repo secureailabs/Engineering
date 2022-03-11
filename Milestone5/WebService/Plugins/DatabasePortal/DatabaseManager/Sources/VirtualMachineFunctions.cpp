@@ -403,7 +403,6 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterVirtualMachine(
         oObject.PutUnsignedInt64("RegistrationTime", c_oRequest.GetUnsignedInt64("RegistrationTime"));
         oObject.PutUnsignedInt64("HeartbeatBroadcastTime", c_oRequest.GetUnsignedInt64("HeartbeatBroadcastTime"));
         oObject.PutString("IPAddress", c_oRequest.GetString("IPAddress"));
-        oObject.PutUnsignedInt64("NumberOfVCPU", c_oRequest.GetUnsignedInt64("NumberOfVCPU"));
         oObject.PutString("HostRegion", c_oRequest.GetString("HostRegion"));
         oObject.PutUnsignedInt64("StartTime", c_oRequest.GetUnsignedInt64("StartTime"));
         bsoncxx::types::b_binary oObjectBlob

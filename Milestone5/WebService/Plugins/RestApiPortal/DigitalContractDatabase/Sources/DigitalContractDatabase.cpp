@@ -457,10 +457,6 @@ void __thiscall DigitalContractDatabase::InitializePlugin(
     oNumberOfVM.PutByte("ElementType", UINT64_VALUE_TYPE);
     oNumberOfVM.PutBoolean("IsRequired", true);
     oDcAcceptance.PutStructuredBuffer("NumberOfVirtualMachines", oNumberOfVM);
-    StructuredBuffer oNumberOfVCPUs;
-    oNumberOfVCPUs.PutByte("ElementType", UINT64_VALUE_TYPE);
-    oNumberOfVCPUs.PutBoolean("IsRequired", true);
-    oDcAcceptance.PutStructuredBuffer("NumberOfVCPU", oNumberOfVCPUs);
     StructuredBuffer oHostRegion;
     oHostRegion.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oHostRegion.PutBoolean("IsRequired", true);
@@ -900,8 +896,8 @@ std::vector<Byte> __thiscall DigitalContractDatabase::GetDigitalSignature(
  * @returns Serialized digital contract blob
  *
  ********************************************************************************************/
- 
- void __thiscall DigitalContractDatabase::SerializeDigitalContract(
+
+void __thiscall DigitalContractDatabase::SerializeDigitalContract(
     _in const StructuredBuffer & c_oDc,
     _in std::vector<Byte> & stlDigitalContractBlob
     )
@@ -1007,8 +1003,8 @@ std::vector<Byte> __thiscall DigitalContractDatabase::GetDigitalSignature(
  * @returns Deserialized digital contract structured buffer
  *
  ********************************************************************************************/
- 
- StructuredBuffer __thiscall DigitalContractDatabase::DeserializeDigitalContract(
+
+StructuredBuffer __thiscall DigitalContractDatabase::DeserializeDigitalContract(
     _in const std::vector<Byte> c_stlDcBlob
     )
 {
@@ -1496,7 +1492,6 @@ std::vector<Byte> __thiscall DigitalContractDatabase::AcceptDigitalContract(
                             oSsb.PutUnsignedInt64("LastActivity", ::GetEpochTimeInSeconds());
                             oSsb.PutString("HostForVirtualMachines", c_oRequest.GetString("HostForVirtualMachines"));
                             oSsb.PutUnsignedInt64("NumberOfVirtualMachines", c_oRequest.GetUnsignedInt64("NumberOfVirtualMachines"));
-                            oSsb.PutUnsignedInt64("NumberOfVCPU", c_oRequest.GetUnsignedInt64("NumberOfVCPU"));
                             oSsb.PutString("HostRegion", c_oRequest.GetString("HostRegion"));
                             oSsb.PutString("Note", "...");
                             // Serialize the update digital contract blob
@@ -2193,49 +2188,14 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ProvisionDigitalContract(
 
                         // Get the Guid of the user who's azure template are to be used to create Virtual Machine
                         std::string strHostForVirtualMachine = oDigitialContract.GetString("HostForVirtualMachines");
-
                         auto unNumberOfVirtualMachines = oDigitialContract.GetUnsignedInt64("NumberOfVirtualMachines");
+
                         std::string strOptionalVirtualMachineType{""};
-                        if ( c_oRequest.IsElementPresent("VirtualMachineType", ANSI_CHARACTER_STRING_VALUE_TYPE) )
-                        {
-                            strOptionalVirtualMachineType = c_oRequest.GetString("VirtualMachineType");
-                        }
+                        strOptionalVirtualMachineType = c_oRequest.GetString("VirtualMachineType");
+                        _ThrowBaseExceptionIf((false == ::IsValidVirtualMachineType(strOptionalVirtualMachineType)), "Invalid VM Type", nullptr);
 
                         Guid oNewVmGuid(eSecureComputationalVirtualMachine);
                         StructuredBuffer oVirtualMachineCreateParameter;
-                        if ( !::IsValidVirtualMachineType(strOptionalVirtualMachineType) )
-                        {
-                            switch (oDigitialContract.GetUnsignedInt64("NumberOfVCPU"))
-                            {
-                                case 4
-                                :
-                                    strOptionalVirtualMachineType = "Standard_D4s_v4";
-                                    break;
-                                case 8
-                                :
-                                    strOptionalVirtualMachineType = "Standard_D8s_v4";
-                                    break;
-                                case 16
-                                :
-                                    strOptionalVirtualMachineType = "Standard_B16ms";
-                                    break;
-                                case 32
-                                :
-                                    strOptionalVirtualMachineType = "Standard_D8_v4";
-                                    break;
-                                case 48
-                                :
-                                    strOptionalVirtualMachineType = "Standard_D48_v4";
-                                    break;
-                                default
-                                :
-                                    _ThrowBaseException("Number Of CPUs not supported", nullptr);
-                                    break;
-                            }
-                            oResponse.PutString("Message",  "Unknown Virtual Machine type " + strOptionalVirtualMachineType + " using DC value " +
-                                strOptionalVirtualMachineType
-                            );
-                        }
 
                         Guid oDatasetGuid(oDigitialContract.GetString("DatasetGuid"));
                         /* Comment back in when we can deploy any data set
@@ -2394,7 +2354,6 @@ void __thiscall DigitalContractDatabase::ProvisionVirtualMachine(
         oVmRegisterRequest.PutString("VirtualMachineGuid", c_oNewVirtualMachineGuid.ToString(eRaw));
         oVmRegisterRequest.PutUnsignedInt64("HeartbeatBroadcastTime", ::GetEpochTimeInSeconds());
         oVmRegisterRequest.PutString("IPAddress", "0.0.0.0");
-        oVmRegisterRequest.PutUnsignedInt64("NumberOfVCPU", c_oDigitalContract.GetUnsignedInt64("NumberOfVCPU"));
         oVmRegisterRequest.PutString("HostRegion", c_oDigitalContract.GetString("HostRegion"));
         oVmRegisterRequest.PutUnsignedInt64("StartTime", ::GetEpochTimeInSeconds());
 

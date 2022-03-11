@@ -20,6 +20,7 @@ declare -a ListOfFiles=(
 "Binary/SharedLibraries/RestApiPortal/libDatasetDatabase.so"
 "Binary/SharedLibraries/RestApiPortal/libAccountDatabase.so"
 "Binary/SharedLibraries/RestApiPortal/libDigitalContractDatabase.so"
+"Binary/SharedLibraries/RestApiPortal/libDataFederationManager.so"
 )
 
 for val in "${ListOfFiles[@]}"; do

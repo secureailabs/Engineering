@@ -392,17 +392,14 @@ std::string RegisterVirtualMachine(
     // Get virtual machine information
     std::cout << "************************\n Register Virtual Machine \n************************\n" << std::endl;
     std::string strDcGuid = ::GetStringInput("Enter hyphen and curly braces formatted digital contract guid: ", 38, true, c_szValidInputCharacters);
-    uint64_t un64NoOfVCPU = std::stoull(::GetStringInput("Enter the number of VCPUs: ", 50, false, c_szValidInputCharacters));
     std::string strHostRegion = ::GetStringInput("Enter the region to run the VM's: ", 500, false, c_szValidInputCharacters);
 
     __DebugAssert(38 == strDcGuid.size());
-    __DebugAssert(0 < un64NoOfVCPU);
     __DebugAssert(0 < strHostRegion.size());
 
     StructuredBuffer oVmInformation;
     oVmInformation.PutString("DigitalContractGuid", strDcGuid);
     oVmInformation.PutString("IPAddress", "127.0.0.1");
-    oVmInformation.PutUnsignedInt64("NumberOfVCPU", un64NoOfVCPU);
     oVmInformation.PutString("HostRegion", strHostRegion);
 
     strVmEosb = ::RegisterVirtualMachine(c_strEncodedIEosb, c_strVmGuid, oVmInformation);
@@ -465,7 +462,6 @@ std::string RegisterVirtualMachine(
                                 "\n    \"VirtualMachineGuid\": \""+ c_strVmGuid +"\","
                                 "\n    \"HeartbeatBroadcastTime\": "+ std::to_string(::GetEpochTimeInSeconds()) +","
                                 "\n    \"IPAddress\": \""+ c_oVmInformation.GetString("IPAddress") +"\","
-                                "\n    \"NumberOfVCPU\": "+ std::to_string(c_oVmInformation.GetUnsignedInt64("NumberOfVCPU")) +","
                                 "\n    \"HostRegion\": \""+ c_oVmInformation.GetString("HostRegion") +"\","
                                 "\n    \"StartTime\": "+ std::to_string(::GetEpochTimeInSeconds()) +""
                                 "\n}";
@@ -667,7 +663,6 @@ bool ListVirtualMachines(
                 std::cout << "Registration time: " << (uint64_t) oVirtualMachine.GetFloat64("RegistrationTime") << std::endl;
                 std::cout << "Heart beat broadcast time: " << (uint64_t) oVirtualMachine.GetFloat64("HeartbeatBroadcastTime") << std::endl;
                 std::cout << "IP address: " << oVirtualMachine.GetString("IPAddress") << std::endl;
-                std::cout << "Number of VCPUs: " << (uint64_t) oVirtualMachine.GetFloat64("NumberOfVCPU") << std::endl;
                 std::cout << "Host region: " << oVirtualMachine.GetString("HostRegion") << std::endl;
                 std::cout << "Start time: " << (uint64_t) oVirtualMachine.GetFloat64("StartTime") << std::endl;
                 if (true == oVirtualMachine.IsElementPresent("State", FLOAT64_VALUE_TYPE))
@@ -732,7 +727,6 @@ std::vector<Byte> PullVirtualMachine(
         std::cout << "Registration time: " << (uint64_t) oVirtualMachine.GetFloat64("RegistrationTime") << std::endl;
         std::cout << "Heart beat broadcast time: " << (uint64_t) oVirtualMachine.GetFloat64("HeartbeatBroadcastTime") << std::endl;
         std::cout << "IP address: " << oVirtualMachine.GetString("IPAddress") << std::endl;
-        std::cout << "Number of VCPUs: " << (uint64_t) oVirtualMachine.GetFloat64("NumberOfVCPU") << std::endl;
         std::cout << "Host region: " << oVirtualMachine.GetString("HostRegion") << std::endl;
         std::cout << "Start time: " << (uint64_t) oVirtualMachine.GetFloat64("StartTime") << std::endl;
         if (true == oVirtualMachine.IsElementPresent("State", FLOAT64_VALUE_TYPE))
@@ -1751,7 +1745,6 @@ bool AcceptDigitalContract(
     std::string strLegalAgreement = ::GetStringInput("Enter the legal agreement: ", 500, false, c_szValidInputCharacters);
     std::string strHostForVm = ::GetStringInput("Enter the host responsible for VM: ", 50, false, c_szValidInputCharacters);
     uint64_t un64NoOfVM = std::stoull(::GetStringInput("Enter the number of required VMs: ", 50, false, c_szValidInputCharacters));
-    uint64_t un64NoOfVCPU = std::stoull(::GetStringInput("Enter the number of VCPUs: ", 50, false, c_szValidInputCharacters));
     std::string strHostRegion = ::GetStringInput("Enter the region to run the VM's: ", 500, false, c_szValidInputCharacters);
 
     __DebugAssert(0 < strDcGuid.size());
@@ -1759,7 +1752,6 @@ bool AcceptDigitalContract(
     __DebugAssert(0 < strLegalAgreement.size());
     __DebugAssert(0 < strHostForVm.size());
     __DebugAssert(0 < un64NoOfVM);
-    __DebugAssert(0 < un64NoOfVCPU);
     __DebugAssert(0 < strHostRegion.size());
 
     StructuredBuffer oDcInformation;
@@ -1772,7 +1764,6 @@ bool AcceptDigitalContract(
     oDcInformation.PutString("LegalAgreement", strLegalAgreement);
     oDcInformation.PutString("HostForVirtualMachines", strHostForVm);
     oDcInformation.PutUnsignedInt64("NumberOfVirtualMachines", un64NoOfVM);
-    oDcInformation.PutUnsignedInt64("NumberOfVCPU", un64NoOfVCPU);
     oDcInformation.PutString("HostRegion", strHostRegion);
 
     fSuccess = ::AcceptDigitalContract(c_strEncodedEosb, oDcInformation);
@@ -1805,7 +1796,6 @@ bool AcceptDigitalContract(
                         "\n    \"LegalAgreement\": \""+ c_oDcInformation.GetString("LegalAgreement") +"\","
                         "\n    \"HostForVirtualMachines\": \""+ c_oDcInformation.GetString("HostForVirtualMachines") +"\","
                         "\n    \"NumberOfVirtualMachines\": "+ std::to_string(c_oDcInformation.GetUnsignedInt64("NumberOfVirtualMachines")) +","
-                        "\n    \"NumberOfVCPU\": "+ std::to_string(c_oDcInformation.GetUnsignedInt64("NumberOfVCPU")) +","
                         "\n    \"HostRegion\": \""+ c_oDcInformation.GetString("HostRegion") +"\""
                         "\n}";
         // Make the API call and get REST response
@@ -1984,10 +1974,6 @@ void PrintDigitalContracts(
         if (true == oElement.IsElementPresent("NumberOfVirtualMachines", FLOAT64_VALUE_TYPE))
         {
             std::cout << "Number of required VMs: " << (uint64_t) oElement.GetFloat64("NumberOfVirtualMachines") << std::endl;
-        }
-        if (true == oElement.IsElementPresent("NumberOfVCPU", FLOAT64_VALUE_TYPE))
-        {
-            std::cout << "Number of required VCPUs: " << (uint64_t) oElement.GetFloat64("NumberOfVCPU") << std::endl;
         }
         if (true == oElement.IsElementPresent("HostRegion", ANSI_CHARACTER_STRING_VALUE_TYPE))
         {

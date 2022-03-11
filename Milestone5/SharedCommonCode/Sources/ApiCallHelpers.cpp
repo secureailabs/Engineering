@@ -276,7 +276,6 @@ StructuredBuffer __stdcall RegisterVirtualMachineAfterInitialization(
         oApiBodyContent.PutString("HeartbeatBroadcastTime", std::to_string(::GetEpochTimeInSeconds()));
         oApiBodyContent.PutString("IPAddress", c_strIpAddress);
         // HACK-DG - Hardcoded these values that aren't passed in and the remote expects
-        oApiBodyContent.PutUnsignedInt64("NumberOfVCPU", 1);
         oApiBodyContent.PutString("HostRegion", "USEast");
         oApiBodyContent.PutUnsignedInt64("StartTime", 1);
         oApiBodyContent.PutString("DigitalContractTitle", "Test title");

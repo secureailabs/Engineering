@@ -26,7 +26,7 @@ import newLogo from '@assets/newLogo.png';
 
 import { FaServer } from 'react-icons/fa';
 //@ts-ignore
-const Dashboard = ({ logout }) => {
+const Dashboard = ({ logout, userData }) => {
   const primary = [
     { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },
     { text: 'Datasets', Icon: MdViewColumn, link: '/dashboard/datasets' },
@@ -76,12 +76,11 @@ const Dashboard = ({ logout }) => {
         <div className="standard-grid-row">
           <Header
             search={() => {}}
-            username="User_name"
+            username={userData?.Username}
             profile_image={default_profile_image}
-            organization="Mayo Clinic"
+            organization={userData?.Organization}
           />
           <DashboardRouter />
-          <Footer />
         </div>
       </Sidebar>
     </>

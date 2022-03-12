@@ -54,6 +54,7 @@
     display: flex;
     // width: 50%;
     height: 100%;
+    width: 90%;
     min-width: 0;
     & > * {
       margin-left: 2rem;
@@ -68,13 +69,14 @@
     display: grid;
     column-gap: 2rem;
     min-width: 0;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    width: 95%;
   }
   &__top {
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding-bottom: 2rem;
-
+    row-gap: 2rem;
     & > * {
       display: flex;
       .react-select-container {
@@ -109,6 +111,28 @@
   & > * {
     &:not(&:first-child) {
       margin-left: 3rem;
+    }
+  }
+}
+
+.stat {
+  max-width: 18rem !important;
+  width: 18rem !important;
+}
+
+@element .feed-item and (max-width: 400px) {
+  :self {
+    flex-direction: column;
+    .feed-item__date {
+      margin-left: 0;
+      margin-right: auto;
+    }
+    .feed-item__content {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    .feed-item__image {
+      display: none;
     }
   }
 }

@@ -20,6 +20,7 @@ const DatasetVersion: React.FC<TDatasetVersionProps> = ({
   getDatasetVersionStart,
   getDatasetVersionState,
   getDatasetVersionData,
+  getDatasetData,
 }) => {
   const params = useParams();
   useEffect(() => {
@@ -42,6 +43,7 @@ const DatasetVersion: React.FC<TDatasetVersionProps> = ({
         success={() => (
           <DatasetVersionSuccess
             getDatasetVersionData={getDatasetVersionData}
+            getDatasetData={getDatasetData}
           />
         )}
         failure={<>Failure</>}

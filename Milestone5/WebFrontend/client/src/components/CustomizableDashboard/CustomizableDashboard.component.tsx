@@ -8,6 +8,8 @@ const timeAgo = new TimeAgo('en');
 import PatientSummary from '@components/PatientSummary';
 
 import Feed from '@components/Feed';
+import 'eqcss/EQCSS-polyfills';
+import FeedComponent from '@secureailabs/web-ui/components/Feed';
 
 import GridLayout from 'react-grid-layout';
 
@@ -15,6 +17,7 @@ import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 import Stats from '@secureailabs/web-ui/components/Stats';
 
 import { FaUsers } from 'react-icons/fa';
+import { HiViewBoards } from 'react-icons/hi';
 import { IUserData } from '@redux/user/user.typeDefs';
 
 const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
@@ -22,8 +25,8 @@ const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
 }) => {
   const stats = [
     {
-      title: 'No. of Data Users',
-      Icon: FaUsers,
+      title: 'No. of Dataset Owners',
+      Icon: HiViewBoards,
       value: '7',
     },
     {
@@ -32,13 +35,24 @@ const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
       value: '7',
     },
   ];
+  const current_time = new Date();
+  const data_user_activity = [
+    {
+      title: 'lorem Ipsum performs data updates on lorem ispum',
+      date: timeAgo.format(new Date(current_time.getTime() - 15 * 60000)),
+    },
+    {
+      title: 'lorem Ipsum performs data updates on lorem ispum',
+      date: timeAgo.format(new Date(current_time.getTime() - 15 * 60000)),
+    },
+  ];
 
   const layout = [
-    { i: 'a', x: 0, y: 0, w: 8, h: 5 },
-    { i: 'b', x: 0, y: 5, w: 5, h: 6 },
-    { i: 'c', x: 8, y: 0, w: 2, h: 7 },
+    { i: 'a', x: 0, y: 0, w: 8, h: 16, static: true },
+    { i: 'b', x: 0, y: 17, w: 8, h: 5, static: true },
+    { i: 'c', x: 8, y: 0, w: 3, h: 7, static: true },
+    { i: 'd', x: 8, y: 7, w: 3, h: 5, static: true },
   ];
-  console.log(userData);
   if (userData?.AccessRights === 6) {
     return (
       <StandardContent title="Dashboard">
@@ -50,10 +64,20 @@ const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
           rowHeight={50}
         >
           <div key="a">
-            <Feed containerHeight={true} limit={2} />
+            <PatientSummary />
           </div>
           <div key="b">
-            <PatientSummary />
+            <Feed containerHeight={true} limit={2} />
+          </div>
+
+          <div key="d">
+            <FeedComponent
+              title="Data User Activity"
+              seconday="Show all"
+              containerHeight={true}
+              //@ts-ignore
+              feed={data_user_activity}
+            />
           </div>
           <div key="c">
             <Stats

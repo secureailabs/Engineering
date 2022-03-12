@@ -26,6 +26,9 @@ export type TGetFeedSuccess = {
     Image: string;
     CreatedAt: Date;
     UpdatedAt: Date;
+    Link?: string;
+    avatar?: string;
+    avatar_color?: string;
   };
 };
 

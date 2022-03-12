@@ -42,7 +42,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
         },
       },
       {
-        Header: 'CreatedDate',
+        Header: 'Created Date',
         accessor: 'CreatedAt',
         width: 100,
         Cell: ({ value }: { value: Date }) => {
@@ -50,7 +50,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
         },
       },
       {
-        Header: 'No. of data owner',
+        Header: 'No. Of Data Owners',
         accessor: 'NumberOfDataOwner',
         width: 100,
         Cell: ({ value }: { value: number }) => {
@@ -59,7 +59,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
       },
 
       {
-        Header: 'No. of patients',
+        Header: 'No. Of Patients',
         accessor: 'NumberOfPatients',
         width: 200,
         Cell: ({ value }: { value: number }) => {

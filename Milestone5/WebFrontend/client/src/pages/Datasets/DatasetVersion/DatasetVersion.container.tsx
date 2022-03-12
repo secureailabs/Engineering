@@ -17,6 +17,7 @@ const mapStateToProps = (state: IState) => {
     getDatasetVersionError: selectDataset(state).getDatasetVersionError,
     getDatasetVersionState: selectDataset(state).getDatasetVersionState,
     getDatasetVersionData: selectDataset(state).getDatasetVersionData,
+    getDatasetData: selectDataset(state).getDatasetData,
     userData: selectUser(state).userData,
   };
 };

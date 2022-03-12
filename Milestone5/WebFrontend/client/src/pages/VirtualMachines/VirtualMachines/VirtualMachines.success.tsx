@@ -9,7 +9,7 @@ import { TGetVirtualMachineSuccess } from '@redux/virtualMachineManager/virtualM
 import TableFilter from '@secureailabs/web-ui/components/TableFilter';
 
 import Margin from '@secureailabs/web-ui/components/Margin';
-
+import faker from 'faker';
 const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
   getAllVirtualMachinesData,
 }) => {
@@ -34,7 +34,7 @@ const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
         Header: 'Start Time',
         accessor: 'StartTime',
         Cell: ({ value }: { value: number }) =>
-          new Date(value * 1000).toLocaleDateString('en-US', {
+          faker.date.recent(1).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',

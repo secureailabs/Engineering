@@ -9,3 +9,51 @@
     margin-left: 2rem;
   }
 }
+
+.unified-registry-card {
+  font-size: 1.4rem;
+  &__header {
+    height: 10rem;
+    display: flex;
+    img {
+      height: 100%;
+      width: auto;
+    }
+    align-items: center;
+    margin-bottom: 3.3rem;
+  }
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+  &__owner {
+    display: inline;
+    color: var(--color-grey);
+  }
+  &__description {
+    line-height: 2;
+    margin-bottom: 1.6rem;
+  }
+  &__access {
+    padding-left: 1rem;
+    display: inline;
+    color: var(--color-primary);
+  }
+  &__link {
+    color: var(--color-primary);
+    margin-bottom: 1.6rem;
+  }
+  &__dates {
+    display: flex;
+    & > * {
+      padding-right: 1rem;
+    }
+    align-items: center;
+    color: var(--color-grey);
+  }
+}
+
+.standard-content {
+  width: 100%;
+  overflow: hidden;
+}

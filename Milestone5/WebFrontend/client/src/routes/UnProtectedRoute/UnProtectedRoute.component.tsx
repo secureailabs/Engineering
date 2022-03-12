@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 
-import { Route, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import { IUnProtectedRoutes } from './UnProtectedRoute.types';
 

@@ -17,14 +17,15 @@ import Table from '@components/Table';
 
 const DatasetSuccess: React.FC<TDatasetVersionSuccessProps> = ({
   getDatasetVersionData,
+  getDatasetData,
 }) => {
+  console.log(getDatasetData);
   const { register, handleSubmit, formState, trigger } = useForm({
     mode: 'onSubmit',
     defaultValues: {
       ...getDatasetVersionData.Dataset,
-      NumberOfVersions: Object.keys(
-        getDatasetVersionData?.Dataset?.Versions || {}
-      ).length,
+      NumberOfVersions: Object.keys(getDatasetData?.Dataset?.Versions || {})
+        .length,
       PublishDate: new Date(
         getDatasetVersionData?.Dataset?.PublishDate
       ).toLocaleDateString('en-US'),
@@ -32,7 +33,10 @@ const DatasetSuccess: React.FC<TDatasetVersionSuccessProps> = ({
   });
 
   return (
-    <StandardContent title={getDatasetVersionData?.Dataset?.DatasetName}>
+    <StandardContent
+      back={true}
+      title={getDatasetVersionData?.Dataset?.DatasetName}
+    >
       <>
         <Card primaryText="">
           <div className="form-double">

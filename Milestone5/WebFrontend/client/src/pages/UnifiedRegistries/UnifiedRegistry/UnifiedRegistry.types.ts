@@ -1,8 +1,11 @@
-import { TGetUnifiedRegistrySuccess } from '@redux/unifiedRegistry/unifiedRegistry.types';
+import {
+  TGetUnifiedRegistryStart,
+  TGetUnifiedRegistrySuccess,
+} from '@redux/unifiedRegistry/unifiedRegistry.types';
 import { IDefaults } from '@redux/typedefs';
 
 export type TUnifiedRegistryProps = {
-  getUnifiedRegistryStart(): void;
+  getUnifiedRegistryStart(data: TGetUnifiedRegistryStart['ID']): void;
   getUnifiedRegistryReset(): void;
   getUnifiedRegistryState: IDefaults['state'];
   getUnifiedRegistryData: TGetUnifiedRegistrySuccess;

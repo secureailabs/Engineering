@@ -1,4 +1,4 @@
-export const demo_data = {
+const demo_data = {
   Datasets: {
     uuid1: {
       DataOwnerGuid: 'uuid1',
@@ -51,7 +51,7 @@ export const demo_data = {
           PublishDate: 1000,
         },
       },
-      DatasetName: 'Chronic Kidney Disesase dataset',
+      DatasetName: 'Chronic Kidney Disease dataset',
       Description: 'Description',
       JurisdictionalLimitations: 'JurisdictionalLimitations',
       Keywords: 'Keywords',
@@ -180,3 +180,6 @@ export const demo_data = {
     },
   },
 };
+
+export { demo_data };
+export default demo_data;

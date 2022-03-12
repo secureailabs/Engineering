@@ -12,6 +12,8 @@ import getDCStage from '@utils/getDCStage';
 
 import getPartnerOrg from '@utils/getPartnerOrg';
 
+import faker from 'faker';
+
 const DigitalContractsSuccess: React.FC<TDigitalContractsSuccessProps> = ({
   getAllDigitalContractsData,
   userData,
@@ -38,7 +40,7 @@ const DigitalContractsSuccess: React.FC<TDigitalContractsSuccessProps> = ({
         Header: 'Last Activity',
         accessor: 'LastActivity',
         Cell: ({ value }: { value: number }) =>
-          new Date(value * 1000).toLocaleDateString('en-US', {
+          faker.date.recent(1).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',

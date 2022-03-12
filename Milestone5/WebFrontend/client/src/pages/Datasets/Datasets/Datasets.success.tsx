@@ -6,6 +6,8 @@ import { TDatasetsSuccessProps } from './Datasets.types';
 
 import Text from '@secureailabs/web-ui/components/Text';
 
+import faker from 'faker';
+
 const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
   getAllDatasetsData,
 }) => {
@@ -17,7 +19,7 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
         width: 300,
       },
       {
-        Header: 'No. of versions',
+        Header: 'No. of Versions',
         accessor: 'Versions',
         width: 300,
         Cell: ({ value }: { value: Record<string, any> }) => (
@@ -37,7 +39,7 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
         width: 200,
       },
       {
-        Header: 'Dataset Owners',
+        Header: 'Dataset Owner',
         accessor: 'DatasetOwners',
         width: 200,
       },
@@ -50,17 +52,14 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
       return {
         key,
         ...value,
-        PublishDate: new Date(value.PublishDate * 1000).toLocaleDateString(
-          'en-US',
-          {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          }
-        ),
+        PublishDate: faker.date.recent(3).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
       };
     })
-    .sort((elem1, elem2) => elem1.DatasetName.localeCompare(elem2.DatasetName));
+    .sort((elem1, elem2) => elem1.PublishDate.localeCompare(elem2.PublishDate));
   return (
     <>
       <Table

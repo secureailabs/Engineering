@@ -8,24 +8,7 @@ import {
   takeLatest,
 } from 'redux-saga/effects';
 
-import preview from '@assets/preview.png';
-
-const demo_data = {
-  UnifiedRegistries: {
-    uuid1: {
-      ID: 'uuid1',
-      Name: 'string',
-      Description:
-        "KCA Consortium RegistryLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s ....",
-      Image: preview,
-      NumberOfDataOwner: 7,
-      NumberOfPatients: 29,
-      CreatedAt: new Date(),
-      UpdateAt: new Date(),
-      Datasets: {},
-    },
-  },
-};
+import { demo_data } from './unifiedRegistry.data';
 
 import {
   // GET ALL
@@ -113,18 +96,24 @@ export function* onGetAllUnifiedRegistriesStart() {
 export function* getUnifiedRegistrySaga({
   payload,
 }: ReturnType<typeof getUnifiedRegistryStart>) {
-  try {
-    console.log(payload);
-    const { data } = (yield getUnifiedRegistryAPI({
-      data: payload,
-    })) as AxiosResponse<TGetUnifiedRegistrySuccess>;
-    console.log(data);
+  console.log(payload);
+  yield put(
+    getUnifiedRegistrySuccess({
+      UnifiedRegistry: demo_data.UnifiedRegistries[payload],
+    })
+  );
+  // try {
+  //   console.log(payload);
+  //   const { data } = (yield getUnifiedRegistryAPI({
+  //     data: payload,
+  //   })) as AxiosResponse<TGetUnifiedRegistrySuccess>;
+  //   console.log(data);
 
-    yield put(getUnifiedRegistrySuccess(data));
-  } catch (err) {
-    // tslint:disable-next-line: no-unsafe-any
-    yield put(getUnifiedRegistryFailure(err.response.data));
-  }
+  //   yield put(getUnifiedRegistrySuccess(data));
+  // } catch (err) {
+  //   // tslint:disable-next-line: no-unsafe-any
+  //   yield put(getUnifiedRegistryFailure(err.response.data));
+  // }
 }
 
 export function* onGetUnifiedRegistryStart() {

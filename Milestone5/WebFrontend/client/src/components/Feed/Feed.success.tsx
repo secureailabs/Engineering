@@ -10,18 +10,25 @@ const timeAgo = new TimeAgo('en');
 
 import { TFeedSuccessProps } from './Feed.types';
 
+import { useNavigate } from 'react-router';
+
+import _ from 'lodash';
+
 const FeedSuccess: React.FC<TFeedSuccessProps> = ({
   getAllFeedsData,
   limit,
   containerHeight,
 }) => {
+  const navigate = useNavigate();
   const parsed_data = Object.entries(getAllFeedsData.Feeds)
     .map(([key, value]) => {
       return {
         title: value.Title,
         description: value.Description,
-        image: value.Image,
         date: timeAgo.format(value.CreatedAt),
+        image: value.Image,
+        avatar: value.avatar,
+        avatar_color: value.avatar_color,
       };
     })
     .slice(0, limit);
@@ -31,7 +38,7 @@ const FeedSuccess: React.FC<TFeedSuccessProps> = ({
       seconday="Show all"
       containerHeight={containerHeight}
       //@ts-ignore
-      feed={parsed_data}
+      feed={_.sortBy(parsed_data, 'date')}
     />
   );
 };

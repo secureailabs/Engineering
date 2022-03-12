@@ -22,7 +22,7 @@ const UnifiedRegistries: React.FC<TUnifiedRegistriesProps> = ({
     getAllUnifiedRegistriesStart();
   }, []);
   return (
-    <StandardContent title="Virtual Machines">
+    <StandardContent title="Unified Registries">
       <ConditionalRender
         //@ts-ignore
         state={getAllUnifiedRegistriesState}

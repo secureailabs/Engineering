@@ -42,6 +42,18 @@ DataFederation::DataFederation(
 
 /********************************************************************************************
  *
+ * @class DataFederation
+ * @function ~DataFederation
+ * @brief Destructor
+ *
+ ********************************************************************************************/
+DataFederation::~DataFederation()
+{
+
+}
+
+/********************************************************************************************
+ *
  * @class DatasetFamilyManager
  * @function ToStructuredBuffer
  * @brief Convert this object to a StructuredBuffer

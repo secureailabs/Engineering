@@ -47,24 +47,43 @@ def deploy_module(account_credentials, deployment_name, module_name):
     return virtual_machine_public_ip
 
 
-def deploy_backend(account_credentials, deployment_name, owner):
+def deploy_dataservices(account_credentials, deployment_name):
     # Deploy the backend server
-    platform_services_ip = deploy_module(account_credentials, deployment_name, "backend")
+    dataservices_ip = deploy_module(account_credentials, deployment_name, "dataservices")
+
+    upload_status = subprocess.run(
+        [
+            "./UploadPackageAndInitializationVector",
+            "--IpAddress=" + dataservices_ip,
+            "--Package=dataservices.tar.gz",
+            "--InitializationVector=dataservices.json",
+        ],
+        stdout=subprocess.PIPE,
+    )
+    print("Upload status: ", upload_status.stdout)
+
+    return dataservices_ip
+
+
+def deploy_platformservices(account_credentials, deployment_name, data_services_ip, owner):
+    # Deploy the frontend server
+    platformservices_ip = deploy_module(account_credentials, deployment_name, "platformservices")
 
     # Read backend json from file
-    with open("backend.json", "r") as backend_json_fd:
+    with open("platformservices.json", "r") as backend_json_fd:
         backend_json = json.load(backend_json_fd)
         backend_json["Owner"] = owner
+        backend_json["DataservicesUrl"] = data_services_ip
 
-    with open("backend.json", "w") as outfile:
+    with open("platformservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
 
     upload_status = subprocess.run(
         [
             "./UploadPackageAndInitializationVector",
-            "--IpAddress=" + platform_services_ip,
-            "--Package=backend.tar.gz",
-            "--InitializationVector=backend.json",
+            "--IpAddress=" + platformservices_ip,
+            "--Package=platformservices.tar.gz",
+            "--InitializationVector=platformservices.json",
         ],
         stdout=subprocess.PIPE,
     )
@@ -75,11 +94,12 @@ def deploy_backend(account_credentials, deployment_name, owner):
 
     # Run database tools for the backend server
     database_tools_run = subprocess.run(
-        ["./DemoDatabaseTools", "--PortalIp=" + platform_services_ip, "--Port=6200"],
+        ["./DemoDatabaseTools", "--PortalIp=" + platformservices_ip, "--Port=6200"],
         stdout=subprocess.PIPE,
     )
     print("database_tools_run: ", database_tools_run)
-    return platform_services_ip
+
+    return platformservices_ip
 
 
 def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
@@ -152,9 +172,13 @@ if __name__ == "__main__":
 
     # TODO: Prawal deploy the VMs in parallel and initialize them sequesntially
 
-    # Deploy the backend server
-    platform_services_ip = deploy_backend(account_credentials, deployment_id, OWNER)
-    print("Backend server: ", platform_services_ip)
+    # Deploy the data services
+    data_services_ip = deploy_dataservices(account_credentials, deployment_id)
+    print("Data Services server: ", data_services_ip)
+
+    # Deploy the platform services
+    platform_services_ip = deploy_platformservices(account_credentials, deployment_id, data_services_ip, OWNER)
+    print("Platform Services server: ", platform_services_ip)
 
     # Deploy the frontend server
     frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip)

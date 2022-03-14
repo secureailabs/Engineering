@@ -22,7 +22,7 @@ SRCDIRS+=$(shell realpath ./Sources)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
+OUTPUT=$(ABSROOTDIR)/Binary/dataservices/$(notdir $(shell pwd))
 
 .PHONY: all, clean, cleanall
 

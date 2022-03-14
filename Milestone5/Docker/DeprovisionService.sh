@@ -5,7 +5,7 @@ PrintHelp()
 {
     echo ""
     echo "Usage: $0 -s [Service Name]"
-    echo -e "\t-s Service Name: backend | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
+    echo -e "\t-s Service Name: platformservices | dataservices | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
     exit 1 # Exit script after printing help
 }
 

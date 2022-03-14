@@ -1,10 +1,10 @@
 #!/bin/bash
 # set -e
-declare -a StringArray=("BaseVmImageInit" "CommunicationPortal" "DataDomainProcess" "DatabaseGateway"
-"DatabaseTools" "InitializerProcess" "JobEngine" "RestApiPortal" "RootOfTrustProcess" "SignalTerminationProcess"
+declare -a StringArray=("BaseVmImageInit" "CommunicationPortal" "DataDomainProcess"
+"DatabaseTools" "InitializerProcess" "JobEngine" "RootOfTrustProcess" "SignalTerminationProcess"
 "Tests")
 
-declare -a StringArray2=("libDatabaseManager.so" "libAccountDatabase.so" "libAuditLogManager.so" "libAzureManager.so"
+declare -a StringArray2=("DatabaseGateway" "RestApiPortal" "libDatabaseManager.so" "libAccountDatabase.so" "libAuditLogManager.so" "libAzureManager.so"
 "libCryptographicKeyManagement.so" "libDatasetDatabase.so" "libDigitalContractDatabase.so"
 "libRemoteDataConnectorManager.so" "libSailAuthentication.so" "libVirtualMachineManager.so"
 "libDatasetFamilyManager.so" "libDataFederationManager.so" "SAILPyAPI.so")

@@ -362,7 +362,7 @@ std::vector<Byte> __thiscall DataFederationManager::RegisterDataFederation(
     __DebugFunction();
 
     StructuredBuffer oResponse;
-    TlsNode* poTlsNode{nullptr};
+    std::unique_ptr<TlsNode> poTlsNode{nullptr};
     Dword dwStatus{400};
 
     try
@@ -401,7 +401,7 @@ std::vector<Byte> __thiscall DataFederationManager::RegisterDataFederation(
             std::vector<Byte> stlRequest = ::CreateRequestPacketFromStructuredBuffer(oDatabaseRequest);
 
             // Make a Tls connection with the database portal
-            poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
+            poTlsNode.reset(::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort));
             // Send request packet
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
@@ -410,9 +410,6 @@ std::vector<Byte> __thiscall DataFederationManager::RegisterDataFederation(
             unsigned int unResponseDataSizeInBytes = *((uint32_t *)stlRestResponseLength.data());
             std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
-
-            poTlsNode->Release();
-            poTlsNode = nullptr;
 
             // Check if DatabaseManager registered the dataset or not
             StructuredBuffer oDatabaseResponse(stlResponse);
@@ -436,11 +433,6 @@ std::vector<Byte> __thiscall DataFederationManager::RegisterDataFederation(
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         oResponse.Clear();
-    }
-    if ( nullptr != poTlsNode )
-    {
-        poTlsNode->Release();
-        poTlsNode = nullptr;
     }
 
     oResponse.PutDword("Status", dwStatus);

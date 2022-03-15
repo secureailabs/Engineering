@@ -299,71 +299,78 @@ std::vector<Byte> __thiscall DatasetFamilyManager::RegisterDatasetFamily(
 
     StructuredBuffer oResponse;
     TlsNode* poTlsNode{nullptr};
-    Dword dwStatus;
+    Dword dwStatus{400};
 
     try
     {
         StructuredBuffer oUserInfo = ::GetUserInfoFromEosb(c_oRequest);
-        std::string strNewGuid = Guid(eDatasetFamily).ToString(eHyphensAndCurlyBraces);
-        Guid oDatasetFamilyOwner = oUserInfo.GetGuid("OrganizationGuid");
-
-        std::string strDatasetFamilyOwner = oDatasetFamilyOwner.ToString(eHyphensAndCurlyBraces);
-        std::vector<Byte> stlResponseBuffer;
-
-
-        // Create a request to add dataset metadata to the database
-        StructuredBuffer oRequest;
-        oRequest.PutString("PluginName", "DatabaseManager");
-        oRequest.PutString("Verb", "POST");
-        oRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterDatasetFamily");
-
-        StructuredBuffer oDatasetFamily;
-        oDatasetFamily.PutBoolean("DatasetFamilyActive", true);
-        oDatasetFamily.PutString("DatasetFamilyDescription", c_oRequest.GetString("DatasetFamilyDescription"));
-        oDatasetFamily.PutString("DatasetFamilyGuid", strNewGuid);
-        oDatasetFamily.PutString("DatasetFamilyOwnerGuid", strDatasetFamilyOwner);
-
-        if ( true == c_oRequest.IsElementPresent("DatasetFamilyTags", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        if (200 == oUserInfo.GetDword("Status"))
         {
-            oDatasetFamily.PutString("DatasetFamilyTags", c_oRequest.GetString("DatasetFamilyTags"));
-        }
+            std::string strNewGuid = Guid(eDatasetFamily).ToString(eHyphensAndCurlyBraces);
+            Guid oDatasetFamilyOwner = oUserInfo.GetGuid("OrganizationGuid");
 
-        oDatasetFamily.PutString("DatasetFamilyTitle", c_oRequest.GetString("DatasetFamilyTitle"));
-        oDatasetFamily.PutString("VersionNumber", "0x00000001");
+            std::string strDatasetFamilyOwner = oDatasetFamilyOwner.ToString(eHyphensAndCurlyBraces);
+            std::vector<Byte> stlResponseBuffer;
 
-        oRequest.PutStructuredBuffer("DatasetFamily",oDatasetFamily);
 
-        std::vector<Byte> stlRequest = ::CreateRequestPacketFromStructuredBuffer(oRequest);
+            // Create a request to add dataset metadata to the database
+            StructuredBuffer oRequest;
+            oRequest.PutString("PluginName", "DatabaseManager");
+            oRequest.PutString("Verb", "POST");
+            oRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterDatasetFamily");
 
-        // Make a Tls connection with the database portal
-        poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
-        // Send request packet
-        poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
+            StructuredBuffer oDatasetFamily;
+            oDatasetFamily.PutBoolean("DatasetFamilyActive", true);
+            oDatasetFamily.PutString("DatasetFamilyDescription", c_oRequest.GetString("DatasetFamilyDescription"));
+            oDatasetFamily.PutString("DatasetFamilyGuid", strNewGuid);
+            oDatasetFamily.PutString("DatasetFamilyOwnerGuid", strDatasetFamilyOwner);
 
-        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
-        _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-        unsigned int unResponseDataSizeInBytes = *((uint32_t *)stlRestResponseLength.data());
-        std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
-        _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
+            if ( true == c_oRequest.IsElementPresent("DatasetFamilyTags", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+            {
+                oDatasetFamily.PutString("DatasetFamilyTags", c_oRequest.GetString("DatasetFamilyTags"));
+            }
 
-        poTlsNode->Release();
-        poTlsNode = nullptr;
+            oDatasetFamily.PutString("DatasetFamilyTitle", c_oRequest.GetString("DatasetFamilyTitle"));
+            oDatasetFamily.PutString("VersionNumber", "0x00000001");
 
-        // Check if DatabaseManager registered the dataset or not
-        StructuredBuffer oDatabaseResponse(stlResponse);
-        if (204 != oDatabaseResponse.GetDword("Status"))
-        {
-            oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
-            dwStatus = 201;
+            oRequest.PutStructuredBuffer("DatasetFamily",oDatasetFamily);
+
+            std::vector<Byte> stlRequest = ::CreateRequestPacketFromStructuredBuffer(oRequest);
+
+            // Make a Tls connection with the database portal
+            poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
+            // Send request packet
+            poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
+
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
+            unsigned int unResponseDataSizeInBytes = *((uint32_t *)stlRestResponseLength.data());
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
+
+            poTlsNode->Release();
+            poTlsNode = nullptr;
+
+            // Check if DatabaseManager registered the dataset or not
+            StructuredBuffer oDatabaseResponse(stlResponse);
+            if (201 == oDatabaseResponse.GetDword("Status") )
+            {
+                oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
+                dwStatus = 201;
+            }
+            else
+            {
+                dwStatus = oDatabaseResponse.GetDword("Status");
+            }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -450,7 +457,6 @@ std::vector<Byte> __thiscall DatasetFamilyManager::ListDatasetFamilies(
             dwStatus = 408;
         }
     }
-    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

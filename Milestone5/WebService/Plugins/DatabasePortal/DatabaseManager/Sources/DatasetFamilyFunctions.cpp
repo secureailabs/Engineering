@@ -123,7 +123,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterDatasetFamily(
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

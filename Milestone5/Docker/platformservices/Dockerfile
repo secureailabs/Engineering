@@ -13,7 +13,7 @@ RUN apt-get update && \
   apt-get install -y \
   wget \
   curl \
-  # libcurl4-gnutls-dev \
+  libcurl4-gnutls-dev \
   build-essential \
   python3-pip
 

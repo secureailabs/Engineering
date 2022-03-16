@@ -73,7 +73,7 @@ def deploy_platformservices(account_credentials, deployment_name, data_services_
     with open("platformservices.json", "r") as backend_json_fd:
         backend_json = json.load(backend_json_fd)
         backend_json["Owner"] = owner
-        backend_json["DataservicesUrl"] = data_services_ip
+        backend_json["DataservicesURL"] = data_services_ip
 
     with open("platformservices.json", "w") as outfile:
         json.dump(backend_json, outfile)

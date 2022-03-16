@@ -21,7 +21,7 @@ else
 fi
 
 # Move the InitializerVector to the Binary folder
-mv InitializationVector.json Binary/$imageName
+mv InitializationVector.json Binary/$imageName/
 
 # Run the docker container
 docker run \

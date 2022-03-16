@@ -30,7 +30,7 @@ int main(
     Word wPort = 6200;
     std::cout << "Initializing server at port " << wPort << std::endl;
     // Get the IP Address and port of our remote database service
-    std::string strDatabaseServiceIp = ::GetInitializationValue("DataservicesUrl");
+    std::string strDatabaseServiceIp = ::GetInitializationValue("DataservicesURL");
     unsigned int unDatabaseServerPort = 6500;
     // Parse the command line
     StructuredBuffer oCommandLineArguments = ::ParseCommandLineParameters((unsigned int) nNumberOfArguments, (const char **) pszCommandLineArguments);

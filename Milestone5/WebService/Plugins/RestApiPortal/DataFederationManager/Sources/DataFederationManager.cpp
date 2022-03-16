@@ -27,6 +27,36 @@ static DataFederationManager * gs_oDataFederationManager = nullptr;
 
 /********************************************************************************************
  *
+ * @function SendRequestToDatabase
+ * @brief Send a StructuredBuffer request over TLS to a remote database
+ * @return Return the StructuredBuffer response, or throw on error
+ *
+ ********************************************************************************************/
+static StructuredBuffer __stdcall SendRequestToDatabase(
+    _in const StructuredBuffer& c_oRequest,
+    _in const std::string& c_strDestinationIpAddress,
+    _in const uint16_t c_unDestinationPort
+    )
+{
+    std::vector<Byte> stlResponse;
+    std::unique_ptr<TlsNode> poTlsNode{nullptr};
+    std::vector<Byte> stlRequest = ::CreateRequestPacketFromStructuredBuffer(c_oRequest);
+    poTlsNode.reset(::TlsConnectToNetworkSocket(c_strDestinationIpAddress.c_str(), c_unDestinationPort));
+    // Send request packet
+    poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
+
+    // Read header and body of the response
+    std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 3000);
+    _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
+    unsigned int unResponseDataSizeInBytes = *((uint32_t *)stlRestResponseLength.data());
+    stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+    _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
+
+    return StructuredBuffer(stlResponse);
+}
+
+/********************************************************************************************
+ *
  * @function GetDataFederationManager
  * @brief Create a singleton object of DataFederationManager class
  * @throw OutOfMemoryException If there isn't enough memory left to create a new instance
@@ -226,7 +256,11 @@ void __thiscall DataFederationManager::InitializePlugin(const StructuredBuffer& 
     oRegisterNewDataFederationParameters.PutStructuredBuffer("DataFederationName",oRequiredStringElement);
     oRegisterNewDataFederationParameters.PutStructuredBuffer("DataFederationDescription", oRequiredStringElement);
 
+    StructuredBuffer oListDataFederationParameters;
+    oListDataFederationParameters.PutStructuredBuffer("Eosb", oRequriedBufferElement);
+
     m_oDictionary.AddDictionaryEntry("POST","/SAIL/DataFederationManager/RegisterDataFederation",oRegisterNewDataFederationParameters, 1);
+    m_oDictionary.AddDictionaryEntry("GET","/SAIL/DataFederationManager/ListDataFederations",oListDataFederationParameters, 1);
 
     m_strDatabaseServiceIpAddr = oInitializationVectors.GetString("DatabaseServerIp");
     m_unDatabaseServiceIpPort = oInitializationVectors.GetUnsignedInt32("DatabaseServerPort");
@@ -267,7 +301,10 @@ uint64_t __thiscall DataFederationManager::SubmitRequest(
 
     if ( "GET" == strVerb)
     {
-
+        if ("/SAIL/DataFederationManager/ListDataFederations" == strResource)
+        {
+            stlResponseBuffer = ListDataFederations(c_oRequestStructuredBuffer);
+        }
     }
     else if ("POST" == strVerb)
     {
@@ -343,15 +380,12 @@ bool __thiscall DataFederationManager::GetResponse(
     return fSuccess;
 }
 
-
 /********************************************************************************************
  *
  * @class DataFederationManager
  * @function RegisterDataFederation
  * @brief Method called by flat function SubmitRequest when a client requests for the plugin's resource
  * @param[in] c_oRequest the structued buffer that contains the request's information
- * @throw BaseException Element not found
- * @throw BaseException Error generating challenge nonce
  * @returns std::vector<Byte> stores the serialized response
  *
  ********************************************************************************************/
@@ -398,25 +432,69 @@ std::vector<Byte> __thiscall DataFederationManager::RegisterDataFederation(
             oDatabaseRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterDataFederation");
             oDatabaseRequest.PutStructuredBuffer("DataFederation", oNewDataFederation.ToStructuredBuffer());
 
-            std::vector<Byte> stlRequest = ::CreateRequestPacketFromStructuredBuffer(oDatabaseRequest);
+            StructuredBuffer oDatabaseResponse{::SendRequestToDatabase(oDatabaseRequest, m_strDatabaseServiceIpAddr, m_unDatabaseServiceIpPort)};
 
-            // Make a Tls connection with the database portal
-            poTlsNode.reset(::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort));
-            // Send request packet
-            poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
-
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
-            _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-            unsigned int unResponseDataSizeInBytes = *((uint32_t *)stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
-            _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
-
-            // Check if DatabaseManager registered the dataset or not
-            StructuredBuffer oDatabaseResponse(stlResponse);
             if (201 == oDatabaseResponse.GetDword("Status") )
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
                 dwStatus = 201;
+            }
+            else
+            {
+                dwStatus = oDatabaseResponse.GetDword("Status");
+            }
+        }
+    }
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oResponse.Clear();
+    }
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        oResponse.Clear();
+    }
+
+    oResponse.PutDword("Status", dwStatus);
+    return oResponse.GetSerializedBuffer();
+}
+
+/********************************************************************************************
+ *
+ * @class DataFederationManager
+ * @function ListDataFederations
+ * @brief Method called by flat function SubmitRequest when a client requests for the plugin's resource
+ * @param[in] c_oRequest the structued buffer that contains the request's information
+ * @returns std::vector<Byte> stores the serialized response
+ *
+ ********************************************************************************************/
+std::vector<Byte>__thiscall DataFederationManager::ListDataFederations(
+    _in const StructuredBuffer & c_oRequest
+    )
+{
+    __DebugFunction();
+
+    StructuredBuffer oResponse;
+    Dword dwStatus{400};
+    try
+    {
+        StructuredBuffer oUserInfo = ::GetUserInfoFromEosb(c_oRequest);
+        if (200 == oUserInfo.GetDword("Status"))
+        {
+            // Create a request to get the database manager to query for the organization GUID
+            StructuredBuffer oDatabaseRequest;
+            oDatabaseRequest.PutString("PluginName", "DatabaseManager");
+            oDatabaseRequest.PutString("Verb", "GET");
+            oDatabaseRequest.PutString("Resource", "/SAIL/DatabaseManager/DataFederations");
+
+            StructuredBuffer oDatabaseResponse{::SendRequestToDatabase(oDatabaseRequest, m_strDatabaseServiceIpAddr, m_unDatabaseServiceIpPort)};
+            std::cout << "Database response " << oDatabaseResponse.ToString() << std::endl;
+            if (200 == oDatabaseResponse.GetDword("Status"))
+            {
+                oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
+                oResponse.PutStructuredBuffer("DataFederations", oDatabaseResponse.GetStructuredBuffer("DataFederations"));
+                dwStatus = 200;
             }
             else
             {

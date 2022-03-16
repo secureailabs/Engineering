@@ -356,8 +356,17 @@ class DatabaseManager : public Object
             _in const StructuredBuffer &c_oRequest
             );
 
-        // Register a dataset family
+        std::string __thiscall GetDatasetFamilyTitle(
+            _in const Guid& c_oDatasetFamilyIdentifier
+            );
+
+        // Register a data federation
         std::vector<Byte> __thiscall RegisterDataFederation(
+            _in const StructuredBuffer & c_oRequest
+            );
+
+        // Fetch a list of all data federations
+        std::vector<Byte> __thiscall ListActiveDataFederations(
             _in const StructuredBuffer & c_oRequest
             );
 

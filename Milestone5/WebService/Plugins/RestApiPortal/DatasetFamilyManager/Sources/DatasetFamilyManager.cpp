@@ -446,7 +446,7 @@ std::vector<Byte> __thiscall DatasetFamilyManager::ListDatasetFamilies(
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);

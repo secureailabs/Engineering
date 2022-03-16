@@ -65,7 +65,7 @@ StructuredBuffer __thiscall DataFederation::ToStructuredBuffer(void) const
     StructuredBuffer oDataFederationStructuredBuffer;
 
     oDataFederationStructuredBuffer.PutGuid("DataFederationIdentifier", this->m_oIdentifier);
-    oDataFederationStructuredBuffer.PutGuid("DataFederationOwnerIdentifier", this->m_oOrganizationOwnerIdentifier);
+    oDataFederationStructuredBuffer.PutGuid("DataFederationOwnerOrganizationIdentifier", this->m_oOrganizationOwnerIdentifier);
     oDataFederationStructuredBuffer.PutString("DataFederationName", this->m_strName);
     oDataFederationStructuredBuffer.PutString("DataFederationDescription", this->m_strDescription);
     oDataFederationStructuredBuffer.PutBoolean("DataFederationActive", this->m_fActive);
@@ -73,9 +73,11 @@ StructuredBuffer __thiscall DataFederation::ToStructuredBuffer(void) const
 
     StructuredBuffer oDataFederationDataSubmitterList = ConvertIdentifierListToStructuredBuffer(this->m_stlDataSubmitterOrganizations);
     StructuredBuffer oDataFederationResearcherList = ConvertIdentifierListToStructuredBuffer(this->m_stlResearchOrganizations);
+    StructuredBuffer oDataFederationDatasetFamilies = ConvertIdentifierListToStructuredBuffer(this->m_stlDataFamilies);
 
     oDataFederationStructuredBuffer.PutStructuredBuffer("DataFederationDataSubmitterList", oDataFederationDataSubmitterList);
     oDataFederationStructuredBuffer.PutStructuredBuffer("DataFederationResearcherList", oDataFederationResearcherList);
+    oDataFederationStructuredBuffer.PutStructuredBuffer("DataFederationDatasetFamilyList", oDataFederationDatasetFamilies);
     oDataFederationStructuredBuffer.PutString("VersionNumber", "0x00000001");
 
     return oDataFederationStructuredBuffer;

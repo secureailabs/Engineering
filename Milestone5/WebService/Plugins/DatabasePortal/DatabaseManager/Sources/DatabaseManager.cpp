@@ -290,12 +290,15 @@ void __thiscall DatabaseManager::InitializePlugin(void)
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/RemoveVmAsWaitingForData");
     // Add metadata of a dataset family to the database
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterDatasetFamily");
+    // Add metadata of a dataset family to the database
+    m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/DatasetFamilies");
+    // Add metadata of a data federation to the database
+    m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterDataFederation");
     // List the dataset family entries in the database
     m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/DataFederations");
     // Reset the database
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/ResetDatabase");
-    // Add metadata of a data federation to the database
-    m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterDataFederation");
+
 }
 
 /********************************************************************************************

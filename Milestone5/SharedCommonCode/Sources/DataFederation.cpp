@@ -4,13 +4,14 @@
  * @author David Gascon
  * @date 14 Mar 2022
  * @License Private and Confidential. Internal Use Only.
- * @copyright Copyright (C) 2021 Secure AI Labs, Inc. All Rights Reserved.
+ * @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
  *
  ********************************************************************************************/
 #include <algorithm>
 #include <iostream>
 #include <DataFederation.h>
 #include <StructuredBufferHelperFunctions.h>
+#include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
 
@@ -38,6 +39,8 @@ DataFederation::DataFederation(
     m_strDescription{strDescription},
     m_fActive{true}
 {
+    __DebugFunction();
+
     _ThrowBaseExceptionIf(eDataFederation != m_oIdentifier.GetObjectType(), "Invalid Identifier type", nullptr);
     _ThrowBaseExceptionIf(eOrganization != m_oOrganizationOwnerIdentifier.GetObjectType(), "Invalid Organization Identifier type", nullptr);
 }
@@ -59,6 +62,7 @@ DataFederation::DataFederation(
     m_strDescription{c_oSourceBuffer.GetString("DataFederationDescription")},
     m_fActive{c_oSourceBuffer.GetBoolean("DataFederationActive")}
 {
+    __DebugFunction();
 
     // Fill in data submitter list
     std::for_each(c_oSourceBuffer.GetStructuredBuffer("DataFederationDataSubmitterList").GetNamesOfElements().begin(),
@@ -96,7 +100,7 @@ DataFederation::DataFederation(
  ********************************************************************************************/
 DataFederation::~DataFederation()
 {
-
+    __DebugFunction();
 }
 
 /********************************************************************************************
@@ -109,6 +113,8 @@ DataFederation::~DataFederation()
  ********************************************************************************************/
 StructuredBuffer __thiscall DataFederation::ToStructuredBuffer(void) const
 {
+    __DebugFunction();
+
     StructuredBuffer oDataFederationStructuredBuffer;
 
     oDataFederationStructuredBuffer.PutGuid("DataFederationIdentifier", this->m_oIdentifier);
@@ -143,6 +149,8 @@ bool DataFederation::IsOrganizationInFederation(
     _in const Guid & c_oOrganizationIdentifier
     ) const throw()
 {
+    __DebugFunction();
+
     bool fIsInFederation{ m_oOrganizationOwnerIdentifier == c_oOrganizationIdentifier};
     if ( false == fIsInFederation )
     {
@@ -171,6 +179,8 @@ bool DataFederation::IsOrganizationInFederation(
  ********************************************************************************************/
 bool DataFederation::IsActive() const throw()
 {
+    __DebugFunction();
+
     return m_fActive;
 }
 
@@ -184,6 +194,8 @@ bool DataFederation::IsActive() const throw()
  ********************************************************************************************/
 std::string DataFederation::Name() const throw()
 {
+    __DebugFunction();
+
     return m_strName;
 }
 
@@ -197,6 +209,8 @@ std::string DataFederation::Name() const throw()
  ********************************************************************************************/
 std::string DataFederation::Description() const throw()
 {
+    __DebugFunction();
+
     return m_strDescription;
 }
 
@@ -210,6 +224,8 @@ std::string DataFederation::Description() const throw()
  ********************************************************************************************/
 Guid DataFederation::Identifier() const throw()
 {
+    __DebugFunction();
+
     return m_oIdentifier;
 }
 
@@ -223,6 +239,8 @@ Guid DataFederation::Identifier() const throw()
  ********************************************************************************************/
 Guid DataFederation::OrganizationOwnerIdentifier() const throw()
 {
+    __DebugFunction();
+
     return m_oOrganizationOwnerIdentifier;
 }
 
@@ -236,6 +254,8 @@ Guid DataFederation::OrganizationOwnerIdentifier() const throw()
  ********************************************************************************************/
 std::list<Guid> DataFederation::DataSubmitterOrganizations() const throw()
 {
+    __DebugFunction();
+
     return m_stlDataSubmitterOrganizations;
 }
 
@@ -249,6 +269,8 @@ std::list<Guid> DataFederation::DataSubmitterOrganizations() const throw()
  ********************************************************************************************/
 std::list<Guid> DataFederation::ResearchOrganizations() const throw()
 {
+    __DebugFunction();
+
     return m_stlResearchOrganizations;
 }
 
@@ -262,5 +284,7 @@ std::list<Guid> DataFederation::ResearchOrganizations() const throw()
  ********************************************************************************************/
 std::list<Guid> DataFederation::DatasetFamilies() const throw()
 {
+    __DebugFunction();
+
     return m_stlDataFamilies;
 }

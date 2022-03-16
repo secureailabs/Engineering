@@ -487,9 +487,10 @@ std::vector<Byte>__thiscall DataFederationManager::ListDataFederations(
             oDatabaseRequest.PutString("PluginName", "DatabaseManager");
             oDatabaseRequest.PutString("Verb", "GET");
             oDatabaseRequest.PutString("Resource", "/SAIL/DatabaseManager/DataFederations");
+            oDatabaseRequest.PutGuid("RequestingUserOrganizationIdentifier", oUserInfo.GetGuid("OrganizationGuid"));
 
             StructuredBuffer oDatabaseResponse{::SendRequestToDatabase(oDatabaseRequest, m_strDatabaseServiceIpAddr, m_unDatabaseServiceIpPort)};
-            std::cout << "Database response " << oDatabaseResponse.ToString() << std::endl;
+
             if (200 == oDatabaseResponse.GetDword("Status"))
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));

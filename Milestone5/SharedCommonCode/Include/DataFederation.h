@@ -17,12 +17,17 @@
 class DataFederation
 {
     public:
-        DataFederation(
+        explicit DataFederation(
             _in const Guid & oIdentifier,
             _in const Guid & oOrganizationOwnerIdentifier,
             _in const std::string & strName,
             _in const std::string & strDescription
             );
+
+        explicit DataFederation(
+            _in const StructuredBuffer & c_oSourceBuffer
+            );
+
         // Don't allow default construction
         DataFederation() = delete;
 
@@ -31,6 +36,22 @@ class DataFederation
         // Convert this object to a structured buffer
         StructuredBuffer ToStructuredBuffer(void) const;
 
+        // Determine if an organization is participating in this federation
+        bool IsOrganizationInFederation(
+            _in const Guid & 
+            ) const throw();
+
+        bool IsActive() const throw();
+
+        std::string Name() const throw();
+        std::string Description() const throw();
+
+        Guid Identifier() const throw();
+        Guid OrganizationOwnerIdentifier() const throw();
+
+        std::list<Guid> DataSubmitterOrganizations() const throw();
+        std::list<Guid> ResearchOrganizations() const throw();
+        std::list<Guid> DatasetFamilies() const throw();
     private:
         // Data members
         bool m_fActive;

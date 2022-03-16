@@ -8,6 +8,7 @@
  * @brief
  ********************************************************************************************/
 
+#include "DataFederation.h"
 #include "DatabaseManager.h"
 
 /********************************************************************************************
@@ -159,7 +160,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
     mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
     // Fetch all digital contract records associated with a researcher's or data owner's organization
     mongocxx::cursor oDatasetFamilyRecords = oSailDatabase["DataFederation"].find({});
-
+    Guid oRequestingUserOrganization = c_oRequest.GetGuid("RequestingUserOrganizationIdentifier");
     // Loop through returned documents and add information to the list
     StructuredBuffer oListOfDataFederations;
     try
@@ -193,17 +194,19 @@ std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
                                 bsoncxx::document::element oObjectBlob = oObjectDocument->view()["ObjectBlob"];
                                 if (oObjectBlob && oObjectBlob.type() == type::k_binary)
                                 {
-                                    StructuredBuffer oObject(oObjectBlob.get_binary().bytes, oObjectBlob.get_binary().size);
-                                    // Only return federations that are active
-                                    if ( true == oObject.GetBoolean("DataFederationActive"))
+                                    StructuredBuffer oFederationObject(oObjectBlob.get_binary().bytes, oObjectBlob.get_binary().size);
+                                    // Only return federations that are active, and the user belongs to or created
+                                    DataFederation oDataFederation(oFederationObject);
+                                    if ( (true == oDataFederation.IsActive()) && 
+                                        (true == oDataFederation.IsOrganizationInFederation(oRequestingUserOrganization)) )
                                     {
                                         StructuredBuffer oDataFederationInformation;
-                                        oDataFederationInformation.PutString("Name", oObject.GetString("DataFederationName"));
-                                        oDataFederationInformation.PutString("Description", oObject.GetString("DataFederationDescription"));
-                                        oDataFederationInformation.PutString("Identifier", oObject.GetGuid("DataFederationIdentifier").ToString(eHyphensAndCurlyBraces));
-                                        oDataFederationInformation.PutString("OrganizationIdentifier", oObject.GetGuid("DataFederationOwnerOrganizationIdentifier").ToString(eHyphensAndCurlyBraces));
+                                        oDataFederationInformation.PutString("Name", oDataFederation.Name());
+                                        oDataFederationInformation.PutString("Description", oDataFederation.Description());
+                                        oDataFederationInformation.PutString("Identifier", oDataFederation.Identifier().ToString(eHyphensAndCurlyBraces));
+                                        oDataFederationInformation.PutString("OrganizationIdentifier", oDataFederation.OrganizationOwnerIdentifier().ToString(eHyphensAndCurlyBraces));
 
-                                        StructuredBuffer oOrganizationName = this->GetOrganizationName(oDataFederationInformation.GetString("OrganizationIdentifier"));
+                                        StructuredBuffer oOrganizationName = this->GetOrganizationName(oDataFederation.OrganizationOwnerIdentifier().ToString(eHyphensAndCurlyBraces));
                                         if ( 200 == oOrganizationName.GetDword("Status") )
                                         {
                                             oDataFederationInformation.PutString("OrganizationName", oOrganizationName.GetString("OrganizationName"));
@@ -212,43 +215,38 @@ std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
                                         {
                                             oDataFederationInformation.PutString("OrganizationName", "");
                                         }
-                                        StructuredBuffer oDataFederationSubmitters = oObject.GetStructuredBuffer("DataFederationDataSubmitterList");
+                                        // Build a list of submitter names + guids for readability
                                         StructuredBuffer oNamedSubmitters;
-                                        for ( auto strName : oDataFederationSubmitters.GetNamesOfElements() )
+                                        for ( auto oSubmitterIdentifier : oDataFederation.DataSubmitterOrganizations() )
                                         {
-                                            Guid oOrganizationGuid = oDataFederationSubmitters.GetGuid(strName.c_str());
-                                            StructuredBuffer oOrganizationName = this->GetOrganizationName(oOrganizationGuid.ToString(eHyphensAndCurlyBraces));
+                                            StructuredBuffer oOrganizationName = this->GetOrganizationName(oSubmitterIdentifier.ToString(eHyphensAndCurlyBraces));
                                             std::string strOrganizationName{""};
                                             if ( 200 == oOrganizationName.GetDword("Status") )
                                             {
                                                 strOrganizationName = oOrganizationName.GetString("OrganizationName");
                                             }
-                                            oNamedSubmitters.PutString(oOrganizationGuid.ToString(eHyphensAndCurlyBraces).c_str(), strOrganizationName);
+                                            oNamedSubmitters.PutString(oSubmitterIdentifier.ToString(eHyphensAndCurlyBraces).c_str(), strOrganizationName);
                                         }
                                         oDataFederationInformation.PutStructuredBuffer("DataSubmitterOrganizations", oNamedSubmitters);
 
-                                        StructuredBuffer oDataFederationResearchers = oObject.GetStructuredBuffer("DataFederationResearcherList");
+                                        // Build a list of submitter names + guids for readability
                                         StructuredBuffer oNamedResearchers;
-                                        for ( auto strName : oDataFederationResearchers.GetNamesOfElements() )
+                                        for ( auto oResearcherIdentifier : oDataFederation.ResearchOrganizations() )
                                         {
-                                            Guid oOrganizationGuid = oDataFederationResearchers.GetGuid(strName.c_str());
-                                            StructuredBuffer oOrganizationName = this->GetOrganizationName(oOrganizationGuid.ToString(eHyphensAndCurlyBraces));
+                                            StructuredBuffer oOrganizationName = this->GetOrganizationName(oResearcherIdentifier.ToString(eHyphensAndCurlyBraces));
                                             std::string strOrganizationName{""};
                                             if ( 200 == oOrganizationName.GetDword("Status") )
                                             {
                                                 strOrganizationName = oOrganizationName.GetString("OrganizationName");
                                             }
-                                            oNamedResearchers.PutString(oOrganizationGuid.ToString(eHyphensAndCurlyBraces).c_str(), strOrganizationName);
+                                            oNamedResearchers.PutString(oResearcherIdentifier.ToString(eHyphensAndCurlyBraces).c_str(), strOrganizationName);
                                         }
                                         oDataFederationInformation.PutStructuredBuffer("ResearcherOrganizations", oNamedResearchers);
 
-                                        StructuredBuffer oDataFederationDatasetFamilies = oObject.GetStructuredBuffer("DataFederationDatasetFamilyList");
                                         StructuredBuffer oNamedDatasetFamilies;
-                                        for ( auto strName : oDataFederationDatasetFamilies.GetNamesOfElements() )
+                                        for ( auto oDatasetFamilyIdentifier : oDataFederation.DatasetFamilies() )
                                         {
-                                            Guid oDatasetFamiliyIdentifier = oDataFederationDatasetFamilies.GetGuid(strName.c_str());
-                                            std::string strDatasetFamilyName = this->GetDatasetFamilyTitle(oDatasetFamiliyIdentifier);
-                                            oNamedDatasetFamilies.PutString(oDatasetFamiliyIdentifier.ToString(eHyphensAndCurlyBraces).c_str(), strDatasetFamilyName);
+                                            oNamedDatasetFamilies.PutString(oDatasetFamilyIdentifier.ToString(eHyphensAndCurlyBraces).c_str(), this->GetDatasetFamilyTitle(oDatasetFamilyIdentifier));
                                         }
                                         oDataFederationInformation.PutStructuredBuffer("DatasetFamilies", oNamedDatasetFamilies);
                                         oListOfDataFederations.PutStructuredBuffer(strDataFederationIdentifier.c_str(), oDataFederationInformation);

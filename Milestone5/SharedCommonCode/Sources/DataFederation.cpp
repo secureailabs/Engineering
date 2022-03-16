@@ -288,3 +288,17 @@ std::list<Guid> DataFederation::DatasetFamilies() const throw()
 
     return m_stlDataFamilies;
 }
+
+/********************************************************************************************
+ *
+ * @class DataFederation
+ * @function SetInactive
+ * @brief Set this federation to be inactive
+ *
+ ********************************************************************************************/
+void DataFederation::SetInactive() throw()
+{
+    __DebugFunction()
+
+    m_fActive = false;
+}

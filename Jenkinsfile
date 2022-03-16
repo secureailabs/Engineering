@@ -66,9 +66,9 @@ pipeline {
                 script {
                     echo 'Deploy DatabaseGateway and RestApiPortal'
                     sh '''
-                    docker exec -w /Workspace/Milestone5/Binary ubuntu_dev_CI sh -c "sudo ./DatabaseGateway  > database.log &"
+                    docker exec -w /Workspace/Milestone5/Binary/dataservices ubuntu_dev_CI sh -c "sudo ./DatabaseGateway  > database.log &"
                     sleep 1
-                    docker exec -w /Workspace/Milestone5/Binary ubuntu_dev_CI sh -c "sudo ./RestApiPortal > portal.log &"
+                    docker exec -w /Workspace/Milestone5/Binary/platformservices ubuntu_dev_CI sh -c "sudo ./RestApiPortal > portal.log &"
                     sleep 1
                     docker exec -w /Workspace/Milestone5/ ubuntu_dev_CI ps -ef
                     '''

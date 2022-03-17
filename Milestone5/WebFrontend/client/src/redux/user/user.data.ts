@@ -6,7 +6,7 @@ export const demo_data = [
     PhoneNumber: '123-456-7890',
     TimeOfAccountCreation: new Date(),
     Title: 'title',
-    Organization: 'IRG',
+    Organization: 'IGR',
     UserGuid: 'uuid1',
     Username: 'datafederation@igr.com',
   },

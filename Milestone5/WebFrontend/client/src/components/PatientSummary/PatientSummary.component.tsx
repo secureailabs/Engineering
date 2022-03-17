@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Text from '@secureailabs/web-ui/components/Text';
 import _ from 'lodash';
 import Measure from 'react-measure';
-import 'chartjs-plugin-labels';
-
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -25,7 +24,8 @@ ChartJS.register(
   Legend,
   CategoryScale,
   LinearScale,
-  BarElement
+  BarElement,
+  ChartDataLabels
 );
 
 import Card from '@secureailabs/web-ui/components/Card';
@@ -45,52 +45,11 @@ const PatientSummary = ({
 }) => {
   const plugins = [
     {
-      beforeDraw: function (chart: any) {
-        var width = chart.width,
-          height = chart.height,
-          ctx = chart.ctx;
-        ctx.restore();
-        var fontSize = (height / 100).toFixed(2);
-        ctx.font = fontSize + 'em sans-serif';
-        ctx.textBaseline = 'top';
-        var text = fake_data.length,
-          textX = Math.round((width - ctx.measureText(text).width) / 2),
-          textY = height / 2;
-        ctx.fillText(text, textX, textY);
-        ctx.save();
-      },
+   
     },
   ];
-  const applyFilters = () => {
-    const filtered_by_age = _.filter(fake_data_json, function (o) {
-      return age_filter[0] < o.age && age_filter[1] > o.age;
-    });
-    const filtered_by_cancer_type = cancer_type_filter
-      ? _.filter(filtered_by_age, function (o) {
-          return o.cancer_type === cancer_type_filter;
-        })
-      : filtered_by_age;
-    const filtered_by_gender = gender_filter
-      ? _.filter(filtered_by_cancer_type, function (o) {
-          return o.gender === gender_filter;
-        })
-      : filtered_by_cancer_type;
-    const filtered_by_hospital = hospital_filter
-      ? _.filter(filtered_by_gender, function (o) {
-          return o.hospital === hospital_filter;
-        })
-      : filtered_by_gender;
-    const filtered_by_ethnicity = ethnicity_filter
-      ? _.filter(filtered_by_hospital, function (o) {
-          return o.ethnicity === ethnicity_filter;
-        })
-      : filtered_by_hospital;
-    setFakeData(filtered_by_ethnicity);
-  };
-
   const [fake_data, setFakeData] = useState(fake_data_json);
 
-  console.log(Object.keys(_.groupBy(fake_data, 'gender')));
 
   const gender_data = {
     labels: Object.keys(_.groupBy(fake_data, 'gender')),
@@ -115,12 +74,12 @@ const PatientSummary = ({
     ],
   };
 
-  const ethnicity_data = {
-    labels: Object.keys(_.groupBy(fake_data, 'ethnicity')),
+  const race_data = {
+    labels: Object.keys(_.groupBy(fake_data, 'race')),
     datasets: [
       {
         label: 'Total No. Of Patients',
-        data: Object.values(_.groupBy(fake_data, 'ethnicity')).map(
+        data: Object.values(_.groupBy(fake_data, 'race')).map(
           (el) => el.length
         ),
         backgroundColor: [
@@ -196,17 +155,17 @@ const PatientSummary = ({
       },
     },
   };
-
+  
   const labels = Object.keys(
     _.groupBy(fake_data, function (o) {
       return Math.ceil(o.age / 10) * 10;
     })
-  ).map((el) => `${el || 10 - 9} - ${el}`);
+  ).map((el) => `${parseInt(el) - 10} - ${parseInt(el)}`);
   const data = {
     labels,
     datasets: [
       {
-        label: 'Age',
+        label: 'Patient Count',
         data: Object.values(
           _.groupBy(fake_data, function (o) {
             return Math.ceil(o.age / 10) * 10;
@@ -219,18 +178,72 @@ const PatientSummary = ({
 
   const [age_filter, setAgeFilter] = useState([0, 100]);
   const [cancer_type_filter, setCancerTypeFilter] = useState<
-    string | undefined
-  >(undefined);
-  const [gender_filter, setGenderFilter] = useState<string | undefined>(
-    undefined
+    Array<string>
+  >([]);
+  const [gender_filter, setGenderFilter] = useState<Array<string>>(
+    []
   );
-  const [hospital_filter, setHospitalFilter] = useState<string | undefined>(
-    undefined
+  const [hospital_filter, setHospitalFilter] = useState<Array<string>>(
+    []
   );
-  const [ethnicity_filter, setEthnicityFilter] = useState<string | undefined>(
-    undefined
+  const [race_filter, setRaceFilter] = useState<Array<string>>(
+    []
   );
+  const splitByWordCount = (str: string, count: number): string[] => {
+  const arr = str.split(' ')
+  const r = [];
+  while (arr.length) {
+    r.push(arr.splice(0, count).join(' '))
+  }
+  return r;
+}
   const [dimensions, setDimensions] = useState({ width: 150, height: 150 });
+  const applyFilters = (): void => {
+    const filters = [{
+        filter_key: "gender",
+        filter: gender_filter,
+        filter_function: "equality"
+      }, 
+      { 
+        filter_key: "cancer_type", 
+        filter: cancer_type_filter,
+        filter_function: "equality" 
+      },
+      { 
+        filter_key: "hospital", 
+        filter: hospital_filter,
+        filter_function: "equality" 
+      },
+      { 
+        filter_key: "race", 
+        filter: race_filter,
+        filter_function: "equality" 
+      },
+      { 
+        filter_key: "age", 
+        filter: age_filter,
+        filter_function: "in-between" 
+      }
+        ];
+
+    let filtered_data = fake_data_json;
+    for(const { filter_key, filter_function, filter} of filters){
+          filtered_data = _.filter((filtered_data), function(o){
+            if(filter_function === "equality" && filter.length !== 0){
+              //@ts-ignore
+            return filter.includes(o[filter_key]);
+              }  else if (filter_function === "in-between") {
+
+      return filter[0] < o.age && filter[1] > o.age;
+                }
+ 
+              return true; 
+            })
+        }
+    setFakeData(filtered_data);
+  };
+
+
   useEffect(() => {
     applyFilters();
   }, [
@@ -238,7 +251,7 @@ const PatientSummary = ({
     cancer_type_filter,
     gender_filter,
     hospital_filter,
-    ethnicity_filter,
+    race_filter,
   ]);
 
   return (
@@ -258,59 +271,12 @@ const PatientSummary = ({
               <div className="patient-summary">
                 <div className="patient-summary__top">
                   <div>
-                    <Text>Gender</Text>
-                    <Select
-                      isClearable={true}
-                      onChange={(el) => {
-                        if (el) {
-                          setGenderFilter(el.value);
-                        } else {
-                          setGenderFilter(undefined);
-                        }
-                      }}
-                      className="react-select-container"
-                      options={Object.keys(
-                        _.groupBy(fake_data_json, 'gender')
-                      ).map((el) => {
-                        return {
-                          value: el,
-                          label: el,
-                        };
-                      })}
-                    />
-                  </div>
-                  <div>
-                    <Text>Cancer Type</Text>
-                    <Select
-                      isClearable={true}
-                      className="react-select-container"
-                      onChange={(el) => {
-                        if (el) {
-                          setCancerTypeFilter(el.value);
-                        } else {
-                          setCancerTypeFilter(undefined);
-                        }
-                      }}
-                      options={Object.keys(
-                        _.groupBy(fake_data_json, 'cancer_type')
-                      ).map((el) => {
-                        return {
-                          value: el,
-                          label: el,
-                        };
-                      })}
-                    />
-                  </div>
-                  <div>
                     <Text>Hospital</Text>
                     <Select
                       isClearable={true}
+                      isMulti={true}
                       onChange={(el) => {
-                        if (el) {
-                          setHospitalFilter(el.value);
-                        } else {
-                          setHospitalFilter(undefined);
-                        }
+                          setHospitalFilter(el.map((e) => e.value));
                       }}
                       className="react-select-container"
                       options={Object.keys(
@@ -324,19 +290,16 @@ const PatientSummary = ({
                     />
                   </div>
                   <div>
-                    <Text>Ethnicity/Race</Text>
+                    <Text>Gender</Text>
                     <Select
                       isClearable={true}
+                      isMulti={true}
                       onChange={(el) => {
-                        if (el) {
-                          setEthnicityFilter(el.value);
-                        } else {
-                          setEthnicityFilter(undefined);
-                        }
+                          setGenderFilter(el.map((e) => e.value));
                       }}
                       className="react-select-container"
                       options={Object.keys(
-                        _.groupBy(fake_data_json, 'ethnicity')
+                        _.groupBy(fake_data_json, 'gender')
                       ).map((el) => {
                         return {
                           value: el,
@@ -345,6 +308,46 @@ const PatientSummary = ({
                       })}
                     />
                   </div>
+                   <div>
+                    <Text>Race</Text>
+                    <Select
+                      isClearable={true}
+                      isMulti={true}
+                      onChange={(el) => {
+                          setRaceFilter(el.map((e) => e.value));
+                      }}
+                      className="react-select-container"
+                      options={Object.keys(
+                        _.groupBy(fake_data_json, 'race')
+                      ).map((el) => {
+                        return {
+                          value: el,
+                          label: el,
+                        };
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <Text>Cancer Type</Text>
+                    <Select
+                      isClearable={true}
+                      isMulti={true}
+                      className="react-select-container"
+                      onChange={(el) => {
+                          setCancerTypeFilter(el.map((e) => e.value));
+                      }}
+                      options={Object.keys(
+                        _.groupBy(fake_data_json, 'cancer_type')
+                      ).map((el) => {
+                        return {
+                          value: el,
+                          label: el,
+                        };
+                      })}
+                    />
+                  </div>
+                  
+                 
                 </div>
                 <div
                   style={{
@@ -422,7 +425,7 @@ const PatientSummary = ({
                             backgroundColor: '#F37324',
                           }}
                         >
-                          {age_filter[index].toFixed(1)}
+                          {age_filter[index].toFixed(0)}
                         </div>
                       </div>
                     )}
@@ -430,6 +433,37 @@ const PatientSummary = ({
                 </div>
                 <div className="patient-summary__bottom">
                   <div className="patient-summary__charts">
+                     <div>
+                      <Text
+                        fontWeight={600}
+                        fontSize="1.4rem"
+                        textAlign="center"
+                        lineHeight={8}
+                      >
+                        By Hospital
+                      </Text>
+                      <Doughnut
+                        data={hospital_data}
+
+                      plugins={[ChartDataLabels]}
+                        options={{
+                          maintainAspectRatio: true,
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(e){
+                                      return splitByWordCount(e.label,2)
+                                    }
+                                  },
+                              }
+                          },
+                        }}
+                      />
+                    </div>
                     <div>
                       <Text
                         fontWeight={600}
@@ -451,11 +485,52 @@ const PatientSummary = ({
                             legend: {
                               display: false,
                             },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(e){
+                                      return splitByWordCount(e.label,2)
+                                    }
+                                  },
+                              }
                           },
                         }}
                       />
                     </div>
+               
+                  </div>
+                  <div className="patient-summary__charts">
                     <div>
+                      <Text
+                        fontWeight={600}
+                        fontSize="1.4rem"
+                        textAlign="center"
+                        lineHeight={8}
+                      >
+                        By Race
+                      </Text>
+                      <Doughnut
+                        data={race_data}
+                        //@ts-ignore
+                        plugins={plugins}
+                        options={{
+                          maintainAspectRatio: true,
+                          responsive: true,
+                          plugins: {
+                            legend: {
+                              display: false,
+                            },
+                             tooltip: {
+                                callbacks: {
+                                    label: function(e){
+                                      return splitByWordCount(e.label,3)
+                                    }
+                                  },
+                              }
+                          },
+                        }}
+                      />
+                    </div>
+                        <div>
                       <Text
                         fontWeight={600}
                         fontSize="1.4rem"
@@ -466,8 +541,7 @@ const PatientSummary = ({
                       </Text>
                       <Doughnut
                         data={disease_data}
-                        //@ts-ignore
-                        plugins={plugins}
+                       
                         options={{
                           maintainAspectRatio: true,
                           responsive: true,
@@ -475,60 +549,19 @@ const PatientSummary = ({
                             legend: {
                               display: false,
                             },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(e){
+                                      return e.label
+                                    }
+                                      
+                                  },
+                              }
                           },
                         }}
                       />
                     </div>
-                  </div>
-                  <div className="patient-summary__charts">
-                    <div>
-                      <Text
-                        fontWeight={600}
-                        fontSize="1.4rem"
-                        textAlign="center"
-                        lineHeight={8}
-                      >
-                        By Hospital
-                      </Text>
-                      <Doughnut
-                        data={hospital_data}
-                        //@ts-ignore
-                        plugins={plugins}
-                        options={{
-                          maintainAspectRatio: true,
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              display: false,
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <Text
-                        fontWeight={600}
-                        fontSize="1.4rem"
-                        textAlign="center"
-                        lineHeight={8}
-                      >
-                        By Ethnicity/Race
-                      </Text>
-                      <Doughnut
-                        data={ethnicity_data}
-                        //@ts-ignore
-                        plugins={plugins}
-                        options={{
-                          maintainAspectRatio: true,
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              display: false,
-                            },
-                          },
-                        }}
-                      />
-                    </div>
+
                   </div>
                 </div>
               </div>

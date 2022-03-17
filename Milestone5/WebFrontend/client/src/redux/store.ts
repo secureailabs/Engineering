@@ -16,7 +16,9 @@ const dev = () => {
   if (import.meta.env.NODE_ENV === 'development') {
     return compose(
       applyMiddleware(...middleware),
+      //@ts-ignore
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
+        //@ts-ignore
         window.__REDUX_DEVTOOLS_EXTENSION__()
     );
   }

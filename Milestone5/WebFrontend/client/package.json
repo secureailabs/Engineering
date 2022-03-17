@@ -1,14 +1,16 @@
 {
+  "name": "sail-portal",
+  "private": true,
+  "version": "0.0.0",
   "scripts": {
-    "start": "export SNOWPACK_PUBLIC_COMMIT_ID=$(git rev-parse --short HEAD) || echo Couldnt load commit id, this only works on linux. && snowpack dev",
-    "build": "export SNOWPACK_PUBLIC_COMMIT_ID=$(git rev-parse --short HEAD) || echo Couldnt load commit id, this only works on linux. && snowpack build",
-    "test": "web-test-runner \"src/**/*.test.tsx\"",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "lint": "eslint . --ext .tsx"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^2.5.1",
-    "@secureailabs/web-ui": "^1.3.16",
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
+    "@secureailabs/web-ui": "^1.3.17",
     "@types/faker": "5.5.3",
     "@types/react-grid-layout": "^1.1.2",
     "@types/react-measure": "^2.0.8",
@@ -49,6 +51,7 @@
     "redux-saga": "^1.1.3",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
+    "sass": "^1.49.9",
     "typesafe-actions": "^5.1.0",
     "typescript": "^4.2.4",
     "yup": "^0.32.9",
@@ -56,21 +59,16 @@
     "yup-phone": "^1.2.19"
   },
   "devDependencies": {
-    "@snowpack/plugin-dotenv": "^2.1.0",
-    "@snowpack/plugin-react-refresh": "^2.5.0",
-    "@snowpack/plugin-sass": "^1.4.0",
-    "@snowpack/plugin-typescript": "^1.2.1",
-    "@snowpack/web-test-runner-plugin": "^0.2.2",
     "@testing-library/react": "^11.2.6",
     "@types/chai": "^4.2.17",
     "@types/mocha": "^8.2.2",
-    "@types/react": "^17.0.4",
-    "@types/react-dom": "^17.0.3",
+    "@types/react": "^17.0.33",
+    "@types/react-dom": "^17.0.10",
     "@types/react-router-dom": "^5.1.7",
     "@types/react-transition-group": "^4.4.1",
-    "@types/snowpack-env": "^2.3.3",
     "@typescript-eslint/eslint-plugin": "^4.15.1",
     "@typescript-eslint/parser": "^4.15.1",
+    "@vitejs/plugin-react": "^1.0.7",
     "@web/test-runner": "^0.13.3",
     "chai": "^4.3.4",
     "eslint": "^7.20.0",
@@ -83,6 +81,7 @@
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "2.2.1",
-    "snowpack": "^3.8.8"
+    "typescript": "^4.5.4",
+    "vite": "^2.8.0"
   }
 }

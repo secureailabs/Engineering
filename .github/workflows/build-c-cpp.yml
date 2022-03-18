@@ -1,0 +1,22 @@
+name: C/C++ Windows CI for Development Repository
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: [self-hosted, Windows, x64]
+
+    steps:
+    - name: Check out Repo
+    - uses: actions/checkout@v2
+    - run: |
+          $psversiontable
+          write-host "Hello World"
+          get-computerinfo
+          Get-Location
+          .\CI-WindowsPlatformDeliverables.bat
+          Get-Item .\WindowsPlatformDeliverables.tar

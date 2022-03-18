@@ -39,7 +39,7 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           
   build:
-    runs-on: [self-hosted, docker]
+    runs-on: [self-hosted, Linux, x64, docker]
     needs: clean
     steps:
       - uses: actions/checkout@v2   

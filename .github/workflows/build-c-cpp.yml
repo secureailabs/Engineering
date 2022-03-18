@@ -1,0 +1,28 @@
+name: C/C++ Windows CI for Development Repository
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  pull_request:
+    branches: [ main ]
+    
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Only one concurrent action at a time for group tag.
+concurrency:
+  group: Windows-CI-Build-Development
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: [self-hosted, Windows, x64]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build WindowsPlatformDeliverables
+      run: |
+          $psversiontable
+          write-host "Hello World"
+          get-computerinfo
+          Get-Location
+          .\CI-WindowsPlatformDeliverables.bat
+          Get-Item .\WindowsPlatformDeliverables.tar

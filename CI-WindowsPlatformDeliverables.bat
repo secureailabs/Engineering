@@ -134,6 +134,7 @@ ECHO VERIFY COPYLIST
 		ECHO.
 	)
 ))
+cd %script_dir%
 
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
@@ -149,15 +150,18 @@ ECHO STEP TARBALL Debug Folder >> output.txt
 ECHO ---------------------------------------------------------------------------------------------- >> output.txt
 ECHO ----------------------------------------------------------------------------------------------
 ECHO STEP TARBALL
-cd "%windows_deliverables_path%\Binaries\x64\"
-tar -cvzf WindowsPlatformDeliverables.tar Debug >> %script_dir%\output.txt 2>&1
+CD "%windows_deliverables_path%\Binaries\x64\Debug"
+MKDIR WindowsPlatformDeliverables
+COPY *.exe WindowsPlatformDeliverables
+COPY *.dll WindowsPlatformDeliverables
+tar -cvzf WindowsPlatformDeliverables.tar WindowsPlatformDeliverables >> %script_dir%\output.txt 2>&1
 IF %errorlevel% NEQ 0 (
     ECHO TARBALL CREATION FAILED! >> %script_dir%\output.txt
     ECHO TARBALL CREATION FAILED! && EXIT /b %errorlevel%
 )
 
 ECHO.
-copy WindowsPlatformDeliverables.tar %script_dir%\
+COPY WindowsPlatformDeliverables.tar %script_dir%\ /V
 IF %errorlevel%==0 (
     ECHO TARBALL COPIED to HOME of BATCH script! >> %script_dir%\output.txt
 	ECHO TARBALL COPIED to HOME of BATCH script!

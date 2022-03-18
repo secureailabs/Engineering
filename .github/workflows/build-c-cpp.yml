@@ -17,10 +17,9 @@ jobs:
   build:
     runs-on: [self-hosted, Windows, x64]
     steps:
-    - name: Check out Repo
     - uses: actions/checkout@v2
     - name: Build WindowsPlatformDeliverables
-    - run: |
+      run: |
           $psversiontable
           write-host "Hello World"
           get-computerinfo

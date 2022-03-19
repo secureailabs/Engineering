@@ -4,7 +4,7 @@
     "AzureVirtualNetworkTemplateUrl": "https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/VirtualNetwork.json?sp=r&st=2021-08-18T11:49:19Z&se=2022-05-31T19:49:19Z&spr=https&sv=2020-08-04&sr=b&sig=UepJBsssk48ON0SKPRo8G1IOc%2F4dysKVOjjQ%2B59iNxA%3D",
     "AzureNetworkSecurityGroupTemplateUrl": "https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/NetworkSecurityGroup.json?sp=r&st=2021-08-18T11:45:41Z&se=2022-08-31T19:45:41Z&spr=https&sv=2020-08-04&sr=b&sig=6NdypMlPI6D0UVzeux1HUY9KaRns%2BFjX2yluqPoMT1w%3D",
     "AzureVirtualMachineTemplateUrl": "https://sailcomputationimage9891.blob.core.windows.net/templates/securecomputationnode.json?sp=r&st=2022-03-01T09:58:31Z&se=2025-01-01T17:58:31Z&spr=https&sv=2020-08-04&sr=b&sig=qE9cD28XE5T1itj%2FNjOKIoRNsAAyir3YhmVa0desSSY%3D",
-    "SecureComputationNodePackageUrl": "/builds/SecureComputationNode.tar.gz?sp=r&st=2022-01-27T12:04:31Z&se=2024-03-31T20:04:31Z&spr=https&sv=2020-08-04&sr=b&sig=QbMNfC00WrhmtBCtOziyZ8r7sKuYJucUYg2aP5gaVFk%3D",
+    "SecureComputationNodePackageUrl": "/builds/SecureComputationNode.tar.gz?sp=r&st=2022-03-22T17:15:10Z&se=2024-06-01T01:15:10Z&spr=https&sv=2020-08-04&sr=b&sig=C3MCVlG%2Figr7thUBxEDiplS3gO6PXvNC4XAXd2HcCfE%3D",
     "SecureComputationNodePackageHost": "sailcomputationimage9891.blob.core.windows.net",
     "TlsCertificate": "aaaa",
     "TlsPrivateKey": "bbbb",

@@ -19,6 +19,9 @@ RUN apt-get update && \
 
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
+RUN pip3 install fastapi
+RUN pip3 install "uvicorn[standard]"
+
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY Entrypoint.sh /Entrypoint.sh

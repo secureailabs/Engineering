@@ -6,7 +6,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0"
-    echo -e "\t-i Image Name: platformservices | dataservices | orchestrator | remotedataconnector | webfrontend | securecomputationnode | devopsconsole"
+    echo -e "\t-i Image Name: devopsconsole | dataservices | platformservices | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
     exit 1 # Exit script after printing help
 }
 
@@ -37,7 +37,7 @@ then
     echo "Network already exists"
 else
     echo "Creating network"
-    docker network create $networkName
+    docker network create --subnet=172.56.0.0/16 $networkName
 fi
 
 # Build the asked image if it specified in the input parameters

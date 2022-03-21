@@ -5,7 +5,7 @@ PrintHelp()
 {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: platformservices | dataservices | orchestrator | remotedataconnector | webfrontend | securecomputationnode | devopsconsole"
+    echo -e "\t-s Service Name: devopsconsole | dataservices | platformservices | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
@@ -92,11 +92,12 @@ then
     fi
     # Copy InitializationVector.json to the dataservices
     cp dataservices/InitializationVector.json $rootDir/Binary/dataservices
-    runtimeFlags="$runtimeFlags --hostname dataservices -p 6500:6500 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
+    runtimeFlags="$runtimeFlags --hostname dataservices -p 6500:6500 --ip 172.56.0.98 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
 elif [ "platformservices" == "$imageName" ]
 then
     # Copy InitializationVector.json to the platformservices
     cp platformservices/InitializationVector.json $rootDir/Binary/platformservices
+    sed -i 's/"DataservicesURL": "10.0.0.5"/"DataservicesURL": "172.56.0.98"/' $rootDir/Binary/platformservices/InitializationVector.json
     runtimeFlags="$runtimeFlags --hostname platformservices -p 6200:6200 -v $rootDir/Binary/platformservices:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]
 then

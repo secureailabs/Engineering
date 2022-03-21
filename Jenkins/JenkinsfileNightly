@@ -25,6 +25,7 @@ pipeline {
                     ls -l
                     sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Milestone5/Docker/platformservices/InitializationVector.json
                     ./Milestone5/CreateDailyBuild.sh
+                    cp ./Milestone5/Binary/DatabaseTools ./Milestone5/Binary/platformservices
                     '''
                 }
             }

@@ -29,6 +29,7 @@ pipeline {
                     ./Milestone5/BuildSecureComputation.sh
                     ./Milestone5/PackageSecureComputationNode.sh
                     cp ./Milestone5/SecureComputationNode.tar.gz ./Milestone5/Binary/platformservices
+                    cp ./Milestone5/Binary/DatabaseTools ./Milestone5/Binary/platformservices
                     '''
                 }
             }

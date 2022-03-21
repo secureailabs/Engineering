@@ -23,13 +23,13 @@ pipeline {
                     set -x
                     pwd
                     ls -l
-                    sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Milestone5/Docker/platformservices/InitializationVector.json
-                    grep '"Owner": "Nightly"' ./Milestone5/Docker/platformservices/InitializationVector.json
-                    ./Milestone5/CreateDailyBuild.sh
-                    ./Milestone5/BuildSecureComputation.sh
-                    ./Milestone5/PackageSecureComputationNode.sh
-                    cp ./Milestone5/SecureComputationNode.tar.gz ./Milestone5/Binary/platformservices
-                    cp ./Milestone5/Binary/DatabaseTools ./Milestone5/Binary/platformservices
+                    sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Docker/platformservices/InitializationVector.json
+                    grep '"Owner": "Nightly"' ./Docker/platformservices/InitializationVector.json
+                    ./CreateDailyBuild.sh
+                    ./BuildSecureComputation.sh
+                    ./PackageSecureComputationNode.sh
+                    cp ./SecureComputationNode.tar.gz ./Binary/platformservices
+                    cp ./Binary/DatabaseTools ./Binary/platformservices
                     '''
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
                     'Build Docker',
                     script:'''
                     pwd
-                    cd Milestone5/Docker/
+                    cd Docker/
                     ./BuildImages.sh -i dataservices
                     '''
                     echo 'Start Data Services Container'
@@ -61,7 +61,7 @@ pipeline {
                     'Run Data Services Docker',
                     script:'''
                     pwd
-                    cd Milestone5/Docker/
+                    cd Docker/
                     ./RunService.sh -s dataservices -d -c
                     docker ps -q
                     sleep 5
@@ -101,7 +101,7 @@ pipeline {
                     'Build Platform Services',
                     script:'''
                     pwd
-                    cd Milestone5/Docker/
+                    cd Docker/
                     ./BuildImages.sh -i platformservices
                     '''
                     echo 'Start Platform Services Container'
@@ -109,7 +109,7 @@ pipeline {
                     'Run Platform Services Docker',
                     script:'''
                     pwd
-                    cd Milestone5/Docker/
+                    cd Docker/
                     ./RunService.sh -s platformservices -d
                     docker ps -q
                     sleep 5
@@ -137,7 +137,7 @@ pipeline {
                 script {
                     echo ' Copy Orchestrator Folder to tmp directory'
 
-                    sh 'cp -r Milestone5/EndPointTools/Orchestrator/ /datadrive/jenkins_workspace/workspace/tmp_engineering/'
+                    sh 'cp -r EndPointTools/Orchestrator/ /datadrive/jenkins_workspace/workspace/tmp_engineering/'
                 }
             }
             post {

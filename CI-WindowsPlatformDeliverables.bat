@@ -22,7 +22,7 @@ ECHO - PATH to vcvars64.bat:
 ECHO C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 ECHO.
 ECHO - PATH to WindowsPlatformDeliverables:
-ECHO C:\Users\StanleyLin\REPO\Engineering\Milestone5\InternalTools\WindowsPlatformDeliverables
+ECHO C:\Users\StanleyLin\REPO\Engineering\InternalTools\WindowsPlatformDeliverables
 ECHO.
 ECHO.
 
@@ -31,7 +31,7 @@ ECHO ---------------------------------------------------------------------------
 ECHO STEP SPECIFY UNIQUE PATHS with NO (Leading OR Trailing) SPACES in your PATH
 ECHO ----------------------------------------------------------------------------------------------
 SET "vcvars64_path=C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build"
-SET "windows_deliverables_path=C:\actions-runner\_work\Engineering\Engineering\Milestone5\InternalTools\WindowsPlatformDeliverables"
+SET "windows_deliverables_path=C:\actions-runner\_work\Engineering\Engineering\InternalTools\WindowsPlatformDeliverables"
 ECHO.
 
 ECHO SPECIFIED PATH of vcvars64.bat:

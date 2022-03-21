@@ -5,7 +5,7 @@ Have docker installed and docker service running. If not already done, install f
 
 ## Sail Platform Deployment Tool
 
-The Azure VM Image Id is hard coded in the Engineering/Milestone5/InternalTools/DeployPlatform/Deploy.py. If the requirement is to use the new images the IDs need to change. This is a temporary file which will go away when the devops framework is mature enough to be used more easily than this script.
+The Azure VM Image Id is hard coded in the Engineering/InternalTools/DeployPlatform/Deploy.py. If the requirement is to use the new images the IDs need to change. This is a temporary file which will go away when the devops framework is mature enough to be used more easily than this script.
 
 Setting the correct azure credential environment variables in the terminal:
 ```

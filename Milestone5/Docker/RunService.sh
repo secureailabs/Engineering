@@ -97,7 +97,6 @@ elif [ "platformservices" == "$imageName" ]
 then
     # Copy InitializationVector.json to the platformservices
     cp platformservices/InitializationVector.json $rootDir/Binary/platformservices
-    sed -i 's/"DataservicesURL": "10.0.0.5"/"DataservicesURL": "172.56.0.98"/' $rootDir/Binary/platformservices/InitializationVector.json
     runtimeFlags="$runtimeFlags --hostname platformservices -p 6200:6200 -v $rootDir/Binary/platformservices:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]
 then

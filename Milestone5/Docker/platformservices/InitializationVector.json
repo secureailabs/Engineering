@@ -1,5 +1,5 @@
 {
-    "DataservicesURL": "10.0.0.5",
+    "DataservicesURL": "172.56.0.98",
     "SecureVirtualMachineImageUrl": "https://sailcomputationimage9891.blob.core.windows.net/system/Microsoft.Compute/Images/sailimages/securecomputationnode-osDisk.332e0ac5-81e2-439a-8f0c-45b3de6414b7.vhd?sp=r&st=2022-01-27T11:55:36Z&se=2025-08-31T19:55:36Z&spr=https&sv=2020-08-04&sr=b&sig=3FOv14f%2FbRHG%2FrAh4CYy5%2BgRXAgGJDTpK0gysC3SSJw%3D",
     "AzureVirtualNetworkTemplateUrl": "https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/VirtualNetwork.json?sp=r&st=2021-08-18T11:49:19Z&se=2022-05-31T19:49:19Z&spr=https&sv=2020-08-04&sr=b&sig=UepJBsssk48ON0SKPRo8G1IOc%2F4dysKVOjjQ%2B59iNxA%3D",
     "AzureNetworkSecurityGroupTemplateUrl": "https://confidentialvmdeployment.blob.core.windows.net/deployemnttemplate/NetworkSecurityGroup.json?sp=r&st=2021-08-18T11:45:41Z&se=2022-08-31T19:45:41Z&spr=https&sv=2020-08-04&sr=b&sig=6NdypMlPI6D0UVzeux1HUY9KaRns%2BFjX2yluqPoMT1w%3D",

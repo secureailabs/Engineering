@@ -24,7 +24,7 @@ SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 C_SOURCES := $(foreach DIR,$(SRCDIRS),$(C_FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
+OUTPUT=$(ABSROOTDIR)/Binary/platformservices/$(notdir $(shell pwd))
 
 .PHONY: all, clean, cleanall
 

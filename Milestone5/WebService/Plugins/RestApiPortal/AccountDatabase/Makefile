@@ -29,7 +29,7 @@ FINDFILES = $(wildcard $(DIR)/*.cpp)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-OUTPUT=$(ABSROOTDIR)/Binary/SharedLibraries/RestApiPortal/lib$(notdir $(shell pwd)).so
+OUTPUT=$(ABSROOTDIR)/Binary/platformservices/SharedLibraries/RestApiPortal/lib$(notdir $(shell pwd)).so
 
 .PHONY: all, clean
 

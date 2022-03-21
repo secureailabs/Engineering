@@ -37,7 +37,7 @@ SOURCES += $(shell realpath ../../../../WebService/Plugins/RestApiPortal/Cryptog
 SOURCES += $(shell realpath ../../../../WebService/Plugins/RestApiPortal/CryptographicKeyManagement/CryptographyHelperFunctions.cpp)
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-OUTPUT=$(ABSROOTDIR)/Binary/SharedLibraries/DatabasePortal/lib$(notdir $(shell pwd)).so
+OUTPUT=$(ABSROOTDIR)/Binary/dataservices/SharedLibraries/DatabasePortal/lib$(notdir $(shell pwd)).so
 
 .PHONY: all,clean
 

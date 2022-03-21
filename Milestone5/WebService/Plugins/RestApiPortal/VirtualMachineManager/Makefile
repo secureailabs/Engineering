@@ -30,7 +30,7 @@ SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
 LOCAL_BIN=$(ABSROOTDIR)/WebService/SharedLibraries/RestApiPortal/lib$(notdir $(shell pwd)).so
-OUTPUT=$(ABSROOTDIR)/Binary/SharedLibraries/RestApiPortal/lib$(notdir $(shell pwd)).so
+OUTPUT=$(ABSROOTDIR)/Binary/platformservices/SharedLibraries/RestApiPortal/lib$(notdir $(shell pwd)).so
 
 .PHONY: all, clean
 

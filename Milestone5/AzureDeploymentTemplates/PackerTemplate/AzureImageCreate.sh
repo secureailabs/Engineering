@@ -9,7 +9,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -m [Image Name]"
     echo "Usage: $0"
-    echo -e "\t-m Module Name: backend | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
+    echo -e "\t-m Module Name:  platformservices | dataservices | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
     exit 1 # Exit script after printing help
 }
 
@@ -58,6 +58,9 @@ if [ -z "${AZURE_CLIENT_SECRET}" ]; then
   echo "environment variable AZURE_CLIENT_SECRET is undefined"
   exit 1
 fi
+
+# Set the subscription
+az account set --subscription $AZURE_SUBSCRIPTION_ID
 
 # Create resource group for storage account
 az group create \

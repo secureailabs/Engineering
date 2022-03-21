@@ -1,5 +1,5 @@
 #!/bin/bash
-imageName=backend
+imageName=dataservices
 
 # Check if docker is installed
 docker --version
@@ -21,11 +21,11 @@ else
 fi
 
 # Move the InitializerVector to the Binary folder
-mv InitializationVector.json Binary/
+mv InitializationVector.json Binary/$imageName/
 
 # Run the docker container
 docker run \
 -dit \
--p 6200:6200 \
--v $(pwd)/Binary:/app \
+-p 6500:6500 \
+-v $(pwd)/Binary/$imageName:/app \
 $imageName

@@ -117,9 +117,9 @@
             }
           },
           {
-            "name": "OutboundAllow_443_9090",
+            "name": "OutboundAllow_443_9090_6500",
             "properties": {
-              "description": "Interact with Azure and SAIL SCNs",
+              "description": "Interact with DataServices, Azure and SAIL SCNs",
               "protocol": "TCP",
               "sourcePortRange": "*",
               "sourceAddressPrefix": "*",
@@ -130,7 +130,8 @@
               "sourcePortRanges": [],
               "destinationPortRanges": [
                 "443",
-                "9090"
+                "9090",
+                "6500"
               ],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []

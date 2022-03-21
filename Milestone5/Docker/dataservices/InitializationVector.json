@@ -1,0 +1,5 @@
+{
+    "MongoDbUrl": "mongodb://localhost:27017",
+    "TlsCertificate": "aaaa",
+    "TlsPrivateKey": "bbbb"
+}

@@ -14,4 +14,3 @@ LDFLAGS += -L$(ABSROOTDIR)/Binary/StaticLibraries
 
 SharedCommonCode:
 	@make -C $(ABSROOTDIR)/SharedCommonCode all
-

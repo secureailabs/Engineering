@@ -23,12 +23,13 @@ pipeline {
                     set -x
                     pwd
                     ls -l
-                    sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Milestone5/Docker/backend/InitializationVector.json
-                    grep '"Owner": "Nightly"' ./Milestone5/Docker/backend/InitializationVector.json
+                    sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Milestone5/Docker/platformservices/InitializationVector.json
+                    grep '"Owner": "Nightly"' ./Milestone5/Docker/platformservices/InitializationVector.json
                     ./Milestone5/CreateDailyBuild.sh
                     ./Milestone5/BuildSecureComputation.sh
                     ./Milestone5/PackageSecureComputationNode.sh
-                    cp ./Milestone5/SecureComputationNode.tar.gz ./Milestone5/Binary/
+                    cp ./Milestone5/SecureComputationNode.tar.gz ./Milestone5/Binary/platformservices
+                    cp ./Milestone5/Binary/DatabaseTools ./Milestone5/Binary/platformservices
                     '''
                 }
             }
@@ -38,7 +39,7 @@ pipeline {
                 }
             }
         }
-        stage('Build Backend') {
+        stage('Build Data Services') {
             steps {
                 pwd(tmp: true)
                 sh '''
@@ -46,22 +47,70 @@ pipeline {
                 ls -l
                 '''
                 script {
-                    echo 'Starting to build docker image: Backend Api Portal Server '
-                    echo ' Build Backend Docker Image'
+                    echo 'Starting to build docker image: Data Services Api Portal Server '
+                    echo ' Build Data Services Docker Image'
                     sh label:
                     'Build Docker',
                     script:'''
                     pwd
                     cd Milestone5/Docker/
-                    ./BuildImages.sh -i backend
+                    ./BuildImages.sh -i dataservices
                     '''
-                    echo 'Start Backend Container'
+                    echo 'Start Data Services Container'
                     sh label:
-                    'Run Backend Docker',
+                    'Run Data Services Docker',
                     script:'''
                     pwd
                     cd Milestone5/Docker/
-                    ./RunService.sh -s backend -d -c
+                    ./RunService.sh -s dataservices -d -c
+                    docker ps -q
+                    sleep 5
+                    '''
+                }
+                script {
+                    try {
+                        sh '''
+                        docker exec -w /app dataservices sh -c "pwd"
+                        docker exec -w /app dataservices sh -c "ls -l"
+                        docker exec -w /app dataservices sh -c "ps -ef"
+                        '''
+                    } catch (exception) {
+                        echo getStackTrace(exception)
+                        echo 'Error detected, retrying...'
+                    }
+                }
+                echo 'Data Services Server is Deployed and Ready to use'
+            }
+            post {
+                failure {
+                    echo 'Failed Setting Data Services'
+                }
+            }
+        }
+        stage('Build Platform Services') {
+            steps {
+                pwd(tmp: true)
+                sh '''
+                pwd
+                ls -l
+                '''
+                script {
+                    echo 'Starting to build docker image: Platform Services Server '
+                    echo ' Build Platform Services Docker Image'
+                    sh label:
+                    'Build Platform Services',
+                    script:'''
+                    pwd
+                    cd Milestone5/Docker/
+                    ./BuildImages.sh -i platformservices
+                    '''
+                    echo 'Start Platform Services Container'
+                    sh label:
+                    'Run Platform Services Docker',
+                    script:'''
+                    pwd
+                    cd Milestone5/Docker/
+                    ./RunService.sh -s platformservices -d
                     docker ps -q
                     sleep 5
                     '''
@@ -70,21 +119,21 @@ pipeline {
                     try {
                         echo 'Load Database'
                         sh '''
-                        docker exec -w /app backend sh -c "pwd"
-                        docker exec -w /app backend sh -c "ls -l"
-                        docker exec -w /app backend sh -c "ps -ef"
-                        docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        docker exec -w /app platformservices sh -c "pwd"
+                        docker exec -w /app platformservices sh -c "ls -l"
+                        docker exec -w /app platformservices sh -c "ps -ef"
+                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     } catch (exception) {
                         echo getStackTrace(exception)
                         echo 'Error detected, retrying...'
                         sh '''
-                        docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
-                        docker exec -w /app backend sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
+                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     }
                 }
-                echo 'Backend Portal Server is Deployed and Ready to use'
+                echo 'Platform Services Server is Deployed and Ready to use'
                 script {
                     echo ' Copy Orchestrator Folder to tmp directory'
 
@@ -93,7 +142,7 @@ pipeline {
             }
             post {
                 failure {
-                    echo 'Failed Setting Backend'
+                    echo 'Failed Setting Platform Services'
                 }
             }
         }
@@ -127,8 +176,8 @@ pipeline {
                     echo 'End of stage test in Run SAILTAP!'
                     sh'''
                     docker cp ubuntu_tst_bash:/Test/test-results.xml .
-                    docker cp backend:/app/restportal.log .
-                    docker cp backend:/app/databasegateway.log .
+                    docker cp platformservices:/app/restportal.log .
+                    docker cp dataservices:/app/databasegateway.log .
                     '''
                     junit '*.xml'
                     archiveArtifacts artifacts: '*.log'

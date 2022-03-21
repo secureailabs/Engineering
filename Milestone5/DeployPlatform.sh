@@ -79,11 +79,13 @@ cp Binary/DemoDatabaseTools $tempDeployDir
 cp Binary/UploadPackageAndInitializationVector $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 mv webfrontend.tar.gz $tempDeployDir
-mv PlatformServices.tar.gz $tempDeployDir/backend.tar.gz
+mv PlatformServices.tar.gz $tempDeployDir/platformservices.tar.gz
+mv DataServices.tar.gz $tempDeployDir/dataservices.tar.gz
 cp -r InternalTools/DeployPlatform/* $tempDeployDir
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime
-cp Docker/backend/InitializationVector.json $tempDeployDir/backend.json
+cp Docker/dataservices/InitializationVector.json $tempDeployDir/dataservices.json
+cp Docker/platformservices/InitializationVector.json $tempDeployDir/platformservices.json
 
 # Check for the docker image and create it if it does not exist
 docker images | grep -x "azuredeploymenttools"

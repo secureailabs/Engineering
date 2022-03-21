@@ -5,7 +5,7 @@ PrintHelp()
 {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: backend | orchestrator | remotedataconnector | webfrontend | securecomputationnode | devopsconsole"
+    echo -e "\t-s Service Name: devopsconsole | dataservices | platformservices | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
@@ -72,13 +72,13 @@ runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
 
 if [ "orchestrator" == "$imageName" ]
 then
-    cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator
-    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator:/app $imageName"
+    cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail
+    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator/sail:/app $imageName"
 elif [ "devopsconsole" == "$imageName" ]
 then
     cp devopsconsole/InitializationVector.json $rootDir/DevopsConsole
     runtimeFlags="$runtimeFlags -v $rootDir/DevopsConsole:/app -v $rootDir/DevopsConsole/nginx:/etc/nginx/conf.d -v $rootDir/DevopsConsole/certs:/etc/nginx/certs -p 5050:443 $imageName"
-elif [ "backend" == "$imageName" ]
+elif [ "dataservices" == "$imageName" ]
 then
     # Create database volume if it does not exist
     foundVolumeName=$(docker volume ls --filter name=$sailDatabaseVolumeName --format {{.Name}})
@@ -90,9 +90,14 @@ then
         echo "Creating database volume"
         docker volume create $sailDatabaseVolumeName
     fi
-    # Copy InitializationVector.json to the backend
-    cp backend/InitializationVector.json $rootDir/Binary
-    runtimeFlags="$runtimeFlags --hostname backend -p 6200:6200 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary:/app $imageName"
+    # Copy InitializationVector.json to the dataservices
+    cp dataservices/InitializationVector.json $rootDir/Binary/dataservices
+    runtimeFlags="$runtimeFlags --hostname dataservices -p 6500:6500 --ip 172.56.0.98 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
+elif [ "platformservices" == "$imageName" ]
+then
+    # Copy InitializationVector.json to the platformservices
+    cp platformservices/InitializationVector.json $rootDir/Binary/platformservices
+    runtimeFlags="$runtimeFlags --hostname platformservices -p 6200:6200 -v $rootDir/Binary/platformservices:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]
 then
     cp webfrontend/InitializationVector.json $rootDir/WebFrontend

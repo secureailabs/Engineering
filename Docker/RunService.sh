@@ -92,7 +92,7 @@ then
     fi
     # Copy InitializationVector.json to the dataservices
     cp dataservices/InitializationVector.json $rootDir/Binary/dataservices
-    runtimeFlags="$runtimeFlags --hostname dataservices -p 6500:6500 --ip 172.56.0.98 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
+    runtimeFlags="$runtimeFlags --hostname dataservices -p 6500:6500 --ip 172.31.252.2 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
 elif [ "platformservices" == "$imageName" ]
 then
     # Copy InitializationVector.json to the platformservices

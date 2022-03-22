@@ -37,7 +37,7 @@ then
     echo "Network already exists"
 else
     echo "Creating network"
-    docker network create --subnet=172.56.0.0/16 $networkName
+    docker network create --subnet=172.31.252.0/24 $networkName
 fi
 
 # Build the asked image if it specified in the input parameters

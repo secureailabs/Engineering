@@ -77,11 +77,6 @@ pipeline {
                     }
                 }
                 echo 'Data Services Portal Server is Deployed and Ready to use'
-                script {
-                    echo ' Copy Orchestrator Folder to tmp directory'
-
-                    sh 'cp -r EndPointTools/Orchestrator/ /datadrive/jenkins_workspace/workspace/tmp_engineering/'
-                }
             }
             post {
                 failure {
@@ -112,7 +107,7 @@ pipeline {
                     script:'''
                     pwd
                     cd Docker/
-                    ./RunService.sh -s platformservices -d -c
+                    ./RunService.sh -s platformservices -d
                     docker ps -q
                     sleep 5
                     '''
@@ -124,14 +119,14 @@ pipeline {
                         docker exec -w /app platformservices sh -c "pwd"
                         docker exec -w /app platformservices sh -c "ls -l"
                         docker exec -w /app platformservices sh -c "ps -ef"
-                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     } catch (exception) {
                         echo getStackTrace(exception)
                         echo 'Error detected, retrying...'
                         sh '''
-                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
-                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
+                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     }
                 }

@@ -49,25 +49,18 @@ export function* onSignUpStart() {
 export function* signIn({
   payload: { email, password },
 }: ReturnType<typeof signInStart>) {
-  console.log('EMAIL: ', email);
-  const result = _.find(demo_data, { Email: email });
-  console.log(result);
-  if (result) {
-    yield put(signInSuccess(result));
-  } else {
-    yield put(signInFailure('Invalid credentials'));
+
+  try {
+    (yield userLogin(email, password)) as AxiosResponse<{
+      data: { user: IUserData };
+      token: string;
+    }>;
+    const { data } = yield checkAuth();
+    yield put(signInSuccess(data));
+  } catch (error) {
+    console.log(error);
+    yield put(signInFailure(error?.response?.data));
   }
-  // try {
-  //   (yield userLogin(email, password)) as AxiosResponse<{
-  //     data: { user: IUserData };
-  //     token: string;
-  //   }>;
-  //   const { data } = yield checkAuth();
-  //   yield put(signInSuccess(data));
-  // } catch (error) {
-  //   console.log(error);
-  //   yield put(signInFailure(error?.response?.data));
-  // }
 }
 export function* onSignInStart() {
   yield takeLatest(signInStart, signIn);
@@ -105,8 +98,8 @@ export function* onCheckUserSessionAsync() {
 
 export function* signOut() {
   try {
-    // yield logOut();
-    // yield removeToken();
+    yield logOut();
+    yield removeToken();
     yield put(signOutSuccess());
   } catch (error) {
     yield put(signOutFailure(error));

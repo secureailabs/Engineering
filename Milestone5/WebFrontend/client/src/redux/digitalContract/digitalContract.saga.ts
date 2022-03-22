@@ -207,18 +207,18 @@ export function* onPatchAcceptDigitalContractStart() {
 // GET ALL
 
 export function* getAllDigitalContractsSaga() {
-  yield put(getAllDigitalContractsSuccess(demo_data));
-  // try {
-  //   const {
-  //     data,
-  //   } = (yield getAllDigitalContractsAPI()) as AxiosResponse<TGetAllDigitalContractsSuccess>;
+  // yield put(getAllDigitalContractsSuccess(demo_data));
+  try {
+    const {
+      data,
+    } = (yield getAllDigitalContractsAPI()) as AxiosResponse<TGetAllDigitalContractsSuccess>;
 
-  //   yield put(getAllDigitalContractsSuccess(data));
-  // } catch (err) {
-  //   console.log(err);
-  //   // tslint:disable-next-line: no-unsafe-any
-  //   yield put(getAllDigitalContractsFailure(err.response));
-  // }
+    yield put(getAllDigitalContractsSuccess(data));
+  } catch (err) {
+    console.log(err);
+    // tslint:disable-next-line: no-unsafe-any
+    yield put(getAllDigitalContractsFailure(err.response));
+  }
 }
 
 export function* onGetAllDigitalContractsStart() {
@@ -231,7 +231,6 @@ export function* getDigitalContractSaga({
   payload,
 }: ReturnType<typeof getDigitalContractStart>) {
   try {
-    console.log(payload);
     const { data } = (yield getDigitalContractAPI({
       data: payload,
     })) as AxiosResponse<TGetDigitalContractSuccess>;

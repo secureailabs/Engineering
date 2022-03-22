@@ -158,9 +158,9 @@ const PatientSummary = ({
   
   const labels = Object.keys(
     _.groupBy(fake_data, function (o) {
-      return Math.ceil(o.age / 10) * 10;
+      return Math.floor(o.age / 10) * 10;
     })
-  ).map((el) => `${parseInt(el) - 10} - ${parseInt(el)}`);
+  ).map((el) => `${parseInt(el)} - ${parseInt(el) + 9}`);
   const data = {
     labels,
     datasets: [
@@ -168,7 +168,7 @@ const PatientSummary = ({
         label: 'Patient Count',
         data: Object.values(
           _.groupBy(fake_data, function (o) {
-            return Math.ceil(o.age / 10) * 10;
+            return Math.floor(o.age / 10) * 10;
           })
         ).map((el) => el.length),
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
@@ -233,8 +233,7 @@ const PatientSummary = ({
               //@ts-ignore
             return filter.includes(o[filter_key]);
               }  else if (filter_function === "in-between") {
-
-      return filter[0] < o.age && filter[1] > o.age;
+                  return filter[0] <= o.age && filter[1] >= o.age;
                 }
  
               return true; 
@@ -362,6 +361,7 @@ const PatientSummary = ({
                     max={MAX}
                     values={age_filter}
                     onChange={(el) => {
+
                       setAgeFilter(el);
                     }}
                     renderTrack={({ props, children }) => (

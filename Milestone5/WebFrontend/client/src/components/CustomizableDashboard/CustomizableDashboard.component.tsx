@@ -53,7 +53,7 @@ const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
     { i: 'c', x: 8, y: 0, w: 3, h: 7, static: true },
     { i: 'd', x: 8, y: 7, w: 3, h: 5, static: true },
   ];
-  if (userData?.AccessRights === 6) {
+  if (userData?.AccessRights === 1) {
     return (
       <StandardContent title="Dashboard">
         <GridLayout

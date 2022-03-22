@@ -1,6 +1,7 @@
 import { pascalCase } from 'change-case';
 
 export const axiosProxy = () => {
+  console.log(import.meta.env);
   // console.log(import.meta.env);
   if (import.meta.env.MODE === 'development') {
     return import.meta.env.VITE_PUBLIC_API_URL_DEV;

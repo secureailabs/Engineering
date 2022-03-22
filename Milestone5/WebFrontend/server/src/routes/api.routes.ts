@@ -13,7 +13,7 @@ if (process.env.NODE_ENV != 'production') {
 }
 
 // These modules only apply when we proxy API requests
-router.use(session({ secret: 'Luis is watching you...', rolling: true, resave: false, saveUninitialized: false }));
+router.use(session({ secret: 'Luis is watching you...', rolling: true, resave: false, saveUninitialized: false, cookie: { secure: true, sameSite: 'none'  } }));
 router.use(secureSession())
 router.use(bodyParser.json());
 

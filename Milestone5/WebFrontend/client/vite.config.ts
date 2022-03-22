@@ -6,6 +6,9 @@ export default defineConfig({
   plugins: [react({
     jsxRuntime: 'classic'
   })],
+  server: {
+    port: 3001
+  },
   resolve: {
     alias: {
       "@graphql": path.resolve(__dirname, "./src/graphql"),

@@ -122,14 +122,14 @@ pipeline {
                         docker exec -w /app platformservices sh -c "pwd"
                         docker exec -w /app platformservices sh -c "ls -l"
                         docker exec -w /app platformservices sh -c "ps -ef"
-                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     } catch (exception) {
                         echo getStackTrace(exception)
                         echo 'Error detected, retrying...'
                         sh '''
-                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
-                        docker exec -w /app platformservices sh -c "sudo ./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
+                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
                         '''
                     }
                 }

@@ -5,7 +5,7 @@ __license__ = "Private and Confidential. Internal Use Only."
 __date__ = "25 March 2022"
 __file__ = "main.py"
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, StrictStr
 import sendEmail
 from sendEmail import SenderCredentials
@@ -21,15 +21,19 @@ class ForgotPassswordRequest(BaseModel):
 
 @emailPlugin.post("/Email/forgotPassword")
 async def forgotPassword(request: ForgotPassswordRequest):
-    subject = "Secure AI Labs - Reset Password"
-    body = sendEmail.getForgetPasswordContent(request.Secret)
-    sendEmail.sendEmail(
-        sender=SenderCredentials(email=request.Sender.email, password=request.Sender.password),
-        recepient=request.Recepient,
-        subject=subject,
-        body=body,
-    )
-    return "Success"
+    try:
+        subject = "Secure AI Labs - Reset Password"
+        body = sendEmail.getForgetPasswordContent(request.Secret)
+        sendEmail.sendEmail(
+            sender=SenderCredentials(email=request.Sender.email, password=request.Sender.password),
+            recepient=request.Recepient,
+            subject=subject,
+            body=body,
+        )
+        return "Success"
+    except HTTPException as exception:
+        print("exception: ", exception.detail)
+        raise HTTPException(status_code=exception.status_code, detail=exception.detail)
 
 
 class VerifyEmailRequest(BaseModel):
@@ -40,15 +44,19 @@ class VerifyEmailRequest(BaseModel):
 
 @emailPlugin.post("/Email/verifyEmail")
 async def verifyEmail(request: VerifyEmailRequest):
-    subject = "Welcome to Secure AI Labs. Let's verify your email!"
-    body = sendEmail.getVerifyEmailContent(request.Secret)
-    sendEmail.sendEmail(
-        sender=SenderCredentials(email=request.Sender.email, password=request.Sender.password),
-        recepient=request.Recepient,
-        subject=subject,
-        body=body,
-    )
-    return "Success"
+    try:
+        subject = "Welcome to Secure AI Labs. Let's verify your email!"
+        body = sendEmail.getVerifyEmailContent(request.Secret)
+        sendEmail.sendEmail(
+            sender=SenderCredentials(email=request.Sender.email, password=request.Sender.password),
+            recepient=request.Recepient,
+            subject=subject,
+            body=body,
+        )
+        return "Success"
+    except HTTPException as exception:
+        print("exception: ", exception.detail)
+        raise HTTPException(status_code=exception.status_code, detail=exception.detail)
 
 
 class AlertRequest(BaseModel):
@@ -59,12 +67,16 @@ class AlertRequest(BaseModel):
 
 @emailPlugin.post("/Email/alert")
 async def alert(request: AlertRequest):
-    subject = "Important Alert:" + request.Alert
-    body = sendEmail.getAlertContent(request.Alert)
-    sendEmail.sendEmail(
-        sender=SenderCredentials(email=request.Sender.email, password=request.Sender.password),
-        recepient=request.Recepient,
-        subject=subject,
-        body=body,
-    )
-    return "Success"
+    try:
+        subject = "Important Alert:" + request.Alert
+        body = sendEmail.getAlertContent(request.Alert)
+        sendEmail.sendEmail(
+            sender=SenderCredentials(email=request.Sender.email, password=request.Sender.password),
+            recepient=request.Recepient,
+            subject=subject,
+            body=body,
+        )
+        return "Success"
+    except HTTPException as exception:
+        print("exception: ", exception.detail)
+        raise HTTPException(status_code=exception.status_code, detail=exception.detail)

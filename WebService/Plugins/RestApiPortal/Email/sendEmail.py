@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+__author__ = "Prawal Gangwar"
+__copyright__ = "Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved."
+__license__ = "Private and Confidential. Internal Use Only."
+__date__ = "25 March 2022"
+__file__ = "sendEmail.py"
+
 import smtplib
 from pydantic import BaseModel, StrictStr
 from email.mime.text import MIMEText
@@ -11,51 +18,64 @@ class SenderCredentials(BaseModel):
 
 
 def getForgetPasswordContent(secret: str):
-    htmlText = """
+    htmlText = (
+        """
         <html>
             <head></head>
             <body>
-                Hello, <br><br> <br>Visit to reset your password: <a href = "http://www.secureailabs.com">http://www.secureailabs.com/"""+secret+"""</a>
+                Hello, <br><br> <br>Visit to reset your password:
+                    <a href = "http://www.secureailabs.com">http://www.secureailabs.com/"""
+        + secret
+        + """</a>
             </body>
         </html>
     """
+    )
     return htmlText
 
 
 def getVerifyEmailContent(secret: str):
-    htmlText = """
+    htmlText = (
+        """
         <html>
             <head></head>
             <body>
-                Hello, <br><br> <br>Visit to verify your email: <a href = "http://www.secureailabs.com">http://www.secureailabs.com/"""+secret+"""</a>
+                Hello, <br><br> <br>Visit to verify your email: <a href = "http://www.secureailabs.com">http://www.secureailabs.com/"""
+        + secret
+        + """</a>
             </body>
         </html>
     """
+    )
     return htmlText
 
 
 def getAlertContent(alert: str):
-    htmlText = """
+    htmlText = (
+        """
         <html>
             <head></head>
             <body>
-                Hello, <br><br> Unusual activity detected on your account: <a href = "http://www.secureailabs.com">http://www.secureailabs.com/"""+alert+"""</a>
+                Hello, <br><br> Unusual activity detected on your account: <a href = "http://www.secureailabs.com">http://www.secureailabs.com/"""
+        + alert
+        + """</a>
             </body>
         </html>
     """
+    )
     return htmlText
 
 
 def sendEmail(sender: SenderCredentials, recepient: str, subject: str, body: str):
     message = MIMEMultipart()
-    message['Subject'] = subject
-    message['From'] = 'Secure AI Labs <' + sender.email + '>'
-    message['To'] = recepient
-    part1 = MIMEText(body, 'html')
+    message["Subject"] = subject
+    message["From"] = "Secure AI Labs <" + sender.email + ">"
+    message["To"] = recepient
+    part1 = MIMEText(body, "html")
     message.attach(part1)
 
     try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
         server.login(sender.email, sender.password)
         server.sendmail(sender.email, [recepient], message.as_string())
@@ -65,13 +85,23 @@ def sendEmail(sender: SenderCredentials, recepient: str, subject: str, body: str
     except smtplib.SMTPRecipientsRefused as exception:
         raise HTTPException(status_code=450, detail="Failed sending email to: " + str(exception))
     except smtplib.SMTPServerDisconnected:
-        raise HTTPException(status_code=554, detail="Server unexpectedly disconnected or an attempt is made to use \
-            the SMTP instance before connecting it to a server")
+        raise HTTPException(
+            status_code=554,
+            detail="Server unexpectedly disconnected or an attempt is made to use \
+            the SMTP instance before connecting it to a server",
+        )
     except smtplib.SMTPNotSupportedError:
-        raise HTTPException(status_code=status.HTTP_510_NOT_EXTENDED, detail="The command or option is not \
-            supported by the SMTP server")
+        raise HTTPException(
+            status_code=status.HTTP_510_NOT_EXTENDED,
+            detail="The command or option is not \
+            supported by the SMTP server",
+        )
     except smtplib.SMTPException:
         raise HTTPException(status_code=status.HTTP_510_NOT_EXTENDED, detail="Unknown SMTP error. Should not happen")
     except Exception as exception:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Send Email \
-            Error: " + str(exception))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Send Email \
+            Error: "
+            + str(exception),
+        )

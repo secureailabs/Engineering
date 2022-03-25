@@ -19,10 +19,10 @@ RUN apt-get update && \
 
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
-RUN pip3 install fastapi
-RUN pip3 install "uvicorn[standard]"
-
 RUN rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

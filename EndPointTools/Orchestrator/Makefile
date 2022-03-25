@@ -13,7 +13,7 @@ endif
 ROOTDIR=../..
 
 # Build rules for the SharedCommonCode directory
-include $(ROOTDIR)/Common.mk
+include $(ROOTDIR)/make/Common.mk
 
 # Add the new include folders here
 PYTHONINC = /usr/include/python3.8

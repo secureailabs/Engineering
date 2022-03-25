@@ -12,7 +12,7 @@ endif
 ROOTDIR=../..
 
 # Rules for using the SharedCommonCode static library and headers
-include $(ROOTDIR)/Common.mk
+include $(ROOTDIR)/make/Common.mk
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Sources)

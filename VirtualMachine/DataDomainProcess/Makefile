@@ -11,7 +11,7 @@ endif
 # The Root directory containing all the code
 ROOTDIR=../..
 
-include $(ROOTDIR)/Common.mk
+include $(ROOTDIR)/make/Common.mk
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath .)

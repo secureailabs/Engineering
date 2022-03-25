@@ -14,7 +14,7 @@ ABSROOTDIR=$(shell realpath $(ROOTDIR))
 OBJDIR=$(ABSROOTDIR)/Binary/Objects
 
 # Build rules for the SharedCommonCode directory
-include $(ROOTDIR)/Common.mk
+include $(ROOTDIR)/make/Common.mk
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./)

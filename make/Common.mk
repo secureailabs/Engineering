@@ -1,3 +1,11 @@
+BUILD_MODE?=debug
+
+ifeq ($(BUILD_MODE), debug)
+	CXXFLAGS+= -ggdb
+else
+	CXXFLAGS+= -O3
+endif
+
 ABSROOTDIR=$(shell realpath $(ROOTDIR))
 OBJDIR=$(ABSROOTDIR)/Binary/Objects
 

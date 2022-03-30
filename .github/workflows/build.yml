@@ -43,12 +43,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run a multi-line script, Build Binaries
+      - shell: bash
+        env:
+          PAT: $ {{ secret.JENKINS_BUILD_TOKEN }}
         run: |
           set -e
           pwd
           ls -l
           sudo chmod 666 /var/run/docker.sock
-          docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=${{ secrets.GITHUB_TOKEN }} -f CI_CD/Dockerfile.ci .
+          docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           docker run --name ubuntu_dev_CI -dit -p 6200:6200 -p 27017:27017 -v ${PWD}:/Workspace -w="/Workspace" ubuntu-development:1.0 /bin/bash
           docker exec -w /Workspace/ ubuntu_dev_CI sudo mongod --port 27017 --dbpath /srv/mongodb/db0 --replSet rs0 --bind_ip localhost --fork --logpath /var/log/mongod3.log

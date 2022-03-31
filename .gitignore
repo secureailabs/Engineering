@@ -3,6 +3,7 @@ Binary
 WebFrontend/InitializationVector.json
 DevopsConsole/InitializationVector.json
 SCN
+*/*/venv*/*
 *.tar.gz
 *__pycache__*
 *.log

@@ -1,18 +1,9 @@
-BUILD_MODE?=debug
-CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
-
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb
-else
-	CXXFLAGS+= -O3
-endif
-
 # The Root directory containing all the code
 ROOTDIR=../..
-
-# Rules for using the SharedCommonCode static library and headers
 include $(ROOTDIR)/make/Common.mk
+
+CXXFLAGS+=
+LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Sources)
@@ -50,7 +41,7 @@ $(OUTPUT): $(OBJS) SharedCommonCode
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 
 clean:
-	rm -rf $(OUTPUT) $(OBJS)
+	@rm -rf $(OUTPUT) $(OBJS)
 
 cleanall:
-	rm -rf $(ABSROOTDIR)/Binary
+	@rm -rf $(ABSROOTDIR)/Binary

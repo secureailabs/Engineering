@@ -1,10 +1,9 @@
-CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
-LDFLAGS= -lSharedCommonCode -pthread -ldl -luuid -lcrypto -lssl -lstdc++fs -lssl -lmongocxx -lbsoncxx -lcurl
-
 # The Root directory containing all the code
 ROOTDIR=../../../..
-# Build rules for the SharedCommonCode directory
 include $(ROOTDIR)/make/Common.mk
+
+CXXFLAGS+=
+LDFLAGS+= -lmongocxx -lbsoncxx -lcurl
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)

@@ -1,9 +1,9 @@
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -fPIC
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
-
 # The Root directory containing all the code
 ROOTDIR=../..
 include $(ROOTDIR)/make/Common.mk
+
+CXXFLAGS+=
+LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
@@ -13,10 +13,8 @@ INCLUDE+=-I$(shell realpath ../../WebService/RestApiPortal/Include)
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)
 SRCDIRS+=$(shell realpath ../SharedComponents/Sources)
-# SRCDIRS+=$(shell realpath ../../WebService/RestApiPortal/Sources)
 
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
-
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
@@ -33,7 +31,7 @@ $(OUTPUT): $(OBJS) SharedCommonCode
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 
 clean:
-	rm -rf $(OUTPUT) $(OBJS)
+	@rm -rf $(OUTPUT) $(OBJS)
 
 cleanall:
-	rm -rf $(ABSROOTDIR)/Binary
+	@rm -rf $(ABSROOTDIR)/Binary

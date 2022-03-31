@@ -1,10 +1,9 @@
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -Wall -g -MMD -MP -fPIC
-LDFLAGS = -Xlinker -export-dynamic -shared
-LDLIBS = -lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lutil -lm -lstdc++fs -lpython3.8 -lcurl
-
 # The Root directory containing all the code
 ROOTDIR=../..
 include $(ROOTDIR)/make/Common.mk
+
+CXXFLAGS+= -Wall -g -MMD -MP -fPIC
+LDFLAGS += -Xlinker -export-dynamic -shared -lm -lpython3.8
 
 # Add the new include folders here
 PYTHONINC = /usr/include/python3.8

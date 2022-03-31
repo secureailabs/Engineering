@@ -1,22 +1,19 @@
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -fPIC
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
-
 # The Root directory containing all the code
 ROOTDIR=../..
 include $(ROOTDIR)/make/Common.mk
 
+CXXFLAGS+=
+LDFLAGS+=
+
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
-#INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
+INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)
-#SRCDIRS+=$(shell realpath ../SharedComponents/Sources)
-
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
 .PHONY: all, clean, cleanall

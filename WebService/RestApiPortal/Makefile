@@ -1,10 +1,9 @@
-CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX -rdynamic
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lstdc++fs -lssl -lcurl
-
 # The Root directory containing all the code
 ROOTDIR=../..
-
 include $(ROOTDIR)/make/Common.mk
+
+CXXFLAGS+=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
+LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)

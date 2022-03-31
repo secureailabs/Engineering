@@ -4,7 +4,7 @@ include make/dataservices.mk
 include make/webfrontend.mk
 include make/securecomputationnode.mk
 
-.PHONY: platformservices dataservices securecomputationnode orchestrator databasetools deployutilities package all clean SharedCommonCode
+.PHONY: platformservices dataservices securecomputationnode orchestrator databaseTools demoDatabaseTools uploadPackageAndInitializationVector package all clean SharedCommonCode
 
 platformservices: SharedCommonCode
 	@make restapiportal platformservices_plugins
@@ -15,7 +15,7 @@ dataservices: SharedCommonCode
 	@echo "dataservices done!"
 
 orchestrator: SharedCommonCode EndPointTools/Orchestrator
-	@make -C EndPointTools/Orchestrator all
+	@make -C $(ORCHESTRATOR) all
 	@echo "orchestrator done!"
 
 securecomputationnode: SharedCommonCode
@@ -26,18 +26,27 @@ package: SharedCommonCode
 	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend
 	@echo "package done!"
 
-databasetools:
+databaseTools: SharedCommonCode
 	@make -C $(DATABASE_TOOLS) all
 	@echo "databaseTools done!"
 
-demodatabasetools:
+demoDatabaseTools: SharedCommonCode
 	@make -C $(DEMO_DATABASE_TOOLS) all
 	@echo "databaseTools done!"
 
-SharedCommonCode:
-	@make -C SharedCommonCode all
+uploadPackageAndInitializationVector: SharedCommonCode
+	@make -C $(UPLOAD_TOOL) all
+	@echo "databaseTools done!"
 
-all: package databasetools demodatabasetools
+baseVmInit: SharedCommonCode
+	@make -C $(BASE_VM_INIT) all
+	@echo "baseVmInit done!"
+
+SharedCommonCode:
+	@make -C $(SHARED_COMMON_CODE) all
+
+all: SharedCommonCode
+	@make package databasetools demoDatabaseTools baseVmInit uploadPackageAndInitializationVector
 	@echo "All build and packaged!"
 
 clean:

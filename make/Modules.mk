@@ -1,3 +1,13 @@
+WEB_SERVICES:=WebService
 REST_API_PORTAL:=WebService/RestApiPortal
 DATABASE_PORTAL:=WebService/DatabaseGateway
-WEB_SERVICES:=WebService
+
+DATABASE_TOOLS:=InternalTools/DatabaseTools
+DEMO_DATABASE_TOOLS:=InternalTools/DemoDatabaseTools
+UPLOAD_TOOL:=InternalTools/UploadPackageAndInitializationVector
+
+BASE_VM_INIT:=VirtualMachine/BaseVmImageInit
+
+SHARED_COMMON_CODE:=SharedCommonCode
+
+ORCHESTRATOR:=EndPointTools/Orchestrator

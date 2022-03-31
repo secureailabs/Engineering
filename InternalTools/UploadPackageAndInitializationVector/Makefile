@@ -1,9 +1,9 @@
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -fPIC
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
-
 # The Root directory containing all the code
 ROOTDIR=../..
 include $(ROOTDIR)/make/Common.mk
+
+CXXFLAGS+=
+LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath .)
@@ -12,9 +12,7 @@ INCLUDE+=-I$(shell realpath .)
 SRCDIRS+=$(shell realpath .)
 
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
-
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
 .PHONY: all, clean, cleanall
@@ -29,7 +27,7 @@ $(OUTPUT): $(OBJS) SharedCommonCode
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 
 clean:
-	rm -rf $(OUTPUT) $(OBJS)
+	@rm -rf $(OUTPUT) $(OBJS)
 
 cleanall:
-	rm -rf $(ABSROOTDIR)/Binary
+	@rm -rf $(ABSROOTDIR)/Binary

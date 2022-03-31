@@ -19,6 +19,8 @@ declare -a ListOfFiles=(
 "Binary/platformservices/SharedLibraries/RestApiPortal/libAccountDatabase.so"
 "Binary/platformservices/SharedLibraries/RestApiPortal/libDigitalContractDatabase.so"
 "Binary/platformservices/SharedLibraries/RestApiPortal/libDataFederationManager.so"
+"Binary/platformservices/Email/main.py"
+"Binary/platformservices/Email/sendEmail.py"
 )
 
 for val in "${ListOfFiles[@]}"; do

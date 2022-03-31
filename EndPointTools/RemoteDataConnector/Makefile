@@ -1,12 +1,5 @@
-BUILD_MODE?=debug
 CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX
 LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
-
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb
-else
-	CXXFLAGS+= -O3
-endif
 
 # The Root directory containing all the code
 ROOTDIR=../..

@@ -1,2 +1,3 @@
 REST_API_PORTAL:=WebService/RestApiPortal
+DATABASE_PORTAL:=WebService/DatabaseGateway
 WEB_SERVICES:=WebService

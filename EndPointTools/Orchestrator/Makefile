@@ -1,18 +1,9 @@
-BUILD_MODE?=debug
 CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -Wall -g -MMD -MP -fPIC -Werror
 LDFLAGS = -Xlinker -export-dynamic -shared
 LDLIBS = -lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lutil -lm -lstdc++fs -lpython3.8 -lcurl
 
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb -O0
-else
-	CXXFLAGS+= -O3
-endif
-
 # The Root directory containing all the code
 ROOTDIR=../..
-
-# Build rules for the SharedCommonCode directory
 include $(ROOTDIR)/make/Common.mk
 
 # Add the new include folders here

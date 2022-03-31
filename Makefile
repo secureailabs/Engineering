@@ -1,32 +1,44 @@
 include make/Modules.mk
 include make/platformservices.mk
+include make/dataservices.mk
+include make/webfrontend.mk
+include make/securecomputationnode.mk
 
-platformservices: restapiportal plugins
+.PHONY: platformservices dataservices securecomputationnode orchestrator databasetools deployutilities package all clean SharedCommonCode
+
+platformservices: SharedCommonCode
+	@make restapiportal platformservices_plugins
 	@echo "platformservices done!"
 
-dataservices:
+dataservices: SharedCommonCode
+	@make databaseportal dataservices_plugins
 	@echo "dataservices done!"
 
-backend: dataservices platformservices
-	@echo "backend done!"
-
-scn:
-	@echo "securecomputationnode done!"
-
-orchestrator:
+orchestrator: SharedCommonCode EndPointTools/Orchestrator
+	@make -C EndPointTools/Orchestrator all
 	@echo "orchestrator done!"
 
-databasetools:
-	@echo "databaseTools done!"
+securecomputationnode: SharedCommonCode
+	@make scn_componenets
+	@echo "securecomputationnode done!"
 
-deployutilities:
-	@echo "deployUtilities done!"
-
-package: backend orchestrator scn
+package: SharedCommonCode
+	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend
 	@echo "package done!"
 
-all: backend
-	@echo "All done!"
+databasetools:
+	@make -C $(DATABASE_TOOLS) all
+	@echo "databaseTools done!"
+
+demodatabasetools:
+	@make -C $(DEMO_DATABASE_TOOLS) all
+	@echo "databaseTools done!"
+
+SharedCommonCode:
+	@make -C SharedCommonCode all
+
+all: package databasetools demodatabasetools
+	@echo "All build and packaged!"
 
 clean:
-	rm -rf Binary
+	@rm -rf Binary

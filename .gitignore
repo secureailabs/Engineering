@@ -1,4 +1,8 @@
 .vscode/
 Binary
 WebFrontend/InitializationVector.json
+DevopsConsole/InitializationVector.json
 SCN
+*.tar.gz
+*__pycache__*
+*.log

@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
 
-PrintHelp()
-{
+PrintHelp() {
     echo ""
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0"
@@ -19,12 +18,11 @@ if [ $retVal -ne 0 ]; then
 fi
 
 # Parse the input parameters
-while getopts "i:" opt
-do
+while getopts "i:" opt; do
     echo "opt: $opt $OPTARG"
     case "$opt" in
-        i ) imageName="$OPTARG" ;;
-        ? ) PrintHelp ;;
+    i) imageName="$OPTARG" ;;
+    ?) PrintHelp ;;
     esac
 done
 
@@ -32,8 +30,7 @@ done
 networkName="sailNetwork"
 foundNetworkName=$(docker network ls --filter name=$networkName --format {{.Name}})
 echo "$foundNetworkName"
-if [ "$foundNetworkName" == "$networkName" ]
-then
+if [ "$foundNetworkName" == "$networkName" ]; then
     echo "Network already exists"
 else
     echo "Creating network"
@@ -41,8 +38,7 @@ else
 fi
 
 # Build the asked image if it specified in the input parameters
-if [ -z "$imageName" ]
-then
+if [ -z "$imageName" ]; then
     echo "No image specified. Building all of them..."
 else
     echo "Building image $imageName"

@@ -1,12 +1,11 @@
 # CI workflow Docker Build
 name: CI for Development Repository
 on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
   # Triggers the workflow on push or pull request events but only for the main branch
   pull_request:
     branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
 
 # Only one concurrent action at a time for group tag.
 concurrency:
@@ -44,14 +43,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run a multi-line script, Build Binaries
+        env:
+          PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
         run: |
           set -e
           pwd
           ls -l
           sudo chmod 666 /var/run/docker.sock
-          docker build -t ubuntu-development:1.0 --build-arg git_personal_token=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 -f Dockerfile.development .
+          docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
-          docker run --name ubuntu_dev_CI -dit -p 6200:6200 -p 27017:27017 -v ${PWD}:/Workspace -w="/Workspace" ubuntu-development:1.0 /bin/bash
+          docker run --name ubuntu_dev_CI -dit -p 6200:6200 -p 27017:27017 -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
           docker exec -w /Workspace/ ubuntu_dev_CI sudo mongod --port 27017 --dbpath /srv/mongodb/db0 --replSet rs0 --bind_ip localhost --fork --logpath /var/log/mongod3.log
           docker exec -w /Workspace/ ubuntu_dev_CI ps -ef
           docker exec -w /Workspace/ ubuntu_dev_CI ./CreateDailyBuild.sh

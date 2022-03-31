@@ -1,0 +1,21 @@
+FROM ubuntu
+ENV TZ=America/Toronto
+LABEL authors="stanley@secureailabs.com"
+USER root
+# Set tzdata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+git \
+python3.9 \
+pip
+
+# GIT
+ARG git_personal_token
+RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf " https://github.com/"
+RUN git clone https://$git_personal_token@github.com/secureailabs/ScratchPad.git /Test
+WORKDIR /Test
+RUN git pull
+RUN pip install -r StanleyLin/requirements.txt
+
+CMD ["/bin/bash"]

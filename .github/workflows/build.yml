@@ -55,7 +55,7 @@ jobs:
           docker run --name ubuntu_dev_CI -dit -p 6200:6200 -p 27017:27017 -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
           docker exec -w /Workspace/ ubuntu_dev_CI sudo mongod --port 27017 --dbpath /srv/mongodb/db0 --replSet rs0 --bind_ip localhost --fork --logpath /var/log/mongod3.log
           docker exec -w /Workspace/ ubuntu_dev_CI ps -ef
-          docker exec -w /Workspace/ ubuntu_dev_CI ./CreateDailyBuild.sh
+          docker exec -w /Workspace/ ubuntu_dev_CI make all -j
           docker exec -w /Workspace/Binary/ ubuntu_dev_CI ls -l
           docker stop ubuntu_dev_CI
           docker rm ubuntu_dev_CI

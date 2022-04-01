@@ -1,9 +1,13 @@
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
 include $(ROOTDIR)/make/Common.mk
 
 CXXFLAGS+=
 LDFLAGS+=
+
+# Add the new include folders here
+INCLUDE+=-I$(shell realpath .)
+INCLUDE+=-I$(VIRTUAL_MACHINE_SHARED)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath .)

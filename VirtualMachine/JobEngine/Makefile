@@ -1,5 +1,5 @@
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
 include $(ROOTDIR)/make/Common.mk
 
 CXXFLAGS+=
@@ -7,19 +7,15 @@ LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./)
-INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
-INCLUDE+=-I$(shell realpath ../CommunicationPortal)
-INCLUDE+=-I$(shell realpath ../DataDomainProcess)
+INCLUDE+=-I$(VIRTUAL_MACHINE_SHARED)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./)
-SRCDIRS+=$(shell realpath ../SharedComponents/Sources)
+SRCDIRS+=$(VIRTUAL_MACHINE_SHARED)/Sources
 
-SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
-SOURCES+=$(shell realpath ../CommunicationPortal/CommunicationPortal.cpp)
+SOURCES:= $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
 .PHONY: all, clean, cleanall

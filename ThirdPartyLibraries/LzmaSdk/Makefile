@@ -1,18 +1,8 @@
-LZMA_CFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
+# The Root directory containing all the code
+ROOTDIR=$(shell realpath ../../)
+include $(ROOTDIR)/make/Common.mk
 
-BUILD_MODE?=debug
-ifeq ($(BUILD_MODE), debug)
-	SHARED_COMMON_CXXFLAGS+= -ggdb
-else
-	SHARED_COMMON_CXXFLAGS+= -O3
-endif
-
-ROOTDIR:=../../
-
-ABSROOTDIR=$(shell realpath $(ROOTDIR))
-OBJDIR=$(ABSROOTDIR)/Binary/Objects
-
-FINDFILES = $(wildcard $(DIR)/*.c)
+CXXFLAGS+=
 
 # Add the new include folders here
 LZMA_INCLUDE :=-I$(shell realpath ./Include/)

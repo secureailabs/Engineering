@@ -2,7 +2,7 @@ CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX
 LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
 
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
 
 # Build rules for the SharedCommonCode directory
 include $(ROOTDIR)/make/Common.mk

@@ -1,13 +1,19 @@
-WEB_SERVICES:=WebService
-REST_API_PORTAL:=WebService/RestApiPortal
-DATABASE_PORTAL:=WebService/DatabaseGateway
+# Define ROOTDIR only if not already defined
+ROOTDIR?=$(shell realpath .)
 
-DATABASE_TOOLS:=InternalTools/DatabaseTools
-DEMO_DATABASE_TOOLS:=InternalTools/DemoDatabaseTools
-UPLOAD_TOOL:=InternalTools/UploadPackageAndInitializationVector
+WEB_SERVICES:=$(ROOTDIR)/WebService
+WEB_SERVICES_SHARED:=$(ROOTDIR)/WebService/SharedCommonCode
+REST_API_PORTAL:=$(ROOTDIR)/WebService/RestApiPortal
+DATABASE_PORTAL:=$(ROOTDIR)/WebService/DatabaseGateway
 
-BASE_VM_INIT:=VirtualMachine/BaseVmImageInit
+DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DatabaseTools
+DEMO_DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DemoDatabaseTools
+UPLOAD_TOOL:=$(ROOTDIR)/InternalTools/UploadPackageAndInitializationVector
+CRYPTOGRAPHIC_TOOLS:=$(ROOTDIR)/InternalTools/CryptographicTools
 
-SHARED_COMMON_CODE:=SharedCommonCode
+BASE_VM_INIT:=$(ROOTDIR)/VirtualMachine/BaseVmImageInit
+VIRTUAL_MACHINE_SHARED:=$(ROOTDIR)/VirtualMachine/SharedComponents
 
-ORCHESTRATOR:=EndPointTools/Orchestrator
+SHARED_COMMON_CODE:=$(ROOTDIR)/SharedCommonCode
+
+ORCHESTRATOR:=$(ROOTDIR)/EndPointTools/Orchestrator

@@ -1,5 +1,5 @@
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
 include $(ROOTDIR)/make/Common.mk
 
 CXXFLAGS+= -Wall -g -MMD -MP -fPIC
@@ -10,11 +10,10 @@ PYTHONINC = /usr/include/python3.8
 INCLUDE += -isystem$(PYTHONINC)
 
 INCLUDE+=-I$(shell realpath ./)
-INCLUDE+=-I$(shell realpath ../../SharedCommonCode/Include)
+INCLUDE+=-I$(SHARED_COMMON_CODE)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./)
-SRCDIRS+=$(shell realpath ../../SharedCommonCode/Sources)
 
 FINDFILES = $(wildcard $(DIR)/*.cpp)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))

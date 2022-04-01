@@ -1,5 +1,5 @@
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
 include $(ROOTDIR)/make/Common.mk
 
 CXXFLAGS+=
@@ -7,7 +7,7 @@ LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
-INCLUDE+=-I$(shell realpath ../SharedComponents/Include)
+INCLUDE+=-I$(SHARED_COMMON_CODE)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)

@@ -1,5 +1,5 @@
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
 include $(ROOTDIR)/make/Common.mk
 
 CXXFLAGS+=
@@ -8,7 +8,7 @@ LDFLAGS+=
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
 INCLUDE+=-I$(shell realpath ../../EndPointTools/RestPortalTester/Sources)
-INCLUDE+=-I$(shell realpath ../../WebService/RestApiPortal/Include)
+INCLUDE+=-I$(REST_API_PORTAL)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)

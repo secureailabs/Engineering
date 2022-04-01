@@ -22,7 +22,8 @@ SCN_BINARIES=$(SCN_COMPONENTS:VirtualMachine/%=Binary/%)
 Binary/%: VirtualMachine/%
 	@make -C $^ all
 
-scn_componenets: $(SCN_BINARIES)
+scn_componenets: SharedCommonCode
+	@make $(SCN_BINARIES)
 
 package_securecomputationnode: scn_componenets
 	@tar -czvf Binary/SecureComputationNode.tar.gz $(SCN_PACKAGE)

@@ -10,7 +10,7 @@ else
 endif
 
 # The Root directory containing all the code
-ROOTDIR=../../../..
+ROOTDIR=$(shell realpath ../../../..)
 include $(ROOTDIR)/make/Common.mk
 
 # Add the new include folders here

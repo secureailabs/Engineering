@@ -1,5 +1,5 @@
 # The Root directory containing all the code
-ROOTDIR=../../../..
+ROOTDIR=$(shell realpath ../../../..)
 ABSROOTDIR=$(shell realpath $(ROOTDIR))
 
 OUTPUT=$(ABSROOTDIR)/Binary/platformservices/$(notdir $(shell pwd))/

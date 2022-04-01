@@ -6,7 +6,7 @@ include make/securecomputationnode.mk
 
 .PHONY: platformservices dataservices securecomputationnode orchestrator databaseTools demoDatabaseTools uploadPackageAndInitializationVector package all clean SharedCommonCode
 
-platformservices: SharedCommonCode
+platformservices: SharedCommonCode WebServices_Shared
 	@make restapiportal platformservices_plugins
 	@echo "platformservices done!"
 
@@ -18,11 +18,11 @@ orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all
 	@echo "orchestrator done!"
 
-securecomputationnode: SharedCommonCode
+securecomputationnode: SharedCommonCode VirtualMachine_Shared
 	@make scn_componenets
 	@echo "securecomputationnode done!"
 
-package: SharedCommonCode
+package: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend
 	@echo "package done!"
 
@@ -45,8 +45,15 @@ baseVmInit: SharedCommonCode
 SharedCommonCode:
 	@make -C $(SHARED_COMMON_CODE) all
 
-all: SharedCommonCode
-	@make package databasetools demoDatabaseTools baseVmInit uploadPackageAndInitializationVector
+WebServices_Shared:
+	@make -C $(WEB_SERVICES_SHARED) all
+
+VirtualMachine_Shared:
+	@make -C $(VIRTUAL_MACHINE_SHARED) all
+
+all: SharedCommonCode WebServices_Shared VirtualMachine_Shared
+	@make package
+	@make databaseTools demoDatabaseTools baseVmInit uploadPackageAndInitializationVector
 	@echo "All build and packaged!"
 
 clean:

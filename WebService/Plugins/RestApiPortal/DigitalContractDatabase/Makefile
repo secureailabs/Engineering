@@ -1,5 +1,5 @@
 # The Root directory containing all the code
-ROOTDIR=../../../..
+ROOTDIR=$(shell realpath ../../../..)
 include $(ROOTDIR)/make/Common.mk
 
 CXXFLAGS+=
@@ -7,13 +7,13 @@ LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
-INCLUDE+=-I$(shell realpath ../../../../WebService/SharedCommonCode/Include)
-INCLUDE+=-I$(shell realpath ../../../../WebService/RestApiPortal/Include)
+INCLUDE+=-I$(WEB_SERVICES_SHARED)/Include
+INCLUDE+=-I$(REST_API_PORTAL)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)
-SRCDIRS+=$(shell realpath ../../../../WebService/RestApiPortal/Sources)
-SRCDIRS+=$(shell realpath ../../../../WebService/SharedCommonCode/Sources)
+SRCDIRS+=$(REST_API_PORTAL)/Sources
+SRCDIRS+=$(WEB_SERVICES_SHARED)/Sources
 
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)

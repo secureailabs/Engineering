@@ -2,7 +2,7 @@ CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX -fPIC
 LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lstdc++fs -lssl -lcurl
 
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
 ABSROOTDIR=$(shell realpath $(ROOTDIR))
 OBJDIR=$(ABSROOTDIR)/Binary/Objects
 
@@ -11,12 +11,11 @@ include $(ROOTDIR)/make/Common.mk
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
-INCLUDE+=-I$(shell realpath ../../SharedCommonCode/Include)
+INCLUDE+=-I$(SHARED_COMMON_CODE)/Include
 INCLUDE+=-I$(shell realpath ../../WebService/RestApiPortal/Include)
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)
-SRCDIRS+=$(shell realpath ../../SharedCommonCode/Sources)
 
 FINDFILES = $(wildcard $(DIR)/*.cpp)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))

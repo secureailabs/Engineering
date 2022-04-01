@@ -436,29 +436,3 @@ void __thiscall CommunicationPortal::OneTimeConnectionHandler(
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
 }
-
-/********************************************************************************************
- *
- * @class CommunicationPortal
- * @function StartServer
- * @brief Constructor to create a CommunicationPortal object
- * @param[in] poSocket Inout Request Params
- *
- ********************************************************************************************/
-
-Socket * const __stdcall CommunicationPortal::RegisterProcess(
-    _in const std::string & c_strProcessName
-)
-{
-    __DebugFunction();
-
-    // Establish a connection and register with the Communication Module
-    Socket * poSocket = ::ConnectToUnixDomainSocket(gc_strCommunicationPortalAddress);
-
-    StructuredBuffer oStructuredBufferProcessInformation;
-    oStructuredBufferProcessInformation.PutString("ProcessName", c_strProcessName);
-
-    ::PutIpcTransaction(poSocket, oStructuredBufferProcessInformation);
-
-    return poSocket;
-}

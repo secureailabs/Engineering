@@ -5,7 +5,7 @@ LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
 ROOTDIR=$(shell realpath ../..)
 
 # Build rules for the SharedCommonCode directory
-include $(ROOTDIR)/make/Common.mk
+include $(ROOTDIR)/Make/Common.mk
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath .)

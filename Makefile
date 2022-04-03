@@ -1,8 +1,8 @@
-include make/Modules.mk
-include make/platformservices.mk
-include make/dataservices.mk
-include make/webfrontend.mk
-include make/securecomputationnode.mk
+include Make/Modules.mk
+include Make/platformservices.mk
+include Make/dataservices.mk
+include Make/webfrontend.mk
+include Make/securecomputationnode.mk
 
 .PHONY: platformservices dataservices securecomputationnode orchestrator databaseTools demoDatabaseTools uploadPackageAndInitializationVector package all clean SharedCommonCode
 

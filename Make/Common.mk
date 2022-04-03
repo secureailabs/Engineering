@@ -1,7 +1,7 @@
 ifndef ROOTDIR
 $(error ROOTDIR is not set. Common.mk can only be included in a file which has ROOTDIR defined)
 endif
-include $(ROOTDIR)/make/Modules.mk
+include $(ROOTDIR)/Make/Modules.mk
 
 BUILD_MODE?=debug
 CXXFLAGS+=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX

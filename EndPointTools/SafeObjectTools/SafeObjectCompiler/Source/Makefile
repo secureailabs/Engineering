@@ -11,7 +11,7 @@ endif
 
 # The Root directory containing all the code
 ROOTDIR=$(shell realpath ../../../..)
-include $(ROOTDIR)/make/Common.mk
+include $(ROOTDIR)/Make/Common.mk
 
 # Add the new include folders here
 PYTHONINC = /usr/include/python3.8

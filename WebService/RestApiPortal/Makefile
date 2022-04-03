@@ -1,6 +1,6 @@
 # The Root directory containing all the code
 ROOTDIR=$(shell realpath ../..)
-include $(ROOTDIR)/make/Common.mk
+include $(ROOTDIR)/Make/Common.mk
 
 CXXFLAGS+=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
 LDFLAGS+=

@@ -1,6 +1,6 @@
 # The Root directory containing all the code
 ROOTDIR=$(shell realpath ../..)
-include $(ROOTDIR)/make/Common.mk
+include $(ROOTDIR)/Make/Common.mk
 
 CXXFLAGS+= -Wall -g -MMD -MP -fPIC
 LDFLAGS += -Xlinker -export-dynamic -shared -lm -lpython3.8

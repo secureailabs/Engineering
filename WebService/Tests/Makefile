@@ -1,22 +1,14 @@
-BUILD_MODE?=debug
-CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX -fPIC
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lstdc++fs -lssl -lcurl
-
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb
-else
-	CXXFLAGS+= -O3
-endif
-
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
+include $(ROOTDIR)/Make/Common.mk
 
-include $(ROOTDIR)/Common.mk
+CXXFLAGS+=
+LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
 INCLUDE+=-I$(shell realpath ../../EndPointTools/RestPortalTester/Sources)
-INCLUDE+=-I$(shell realpath ../../WebService/RestApiPortal/Include)
+INCLUDE+=-I$(REST_API_PORTAL)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)
@@ -43,7 +35,7 @@ $(OUTPUT): $(OBJS) SharedCommonCode
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 
 clean:
-	rm -rf $(OUTPUT) $(OBJS)
+	@rm -rf $(OUTPUT) $(OBJS)
 
 cleanall:
-	rm -rf $(ABSROOTDIR)/Binary
+	@rm -rf $(ABSROOTDIR)/Binary

@@ -1,30 +1,19 @@
-BUILD_MODE?=debug
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -Wall -g -MMD -MP -fPIC
-LDFLAGS = -Xlinker -export-dynamic -shared
-LDLIBS = -lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lutil -lm -lstdc++fs -lpython3.8 -lcurl
-
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb -O0
-else
-	CXXFLAGS+= -O3
-endif
-
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
+include $(ROOTDIR)/Make/Common.mk
 
-# Build rules for the SharedCommonCode directory
-include $(ROOTDIR)/Common.mk
+CXXFLAGS+= -Wall -g -MMD -MP -fPIC
+LDFLAGS += -Xlinker -export-dynamic -shared -lm -lpython3.8
 
 # Add the new include folders here
 PYTHONINC = /usr/include/python3.8
 INCLUDE += -isystem$(PYTHONINC)
 
 INCLUDE+=-I$(shell realpath ./)
-INCLUDE+=-I$(shell realpath ../../SharedCommonCode/Include)
+INCLUDE+=-I$(SHARED_COMMON_CODE)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./)
-SRCDIRS+=$(shell realpath ../../SharedCommonCode/Sources)
 
 FINDFILES = $(wildcard $(DIR)/*.cpp)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))

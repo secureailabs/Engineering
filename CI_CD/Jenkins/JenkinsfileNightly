@@ -24,7 +24,7 @@ pipeline {
                     pwd
                     ls -l
                     sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Docker/platformservices/InitializationVector.json
-                    ./CreateDailyBuild.sh
+                    make all -j
                     cp ./Binary/DatabaseTools ./Binary/platformservices
                     '''
                 }

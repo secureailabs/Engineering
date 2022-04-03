@@ -1,19 +1,9 @@
-BUILD_MODE?=debug
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX -Wall -g -MMD -MP -fPIC -Werror
-LDFLAGS = -Xlinker -export-dynamic -shared
-LDLIBS = -lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lutil -lm -lstdc++fs -lpython3.8 -lcurl
-
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb -O0
-else
-	CXXFLAGS+= -O3
-endif
-
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
+include $(ROOTDIR)/Make/Common.mk
 
-# Build rules for the SharedCommonCode directory
-include $(ROOTDIR)/Common.mk
+CXXFLAGS+= -Wall -g -MMD -MP -fPIC -Werror
+LDFLAGS += -Xlinker -export-dynamic -shared -lutil -lm -lpython3.8
 
 # Add the new include folders here
 PYTHONINC = /usr/include/python3.8
@@ -27,9 +17,7 @@ INCLUDE+=-I$(shell realpath ../../VirtualMachine/SharedComponents/Include)
 SRCDIRS+=$(shell realpath ./Sources)
 SRCDIRS+=$(shell realpath ../../VirtualMachine/SharedComponents/Sources)
 
-FINDFILES = $(wildcard $(DIR)/*.cpp)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
-
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
 
 OUTPUT=$(ABSROOTDIR)/Binary/SAILPyAPI.so
@@ -44,7 +32,7 @@ $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 
 $(OUTPUT): $(OBJS) SharedCommonCode
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 	@cp $@ ./sail/sail/
 
 cleanall:

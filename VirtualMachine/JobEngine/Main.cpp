@@ -15,11 +15,37 @@
 #include "StructuredBuffer.h"
 #include "JobEngine.h"
 #include "SocketClient.h"
-#include "CommunicationPortal.h"
+#include "IpcTransactionHelperFunctions.h"
+#include "Enums.h"
 
 #include <iostream>
 
 JobEngine JobEngine::m_oJobEngine;
+
+/********************************************************************************************
+ *
+ * @function RegisterProcess
+ * @brief Register a process with CommunicationPortal
+ * @param[in] c_strProcessName Process name
+ *
+ ********************************************************************************************/
+
+Socket * const __stdcall RegisterProcess(
+    _in const std::string & c_strProcessName
+)
+{
+    __DebugFunction();
+
+    // Establish a connection and register with the Communication Module
+    Socket * poSocket = ::ConnectToUnixDomainSocket(gc_strCommunicationPortalAddress);
+
+    StructuredBuffer oStructuredBufferProcessInformation;
+    oStructuredBufferProcessInformation.PutString("ProcessName", c_strProcessName);
+
+    ::PutIpcTransaction(poSocket, oStructuredBufferProcessInformation);
+
+    return poSocket;
+}
 
 int __cdecl main(
     _in int nNumberOfArguments,
@@ -38,7 +64,7 @@ int __cdecl main(
 
         // Connect and Register to the Communication module for further communication
         std::cout << "Registering the JobEngine on Communication Server..." << std::endl;
-        Socket * const poSocket = CommunicationPortal::RegisterProcess("JobEngine");
+        Socket * const poSocket = ::RegisterProcess("JobEngine");
 
         // Get the singleton object of the Job Engine
         JobEngine & oJobEngine = JobEngine::Get();

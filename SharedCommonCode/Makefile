@@ -1,19 +1,9 @@
-SHARED_COMMON_CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
+# The Root directory containing all the code
+ROOTDIR=$(shell realpath ../)
+include $(ROOTDIR)/Make/Common.mk
 
-BUILD_MODE?=debug
-ifeq ($(BUILD_MODE), debug)
-	SHARED_COMMON_CXXFLAGS+= -ggdb
-else
-	SHARED_COMMON_CXXFLAGS+= -O3
-endif
-
-ROOTDIR:=../
-
-ABSROOTDIR=$(shell realpath $(ROOTDIR))
-OBJDIR=$(ABSROOTDIR)/Binary/Objects
+CXXFLAGS+=
 LIB_WORKSPACE_DIR = $(OBJDIR)/LibWorkspace
-
-FINDFILES = $(wildcard $(DIR)/*.cpp)
 
 # Add the new include folders here
 SHARED_COMMON_INCLUDE :=-I$(shell realpath $(ABSROOTDIR)/SharedCommonCode/Include)
@@ -33,7 +23,7 @@ all: $(SHARED_COMMON_LIBRARY)
 
 $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(SHARED_COMMON_CXXFLAGS) $(SHARED_COMMON_INCLUDE) -c $^ -o $@
+	$(CXX) $(CXXFLAGS) $(SHARED_COMMON_INCLUDE) -c $^ -o $@
 
 $(LZMA_LIBRARY):
 	@make -C $(ABSROOTDIR)/ThirdPartyLibraries/LzmaSdk all

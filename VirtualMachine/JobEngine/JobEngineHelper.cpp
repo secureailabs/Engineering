@@ -12,9 +12,9 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "SocketClient.h"
-#include "DataConnector.h"
 #include "IpcTransactionHelperFunctions.h"
 #include "FileUtils.h"
+#include "Enums.h"
 
 #include <sys/inotify.h>
 #include <unistd.h>

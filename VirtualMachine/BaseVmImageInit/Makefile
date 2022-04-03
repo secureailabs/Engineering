@@ -1,25 +1,15 @@
-BUILD_MODE?=debug
-CXXFLAGS=-std=c++17 -fstack-protector -DUNIX -DOS_UNIX
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lcurl
-
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb
-else
-	CXXFLAGS+= -O3
-endif
-
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
+include $(ROOTDIR)/Make/Common.mk
 
-include $(ROOTDIR)/Common.mk
+CXXFLAGS+=
+LDFLAGS+=
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath .)
-
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
-
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
 .PHONY: all, clean, cleanall

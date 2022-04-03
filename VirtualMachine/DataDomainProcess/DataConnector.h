@@ -17,21 +17,11 @@
 #include "RootOfTrustNode.h"
 #include "Socket.h"
 #include "StructuredBuffer.h"
+#include "Enums.h"
 
 #include <map>
 #include <string>
 #include <vector>
-
-enum CSVRequest
-{
-    eGetRowRange,
-    eGetColumnRange,
-    eGetTable,
-    eGetDatasetMetadata,
-    eGetTableMetadata,
-    eCloseFile,
-    eGetUuids
-};
 
 /********************************************************************************************/
 

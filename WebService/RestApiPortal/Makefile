@@ -1,21 +1,13 @@
-BUILD_MODE?=debug
-CXXFLAGS=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX -rdynamic
-LDFLAGS=-lSharedCommonCode -lpthread -ldl -luuid -lrt -lcrypto -lssl -lstdc++fs -lssl -lcurl
-
-ifeq ($(BUILD_MODE), debug)
-	CXXFLAGS+= -ggdb
-else
-	CXXFLAGS+= -O3
-endif
-
 # The Root directory containing all the code
-ROOTDIR=../..
+ROOTDIR=$(shell realpath ../..)
+include $(ROOTDIR)/Make/Common.mk
 
-include $(ROOTDIR)/Common.mk
+CXXFLAGS+=-std=c++17 -fPIC -fstack-protector -DUNIX -DOS_UNIX
+LDFLAGS+=
 
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Include)
-INCLUDE+=-I$(shell realpath ../SharedCommonCode/Include)
+INCLUDE+=-I$(WEB_SERVICES_SHARED)/Include
 
 # Add the new source directory here
 SRCDIRS+=$(shell realpath ./Sources)

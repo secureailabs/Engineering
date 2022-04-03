@@ -17,12 +17,11 @@
 #include "Socket.h"
 #include "TlsNode.h"
 #include "StructuredBuffer.h"
+#include "Enums.h"
 
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
-
-const std::string gc_strCommunicationPortalAddress = "{3d14320b-c7bd-4496-81b3-90a4a703af93}";
 
 class CommunicationPortal : public Object
 {
@@ -42,12 +41,6 @@ class CommunicationPortal : public Object
             _in Word wPortNumber
             );
         void __thiscall WaitForProcessToRegister(void);
-
-        // This function will be used by the process to register themselves
-        // with the Communication Portal and get a socket for further communication
-        static Socket * const __thiscall RegisterProcess(
-            _in const std::string & c_strProcessName
-        );
 
     private:
 

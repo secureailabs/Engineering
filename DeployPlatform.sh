@@ -56,11 +56,11 @@ if [ -z "${AZURE_CLIENT_SECRET}" ]; then
 fi
 
 # Build and Package the Platform Services
-./BuildPlatformServices.sh
-./PackagePlatformServices.sh
+make package_platformservices
+make package_dataservices
 
 # Build and Package the Frontend Services
-./PackageWebFrontend.sh
+make package_webfrontend
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir
@@ -78,9 +78,9 @@ popd
 cp Binary/DemoDatabaseTools $tempDeployDir
 cp Binary/UploadPackageAndInitializationVector $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
-mv webfrontend.tar.gz $tempDeployDir
-mv PlatformServices.tar.gz $tempDeployDir/platformservices.tar.gz
-mv DataServices.tar.gz $tempDeployDir/dataservices.tar.gz
+mv Binary/webfrontend.tar.gz $tempDeployDir
+mv Binary/PlatformServices.tar.gz $tempDeployDir/platformservices.tar.gz
+mv Binary/DataServices.tar.gz $tempDeployDir/dataservices.tar.gz
 cp -r InternalTools/DeployPlatform/* $tempDeployDir
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime

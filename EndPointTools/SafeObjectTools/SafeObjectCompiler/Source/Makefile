@@ -10,8 +10,8 @@ else
 endif
 
 # The Root directory containing all the code
-ROOTDIR=../../../..
-include $(ROOTDIR)/Common.mk
+ROOTDIR=$(shell realpath ../../../..)
+include $(ROOTDIR)/Make/Common.mk
 
 # Add the new include folders here
 PYTHONINC = /usr/include/python3.8

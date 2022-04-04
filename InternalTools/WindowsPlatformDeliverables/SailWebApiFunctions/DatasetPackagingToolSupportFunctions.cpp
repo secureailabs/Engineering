@@ -586,8 +586,8 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
         StructuredBuffer oDatasetMetadata;
         // STEP 1: Generic dataset level metadata
         oDatasetMetadata.PutString("Version", "0.1.0");
-        oDatasetMetadata.PutGuid("DatasetIdentifier", Guid(c_szDatasetIdentifier));
-        oDatasetMetadata.PutGuid("PublisherIdentifier", Guid(::GetSailPlatformServicesUserOrganizationIdentifier().c_str()));
+        oDatasetMetadata.PutGuid("DatasetGuid", Guid(c_szDatasetIdentifier));
+        oDatasetMetadata.PutGuid("OrganizationGuid", Guid(::GetSailPlatformServicesUserOrganizationIdentifier().c_str()));
         oDatasetMetadata.PutString("Title", c_szDatasetTitle);
         oDatasetMetadata.PutString("Description", c_szDatasetDescription);
         oDatasetMetadata.PutString("Tags", c_szDatasetTags);
@@ -788,7 +788,7 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
         std::string strApiUri = "/SAIL/DatasetManager/RegisterDataset?Eosb=" + ::GetSailPlatformServicesEosb();
         StructuredBuffer oRestApiCall;
         StructuredBuffer oDatasetMetadataToRegister;
-        oRestApiCall.PutString("DatasetGuid", oDatasetMetadata.GetGuid("DatasetIdentifier").ToString(eHyphensOnly));
+        oRestApiCall.PutString("DatasetGuid", oDatasetMetadata.GetGuid("DatasetGuid").ToString(eHyphensOnly));
         oDatasetMetadataToRegister.PutString("VersionNumber", "0.1.0.0");
         oDatasetMetadataToRegister.PutString("DatasetName", oDatasetMetadata.GetString("Title"));
         oDatasetMetadataToRegister.PutString("Description", oDatasetMetadata.GetString("Description"));

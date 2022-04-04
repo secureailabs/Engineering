@@ -68,14 +68,14 @@ void __thiscall DatabaseTools::InitializeMembers(void)
     // Initialize to the number of other users that will be added for each organization
     m_unNumberOfOtherUsers = 2;
     // Add datasets information
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Chronic Kidney Disease dataset", "Data has 25 features which may predict a patient with chronic kidney disease", "Health conditions", GetEpochTimeInSeconds(), 1, "N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Raman spectroscopy of Diabetes", "Raman Spectroscopy to Screen Diabetes Mellitus with Machine Learning Tools", "computer science,health,classification,diabetes,healthcare,nutrition,medicine", GetEpochTimeInSeconds(), 1, "N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Telco Customer Churn", "Focused customer retention programs", "business", GetEpochTimeInSeconds(), 1, "N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Harvest", "A toolkit for extracting posts and post metadata from web forums", "computer science,software,programming", GetEpochTimeInSeconds(), 1, "N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "Obesity among adults by country, 1975-2016", "Prevalence of obesity among adults", "N/A", GetEpochTimeInSeconds(), 1, "N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "KCA Breast Cancer Dataset - I", "Predict whether the cancer is benign or malignant", "breast cancer,cancer,healthcare,benign,malignant", GetEpochTimeInSeconds(), 1, "N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "KCA Breast Cancer Dataset - II", "Predict whether the cancer is benign or malignant", "breast cancer,cancer,healthcare,benign,malignant", GetEpochTimeInSeconds(), 1, "N/A"));
-    m_stlDatasets.push_back(DatasetInformation(Guid(eDataset).ToString(eHyphensAndCurlyBraces), "0x00000001", "KCA Breast Cancer Dataset - III", "Predict whether the cancer is benign or malignant", "breast cancer,cancer,healthcare,benign,malignant", GetEpochTimeInSeconds(), 1, "N/A"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_001.csvp"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_002.csvp"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_003.csvp"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_004.csvp"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_005.csvp"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_006.csvp"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_007.csvp"));
+    m_stlDatasets.push_back(DatasetInformation("Datataset_008.csvp"));
     // Add digital contracts information
     std::string strLegalAgreement = "The Parties acknowledge and agree that this Agreement represents the entire agreement between the Parties. "
                                     "In the event that the Parties desire to change, add, or otherwise modify any terms, they shall do so in writing to be signed by both parties.";
@@ -170,30 +170,7 @@ void __thiscall DatabaseTools::AddDatasets(void)
     // The dataset guids will later be used in the digital contracts
     for (unsigned int unIndex = 0; unIndex < m_stlDatasets.size(); ++unIndex)
     {
-        StructuredBuffer oPacket;
-        oPacket.PutString("DatasetGuid", m_stlDatasets.at(unIndex).m_strDatasetGuid);
-
-        StructuredBuffer oDsetInformation;
-        oDsetInformation.PutString("VersionNumber", m_stlDatasets.at(unIndex).m_strVersionNumber);
-        oDsetInformation.PutString("DatasetName", m_stlDatasets.at(unIndex).m_strName);
-        oDsetInformation.PutString("Description", m_stlDatasets.at(unIndex).m_strDescription);
-        oDsetInformation.PutString("Keywords", m_stlDatasets.at(unIndex).m_strKeywords);
-        oDsetInformation.PutUnsignedInt64("PublishDate", m_stlDatasets.at(unIndex).m_un64PublishTime);
-        oDsetInformation.PutByte("PrivacyLevel", m_stlDatasets.at(unIndex).m_bPrivacyLevel);
-        oDsetInformation.PutString("JurisdictionalLimitations", m_stlDatasets.at(unIndex).m_strLimitations);
-        StructuredBuffer oTables;
-        StructuredBuffer oSingleTable;
-        oSingleTable.PutString("ColumnName", ",AGE,BMI,PD-L1 level before treatment,PD-L1 level after treatment,PD-L2 level before treatment,PD-L2 level after treatment,PD1 level before treatment,PD1 level after treatment,");
-        oSingleTable.PutString("Description", "table 1_2");
-        oSingleTable.PutString("Hashtags", "t1h2");
-        oSingleTable.PutString("Name", "1_2.csv");
-        oSingleTable.PutDword("NumberColumns", 9);
-        oSingleTable.PutDword("NumberRows", 30);
-        oTables.PutStructuredBuffer("52d7aa80-f18f-4932-af61-ecf6fd74c064", oSingleTable);
-        oDsetInformation.PutStructuredBuffer("Tables", oTables);
-        oPacket.PutStructuredBuffer("DatasetData", oDsetInformation);
-        // Register dataset
-        ::RegisterDataset(strEncodedEosb, oPacket);
+        ::RegisterDataset(strEncodedEosb, StructuredBuffer(m_stlDatasets.at(unIndex).m_oDataset.GetSerializedDatasetMetadata()));
     }
 
     std::cout << "Datasets added successfully." << std::endl;
@@ -223,7 +200,7 @@ void __thiscall DatabaseTools::AddDigitalContracts(void)
         oDcInformation.PutUnsignedInt64("SubscriptionDays", m_stlDigitalContracts.at(unIndex).m_unSubscriptionDays);
         oDcInformation.PutString("LegalAgreement", m_stlDigitalContracts.at(unIndex).m_strLegalAgreement);
         oDcInformation.PutString("Description", m_stlDigitalContracts.at(unIndex).m_strDescription);
-        oDcInformation.PutString("DatasetGuid", m_stlDatasets.at(unIndex).m_strDatasetGuid);
+        oDcInformation.PutString("DatasetGuid", m_stlDatasets.at(unIndex).m_oDataset.GetDatasetIdentifier());
         // Register digital contract
         ::RegisterDigitalContract(strEncodedEosb, oDcInformation);
     }

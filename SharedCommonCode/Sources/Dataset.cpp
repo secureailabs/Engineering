@@ -230,3 +230,12 @@ DatasetTable __thiscall Dataset::GetDatasetTable(
 
     return DatasetTable(m_strFilename, oTable.GetSerializedBuffer(), un64Offset);
 }
+
+/********************************************************************************************/
+
+std::vector<Byte> __thiscall Dataset::GetSerializedDatasetMetadata(void) const throw()
+{
+    __DebugFunction();
+    
+    return m_oDatasetMetadata.GetSerializedBuffer();
+}

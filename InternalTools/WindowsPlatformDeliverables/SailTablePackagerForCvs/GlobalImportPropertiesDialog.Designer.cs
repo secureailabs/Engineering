@@ -318,6 +318,7 @@
             this.m_PreviewDataGrid.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.m_PreviewDataGrid.Size = new System.Drawing.Size(858, 404);
             this.m_PreviewDataGrid.TabIndex = 0;
+            this.m_PreviewDataGrid.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.m_PreviewDataGrid_ColumnAdded);
             // 
             // m_NextButton
             // 

@@ -121,9 +121,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
             // Virtual Machine is waiting for this dataset
             std::string strVerb = "PUT";
             std::string strApiUrl = "/SAIL/RemoteDataConnectorManager/HeartBeat?Eosb=" + ::GetSailPlatformServicesEosb();
-            auto oJsonBody = JsonValue::ParseStructuredBufferToJson(oHeartbeatRequest);
-            std::string strJsonBody = oJsonBody->ToString();
-            oJsonBody->Release();
+            std::string strJsonBody = ::ConvertStructuredBufferToJson(oHeartbeatRequest);
             std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word) 6200, strVerb, strApiUrl, strJsonBody, true);
             // Parse the returning value.
             StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
@@ -258,9 +256,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
             oUpdateDataConnector.PutString("RemoteDataConnectorGuid", gs_oRemoteDataConnectorIdentifier.ToString(eHyphensAndCurlyBraces));
             oUpdateDataConnector.PutStructuredBuffer("Datasets", oListOfDatasets);
             oUpdateDataConnector.PutString("Version", "0.0.1");
-            auto oJsonBody = JsonValue::ParseStructuredBufferToJson(oUpdateDataConnector);
-            std::string strJsonBody = oJsonBody->ToString();
-            oJsonBody->Release();
+            std::string strJsonBody = ::ConvertStructuredBufferToJson(oUpdateDataConnector);
             std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word) 6200, strVerb, strApiUrl, strJsonBody, true);
             // Parse the returning value.
             StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());

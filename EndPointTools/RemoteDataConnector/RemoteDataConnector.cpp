@@ -14,7 +14,7 @@
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
 #include "FileUtils.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "RemoteDataConnector.h"
 #include "TlsClient.h"
 #include "TlsTransactionHelperFunctions.h"
@@ -230,8 +230,7 @@ void __thiscall RemoteDataConnector::SendDataConnectorHeartbeat(void) throw()
             oJsonBody->Release();
             std::cout << "Sending a heartbeat to backend" << std::endl;
             std::vector<Byte> stlRestResponse = ::RestApiCall(m_strRestPortalAddress, m_dwRestPortalPort, strVerb, strApiUrl, strJsonBody, true);
-            std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-            StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
             if (200 == oResponse.GetFloat64("Status"))
             {
                 // Update the Eosb in case it changed
@@ -322,8 +321,7 @@ bool __thiscall RemoteDataConnector::UserLogin(
     std::string strApiUrl = "/SAIL/AuthenticationManager/User/Login?Email="+ c_strEmail +"&Password="+ c_strPassword;
     std::string strJsonBody = "";
     std::vector<Byte> stlRestResponse = ::RestApiCall(c_strRestPortalIpAddress, c_dwPort, strVerb, strApiUrl, strJsonBody, true);
-    std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-    StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str());
+    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
     if (201 == oResponse.GetFloat64("Status"))
     {
         fLoginSuccess = true;
@@ -334,8 +332,7 @@ bool __thiscall RemoteDataConnector::UserLogin(
     strApiUrl = "/SAIL/AuthenticationManager/GetBasicUserInformation?Eosb="+ m_strUserEosb;
     // Make the API call and get REST response
     stlRestResponse = ::RestApiCall(c_strRestPortalIpAddress, c_dwPort, "GET", strApiUrl, strJsonBody, true);
-    strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-    oResponse = JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str());
+    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
     _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed REST Response", nullptr);
 
     m_strUserUuid = oResponse.GetString("UserGuid");
@@ -455,8 +452,7 @@ bool __thiscall RemoteDataConnector::UpdateDatasets(void)
     std::string strJsonBody = oJsonBody->ToString();
     oJsonBody->Release();
     std::vector<Byte> stlRestResponse = ::RestApiCall(m_strRestPortalAddress, m_dwRestPortalPort, strVerb, strApiUrl, strJsonBody, true);
-    std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-    StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
     if ((201 == oResponse.GetFloat64("Status")) || 200 == oResponse.GetFloat64("Status"))
     {
         m_strUserEosb = oResponse.GetString("Eosb");

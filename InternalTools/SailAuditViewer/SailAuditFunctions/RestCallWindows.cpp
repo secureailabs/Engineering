@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "StructuredBuffer.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 
@@ -109,7 +109,7 @@ StructuredBuffer GetListOfEvents(
         std::string strApiUri = "/SAIL/AuditLogManager/GetListOfEvents";
         std::vector<Byte> stlRestResponse = ::RestApiCall(strHostIp, nPort, strVerb, strApiUri, strContent);
         std::cout << stlRestResponse.data() << std::endl;
-        StructuredBuffer oResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlRestResponse.data());
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
         _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error getting list of events.", nullptr);
 
         StructuredBuffer oListOfEvents(oResponse.GetStructuredBuffer("ListOfEvents"));
@@ -139,18 +139,17 @@ int main()
         std::string strApiUri = "/SAIL/AuthenticationManager/User/Login?Email=overlord@zerg.com&Password=sailpassword";
         std::string strJsonBody = "";
         std::vector<byte> stlRestResponse = ::RestApiCall(strHostIp, nPort, strVerb, strApiUri, strJsonBody);
-        StructuredBuffer oStructuredBuffer = JsonValue::ParseDataToStructuredBuffer((const char*)stlRestResponse.data());
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
 
         // GET USER BASIC INFORMATION
-        std::string strEncodedEosb = ::UnEscapeJsonString(oStructuredBuffer.GetString("Eosb"));
         strVerb = "GET";
-        strApiUri = "/SAIL/AuthenticationManager/GetBasicUserInformation?Eosb=" + strEncodedEosb;
+        strApiUri = "/SAIL/AuthenticationManager/GetBasicUserInformation?Eosb=" + oResponse.GetString("Eosb");
         stlRestResponse = ::RestApiCall(strHostIp, nPort, strVerb, strApiUri, strJsonBody);
-        StructuredBuffer oBasicUserInfoStructuredBuffer = JsonValue::ParseDataToStructuredBuffer((const char*)stlRestResponse.data());
+        oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
 
         // GET LIST OF EVENTS
         const std::string c_strParentGuid = "{00000000-0000-0000-0000-000000000000}";
-        const std::string c_strOrganizationGuid = oBasicUserInfoStructuredBuffer.GetString("OrganizationGuid");
+        const std::string c_strOrganizationGuid = oResponse.GetString("OrganizationGuid");
         const unsigned int unSequenceNumber = 0;
         StructuredBuffer oAuditEventsStructuredBuffer = ::GetListOfEvents(strEncodedEosb, c_strParentGuid, c_strOrganizationGuid, 0);
     }

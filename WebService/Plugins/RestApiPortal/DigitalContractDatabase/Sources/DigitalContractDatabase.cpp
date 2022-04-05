@@ -17,7 +17,7 @@
 #include "TlsClient.h"
 #include "AzureHelper.h"
 #include "Guid.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "CurlRest.h"
 #include "TlsTransactionHelperFunctions.h"
 #include "Base64Encoder.h"

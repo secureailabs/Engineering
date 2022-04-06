@@ -12,6 +12,7 @@
 
 #include "64BitHashes.h"
 #include "CryptoUtils.h"
+#include "Dataset.h"
 #include "DateAndTime.h"
 #include "DebugLibrary.h"
 #include "EntityTypes.h"
@@ -129,34 +130,14 @@ DigitalContractInformation;
 
 typedef struct DatasetInformation
 {
-    std::string m_strDatasetGuid;
-    std::string m_strVersionNumber;
-    std::string m_strName;
-    std::string m_strDescription;
-    std::string m_strKeywords;
-    uint64_t m_un64PublishTime;
-    Byte m_bPrivacyLevel;
-    std::string m_strLimitations;
-
+    Dataset m_oDataset;
+    
     DatasetInformation(
-        _in const std::string & c_strDatasetGuid,
-        _in const std::string & c_strVersionNumber,
-        _in const std::string & c_strName,
-        _in const std::string & c_strDescription,
-        _in const std::string & c_strKeywords,
-        _in uint64_t un64PublishTime,
-        _in Byte bPrivacyLevel,
-        _in const std::string & c_strLimitations
+        _in const char * c_szDatasetFilename
         )
+        : m_oDataset(c_szDatasetFilename)
     {
-        m_strDatasetGuid = c_strDatasetGuid;
-        m_strVersionNumber = c_strVersionNumber;
-        m_strName = c_strName;
-        m_strDescription = c_strDescription;
-        m_strKeywords = c_strKeywords;
-        m_un64PublishTime = un64PublishTime;
-        m_bPrivacyLevel = bPrivacyLevel;
-        m_strLimitations = c_strLimitations;
+        
     }
 } 
 DatasetInformation;

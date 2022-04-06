@@ -66,7 +66,7 @@ class DatasetTable: public Object
             _in const char * c_szColumnIdentifier
             ) const;
         StructuredBuffer __thiscall GetInformationForDataAccess(void) const throw();
-    
+        
     private:
     
         std::string m_strFilename;
@@ -102,7 +102,9 @@ class Dataset : public Object
         DatasetTable __thiscall GetDatasetTable(
             _in const char * c_szTableIdentifier
             ) const;
-            
+
+        std::vector<Byte> __thiscall GetSerializedDatasetMetadata(void) const throw();
+        
     private:
     
         // Variable used to track whether or not this object instance is just metadata or

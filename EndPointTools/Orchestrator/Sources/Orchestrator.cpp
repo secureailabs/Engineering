@@ -51,11 +51,9 @@ std::string __stdcall GetJsonForStructuredBuffer(
     )
 {
     std::string strJSON{""};
-    JsonValue* oJsonValue{nullptr};
     try
     {
-        oJsonValue = JsonValue::ParseStructuredBufferToJson(c_oStructuredBuffer);
-        strJSON = oJsonValue->ToString();
+        strJSON = ::GetJsonForStructuredBuffer(c_oStructuredBuffer);
     }
     catch(const BaseException& oBaseException)
     {
@@ -66,12 +64,6 @@ std::string __stdcall GetJsonForStructuredBuffer(
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         strJSON.clear();
-    }
-
-    if ( nullptr != oJsonValue )
-    {
-        oJsonValue->Release();
-        oJsonValue = nullptr;
     }
 
     return strJSON;

@@ -1,4 +1,9 @@
 DB_PLUGINS = WebService/Plugins/DatabasePortal/DatabaseManager
+
+DB_PACKAGE = \
+Binary/dataservices/SharedLibraries/DatabasePortal/libDatabaseManager.so \
+Binary/dataservices/DatabaseGateway
+
 DB_PLUGINS_SO=$(DB_PLUGINS:WebService/Plugins/DatabasePortal/%=dataservices/SharedLibraries/DatabasePortal/lib%.so)
 
 # These are .PHONY targets but not specified so that the make call to the target is made
@@ -13,4 +18,4 @@ databaseportal:
 dataservices_plugins: $(DB_PLUGINS_SO)
 
 package_dataservices: $(DB_PLUGINS_SO) databaseportal
-	@tar -czvf Binary/DataServices.tar.gz $(DB_PLUGINS_SO) Binary/dataservices/DatabaseGateway
+	@tar -czvf Binary/DataServices.tar.gz $(DB_PACKAGE)

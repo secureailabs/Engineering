@@ -9,7 +9,24 @@ WebService/Plugins/RestApiPortal/RemoteDataConnectorManager \
 WebService/Plugins/RestApiPortal/DatasetDatabase \
 WebService/Plugins/RestApiPortal/AccountDatabase \
 WebService/Plugins/RestApiPortal/DigitalContractDatabase \
-WebService/Plugins/RestApiPortal/DataFederationManager
+WebService/Plugins/RestApiPortal/DataFederationManager \
+WebService/Plugins/RestApiPortal/Email
+
+PS_PACKAGE = \
+Binary/platformservices/RestApiPortal \
+Binary/platformservices/SharedLibraries/RestApiPortal/libSailAuthentication.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libAzureManager.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libDatasetFamilyManager.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libVirtualMachineManager.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libCryptographicKeyManagement.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libAuditLogManager.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libRemoteDataConnectorManager.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libDatasetDatabase.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libAccountDatabase.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libDigitalContractDatabase.so \
+Binary/platformservices/SharedLibraries/RestApiPortal/libDataFederationManager.so \
+Binary/platformservices/Email/main.py \
+Binary/platformservices/Email/sendEmail.py
 
 PS_PLUGINS_SO=$(PS_PLUGINS:WebService/Plugins/RestApiPortal/%=platformservices/SharedLibraries/RestApiPortal/lib%.so)
 
@@ -29,4 +46,4 @@ restapiportal:
 platformservices_plugins: $(PS_PLUGINS_SO)
 
 package_platformservices: $(PS_PLUGINS_SO) restapiportal
-	@tar -czvf Binary/PlatformServices.tar.gz $(PS_PLUGINS_SO) Binary/platformservices/RestApiPortal
+	@tar -czvf Binary/PlatformServices.tar.gz $(PS_PACKAGE)

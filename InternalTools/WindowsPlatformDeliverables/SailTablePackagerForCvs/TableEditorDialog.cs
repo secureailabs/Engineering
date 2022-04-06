@@ -394,6 +394,20 @@ namespace SailTablePackagerForCsv
             m_TableProperties.SetTableProperty("Tags", m_TableTagsTextBox.Text);
         }
 
+        /// <summary>
+        /// We need to add this event in order to allow the data grid to handle more
+        /// than 300 columns
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void m_TableDataGrid_ColumnAdded(
+            object sender,
+            DataGridViewColumnEventArgs e
+            )
+        {
+            e.Column.FillWeight = 1;
+        }
+
         private TableProperties m_TableProperties;
         private string m_SelectedPropertyName;
         private string[] m_ListOfPropertiesWeCannotDelete = { "Description", "Identifier", "SourceFileHeaderName", "Name", "Units", "Type", "PrivacyLevel", "UnitCategories" };

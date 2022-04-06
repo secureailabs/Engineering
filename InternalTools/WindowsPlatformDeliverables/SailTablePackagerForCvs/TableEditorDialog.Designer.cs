@@ -149,6 +149,7 @@
             this.m_TableDataGrid.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.m_TableDataGrid.Size = new System.Drawing.Size(1195, 295);
             this.m_TableDataGrid.TabIndex = 0;
+            this.m_TableDataGrid.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.m_TableDataGrid_ColumnAdded);
             this.m_TableDataGrid.SelectionChanged += new System.EventHandler(this.m_TableDataGrid_SelectionChanged);
             // 
             // m_TableIdentifierTextBox

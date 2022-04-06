@@ -601,6 +601,21 @@ namespace SailTablePackagerForCsv
             m_PreviewDataGrid.DataSource = dataTableToDisplay;
         }
 
+        /// <summary>
+        /// We need to add this event in order to change the column weight to something
+        /// other than 1, otherwise we will not be able to import tables which have
+        /// more than 300 colums
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void m_PreviewDataGrid_ColumnAdded(
+            object sender,
+            DataGridViewColumnEventArgs e
+            )
+        {
+            e.Column.FillWeight = 1;
+        }
+
         private TableProperties m_TableProperties;
         private int m_ColumnCount;
         private bool m_FirstLineHeaderHasChanged;

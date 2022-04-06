@@ -6,7 +6,7 @@
 #include "DebugLibrary.h"
 #include "EosbRotationManager.h"
 #include "ExceptionRegister.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "StructuredBuffer.h"
 
 /********************************************************************************************
@@ -45,12 +45,13 @@ EosbRotationManager::~EosbRotationManager(void)
 void __thiscall EosbRotationManager::PeriodicEosbUpdate(void)
 {
     __DebugFunction();
-    while ( !fStopRequest )
+    
+    while (false == fStopRequest)
     {
         using namespace std::literals;
         std::unique_lock<std::mutex> oMutexLock(m_oLock);
         m_oTimedWait.wait_for(oMutexLock, 10min, [&] { return fStopRequest; });
-        if ( !fStopRequest )
+        if (false == fStopRequest)
         {
             // We aren't stopping, update the EOSB
             std::string strVerb = "GET";
@@ -60,11 +61,11 @@ void __thiscall EosbRotationManager::PeriodicEosbUpdate(void)
             try
             {
                 std::vector<Byte> stlRestResponse = ::RestApiCall(m_strServerIp, m_unServerPort, strVerb, strApiUrl, strJsonBody, true);
-                std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-                StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+                StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
                 _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error updating EOSB in.", nullptr);
                 m_strEosb = oResponse.GetString("Eosb");
             }
+            
             catch (const BaseException & c_oBaseException)
             {
                 ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);

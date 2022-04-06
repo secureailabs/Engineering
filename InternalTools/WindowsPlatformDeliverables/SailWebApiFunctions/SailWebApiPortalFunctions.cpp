@@ -16,7 +16,7 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "RestApiHelperFunctions.h"
 #include "StructuredBuffer.h"
 #include "SmartMemoryAllocator.h"
@@ -373,25 +373,24 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
         // Send the REST API call to the SAIL Web Api Portal
         std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word) gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUri, strJsonBody, true);
         _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "Failed to log in. API call failed to complete.", nullptr);
-        stlRestResponse.push_back(0);
         // Parse the returning value.
-        StructuredBuffer oLoginResponse = JsonValue::ParseDataToStructuredBuffer((const char*) stlRestResponse.data());
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((201 != oLoginResponse.GetFloat64("Status")), "Failed to log in. Invalid Credentials.", nullptr);
-        gs_strEosb = oLoginResponse.GetString("Eosb");
+        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Failed to log in. Invalid Credentials.", nullptr);
+        gs_strEosb = oResponse.GetString("Eosb");
 
         // By default, we automatically get the basic user information since some of those
         // values are useful in other SAIL Web API Portal transactions
         strVerb = "GET";
         strApiUri = "/SAIL/AuthenticationManager/GetBasicUserInformation?Eosb=" + gs_strEosb;
         stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word) gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUri, strJsonBody, true);
-        StructuredBuffer oBasicUserInfoStructuredBuffer = JsonValue::ParseDataToStructuredBuffer((const char*) stlRestResponse.data());
+        oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((200 != oBasicUserInfoStructuredBuffer.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
+        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
         // Extract all values and cache them in global variables
-        gs_strOrganizationIdentifier = oBasicUserInfoStructuredBuffer.GetString("OrganizationGuid");
-        gs_strAuthenticatedUserIdentifier = oBasicUserInfoStructuredBuffer.GetString("UserGuid");
-        gs_qwAuthenticatedUserAccessRights = (Qword) oBasicUserInfoStructuredBuffer.GetFloat64("AccessRights");
+        gs_strOrganizationIdentifier = oResponse.GetString("OrganizationGuid");
+        gs_strAuthenticatedUserIdentifier = oResponse.GetString("UserGuid");
+        gs_qwAuthenticatedUserAccessRights = (Qword) oResponse.GetFloat64("AccessRights");
         // If we get here, no exceptions were thrown, so the transaction was successfull!!!
         fSuccess = true;
     }
@@ -488,11 +487,11 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetSailWebApiPortalImpostorEosb(vo
         std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word) gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUri, strJsonBody, true);
         _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "Failed to get impostor EOSB. API call failed to complete.", nullptr);
         // Parse the returning value.
-        StructuredBuffer oGetSailWebApiPortalImpostorEosbResponse = JsonValue::ParseDataToStructuredBuffer((const char*) stlRestResponse.data());
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((200 != oGetSailWebApiPortalImpostorEosbResponse.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
+        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
         // Extract the IEOSB from the response
-        strSailWebApiPortalImportorEosb = oGetSailWebApiPortalImpostorEosbResponse.GetString("UpdatedEosb");
+        strSailWebApiPortalImportorEosb = oResponse.GetString("UpdatedEosb");
     }
 
     catch (const BaseException & c_oBaseException)
@@ -538,12 +537,11 @@ extern "C" __declspec(dllexport) unsigned int __cdecl LoadDigitalContracts(void)
         std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word) gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUri, strJsonBody, true);
         _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "Failed to get list of digital contracts. API call failed to complete.", nullptr);
         // Parse the returning value.
-        stlRestResponse.push_back(0);
-        StructuredBuffer oGetDigitalContractsResponse = JsonValue::ParseDataToStructuredBuffer((const char*) stlRestResponse.data());
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((200 != oGetDigitalContractsResponse.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
+        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
         // Extract the Eosb (in this case an importer EOSB) from the transaction response
-        StructuredBuffer oDigitalContracts = oGetDigitalContractsResponse.GetStructuredBuffer("DigitalContracts");
+        StructuredBuffer oDigitalContracts = oResponse.GetStructuredBuffer("DigitalContracts");
         // Clear the currently cached list of Digital Contracts
         gs_stlIndexedListOfSerializedBase64DigitalContracts.clear();
         // Now let's extract each individual digital contract and registered them in a way
@@ -845,9 +843,9 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInitializationParametersToVi
             else
             {
                  // Parse the returning value.
-                 StructuredBuffer oGetDigitalContractsResponse = JsonValue::ParseDataToStructuredBuffer((const char*)stlResponse.data());
+                 StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
                  // Did the transaction succeed?
-                 _ThrowBaseExceptionIf(("Success" != oGetDigitalContractsResponse.GetString("Status")), "Initialization has failed. %s", (const char*)stlResponse.data(),nullptr);
+                 _ThrowBaseExceptionIf(("Success" != oResponse.GetString("Status")), "Initialization has failed. %s", (const char*)stlResponse.data(),nullptr);
                  fSuccess = true;
             }
         } while ((0 <= unLoopCounter) && (false == fSuccess));
@@ -896,8 +894,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
             oJsonBody->Release();
             std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word)gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUrl, strJsonBody, true);
             _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "Failed to send a heartbeat to the SAIL API Web Services. API call failed to complete.", nullptr);
-            std::string strUnescapedResponse = ::UnEscapeJsonString((const char*)stlRestResponse.data());
-            StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
             float64_t fl64Response = oResponse.GetFloat64("Status");
             if (200 == fl64Response)
             {
@@ -1037,7 +1034,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
             std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word)gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUrl, strJsonBody, true);
             _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "Failed to upload available datasets. API call failed to complete.", nullptr);
             std::string strUnescapedResponse = ::UnEscapeJsonString((const char*)stlRestResponse.data());
-            StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
             if ((201 == oResponse.GetFloat64("Status")) || 200 == oResponse.GetFloat64("Status"))
             {
                 // Update the Eosb in case it changed

@@ -21,7 +21,7 @@
 #include "TlsTransactionHelperFunctions.h"
 #include "HttpRequestParser.h"
 #include "CurlRest.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "FileUtils.h"
 #include <algorithm>
 #include <exception>
@@ -199,7 +199,7 @@ Orchestrator::~Orchestrator(void)
  *
  ********************************************************************************************/
 void __thiscall Orchestrator::CacheDigitalContractsFromRemote(
-    _in const std::string& c_strServerIpAddress,
+    _in const std::string & c_strServerIpAddress,
     _in unsigned long unServerPort
     )
 {
@@ -210,17 +210,16 @@ void __thiscall Orchestrator::CacheDigitalContractsFromRemote(
     {
         std::string strApiUrl = "/SAIL/DigitalContractManager/DigitalContracts?Eosb=" + m_oEosbRotator.GetEosb();
         std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, unServerPort, "GET", strApiUrl, "", true);
-        std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-        StructuredBuffer oDigitalContractResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
-        _ThrowBaseExceptionIf((200 != oDigitalContractResponse.GetFloat64("Status")), "Failed to retrieve digital contracts", nullptr);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to retrieve digital contracts", nullptr);
 
-        if ( oDigitalContractResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        if (oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
         {
-            m_oEosbRotator.SetEosb(oDigitalContractResponse.GetString("Eosb"));
+            m_oEosbRotator.SetEosb(oResponse.GetString("Eosb"));
         }
 
-        StructuredBuffer oDigitalContracts = oDigitalContractResponse.GetStructuredBuffer("DigitalContracts");
-        for (const std::string& strDcGuid : oDigitalContracts.GetNamesOfElements())
+        StructuredBuffer oDigitalContracts = oResponse.GetStructuredBuffer("DigitalContracts");
+        for (const std::string & strDcGuid : oDigitalContracts.GetNamesOfElements())
         {
             StructuredBuffer oDigitalContractRecord = oDigitalContracts.GetStructuredBuffer(strDcGuid.c_str());
             m_stlDigitalContracts.insert({strDcGuid, oDigitalContractRecord});
@@ -261,17 +260,16 @@ void Orchestrator::CacheDatasetsFromRemote(
         std::string strApiUrl = "/SAIL/DatasetManager/ListDatasets?Eosb=" + m_oEosbRotator.GetEosb();
         StructuredBuffer oDatasetRequest;
         std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, unServerPort, "GET", strApiUrl, "", true);
-        std::string strUnescapedResponse = ::UnEscapeJsonString((const char *)stlRestResponse.data());
-        StructuredBuffer oDatasetResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
-        _ThrowBaseExceptionIf((200 != oDatasetResponse.GetFloat64("Status")), "Failed to retrieve datasets", nullptr);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to retrieve datasets", nullptr);
 
-        if ( oDatasetResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        if (true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
         {
-            m_oEosbRotator.SetEosb(oDatasetResponse.GetString("Eosb"));
+            m_oEosbRotator.SetEosb(oResponse.GetString("Eosb"));
         }
 
-        StructuredBuffer oDatasets = oDatasetResponse.GetStructuredBuffer("Datasets");
-        for (const std::string& strDatasetGuid : oDatasets.GetNamesOfElements())
+        StructuredBuffer oDatasets = oResponse.GetStructuredBuffer("Datasets");
+        for (const std::string & strDatasetGuid : oDatasets.GetNamesOfElements())
         {
             StructuredBuffer oDatasetRecord = oDatasets.GetStructuredBuffer(strDatasetGuid.c_str());
             Guid oDatasetGuid(strDatasetGuid.c_str());
@@ -279,7 +277,7 @@ void Orchestrator::CacheDatasetsFromRemote(
 
             // Cache our tables
             StructuredBuffer oDatasetTables = oDatasetRecord.GetStructuredBuffer("Tables");
-            for ( const auto& oTableItr : oDatasetTables.GetNamesOfElements() )
+            for (const auto & oTableItr : oDatasetTables.GetNamesOfElements())
             {
                 TableInformation oTableInfo(oDatasetGuid.ToString(eRaw), oDatasetTables.GetStructuredBuffer(oTableItr.c_str()));
                 m_stlAvailableTables.insert({oTableItr, oTableInfo});
@@ -347,13 +345,11 @@ unsigned int Orchestrator::Login(
         std::string strJsonBody = "";
         // Make the API call and get REST response
         std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIPAddress, c_wordServerPort, strVerb, strApiUrl, strJsonBody, true);
-        std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-        StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
-        unStatus = static_cast<uint64_t>(oResponse.GetFloat64("Status"));
-        _ThrowBaseExceptionIf((201 != unStatus), "Error logging in.", nullptr);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error logging in.", nullptr);
         strEosb = oResponse.GetString("Eosb");
 
-        if ( m_oEosbRotator.IsRunning() )
+        if (true == m_oEosbRotator.IsRunning())
         {
             std::cout << "Replacing existing session" << std::endl;
             m_oEosbRotator.Stop();
@@ -1124,8 +1120,7 @@ VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation
     std::string strVerb = "GET";
     std::string strApiUrl = "/SAIL/VirtualMachineManager/PullVirtualMachine?Eosb=" + m_oEosbRotator.GetEosb();
     std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
-    std::string strUnescapedResponse = ::UnEscapeJsonString((const char *) stlRestResponse.data());
-    StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strUnescapedResponse.c_str()));
+    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
     _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error retrieving secure node provision status", nullptr);
 
     const std::string c_strRawSecureNodeProvisionGuid = c_oSecureNodeGuid.ToString(eRaw);

@@ -18,7 +18,7 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "RestApiHelperFunctions.h"
 #include "StructuredBuffer.h"
 #include "SmartMemoryAllocator.h"
@@ -217,10 +217,10 @@ extern "C" __declspec(dllexport) bool __cdecl LoginToMicrosoftAzureApiPortal(
         std::vector<std::string> stlHeader;
         stlHeader.push_back("Content-Type: application/x-www-form-urlencoded");
         stlHeader.push_back("Accept: */*");
-        std::vector<Byte> stlResponse = ::RestApiCall("login.microsoftonline.com", 443, strVerb, strApiUri, strApiContentBody, false, stlHeader);
-        StructuredBuffer oMicrosoftAzureResponse = JsonValue::ParseDataToStructuredBuffer((const char*) stlResponse.data());
-        _ThrowBaseExceptionIf((false == oMicrosoftAzureResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Microsoft Azure authentication failed. Response JSON is:\r\n%s", (const char *) oMicrosoftAzureResponse.ToString().c_str());
-        gs_strMicrosoftAzureAccessToken = oMicrosoftAzureResponse.GetString("access_token");
+        std::vector<Byte> stlRestResponse = ::RestApiCall("login.microsoftonline.com", 443, strVerb, strApiUri, strApiContentBody, false, stlHeader);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+        _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Microsoft Azure authentication failed. Response JSON is:\r\n%s", (const char *) oResponse.ToString().c_str());
+        gs_strMicrosoftAzureAccessToken = oResponse.GetString("access_token");
         // If we get here, no exceptions were thrown, so the transaction was successfull!!!
         fSuccess = true;
     }
@@ -249,10 +249,10 @@ extern "C" __declspec(dllexport) bool __cdecl LoginToMicrosoftAzureApiPortal(
 /// <param name="c_szVirtualMachineSpecification"></param>
 /// <returns></returns>
 extern "C" __declspec(dllexport) BSTR __cdecl CreateResourceGroup(
-    _in const char* c_szSubscriptionIdentifier,
-    _in const char* c_szResourceGroup,
-    _in const char* c_szResourceGroupSpecification
-)
+    _in const char * c_szSubscriptionIdentifier,
+    _in const char * c_szResourceGroup,
+    _in const char * c_szResourceGroupSpecification
+    )
 {
     __DebugFunction();
 

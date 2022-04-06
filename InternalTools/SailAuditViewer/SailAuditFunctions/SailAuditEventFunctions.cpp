@@ -7,7 +7,7 @@
 
 #include "SmartMemoryAllocator.h"
 #include "StructuredBuffer.h"
-#include "JsonValue.h"
+#include "JsonParser.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "64BitHashes.h"
@@ -257,16 +257,14 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
         std::string strApiUri = "/SAIL/AuthenticationManager/User/Login?Email=" + std::string(c_szUsername) + "&Password=" + std::string(c_szPassword);
         std::string strJsonBody = "";
         std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word) gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUri, strJsonBody, true);
-        std::string strResponse = ::UnEscapeJsonString((const char*) stlRestResponse.data());
-        StructuredBuffer oStructuredBuffer(JsonValue::ParseDataToStructuredBuffer(strResponse.c_str()));
-        gs_strEosb = oStructuredBuffer.GetString("Eosb");
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+        gs_strEosb = oResponse.GetString("Eosb");
 
         strVerb = "GET";
         strApiUri = "/SAIL/AuthenticationManager/GetBasicUserInformation?Eosb=" + gs_strEosb;
         stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word) gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUri, strJsonBody, true);
-        strResponse = ::UnEscapeJsonString((const char*) stlRestResponse.data());
-        StructuredBuffer oBasicUserInfoStructuredBuffer(JsonValue::ParseDataToStructuredBuffer(strResponse.c_str()));
-        gs_strOrganizationIdentifier = oBasicUserInfoStructuredBuffer.GetString("OrganizationGuid");
+        oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+        gs_strOrganizationIdentifier = oResponse.GetString("OrganizationGuid");
         fSuccess = true;
     }
 
@@ -321,8 +319,7 @@ extern "C" __declspec(dllexport) void __cdecl ReloadLoadAllAuditEvents(
             // Execute the API call and get the response
               std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfSailWebApiPortal, (Word) gs_unPortAddressOfSailWebApiPortal, strVerb, strApiUri, strContent, true);
             // Parse the response into a StructuredBuffer
-            std::string strResponse = ::UnEscapeJsonString((const char*) stlRestResponse.data());
-            StructuredBuffer oResponse(JsonValue::ParseDataToStructuredBuffer(strResponse.c_str()));
+            StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
             // Fetch the list of audit events from the response
             StructuredBuffer oListOfEvents(oResponse.GetStructuredBuffer("ListOfEvents"));
             // Loop through each element within the list of audit events and record each individual audit event

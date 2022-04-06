@@ -102,7 +102,7 @@ class Dataset : public Object
         DatasetTable __thiscall GetDatasetTable(
             _in const char * c_szTableIdentifier
             ) const;
-        
+
         std::vector<Byte> __thiscall GetSerializedDatasetMetadata(void) const throw();
         
     private:

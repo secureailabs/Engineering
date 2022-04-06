@@ -35,8 +35,8 @@ Dataset::Dataset(
     StructuredBuffer oDatasetMetadata(stlBuffer);
     // Now let's do a quick reality check and make sure the header is in good order
     _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("Version", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Version is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DatasetIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DatasetIdentifier is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("PublisherIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: PublisherIdentifier is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DatasetGuid", GUID_VALUE_TYPE)), "INVALID METADATA: DatasetGuid is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("OrganizationGuid", GUID_VALUE_TYPE)), "INVALID METADATA: OrganizationGuid is missing", nullptr);
     //_ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DataFamilyIdentifier is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Title is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Description is missing", nullptr);
@@ -93,8 +93,8 @@ Dataset::Dataset(
     StructuredBuffer oDatasetMetadata(c_stlSerializedMetadata);
     // Now let's do a quick reality check and make sure the header is in good order
     _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("Version", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Version is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DatasetIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DatasetIdentifier is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("PublisherIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: PublisherIdentifier is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DatasetGuid", GUID_VALUE_TYPE)), "INVALID METADATA: DatasetGuid is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("OrganizationGuid", GUID_VALUE_TYPE)), "INVALID METADATA: OrganizationGuid is missing", nullptr);
     //_ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DataFamilyIdentifier is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Title is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Description is missing", nullptr);
@@ -130,9 +130,9 @@ Dataset::~Dataset(void) throw()
 std::string __thiscall Dataset::GetDatasetIdentifier(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("DatasetIdentifier", GUID_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("DatasetGuid", GUID_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetGuid("DatasetIdentifier").ToString(eHyphensOnly);
+    return m_oDatasetMetadata.GetGuid("DatasetGuid").ToString(eHyphensOnly);
 }
 
 /********************************************************************************************/
@@ -150,9 +150,9 @@ std::string __thiscall Dataset::GetDatasetFamilyIdentifier(void) const throw()
 std::string __thiscall Dataset::GetPublisherIdentifier(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("PublisherIdentifier", GUID_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("OrganizationGuid", GUID_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetGuid("PublisherIdentifier").ToString(eHyphensOnly);
+    return m_oDatasetMetadata.GetGuid("OrganizationGuid").ToString(eHyphensOnly);
 }
 
 /********************************************************************************************/
@@ -229,4 +229,13 @@ DatasetTable __thiscall Dataset::GetDatasetTable(
     uint64_t un64Offset = m_stlListOfTableMarkerOffsets.at(qwTableIdentifierHash);
 
     return DatasetTable(m_strFilename, oTable.GetSerializedBuffer(), un64Offset);
+}
+
+/********************************************************************************************/
+
+std::vector<Byte> __thiscall Dataset::GetSerializedDatasetMetadata(void) const throw()
+{
+    __DebugFunction();
+    
+    return m_oDatasetMetadata.GetSerializedBuffer();
 }

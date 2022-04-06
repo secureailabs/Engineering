@@ -17,9 +17,11 @@ Binary/PrivacySentinelPolicy.json \
 Binary/RootOfTrustProcess \
 Binary/SignalTerminationProcess
 
-SCN_BINARIES=$(SCN_COMPONENTS:VirtualMachine/%=Binary/%)
+SCN_BINARIES=$(SCN_COMPONENTS:VirtualMachine/%=securecomputationnode/%)
 
-Binary/%: VirtualMachine/%
+# These are .PHONY targets but not specified so that the make call to the target is made
+# everytime the target is called. If the binary already exists, the build will not happen.
+securecomputationnode/%: VirtualMachine/%
 	@make -C $^ all
 
 scn_componenets: SharedCommonCode

@@ -11,9 +11,11 @@ WebService/Plugins/RestApiPortal/AccountDatabase \
 WebService/Plugins/RestApiPortal/DigitalContractDatabase \
 WebService/Plugins/RestApiPortal/DataFederationManager
 
-PS_PLUGINS_SO=$(PS_PLUGINS:WebService/Plugins/RestApiPortal/%=Binary/platformservices/SharedLibraries/RestApiPortal/lib%.so)
+PS_PLUGINS_SO=$(PS_PLUGINS:WebService/Plugins/RestApiPortal/%=platformservices/SharedLibraries/RestApiPortal/lib%.so)
 
-Binary/platformservices/SharedLibraries/RestApiPortal/lib%.so: ./WebService/Plugins/RestApiPortal/%
+# These are .PHONY targets but not specified so that the make call to the target is made
+# everytime the target is called. If the binary already exists, the build will not happen.
+platformservices/SharedLibraries/RestApiPortal/lib%.so: ./WebService/Plugins/RestApiPortal/%
 	@echo $<
 	@make -C $^ all
 

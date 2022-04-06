@@ -23,7 +23,7 @@ securecomputationnode: SharedCommonCode VirtualMachine_Shared
 	@echo "securecomputationnode done!"
 
 package: SharedCommonCode WebServices_Shared VirtualMachine_Shared
-	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend
+	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend orchestrator
 	@echo "package done!"
 
 databaseTools: SharedCommonCode

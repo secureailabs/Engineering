@@ -1,7 +1,9 @@
 DB_PLUGINS = WebService/Plugins/DatabasePortal/DatabaseManager
-DB_PLUGINS_SO=$(DB_PLUGINS:WebService/Plugins/DatabasePortal/%=Binary/dataservices/SharedLibraries/DatabasePortal/lib%.so)
+DB_PLUGINS_SO=$(DB_PLUGINS:WebService/Plugins/DatabasePortal/%=dataservices/SharedLibraries/DatabasePortal/lib%.so)
 
-Binary/dataservices/SharedLibraries/DatabasePortal/lib%.so: ./WebService/Plugins/DatabasePortal/%
+# These are .PHONY targets but not specified so that the make call to the target is made
+# everytime the target is called. If the binary already exists, the build will not happen.
+dataservices/SharedLibraries/DatabasePortal/lib%.so: ./WebService/Plugins/DatabasePortal/%
 	@echo $<
 	@make -C $^ all
 

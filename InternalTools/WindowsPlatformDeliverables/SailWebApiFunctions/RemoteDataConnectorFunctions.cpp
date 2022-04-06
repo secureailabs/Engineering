@@ -353,7 +353,7 @@ extern "C" __declspec(dllexport) bool __cdecl RemoteDataConnectorAddDataset(
                     un64Header = *((uint64_t *) c_pbBinaryBuffer);
                     _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != un64Header), "Expected header to be [0xEE094CBA1B48A123] but found [%xul]", un64Header);
                     // Get the identifier of the dataset
-                    std::string strDatasetIdentifier = oSerializedDatasetMetadata.GetGuid("DatasetIdentifier").ToString(eHyphensOnly);
+                    std::string strDatasetIdentifier = oSerializedDatasetMetadata.GetGuid("DatasetGuid").ToString(eHyphensOnly);
                     // Add the new dataset now that we know that the identifier of the dataset is
                     gs_stlListOfNewDatasetFiles[qwHashOfDatasetFilename] = strDatasetIdentifier;
                     gs_stlListOfRegisteredDatasetFilenames[qwHashOfDatasetFilename] = c_szDatasetFilename;

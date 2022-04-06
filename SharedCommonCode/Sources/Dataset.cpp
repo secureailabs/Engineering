@@ -239,3 +239,4 @@ std::vector<Byte> __thiscall Dataset::GetSerializedDatasetMetadata(void) const t
     
     return m_oDatasetMetadata.GetSerializedBuffer();
 }
+

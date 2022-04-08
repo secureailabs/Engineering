@@ -1,0 +1,17 @@
+# Default Reviewers for all code changes
+
+# Review for README.md
+*.md @stanleylinSail
+
+# Review for Builds
+*.sh @JENKINS-SAIL @prawalgangwar @stanleylinSail
+*.bat @JENKINS-SAIL @stanleylinSail
+
+# Review for Platform Stability
+/Docker/* @prawalgangwar @stanleylinSail
+/CI_CD/* @JENKINS-SAIL @stanleylinSail
+/AzureDeploymentTemplates/* @prawalgangwar
+/InternalTools/DeployPlatform/* @prawalgangwar
+
+# Github Configs PR review
+.github/* @JENKINS-SAIL @stanleylinSail

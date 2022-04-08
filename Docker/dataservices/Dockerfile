@@ -27,4 +27,10 @@ RUN chmod +x /install.sh && /install.sh
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
+RUN apt-get update && \
+  apt-get install -y \
+  nginx
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
 CMD ["/bin/bash", "/Entrypoint.sh"]

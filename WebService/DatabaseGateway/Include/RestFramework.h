@@ -24,7 +24,7 @@
 #include "RestFrameworkRuntimeData.h"
 #include "RestFrameworkSharedFunctions.h"
 #include "StructuredBuffer.h"
-#include "TlsServer.h"
+#include "SocketServer.h"
 
 #include <unistd.h>
 #include <uuid/uuid.h>
@@ -41,7 +41,7 @@
 /********************************************************************************************/
 
 extern bool __stdcall PutDatabaseGatewayResponse (
-    _in TlsNode& oTlsNode,
+    _in Socket & oSocket,
     _in const StructuredBuffer& oStructuredBuffer
 );
 
@@ -89,6 +89,6 @@ class RestFramework : public Object
 
         // Private data members
         std::vector<void *> m_stlPluginHandles;
-        TlsServer * m_poTlsServer;
+        SocketServer * m_poRestServer;
         PluginDictionaryManager * m_poDictionaryManager;
 };

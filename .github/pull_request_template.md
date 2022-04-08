@@ -1,13 +1,13 @@
 ### Deployment Checklist
 
-[  ] Make all ran Sucessfully
-[  ] CI-WindowsPlatformDeliverables.bat ran Sucessfully?
-[  ] Deployed Dataservice Docker Succesfully?
-[  ] Deployed PlatformService Docker Succesfully?
-[  ] Loaded Database Sucessfully?
-[  ] Deployed FrontEnd Docker Sucessfully?
-[  ] Deployed Orchestrator Docker Sucessfully?
-[  ] Deployed SCN Docker Sucessfully
+[  ] Make all ran Successfully?
+[  ] CI-WindowsPlatformDeliverables.bat ran Successfully?
+[  ] Deployed Dataservice Docker Successfully?
+[  ] Deployed PlatformService Docker Successfully?
+[  ] Loaded Database Successfully?
+[  ] Deployed FrontEnd Docker Successfully?
+[  ] Deployed Orchestrator Docker Successfully?
+[  ] Deployed SCN Docker Successfully
 
 ### Engineer Checklist
 

@@ -1,4 +1,5 @@
 ### Deployment Checklist
+
 [] Make all ran Sucessfully
 [] CI-WindowsPlatformDeliverables.bat ran Sucessfully?
 [] Deployed Dataservice Docker Succesfully?

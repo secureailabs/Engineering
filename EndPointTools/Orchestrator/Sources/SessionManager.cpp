@@ -16,60 +16,7 @@
 #include "SessionManager.h"
 #include "StructuredBuffer.h"
 
-#include <iostream>
 #include <vector>
-
-/*********************************************************************************************/
-
-static bool __stdcall CheckEosb(
-    _in const std::string & c_strEosb,
-    _in const std::string & c_strServerIpAddress,
-    _in Word wServerPort
-    ) throw()
-{
-    __DebugFunction();
-
-    bool fSuccess = false;
-    
-    try
-    {
-        std::string strVerb = "GET";
-        std::string strApiUri = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + c_strEosb;
-        std::string strJsonBody = "";
-        // Send the REST API call to the SAIL Web Api Portal
-        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, (Word) wServerPort, strVerb, strApiUri, strJsonBody, true);
-        // Parse the returning value.
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-        // Did the transaction succeed?
-        if ((true == oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE))&&(200 == oResponse.GetFloat64("Status")))
-        {
-            // Check to see if we need to update the internal gs_strSailPlatformServicesEosb
-            if (true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
-            {
-                std::cout << "bool __stdcall CheckEosb()" << std::endl;
-                std::cout << oResponse.GetString("Eosb") << std::endl;
-                fSuccess = true;
-            }
-        }
-    }
-    
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-
-    catch (const std::exception & c_oException)
-    {
-        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
-    }
-    
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-    
-    return fSuccess;
-}
 
 /*********************************************************************************************/
 
@@ -84,10 +31,25 @@ SessionManager::~SessionManager(void)
 {
     __DebugFunction();
     
-    this->Logout();
+    //this->Logout();
 }
 
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function Login
+ * @brief login to the Sail Platform
+ * @param[in] c_strEmail (string) Email (i.e. username) used to login
+ * @param[in] c_strUserPassword (string) Password used to login
+ * @param[in] c_strServerIpAddress (string) Ip address of the Sail Platform Services API portal
+ * @param[in] wServerPort (Word) Port number of the Sail Platform Services API portal
+ * @return (bool) true if login was successful, false otherwise
+ * @return (bool) false if credentials are invalid or any other errors
+ * @note
+ *     If already logged in, calling Login will override the previous session with this new
+ *     session
+ *
+ ********************************************************************************************/
 
 bool __thiscall SessionManager::Login(
     _in const std::string & c_strEmail,
@@ -112,17 +74,15 @@ bool __thiscall SessionManager::Login(
         std::string strJsonBody = "";
         // Make the API call and get REST response
         std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, wServerPort, strVerb, strApiUrl, strJsonBody, true);
-        std::cout << "JSON = " << (char *) stlRestResponse.data() << std::endl;
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
         // Did the call succeed?
         _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error logging in.", nullptr);
         // If the call succeeded, let's make sure that the format of the return value is correct
         _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID FORMAT. Invalid return value, missing 'Eosb'", nullptr);
         // Calling SetEosb() will start the update thread automatically
-        std::cout << oResponse.ToString() << std::endl;
         this->SetSessionParameters(c_strServerIpAddress, wServerPort, oResponse.GetString("Eosb"));
         // If we get here, we were successful
-        fSuccess = ::CheckEosb(oResponse.GetString("Eosb"), c_strServerIpAddress, wServerPort);
+        fSuccess = true;
     }
     
     catch (const BaseException & c_oBaseException)
@@ -143,7 +103,14 @@ bool __thiscall SessionManager::Login(
     return fSuccess;
 }
 
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function Logout
+ * @brief Logout and invalidate the current session
+ * @return (void) Nothing
+ *
+ ********************************************************************************************/
 
 void __thiscall SessionManager::Logout(void) throw()
 {
@@ -163,7 +130,7 @@ void __thiscall SessionManager::Logout(void) throw()
         {
             // Now join the thread (i.e. wait for it to exit properly)
             m_oEosbMaintenanceThread.get()->join();
-            // Update member variables to their starting state
+            // Update member variables to their starting state.
             m_oEosbMaintenanceThread = nullptr;
             m_strEosb = "";
             m_strServerIpAddress = "";
@@ -187,7 +154,15 @@ void __thiscall SessionManager::Logout(void) throw()
     }
 }
 
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function GetServerIpAddress
+ * @brief Returns the Sail Platform Services Ip address for the current session
+ * @return (string) Ip address of Sail Platform Services Ip address for the current session
+ * @return (string) Empty string if there is no current session
+ *
+ ********************************************************************************************/
 
 std::string __thiscall SessionManager::GetServerIpAddress(void) const throw()
 {
@@ -199,7 +174,16 @@ std::string __thiscall SessionManager::GetServerIpAddress(void) const throw()
     return strServerIpAddress;
 }
 
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function GetServerPortNumber
+ * @brief Returns the Sail Platform Services port number for the current session
+ * @return (Word) Port number of the Sail Platform Services for the current session
+ * @return (Word) 0 if there is no current session
+ *
+ ********************************************************************************************/
+
 
 Word __thiscall SessionManager::GetServerPortNumber(void) const throw()
 {
@@ -211,7 +195,15 @@ Word __thiscall SessionManager::GetServerPortNumber(void) const throw()
     return wServerPortNumber;
 }
 
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function GetEosb
+ * @brief Returns the Sail Platform Services port number for the current session
+ * @return (string) Base64 string of the EOSB for a valid session
+ * @return (string) Empty string if there is no current session
+ *
+ ********************************************************************************************/
 
 std::string __thiscall SessionManager::GetEosb(void) const throw()
 {
@@ -223,7 +215,16 @@ std::string __thiscall SessionManager::GetEosb(void) const throw()
     return strEosb;
 }
 
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function SetEosb
+ * @brief This function allows external code to update the EOSB. This is required since a lot
+ *        
+ * @return (string) Base64 string of the EOSB for a valid session
+ * @return (string) Empty string if there is no current session
+ *
+ ********************************************************************************************/
 
 void __thiscall SessionManager::SetEosb(
     _in const std::string & c_strEosb
@@ -232,10 +233,23 @@ void __thiscall SessionManager::SetEosb(
     __DebugFunction();
     
     std::unique_lock<std::mutex> oMutexLock(m_oLock);
-    m_strEosb = c_strEosb;
+    // If someone is setting an EOSB, we'd better have a running session, so let's make sure
+    if ((true == m_fIsRunning)&&(0 < m_strServerIpAddress.size())&&(0 < m_wServerPortNumber)&&(0 < m_strEosb.size()))
+    {
+        m_strEosb = c_strEosb;
+    }
 }
 
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function SetSessionParameters
+ * @brief Private method used to set all of the session parameters in an atomic fashion
+ * @param[in] c_strServerIpAddress (string) Ip address of the Sail Platform Services API portal for the current session
+ * @param[in] wServerPort (Word) Port number of the Sail Platform Services API portal for the current session
+ * @param[in] c_strEosb (string) EOSB for the current session
+ *
+ ********************************************************************************************/
 
 void __thiscall SessionManager::SetSessionParameters(
     _in const std::string & c_strServerIpAddress,
@@ -261,7 +275,17 @@ void __thiscall SessionManager::SetSessionParameters(
     }
 }
             
-/*********************************************************************************************/
+/********************************************************************************************
+ *
+ * @class SessionManager
+ * @function EosbMaintenanceFunction
+ * @brief This function runs on it's own thread and continuously spins to maintain the freshness
+ *        of the EOSB. This ensures that the EOSB is always fresh, even when an application
+ *        goes idle for a while.
+ * @note
+ *     The function runs on it's own thread until the m_fIsRunning is set to false
+ *
+ ********************************************************************************************/
 
 void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
 {
@@ -279,6 +303,10 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
             m_oTimedWait.wait_for(oMutexLock, 1min, [&] { return !m_fIsRunning; });
             if (true == m_fIsRunning)
             {
+                __DebugAssert(0 < m_strEosb.size());
+                __DebugAssert(0 < m_strServerIpAddress.size());
+                __DebugAssert(0 < m_wServerPortNumber);
+                
                 // We aren't stopping, update the EOSB
                 std::string strVerb = "GET";
                 std::string strApiUrl = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + m_strEosb;

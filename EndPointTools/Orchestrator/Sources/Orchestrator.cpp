@@ -9,20 +9,21 @@
  *
  ********************************************************************************************/
 
-#include "JsonParser.h"
-#include "JobOutputParameter.h"
-#include "Orchestrator.h"
-#include "StructuredBuffer.h"
-#include "SocketClient.h"
-#include "TlsClient.h"
+#include "BinaryFileHandlers.h"
+#include "CurlRest.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
-#include "TlsTransactionHelperFunctions.h"
 #include "HttpRequestParser.h"
-#include "CurlRest.h"
-#include "JsonParser.h"
 #include "FileUtils.h"
+#include "JsonParser.h"
+#include "JobOutputParameter.h"
+#include "Orchestrator.h"
+#include "SocketClient.h"
+#include "StructuredBuffer.h"
+#include "TlsClient.h"
+#include "TlsTransactionHelperFunctions.h"
+
 #include <algorithm>
 #include <exception>
 #include <iostream>
@@ -40,37 +41,6 @@ constexpr Word REMOTE_JOB_PORT{3500};
 
 /********************************************************************************************
  *
- * @function GetJsonForStructuredBuffer
- * @brief Helper function to create a JSON str out of a StructuredBuffer
- * @param [in] StructuredBuffer - The StructuredBuffer to convert to a string
- * @return std::string - The JSON representation of the map, or "" on error
- *
- ********************************************************************************************/
-std::string __stdcall GetJsonForStructuredBuffer(
-    _in const StructuredBuffer& c_oStructuredBuffer
-    )
-{
-    std::string strJSON{""};
-    try
-    {
-        strJSON = ::GetJsonForStructuredBuffer(c_oStructuredBuffer);
-    }
-    catch(const BaseException& oBaseException)
-    {
-        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-        strJSON.clear();
-    }
-    catch(...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        strJSON.clear();
-    }
-
-    return strJSON;
-}
-
-/********************************************************************************************
- *
  * @function GetJsonForStructuredBufferMap
  * @brief Helper function to create a JSON str out of a map of GUID:StructuredBuffer pairs
  * @param [in] std::unordered_map - The map containg the GUID:StructuredBuffer pairs
@@ -78,40 +48,41 @@ std::string __stdcall GetJsonForStructuredBuffer(
  *
  ********************************************************************************************/
 static std::string __stdcall GetJsonForStructuredBufferMap(
-    _in const std::unordered_map<std::string, StructuredBuffer>& stlStructuredBufferMap
-)
+    _in const std::unordered_map<std::string, StructuredBuffer> & stlStructuredBufferMap
+    ) throw()
 {
     __DebugFunction();
 
-    std::string strJSON{""};
+    std::string strJson{""};
+    
     try
     {
-        StructuredBuffer oBufferWithAllObjects;
-        for ( const auto& oStructuredBufferItr : stlStructuredBufferMap )
+        StructuredBuffer oAllObjects;
+        for (const auto & oElement: stlStructuredBufferMap)
         {
-            Guid oEntryGuid(oStructuredBufferItr.first);
-            oBufferWithAllObjects.PutStructuredBuffer(oEntryGuid.ToString(eHyphensAndCurlyBraces).c_str(), oStructuredBufferItr.second);
+            Guid oEntryGuid(oElement.first);
+            oAllObjects.PutStructuredBuffer(oEntryGuid.ToString(eHyphensAndCurlyBraces).c_str(), oElement.second);
         }
-
-        if ( 0 < oBufferWithAllObjects.GetNamesOfElements().size() )
-        {
-            strJSON = GetJsonForStructuredBuffer(oBufferWithAllObjects);
-        }
+        
+        strJson = ::ConvertStructuredBufferToJson(oAllObjects);
     }
 
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-        strJSON.clear();
     }
 
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        strJSON.clear();
     }
 
-    return strJSON;
+    return strJson;
 }
 
 /********************************************************************************************
@@ -125,50 +96,51 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
  *
  ********************************************************************************************/
 static std::string __stdcall GetJsonForStructuredBufferMap(
-    _in const std::unordered_map<std::string, TableInformation>& stlStructuredBufferMap
-)
+    _in const std::unordered_map<std::string, TableInformation> & stlStructuredBufferMap
+    ) throw()
 {
     __DebugFunction();
 
-    std::string strJSON{""};
+    std::string strJson{""};
+    
     try
     {
-        StructuredBuffer oBufferWithAllObjects;
-        for ( const auto& oStructuredBufferItr : stlStructuredBufferMap )
+        StructuredBuffer oAllObjects;
+        for (const auto & oElement: stlStructuredBufferMap)
         {
-            oBufferWithAllObjects.PutStructuredBuffer(oStructuredBufferItr.first.c_str(),
-                oStructuredBufferItr.second.m_oInformation);
+            oAllObjects.PutStructuredBuffer(oElement.first.c_str(), oElement.second.m_oInformation);
         }
 
-        if ( 0 < oBufferWithAllObjects.GetNamesOfElements().size() )
-        {
-            strJSON = GetJsonForStructuredBuffer(oBufferWithAllObjects);
-        }
+        strJson = ::ConvertStructuredBufferToJson(oAllObjects);
     }
-    catch(const BaseException& oBaseException)
+    
+    catch (const BaseException & oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-        strJSON.clear();
     }
 
-    catch(...)
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        strJSON.clear();
     }
 
-    return strJSON;
+    return strJson;
 }
+
 /********************************************************************************************
  *
  * @class Orchestrator
  * @function Default constructor
  *
  ********************************************************************************************/
-Orchestrator::Orchestrator(void)
+Orchestrator::Orchestrator(void) throw()
 {
     __DebugFunction();
-
 }
 
 /********************************************************************************************
@@ -177,137 +149,12 @@ Orchestrator::Orchestrator(void)
  * @function Destructor
  *
  ********************************************************************************************/
-Orchestrator::~Orchestrator(void)
+Orchestrator::~Orchestrator(void) throw()
 {
     __DebugFunction();
+    
+    //m_oSessionManager.Logout();
 }
-
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function CacheDigitalContractsFromRemote
- * @brief Call to our remote server to get all our digital contracts, and cached their SBs
- *        in a class member map
- *
- ********************************************************************************************/
-void __thiscall Orchestrator::CacheDigitalContractsFromRemote(
-    _in const std::string & c_strServerIpAddress,
-    _in unsigned long unServerPort
-    )
-{
-    __DebugFunction();
-    __DebugAssert(unServerPort < 65536);
-
-    try
-    {
-        std::string strApiUrl = "/SAIL/DigitalContractManager/DigitalContracts?Eosb=" + m_oEosbRotator.GetEosb();
-        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, unServerPort, "GET", strApiUrl, "", true);
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to retrieve digital contracts", nullptr);
-
-        if (oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
-        {
-            m_oEosbRotator.SetEosb(oResponse.GetString("Eosb"));
-        }
-
-        StructuredBuffer oDigitalContracts = oResponse.GetStructuredBuffer("DigitalContracts");
-        for (const std::string & strDcGuid : oDigitalContracts.GetNamesOfElements())
-        {
-            StructuredBuffer oDigitalContractRecord = oDigitalContracts.GetStructuredBuffer(strDcGuid.c_str());
-            m_stlDigitalContracts.insert({strDcGuid, oDigitalContractRecord});
-        }
-    }
-
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-        m_stlDigitalContracts.clear();
-    }
-
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        m_stlDigitalContracts.clear();
-    }
-}
-
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function CacheDatasetsFromRemote
- * @brief Call to our remote server to get all our datasets, and cached their SBs
- *        in a class member map
- *
- ********************************************************************************************/
-void Orchestrator::CacheDatasetsFromRemote(
-    _in const std::string& c_strServerIpAddress,
-    _in unsigned long unServerPort
-    )
-{
-    __DebugFunction();
-    __DebugAssert(unServerPort < 65536);
-
-    try
-    {
-        std::string strApiUrl = "/SAIL/DatasetManager/ListDatasets?Eosb=" + m_oEosbRotator.GetEosb();
-        StructuredBuffer oDatasetRequest;
-        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, unServerPort, "GET", strApiUrl, "", true);
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to retrieve datasets", nullptr);
-
-        if (true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
-        {
-            m_oEosbRotator.SetEosb(oResponse.GetString("Eosb"));
-        }
-
-        StructuredBuffer oDatasets = oResponse.GetStructuredBuffer("Datasets");
-        for (const std::string & strDatasetGuid : oDatasets.GetNamesOfElements())
-        {
-            StructuredBuffer oDatasetRecord = oDatasets.GetStructuredBuffer(strDatasetGuid.c_str());
-            Guid oDatasetGuid(strDatasetGuid.c_str());
-            m_stlAvailableDatasets.insert({oDatasetGuid.ToString(eRaw), oDatasetRecord});
-
-            // Cache our tables
-            StructuredBuffer oDatasetTables = oDatasetRecord.GetStructuredBuffer("Tables");
-            for (const auto & oTableItr : oDatasetTables.GetNamesOfElements())
-            {
-                TableInformation oTableInfo(oDatasetGuid.ToString(eRaw), oDatasetTables.GetStructuredBuffer(oTableItr.c_str()));
-                m_stlAvailableTables.insert({oTableItr, oTableInfo});
-            }
-        }
-    }
-
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-        m_stlAvailableDatasets.clear();
-        m_stlAvailableTables.clear();
-    }
-
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        m_stlAvailableDatasets.clear();
-        m_stlAvailableTables.clear();
-    }
-}
-
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function GetDatasets
- * @brief Lookup in our local cache for the datasets we have and return them as a JSON string
- * @return std::string - Containing a list of our datasets in the form: GUID:Metadata
- *
- ********************************************************************************************/
-std::string __thiscall Orchestrator::GetDatasets(void) const
-{
-    __DebugFunction();
-
-    return ::GetJsonForStructuredBufferMap(m_stlAvailableDatasets);
-}
-
-/********************************************************************************************/
 
 /********************************************************************************************
  *
@@ -317,45 +164,31 @@ std::string __thiscall Orchestrator::GetDatasets(void) const
  * @return unsigned int - status code of the login operation
  *
  ********************************************************************************************/
-unsigned int Orchestrator::Login(
-    _in const std::string& c_strEmail,
-    _in const std::string& c_strUserPassword,
-    _in const int c_wordServerPort,
-    _in const std::string& c_strServerIPAddress
-    )
+unsigned int __thiscall Orchestrator::Login(
+    _in const std::string & c_strEmail,
+    _in const std::string & c_strUserPassword,
+    _in int nServerPort,
+    _in const std::string & c_strServerIpAddress
+    ) throw()
 {
     __DebugFunction();
     __DebugAssert(0 < c_strEmail.size());
     __DebugAssert(0 < c_strUserPassword.size());
+    __DebugAssert(0 < nServerPort);
+    __DebugAssert(0 < c_strServerIpAddress.size());
 
-    std::string strEosb;
     uint64_t unStatus{401};
+    
     try
     {
-        std::string strVerb = "POST";
-        std::string strApiUrl = "/SAIL/AuthenticationManager/User/Login?Email="+ c_strEmail +"&Password="+ c_strUserPassword;
-        std::string strJsonBody = "";
-        // Make the API call and get REST response
-        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIPAddress, c_wordServerPort, strVerb, strApiUrl, strJsonBody, true);
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error logging in.", nullptr);
-        strEosb = oResponse.GetString("Eosb");
-
-        if (true == m_oEosbRotator.IsRunning())
-        {
-            std::cout << "Replacing existing session" << std::endl;
-            m_oEosbRotator.Stop();
-        }
-        m_oEosbRotator.SetEosb(strEosb);
-
-        // Start the periodic rotation of EOSBs
-        m_oEosbRotator.Start(c_strServerIPAddress, c_wordServerPort);
-
+        // Call the session manager to login
+        _ThrowBaseExceptionIf((false == m_oSessionManager.Login(c_strEmail, c_strUserPassword, c_strServerIpAddress, (Word) LOWORD(nServerPort))), "ERROR: Failed to login", nullptr);
         // Get our list of digital contracts
-        CacheDigitalContractsFromRemote(c_strServerIPAddress, c_wordServerPort);
-
-        CacheDatasetsFromRemote(c_strServerIPAddress, c_wordServerPort);
-
+        this->CacheDigitalContractsFromRemote();
+        // Get our list of datasets
+        this->CacheDatasetsFromRemote();
+        // If we get here, everything was a success
+        unStatus = 201;
     }
 
     catch (const BaseException & c_oBaseException)
@@ -363,6 +196,11 @@ unsigned int Orchestrator::Login(
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
 
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -374,12 +212,71 @@ unsigned int Orchestrator::Login(
 /********************************************************************************************
  *
  * @class Orchestrator
+ * @function ExitCurrentSession
+ * @brief Remove information related to our current lgoged in session, and stop EOSB rotation
+ *
+ ********************************************************************************************/
+void __thiscall Orchestrator::ExitCurrentSession(void) throw()
+{
+    __DebugFunction();
+    
+    m_oSessionManager.Logout();
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function GetCurrentEosb
+ * @brief Return the EOSB currently being used
+ * @return std::string - The value of the EOSB currently being used
+ *
+ ********************************************************************************************/
+std::string __thiscall Orchestrator::GetCurrentEosb(void) const throw()
+{
+    __DebugFunction();
+
+    return m_oSessionManager.GetEosb();
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function GetSafeFunctions
+ * @brief Build a list of safe functions available
+ * @return std::string - Containing a list of our safe functions in the form: GUID:Metadata
+ *
+ ********************************************************************************************/
+std::string __thiscall Orchestrator::GetSafeFunctions(void) const throw()
+{
+    __DebugFunction();
+
+    return ::GetJsonForStructuredBufferMap(m_stlAvailableSafeFunctions);
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function GetDatasets
+ * @brief Lookup in our local cache for the datasets we have and return them as a JSON string
+ * @return std::string - Containing a list of our datasets in the form: GUID:Metadata
+ *
+ ********************************************************************************************/
+std::string __thiscall Orchestrator::GetDatasets(void) const throw()
+{
+    __DebugFunction();
+
+    return ::GetJsonForStructuredBufferMap(m_stlAvailableDatasets);
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
  * @function GetDigitalContracts
  * @brief Lookup in our local cache for the digital contracts we have and return them as a JSON string
  * @return std::string - Containing a JSON dictionary of our DCs in the form: GUID:Metadata
  *
  ********************************************************************************************/
-std::string __thiscall Orchestrator::GetDigitalContracts(void) const
+std::string __thiscall Orchestrator::GetDigitalContracts(void) const throw()
 {
     __DebugFunction();
 
@@ -394,54 +291,11 @@ std::string __thiscall Orchestrator::GetDigitalContracts(void) const
  * @return std::string - Containing a JSON dictionary of our DCs in the form: GUID:Metadata
  *
  ********************************************************************************************/
-std::string __thiscall Orchestrator::GetTables(void) const
+std::string __thiscall Orchestrator::GetTables(void) const throw()
 {
     __DebugFunction();
 
     return ::GetJsonForStructuredBufferMap(m_stlAvailableTables);
-}
-
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function GetCurrentEosb
- * @brief Return the EOSB currently being used
- * @return std::string - The value of the EOSB currently being used
- *
- ********************************************************************************************/
-std::string __thiscall Orchestrator::GetCurrentEosb(void) const
-{
-    __DebugFunction();
-
-    return m_oEosbRotator.GetEosb();
-}
-
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function ExitCurrentSession
- * @brief Remove information related to our current lgoged in session, and stop EOSB rotation
- *
- ********************************************************************************************/
-void __thiscall Orchestrator::ExitCurrentSession(void)
-{
-    __DebugFunction();
-
-    if ( true == m_oEosbRotator.IsRunning() )
-    {
-        m_oEosbRotator.Stop();
-        m_oEosbRotator.SetEosb("");
-    }
-    m_stlDigitalContracts.clear();
-    m_stlAvailableDatasets.clear();
-    m_stlAvailableTables.clear();
-    m_stlProvisionInformation.clear();
-    m_stlAvailableSafeFunctions.clear();
-    m_stlPushedData.clear();
-
-    m_stlJobInformation.clear();
-    m_oJobMessageQueue.ClearAllMessages();
-    m_stlSecureNodeConnections.clear();
 }
 
 /********************************************************************************************
@@ -452,76 +306,86 @@ void __thiscall Orchestrator::ExitCurrentSession(void)
  *
  ********************************************************************************************/
 int __thiscall Orchestrator::LoadSafeObjects(
-    _in const std::string& c_strSafeObjectDirectory
-    )
+    _in const std::string & c_strSafeObjectDirectory
+    ) throw()
 {
     __DebugFunction();
 
     int nReturnValue{0};
-    std::error_code stlFileErrorCode;
-
-    bool fDirectoryExists = std::filesystem::exists(c_strSafeObjectDirectory, stlFileErrorCode);
-
-    if ( fDirectoryExists )
+    
+    try
     {
-        for ( const auto & oEntry : std::filesystem::directory_iterator(c_strSafeObjectDirectory) )
+        std::error_code stlFileErrorCode;
+        if (false == std::filesystem::exists(c_strSafeObjectDirectory, stlFileErrorCode))
         {
-            // Only load objects that have the right extension
-            if ( oEntry.path().extension() == ".safe" )
+            if (stlFileErrorCode)
             {
-                try
+                nReturnValue = stlFileErrorCode.value();
+            }
+            else
+            {
+                nReturnValue = -1;
+            }
+        }
+        else
+        {
+            for (const auto & oEntry : std::filesystem::directory_iterator(c_strSafeObjectDirectory))
+            {
+                // Only load objects that have the right extension
+                if (oEntry.path().extension() == ".safe")
                 {
-                    std::string strFilename = oEntry.path().string();
-                    std::vector<Byte> stlFileContents = ::ReadFileAsByteBuffer(strFilename);
- 
-                    if ( stlFileContents.size() > 0 )
+                    // We use a nested try...catch block since it's possible that some of the
+                    // safe functions are malformed and we don't want to end up skipping a whole
+                    // bunch of files if only one is bad. This ensures that all safe function
+                    // files that are loadable will in fact be loaded
+                    try
                     {
-                        StructuredBuffer oSafeObject(stlFileContents);
-                        Guid oSafeObjectGuid(oSafeObject.GetString("Uuid"));
-                        m_stlAvailableSafeFunctions.emplace(oSafeObjectGuid.ToString(eRaw), oSafeObject);
-                        ++nReturnValue;
+                        BinaryFileReader oInputFile(oEntry.path().string());
+                        std::vector<Byte> stlFileContents = oInputFile.ReadAll();     
+                        if (0 < stlFileContents.size())
+                        {
+                            StructuredBuffer oSafeObject(stlFileContents);
+                            Guid oSafeObjectGuid(oSafeObject.GetString("Uuid"));
+                            m_stlAvailableSafeFunctions.emplace(oSafeObjectGuid.ToString(eRaw), oSafeObject);
+                            ++nReturnValue;
+                        }
                     }
-                }
-                catch(const BaseException& oBaseException )
-                {
-                    ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-                }
+                    
+                    catch (const BaseException & oBaseException )
+                    {
+                        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
+                    }
 
-                catch( ... )
-                {
-                    ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+                    catch (const std::exception & c_oException)
+                    {
+                        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+                    }
+    
+                    catch ( ... )
+                    {
+                        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+                    }
                 }
             }
         }
     }
-    else
+
+    catch (const BaseException & oBaseException )
     {
-        if ( stlFileErrorCode )
-        {
-            nReturnValue = stlFileErrorCode.value();
-        }
-        else
-        {
-            nReturnValue = -1;
-        }
+        ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
 
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+
+    catch ( ... )
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    
     return nReturnValue;
-}
-
-/********************************************************************************************
- *
- * @class Orchestrator
- * @function GetSafeFunctions
- * @brief Build a list of safe functions available
- * @return std::string - Containing a list of our safe functions in the form: GUID:Metadata
- *
- ********************************************************************************************/
-std::string __thiscall Orchestrator::GetSafeFunctions(void) const
-{
-    __DebugFunction();
-
-    return ::GetJsonForStructuredBufferMap(m_stlAvailableSafeFunctions);
 }
 
 /********************************************************************************************
@@ -529,84 +393,85 @@ std::string __thiscall Orchestrator::GetSafeFunctions(void) const
  * @class Orchestrator
  * @function ProvisionSecureComputationalNode
  * @brief Send a request to provision a Secure Computational Node (SCN)
- * @param[in] c_strDigitalContractGUID The GUID of the digital contract to provision with the SCN
+ * @param[in] c_strDigitalContractIdentifier The GUID of the digital contract to provision with the SCN
  * @param[in] std::string - Eventually the GUID of the dataset in the family to provision, un-used today
  * @return std::string - Containing a list of our safe functions in the form: GUID:Metadata
  *
  ********************************************************************************************/
 std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
-    _in const std::string & c_strDigitalContractGUID,
-    _in const std::string & c_strDatasetGUID,
-    _in const std::string & c_strVmType
+    _in const std::string & c_strDigitalContractIdentifier,
+    _in const std::string & c_strDatasetIdentifier,
+    _in const std::string & c_strVirtualMachineType
     )
 {
     __DebugFunction();
-    unsigned int unStatus{404};
-    bool fProvisionResult{false};
+    
     StructuredBuffer oReturnStructuredBuffer;
-    std::string strRawProvisionGuid{""};
-    std::string strProvisionMessage{""};
-
+    
     try
-    {
-        Guid oDatasetGuid(c_strDatasetGUID);
-        Guid oDigitalContractGuid(c_strDigitalContractGUID);
-        const std::string c_strRawDigitalContractGuid{oDigitalContractGuid.ToString(eRaw)};
+    {  
+        unsigned int unStatus{404};
+        bool fProvisionResult{false};
+        Guid oDatasetGuid(c_strDatasetIdentifier);
+        Guid oDigitalContractGuid(c_strDigitalContractIdentifier);
 
+        // Prepare the API call
         std::string strVerb = "POST";
-        std::string strApiUrl = "/SAIL/DigitalContractManager/Provision?Eosb=" + m_oEosbRotator.GetEosb();
+        std::string strApiUrl = "/SAIL/DigitalContractManager/Provision?Eosb=" + m_oSessionManager.GetEosb();
         StructuredBuffer oJsonRequest;
         oJsonRequest.PutString("DigitalContractGuid", oDigitalContractGuid.ToString(eHyphensAndCurlyBraces));
         oJsonRequest.PutString("DatasetGuid", oDatasetGuid.ToString(eHyphensAndCurlyBraces));
-        oJsonRequest.PutString("VirtualMachineType", c_strVmType);
+        oJsonRequest.PutString("VirtualMachineType", c_strVirtualMachineType);
         std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
-
-        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
+        // Make the API call
+        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oSessionManager.GetServerIpAddress(), m_oSessionManager.GetServerPortNumber(), strVerb, strApiUrl, strContent, true);
+        // Make sure the response isn't empty
+        _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "ERROR: RestApiCall(%s, %d, %s, %s, %s) has failed.", m_oSessionManager.GetServerIpAddress(), m_oSessionManager.GetServerPortNumber(), strVerb, strApiUrl, strContent);
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-
+        // Reality check to make sure the format of the response contains the minimal required elements
+        _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE)), "ERROR: Missing Status in API response", nullptr);
         unStatus = static_cast<unsigned int>(oResponse.GetFloat64("Status"));
-
-        if ( oResponse.IsElementPresent("Message", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        
+        if (true == oResponse.IsElementPresent("Message", ANSI_CHARACTER_STRING_VALUE_TYPE))
         {
-            strProvisionMessage = oResponse.GetString("Message");
+            // If the API call contains a message, make sure to persist it inside the return
+            // Json
+            oReturnStructuredBuffer.PutString("Message", oResponse.GetString("Message"));
         }
-        if ( (200 == unStatus) || (201 == unStatus) )
+    
+        if ((200 == unStatus)||(201 == unStatus))
         {
             fProvisionResult = true;
             Guid oProvisionGuid = Guid(oResponse.GetString("SecureNodeGuid"));
-            strRawProvisionGuid = oProvisionGuid.ToString(eRaw);
-
+            std::string strRawProvisionGuid = oProvisionGuid.ToString(eRaw);
+            
             __DebugAssert(m_stlProvisionInformation.end() == m_stlProvisionInformation.find(strRawProvisionGuid));
 
             m_stlProvisionInformation[strRawProvisionGuid].eProvisionStatus = VirtualMachineState::eStarting;
             m_stlProvisionInformation[strRawProvisionGuid].oHostedDataset.oDatsetGuid = oDatasetGuid;
             m_stlProvisionInformation[strRawProvisionGuid].strDigitalContractGUID = oDigitalContractGuid.ToString(eRaw);
+            
+            oReturnStructuredBuffer.PutString("SCNGuid", oProvisionGuid.ToString(eHyphensAndCurlyBraces));
         }
-
+        oReturnStructuredBuffer.PutBoolean("Status", fProvisionResult);
     }
-    catch(const BaseException& oBaseException )
+    
+    catch (const BaseException & oBaseException )
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-        unStatus = 404;
     }
-    catch( ... )
+    
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
+    catch ( ... )
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        unStatus = 404;
     }
 
-    oReturnStructuredBuffer.PutBoolean("Status", fProvisionResult);
-    if ( "" != strProvisionMessage )
-    {
-        oReturnStructuredBuffer.PutString("Message", strProvisionMessage);
-    }
-    if ( ("" != strRawProvisionGuid) && (true == fProvisionResult) )
-    {
-        Guid oPrettyGuid(strRawProvisionGuid);
-        oReturnStructuredBuffer.PutString("SCNGuid", oPrettyGuid.ToString(eHyphensAndCurlyBraces));
-    }
-
-    return GetJsonForStructuredBuffer(oReturnStructuredBuffer);
+    return ::ConvertStructuredBufferToJson(oReturnStructuredBuffer);
 }
 
 /********************************************************************************************
@@ -619,7 +484,7 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
  *
  ********************************************************************************************/
 std::string Orchestrator::RunJob(
-    _in const std::string& c_strSafeFunctionId
+    _in const std::string & c_strSafeFunctionIdentifier
     )
 {
     __DebugFunction();
@@ -629,31 +494,37 @@ std::string Orchestrator::RunJob(
     try
     {
         // We must be logged in to start a job
-        if ( "" != m_oEosbRotator.GetEosb() )
+        if ("" != m_oSessionManager.GetEosb())
         {
-            Guid oSafeFunctionGuid(c_strSafeFunctionId);
-            if ( m_stlAvailableSafeFunctions.end() != m_stlAvailableSafeFunctions.find(oSafeFunctionGuid.ToString(eRaw)) )
+            Guid oSafeFunctionGuid(c_strSafeFunctionIdentifier);
+            if (m_stlAvailableSafeFunctions.end() != m_stlAvailableSafeFunctions.find(oSafeFunctionGuid.ToString(eRaw)))
             {
                 std::vector<std::string> stlInputParameters;
-                Guid oJobId(eJobIdentifier);
+                Guid oJobIdentifier(eJobIdentifier);
                 StructuredBuffer oSafeFunction = m_stlAvailableSafeFunctions[oSafeFunctionGuid.ToString(eRaw)];
                 StructuredBuffer oInputParameters = oSafeFunction.GetStructuredBuffer("InputParameters");
-                for (const std::string& strInputParameterId : oInputParameters.GetNamesOfElements() )
+                for (const std::string & strInputParameterId : oInputParameters.GetNamesOfElements() )
                 {
                     stlInputParameters.push_back(oInputParameters.GetStructuredBuffer(strInputParameterId.c_str()).GetString("Uuid"));
                 }
                 // When returning GUIDs to the user we return human readable versions
-                strNewJobId = oJobId.ToString(eHyphensAndCurlyBraces);
+                strNewJobId = oJobIdentifier.ToString(eHyphensAndCurlyBraces);
                 // We make a unique pointer because mutexes are not trivially copyable
-                m_stlJobInformation.emplace(oJobId.ToString(eRaw), new JobInformation(oJobId, oSafeFunctionGuid, stlInputParameters, m_oJobMessageQueue));
+                m_stlJobInformation.emplace(oJobIdentifier.ToString(eRaw), new JobInformation(oJobIdentifier, oSafeFunctionGuid, stlInputParameters, m_oJobMessageQueue));
             }
         }
     }
-    catch(const BaseException& oBaseException)
+    
+    catch (const BaseException& oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
 
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -667,39 +538,45 @@ std::string Orchestrator::RunJob(
  * @class Orchestrator
  * @function GetJobStatus
  * @brief Get the job status for a given job id
- * @param[in] c_strJobId The GUID of the safe function to run
+ * @param[in] c_strJobIdentifier The GUID of the safe function to run
  * @return std::string - The status of the current job
  *
  ********************************************************************************************/
 std::string Orchestrator::GetJobStatus(
-    _in const std::string& c_strJobId
-) const
+    _in const std::string & c_strJobIdentifier
+    ) const
 {
     __DebugFunction();
 
     std::string strStatus = "Job not found";
+    
     try
     {
-        Guid oJobGuid(c_strJobId);
+        Guid oJobGuid(c_strJobIdentifier);
 
-        if ( m_stlJobInformation.end() != m_stlJobInformation.find(oJobGuid.ToString(eRaw)) )
+        if (m_stlJobInformation.end() != m_stlJobInformation.find(oJobGuid.ToString(eRaw)))
         {
             __DebugAssert(nullptr != m_stlJobInformation.at(oJobGuid.ToString(eRaw)).get());
             std::lock_guard<JobInformation> stlLock(*m_stlJobInformation.at(oJobGuid.ToString(eRaw)).get());
-             strStatus = m_stlJobInformation.at(oJobGuid.ToString(eRaw))->GetJobStatus();
+            strStatus = m_stlJobInformation.at(oJobGuid.ToString(eRaw))->GetJobStatus();
         }
     }
-    catch(const BaseException& oBaseException)
+    
+    catch (const BaseException& oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-        strStatus = "Job not found";
     }
 
-    catch(...)
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
+    catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        strStatus = "Job not found";
     }
+    
     return strStatus;
 }
 
@@ -708,42 +585,42 @@ std::string Orchestrator::GetJobStatus(
  * @class Orchestrator
  * @function SetParameter
  * @brief Get the job status for a given job id
- * @param[in] c_strJobId The GUID of the job whose parameter to set
+ * @param[in] c_strJobIdentifier The GUID of the job whose parameter to set
  * @param[in] c_strInputParamId The input parameter to set
  * @param[in] c_strParamValue The value for the input parameter
  * @return std::string - The ID for the parameter if it was set, blank if it wasn't
  *
  ********************************************************************************************/
 std::string Orchestrator::SetParameter(
-    _in const std::string& c_strJobId,
-    _in const std::string& c_strInputParamId,
-    _in const std::string& c_strParamValue
+    _in const std::string & c_strJobIdentifier,
+    _in const std::string & c_strInputParamId,
+    _in const std::string & c_strParamValue
     )
 {
     __DebugFunction();
 
-    std::string strParameterId{""};
+    std::string strParameterIdentifier{""};
+    
     try
     {
-        Guid oJobId(c_strJobId);
-        auto stlJobInformation = m_stlJobInformation.find(oJobId.ToString(eRaw));
-        if ( m_stlJobInformation.end() != stlJobInformation )
+        Guid oJobIdentifier(c_strJobIdentifier);
+        auto stlJobInformation = m_stlJobInformation.find(oJobIdentifier.ToString(eRaw));
+        if (m_stlJobInformation.end() != stlJobInformation)
         {
-            __DebugAssert( nullptr != stlJobInformation->second.get() );
+            __DebugAssert(nullptr != stlJobInformation->second.get());
 
-            JobInformation& oJobInformation = *stlJobInformation->second;
+            JobInformation & oJobInformation = *stlJobInformation->second;
             std::lock_guard<JobInformation> stlLock(oJobInformation);
-
             Guid oInputParameterGuid(c_strInputParamId);
 
-            if ( !IsJobOutputParameter(c_strParamValue))
+            if (false == ::IsJobOutputParameter(c_strParamValue))
             {
                 Guid oParameterGuid(c_strParamValue);
 
-                if ( true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue) )
+                if (true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue))
                 {
-                    strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
-                    UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
+                    strParameterIdentifier = oJobIdentifier.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+                    this->UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
                 }
             }
             else
@@ -751,16 +628,16 @@ std::string Orchestrator::SetParameter(
                 // Convert from whatever format the user has passed in to Raw
                 JobOutputParameter oJobOutputPieces = ::ParseStringToJobOutput(c_strParamValue);
                 std::string strRawOutputParam = oJobOutputPieces.ToString();
-                if ( true == oJobInformation.SetInputParameter(c_strInputParamId, strRawOutputParam) )
+                if (true == oJobInformation.SetInputParameter(c_strInputParamId, strRawOutputParam))
                 {
-                    strParameterId = oJobId.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+                    strParameterIdentifier = oJobIdentifier.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
                 }
 
                 // We aren't aware of this parameter yet, pull it
-                if ( m_stlJobResults.end() == m_stlJobResults.find(strRawOutputParam))
+                if (m_stlJobResults.end() == m_stlJobResults.find(strRawOutputParam))
                 {
                     // Sent an implicit pull to ensure the job engine encrypts the data sent back
-                    PullJobData(strRawOutputParam, false);
+                    this->PullJobData(strRawOutputParam, false);
                     m_stlOutstandingImplicitPullRequests.insert(strRawOutputParam);
                 }
                 else
@@ -771,31 +648,37 @@ std::string Orchestrator::SetParameter(
 
             // All our parameters are set, none require a dataset, and we don't have an IP try
             // to get one
-            if ( (true == oJobInformation.AllInputParametersSet()) &&
-                ( false == oJobInformation.RequiresDataset()) &&
-                ("" == oJobInformation.GetTargetIP()))
+            if ((true == oJobInformation.AllInputParametersSet())&&(false == oJobInformation.RequiresDataset())&&("" == oJobInformation.GetTargetIP()))
             {
-                UpdateJobIPAddressForAnySecureComputationalNode(oJobInformation);
+                this->UpdateJobIPAddressForAnySecureComputationalNode(oJobInformation);
             }
 
             // We have everything we need to submit this job, start it up
-            if ( true == oJobInformation.ReadyToExcute() )
+            if (true == oJobInformation.ReadyToExcute())
             {
                 StartJobRemoteExecution(oJobInformation);
             }
         }
     }
-    catch(const BaseException& oBaseException)
+    
+    catch (const BaseException & oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
-        strParameterId = "";
+        strParameterIdentifier = "";
     }
+    
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        strParameterId = "";
+        strParameterIdentifier = "";
     }
-    return strParameterId;
+    
+    return strParameterIdentifier;
 }
 
 /********************************************************************************************
@@ -851,9 +734,11 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
  *
  ********************************************************************************************/
 void Orchestrator::UpdateJobIPAddressForAnySecureComputationalNode(
-    _in JobInformation& oJob
+    _in JobInformation & oJob
     )
 {
+    __DebugFunction();
+    
     std::optional<Guid> oTargetSecureComputationalNode{GetSecureComputationalNodeWithoutDataset()};
 
     if ( oTargetSecureComputationalNode.has_value() )
@@ -884,22 +769,22 @@ void Orchestrator::UpdateJobIPAddressForAnySecureComputationalNode(
  *
  ********************************************************************************************/
 bool __thiscall Orchestrator::DeprovisionDigitalContract(
-    _in const std::string& c_strDigitalContractGUID
+    _in const std::string& c_strDigitalContractIdentifier
     )
 {
     bool fRetrurnValue{false};
     try
     {
 
-        Guid oDigitalContractGuid(c_strDigitalContractGUID);
+        Guid oDigitalContractGuid(c_strDigitalContractIdentifier);
 
         std::string strVerb = "POST";
-        std::string strApiUrl = "/SAIL/DigitalContractManager/Deprovision?Eosb=" + m_oEosbRotator.GetEosb();
+        std::string strApiUrl = "/SAIL/DigitalContractManager/Deprovision?Eosb=" + m_oSessionManager.GetEosb();
         StructuredBuffer oJsonRequest;
         oJsonRequest.PutString("DigitalContractGuid", oDigitalContractGuid.ToString(eHyphensAndCurlyBraces));
         std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
 
-        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
+        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oSessionManager.GetServerIpAddress(), m_oSessionManager.GetServerPortNumber(), strVerb, strApiUrl, strContent, true);
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
 
         if ( oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE) )
@@ -974,7 +859,7 @@ std::string __thiscall Orchestrator::GetIPAddressForJob(
  *
  ********************************************************************************************/
 bool __thiscall Orchestrator::StartJobRemoteExecution(
-    _in JobInformation& oJob
+    _in JobInformation & oJob
     ) throw()
 {
     __DebugFunction();
@@ -1000,7 +885,7 @@ bool __thiscall Orchestrator::StartJobRemoteExecution(
             StructuredBuffer oPushBuffer;
             oPushBuffer.PutByte("RequestType", static_cast<Byte>(EngineRequest::eConnectVirtualMachine));
             oPushBuffer.PutString("Username", "TEST_USERNAME");
-            oPushBuffer.PutString("Eosb", m_oEosbRotator.GetEosb());
+            oPushBuffer.PutString("Eosb", m_oSessionManager.GetEosb());
             oPushBuffer.PutString("EndPoint", "JobEngine");
             oPushBuffer.PutString("OrchestratorIdentifier", m_oOrchestratorIdentifier.ToString(eRaw));
 
@@ -1110,8 +995,8 @@ VirtualMachineState __thiscall Orchestrator::GetSecureComputationNodeInformation
     oJsonRequest.PutString("VirtualMachineGuid", c_oSecureNodeGuid.ToString(eRaw));
     std::string strContent = ::ConvertStructuredBufferToJson(oJsonRequest);
     std::string strVerb = "GET";
-    std::string strApiUrl = "/SAIL/VirtualMachineManager/PullVirtualMachine?Eosb=" + m_oEosbRotator.GetEosb();
-    std::vector<Byte> stlRestResponse = ::RestApiCall(m_oEosbRotator.GetServerIp(), (Word) m_oEosbRotator.GetServerPort(), strVerb, strApiUrl, strContent, true);
+    std::string strApiUrl = "/SAIL/VirtualMachineManager/PullVirtualMachine?Eosb=" + m_oSessionManager.GetEosb();
+    std::vector<Byte> stlRestResponse = ::RestApiCall(m_oSessionManager.GetServerIpAddress(), m_oSessionManager.GetServerPortNumber(), strVerb, strApiUrl, strContent, true);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
     _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error retrieving secure node provision status", nullptr);
 
@@ -1154,7 +1039,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
     std::string strProvisionStatus{""};
 
     // If we aren't logged in, don't return anything
-    if ( "" != m_oEosbRotator.GetEosb())
+    if ( "" != m_oSessionManager.GetEosb())
     {
         try
         {
@@ -1232,19 +1117,19 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                 // Any job that is waiting for this dataset should be assigned this IP
                 for ( auto& oPendingJob : m_stlJobInformation)
                 {
-                    if ( oPendingJob.second->JobParameterUsesGuid(m_stlProvisionInformation[oSucceededItr].oHostedDataset.oDatsetGuid) )
+                    if (true == oPendingJob.second->JobParameterUsesGuid(m_stlProvisionInformation[oSucceededItr].oHostedDataset.oDatsetGuid))
                     {
                         oPendingJob.second->SetTargetIP(m_stlProvisionInformation[oSucceededItr].strRemoteIpAddress);
                     }
 
-                    if ( oPendingJob.second->ReadyToExcute() && !oPendingJob.second->IsRunning() )
+                    if ((true == oPendingJob.second->ReadyToExcute())&&(false == oPendingJob.second->IsRunning()))
                     {
-                        StartJobRemoteExecution(*oPendingJob.second);
+                        this->StartJobRemoteExecution(*oPendingJob.second);
                     }
                 }
             }
             unProvisionItr = 0;
-            for ( auto& oInProgressItr : stlInProgressProvisions )
+            for (auto & oInProgressItr : stlInProgressProvisions)
             {
                 Guid oProvisionGuid(oInProgressItr);
                 oInProgressProvisions.PutString(oProvisionGuid.ToString(eHyphensAndCurlyBraces).c_str(), m_stlProvisionInformation[oInProgressItr].strProvisionMessage);
@@ -1267,7 +1152,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
             oProvisionStatus.PutStructuredBuffer("Succeeded", oSucceededProvisions);
             oProvisionStatus.PutStructuredBuffer("Failed", oFailedProvisions);
             oProvisionStatus.PutStructuredBuffer("InProgress", oInProgressProvisions);
-            strProvisionStatus = ::GetJsonForStructuredBuffer(oProvisionStatus);
+            strProvisionStatus = ::ConvertStructuredBufferToJson(oProvisionStatus);
         }
         catch(const BaseException& oBaseException )
         {
@@ -1432,8 +1317,8 @@ std::string __thiscall Orchestrator::PullJobData(
             __DebugAssert(nullptr != oStlJobInformationItr->second.get());
 
             std::lock_guard<JobInformation> stlLock(*oStlJobInformationItr->second);
-            const std::string& c_strSafeFunctionId = oStlJobInformationItr->second->GetSafeFunctionId();
-            auto oSafeFunctionItr = m_stlAvailableSafeFunctions.find(c_strSafeFunctionId);
+            const std::string& c_strSafeFunctionIdentifier = oStlJobInformationItr->second->GetSafeFunctionId();
+            auto oSafeFunctionItr = m_stlAvailableSafeFunctions.find(c_strSafeFunctionIdentifier);
             __DebugAssert(m_stlAvailableSafeFunctions.end() != oSafeFunctionItr);
             const StructuredBuffer& c_oOutputParameters = oSafeFunctionItr->second.GetStructuredBuffer("OutputParameters");
 
@@ -1555,7 +1440,7 @@ std::string __thiscall Orchestrator::WaitForData(
         while ( false == fReturnEventToUser && nullptr != oDataResult ); // Keep pulling of non-user events until we find one
         if ( true == fReturnEventToUser && nullptr != oDataResult)
         {
-            strReturn = GetJsonForStructuredBuffer(*oDataResult);
+            strReturn = ::ConvertStructuredBufferToJson(*oDataResult);
         }
     }
     catch (const BaseException & c_oBaseException)
@@ -1610,11 +1495,9 @@ void __thiscall Orchestrator::UpdateJobsWaitingForData(
 
                 // All our parameters are set, none require a dataset, and we don't have an IP try
                 // to get one
-                if ( (true == oJobInformation.second->AllInputParametersSet()) &&
-                    ( false == oJobInformation.second->RequiresDataset()) &&
-                    ("" == oJobInformation.second->GetTargetIP()))
+                if ((true == oJobInformation.second->AllInputParametersSet())&&(false == oJobInformation.second->RequiresDataset())&&("" == oJobInformation.second->GetTargetIP()))
                 {
-                    UpdateJobIPAddressForAnySecureComputationalNode(*oJobInformation.second);
+                    this-> UpdateJobIPAddressForAnySecureComputationalNode(*oJobInformation.second);
                 }
 
                 // We have everything we need to submit this job, start it up
@@ -1931,6 +1814,7 @@ void __thiscall Orchestrator::SendDataToJob(
     )
 {
     __DebugFunction()
+    
     try
     {
         std::shared_ptr<TlsNode> poJobEngineConnection = oJob.GetConnection();
@@ -1943,17 +1827,134 @@ void __thiscall Orchestrator::SendDataToJob(
             std::cout << "NO CONNECTION TO JOB ENGINE " << std::endl;
         }
     }
+    
     catch(const BaseException& oBaseException)
     {
         ::RegisterBaseException(oBaseException, __func__, __FILE__, __LINE__);
     }
+    
     catch(std::exception & e)
     {
         std::cout << "Exception: " << e.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+    
     catch(...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+}
+
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function CacheDigitalContractsFromRemote
+ * @brief Call to our remote server to get all our digital contracts, and cached their SBs
+ *        in a class member map
+ *
+ ********************************************************************************************/
+void __thiscall Orchestrator::CacheDigitalContractsFromRemote(void)
+{
+    __DebugFunction();
+
+    try
+    {
+        std::string strVerb = "GET";
+        std::string strApiUrl = "/SAIL/DigitalContractManager/DigitalContracts?Eosb=" + m_oSessionManager.GetEosb();
+        std::string strJsonBody = "";
+        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oSessionManager.GetServerIpAddress(), m_oSessionManager.GetServerPortNumber(), strVerb, strApiUrl, strJsonBody, true);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+        std::cout << "void __thiscall Orchestrator::CacheDigitalContractsFromRemote(" << m_oSessionManager.GetServerIpAddress() << ")" << std::endl;
+        std::cout << "Eosb = " << m_oSessionManager.GetEosb() << std::endl;
+        std::cout << oResponse.ToString() << std::endl;
+        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to retrieve digital contracts", nullptr);
+
+        if (oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        {
+            m_oSessionManager.SetEosb(oResponse.GetString("Eosb"));
+        }
+
+        // Need to add an if statement here, since it's possible for the response to have NO digital contracts to
+        // offer, in which case there is no "DigitalContracts" element at all. Trying to call oResponse.GetStructuredBuffer("DigitalContracts")
+        // without checking will cause an exception
+        if (true == oResponse.IsElementPresent("DigitalContracts", INDEXED_BUFFER_VALUE_TYPE))
+        {
+            StructuredBuffer oDigitalContracts = oResponse.GetStructuredBuffer("DigitalContracts");
+            for (const std::string & strDcGuid : oDigitalContracts.GetNamesOfElements())
+            {
+                StructuredBuffer oDigitalContractRecord = oDigitalContracts.GetStructuredBuffer(strDcGuid.c_str());
+                m_stlDigitalContracts.insert({strDcGuid, oDigitalContractRecord});
+            }
+        }
+    }
+
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        m_stlDigitalContracts.clear();
+    }
+
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        m_stlDigitalContracts.clear();
+    }
+}
+
+/********************************************************************************************
+ *
+ * @class Orchestrator
+ * @function CacheDatasetsFromRemote
+ * @brief Call to our remote server to get all our datasets, and cached their SBs
+ *        in a class member map
+ *
+ ********************************************************************************************/
+void Orchestrator::CacheDatasetsFromRemote(void)
+{
+    __DebugFunction();
+
+    try
+    {
+        std::string strApiUrl = "/SAIL/DatasetManager/ListDatasets?Eosb=" + m_oSessionManager.GetEosb();
+        StructuredBuffer oDatasetRequest;
+        std::vector<Byte> stlRestResponse = ::RestApiCall(m_oSessionManager.GetServerIpAddress(), m_oSessionManager.GetServerPortNumber(), "GET", strApiUrl, "", true);
+        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
+        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to retrieve datasets", nullptr);
+
+        if (true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        {
+            m_oSessionManager.SetEosb(oResponse.GetString("Eosb"));
+        }
+
+        StructuredBuffer oDatasets = oResponse.GetStructuredBuffer("Datasets");
+        for (const std::string & strDatasetGuid : oDatasets.GetNamesOfElements())
+        {
+            StructuredBuffer oDatasetRecord = oDatasets.GetStructuredBuffer(strDatasetGuid.c_str());
+            Guid oDatasetGuid(strDatasetGuid.c_str());
+            m_stlAvailableDatasets.insert({oDatasetGuid.ToString(eRaw), oDatasetRecord});
+
+            // Cache our tables
+            StructuredBuffer oDatasetTables = oDatasetRecord.GetStructuredBuffer("Tables");
+            for (const auto & oTableItr : oDatasetTables.GetNamesOfElements())
+            {
+                TableInformation oTableInfo(oDatasetGuid.ToString(eRaw), oDatasetTables.GetStructuredBuffer(oTableItr.c_str()));
+                m_stlAvailableTables.insert({oTableItr, oTableInfo});
+            }
+        }
+    }
+
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        m_stlAvailableDatasets.clear();
+        m_stlAvailableTables.clear();
+    }
+
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        m_stlAvailableDatasets.clear();
+        m_stlAvailableTables.clear();
     }
 }

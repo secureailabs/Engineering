@@ -7,7 +7,8 @@
  * @copyright Copyright (C) 2020 Secure AI Labs, Inc. All Rights Reserved.
  *
  ********************************************************************************************/
-
+ 
+#include "BinaryFileHandlers.h"
 #include "CommandLine.h"
 #include "CompressionHelperFunctions.h"
 #include "BinaryFileHandlers.h"
@@ -15,6 +16,7 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
+#include "JsonParser.h"
 
 #include <iostream>
 
@@ -128,7 +130,6 @@ int main(
                     StructuredBuffer oCompressedSerializedData(stlCompressedSerializedData);
                     std::vector<Byte> stlDecompressedSerializedData = ::DecompressStructuredBuffer(oCompressedSerializedData);
                     ::PrintData(stlDecompressedSerializedData);
-                    //std::cout << (const char *) stlDecompressedSerializedData.data() << std::endl;
                 }
             }
         }

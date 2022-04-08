@@ -55,6 +55,7 @@ class BinaryFileReader: public Object
         std::vector<Byte> __thiscall Read(
             _in uint64_t un64NumberOfBytesToRead
             );
+        std::vector<Byte> __thiscall ReadAll(void);
 
     private:
 

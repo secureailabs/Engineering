@@ -11,7 +11,6 @@
 #pragma once
 
 #include "EntityTypes.h"
-#include "EosbRotationManager.h"
 #include "JobEngineConnection.h"
 #include "JobInformation.h"
 #include "SecureNodeInformation.h"

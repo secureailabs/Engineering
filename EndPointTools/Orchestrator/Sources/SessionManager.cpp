@@ -8,6 +8,7 @@
  *
  ********************************************************************************************/
 
+#include "Chronometer.h"
 #include "CurlRest.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
@@ -16,6 +17,8 @@
 #include "SessionManager.h"
 #include "StructuredBuffer.h"
 
+#include <chrono>
+#include <thread>
 #include <vector>
 
 /*********************************************************************************************/
@@ -294,35 +297,63 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
     try
     {
         bool fIsRunning;
+        Chronometer oChronometer;
+        
+        // Start the chronometer
+        oChronometer.Start();
         
         do
         {
-            using namespace std::literals;
-            std::unique_lock<std::mutex> oMutexLock(m_oLock);
-            // Wait no more than 1 minute to check the EOSB
-            m_oTimedWait.wait_for(oMutexLock, 1min, [&] { return !m_fIsRunning; });
-            if (true == m_fIsRunning)
+            std::string strCurrentEosb{};
+            std::string strServerIpAddress{};
+            Word wServerPortNumber{0};
+            
+            // Sleep for 100 milliseconds
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            // Now let's check if we are still running. We do this in an artificially
+            // nested scope to protect the mutex in case an exception is thrown
             {
-                __DebugAssert(0 < m_strEosb.size());
-                __DebugAssert(0 < m_strServerIpAddress.size());
-                __DebugAssert(0 < m_wServerPortNumber);
-                
+                // We want to take an atomic snapshot of all of the session manager state here since we do not
+                // want to create a race condition between checking to see if the session manager is still running,
+                // and accessing the session manager settings. We also want to take a snapshot of the session
+                // manager so that we don't have to be INSIDE the lock when we are making the RestApiCall, which
+                // is very expensive time wise to keep a lock
+                std::unique_lock<std::mutex> oMutexLock(m_oLock);
+                fIsRunning = m_fIsRunning;
+                if (true == fIsRunning)
+                {
+                    // Quick reality check that ensures that the session manager didn't fall into
+                    // a weird state
+                    __DebugAssert(0 < m_strEosb.size());
+                    __DebugAssert(0 < m_strServerIpAddress.size());
+                    __DebugAssert(0 < m_wServerPortNumber);
+                    // Take an atomic snapshot of the session manager settings
+                    strCurrentEosb = strCurrentEosb;
+                    strServerIpAddress = m_strServerIpAddress;
+                    wServerPortNumber = m_wServerPortNumber;
+                }
+            }
+            // Check to see if 60 seconds has expired on the chronometer. We only care to
+            // try and refresh the EOSB once every minute
+            if ((true == fIsRunning)&&(60 < oChronometer.GetElapsedTimeWithPrecision(Second)))
+            {
+                // Reset the chronometer so we can count down another 10 seconds
+                oChronometer.Reset();
                 // We aren't stopping, update the EOSB
                 std::string strVerb = "GET";
-                std::string strApiUrl = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + m_strEosb;
+                std::string strApiUrl = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + strCurrentEosb;
                 std::string strJsonBody = "";
                 // Make the API call and get REST response
-                std::vector<Byte> stlRestResponse = ::RestApiCall(m_strServerIpAddress, m_wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+                std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
                 // Check to make sure the response size isn't 0 before trying to convert it into a StructuredBuffer
                 _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "ERROR: Invalid 0 sized response", nullptr);
                 // Extract the return parameters
                 StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
                 // Make sure the transaction was an actual success
                 _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "ERROR: Failed to get an Eosb update", nullptr);
-                // Update the internal EOSB
+                // lock the mutex and refresh the EOSB
+                std::unique_lock<std::mutex> oMutexLock(m_oLock);
                 m_strEosb = oResponse.GetString("Eosb");
-                // Make sure we continue looping
-                fIsRunning = true;
             }
         }
         while (true == fIsRunning);

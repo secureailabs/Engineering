@@ -48,7 +48,7 @@ constexpr Word REMOTE_JOB_PORT{3500};
  *
  ********************************************************************************************/
 static std::string __stdcall GetJsonForStructuredBufferMap(
-    _in const std::unordered_map<std::string, StructuredBuffer> & stlStructuredBufferMap
+    _in const std::unordered_map<std::string, StructuredBuffer> & c_stlStructuredBufferMap
     ) throw()
 {
     __DebugFunction();
@@ -57,14 +57,17 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
     
     try
     {
-        StructuredBuffer oAllObjects;
-        for (const auto & oElement: stlStructuredBufferMap)
+        if (0 < c_stlStructuredBufferMap.size())
         {
-            Guid oEntryGuid(oElement.first);
-            oAllObjects.PutStructuredBuffer(oEntryGuid.ToString(eHyphensAndCurlyBraces).c_str(), oElement.second);
+            StructuredBuffer oAllObjects;
+            for (const auto & oElement: c_stlStructuredBufferMap)
+            {
+                Guid oEntryGuid(oElement.first);
+                oAllObjects.PutStructuredBuffer(oEntryGuid.ToString(eHyphensAndCurlyBraces).c_str(), oElement.second);
+            }
+            
+            strJson = ::ConvertStructuredBufferToJson(oAllObjects);
         }
-        
-        strJson = ::ConvertStructuredBufferToJson(oAllObjects);
     }
 
     catch (const BaseException & c_oBaseException)
@@ -96,7 +99,7 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
  *
  ********************************************************************************************/
 static std::string __stdcall GetJsonForStructuredBufferMap(
-    _in const std::unordered_map<std::string, TableInformation> & stlStructuredBufferMap
+    _in const std::unordered_map<std::string, TableInformation> & c_stlStructuredBufferMap
     ) throw()
 {
     __DebugFunction();
@@ -105,13 +108,16 @@ static std::string __stdcall GetJsonForStructuredBufferMap(
     
     try
     {
-        StructuredBuffer oAllObjects;
-        for (const auto & oElement: stlStructuredBufferMap)
+        if (0 < c_stlStructuredBufferMap.size())
         {
-            oAllObjects.PutStructuredBuffer(oElement.first.c_str(), oElement.second.m_oInformation);
-        }
+            StructuredBuffer oAllObjects;
+            for (const auto & oElement: c_stlStructuredBufferMap)
+            {
+                oAllObjects.PutStructuredBuffer(oElement.first.c_str(), oElement.second.m_oInformation);
+            }
 
-        strJson = ::ConvertStructuredBufferToJson(oAllObjects);
+            strJson = ::ConvertStructuredBufferToJson(oAllObjects);
+        }
     }
     
     catch (const BaseException & oBaseException)
@@ -220,7 +226,20 @@ void __thiscall Orchestrator::ExitCurrentSession(void) throw()
 {
     __DebugFunction();
     
+    // First we need to logout
     m_oSessionManager.Logout();
+    // Now we need to clean up cached information
+    m_stlOutstandingImplicitPullRequests.clear();
+    m_stlAvailableSafeFunctions.clear();
+    m_stlDigitalContracts.clear();
+    m_stlAvailableDatasets.clear();
+    m_stlAvailableTables.clear();
+    m_stlProvisionInformation.clear();
+    m_stlJobInformation.clear();
+    m_stlPushedData.clear();
+    m_stlJobResults.clear();
+    m_stlSecureNodeConnections.clear();
+    m_oJobMessageQueue.ClearAllMessages();
 }
 
 /********************************************************************************************

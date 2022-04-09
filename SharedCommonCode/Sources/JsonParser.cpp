@@ -682,7 +682,6 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
                 for (unsigned unIndex = 0; unIndex < strValue.size(); ++unIndex)
                 {
                     char chCurrentCharacter = strValue[unIndex];
-                    _ThrowBaseExceptionIf((('\x00' <= chCurrentCharacter)&&('\x1F' >= chCurrentCharacter)), "Invalid string character 0x%02X found at offset %d", (unsigned int) chCurrentCharacter, unIndex);
 
                     if ('\\' == chCurrentCharacter)
                     {
@@ -714,8 +713,14 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
                         strEscapedValue[unInsertedCharacterCount++] = '\\';
                         strEscapedValue[unInsertedCharacterCount++] = 't';
                     }
+                    else if ('"' == chCurrentCharacter)
+                    {
+                        strEscapedValue[unInsertedCharacterCount++] = '\\';
+                        strEscapedValue[unInsertedCharacterCount++] = '"';
+                    }
                     else
                     {
+                        _ThrowBaseExceptionIf((('\x00' <= chCurrentCharacter)&&('\x1F' >= chCurrentCharacter)), "Invalid string character 0x%02X found at offset %d", (unsigned int) chCurrentCharacter, unIndex);
                         strEscapedValue[unInsertedCharacterCount++] = chCurrentCharacter;
                     }
                 }

@@ -26,6 +26,6 @@ mv InitializationVector.json Binary/$imageName/
 # Run the docker container
 docker run \
 -dit \
--p 6200:6200 \
+-p 6200:6201 \
 -v $(pwd)/Binary/$imageName:/app \
 $imageName

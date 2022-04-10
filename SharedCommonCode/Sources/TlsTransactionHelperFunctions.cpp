@@ -284,5 +284,19 @@ bool __stdcall PutHttpHeaderOnlyResponse(
 }
 
 
+bool __stdcall PutHttpHeaderOnlyResponse(
+    _in Socket& oSocket,
+    _in Dword dStatus,
+    _in const std::string& strStatus
+    )
+{
+    __DebugFunction();
+
+    std::string strResponseHeader = "HTTP/1.1 "+ std::to_string(dStatus) + " " + strStatus +" \r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
+    oSocket.Write(reinterpret_cast<const Byte*>(strResponseHeader.c_str()), strResponseHeader.length());
+
+    return true;
+}
+
 
 /********************************************************************************************/

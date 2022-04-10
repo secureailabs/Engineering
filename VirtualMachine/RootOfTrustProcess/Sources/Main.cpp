@@ -41,7 +41,7 @@ static bool __stdcall RunInitializerProcess(void)
     // Create a unique IPC path. This value is very ephemeral and will not be required
     // past this function
     std::string strInitializerIpcPath = Guid().ToString(eRaw);
-    // Create a TlsServer Unix Domain Socket using the unique IPC path. We need to start this
+    // Create a SocketServer Unix Domain Socket using the unique IPC path. We need to start this
     // before calling fork() and execl() in order to prevent any sort of race condition that
     // might arise since the first thing the Initializer process does is connect to the
     // IPC tunnel with the RootOfTrust process
@@ -101,7 +101,7 @@ static void __stdcall RunProcess(
     // Create a unique IPC path. This value is very ephemeral and will not be required
     // past this function
     std::string strTemporaryIpcPath = Guid().ToString(eRaw);
-    // Create a TlsServer Unix Domain Socket using the unique IPC path. We need to start this
+    // Create a SocketServer Unix Domain Socket using the unique IPC path. We need to start this
     // before calling fork() and execl() in order to prevent any sort of race condition that
     // might arise since the first thing the Initializer process does is connect to the
     // IPC tunnel with the RootOfTrust process

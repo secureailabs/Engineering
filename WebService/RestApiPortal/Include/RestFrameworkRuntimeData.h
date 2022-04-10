@@ -16,8 +16,8 @@
 #include "PluginDictionaryManager.h"
 #include "RestFramework.h"
 #include "SmartMemoryAllocator.h"
-#include "TlsServer.h"
 #include "HttpRequestParser.h"
+#include "Socket.h"
 
 #include <pthread.h>
 #include <string.h>
@@ -41,7 +41,7 @@ class RestFrameworkRuntimeData : public Object
         // Method call by the RestFramework to handle an incoming connection.
         // A new thread is created to process the request and send back a response.
         void __thiscall HandleConnection(
-            _in TlsNode * poTlsNode
+            _in Socket * poSocket
             );
 
         // Methods used to manage the vector m_stlConnectionThreads. A thread id is added
@@ -55,7 +55,7 @@ class RestFrameworkRuntimeData : public Object
         // Parse an incoming connection and routes to the target plugin. Waits for a response from
         // the plugin. Upon receiving a response, sends it to the client.
         void __thiscall RunThread(
-            _in TlsNode * poTlsNode
+            _in Socket * poSocket
             );
 
         // Methods to fetch active connections and termination flag

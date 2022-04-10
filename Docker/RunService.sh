@@ -64,7 +64,7 @@ if $cleanDatabase; then
 fi
 
 # Prepare the flags for the docker run command
-runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
+runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/nginx:/etc/nginx/conf.d -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # runtimeFlags="$detachFlags --name $imageName"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
@@ -85,11 +85,11 @@ elif [ "dataservices" == "$imageName" ]; then
     fi
     # Copy InitializationVector.json to the dataservices
     cp dataservices/InitializationVector.json $rootDir/Binary/dataservices
-    runtimeFlags="$runtimeFlags -p 6500:6500 --ip 172.31.252.2 -v $rootDir/DevopsConsole/nginx:/etc/nginx/conf.d -v $rootDir/DevopsConsole/certs:/etc/nginx/certs -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 6500:6500 --ip 172.31.252.2 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
 elif [ "platformservices" == "$imageName" ]; then
     # Copy InitializationVector.json to the platformservices
     cp platformservices/InitializationVector.json $rootDir/Binary/platformservices
-    runtimeFlags="$runtimeFlags -p 6200:6200 -v $rootDir/Binary/platformservices:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 6200:6201 -v $rootDir/Binary/platformservices:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
     cp webfrontend/InitializationVector.json $rootDir/WebFrontend
     runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/WebFrontend:/app $imageName"

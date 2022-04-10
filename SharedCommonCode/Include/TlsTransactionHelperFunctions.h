@@ -38,3 +38,9 @@ extern bool __stdcall PutHttpHeaderOnlyResponse(
     _in Dword dStatus,
     _in const std::string& strStatus
     );
+
+extern bool __stdcall PutHttpHeaderOnlyResponse(
+    _in Socket& oSocket,
+    _in Dword dStatus,
+    _in const std::string& strStatus
+    );

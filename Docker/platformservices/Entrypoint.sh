@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Start the nginx server
+nginx -g 'daemon off;' 2>&1 | tee /app/nginx.log &
+
 cd /app || exit
 ./RestApiPortal 2>&1 | tee restportal.log &
 

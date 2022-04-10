@@ -48,7 +48,7 @@ std::map<Dword, std::string> g_stlHttpCodes = {
 typedef struct
 {
     RestFrameworkRuntimeData * m_poRestFrameworkRuntimeData;        /* Pointer to RestFrameworkRunTimeData object */
-    TlsNode * m_poTlsNode;                                          /* Pointer to TlsNode */
+    Socket * m_poSocket;                                          /* Pointer to TlsNode */
 }
 ThreadParameters;
 
@@ -69,11 +69,11 @@ static void * __stdcall StartThread(
     __DebugAssert(nullptr != poVoidThreadParameters);
 
     ThreadParameters * poThreadParameters = ((ThreadParameters *) poVoidThreadParameters);
-    TlsNode * poTlsNode = poThreadParameters->m_poTlsNode;
+    Socket * poSocket = poThreadParameters->m_poSocket;
     RestFrameworkRuntimeData * poRestFrameworkRuntimeData = poThreadParameters->m_poRestFrameworkRuntimeData;
-    poRestFrameworkRuntimeData->RunThread((TlsNode *) poTlsNode);
+    poRestFrameworkRuntimeData->RunThread((Socket *) poSocket);
     // Release the Tls Node
-    poTlsNode->Release();
+    poSocket->Release();
     // Deallocate parameters
     poRestFrameworkRuntimeData->m_oSmartMemoryAllocator.Deallocate(poVoidThreadParameters);
     // Delete the connection
@@ -130,15 +130,15 @@ RestFrameworkRuntimeData::~RestFrameworkRuntimeData(void) throw()
  ********************************************************************************************/
 
 void __thiscall RestFrameworkRuntimeData::HandleConnection(
-    _in TlsNode * poTlsNode
+    _in Socket * poSocket
     )
 {
     __DebugFunction();
-    __DebugAssert(nullptr != poTlsNode);
+    __DebugAssert(nullptr != poSocket);
 
     ThreadParameters * poThreadParameters = ((ThreadParameters *) m_oSmartMemoryAllocator.Allocate(sizeof(ThreadParameters), true));
     poThreadParameters->m_poRestFrameworkRuntimeData = this;
-    poThreadParameters->m_poTlsNode = poTlsNode;
+    poThreadParameters->m_poSocket = poSocket;
 
     pthread_t connectionThread;
     int nStatus = ::pthread_create(&connectionThread, nullptr, StartThread, poThreadParameters);
@@ -196,12 +196,12 @@ void __thiscall RestFrameworkRuntimeData::DeleteConnection(void)
  * @function RunThread
  * @brief Parse request packet and route to requested plugin. Get the response and send it back
  *        to the caller.
- * @param[in] poTlsNode TlsNode object pointer
+ * @param[in] poSocket Socket object pointer
  *
  ********************************************************************************************/
 
 void __thiscall RestFrameworkRuntimeData::RunThread(
-    _in TlsNode * poTlsNode
+    _in Socket * poSocket
     )
 {
     __DebugFunction();
@@ -218,8 +218,8 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         bool fIsEndOfHeader = false;
         std::vector<Byte> stlHeaderData;
         while (false == fIsEndOfHeader)
-        {   
-            std::vector<Byte> stlBuffer = poTlsNode->Read(1, 2000);
+        {
+            std::vector<Byte> stlBuffer = poSocket->Read(1, 2000);
             // Check whether the read was successful or not
             if (0 < stlBuffer.size())
             {
@@ -232,7 +232,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
                     }
                 }
             }
-            else 
+            else
             {
                 fIsEndOfHeader = true;
             }
@@ -263,7 +263,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
             if (0 < unContentLength)
             {
                 // Read request content
-                std::vector<Byte> stlBodyData = poTlsNode->Read(unContentLength, 2000);
+                std::vector<Byte> stlBodyData = poSocket->Read(unContentLength, 2000);
                 _ThrowBaseExceptionIf((0 == stlBodyData.size()), "Dead Packet.", nullptr);
                 std::string strRequestBody = std::string(stlBodyData.begin(), stlBodyData.end());
 
@@ -360,7 +360,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         poRequestParameters->Release();
         oLocalSmartMemoryAllocator.Deallocate(pbSerializedResponseBuffer);
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -375,7 +375,7 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
         }
         std::cout << "\n\nRest Response:\n\n" << strResponseData << std::endl;
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -387,14 +387,14 @@ void __thiscall RestFrameworkRuntimeData::RunThread(
     try
     {
         // Send back the response data
-        poTlsNode->Write((const Byte *) strResponseData.data(), strResponseData.size());
+        poSocket->Write((const Byte *) strResponseData.data(), strResponseData.size());
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

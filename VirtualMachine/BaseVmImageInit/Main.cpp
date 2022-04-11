@@ -12,8 +12,8 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "StructuredBuffer.h"
-#include "TlsServer.h"
-#include "TlsTransactionHelperFunctions.h"
+#include "SocketServer.h"
+#include "SocketTransactionHelperFunctions.h"
 #include "FileUtils.h"
 
 #include <iostream>
@@ -33,7 +33,7 @@ void __stdcall InitVirtualMachine()
 {
     __DebugFunction();
 
-    TlsServer oTlsServer(9090);
+    SocketServer oSocketServer(9090);
 
     StructuredBuffer oResponseStructuredBuffer;
     oResponseStructuredBuffer.PutString("Status", "Fail");
@@ -41,19 +41,19 @@ void __stdcall InitVirtualMachine()
     bool fSuccess = false;
     while (false == fSuccess)
     {
-        std::unique_ptr<TlsNode> poTlsNode(nullptr);
+        std::unique_ptr<Socket> poSocket(nullptr);
         try
         {
             // We will first try to download all the incoming package data that needs to be installed
             // on the VM and if this fails we try again.
-            if (true == oTlsServer.WaitForConnection(1000))
+            if (true == oSocketServer.WaitForConnection(1000))
             {
                 std::cout << "New Connection" << std::endl;
-                poTlsNode.reset(oTlsServer.Accept());
-                _ThrowIfNull(poTlsNode, "Cannot establish connection.", nullptr);
+                poSocket.reset(oSocketServer.Accept());
+                _ThrowIfNull(poSocket, "Cannot establish connection.", nullptr);
 
                 // Fetch the serialized Structure Buffer from the remote
-                std::vector<Byte> stlPayload = ::GetTlsTransaction(poTlsNode.get(), 60 * 60 * 1000);
+                std::vector<Byte> stlPayload = ::GetSocketTransaction(poSocket.get(), 60 * 60 * 1000);
                 _ThrowBaseExceptionIf((0 == stlPayload.size()), "Bad Initialization data", nullptr);
 
                 StructuredBuffer oFilesStructuredBuffer(stlPayload);
@@ -87,9 +87,9 @@ void __stdcall InitVirtualMachine()
             // Send the resposnse to the Remote Initializer Tool
             // There is a chance that this transaction may fail but in that case, we will continue to the run the
             // virtual machine and exit the init process and leave it on the discretion of the initialization tool
-            if (nullptr != poTlsNode)
+            if (nullptr != poSocket)
             {
-                bool fResponseStatus = ::PutTlsTransaction(poTlsNode.get(), oResponseStructuredBuffer);
+                bool fResponseStatus = ::PutSocketTransaction(poSocket.get(), oResponseStructuredBuffer.GetSerializedBuffer());
             }
         }
         catch(...)

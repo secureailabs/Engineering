@@ -429,12 +429,12 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
 {
     __DebugFunction();
     
+    bool fProvisionResult{false};
     StructuredBuffer oReturnStructuredBuffer;
     
     try
     {  
         unsigned int unStatus{404};
-        bool fProvisionResult{false};
         Guid oDatasetGuid(c_strDatasetIdentifier);
         Guid oDigitalContractGuid(c_strDigitalContractIdentifier);
 
@@ -464,7 +464,6 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
     
         if ((200 == unStatus)||(201 == unStatus))
         {
-            fProvisionResult = true;
             Guid oProvisionGuid = Guid(oResponse.GetString("SecureNodeGuid"));
             std::string strRawProvisionGuid = oProvisionGuid.ToString(eRaw);
             
@@ -475,8 +474,9 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
             m_stlProvisionInformation[strRawProvisionGuid].strDigitalContractGUID = oDigitalContractGuid.ToString(eRaw);
             
             oReturnStructuredBuffer.PutString("SCNGuid", oProvisionGuid.ToString(eHyphensAndCurlyBraces));
+            // If we get here, everything has worked properly.
+            fProvisionResult = true;
         }
-        oReturnStructuredBuffer.PutBoolean("Status", fProvisionResult);
     }
     
     catch (const BaseException & oBaseException )
@@ -494,6 +494,11 @@ std::string __thiscall Orchestrator::ProvisionSecureComputationalNode(
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
 
+    // No matter what happens, we need to be able to return a Status on the provisioning
+    // result. This needs to be done after the try..catch block, since throwing exceptions
+    // should effectively return a Status of false
+    oReturnStructuredBuffer.PutBoolean("Status", fProvisionResult);
+    
     return ::ConvertStructuredBufferToJson(oReturnStructuredBuffer);
 }
 
@@ -1888,9 +1893,6 @@ void __thiscall Orchestrator::CacheDigitalContractsFromRemote(void)
         std::string strJsonBody = "";
         std::vector<Byte> stlRestResponse = ::RestApiCall(m_oSessionManager.GetServerIpAddress(), m_oSessionManager.GetServerPortNumber(), strVerb, strApiUrl, strJsonBody, true);
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-        std::cout << "void __thiscall Orchestrator::CacheDigitalContractsFromRemote(" << m_oSessionManager.GetServerIpAddress() << ")" << std::endl;
-        std::cout << "Eosb = " << m_oSessionManager.GetEosb() << std::endl;
-        std::cout << oResponse.ToString() << std::endl;
         _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to retrieve digital contracts", nullptr);
 
         if (oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))

@@ -12,6 +12,10 @@
 /CI_CD/* @JENKINS-SAIL @stanleylinSail
 /AzureDeploymentTemplates/* @prawalgangwar
 /InternalTools/DeployPlatform/* @prawalgangwar
+/DevopsConsole/* @prawalgangwar
 
 # Github Configs PR review
 .github/* @JENKINS-SAIL @stanleylinSail
+
+# InternalTools
+/InternalTools/WindowsPlatformDeliverables/* @LuisMiguelHuapaya

@@ -49,7 +49,7 @@ class Orchestrator : public Object
         unsigned int __thiscall Login(
             _in const std::string & c_strEmail,
             _in const std::string & c_strUserPassword,
-            _in const int c_wordServerPort,
+            _in int wServerPort,
             _in const std::string & c_strServerIpAddress
             ) throw();
         void __thiscall ExitCurrentSession(void) throw();

@@ -539,8 +539,11 @@ std::vector<Byte> __thiscall SailAuthentication::AuthenticateUserCredentails(
 
     StructuredBuffer oResponse;
 
-    Dword dwStatus = 404;
-    Socket * poIpcAccountManager = nullptr, * poIpcCryptographicManager = nullptr;
+    // Regardless of the type of failure, authentication functions should always return either
+    // 201 on success, or 401 on failure (regardless of the type of failure).
+    Dword dwStatus = 401;
+    Socket * poIpcAccountManager = nullptr;
+    Socket * poIpcCryptographicManager = nullptr;
 
     try
     {

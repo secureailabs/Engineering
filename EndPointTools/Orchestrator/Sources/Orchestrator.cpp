@@ -178,15 +178,19 @@ unsigned int __thiscall Orchestrator::Login(
     ) throw()
 {
     __DebugFunction();
-    __DebugAssert(0 < c_strEmail.size());
-    __DebugAssert(0 < c_strUserPassword.size());
-    __DebugAssert(0 < nServerPort);
-    __DebugAssert(0 < c_strServerIpAddress.size());
 
+    // Regardless of the type of failure, authentication functions should always return either
+    // 201 on success, or 401 on failure (regardless of the type of failure).
     uint64_t unStatus{401};
-    
+  
     try
     {
+        // First we need to validate the incoming parameters
+        _ThrowBaseExceptionIf((0 == c_strEmail.size()), "ERROR: Invalid email parameter (size = 0)", nullptr);
+        _ThrowBaseExceptionIf((0 == c_strUserPassword.size()), "ERROR: Invalid password parameter (size = 0)", nullptr);
+        _ThrowBaseExceptionIf((0 == c_strServerIpAddress.size()), "ERROR: Invalid server ip address parameter (size = 0)", nullptr);
+        _ThrowBaseExceptionIf((0 >= nServerPort), "ERROR: Invalid server port number parameter (0 >= nServerPort)", nullptr);
+        
         // Call the session manager to login
         _ThrowBaseExceptionIf((false == m_oSessionManager.Login(c_strEmail, c_strUserPassword, c_strServerIpAddress, (Word) LOWORD(nServerPort))), "ERROR: Failed to login", nullptr);
         // Get our list of digital contracts
@@ -211,7 +215,7 @@ unsigned int __thiscall Orchestrator::Login(
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
-
+    
     return unStatus;
 }
 

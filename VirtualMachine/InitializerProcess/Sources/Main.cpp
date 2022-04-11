@@ -15,10 +15,10 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "HardCodedCryptographicKeys.h"
-#include "TlsTransactionHelperFunctions.h"
+#include "SocketTransactionHelperFunctions.h"
 #include "IpcTransactionHelperFunctions.h"
+#include "SocketServer.h"
 #include "SocketClient.h"
-#include "TlsServer.h"
 #include "StructuredBuffer.h"
 #include "JsonValue.h"
 #include "InitializationVector.h"
@@ -53,8 +53,8 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
 
     // Next step is to wait for the dataset from the Remote data connector, the process will wait for the dataset
     // and dataOwner information
-    TlsServer oTlsServer(6800);
-    while (false == oTlsServer.WaitForConnection(1000))
+    SocketServer oSocketServer(6800);
+    while (false == oSocketServer.WaitForConnection(1000))
     {
         // Put the thread into efficient sleep to give a chance for the other process
         // to connect. This reduces thread contention.
@@ -63,10 +63,10 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
 
     // The second connection are the initialization parameters sent from the
     // Remote data connector which has information about the dataowner and the dataset
-    std::unique_ptr<TlsNode> poTlsNode(oTlsServer.Accept());
-    _ThrowBaseExceptionIf((nullptr == poTlsNode), "Unexpected nullptr returned from TlsServer.Accept()", nullptr);
+    std::unique_ptr<Socket> poSocket(oSocketServer.Accept());
+    _ThrowBaseExceptionIf((nullptr == poSocket), "Unexpected nullptr returned from TlsServer.Accept()", nullptr);
 
-    auto stlDatasetParameters = ::GetTlsTransaction(poTlsNode.get(), 60*60*1000);
+    auto stlDatasetParameters = ::GetSocketTransaction(poSocket.get(), 60*60*1000);
     _ThrowBaseExceptionIf((0 == stlDatasetParameters.size()), "Unexpected empty dataset parameters", nullptr);
 
     std::string stlDatasetFilename = "//tmp//" + Guid().ToString(eHyphensOnly) + ".csvp";
@@ -81,13 +81,13 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     // dataset in memory.
     // TODO: In the future, we should deliver the dataset in chunk instead of trying to put everything into memory. This
     // needs to be done at the Data Annocation Tool level (i.e. a single table is actually compressed in separate chunks)
-    std::vector<Byte> stlUnencodedData = ::Base64Decode(::UnEscapeJsonString(oRemoteDatasetParameters.GetString("Base64EncodedDataset")).c_str());    
+    std::vector<Byte> stlUnencodedData = ::Base64Decode(::UnEscapeJsonString(oRemoteDatasetParameters.GetString("Base64EncodedDataset")).c_str());
     BinaryFileWriter oBinaryFileWriter(stlDatasetFilename);
     oBinaryFileWriter.Write(stlUnencodedData);
     // Now return the status to the caller
     StructuredBuffer oStructuredBufferResponse;
     oStructuredBufferResponse.PutString("Status", "Success");
-    ::PutTlsTransaction(poTlsNode.get(), oStructuredBufferResponse);
+    ::PutSocketTransaction(poSocket.get(), oStructuredBufferResponse.GetSerializedBuffer());
 
     return oAllInitializationParameters.GetSerializedBuffer();
 }

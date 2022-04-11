@@ -156,7 +156,19 @@ std::vector<Byte> __stdcall RestApiCall(
         // Execute the API call
         unsigned int unResponse = ::curl_easy_perform(psCurl);
         ::curl_easy_cleanup(psCurl);
-        stlResponse.insert(stlResponse.end(), 0);
+        if (CURLE_OK == unResponse)
+        {
+            if (true == fIsJsonResponse)
+            {
+                // Make sure there is a null-terminating character
+                stlResponse.insert(stlResponse.end(), 0);
+            }
+        }
+        else if (true == fIsJsonResponse)
+        {
+            // stlResponse = "{\n\t"Status"=400\n}"
+            stlResponse = { 0x7b, 0x0a, 0x09, 0x22, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x3d, 0x34, 0x30, 0x30, 0x0a, 0x7d };
+        }
     }
 
     catch (const BaseException & c_oBaseException)

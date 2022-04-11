@@ -13,7 +13,15 @@
 ```
 ### Orchestrator
 ```
-./RunService.sh -s orchestrator
+goto Engineering/EndPointTools/Orchestrator
+
+Run make all
+
+goto Engineering/Docker
+
+run ./BuildImages.sh -i orchestrator
+
+then run  ./RunService.sh -s orchestrator 
 ```
 ### Remote Data Connector
 ```

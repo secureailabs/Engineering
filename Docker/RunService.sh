@@ -68,7 +68,7 @@ runtimeFlags="$detachFlags --name $imageName --network sailNetwork"
 
 if [ "orchestrator" == "$imageName" ]; then
     cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail
-    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator/sail:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator/sail:/app -v $rootDir/EndPointTools/SafeObjectTools/SafeObjects:/SafeObjects $imageName"
 elif [ "devopsconsole" == "$imageName" ]; then
     cp devopsconsole/InitializationVector.json $rootDir/DevopsConsole
     runtimeFlags="$runtimeFlags -v $rootDir/DevopsConsole:/app -v $rootDir/DevopsConsole/nginx:/etc/nginx/conf.d -v $rootDir/DevopsConsole/certs:/etc/nginx/certs -p 5050:443 $imageName"

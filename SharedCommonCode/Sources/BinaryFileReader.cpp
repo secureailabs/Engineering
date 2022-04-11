@@ -142,6 +142,20 @@ std::vector<Byte> __thiscall BinaryFileReader::Read(
 
 /********************************************************************************************/
 
+std::vector<Byte> __thiscall BinaryFileReader::ReadAll(void)
+{
+    __DebugFunction();
+    
+    // First we need to make sure the file pointer is set back to the beginning since ReadAll()
+    // can possibly be called after other calls to Read() which would move the file pointer
+    // beyond the beginning
+    m_stlFileStream.seekg(0, std::ios::beg);
+    
+    return this->Read(m_un64SizeInBytes);
+}
+
+/********************************************************************************************/
+
 void __thiscall BinaryFileReader::Load(void)
 {
     __DebugFunction();

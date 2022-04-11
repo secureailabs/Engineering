@@ -129,16 +129,18 @@ static std::string __stdcall ParseJsonString(
 
     bool fDone = false;
     unsigned int unCurrentOffset = *punOffset;
+    unsigned int unTemporaryStringSize = 0;
     unsigned int unActualStringSize = 0;
+    char szTemporaryString[1000];
     std::string strReturnString;
 
     do
     {
-        // For optimization reasons, we want to grow the string in increments of
-        // 1000, or else this could get really expensive to
-        if (0 == (strReturnString.size() % 1000))
+        if (999 == unTemporaryStringSize)
         {
-            strReturnString.resize(strReturnString.size() + 1000);
+            szTemporaryString[999] = 0;
+            strReturnString += szTemporaryString;
+            unTemporaryStringSize = 0;
         }
         // First make sure we didn't encounter any invalid characters in the string
         _ThrowBaseExceptionIf((('\x00' <= c_szJsonString[unCurrentOffset])&&('\x1F' >= c_szJsonString[unCurrentOffset])), "Invalid string character found at offset %d", unCurrentOffset);
@@ -148,43 +150,43 @@ static std::string __stdcall ParseJsonString(
             ++unCurrentOffset;
             if ('\\' == c_szJsonString[unCurrentOffset])
             {
-                strReturnString.push_back('\\');
+                szTemporaryString[unTemporaryStringSize++] = '\\';
                 ++unCurrentOffset;
             }
             else if ('/' == c_szJsonString[unCurrentOffset])
             {
-                strReturnString.push_back('/');
+                szTemporaryString[unTemporaryStringSize++] = '/';
                 ++unCurrentOffset;
             }
             else if ('b' == c_szJsonString[unCurrentOffset])
             {
-                strReturnString.push_back('\b');
+                szTemporaryString[unTemporaryStringSize++] = '\b';
                 ++unCurrentOffset;
             }
             else if ('f' == c_szJsonString[unCurrentOffset])
             {
-                strReturnString.push_back('\f');
+                szTemporaryString[unTemporaryStringSize++] = '\f';
                 ++unCurrentOffset;
             }
             else if ('n' == c_szJsonString[unCurrentOffset])
             {
-                strReturnString.push_back('\n');
+                szTemporaryString[unTemporaryStringSize++] = '\n';
                 ++unCurrentOffset;
             }
             else if ('r' == c_szJsonString[unCurrentOffset])
             {
-                strReturnString.push_back('\r');
+                szTemporaryString[unTemporaryStringSize++] = '\r';
                 ++unCurrentOffset;
             }
             else if ('t' == c_szJsonString[unCurrentOffset])
             {
-                strReturnString.push_back('\t');
+                szTemporaryString[unTemporaryStringSize++] = '\t';
                 ++unCurrentOffset;
             }
             else if ('u' == c_szJsonString[unCurrentOffset])
             {
                 ++unCurrentOffset;
-                strReturnString.push_back(::ConvertJsonHexCharactersToAnsiCharacter(c_szJsonString, &unCurrentOffset));
+                szTemporaryString[unTemporaryStringSize++] = ::ConvertJsonHexCharactersToAnsiCharacter(c_szJsonString, &unCurrentOffset);
             }
             else
             {
@@ -198,13 +200,19 @@ static std::string __stdcall ParseJsonString(
         }
         else
         {
-            strReturnString[unActualStringSize] = c_szJsonString[unCurrentOffset];
-            ++unActualStringSize;
+            szTemporaryString[unTemporaryStringSize++] = c_szJsonString[unCurrentOffset];
             ++unCurrentOffset;
         }
     }
     while (false == fDone);
 
+    // Make sure to append whatever is left of the szTemporaryString
+    if (0 < unTemporaryStringSize)
+    {
+        szTemporaryString[unTemporaryStringSize] = 0;
+        strReturnString += szTemporaryString;
+    }
+    
     // Make sure to update punOffset
     *punOffset = unCurrentOffset;
 
@@ -674,7 +682,6 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
                 for (unsigned unIndex = 0; unIndex < strValue.size(); ++unIndex)
                 {
                     char chCurrentCharacter = strValue[unIndex];
-                    _ThrowBaseExceptionIf((('\x00' <= chCurrentCharacter)&&('\x1F' >= chCurrentCharacter)), "Invalid string character 0x%02X found at offset %d", (unsigned int) chCurrentCharacter, unIndex);
 
                     if ('\\' == chCurrentCharacter)
                     {
@@ -706,8 +713,14 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
                         strEscapedValue[unInsertedCharacterCount++] = '\\';
                         strEscapedValue[unInsertedCharacterCount++] = 't';
                     }
+                    else if ('"' == chCurrentCharacter)
+                    {
+                        strEscapedValue[unInsertedCharacterCount++] = '\\';
+                        strEscapedValue[unInsertedCharacterCount++] = '"';
+                    }
                     else
                     {
+                        _ThrowBaseExceptionIf((('\x00' <= chCurrentCharacter)&&('\x1F' >= chCurrentCharacter)), "Invalid string character 0x%02X found at offset %d", (unsigned int) chCurrentCharacter, unIndex);
                         strEscapedValue[unInsertedCharacterCount++] = chCurrentCharacter;
                     }
                 }

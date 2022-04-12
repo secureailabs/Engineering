@@ -63,6 +63,12 @@ if $cleanDatabase; then
     docker volume rm -f $sailDatabaseVolumeName
 fi
 
+# Create a folder to hold all the Binaries
+mkdir -p $rootDir/Binary/"$imageName"_dir
+
+# Copy the binaries to the folder
+cp $rootDir/Binary/BaseVmImageInit $rootDir/Binary/"$imageName"_dir/
+
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/nginx:/etc/nginx/conf.d -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # runtimeFlags="$detachFlags --name $imageName"
@@ -84,12 +90,16 @@ elif [ "dataservices" == "$imageName" ]; then
         docker volume create $sailDatabaseVolumeName
     fi
     # Copy InitializationVector.json to the dataservices
-    cp dataservices/InitializationVector.json $rootDir/Binary/dataservices
-    runtimeFlags="$runtimeFlags -p 6500:6500 --ip 172.31.252.2 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices:/app $imageName"
+    make -C $rootDir package_dataservices -s -j
+    cp dataservices/InitializationVector.json $rootDir/Binary/dataservices_dir
+    cp $rootDir/Binary/DataServices.tar.gz $rootDir/Binary/dataservices_dir
+    runtimeFlags="$runtimeFlags -p 6500:6500 --ip 172.31.252.2 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices_dir:/app $imageName"
 elif [ "platformservices" == "$imageName" ]; then
     # Copy InitializationVector.json to the platformservices
-    cp platformservices/InitializationVector.json $rootDir/Binary/platformservices
-    runtimeFlags="$runtimeFlags -p 6200:6201 -v $rootDir/Binary/platformservices:/app $imageName"
+    make -C $rootDir package_platformservices -s -j
+    cp platformservices/InitializationVector.json $rootDir/Binary/platformservices_dir
+    cp $rootDir/Binary/PlatformServices.tar.gz $rootDir/Binary/platformservices_dir
+    runtimeFlags="$runtimeFlags -p 6200:6201 -v $rootDir/Binary/platformservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
     cp webfrontend/InitializationVector.json $rootDir/WebFrontend
     runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/WebFrontend:/app $imageName"

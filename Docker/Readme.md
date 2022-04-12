@@ -25,10 +25,7 @@ goto Engineering/Docker
 ```
 ### Orchestrator
 ```
-
-run ./BuildImages.sh -i orchestrator
-
-then run  ./RunService.sh -s orchestrator 
+./RunService.sh -s orchestrator 
 ```
 ### Remote Data Connector
 ```

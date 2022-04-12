@@ -2,14 +2,12 @@
 
 ## Pre-requirements
 ### Remake Binaries
-```
-goto Engineering/EndPointTools/Orchestrator
 
-make cleanall
+Go to Engineering/
+```
+make clean
 
 make all -j 
-
-goto Engineering/Docker
 ```
 
 ## Build all the docker images

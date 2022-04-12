@@ -1,5 +1,17 @@
 # Readme
 
+## Pre-requirements
+### Remake Binaries
+```
+goto Engineering/EndPointTools/Orchestrator
+
+make cleanall
+
+make all -j 
+
+goto Engineering/Docker
+```
+
 ## Build all the docker images
 ```
 ./BuildImage.sh
@@ -13,11 +25,6 @@
 ```
 ### Orchestrator
 ```
-goto Engineering/EndPointTools/Orchestrator
-
-Run make all
-
-goto Engineering/Docker
 
 run ./BuildImages.sh -i orchestrator
 

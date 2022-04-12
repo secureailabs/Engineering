@@ -33,6 +33,5 @@ docker run \
 -p 6800:6801 \
 -p 9090:9091 \
 -v $(pwd)/"$imageName"_dir:/app \
--v /home/pg/Engineering/DevopsConsole/nginx:/etc/nginx/conf.d \
--v /home/pg/Engineering/DevopsConsole/certs:/etc/nginx/certs \
+-v $(pwd)/certs:/etc/nginx/certs \
 $imageName

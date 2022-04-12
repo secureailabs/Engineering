@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ResourceGroup="VirtualMachineImageStorageRg"
-StorageAccountName="sailcomputationimage9891"
+ResourceGroup="NginxImageStorageRg"
+StorageAccountName="sailvirtualmachineimage9891"
 Location="eastus"
 
 PrintHelp()

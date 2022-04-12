@@ -44,13 +44,13 @@
         },
         {
             "type": "file",
-            "source": "../../Binary/BaseVmImageInit",
-            "destination": "BaseVmImageInit"
+            "source": "../../DevopsConsole/certs/",
+            "destination": "."
         },
         {
             "type": "file",
-            "source": "../../Binary/StartVirtualMachine.sh",
-            "destination": "StartVirtualMachine.sh"
+            "source": "../../Binary/BaseVmImageInit",
+            "destination": "BaseVmImageInit"
         },
         {
             "type": "shell",

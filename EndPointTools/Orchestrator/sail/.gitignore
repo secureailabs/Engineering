@@ -1,0 +1,6 @@
+SafeObjects/
+SAILPyAPI.so
+**/__pycache__/
+.ipynb_checkpoints/
+*.log
+InitializationVector.json

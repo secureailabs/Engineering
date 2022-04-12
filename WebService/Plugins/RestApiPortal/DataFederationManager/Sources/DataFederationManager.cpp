@@ -295,7 +295,6 @@ uint64_t __thiscall DataFederationManager::SubmitRequest(
     )
 {
     __DebugFunction();
-
     __DebugAssert(punSerializedResponseSizeInBytes != nullptr);
 
     uint64_t un64Identifier = 0xFFFFFFFFFFFFFFFF;
@@ -544,6 +543,8 @@ std::vector<Byte> __thiscall DataFederationManager::DeleteDataFederation(
     _in const StructuredBuffer & c_oRequest
     )
 {
+    __DebugFunction();
+
     StructuredBuffer oResponse;
     Dword dwStatus{400};
     try
@@ -553,7 +554,7 @@ std::vector<Byte> __thiscall DataFederationManager::DeleteDataFederation(
         {
             // TODO - There are additional rules to determine when we can delete that are not scoped out yet
             bool fValidatedDeleteRequest{true};
-            if ( true == fValidatedDeleteRequest )
+            if (true == fValidatedDeleteRequest)
             {
                 // Create a request to get the database manager to query for the organization GUID
                 StructuredBuffer oDatabaseRequest;
@@ -564,11 +565,11 @@ std::vector<Byte> __thiscall DataFederationManager::DeleteDataFederation(
 
                 StructuredBuffer oDatabaseResponse{::SendRequestToDatabase(oDatabaseRequest, m_strDatabaseServiceIpAddr, m_unDatabaseServiceIpPort)};
 
-                if ( 200 == oDatabaseResponse.GetDword("Status") )
+                if (200 == oDatabaseResponse.GetDword("Status"))
                 {
                     // Set this federation to inactive if we own it
                     DataFederation oReturnedFederation{oDatabaseResponse.GetStructuredBuffer("DataFederation")};
-                    if ( oReturnedFederation.OrganizationOwnerIdentifier() == oUserInfo.GetGuid("OrganizationGuid"))
+                    if (oReturnedFederation.OrganizationOwnerIdentifier() == oUserInfo.GetGuid("OrganizationGuid"))
                     {
                         oReturnedFederation.SetInactive();
                         // Create a request to get the database manager to store the updated object
@@ -580,7 +581,7 @@ std::vector<Byte> __thiscall DataFederationManager::DeleteDataFederation(
 
                         StructuredBuffer oDatabaseResponse{::SendRequestToDatabase(oDataStoreRequest, m_strDatabaseServiceIpAddr, m_unDatabaseServiceIpPort)};
                         dwStatus = oDatabaseResponse.GetDword("Status");
-                        if ( 200 == dwStatus )
+                        if (200 == dwStatus)
                         {
                             oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
                         }
@@ -597,21 +598,25 @@ std::vector<Byte> __thiscall DataFederationManager::DeleteDataFederation(
             }
         }
     }
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+
     catch(std::exception & e)
     {
         std::cout << "Exception: " << e.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+
     oResponse.PutDword("Status", dwStatus);
     return oResponse.GetSerializedBuffer();
 }

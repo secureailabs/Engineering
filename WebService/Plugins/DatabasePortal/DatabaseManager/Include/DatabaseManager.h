@@ -388,7 +388,7 @@ class DatabaseManager : public Object
             );
 
         std::optional<DataFederation> __thiscall PullDataFederationObject(
-            _in const Guid& c_oIdentifier
+            _in const Guid & c_oIdentifier
             );
 
         // Shutdown the server

@@ -169,13 +169,14 @@ std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
         {
             bsoncxx::document::element oDataFederationIdentifier = oDocumentView["DataFederationIdentifier"];
             bsoncxx::document::element oDataFederationOwnerIdentifier = oDocumentView["DataFederationOwnerOrganizationIdentifier"];
-            if ((oDataFederationIdentifier && oDataFederationIdentifier.type() == type::k_utf8) && (oDataFederationOwnerIdentifier && oDataFederationOwnerIdentifier.type() == type::k_utf8) )
+            if ((oDataFederationIdentifier && (type::k_utf8 == oDataFederationIdentifier.type()))
+                && (oDataFederationOwnerIdentifier && (type::k_utf8 == oDataFederationOwnerIdentifier.type())))
             {
                 std::string strDataFederationIdentifier = oDataFederationIdentifier.get_utf8().value.to_string();
                 std::string strDataFederationOwnerIdentifier = oDataFederationOwnerIdentifier.get_utf8().value.to_string();
 
                 bsoncxx::document::element oPlainTextObjectBlobGuid = oDocumentView["PlainTextObjectBlobGuid"];
-                if (oPlainTextObjectBlobGuid && oPlainTextObjectBlobGuid.type() == type::k_utf8)
+                if (oPlainTextObjectBlobGuid && (type::k_utf8 == oPlainTextObjectBlobGuid.type()))
                 {
                     std::string strPlainTextObjectBlobGuid = oPlainTextObjectBlobGuid.get_utf8().value.to_string();
                     bsoncxx::stdx::optional<bsoncxx::document::value> oPlainTextObjectBlobDocument = oSailDatabase["PlainTextObjectBlob"].find_one(document{}
@@ -185,7 +186,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
                     if (bsoncxx::stdx::nullopt != oPlainTextObjectBlobDocument)
                     {
                         bsoncxx::document::element oObjectGuid = oPlainTextObjectBlobDocument->view()["ObjectGuid"];
-                        if (oObjectGuid && oObjectGuid.type() == type::k_utf8)
+                        if (oObjectGuid && (type::k_utf8 == oObjectGuid.type()))
                         {
                             std::string strObjectGuid = oObjectGuid.get_utf8().value.to_string();
                             bsoncxx::stdx::optional<bsoncxx::document::value> oObjectDocument = oSailDatabase["Object"].find_one(document{} << "ObjectGuid" << strObjectGuid << finalize);
@@ -264,9 +265,9 @@ std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    catch(std::exception & e)
+    catch(std::exception & c_oException)
     {
-        std::cout << "Exception: " << e.what() << '\n';
+        std::cout << "Exception: " << c_oException.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
     catch (...)
@@ -307,7 +308,6 @@ std::optional<DataFederation> __thiscall DatabaseManager::PullDataFederationObje
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
         mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
-
         bsoncxx::stdx::optional<bsoncxx::document::value> oDataFederationDocument = oSailDatabase["DataFederation"].find_one(document{}
                                                                                                                 << "DataFederationIdentifier" << c_oIdentifier.ToString(eHyphensAndCurlyBraces)
                                                                                                                 << finalize);
@@ -315,7 +315,7 @@ std::optional<DataFederation> __thiscall DatabaseManager::PullDataFederationObje
         if (bsoncxx::stdx::nullopt != oDataFederationDocument)
         {
             bsoncxx::document::element oPlainTextObjectBlobGuid = oDataFederationDocument->view()["PlainTextObjectBlobGuid"];
-            if (oPlainTextObjectBlobGuid && oPlainTextObjectBlobGuid.type() == type::k_utf8)
+            if ( oPlainTextObjectBlobGuid && (type::k_utf8 == oPlainTextObjectBlobGuid.type()))
             {
                 std::string strPlainTextObjectBlobGuid = oPlainTextObjectBlobGuid.get_utf8().value.to_string();
                 bsoncxx::stdx::optional<bsoncxx::document::value> oPlainTextObjectBlobDocument = oSailDatabase["PlainTextObjectBlob"].find_one(document{}
@@ -324,16 +324,16 @@ std::optional<DataFederation> __thiscall DatabaseManager::PullDataFederationObje
                 if (bsoncxx::stdx::nullopt != oPlainTextObjectBlobDocument)
                 {
                     bsoncxx::document::element oObjectGuid = oPlainTextObjectBlobDocument->view()["ObjectGuid"];
-                    if (oObjectGuid && oObjectGuid.type() == type::k_utf8)
+                    if (oObjectGuid && (type::k_utf8 == oObjectGuid.type()))
                     {
                         std::string strObjectGuid = oObjectGuid.get_utf8().value.to_string();
                         bsoncxx::stdx::optional<bsoncxx::document::value> oObjectDocument = oSailDatabase["Object"].find_one(document{} << "ObjectGuid" << strObjectGuid << finalize);
                         if (bsoncxx::stdx::nullopt != oObjectDocument)
                         {
-                            mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session *poSession)
+                            mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
                             {
                                 bsoncxx::document::element oObjectBlob = oObjectDocument->view()["ObjectBlob"];
-                                if (oObjectBlob && oObjectBlob.type() == type::k_binary)
+                                if (oObjectBlob && (type::k_binary == oObjectBlob.type()))
                                 {
                                     StructuredBuffer oObject(oObjectBlob.get_binary().bytes, oObjectBlob.get_binary().size);
                                     oDataFederation.emplace(DataFederation{oObject});
@@ -361,11 +361,13 @@ std::optional<DataFederation> __thiscall DatabaseManager::PullDataFederationObje
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    catch(std::exception & e)
+
+    catch(std::exception & c_oException)
     {
-        std::cout << "Exception: " << e.what() << '\n';
+        std::cout << "Exception: " << c_oException.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -392,14 +394,13 @@ std::vector<Byte> __thiscall DatabaseManager::SoftDeleteDataFederation(
     __DebugFunction();
 
     StructuredBuffer oResponse;
-
     Dword dwStatus = 404;
 
     try 
     {
         std::optional<DataFederation> oDataFederation = this->PullDataFederationObject(c_oRequest.GetGuid("DataFederationIdentifier"));
 
-        if ( oDataFederation.has_value() )
+        if (true == oDataFederation.has_value())
         {
             // The requesting user owns this federation
             if ( c_oRequest.GetGuid("RequestingUserOrganizationIdentifier") == oDataFederation.value().OrganizationOwnerIdentifier() )
@@ -418,11 +419,13 @@ std::vector<Byte> __thiscall DatabaseManager::SoftDeleteDataFederation(
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    catch(std::exception & e)
+
+    catch(std::exception & c_oException)
     {
-        std::cout << "Exception: " << e.what() << '\n';
+        std::cout << "Exception: " << c_oException.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -448,7 +451,6 @@ bool __thiscall DatabaseManager::UpdateDataFederationObject(
     )
 {
     __DebugFunction();
-
     bool fStatus{false};
 
     try
@@ -459,7 +461,6 @@ bool __thiscall DatabaseManager::UpdateDataFederationObject(
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
         mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
-
         bsoncxx::stdx::optional<bsoncxx::document::value> oDataFederationDocument = oSailDatabase["DataFederation"].find_one(document{}
                                                                                                                 << "DataFederationIdentifier" << c_oDataFederation.Identifier().ToString(eHyphensAndCurlyBraces)
                                                                                                                 << finalize);
@@ -467,7 +468,7 @@ bool __thiscall DatabaseManager::UpdateDataFederationObject(
         if (bsoncxx::stdx::nullopt != oDataFederationDocument)
         {
             bsoncxx::document::element oPlainTextObjectBlobGuid = oDataFederationDocument->view()["PlainTextObjectBlobGuid"];
-            if (oPlainTextObjectBlobGuid && oPlainTextObjectBlobGuid.type() == type::k_utf8)
+            if (oPlainTextObjectBlobGuid && (type::k_utf8 == oPlainTextObjectBlobGuid.type()))
             {
                 std::string strPlainTextObjectBlobGuid = oPlainTextObjectBlobGuid.get_utf8().value.to_string();
                 bsoncxx::stdx::optional<bsoncxx::document::value> oPlainTextObjectBlobDocument = oSailDatabase["PlainTextObjectBlob"].find_one(document{}
@@ -476,7 +477,7 @@ bool __thiscall DatabaseManager::UpdateDataFederationObject(
                 if (bsoncxx::stdx::nullopt != oPlainTextObjectBlobDocument)
                 {
                     bsoncxx::document::element oObjectGuid = oPlainTextObjectBlobDocument->view()["ObjectGuid"];
-                    if (oObjectGuid && oObjectGuid.type() == type::k_utf8)
+                    if (oObjectGuid && (type::k_utf8 ==  oObjectGuid.type()))
                     {
                         std::string strObjectGuid = oObjectGuid.get_utf8().value.to_string();
                         bsoncxx::stdx::optional<bsoncxx::document::value> oObjectDocument = oSailDatabase["Object"].find_one(document{} << "ObjectGuid" << strObjectGuid << finalize);
@@ -485,7 +486,7 @@ bool __thiscall DatabaseManager::UpdateDataFederationObject(
                             mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session *poSession)
                             {
                                 bsoncxx::document::element oObjectBlob = oObjectDocument->view()["ObjectBlob"];
-                                if (oObjectBlob && oObjectBlob.type() == type::k_binary)
+                                if (oObjectBlob && (type::k_binary ==  oObjectBlob.type()))
                                 {
                                     // Write the serialized structured buffer to a blob
                                     bsoncxx::types::b_binary oNewObjectBlob{
@@ -520,11 +521,13 @@ bool __thiscall DatabaseManager::UpdateDataFederationObject(
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    catch(std::exception & e)
+
+    catch(std::exception & c_oException)
     {
-        std::cout << "Exception: " << e.what() << '\n';
+        std::cout << "Exception: " << c_oException.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -562,16 +565,19 @@ std::vector<Byte> __thiscall DatabaseManager::PullDataFederation(
             dwStatus = 200;
         }
     }
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    catch(std::exception & e)
+
+    catch(std::exception & c_oException)
     {
-        std::cout << "Exception: " << e.what() << '\n';
+        std::cout << "Exception: " << c_oException.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -611,16 +617,19 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateDataFederation(
             dwStatus = 200;
         }
     }
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    catch(std::exception & e)
+
+    catch(std::exception & c_oException)
     {
-        std::cout << "Exception: " << e.what() << '\n';
+        std::cout << "Exception: " << c_oException.what() << '\n';
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -628,5 +637,6 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateDataFederation(
     }
 
     oResponse.PutDword("Status", dwStatus);
+
     return oResponse.GetSerializedBuffer();
 }

@@ -1,4 +1,4 @@
-FROM node:14.16.0 as build
+FROM node:14.19.0 as build
 
 RUN apt-get update && \
   apt-get -y upgrade && \

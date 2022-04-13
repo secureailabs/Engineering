@@ -1,5 +1,15 @@
 # Readme
 
+## Pre-requirements
+### Remake Binaries
+
+Go to Engineering/
+```
+make clean
+
+make all -j 
+```
+
 ## Build all the docker images
 ```
 ./BuildImage.sh
@@ -13,7 +23,7 @@
 ```
 ### Orchestrator
 ```
-./RunService.sh -s orchestrator
+./RunService.sh -s orchestrator 
 ```
 ### Remote Data Connector
 ```

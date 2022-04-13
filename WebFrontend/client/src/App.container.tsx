@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import { bindActionCreators, compose, Dispatch } from 'redux';
 
 import {
@@ -20,4 +19,4 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
     dispatch
   );
 //@ts-ignore
-export default compose(connect(null, mapDispatchToProps))(withRouter(App));
+export default compose(connect(null, mapDispatchToProps))(App);

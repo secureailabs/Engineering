@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { takeLatest, put, all, call } from 'redux-saga/effects';
 
 import {
@@ -16,10 +17,12 @@ import {
   signUpSuccess,
 } from './user.actions';
 
+import { demo_data } from './user.data';
+
 import { userLogin, checkAuth, userSignup, logOut, me } from './user.apis';
 
 import { setToken, removeToken, fetchToken } from './user.utils';
-
+import _ from 'lodash';
 import { IUserData } from './user.typeDefs';
 import { AxiosResponse } from 'axios';
 
@@ -35,7 +38,7 @@ export function* signUp({ payload }: ReturnType<typeof signUpStart>) {
     // The backend returns status 204 when the fields are valid but the org already exists
 
     yield put(signUpSuccess());
-  } catch (error) {
+  } catch (error: any) {
     yield put(signUpFailure(error?.response?.data));
   }
 }
@@ -47,6 +50,7 @@ export function* onSignUpStart() {
 export function* signIn({
   payload: { email, password },
 }: ReturnType<typeof signInStart>) {
+
   try {
     (yield userLogin(email, password)) as AxiosResponse<{
       data: { user: IUserData };

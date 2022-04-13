@@ -217,7 +217,8 @@ export const deprovisionDigitalContractAPI = ({
 }: {
   data: TDeprovisionDigitalContractStart;
 }): Promise<
-  AxiosResponse<{ data: TDeprovisionDigitalContractSuccess }> | IDefaults['error']
+  | AxiosResponse<{ data: TDeprovisionDigitalContractSuccess }>
+  | IDefaults['error']
 > =>
   axios
     .post(

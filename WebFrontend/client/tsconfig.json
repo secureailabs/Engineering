@@ -1,26 +1,34 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "target": "es6",
+    "module": "esnext",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "removeComments": true,
+    "declaration": true,
+    "sourceMap": true,
+    "jsx": "react-jsx",
+    "typeRoots": ["./src/declaration.d.ts", "node_modules/@types"],
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths"
+      }
+    ],
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
+    "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react",
-    "baseUrl": ".",
+    "noEmit": false,
+    "baseUrl": "./",
     "paths": {
-      // Define either ONE of these...
-      // 1. General support: matches everything relative to the project directory
-      "*": ["*"],
-      // 2. Explicit support: match only your mounted directories (Recommended!)
-
       "@redux/*": ["./src/redux/*"],
       "@assets/*": ["./src/assets/*"],
       "@sass/*": ["./src/sass/*"],
@@ -31,7 +39,10 @@
       "@layout/*": ["./src/layout/*"],
       "@app/*": ["./src/*"],
       "@utils/*": ["./src/utils/*"]
+
     }
   },
-  "include": ["src", "types", "src/pages/VirtualMachines/.component.tsx"]
+  "include": ["src", "src/vite-env.d.ts"],
+  "exclude": ["node_modules"]
 }
+

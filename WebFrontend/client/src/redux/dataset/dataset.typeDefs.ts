@@ -32,13 +32,17 @@ export type TGetAllDatasetsSuccess = {
   Datasets: Record<string, TGetDatasetSuccess['Dataset']>;
 };
 
+
 export type TGetDatasetSuccess = {
   Dataset: {
     DataOwnerGuid: string;
     DatasetGuid: string;
     DatasetName: string;
     Description: string;
+    Versions?: Record<string, TGetDatasetSuccess['Dataset']>;
+    Version?: number;
     JurisdictionalLimitations: string;
+    Comments?: string;
     Keywords: string;
     OrganizationName: string;
     PrivacyLevel: number;
@@ -48,4 +52,10 @@ export type TGetDatasetSuccess = {
 
 export type TGetDatasetStart = {
   DatasetGuid: string;
+};
+
+export type TGetDatasetVersionSuccess = TGetDatasetSuccess;
+
+export type TGetDatasetVersionStart = TGetDatasetStart & {
+  Version: string;
 };

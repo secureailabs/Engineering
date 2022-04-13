@@ -1,73 +1,28 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 
-import { Route, Redirect } from 'react-router-dom';
-
-import Spinner from '@components/Spinner';
+import { Navigate } from 'react-router-dom';
 
 import { IUnProtectedRoutes } from './UnProtectedRoute.types';
 
-const UnprotectedRoute: React.FC<IUnProtectedRoutes> = ({
-  exact,
+import Spinner from '@components/Spinner';
+
+const ProtectedRoute: React.FC<IUnProtectedRoutes> = ({
   userState,
   children,
   redirect,
   userData,
-  path,
-}) => {
-  return (
-    <>
-      {exact ? (
-        <Route
-          // we don't want users to access the dashboard while not logged in
-          exact
-          path={path}
-          render={() => {
-            // check if user finished loading, else run spinner
-            if (
-              userState === 'noUserSession' ||
-              userState === 'failure' ||
-              userState === 'signup-success'
-            ) {
-              // if there is not user, render register page
-              if (userData === null) {
-                return <>{children}</>;
-              }
-              // if there is a user, redirect to dashboard dashboard
-              return <Redirect to={redirect} />;
-            }
-            if (userState === 'success' && userData !== null) {
-              return <Redirect to={redirect} />;
-            }
-            return <Spinner />;
-          }}
-        />
-      ) : (
-        <Route
-          // we don't want users to access the dashboard while not logged in
-          path={path}
-          render={() => {
-            // check if user finished loading, else run spinner
-            if (
-              userState === 'noUserSession' ||
-              userState === 'failure' ||
-              userState === 'signup-success'
-            ) {
-              // if there is not user, render register page
-              if (userData === null) {
-                return <>{children}</>;
-              }
-              // if there is a user, redirect to dashboard dashboard
-              return <Redirect to="/dashboard" />;
-            }
-            if (userState === 'success' && userData !== null) {
-              return <Redirect to={redirect} />;
-            }
-            return <Spinner />;
-          }}
-        />
-      )}
-    </>
-  );
+}): ReactElement => {
+  // check if user finished loading, else run spinner
+  if (userState !== 'isLoading' && userState !== null) {
+    // if there is not user, render register page
+    if (userData !== null) {
+      return <Navigate replace to={redirect} />;
+    }
+    // if there is a user, redirect to dashboard dashboard
+    return children;
+  }
+
+  return <Spinner />;
 };
 
-export default UnprotectedRoute;
+export default ProtectedRoute;

@@ -7,7 +7,9 @@ import { IDatasetState } from './dataset/dataset.reducer';
 import { IAccountManagerState } from './accountManager/accountManager.reducer';
 import { IOrganizationState } from './organization/organization.reducer';
 import { IVirtualMachineState } from './virtualMachineManager/virtualMachineManager.reducer';
-import { IAzureTemplatesManagerState } from './azureTemplatesManager/azureTemplatesManager.reducer';
+import { IAzureTemplateState } from './azureTemplate/azureTemplate.reducer';
+import { IFeedState } from './feed/feed.reducer';
+import { IUnifiedRegistryState } from './unifiedRegistry/unifiedRegistry.reducer';
 
 // import userReducer from './user/user.reducer';
 import userReducer, { IUserState } from './user/user.reducer';
@@ -16,7 +18,9 @@ import datasetReducer from './dataset/dataset.reducer';
 import accountManagerReducer from './accountManager/accountManager.reducer';
 import organizationReducer from './organization/organization.reducer';
 import virtualMachineManagerReducer from './virtualMachineManager/virtualMachineManager.reducer';
-import azureTemplatesReducer from './azureTemplatesManager/azureTemplatesManager.reducer';
+import azureTemplateReducer from './azureTemplate/azureTemplate.reducer';
+import feedReducer from './feed/feed.reducer';
+import unifiedRegistryReducer from './unifiedRegistry/unifiedRegistry.reducer';
 
 export interface IState {
   user: IUserState;
@@ -26,7 +30,9 @@ export interface IState {
   accountManager: IAccountManagerState;
   organization: IOrganizationState;
   virtualMachineManager: IVirtualMachineState;
-  azureTemplatesManager: IAzureTemplatesManagerState;
+  azureTemplate: IAzureTemplateState;
+  feed: IFeedState;
+  unifiedRegistry: IUnifiedRegistryState;
 }
 
 const persistConfig: {
@@ -47,7 +53,9 @@ const rootReducer = combineReducers({
   accountManager: accountManagerReducer,
   organization: organizationReducer,
   virtualMachineManager: virtualMachineManagerReducer,
-  azureTemplatesManager: azureTemplatesReducer,
+  azureTemplate: azureTemplateReducer,
+  feed: feedReducer,
+  unifiedRegistry: unifiedRegistryReducer,
 });
 
 export default persistReducer(persistConfig, rootReducer);

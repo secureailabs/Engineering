@@ -13,10 +13,12 @@ const sagaMiddleware = createSagaMiddleware();
 const middleware = [thunk, sagaMiddleware];
 
 const dev = () => {
-  if (import.meta.env.NODE_ENV === 'development') {
+  if (import.meta.env.MODE === 'development') {
     return compose(
       applyMiddleware(...middleware),
+      //@ts-ignore
       window.__REDUX_DEVTOOLS_EXTENSION__ &&
+        //@ts-ignore
         window.__REDUX_DEVTOOLS_EXTENSION__()
     );
   }

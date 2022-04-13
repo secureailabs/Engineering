@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   all,
   AllEffect,
@@ -6,6 +7,33 @@ import {
   put,
   takeLatest,
 } from 'redux-saga/effects';
+
+const demo_data = {
+  DigitalContracts: {
+    uuid1: {
+      Title: 'temp',
+      VersionNumber: '1',
+      ContractStage: 1,
+      SubscriptionDays: 7,
+      Description: 'test',
+      DatasetGuid: '123',
+      DatasetName: 'name',
+      ActivationTime: 0,
+      ExpirationTime: 100,
+      Eula: '',
+      LegalAgreement: '',
+      DataOwnerOrganization: '',
+      DOOName: '',
+      ResearcherOrganization: '',
+      ROName: '',
+      LastActivity: 0,
+      ProvisioningStatus: 1,
+      HostForVirtualMachines: 'localhost',
+      NumberOfVCPU: 10,
+      Note: '',
+    },
+  },
+};
 
 import {
   // GET ALL
@@ -179,6 +207,7 @@ export function* onPatchAcceptDigitalContractStart() {
 // GET ALL
 
 export function* getAllDigitalContractsSaga() {
+  // yield put(getAllDigitalContractsSuccess(demo_data));
   try {
     const {
       data,
@@ -202,7 +231,6 @@ export function* getDigitalContractSaga({
   payload,
 }: ReturnType<typeof getDigitalContractStart>) {
   try {
-    console.log(payload);
     const { data } = (yield getDigitalContractAPI({
       data: payload,
     })) as AxiosResponse<TGetDigitalContractSuccess>;

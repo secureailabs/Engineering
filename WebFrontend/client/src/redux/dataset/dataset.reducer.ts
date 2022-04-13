@@ -12,6 +12,11 @@ import {
   getDatasetReset,
   getDatasetStart,
   getDatasetSuccess,
+  // GET VERSION
+  getDatasetVersionFailure,
+  getDatasetVersionReset,
+  getDatasetVersionStart,
+  getDatasetVersionSuccess,
   // POST
   postDatasetFailure,
   postDatasetReset,
@@ -23,6 +28,7 @@ import type {
   TPostDatasetSuccess,
   TGetAllDatasetsSuccess,
   TGetDatasetSuccess,
+  TGetDatasetVersionSuccess,
   TPatchActivateDatasetSuccess,
   TPatchAcceptDatasetSuccess,
 } from './dataset.typeDefs';
@@ -40,6 +46,11 @@ export interface IDatasetState {
   getDatasetError: IDefaults['errorMessage'];
   getDatasetState: IDefaults['state'];
 
+  // GET VERSION
+  getDatasetVersionData: null | TGetDatasetVersionSuccess;
+  getDatasetVersionError: IDefaults['errorMessage'];
+  getDatasetVersionState: IDefaults['state'];
+
   // POST
   postDatasetData: null | TPostDatasetSuccess;
   postDatasetError: IDefaults['errorMessage'];
@@ -56,6 +67,11 @@ const INITIAL_STATE: IDatasetState = {
   getDatasetData: null,
   getDatasetError: null,
   getDatasetState: null,
+
+  // GET VERSION
+  getDatasetVersionData: null,
+  getDatasetVersionError: null,
+  getDatasetVersionState: null,
 
   // POST
   postDatasetData: null,
@@ -197,6 +213,51 @@ const DatasetReducer = createReducer(INITIAL_STATE)
       getDatasetData: null,
       getDatasetError: null,
       getDatasetState: null,
+    })
+  )
+
+  // GET VERSION
+
+  .handleAction(
+    getDatasetVersionStart,
+    (state: IDatasetState): IDatasetState => ({
+      ...state,
+      getDatasetVersionData: null,
+      getDatasetVersionError: null,
+      getDatasetVersionState: 'isLoading',
+    })
+  )
+  .handleAction(
+    getDatasetVersionSuccess,
+    (
+      state: IDatasetState,
+      action: { payload: TGetDatasetVersionSuccess }
+    ): IDatasetState => ({
+      ...state,
+      getDatasetVersionData: action.payload,
+      getDatasetVersionError: null,
+      getDatasetVersionState: 'success',
+    })
+  )
+  .handleAction(
+    getDatasetVersionFailure,
+    (
+      state: IDatasetState,
+      action: { payload: IDefaults['errorMessage'] }
+    ): IDatasetState => ({
+      ...state,
+      getDatasetVersionData: null,
+      getDatasetVersionError: action.payload,
+      getDatasetVersionState: 'failure',
+    })
+  )
+  .handleAction(
+    getDatasetVersionReset,
+    (state: IDatasetState): IDatasetState => ({
+      ...state,
+      getDatasetVersionData: null,
+      getDatasetVersionError: null,
+      getDatasetVersionState: null,
     })
   );
 

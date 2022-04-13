@@ -17,6 +17,8 @@ import type {
   TGetAllDatasetsSuccess,
   TGetDatasetSuccess,
   TGetDatasetStart,
+  TGetDatasetVersionSuccess,
+  TGetDatasetVersionStart,
 } from './dataset.typeDefs';
 
 export type datasetActions =
@@ -44,129 +46,160 @@ export type datasetActions =
   | ActionType<typeof getDatasetStart>
   | ActionType<typeof getDatasetSuccess>
   | ActionType<typeof getDatasetFailure>
-  | ActionType<typeof getDatasetReset>;
+  | ActionType<typeof getDatasetReset>
+  // GET VERSION
+  | ActionType<typeof getDatasetVersionStart>
+  | ActionType<typeof getDatasetVersionSuccess>
+  | ActionType<typeof getDatasetVersionFailure>
+  | ActionType<typeof getDatasetVersionReset>;
 
 // POST REGISTER
 
 export const postDatasetStart = createAction(
   // Type
-  'Dataset/POST_DATASET_START',
+  'dataset/POST_DATASET_START',
   // Payload
   (data: TPostDatasetStart) => data
 )();
 
 export const postDatasetSuccess: EmptyActionCreator<string> = createAction(
-  'Dataset/POST_DATASET_SUCCESS'
+  'dataset/POST_DATASET_SUCCESS'
   // Payload
 )();
 
 export const postDatasetFailure: (
   error: IDefaults['errorMessage']
 ) => PayloadAction<string, IDefaults['errorMessage']> = createAction(
-  'Dataset/POST_DATASET_FAILURE',
+  'dataset/POST_DATASET_FAILURE',
   // Payload
   (error: IDefaults['errorMessage']): IDefaults['errorMessage'] => error
 )();
 export const postDatasetReset: EmptyActionCreator<string> = createAction(
-  'Dataset/POST_DATASET_RESET'
+  'dataset/POST_DATASET_RESET'
 )();
 
 // PATCH ACTIVATE
 
 export const patchActivateDatasetStart = createAction(
   // Type
-  'Dataset/PATCH_ACTIVATE_DATASET_START',
+  'dataset/PATCH_ACTIVATE_DATASET_START',
   // Payload
   (data: TPatchActivateDatasetStart) => data
 )();
 
 export const patchActivateDatasetSuccess: EmptyActionCreator<string> = createAction(
-  'Dataset/PATCH_ACTIVATE_DATASET_SUCCESS'
+  'dataset/PATCH_ACTIVATE_DATASET_SUCCESS'
   // Payload
 )();
 
 export const patchActivateDatasetFailure: (
   error: IDefaults['errorMessage']
 ) => PayloadAction<string, IDefaults['errorMessage']> = createAction(
-  'Dataset/PATCH_ACTIVATE_DATASET_FAILURE',
+  'dataset/PATCH_ACTIVATE_DATASET_FAILURE',
   // Payload
   (error: IDefaults['errorMessage']): IDefaults['errorMessage'] => error
 )();
 export const patchActivateDatasetReset: EmptyActionCreator<string> = createAction(
-  'Dataset/PATCH_ACTIVATE_DATASET_RESET'
+  'dataset/PATCH_ACTIVATE_DATASET_RESET'
 )();
 
 // PATCH ACCEPT
 
 export const patchAcceptDatasetStart = createAction(
   // Type
-  'Dataset/PATCH_ACCEPT_DATASET_START',
+  'dataset/PATCH_ACCEPT_DATASET_START',
   // Payload
   (data: TPatchAcceptDatasetStart) => data
 )();
 
 export const patchAcceptDatasetSuccess: EmptyActionCreator<string> = createAction(
-  'Dataset/PATCH_ACCEPT_DATASET_SUCCESS'
+  'dataset/PATCH_ACCEPT_DATASET_SUCCESS'
   // Payload
 )();
 
 export const patchAcceptDatasetFailure: (
   error: IDefaults['errorMessage']
 ) => PayloadAction<string, IDefaults['errorMessage']> = createAction(
-  'Dataset/PATCH_ACCEPT_DATASET_FAILURE',
+  'dataset/PATCH_ACCEPT_DATASET_FAILURE',
   // Payload
   (error: IDefaults['errorMessage']): IDefaults['errorMessage'] => error
 )();
 export const patchAcceptDatasetReset: EmptyActionCreator<string> = createAction(
-  'Dataset/PATCH_ACCEPT_DATASET_RESET'
+  'dataset/PATCH_ACCEPT_DATASET_RESET'
 )();
 
 // GET ALL
 
 export const getAllDatasetsStart = createAction(
   // Type
-  'Dataset/GET_ALL_DATASETS_START'
+  'dataset/GET_ALL_DATASETS_START'
 )();
 export const getAllDatasetsSuccess: (
   data: TGetAllDatasetsSuccess
 ) => PayloadAction<string, TGetAllDatasetsSuccess> = createAction(
-  'Dataset/GET_ALL_DATASETS_SUCCESS',
+  'dataset/GET_ALL_DATASETS_SUCCESS',
   // Payload
   (data: TGetAllDatasetsSuccess) => data
 )();
 export const getAllDatasetsFailure: (
   error: IDefaults['errorMessage']
 ) => PayloadAction<string, IDefaults['errorMessage']> = createAction(
-  'Dataset/GET_ALL_DATASETS_FAILURE',
+  'dataset/GET_ALL_DATASETS_FAILURE',
   // Payload
   (error: IDefaults['errorMessage']): IDefaults['errorMessage'] => error
 )();
 export const getAllDatasetsReset: EmptyActionCreator<string> = createAction(
-  'Dataset/GET_ALL_DATASETS_RESET'
+  'dataset/GET_ALL_DATASETS_RESET'
 )();
 
 // GET ONE
 
 export const getDatasetStart = createAction(
   // Type
-  'Dataset/GET_DATASET_START',
+  'dataset/GET_DATASET_START',
   // Payload
   (data: TGetDatasetStart) => data
 )();
 export const getDatasetSuccess: (
   data: TGetDatasetSuccess
 ) => PayloadAction<string, TGetDatasetSuccess> = createAction(
-  'Dataset/GET_DATASET_SUCCESS',
+  'dataset/GET_DATASET_SUCCESS',
   // Payload
   (data: TGetDatasetSuccess) => data
 )();
 export const getDatasetFailure: (
   error: IDefaults['errorMessage']
 ) => PayloadAction<string, IDefaults['errorMessage']> = createAction(
-  'Dataset/GET_DATASET_FAILURE',
+  'dataset/GET_DATASET_FAILURE',
   // Payload
   (error: IDefaults['errorMessage']): IDefaults['errorMessage'] => error
 )();
 export const getDatasetReset: EmptyActionCreator<string> = createAction(
-  'Dataset/GET_DATASET_RESET'
+  'dataset/GET_DATASET_RESET'
+)();
+
+// GET ONE
+
+export const getDatasetVersionStart = createAction(
+  // Type
+  'dataset/GET_DATASET_VERSION_START',
+  // Payload
+  (data: TGetDatasetVersionStart) => data
+)();
+export const getDatasetVersionSuccess: (
+  data: TGetDatasetVersionSuccess
+) => PayloadAction<string, TGetDatasetVersionSuccess> = createAction(
+  'dataset/GET_DATASET_VERSION_SUCCESS',
+  // Payload
+  (data: TGetDatasetVersionSuccess) => data
+)();
+export const getDatasetVersionFailure: (
+  error: IDefaults['errorMessage']
+) => PayloadAction<string, IDefaults['errorMessage']> = createAction(
+  'dataset/GET_DATASET_VERSION_FAILURE',
+  // Payload
+  (error: IDefaults['errorMessage']): IDefaults['errorMessage'] => error
+)();
+export const getDatasetVersionReset: EmptyActionCreator<string> = createAction(
+  'dataset/GET_DATASET_VERSION_RESET'
 )();

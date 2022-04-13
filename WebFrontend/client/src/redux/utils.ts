@@ -1,11 +1,12 @@
 import { pascalCase } from 'change-case';
 
-export const axiosProxy = () => {
+export const axiosProxy = (): string => {
+  console.log(import.meta.env);
   // console.log(import.meta.env);
   if (import.meta.env.MODE === 'development') {
-    return import.meta.env.SNOWPACK_PUBLIC_API_URL_DEV;
+    return import.meta.env.VITE_PUBLIC_API_URL_DEV?.toString() || "";
   } else {
-    return import.meta.env.SNOWPACK_PUBLIC_API_URL_PROD;
+    return import.meta.env.VITE_PUBLIC_API_URL_PROD?.toString() || "";
   }
 };
 

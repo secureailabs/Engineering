@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   all,
   AllEffect,
@@ -6,6 +7,51 @@ import {
   put,
   takeLatest,
 } from 'redux-saga/effects';
+
+const demo_data = {
+  uuid1: {
+    HostForVirtualMachines: 'Researcher',
+    ResearcherOrganization: 'Hopsital 1',
+    DataOwnerOrganization: 'Org1',
+    VirtualMachinesAssociatedWithDc: {
+      uuid: {
+        VirtualMachineGuid: 'uuid2',
+        DigitalContractGuid: 'guid',
+        DigitalContractTitle: 'Digi',
+        DigitalContract: {
+          Title: 'temp',
+          VersionNumber: '1',
+          ContractStage: 1,
+          SubscriptionDays: 7,
+          Description: 'test',
+          DatasetGuid: '123',
+          DatasetName: 'name',
+          ActivationTime: 0,
+          ExpirationTime: 100,
+          Eula: '',
+          LegalAgreement: '',
+          DataOwnerOrganization: '',
+          DOOName: '',
+          ResearcherOrganization: '',
+          ROName: '',
+          LastActivity: 0,
+          ProvisioningStatus: 1,
+          HostForVirtualMachines: 'localhost',
+          NumberOfVCPU: 10,
+          Note: '',
+        },
+        State: 4,
+        RegistrationTime: 20,
+        HeartbeatBroadcastTime: 10,
+        IPAddress: '127.0.0.1',
+        NumberOfVCPU: 10,
+        HostRegion: 'East',
+        StartTime: 1200,
+        Note: '',
+      },
+    },
+  },
+};
 
 import { getDigitalContractAPI } from '../digitalContract/digitalContract.apis';
 
@@ -31,7 +77,7 @@ import {
   getAllVirtualMachinesAPI,
 } from './virtualMachineManager.apis';
 
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import {
   TGetVirtualMachineSuccess,
   TPutVirtualMachineStart,
@@ -46,10 +92,8 @@ export function* putVirtualMachine({
 }: ReturnType<typeof putVirtualMachineStart>) {
   try {
     yield putVirtualMachineAPI({ data: payload });
-    console.log('here');
     yield put(putVirtualMachineSuccess());
-  } catch (error) {
-    // tslint:disable-next-line: no-unsafe-any
+  } catch (error: any) {
     yield put(putVirtualMachineFailure(error.response.data));
   }
 }
@@ -82,9 +126,7 @@ export function* getVirtualMachineSaga({
     data['VirtualMachine']['DigitalContract'] = digitalContract.data;
 
     yield put(getVirtualMachineSuccess(data['VirtualMachine']));
-  } catch (err) {
-    console.log('ERROR: ', err);
-    // tslint:disable-next-line: no-unsafe-any
+  } catch (err: any) {
     yield put(getVirtualMachineFailure(err.response.data));
   }
 }
@@ -96,39 +138,39 @@ export function* onGetVirtualMachineStart() {
 // GET ALL
 
 export function* getAllVirtualMachinesSaga() {
-  console.log('here');
-  try {
-    const {
-      data,
-    } = yield (getAllVirtualMachinesAPI() as unknown) as AxiosResponse<{
-      data: { VirtualMachines: TGetAllVirtualMachinesSuccess };
-    }> | null;
-    console.log('DATA: ', data['VirtualMachines']);
-    for (const [key, value] of Object.entries(data['VirtualMachines'])) {
-      //@ts-ignore
-       const digitalContract = yield getDigitalContractAPI({
-        data: { DigitalContractGuid: key },
-      });
-      for (const [key2, value2] of Object.entries(
-        //@ts-ignore
-        value.VirtualMachinesAssociatedWithDc
-      )) {
-        // //@ts-ignore
-        // const digitalContract = yield getDigitalContractAPI({
-        //   //@ts-ignore
-        //   data: { DigitalContractGuid: value2.DigitalContractGuid },
-        // });
-        data['VirtualMachines'][key].VirtualMachinesAssociatedWithDc[key2][
-          'DigitalContract'
-        ] = digitalContract.data;
-      }
-    }
+  yield put(getAllVirtualMachinesSuccess(demo_data));
+  // try {
+  //   const {
+  //     data,
+  //   } = yield (getAllVirtualMachinesAPI() as unknown) as AxiosResponse<{
+  //     data: { VirtualMachines: TGetAllVirtualMachinesSuccess };
+  //   }> | null;
+  //   console.log('DATA: ', data['VirtualMachines']);
+  //   for (const [key, value] of Object.entries(data['VirtualMachines'])) {
+  //     //@ts-ignore
+  //     const digitalContract = yield getDigitalContractAPI({
+  //       data: { DigitalContractGuid: key },
+  //     });
+  //     for (const [key2, value2] of Object.entries(
+  //       //@ts-ignore
+  //       value.VirtualMachinesAssociatedWithDc
+  //     )) {
+  //       // //@ts-ignore
+  //       // const digitalContract = yield getDigitalContractAPI({
+  //       //   //@ts-ignore
+  //       //   data: { DigitalContractGuid: value2.DigitalContractGuid },
+  //       // });
+  //       data['VirtualMachines'][key].VirtualMachinesAssociatedWithDc[key2][
+  //         'DigitalContract'
+  //       ] = digitalContract.data;
+  //     }
+  //   }
 
-    yield put(getAllVirtualMachinesSuccess(data['VirtualMachines']));
-  } catch (err) {
-    // tslint:disable-next-line: no-unsafe-any
-    yield put(getAllVirtualMachinesFailure(err.response.data));
-  }
+  //   yield put(getAllVirtualMachinesSuccess(data['VirtualMachines']));
+  // } catch (err) {
+  //   // tslint:disable-next-line: no-unsafe-any
+  //   yield put(getAllVirtualMachinesFailure(err.response.data));
+  // }
 }
 
 export function* onGetAllVirtualMachinesStart() {

@@ -92,7 +92,7 @@ class SailAuthentication : public Object
         // Take in a full EOSB, call Cryptographic plugin and fetches user guid and organization guid
         std::vector<Byte> __thiscall GetBasicUserInformation(
             _in const StructuredBuffer & c_oRequest
-            );
+            ) const throw();
 
         // Take in a nonce and send back a certificate and public key
         std::vector<Byte> __thiscall GetRemoteAttestationCertificate(
@@ -112,7 +112,7 @@ class SailAuthentication : public Object
         // Check the validity of an EOSB
         std::vector<Byte> __thiscall CheckEosb(
             _in const StructuredBuffer & c_oRequest
-            );
+            ) const throw();
 
         // private data members
         mutable pthread_mutex_t m_sMutex;

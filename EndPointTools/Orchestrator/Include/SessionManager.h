@@ -53,6 +53,7 @@ class SessionManager : public Object
     
     private:
     
+        bool __thiscall IsRunning(void) const throw();
         void __thiscall SetSessionParameters(
             _in const std::string & c_strServerIpAddress,
             _in Word wServerPortNumber,
@@ -65,10 +66,10 @@ class SessionManager : public Object
 
         // Private data members
         volatile bool m_fIsRunning{false};
+        mutable std::mutex m_oLock{};
         std::string m_strEosb{};
         std::string m_strServerIpAddress{};
         Word m_wServerPortNumber{0};
-        mutable std::mutex m_oLock{};
         std::condition_variable m_oTimedWait{};
         std::unique_ptr<std::thread> m_oEosbMaintenanceThread{nullptr};
 };

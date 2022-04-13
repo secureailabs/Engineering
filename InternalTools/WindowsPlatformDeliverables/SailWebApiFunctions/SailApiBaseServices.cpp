@@ -10,6 +10,7 @@
 #include "SmartMemoryAllocator.h"
 
 #include <mutex>
+#include <iostream>
 
 static std::mutex gs_stlMutex;
 static bool gs_fIsLoggedOn = false;
@@ -44,20 +45,17 @@ static Dword __stdcall EosbMaintenanceThread(
             // Check to see if we are still logged on. If not, then this thread ends
             gs_stlMutex.lock();
             fIsLoggedOn = gs_fIsLoggedOn;
+            std::string strSailPlatformServicesEosb = gs_strSailPlatformServicesEosb;
+            std::string strSailPlatformServicesIpAddress = gs_strSailPlatformServicesIpAddress;
+            Word wSailPlatformServicesPortAddress = 6200;
             gs_stlMutex.unlock();
             if (true == fIsLoggedOn)
             {
                 // Sanity check against all of our global variables, and make thread
                 // safe copies of each value
-                gs_stlMutex.lock();
-                __DebugAssert(0 < gs_strSailPlatformServicesEosb.size());
-                __DebugAssert(0 < gs_strSailPlatformServicesIpAddress.size());
-                __DebugAssert(INVALID_HANDLE_VALUE != gs_EosbMaintenanceThread);
-                __DebugAssert(0 != gs_dwEosbMaintenanceThreadIdentifier);
-                std::string strSailPlatformServicesEosb = gs_strSailPlatformServicesEosb;
-                std::string strSailPlatformServicesIpAddress = gs_strSailPlatformServicesIpAddress;
-                Word wSailPlatformServicesPortAddress = 6200;
-                gs_stlMutex.unlock();
+                __DebugAssert(0 < strSailPlatformServicesEosb.size());
+                __DebugAssert(0 < strSailPlatformServicesIpAddress.size());
+                __DebugAssert(0 < wSailPlatformServicesPortAddress);
                 // Now we call into the SAIL Platform Services API portal to refresh our
                 // EOSB if needed.
                 // Build out the REST API call query

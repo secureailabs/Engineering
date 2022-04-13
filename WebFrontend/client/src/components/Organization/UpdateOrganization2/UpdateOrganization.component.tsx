@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React from 'react';
 
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
@@ -11,7 +12,7 @@ import getPartnerOrg from '@utils/getPartnerOrg';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 
-const UpdateOrganization = ({ organizationData }) => {
+const UpdateOrganization = ({ organizationData }: any) => {
     const { register, handleSubmit, formState, trigger } = useForm({
         mode: 'onSubmit',
         defaultValues: organizationData,

@@ -2,7 +2,7 @@ import React from 'react';
 import ribbon2 from '@assets/pink_ribbon2.jpeg';
 import ribbon from '@assets/pink_ribbon.jpeg';
 import mayo from '@assets/mayo.jpeg';
-import boob from '@assets/boob.jpeg';
+import boob from '@assets/cancer_scan.jpeg';
 import stop_cancer from '@assets/stop_cancer.jpeg';
 import { Link } from 'react-router-dom';
 import faker from 'faker';

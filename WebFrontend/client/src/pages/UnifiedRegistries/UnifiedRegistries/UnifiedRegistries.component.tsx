@@ -15,21 +15,22 @@ import { demo_data } from "@redux/unifiedRegistry/unifiedRegistry.data";
 
 import { useQuery } from 'react-query';
 import { TGetAllUnifiedRegistriesSuccess } from '@redux/unifiedRegistry/unifiedRegistry.types';
+import { AxiosError } from 'axios';
 
 const UnifiedRegistries: React.FC<TUnifiedRegistriesProps> = () => {
 
-  const fetch = async (): Promise<TGetAllUnifiedRegistriesSuccess['UnifiedRegistry']> => {
+  const fetch = (): TGetAllUnifiedRegistriesSuccess['UnifiedRegistries'] => {
     return demo_data.UnifiedRegistries;
-    const res = await axios.get<TGetAllUnifiedRegistriesSuccess>
-    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-    {
-      withCredentials: true,
-    });
-    return res.data.UnifiedRegistry;
+    // const res = await axios.get<TGetAllUnifiedRegistriesSuccess>
+    // (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+    // {
+    //   withCredentials: true,
+    // });
+    // return res.data.UnifiedRegistry;
   }
 
   // eslint-disable-next-line max-len
-  const { data, status, isLoading } = useQuery(["organizations"], () => demo_data);
+  const { data, status, isLoading, error } = useQuery<TGetAllUnifiedRegistriesSuccess, AxiosError>(["organizations"], () => demo_data);
 
   if(isLoading){
     return <><Spinner/></>

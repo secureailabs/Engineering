@@ -23,11 +23,11 @@ const DatasetSuccess: React.FC<TDatasetVersionSuccessProps> = ({
   const { register, handleSubmit, formState, trigger } = useForm({
     mode: 'onSubmit',
     defaultValues: {
-      ...getDatasetVersionData.Dataset,
-      NumberOfVersions: Object.keys(getDatasetData?.Dataset?.Versions || {})
+      ...getDatasetVersionData,
+      NumberOfVersions: Object.keys(getDatasetData?.Versions || {})
         .length,
       PublishDate: new Date(
-        getDatasetVersionData?.Dataset?.PublishDate
+        getDatasetVersionData?.PublishDate
       ).toLocaleDateString('en-US'),
     },
   });
@@ -35,7 +35,7 @@ const DatasetSuccess: React.FC<TDatasetVersionSuccessProps> = ({
   return (
     <StandardContent
       back={true}
-      title={getDatasetVersionData?.Dataset?.DatasetName}
+      title={getDatasetVersionData?.DatasetName}
     >
       <>
         <Card primaryText="">

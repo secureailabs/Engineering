@@ -24,11 +24,11 @@ app.use('/api/v1/', me);
 // if (process.env.NODE_ENV === 'production') {
 // console.log("here");
 //serves the react app in production
-app.use(express.static(path.join(__dirname, '../../client/build')));
+app.use(express.static(path.join(__dirname, '../../client/dist')));
 
 //for any url that is not covered by future routes, sends the react app
 app.get('*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../../client/dist', 'index.html'));
 });
 
 if (process.env.NODE_ENV === 'production') {

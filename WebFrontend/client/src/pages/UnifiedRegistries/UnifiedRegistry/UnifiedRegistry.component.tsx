@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useEffect } from 'react';
 
 import { TUnifiedRegistryProps } from './UnifiedRegistry.types';
@@ -23,14 +24,15 @@ const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
   const { id } = useParams();
 
 
-  const fetch = async (): Promise<TGetUnifiedRegistrySuccess['UnifiedRegistry']> => {
-    return demo_data.UnifiedRegistries[id];
-    const res = await axios.get<TGetUnifiedRegistrySuccess>
-    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-    {
-      withCredentials: true,
-    });
-    return res.data.UnifiedRegistry;
+  const fetch = (): TGetUnifiedRegistrySuccess['UnifiedRegistry'] => {
+    //@ts-nocheck
+    return demo_data?.UnifiedRegistries?.[id || ""];
+    // const res = await axios.get<TGetUnifiedRegistrySuccess>
+    // (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+    // {
+    //   withCredentials: true,
+    // });
+    // return res.data.UnifiedRegistry;
   }
 
   const { data, isLoading, status, error } = 

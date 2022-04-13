@@ -43,7 +43,9 @@ const Dashboard = ({ logout, userData }) => {
     {
       text: 'Launch Notebook',
       Icon: MdLaunch,
-      onClick: () => {},
+      onClick: () => {
+        window.location.href(import.meta.env.VITE_PUBLIC_JUPYTER_URL || "http://52.152.225.54:8080/lab?token=fa8dfcf5a8cfd55402f687698847adabced336cd0423172c")
+      },
     },
     {
       text: 'Unified Registries',

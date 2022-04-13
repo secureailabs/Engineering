@@ -63,7 +63,11 @@ if $cleanDatabase; then
     docker volume rm -f $sailDatabaseVolumeName
 fi
 
+# Build the bootstrap tool to create the database
+make -C $rootDir baseVmInit -s -j
+
 # Create a folder to hold all the Binaries
+rm -rf $rootDir/Binary/"$imageName"_dir
 mkdir -p $rootDir/Binary/"$imageName"_dir
 
 # Copy the binaries to the folder
@@ -92,20 +96,24 @@ elif [ "dataservices" == "$imageName" ]; then
     # Copy InitializationVector.json to the dataservices
     make -C $rootDir package_dataservices -s -j
     cp dataservices/InitializationVector.json $rootDir/Binary/dataservices_dir
-    cp $rootDir/Binary/DataServices.tar.gz $rootDir/Binary/dataservices_dir
+    cp $rootDir/Binary/DataServices.tar.gz $rootDir/Binary/dataservices_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 6500:6500 --ip 172.31.252.2 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices_dir:/app $imageName"
 elif [ "platformservices" == "$imageName" ]; then
     # Copy InitializationVector.json to the platformservices
     make -C $rootDir package_platformservices -s -j
     cp platformservices/InitializationVector.json $rootDir/Binary/platformservices_dir
-    cp $rootDir/Binary/PlatformServices.tar.gz $rootDir/Binary/platformservices_dir
+    cp $rootDir/Binary/PlatformServices.tar.gz $rootDir/Binary/platformservices_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 6200:6201 -v $rootDir/Binary/platformservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
-    cp webfrontend/InitializationVector.json $rootDir/WebFrontend
-    runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/WebFrontend:/app $imageName"
+    make -C $rootDir package_webfrontend -s -j
+    cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
+    cp $rootDir/Binary/webfrontend.tar.gz $rootDir/Binary/webfrontend_dir/package.tar.gz
+    runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/Binary/webfrontend_dir:/app $imageName"
 elif [ "securecomputationnode" == "$imageName" ]; then
-    cp securecomputationnode/InitializationVector.json $rootDir/Binary
-    runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6800 -v $rootDir/Binary:/app $imageName"
+    make -C $rootDir package_securecomputationnode -s -j
+    cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/securecomputationnode_dir/package.tar.gz
+    cp securecomputationnode/InitializationVector.json $rootDir/Binary/securecomputationnode_dir
+    runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6801 -v $rootDir/Binary/securecomputationnode_dir:/app $imageName"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

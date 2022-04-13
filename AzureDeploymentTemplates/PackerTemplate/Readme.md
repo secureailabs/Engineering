@@ -21,5 +21,5 @@ First it will create a VHD image using packer and then there is a manual process
 where the user needs to copy the vhd image url and paste it as a user input in the terminal when asked for.
 
 ## Requirements
-`../../Binary/BaseVmImageInit` and `../../Binary/StartVirtualMachine.sh` should exist before running this script.
+`../../Binary/BaseVmImageInit` should exist before running this script.
 Both can be created by running `make all` in the `VirtualMachine/BaseVmImageInit` directory.

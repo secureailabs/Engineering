@@ -12,6 +12,7 @@ RUN apt-get update && \
   libcurl4-gnutls-dev \
   libcurl4 \
   libssl-dev \
+  nginx \
   libuuid1 \
   python3-dev \
   python3-pip && \
@@ -20,10 +21,6 @@ RUN apt-get update && \
 RUN pip3 install numpy scipy pandas xgboost matplotlib shap imbalanced-learn ipython
 RUN pip3 install -U scikit-learn
 RUN pip3 install torch --no-cache-dir
-
-RUN apt-get update && \
-  apt-get install -y \
-  nginx
 
 COPY nginx.conf /etc/nginx/nginx.conf
 

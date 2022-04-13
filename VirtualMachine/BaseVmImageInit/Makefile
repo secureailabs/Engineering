@@ -15,7 +15,6 @@ OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 .PHONY: all, clean, cleanall
 
 all: $(OUTPUT)
-	@cp StartVirtualMachine.sh $(ABSROOTDIR)/Binary/
 
 $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 	@mkdir -p $(@D)

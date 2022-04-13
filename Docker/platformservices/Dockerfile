@@ -11,6 +11,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && \
   apt-get -y upgrade && \
   apt-get install -y \
+  nginx \
   wget \
   curl \
   libcurl4-gnutls-dev \
@@ -23,10 +24,6 @@ RUN rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-RUN apt-get update && \
-  apt-get install -y \
-  nginx
 
 COPY nginx.conf /etc/nginx/nginx.conf
 

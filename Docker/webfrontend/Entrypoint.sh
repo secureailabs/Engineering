@@ -1,6 +1,29 @@
 #!/bin/bash
+set -e
+imageName=webfrontend
 
 cd /app || exit
+
+# Start the nginx server
+nginx -g 'daemon off;' 2>&1 | tee /app/nginx.log &
+
+# BaseVmImageInit will download the package.tar.gz and InitializationVector.json
+# if they are not already present on the file system.
+ls
+./BaseVmImageInit
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    exit $retVal
+fi
+
+# Unpack the tar package
+tar -xvf package.tar.gz
+
+# Move the InitializerVector to the Binary folder
+mv InitializationVector.json WebFrontend/
+
+# Start the RestApiPortal
+cd WebFrontend
 
 # Use the InitializationVector to populate the IP address of the SAIL Platform Services
 vmIpAddress=$(cat InitializationVector.json | jq -r '.VirtualMachinePublicIp')
@@ -21,5 +44,5 @@ popd
 yarn --cwd client install && yarn cache clean && yarn --cwd client build
 yarn --cwd server install && yarn cache clean
 
-chmod +x /app/env.sh
-/app/env.sh && yarn --cwd /app/server prod && /bin/bash
+chmod +x env.sh
+./env.sh && yarn --cwd /app/WebFrontend/server prod && /bin/bash

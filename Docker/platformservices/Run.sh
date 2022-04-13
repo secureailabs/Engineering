@@ -28,7 +28,7 @@ cp BaseVmImageInit "$imageName"_dir/
 
 # Run the docker container
 docker run \
--it \
+-dit \
 -p 6200:6201 \
 -p 9090:9091 \
 -v $(pwd)/"$imageName"_dir:/app \

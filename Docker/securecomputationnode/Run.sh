@@ -28,7 +28,7 @@ cp BaseVmImageInit "$imageName"_dir/
 
 # Run the docker container
 docker run \
--it \
+-dit \
 -p 3500:3500 \
 -p 6800:6801 \
 -p 9090:9091 \

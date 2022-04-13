@@ -17,32 +17,25 @@ def deploy_module(account_credentials, deployment_name, module_name):
     # Create the resource group
     sailazure.create_resource_group(account_credentials, resource_group_name, "eastus")
 
-    template_path = os.path.join(
-        os.path.dirname(__file__), "ArmTemplates", module_name + ".json"
-    )
+    template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", module_name + ".json")
 
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
 
     parameters = {
         "vmName": module_name,
-        "vmSize": "Standard_B4ms",
-        "vmImageResourceId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/"
-        + "VirtualMachineImageStorageRg/providers/Microsoft.Compute/images/" + module_name,
+        "vmSize": "Standard_D4s_v4",
+        "vmImageResourceId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/NginxImageStorageRg/providers/Microsoft.Compute/images/"
+        + module_name,
         "adminUserName": "sailuser",
         "adminPassword": "SailPassword@123",
         "subnetName": "PlatformService_eastus",
-        "virtualNetworkId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/"
-        + "ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet"
+        "virtualNetworkId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
     }
-    deploy_status = sailazure.deploy_template(
-        account_credentials, resource_group_name, template, parameters
-    )
+    deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
     print(module_name + " server status: ", deploy_status)
 
-    virtual_machine_public_ip = sailazure.get_ip(
-        account_credentials, resource_group_name, module_name + "-ip"
-    )
+    virtual_machine_public_ip = sailazure.get_ip(account_credentials, resource_group_name, module_name + "-ip")
 
     return virtual_machine_public_ip
 
@@ -134,9 +127,7 @@ def deploy_orchestrator(account_credentials, deployment_name):
     orchestrator_server_ip = deploy_module(account_credentials, deployment_name, "orchestrator")
 
     # There is no initialization vector for the orchestrator
-    initialization_vector = {
-        "PlatformServicesUrl": "https://" + platform_services_ip + ":6200"
-    }
+    initialization_vector = {"PlatformServicesUrl": "https://" + platform_services_ip + ":6200"}
 
     with open("orchestrator.json", "w") as outfile:
         json.dump(initialization_vector, outfile)
@@ -156,12 +147,12 @@ def deploy_orchestrator(account_credentials, deployment_name):
 
 
 if __name__ == "__main__":
-    AZURE_SUBSCRIPTION_ID = os.environ.get('AZURE_SUBSCRIPTION_ID')
-    AZURE_TENANT_ID = os.environ.get('AZURE_TENANT_ID')
-    AZURE_CLIENT_ID = os.environ.get('AZURE_CLIENT_ID')
-    AZURE_CLIENT_SECRET = os.environ.get('AZURE_CLIENT_SECRET')
-    OWNER = os.environ.get('OWNER')
-    PURPOSE = os.environ.get('PURPOSE')
+    AZURE_SUBSCRIPTION_ID = os.environ.get("AZURE_SUBSCRIPTION_ID")
+    AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID")
+    AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID")
+    AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
+    OWNER = os.environ.get("OWNER")
+    PURPOSE = os.environ.get("PURPOSE")
 
     deployment_id = OWNER + "-" + str(uuid.uuid1()) + "-" + PURPOSE
 

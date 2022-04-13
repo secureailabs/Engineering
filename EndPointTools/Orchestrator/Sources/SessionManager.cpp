@@ -172,7 +172,7 @@ std::string __thiscall SessionManager::GetServerIpAddress(void) const throw()
 {
     __DebugFunction();
     
-    const std::lock_guard<std::mutex> lock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     std::string strServerIpAddress{m_strServerIpAddress};
     
     return strServerIpAddress;
@@ -193,7 +193,7 @@ Word __thiscall SessionManager::GetServerPortNumber(void) const throw()
 {
     __DebugFunction();
     
-    const std::lock_guard<std::mutex> lock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     Word wServerPortNumber = m_wServerPortNumber;
     
     return wServerPortNumber;
@@ -213,7 +213,7 @@ std::string __thiscall SessionManager::GetEosb(void) const throw()
 {
     __DebugFunction();
     
-    const std::lock_guard<std::mutex> lock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     std::string strEosb{m_strEosb};
     
     return strEosb;
@@ -236,7 +236,7 @@ void __thiscall SessionManager::SetEosb(
 {
     __DebugFunction();
     
-    const std::lock_guard<std::mutex> lock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     // If someone is setting an EOSB, we'd better have a running session, so let's make sure
     if ((true == m_fIsRunning)&&(0 < m_strServerIpAddress.size())&&(0 < m_wServerPortNumber)&&(0 < m_strEosb.size()))
     {
@@ -263,7 +263,7 @@ void __thiscall SessionManager::SetSessionParameters(
 {
     __DebugFunction();
     
-    const std::lock_guard<std::mutex> lock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     // Update the EOSB
     m_strServerIpAddress = c_strServerIpAddress;
     m_wServerPortNumber = wServerPortNumber;
@@ -289,7 +289,7 @@ bool __thiscall SessionManager::IsRunning(void) const throw()
     
     try
     {
-        const std::lock_guard<std::mutex> lock(m_oLock);
+        const std::lock_guard<std::mutex> stlLock(m_oLock);
         fIsRunning = m_fIsRunning;
     }
     
@@ -346,7 +346,7 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
             // nested scope to protect the mutex in case an exception is thrown
             if (true == this->IsRunning())
             {
-                const std::lock_guard<std::mutex> lock(m_oLock);
+                const std::lock_guard<std::mutex> stlLock(m_oLock);
                 // Quick reality check that ensures that the session manager didn't fall into
                 // a weird state
                 __DebugAssert(0 < m_strEosb.size());

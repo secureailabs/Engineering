@@ -21,6 +21,11 @@ tar -xvf package.tar.gz
 # Move the InitializerVector to the Binary folder
 mv InitializationVector.json Binary/$imageName/
 
+if [ -e SecureComputationNode.tar.gz ]
+then
+    mv SecureComputationNode.tar.gz Binary/$imageName/
+fi
+
 # Start the RestApiPortal
 cd Binary/$imageName
 ./RestApiPortal 2>&1 | tee restportal.log &

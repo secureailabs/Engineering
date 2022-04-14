@@ -64,7 +64,7 @@ static std::vector<Byte> __stdcall WaitForInitializationParameters(void)
     // The second connection are the initialization parameters sent from the
     // Remote data connector which has information about the dataowner and the dataset
     std::unique_ptr<Socket> poSocket(oSocketServer.Accept());
-    _ThrowBaseExceptionIf((nullptr == poSocket), "Unexpected nullptr returned from TlsServer.Accept()", nullptr);
+    _ThrowBaseExceptionIf((nullptr == poSocket), "Unexpected nullptr returned from oSocketServer.Accept()", nullptr);
 
     auto stlDatasetParameters = ::GetSocketTransaction(poSocket.get(), 60*60*1000);
     _ThrowBaseExceptionIf((0 == stlDatasetParameters.size()), "Unexpected empty dataset parameters", nullptr);

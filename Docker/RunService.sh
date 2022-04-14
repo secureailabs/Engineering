@@ -100,9 +100,11 @@ elif [ "dataservices" == "$imageName" ]; then
     runtimeFlags="$runtimeFlags -p 6500:6500 --ip 172.31.252.2 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices_dir:/app $imageName"
 elif [ "platformservices" == "$imageName" ]; then
     # Copy InitializationVector.json to the platformservices
+    make -C $rootDir package_securecomputationnode -s -j
     make -C $rootDir package_platformservices -s -j
     cp platformservices/InitializationVector.json $rootDir/Binary/platformservices_dir
     cp $rootDir/Binary/PlatformServices.tar.gz $rootDir/Binary/platformservices_dir/package.tar.gz
+    cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/platformservices_dir/
     runtimeFlags="$runtimeFlags -p 6200:6201 -v $rootDir/Binary/platformservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
     make -C $rootDir package_webfrontend -s -j

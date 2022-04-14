@@ -52,6 +52,8 @@ class DataFederation
         std::list<Guid> DataSubmitterOrganizations() const throw();
         std::list<Guid> ResearchOrganizations() const throw();
         std::list<Guid> DatasetFamilies() const throw();
+
+        void SetInactive() throw();
     private:
         // Data members
         bool m_fActive;

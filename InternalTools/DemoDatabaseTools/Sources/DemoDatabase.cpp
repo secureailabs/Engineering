@@ -136,6 +136,7 @@ void __thiscall DemoDatabase::AddDatasets(void)
 
         // TODO: Prawal Add correct data
         StructuredBuffer oSingleTable;
+	oSingleTable.PutString("TableIdentifier", "52d7aa80-f18f-4932-af61-ecf6fd74c064");
         oSingleTable.PutString("ColumnName", ",AGE,BMI,PD-L1 level before treatment,PD-L1 level after treatment,PD-L2 level before treatment,PD-L2 level after treatment,PD1 level before treatment,PD1 level after treatment,");
         oSingleTable.PutString("Description", "table 1_2");
         oSingleTable.PutString("Hashtags", "t1h2");

@@ -10,7 +10,7 @@ db = client.sailDatabase
 router = APIRouter()
 
 
-@router.post("/organization", response_description="Add new users", response_model=RegisterOrganization_Out)
+@router.post("/organization", response_description="Add new organization", response_model=RegisterOrganization_Out)
 async def post_user(organization: RegisterOrganization_In = Body(...)):
     organization_db: Organization_db = Organization_db(**organization.dict())
     organization = jsonable_encoder(organization_db)

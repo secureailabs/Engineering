@@ -1,7 +1,7 @@
 from datetime import datetime
 from bson import ObjectId
 from pydantic import BaseModel, Field, StrictStr
-from models.users import PyObjectId
+from models.common import PyObjectId
 
 
 class DigitalContractBase(BaseModel):

@@ -26,7 +26,6 @@ pipeline {
                     sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Docker/platformservices/InitializationVector.json
                     grep '"Owner": "Nightly"' ./Docker/platformservices/InitializationVector.json
                     make all -j
-                    cp ./Binary/SecureComputationNode.tar.gz ./Binary/platformservices
                     cp ./Binary/DatabaseTools ./Binary/platformservices
                     '''
                 }

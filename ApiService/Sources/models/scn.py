@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from ipaddress import IPv4Address
 from bson import ObjectId
 from pydantic import BaseModel, Field, StrictStr
 from models.common import PyObjectId
@@ -9,7 +10,10 @@ class ScnState(Enum):
     New = "New"
     Provisioning = "Provisioning"
     Initializing = "Initializing"
+    WaitingForData = "WaitingForData"
+    Ready = "Ready"
     Failed = "Failed"
+    Deleting = "Deleting"
     Deleted = "Deleted"
     Archived = "Archived"
 
@@ -44,3 +48,4 @@ class ScnModel_Db(ScnBase):
     CreationTime: datetime = Field(default_factory=datetime.utcnow)
     ResearcherIdentifier: PyObjectId = Field(...)
     State: ScnState = Field(...)
+    IPAddress: IPv4Address = Field(...)

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from ipaddress import IPv4Address
+from time import sleep
+from fastapi import APIRouter, Depends, BackgroundTasks
 from fastapi import Body
 from typing import List
 import motor.motor_asyncio
@@ -32,19 +34,38 @@ async def put_scn(current_user: UserBase = Depends(get_current_active_user)):
     return {"ping": "pong!"}
 
 
-@router.delete("/scn/{id}")
-async def delete_scn(id: PyObjectId, current_user: UserBase = Depends(get_current_active_user)):
-    return current_user
+@router.delete("/scn/{id}", response_description="Delete scn by id", response_model=ScnModel_Db)
+async def delete_scn(background_tasks: BackgroundTasks, id: PyObjectId, current_user: UserBase = Depends(get_current_active_user)):
+    scn_info = await db["scn"].find_one({"_id": str(id)})
+    scn_db = ScnModel_Db(**scn_info)
+    scn_db.State = ScnState.Deleting
+    db["scn"].update_one({"_id": str(scn_db.id)}, {"$set": jsonable_encoder(scn_db)})
+    background_tasks.add_task(deprovision_scn, scn_db)
+    return scn_db
 
 
 @router.post("/scn", response_description="Provision new scn", response_model=Provision_Scn_Out)
-async def post_scn(scn_info: Provision_Scn_In = Body(...), current_user: UserBase = Depends(get_current_active_user)):
-    scn_db = jsonable_encoder(
-        ScnModel_Db(
-            **scn_info.dict(),
-            ResearcherIdentifier=current_user.id,
-            State=ScnState.Provisioning
-        )
+async def post_scn(background_tasks: BackgroundTasks, scn_info: Provision_Scn_In = Body(...), current_user: UserBase = Depends(get_current_active_user)):
+    scn_db = ScnModel_Db(
+        **scn_info.dict(),
+        ResearcherIdentifier=current_user.id,
+        State=ScnState.Provisioning,
+        IPAddress=IPv4Address("0.0.0.0")
     )
-    new_scn = await db["scn"].insert_one(scn_db)
+    background_tasks.add_task(provision_scn, scn_db)
+    await db["scn"].insert_one(jsonable_encoder(scn_db))
     return scn_db
+
+
+def provision_scn(scn_db: ScnModel_Db):
+    sleep(15)
+    scn_db.State = ScnState.WaitingForData
+    scn_db.IPAddress = IPv4Address("89.89.89.89")
+    db["scn"].update_one({"_id": str(scn_db.id)}, {"$set": jsonable_encoder(scn_db)})
+
+
+def deprovision_scn(scn_db: ScnModel_Db):
+    sleep(15)
+    scn_db.State = ScnState.Deleted
+    scn_db.IPAddress = IPv4Address("0.0.0.0")
+    db["scn"].update_one({"_id": str(scn_db.id)}, {"$set": jsonable_encoder(scn_db)})

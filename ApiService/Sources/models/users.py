@@ -4,8 +4,7 @@ from pydantic import BaseModel, Field, EmailStr
 from models.common import PyObjectId
 
 
-class UserBase(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+class UserInfo(BaseModel):
     username: str = Field(...)
     email: EmailStr = Field(...)
     phone: str = Field(...)
@@ -16,7 +15,11 @@ class UserBase(BaseModel):
         json_encoders = {ObjectId: str}
 
 
-class User_In(UserBase):
+class UserBase(UserInfo):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+
+
+class User_In(UserInfo):
     password: str = Field(...)
 
 

@@ -1,25 +1,46 @@
 from datetime import datetime
+from enum import Enum
 from bson import ObjectId
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, StrictStr
 from models.common import PyObjectId
 
 
-class ScnModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name: str = Field(...)
-    email: EmailStr = Field(...)
-    course: str = Field(...)
-    time: datetime = Field(...)
+class ScnState(Enum):
+    New = "New"
+    Provisioning = "Provisioning"
+    Initializing = "Initializing"
+    Failed = "Failed"
+    Deleted = "Deleted"
+    Archived = "Archived"
+
+
+class ScnBase(BaseModel):
+    DatasetIdentifier: PyObjectId = Field(...)
+    DigitalContractIdentifier: PyObjectId = Field(...)
+    ScnType: StrictStr = Field(...)
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "name": "Jane Doe",
-                "email": "jdoe@example.com",
-                "course": "Experiments, Science, and Fashion in Nanophotonics",
-                "gpa": "3.0",
-            }
-        }
+
+
+class Provision_Scn_In(ScnBase):
+    pass
+
+
+class Provision_Scn_Out(BaseModel):
+    id: PyObjectId = Field(alias="_id")
+    State: ScnState = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+class ScnModel_Db(ScnBase):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    CreationTime: datetime = Field(default_factory=datetime.utcnow)
+    ResearcherIdentifier: PyObjectId = Field(...)
+    State: ScnState = Field(...)

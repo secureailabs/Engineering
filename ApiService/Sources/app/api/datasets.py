@@ -16,9 +16,9 @@ router = APIRouter()
 
 @router.post("/dataset", response_description="Add new dataset", response_model=RegisterDataset_Out)
 async def post_dataset(dataset: RegisterDataset_In = Body(...), current_user: UserBase = Depends(get_current_active_user)):
-    dataset_db = jsonable_encoder(Dataset_Db(**dataset.dict()))
-    await db["datasets"].insert_one(dataset_db)
-    return
+    dataset_db = Dataset_Db(**dataset.dict(), dataOwnerUser=current_user.id)
+    await db["datasets"].insert_one(jsonable_encoder(dataset_db))
+    return dataset_db
 
 
 @router.get("/datasets", response_description="Get all datasets", response_model=List[Dataset_Db])
@@ -35,6 +35,4 @@ async def get_dataset(id: PyObjectId, current_user: UserBase = Depends(get_curre
 
 @router.delete("/dataset/{id}")
 async def delete_dataset(current_user: UserBase = Depends(get_current_active_user)):
-    # some async operation could happen here
-    # example: `notes = await get_all_notes()`
     return {"ping": "pong!"}

@@ -25,6 +25,12 @@ class RegisterDataset_In(DatasetBase):
 class RegisterDataset_Out(BaseModel):
     id: PyObjectId = Field(alias="_id")
 
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
 
 class Dataset_Db(DatasetBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    dataOwnerUser: PyObjectId = Field(...)

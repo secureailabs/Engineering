@@ -2,6 +2,15 @@ from datetime import datetime
 from bson import ObjectId
 from pydantic import BaseModel, Field, StrictStr
 from models.common import PyObjectId
+from enum import Enum
+
+
+class DigitalContractState(Enum):
+    New = "New"
+    Accepted = "Accepted"
+    Activated = "Activated"
+    Rejected = "Rejected"
+    Archived = "Archived"
 
 
 class DigitalContractBase(BaseModel):
@@ -13,11 +22,10 @@ class DigitalContractBase(BaseModel):
 
 
 class RegisterDigitalContract_In(DigitalContractBase):
-    DataOwnerIdentifier: PyObjectId = Field(...)
     Title: StrictStr = Field(...)
     Description: StrictStr = Field(...)
     Version: StrictStr = Field(...)
-    Dataset: PyObjectId = Field(...)
+    DatasetIdentifier: PyObjectId = Field(...)
     SubscriptionDays: int = Field(...)
     LegalAgreement: StrictStr = Field(...)
 
@@ -28,4 +36,7 @@ class RegisterDigitalContract_Out(DigitalContractBase):
 
 class DigitalContract_Db(RegisterDigitalContract_In):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    DataOwnerIdenfier: PyObjectId = Field(...)
+    ResearcherIdentifier: PyObjectId = Field(...)
     Timestamp: datetime = Field(default_factory=datetime.utcnow)
+    State: DigitalContractState = Field(...)

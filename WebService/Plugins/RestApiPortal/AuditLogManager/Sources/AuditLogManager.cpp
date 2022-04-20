@@ -11,6 +11,7 @@
 #include "AuditLogManager.h"
 #include "64BitHashes.h"
 #include "IpcTransactionHelperFunctions.h"
+#include "JsonParser.h"
 #include "SmartMemoryAllocator.h"
 #include "SocketClient.h"
 #include "ThreadManager.h"
@@ -891,11 +892,10 @@ std::vector<Byte> __thiscall AuditLogManager::GetListOfEvents(
 {
     __DebugFunction();
 
-    StructuredBuffer oAuditLogs;
-
     Dword dwStatus = 204;
     TlsNode * poTlsNode = nullptr;
-
+    StructuredBuffer oAuditLogs;
+    
     try 
     {
         // Get user information to check if the user is a digital contract admin or database admin
@@ -930,7 +930,7 @@ std::vector<Byte> __thiscall AuditLogManager::GetListOfEvents(
             if (200 == oResponse.GetDword("Status"))
             {
                 oAuditLogs.PutStructuredBuffer("ListOfEvents", oResponse.GetStructuredBuffer("ListOfEvents"));
-                oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
+                oAuditLogs.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
                 dwStatus = 200;
             }
         }
@@ -960,8 +960,10 @@ std::vector<Byte> __thiscall AuditLogManager::GetListOfEvents(
 
     // Send back status of the transaction
     oAuditLogs.PutDword("Status", dwStatus);
-
-    return oAuditLogs.GetSerializedBuffer();
+    std::string strJsonValue = ::ConvertStructuredBufferToJson(oAuditLogs);
+    std::vector<Byte> stlReturnValue(strJsonValue.begin(), strJsonValue.end());
+    
+    return stlReturnValue;
 }
 
 /********************************************************************************************

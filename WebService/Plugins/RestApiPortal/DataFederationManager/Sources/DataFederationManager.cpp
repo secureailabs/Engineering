@@ -251,6 +251,10 @@ void __thiscall DataFederationManager::InitializePlugin(const StructuredBuffer& 
     oRequriedBufferElement.PutByte("ElementType", BUFFER_VALUE_TYPE);
     oRequriedBufferElement.PutBoolean("IsRequired", true);
 
+    StructuredBuffer oRequiredGuidElement;
+    oRequiredGuidElement.PutByte("ElementType", GUID_VALUE_TYPE);
+    oRequiredGuidElement.PutBoolean("IsRequired", true);
+
     StructuredBuffer oRegisterNewDataFederationParameters;
     oRegisterNewDataFederationParameters.PutStructuredBuffer("Eosb", oRequriedBufferElement);
     oRegisterNewDataFederationParameters.PutStructuredBuffer("DataFederationName",oRequiredStringElement);
@@ -259,8 +263,13 @@ void __thiscall DataFederationManager::InitializePlugin(const StructuredBuffer& 
     StructuredBuffer oListDataFederationParameters;
     oListDataFederationParameters.PutStructuredBuffer("Eosb", oRequriedBufferElement);
 
+    StructuredBuffer oDeleteDataFederationParameters;
+    oDeleteDataFederationParameters.PutStructuredBuffer("Eosb", oRequriedBufferElement);
+    oDeleteDataFederationParameters.PutStructuredBuffer("DataFederationIdentifier", oRequiredGuidElement);
+
     m_oDictionary.AddDictionaryEntry("POST","/SAIL/DataFederationManager/RegisterDataFederation",oRegisterNewDataFederationParameters, 1);
     m_oDictionary.AddDictionaryEntry("GET","/SAIL/DataFederationManager/ListDataFederations",oListDataFederationParameters, 1);
+    m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DataFederationManager/DeleteDataFederation", oDeleteDataFederationParameters, 1);
 
     m_strDatabaseServiceIpAddr = oInitializationVectors.GetString("DatabaseServerIp");
     m_unDatabaseServiceIpPort = oInitializationVectors.GetUnsignedInt32("DatabaseServerPort");
@@ -286,7 +295,6 @@ uint64_t __thiscall DataFederationManager::SubmitRequest(
     )
 {
     __DebugFunction();
-
     __DebugAssert(punSerializedResponseSizeInBytes != nullptr);
 
     uint64_t un64Identifier = 0xFFFFFFFFFFFFFFFF;
@@ -319,7 +327,10 @@ uint64_t __thiscall DataFederationManager::SubmitRequest(
     }
     else if ("DELETE" == strVerb)
     {
-
+        if ("/SAIL/DataFederationManager/DeleteDataFederation" == strResource)
+        {
+            stlResponseBuffer = DeleteDataFederation(c_oRequestStructuredBuffer);
+        }
     }
 
     // Return size of response buffer
@@ -508,6 +519,98 @@ std::vector<Byte>__thiscall DataFederationManager::ListDataFederations(
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+        oResponse.Clear();
+    }
+
+    oResponse.PutDword("Status", dwStatus);
+    return oResponse.GetSerializedBuffer();
+}
+
+
+/********************************************************************************************
+ *
+ * @class DataFederationManager
+ * @function DeleteDataFederation
+ * @brief Method called by flat function SubmitRequest when a client requests for the plugin's resource
+ * @param[in] c_oRequest the structued buffer that contains the request's information
+ * @returns std::vector<Byte> stores the serialized response
+ *
+ ********************************************************************************************/
+std::vector<Byte> __thiscall DataFederationManager::DeleteDataFederation(
+    _in const StructuredBuffer & c_oRequest
+    )
+{
+    __DebugFunction();
+
+    StructuredBuffer oResponse;
+    Dword dwStatus{400};
+    try
+    {
+        StructuredBuffer oUserInfo = ::GetUserInfoFromEosb(c_oRequest);
+        if (200 == oUserInfo.GetDword("Status"))
+        {
+            // TODO - There are additional rules to determine when we can delete that are not scoped out yet
+            bool fValidatedDeleteRequest{true};
+            if (true == fValidatedDeleteRequest)
+            {
+                // Create a request to get the database manager to query for the organization GUID
+                StructuredBuffer oDatabaseRequest;
+                oDatabaseRequest.PutString("PluginName", "DatabaseManager");
+                oDatabaseRequest.PutString("Verb", "GET");
+                oDatabaseRequest.PutString("Resource", "/SAIL/DatabaseManager/DataFederation");
+                oDatabaseRequest.PutGuid("DataFederationIdentifier", c_oRequest.GetGuid("DataFederationIdentifier"));
+
+                StructuredBuffer oDatabaseResponse{::SendRequestToDatabase(oDatabaseRequest, m_strDatabaseServiceIpAddr, m_unDatabaseServiceIpPort)};
+
+                if (200 == oDatabaseResponse.GetDword("Status"))
+                {
+                    // Set this federation to inactive if we own it
+                    DataFederation oReturnedFederation{oDatabaseResponse.GetStructuredBuffer("DataFederation")};
+                    if (oReturnedFederation.OrganizationOwnerIdentifier() == oUserInfo.GetGuid("OrganizationGuid"))
+                    {
+                        oReturnedFederation.SetInactive();
+                        // Create a request to get the database manager to store the updated object
+                        StructuredBuffer oDataStoreRequest;
+                        oDataStoreRequest.PutString("PluginName", "DatabaseManager");
+                        oDataStoreRequest.PutString("Verb", "PUT");
+                        oDataStoreRequest.PutString("Resource", "/SAIL/DatabaseManager/UpdateDataFederation");
+                        oDataStoreRequest.PutStructuredBuffer("DataFederation", oReturnedFederation.ToStructuredBuffer());
+
+                        StructuredBuffer oDatabaseResponse{::SendRequestToDatabase(oDataStoreRequest, m_strDatabaseServiceIpAddr, m_unDatabaseServiceIpPort)};
+                        dwStatus = oDatabaseResponse.GetDword("Status");
+                        if (200 == dwStatus)
+                        {
+                            oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
+                        }
+                    }
+                    else
+                    {
+                        dwStatus = 403;
+                    }
+                }
+                else
+                {
+                    dwStatus = oDatabaseResponse.GetDword("Status");
+                }
+            }
+        }
+    }
+
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+        oResponse.Clear();
+    }
+
+    catch(std::exception & e)
+    {
+        std::cout << "Exception: " << e.what() << '\n';
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

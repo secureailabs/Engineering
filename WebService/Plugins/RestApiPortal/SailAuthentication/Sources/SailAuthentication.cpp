@@ -727,28 +727,29 @@ std::vector<Byte> __thiscall SailAuthentication::UpdatePassword(
 
 std::vector<Byte> __thiscall SailAuthentication::GetBasicUserInformation(
     _in const StructuredBuffer & c_oRequest
-    )
+    ) const throw()
 {
     __DebugFunction();
 
-    StructuredBuffer oResponse;
-
+    // The default failure response to this transaction should always be Status=401 no matter
+    // what. Giving different response codes based on different failures could give
+    // adversaries too much information about how our platform works
     Dword dwStatus = 401;
+    StructuredBuffer oResponse;
     Socket * poIpcCryptographicManager = nullptr;
 
     try 
     {
-        std::vector<Byte> stlEosb = c_oRequest.GetBuffer("Eosb");
-
+        // Build the API request that will be send to the cryptographic manager
         StructuredBuffer oDecryptEosbRequest;
         oDecryptEosbRequest.PutDword("TransactionType", 0x00000007);
-        oDecryptEosbRequest.PutBuffer("Eosb", stlEosb);
-
+        oDecryptEosbRequest.PutBuffer("Eosb", c_oRequest.GetBuffer("Eosb"));
         // Call CryptographicManager plugin to get the decrypted eosb
         poIpcCryptographicManager = ::ConnectToUnixDomainSocket("/tmp/{AA933684-D398-4D49-82D4-6D87C12F33C6}");
         StructuredBuffer oDecryptedEosb(::PutIpcTransactionAndGetResponse(poIpcCryptographicManager, oDecryptEosbRequest, false));
         poIpcCryptographicManager->Release();
         poIpcCryptographicManager = nullptr;
+        // If ther response is a success, then extract the decrypted information from it
         if ((0 < oDecryptedEosb.GetSerializedBufferRawDataSizeInBytes())&&(201 == oDecryptedEosb.GetDword("Status")))
         {
             StructuredBuffer oEosb(oDecryptedEosb.GetStructuredBuffer("UserInformation").GetStructuredBuffer("Eosb"));
@@ -1018,41 +1019,55 @@ std::vector<Byte> __thiscall SailAuthentication::ResetDatabase(
  ********************************************************************************************/
 std::vector<Byte> __thiscall SailAuthentication::CheckEosb(
     _in const StructuredBuffer & c_oRequest
-    )
+    ) const throw()
 {
-
+    __DebugFunction();
+    
     StructuredBuffer oResponse;
+    // The default failure response should always be Status=401 no matter what. Offering any
+    // other sort of failure signal could send signals to malicious actors that offer more
+    // information than needed.
     Dword dwStatus = 401;
+    
     try
     {
-        StructuredBuffer oUserInfo = ::GetUserInfoFromEosb(c_oRequest);
-        if ( 200 == oUserInfo.GetDword("Status") )
+        // In order to check the EOSB, we do a simple GetBasicUserInformation()
+        std::vector<Byte> stlResponse = this->GetBasicUserInformation(c_oRequest);
+        // It should be impossible to get a 0 sized response back from GetBasicUserInformation().
+        __DebugAssert(0 < stlResponse.size());
+        // Deserialize stlResponse into a usable StructuredBuffer
+        StructuredBuffer oUserInfo(stlResponse);
+        // It should be impossible for the response to NOT have a "Status" code.
+        __DebugAssert(true == oUserInfo.IsElementPresent("Status", DWORD_VALUE_TYPE));
+        // If the transaction is a success, this means that the incoming EOSB is valid.
+        if (200 == oUserInfo.GetDword("Status"))
         {
-            dwStatus = 200;
-            if ( c_oRequest.GetBuffer("Eosb") != oUserInfo.GetBuffer("Eosb") )
+            // If the transaction is successful, then it should be impossible not to get
+            // an "Eosb" element
+            __DebugAssert(true == oUserInfo.IsElementPresent("Eosb", BUFFER_VALUE_TYPE));
+            // Make sure that if an updated EOSB is provided, we return the new value
+            // in the transaction response.
+            if (c_oRequest.GetBuffer("Eosb") != oUserInfo.GetBuffer("Eosb"))
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
             }
+            // The transaction was successful
+            dwStatus = 200;
         }
     }
     
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-        oResponse.Clear();
-        // Add status if it was a dead packet
-        if (strcmp("Dead Packet.",c_oBaseException.GetExceptionMessage()) == 0)
-        {
-            dwStatus = 408;
-        }
     }
     
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-        oResponse.Clear();
     }
 
+    // No matter what happens, we have to ensure that the outgoing response always
+    // has a "Status" value provided
     oResponse.PutDword("Status", dwStatus);
 
     return oResponse.GetSerializedBuffer();

@@ -13,6 +13,7 @@
 #include "CryptoUtils.h"
 #include "DateAndTime.h"
 #include "64BitHashes.h"
+#include "DataFederation.h"
 #include "DebugLibrary.h"
 #include "EntityTypes.h"
 #include "ExceptionRegister.h"
@@ -368,6 +369,26 @@ class DatabaseManager : public Object
         // Fetch a list of all data federations
         std::vector<Byte> __thiscall ListActiveDataFederations(
             _in const StructuredBuffer & c_oRequest
+            );
+
+        std::vector<Byte> __thiscall SoftDeleteDataFederation(
+            _in const StructuredBuffer &c_oRequest
+            );
+
+        bool __thiscall UpdateDataFederationObject(
+            _in const DataFederation & c_oDataFederation
+            );
+
+        std::vector<Byte> __thiscall UpdateDataFederation(
+            _in const StructuredBuffer & c_oRequest
+            );
+
+        std::vector<Byte> __thiscall PullDataFederation(
+            _in const StructuredBuffer & c_oRequest
+            );
+
+        std::optional<DataFederation> __thiscall PullDataFederationObject(
+            _in const Guid & c_oIdentifier
             );
 
         // Shutdown the server

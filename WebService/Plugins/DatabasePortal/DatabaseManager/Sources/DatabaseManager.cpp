@@ -296,6 +296,8 @@ void __thiscall DatabaseManager::InitializePlugin(void)
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterDataFederation");
     // List the dataset family entries in the database
     m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/DataFederations");
+    // Get a single data federation object
+    m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/DataFederation");
     // Reset the database
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/ResetDatabase");
 
@@ -429,6 +431,10 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             {
                 stlResponseBuffer = this->ListActiveDataFederations(c_oRequestStructuredBuffer);
             }
+            else if ("/SAIL/DatabaseManager/DataFederation" == strResource)
+            {
+                stlResponseBuffer = this->PullDataFederation(c_oRequestStructuredBuffer);
+            }
             else
             {
                 _ThrowBaseException("Invalid resource.", nullptr);
@@ -527,6 +533,10 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             else if ("/SAIL/DatabaseManager/UpdateDatasetFamily" == strResource)
             {
                 stlResponseBuffer = this->UpdateDatasetFamily(c_oRequestStructuredBuffer);
+            }
+            else if ("/SAIL/DatabaseManager/UpdateDataFederation" == strResource)
+            {
+                stlResponseBuffer = this->UpdateDataFederation(c_oRequestStructuredBuffer);
             }
             else
             {

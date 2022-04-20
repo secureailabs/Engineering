@@ -18,6 +18,7 @@
 #include "StructuredBuffer.h"
 
 #include <chrono>
+#include <iostream>
 #include <thread>
 #include <vector>
 
@@ -171,7 +172,7 @@ std::string __thiscall SessionManager::GetServerIpAddress(void) const throw()
 {
     __DebugFunction();
     
-    std::unique_lock<std::mutex> oMutexLock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     std::string strServerIpAddress{m_strServerIpAddress};
     
     return strServerIpAddress;
@@ -192,7 +193,7 @@ Word __thiscall SessionManager::GetServerPortNumber(void) const throw()
 {
     __DebugFunction();
     
-    std::unique_lock<std::mutex> oMutexLock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     Word wServerPortNumber = m_wServerPortNumber;
     
     return wServerPortNumber;
@@ -212,7 +213,7 @@ std::string __thiscall SessionManager::GetEosb(void) const throw()
 {
     __DebugFunction();
     
-    std::unique_lock<std::mutex> oMutexLock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     std::string strEosb{m_strEosb};
     
     return strEosb;
@@ -235,7 +236,7 @@ void __thiscall SessionManager::SetEosb(
 {
     __DebugFunction();
     
-    std::unique_lock<std::mutex> oMutexLock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     // If someone is setting an EOSB, we'd better have a running session, so let's make sure
     if ((true == m_fIsRunning)&&(0 < m_strServerIpAddress.size())&&(0 < m_wServerPortNumber)&&(0 < m_strEosb.size()))
     {
@@ -262,7 +263,7 @@ void __thiscall SessionManager::SetSessionParameters(
 {
     __DebugFunction();
     
-    std::unique_lock<std::mutex> oMutexLock(m_oLock);
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
     // Update the EOSB
     m_strServerIpAddress = c_strServerIpAddress;
     m_wServerPortNumber = wServerPortNumber;
@@ -277,7 +278,39 @@ void __thiscall SessionManager::SetSessionParameters(
         m_oEosbMaintenanceThread = std::unique_ptr<std::thread>(new std::thread(&SessionManager::EosbMaintenanceFunction, this));
     }
 }
-            
+
+/********************************************************************************************/
+
+bool __thiscall SessionManager::IsRunning(void) const throw()
+{
+    __DebugFunction();
+    
+    bool fIsRunning = false;
+    
+    try
+    {
+        const std::lock_guard<std::mutex> stlLock(m_oLock);
+        fIsRunning = m_fIsRunning;
+    }
+    
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch (const std::exception & c_oException)
+    {
+        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
+    }
+    
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+    
+    return fIsRunning;
+}
+
 /********************************************************************************************
  *
  * @class SessionManager
@@ -296,14 +329,13 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
     
     try
     {
-        bool fIsRunning;
         Chronometer oChronometer;
-        
         // Start the chronometer
         oChronometer.Start();
         
         do
         {
+            bool fIsRunning = false;
             std::string strCurrentEosb{};
             std::string strServerIpAddress{};
             Word wServerPortNumber{0};
@@ -312,33 +344,36 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             // Now let's check if we are still running. We do this in an artificially
             // nested scope to protect the mutex in case an exception is thrown
+            if (true == this->IsRunning())
             {
-                // We want to take an atomic snapshot of all of the session manager state here since we do not
-                // want to create a race condition between checking to see if the session manager is still running,
-                // and accessing the session manager settings. We also want to take a snapshot of the session
-                // manager so that we don't have to be INSIDE the lock when we are making the RestApiCall, which
-                // is very expensive time wise to keep a lock
-                std::unique_lock<std::mutex> oMutexLock(m_oLock);
-                fIsRunning = m_fIsRunning;
-                if (true == fIsRunning)
-                {
-                    // Quick reality check that ensures that the session manager didn't fall into
-                    // a weird state
-                    __DebugAssert(0 < m_strEosb.size());
-                    __DebugAssert(0 < m_strServerIpAddress.size());
-                    __DebugAssert(0 < m_wServerPortNumber);
-                    // Take an atomic snapshot of the session manager settings
-                    strCurrentEosb = strCurrentEosb;
-                    strServerIpAddress = m_strServerIpAddress;
-                    wServerPortNumber = m_wServerPortNumber;
-                }
+                const std::lock_guard<std::mutex> stlLock(m_oLock);
+                // Quick reality check that ensures that the session manager didn't fall into
+                // a weird state
+                __DebugAssert(0 < m_strEosb.size());
+                __DebugAssert(0 < m_strServerIpAddress.size());
+                __DebugAssert(0 < m_wServerPortNumber);
+                // Take an atomic snapshot of the session manager settings
+                fIsRunning = true;
+                strCurrentEosb = m_strEosb;
+                strServerIpAddress = m_strServerIpAddress;
+                wServerPortNumber = m_wServerPortNumber;
             }
+            else
+            {
+                fIsRunning = false;
+            }
+            
             // Check to see if 60 seconds has expired on the chronometer. We only care to
             // try and refresh the EOSB once every minute
             if ((true == fIsRunning)&&(60 < oChronometer.GetElapsedTimeWithPrecision(Second)))
             {
+                __DebugAssert(0 < strCurrentEosb.size());
+                __DebugAssert(0 < strServerIpAddress.size());
+                __DebugAssert(0 < wServerPortNumber);
+                    
                 // Reset the chronometer so we can count down another 10 seconds
                 oChronometer.Reset();
+                oChronometer.Start();
                 // We aren't stopping, update the EOSB
                 std::string strVerb = "GET";
                 std::string strApiUrl = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + strCurrentEosb;
@@ -349,14 +384,14 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
                 _ThrowBaseExceptionIf((0 == stlRestResponse.size()), "ERROR: Invalid 0 sized response", nullptr);
                 // Extract the return parameters
                 StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-                // Make sure the transaction was an actual success
-                _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "ERROR: Failed to get an Eosb update", nullptr);
-                // lock the mutex and refresh the EOSB
-                std::unique_lock<std::mutex> oMutexLock(m_oLock);
-                m_strEosb = oResponse.GetString("Eosb");
+                // Make sure the transaction was an actual success and that a new EOSB was provided
+                if ((200 == oResponse.GetFloat64("Status"))&&(true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+                {
+                    this->SetEosb(oResponse.GetString("Eosb"));
+                }
             }
         }
-        while (true == fIsRunning);
+        while (true == this->IsRunning());
     }
     
     catch (const BaseException & c_oBaseException)

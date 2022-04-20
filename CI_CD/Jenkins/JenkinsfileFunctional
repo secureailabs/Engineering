@@ -173,8 +173,8 @@ pipeline {
                     echo 'End of stage test in Run SAILTAP!'
                     sh'''
                     docker cp ubuntu_tst_bash:/Test/test-results.xml .
-                    docker cp platformservices:/app/restportal.log .
-                    docker cp dataservices:/app/databasegateway.log .
+                    docker cp platformservices:/app/Binary/platformservices/restportal.log .'
+                    docker cp dataservices:/app/Binary/platformservices/databasegateway.log .
                     '''
                     junit '*.xml'
                     archiveArtifacts artifacts: '*.log'

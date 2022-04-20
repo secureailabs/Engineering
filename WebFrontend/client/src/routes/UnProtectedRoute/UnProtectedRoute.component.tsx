@@ -16,7 +16,7 @@ const ProtectedRoute: React.FC<IUnProtectedRoutes> = ({
   if (userState !== 'isLoading' && userState !== null) {
     // if there is not user, render register page
     if (userData !== null) {
-      return <Navigate replace to={redirect} />;
+      return <Navigate replace to={window.localStorage.getItem("login-redirect") || redirect} />;
     }
     // if there is a user, redirect to dashboard dashboard
     return children;

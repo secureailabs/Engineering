@@ -1,11 +1,12 @@
 #!/bin/bash
 set -e
+ids=$(docker ps -aq --format "{{.Names}}")
 
 PrintHelp()
 {
     echo ""
     echo "Usage: $0 -s [Service Name]"
-    echo -e "\t-s Service Name: devopsconsole | dataservices | platformservices | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
+    echo -e "\t-s Service Name: all | devopsconsole | dataservices | platformservices | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
     exit 1 # Exit script after printing help
 }
 
@@ -21,6 +22,32 @@ done
 if [ -z "$dockerContainer" ]
 then
     PrintHelp
+elif [ "$dockerContainer" == "all" ]
+then
+    echo "List of containers to be deprovisioned:"
+    echo "-------------------------"
+    docker ps -aq --format "{{.Names}}"
+    echo "-------------------------"
+    for id in $ids
+    do
+        echo "Stopping docker container :  "
+        docker stop "$id"
+        echo "Deprovisioning docker container :"
+        docker rm "$id"
+    done
+    echo "!!! Deprovision Completed !!!"
+    exit 0
+
+fi
+
+if [ "$dockerContainer" == "all" ]
+then
+    echo "Stopping $dockerContainer running containers ..."
+    "docker kill $(docker ps -q)"
+    echo "Deprovisioning $dockerContainer running containers ..."
+    "docker rm $(docker ps -a -q)"
+    echo "!!! Deprovision Completed !!!"
+    exit 0
 fi
 
 # Check if the docker container is running | stopped

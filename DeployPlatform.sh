@@ -56,23 +56,17 @@ if [ -z "${AZURE_CLIENT_SECRET}" ]; then
 fi
 
 # Build and Package the Platform Services
-make package_platformservices
-make package_dataservices
+make package_platformservices -j
+make package_dataservices -j
+make package_securecomputationnode -j
+make uploadPackageAndInitializationVector -j
+make demoDatabaseTools -j
 
 # Build and Package the Frontend Services
 make package_webfrontend
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir
-
-# Build the DemoDatabaseTools and UploadPackageAndInitializationVector
-pushd InternalTools/UploadPackageAndInitializationVector
-make all -j
-popd
-
-pushd InternalTools/DemoDatabaseTools
-make all -j
-popd
 
 # Copy the files to the temporary directory
 cp Binary/DemoDatabaseTools $tempDeployDir
@@ -81,7 +75,16 @@ cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 mv Binary/webfrontend.tar.gz $tempDeployDir
 mv Binary/PlatformServices.tar.gz $tempDeployDir/platformservices.tar.gz
 mv Binary/DataServices.tar.gz $tempDeployDir/dataservices.tar.gz
+mv Binary/SecureComputationNode.tar.gz $tempDeployDir/
 cp -r InternalTools/DeployPlatform/* $tempDeployDir
+
+# Add the SCN package to the platformservices.tar.gz
+pushd $tempDeployDir
+tar xvf platformservices.tar.gz
+rm platformservices.tar.gz
+cp SecureComputationNode.tar.gz Binary/platformservices/
+tar czvf platformservices.tar.gz Binary
+popd
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime
 cp Docker/dataservices/InitializationVector.json $tempDeployDir/dataservices.json

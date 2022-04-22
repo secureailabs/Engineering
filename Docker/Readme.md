@@ -44,14 +44,16 @@ make all -j
 ```
 ./DeprovisionService.sh -s all
 ```
-*Alternatively, you can add DeprovisionService.sh to pathvia symbolic link and trigger from anywhere!*
+*Alternatively, you can add DeprovisionService.sh to path via symbolic link and trigger from anywhere!*
 ```
 eg: 
 echo $PATH
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/bin
 cd /bin
 ln -s <abs_path>/Engineering/Docker/DeprovisionService.sh .
+DeprovisionService.sh -s all
 ```
+
 #### Backend
 ```
 ./DeprovisionService.sh -s backend

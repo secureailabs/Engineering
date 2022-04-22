@@ -28,6 +28,15 @@ then
     echo "-------------------------"
     docker ps -aq --format "{{.Names}}"
     echo "-------------------------"
+    while true; do
+        read -p "Are you sure you want to continue? " yn
+        case $yn in
+            [Yy] | [Yy][Ee][Ss] ) break;;
+            [Nn] | [Nn][Oo] ) exit;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+
     for id in $ids
     do
         echo "Stopping docker container :  "

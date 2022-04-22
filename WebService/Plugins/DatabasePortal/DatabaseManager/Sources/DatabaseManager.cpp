@@ -71,7 +71,7 @@ DatabaseManager::DatabaseManager(void)
     m_fTerminationSignalEncountered = false;
     // Create only one instance
     mongocxx::instance oMongoInstance{};
-    mongocxx::uri oUri{::GetInitializationValue("MongoDbUrl")+"/?replicaSet=rs0"};
+    mongocxx::uri oUri{::GetInitializationValue("MongoDbUrl")};
     m_poMongoPool = std::unique_ptr<mongocxx::pool>(new mongocxx::pool(oUri));
 }
 

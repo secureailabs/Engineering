@@ -526,7 +526,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterOrganization(
             // Access ConfidentialOrganizationOrUser collection
             mongocxx::collection oConfidentialOrganizationCollection = oSailDatabase["ConfidentialOrganizationOrUser"];
             // Create a transaction callback
-            mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession) 
+            mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
             {
                 // Insert document in the BasicOrganization collection
                 auto oResult = oBasicOrganziationCollection.insert_one(*poSession, oBasicOrganizationDocumentValue.view());
@@ -555,27 +555,26 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterOrganization(
             };
             // Create a session and start the transaction
             mongocxx::client_session oSession = oClient->start_session();
-            try 
+            try
             {
                 oSession.with_transaction(oCallback);
             }
-            catch (mongocxx::exception& e) 
+            catch (mongocxx::exception& e)
             {
                 std::cout << "Collection transaction exception: " << e.what() << std::endl;
             }
         }
-        else 
+        else
         {
             oResponse.PutString("ErrorMessage", "Organization already exists!");
         }
     }
-    
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         oResponse.Clear();
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

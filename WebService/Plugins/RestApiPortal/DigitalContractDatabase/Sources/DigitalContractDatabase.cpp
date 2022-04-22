@@ -1127,10 +1127,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ListDigitalContracts(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 3000);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1229,10 +1229,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::PullDigitalContract(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1355,10 +1355,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1388,10 +1388,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 3000);
+            stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+            stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1512,10 +1512,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::AcceptDigitalContract(
                             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                             // Read header and body of the response
-                            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                             // Make sure to release the poTlsNode
                             poTlsNode->Release();
@@ -1659,10 +1659,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::ActivateDigitalContract(
                             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                             // Read header and body of the response
-                            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                             // Make sure to release the poTlsNode
                             poTlsNode->Release();
@@ -1835,10 +1835,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::AssociateWithAzureTemplate
                                 poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                                 // Read header and body of the response
-                                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                                 // Make sure to release the poTlsNode
                                 poTlsNode->Release();
@@ -2646,10 +2646,10 @@ std::vector<Byte> __thiscall DigitalContractDatabase::UpdateDigitalContractProvi
                     poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                     // Read header and body of the response
-                    std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                    std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                     _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                     unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                    std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                    std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                     _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                     // Make sure to release the poTlsNode
                     poTlsNode->Release();

@@ -55,7 +55,7 @@ static void __cdecl InitDataConnector(void)
     ThreadManager * poThreadManager = ThreadManager::GetInstance();
     StatusMonitor oStatusMonitor("static void __cdecl InitDataConnector()");
     SocketServer oSocketServer("/tmp/{0bd8a254-49e4-4b86-b1b8-f353c18013c5}");
-    unsigned int unSpinner = 0;
+
     do
     {
         fflush(stdout);

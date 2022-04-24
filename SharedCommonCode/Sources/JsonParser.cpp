@@ -130,7 +130,6 @@ static std::string __stdcall ParseJsonString(
     bool fDone = false;
     unsigned int unCurrentOffset = *punOffset;
     unsigned int unTemporaryStringSize = 0;
-    unsigned int unActualStringSize = 0;
     char szTemporaryString[1000];
     std::string strReturnString;
 

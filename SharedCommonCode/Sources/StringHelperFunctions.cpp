@@ -49,12 +49,12 @@ int __stdcall _StringCompare(
 		if (true == fCaseSensitive)
 		{
 			unsigned int unStringIndex = 0;
-			while ((unStringIndex < unCharacterCount)&&(0 != c_szInputString1[unStringIndex])&&(gsc_CaseInsensitiveCharacters[c_szInputString1[unStringIndex]] == gsc_CaseInsensitiveCharacters[c_szInputString2[unStringIndex]]))
+			while ((unStringIndex < unCharacterCount)&&(0 != c_szInputString1[unStringIndex])&&(gsc_CaseInsensitiveCharacters[static_cast<int>(c_szInputString1[unStringIndex])] == gsc_CaseInsensitiveCharacters[static_cast<int>(c_szInputString2[unStringIndex])]))
 			{
 				++unStringIndex;
 			}
 			// Figure out the differential for the strcmp (i.e. -1, 0, 1)
-			nReturnValue = gsc_CaseInsensitiveCharacters[c_szInputString2[unStringIndex]] - gsc_CaseInsensitiveCharacters[c_szInputString2[unStringIndex]];
+			nReturnValue = gsc_CaseInsensitiveCharacters[static_cast<int>(c_szInputString2[unStringIndex])] - gsc_CaseInsensitiveCharacters[static_cast<int>(c_szInputString2[unStringIndex])];
 		}
 		else
 		{

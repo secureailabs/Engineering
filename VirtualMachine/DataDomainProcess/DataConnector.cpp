@@ -439,7 +439,7 @@ StructuredBuffer __thiscall DataConnector::GetTableColumnRange(
     StructuredBuffer oResponseStructuredBuffer;
     std::string strResponseString;
 
-    if ((m_oDatasetMetadata.GetInt32("NumberTables") <= unTableIndex) || (m_stlTableMetaData[unTableIndex].GetInt32("NumberColumns") <= unEndColumnNumber) || (unStartColumnNumber > unEndColumnNumber))
+    if ((m_oDatasetMetadata.GetInt32("NumberTables") <= static_cast<int>(unTableIndex)) || (m_stlTableMetaData[unTableIndex].GetInt32("NumberColumns") <= static_cast<int>(unEndColumnNumber)) || (unStartColumnNumber > unEndColumnNumber))
     {
         oResponseStructuredBuffer.PutBoolean("Status", false);
         oResponseStructuredBuffer.PutString("ResponseString", "Out of Bounds Request");

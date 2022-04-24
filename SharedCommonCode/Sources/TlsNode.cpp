@@ -36,7 +36,7 @@
 TlsNode::TlsNode(
     _in Socket * poSocket,
     _in enum SSLMode connectionMode
-    ) : m_poSocket(poSocket), m_poReadBIO(::BIO_new(::BIO_s_mem())), m_poWriteBIO(::BIO_new(::BIO_s_mem())), m_poSSL(nullptr, ::SSL_free)
+    ) : m_poSocket(poSocket), m_poSSL(nullptr, ::SSL_free), m_poWriteBIO(::BIO_new(::BIO_s_mem())), m_poReadBIO(::BIO_new(::BIO_s_mem()))
 {
     __DebugFunction();
     __DebugAssert(nullptr != poSocket);
@@ -232,12 +232,12 @@ int __thiscall TlsNode::Write(
         // Write the data to the BIO and throw exception in case it fails
         // c_pbSourceBuffer is the unencrypted data, the data written to the writeBIO is encrypted
         nUnencryptedBytesWrittenToBIO = ::SSL_write(m_poSSL.get(), c_pbSourceBuffer, unNumberOfBytesToWrite);
-        _ThrowBaseExceptionIf((nUnencryptedBytesWrittenToBIO != unNumberOfBytesToWrite), "TLS Write failed: Failed to write data to writeBIO", nullptr);
+        _ThrowBaseExceptionIf((nUnencryptedBytesWrittenToBIO != static_cast<int>(unNumberOfBytesToWrite)), "TLS Write failed: Failed to write data to writeBIO", nullptr);
 
         // Get the pointer(pDataInWriteBIO) to the data in the write BIO and
         // write it to the socket descriptor connected to the other side of the TLS connection
         Byte * pDataInWriteBIO = nullptr;
-        size_t nDataInWriteBIO = ::BIO_get_mem_data(m_poWriteBIO, &pDataInWriteBIO);
+        long nDataInWriteBIO = ::BIO_get_mem_data(m_poWriteBIO, &pDataInWriteBIO);
         if ((0 < nDataInWriteBIO) && (nullptr != pDataInWriteBIO))
         {
             int nActualBytesWritten = m_poSocket->Write(pDataInWriteBIO, nDataInWriteBIO);
@@ -303,7 +303,7 @@ void __thiscall TlsNode::SSLHandshake(
         // Get the pointer(pDataInWriteBIO) to the data in the write BIO and
         // write it to the socket descriptor connected to the other side of the TLS connection
         Byte * pDataInWriteBIO = nullptr;
-        size_t nDataInWriteBIO = ::BIO_get_mem_data(m_poWriteBIO, &pDataInWriteBIO);
+        long nDataInWriteBIO = ::BIO_get_mem_data(m_poWriteBIO, &pDataInWriteBIO);
         if ((0 < nDataInWriteBIO) && (nullptr != pDataInWriteBIO))
         {
             int nActualBytesWritten = m_poSocket->Write(pDataInWriteBIO, nDataInWriteBIO);
@@ -327,7 +327,7 @@ void __thiscall TlsNode::SSLHandshake(
             // the SSL header. The subsequent read will read the required bytes
             int nTLSHandshakeDataLength = stlHandshakeHeaderBuffer.at(3)*256 + stlHandshakeHeaderBuffer.at(4);
             std::vector<Byte> stlHandshakeDataBuffer = m_poSocket->Read(nTLSHandshakeDataLength, unMillisecondTimeout - oChronometer.GetElapsedTimeWithPrecision(Millisecond));
-            _ThrowBaseExceptionIf((stlHandshakeDataBuffer.size() != nTLSHandshakeDataLength), "TLS Handshake failed: Read Timeout", nullptr);
+            _ThrowBaseExceptionIf((static_cast<int>(stlHandshakeDataBuffer.size()) != nTLSHandshakeDataLength), "TLS Handshake failed: Read Timeout", nullptr);
 
             // Write the header and data read from the socket to the readBIO for SSL_read
             _ThrowBaseExceptionIf((5 != ::BIO_write(m_poReadBIO, stlHandshakeHeaderBuffer.data(), 5)), "TLS Handshake failed: Writing to readBIO failed", nullptr);
@@ -363,7 +363,7 @@ void __thiscall TlsNode::LoadServerCTXKeyAndCertificate(
 
     // Convert the private key from the PEM format to EVP_PKEY
     int nBytesWrittenToBio = ::BIO_write(poBio.get(), gc_abInitializerTlsPrivateKey, gc_unInitializerTlsPrivateKeySizeInBytes);
-    _ThrowBaseExceptionIf((gc_unInitializerTlsPrivateKeySizeInBytes != nBytesWrittenToBio), "Writing to BIO buffer failed.", nullptr);
+    _ThrowBaseExceptionIf((static_cast<int>(gc_unInitializerTlsPrivateKeySizeInBytes) != nBytesWrittenToBio), "Writing to BIO buffer failed.", nullptr);
 
     std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> poPrivateKey(::PEM_read_bio_PrivateKey(poBio.get(), nullptr, nullptr, nullptr), ::EVP_PKEY_free);
     _ThrowIfNull(poPrivateKey, "Copy key for TLs failed", nullptr);
@@ -373,7 +373,7 @@ void __thiscall TlsNode::LoadServerCTXKeyAndCertificate(
 
     // Convert the certificate from PEM to X509
     nBytesWrittenToBio = ::BIO_write(poBio.get(), gc_abInitializerTlsPublicKeyCertificate, gc_unInitializerTlsPublicKeyCertificateSizeInBytes);
-    _ThrowBaseExceptionIf((gc_unInitializerTlsPublicKeyCertificateSizeInBytes != nBytesWrittenToBio), "Writing to BIO buffer failed.", nullptr);
+    _ThrowBaseExceptionIf((static_cast<int>(gc_unInitializerTlsPublicKeyCertificateSizeInBytes) != nBytesWrittenToBio), "Writing to BIO buffer failed.", nullptr);
 
     std::unique_ptr<X509, decltype(&X509_free)> poX509Certificate(::PEM_read_bio_X509(poBio.get(), nullptr, nullptr, nullptr), ::X509_free);
     _ThrowIfNull(poX509Certificate, "Could not create certificate for TLS", nullptr);

@@ -57,8 +57,7 @@ char __stdcall GetCharacterInput(
     
     char cInputCharacter;
     bool fDone = false;
-    struct termios sOldTerminalSettings, sNewTerminalSettings;
-    
+
     // Print out the prompt
     std::cout << c_szPrompt << std::endl;
     
@@ -95,7 +94,6 @@ std::string __stdcall GetStringInput(
 
     std::string strInputString;
     bool fDone = false;
-    struct termios sOldTerminalSettings, sNewTerminalSettings;
     
     // Print out the prompt
     std::cout << c_szPrompt;

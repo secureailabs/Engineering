@@ -33,11 +33,11 @@ DataFederation::DataFederation(
     _in const std::string & strName,
     _in const std::string & strDescription
     ) :
+    m_fActive{true},
     m_oIdentifier{oIdentifier},
     m_oOrganizationOwnerIdentifier{oOrganizationOwnerIdentifier},
     m_strName{strName},
-    m_strDescription{strDescription},
-    m_fActive{true}
+    m_strDescription{strDescription}
 {
     __DebugFunction();
 
@@ -56,11 +56,11 @@ DataFederation::DataFederation(
 DataFederation::DataFederation(
     _in const StructuredBuffer & c_oSourceBuffer
     ):
+    m_fActive{c_oSourceBuffer.GetBoolean("DataFederationActive")},
     m_oIdentifier{c_oSourceBuffer.GetGuid("DataFederationIdentifier")},
     m_oOrganizationOwnerIdentifier{c_oSourceBuffer.GetGuid("DataFederationOwnerOrganizationIdentifier")},
     m_strName{c_oSourceBuffer.GetString("DataFederationName")},
-    m_strDescription{c_oSourceBuffer.GetString("DataFederationDescription")},
-    m_fActive{c_oSourceBuffer.GetBoolean("DataFederationActive")}
+    m_strDescription{c_oSourceBuffer.GetString("DataFederationDescription")}
 {
     __DebugFunction();
 

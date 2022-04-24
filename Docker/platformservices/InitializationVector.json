@@ -15,7 +15,7 @@
         "SubscriptionID": "3d2b9951-a0c8-4dc3-8114-2776b047b15c",
         "TenantID": "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8",
         "HostRegion": "eastus",
-        "VirtualMachineImageId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/VirtualMachineImageStorageRg/providers/Microsoft.Compute/images/securecomputationnode",
+        "VirtualMachineImageId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/NginxImageStorageRg/providers/Microsoft.Compute/images/securecomputationnode",
         "virtualNetworkId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
         "subnetName": "SCN_eastus",
         "ScnUsername": "sailuser",

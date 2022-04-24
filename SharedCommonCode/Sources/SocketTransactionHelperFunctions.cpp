@@ -2,7 +2,7 @@
  *
  * @file TlsHelperFunctions.cpp
  * @author Prawal Gangwar
- * @date 18 Feb 2021
+ * @date 18 Feb 2022
  * @License Private and Confidential. Internal Use Only.
  * @copyright Copyright (C) 2020 Secure AI Labs, Inc. All Rights Reserved.
  *
@@ -11,7 +11,7 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
-#include "TlsTransactionHelperFunctions.h"
+#include "SocketTransactionHelperFunctions.h"
 #include "HttpRequestParser.h"
 #include "JsonValue.h"
 
@@ -32,8 +32,8 @@
  *
  ********************************************************************************************/
 
-std::vector<Byte> __stdcall GetTlsTransaction(
-    _in TlsNode * poTlsNode,
+std::vector<Byte> __stdcall GetSocketTransaction(
+    _in Socket * poSocket,
     _in unsigned int unMillisecondTimeout
     )
 {
@@ -57,7 +57,7 @@ std::vector<Byte> __stdcall GetTlsTransaction(
         std::vector<Byte> stlHeaderData;
         do
         {
-            std::vector<Byte> stlBuffer = poTlsNode->Read(1, unMillisecondTimeout);
+            std::vector<Byte> stlBuffer = poSocket->Read(1, unMillisecondTimeout);
             if (0 < stlBuffer.size())
             {
                 stlHeaderData.push_back(stlBuffer.at(0));
@@ -85,13 +85,13 @@ std::vector<Byte> __stdcall GetTlsTransaction(
             {
                 std::vector<Byte> stlTemporaryBuffer;
 
-                stlTemporaryBuffer = poTlsNode->Read(sizeof(Qword), 1000);
+                stlTemporaryBuffer = poSocket->Read(sizeof(Qword), 1000);
                 _ThrowBaseExceptionIf((sizeof(Qword) != stlTemporaryBuffer.size()), "Failed to read data from the Tls tunnel", nullptr);
                 Qword qwHeadMarker = *((Qword *) stlTemporaryBuffer.data());
                 _ThrowBaseExceptionIf((0xFFEEDDCCBBAA0099 != qwHeadMarker), "Invalid head marker encountered.", nullptr);
 
                 // The timout here is again set to unMillisecondTimeout as the size of the data packet could be huge
-                stlTemporaryBuffer = poTlsNode->Read(sizeof(unsigned int), 1000);
+                stlTemporaryBuffer = poSocket->Read(sizeof(unsigned int), 1000);
                 _ThrowBaseExceptionIf((sizeof(unsigned int) != stlTemporaryBuffer.size()), "Failed to read data from the Tls tunnel", nullptr);
 
                 unsigned int unSizeInBytesOfSerializedTransactionBuffer = *((unsigned int *) stlTemporaryBuffer.data());
@@ -100,12 +100,12 @@ std::vector<Byte> __stdcall GetTlsTransaction(
                 {
                     // Don't worry about reading things in chunks and caching it since the TlsNode
                     // object does it for us!!!
-                    stlSerializedTransactionBuffer = poTlsNode->Read(unSizeInBytesOfSerializedTransactionBuffer, unMillisecondTimeout);
+                    stlSerializedTransactionBuffer = poSocket->Read(unSizeInBytesOfSerializedTransactionBuffer, unMillisecondTimeout);
                     _ThrowBaseExceptionIf(((0 != stlSerializedTransactionBuffer.size())&&(unSizeInBytesOfSerializedTransactionBuffer != stlSerializedTransactionBuffer.size())), "Failed to read data from the Tls tunnel", nullptr);
                 }
                 while (unSizeInBytesOfSerializedTransactionBuffer != stlSerializedTransactionBuffer.size());
 
-                stlTemporaryBuffer = poTlsNode->Read(sizeof(Qword), 1000);
+                stlTemporaryBuffer = poSocket->Read(sizeof(Qword), 1000);
                 _ThrowBaseExceptionIf((0 == stlTemporaryBuffer.size()), "Failed to read data from the Tls tunnel", nullptr);
                 Qword qwTailMarker = *((Qword *) stlTemporaryBuffer.data());
                 _ThrowBaseExceptionIf((0x0123456789ABCDEF != qwTailMarker), "Invalid marker encountered.", nullptr);
@@ -129,19 +129,19 @@ std::vector<Byte> __stdcall GetTlsTransaction(
                 unsigned int unSizeOfPayload = std::stoi(strStartOfValue.c_str());
 
                 // Read the data as the content lenght is now known
-                std::vector<Byte> stlFileToDownload = poTlsNode->Read(unSizeOfPayload, unMillisecondTimeout);
+                std::vector<Byte> stlFileToDownload = poSocket->Read(unSizeOfPayload, unMillisecondTimeout);
                 _ThrowBaseExceptionIf((unSizeOfPayload != stlFileToDownload.size()), "Read over Tls failed. Timeout", nullptr);
                 stlFileToDownload.push_back(0);
                 stlSerializedTransactionBuffer = JsonValue::ParseDataToStructuredBuffer((char *)stlFileToDownload.data());
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -160,13 +160,13 @@ std::vector<Byte> __stdcall GetTlsTransaction(
  *
  ********************************************************************************************/
 
-bool __stdcall PutTlsTransaction(
-    _in TlsNode * poTlsNode,
+bool __stdcall PutSocketTransaction(
+    _in Socket * poSocket,
     _in const std::vector<Byte> & c_stlSerializedBuffer
     ) throw()
 {
     __DebugFunction();
-    __DebugAssert(nullptr != poTlsNode);
+    __DebugAssert(nullptr != poSocket);
 
     bool fSuccess = false;
 
@@ -184,16 +184,16 @@ bool __stdcall PutTlsTransaction(
 
             // Send the protocol type first such that it can be differentiated from an HTTP packet
             std::string strStrucutredBufferProtocolHeader = "SSB PROTOCOL\r\n\r\n";
-            unNumberOfBytesWritten = (unsigned int)poTlsNode->Write((const Byte *)strStrucutredBufferProtocolHeader.c_str(), strStrucutredBufferProtocolHeader.length());
+            unNumberOfBytesWritten = (unsigned int)poSocket->Write((const Byte *)strStrucutredBufferProtocolHeader.c_str(), strStrucutredBufferProtocolHeader.length());
             _ThrowBaseExceptionIf((strStrucutredBufferProtocolHeader.length() != unNumberOfBytesWritten), "Failed to write the expected number of bytes into the Tls tunnel", nullptr);
 
-            unNumberOfBytesWritten = (unsigned int) poTlsNode->Write((const Byte *) &qwHeadMarker, sizeof(qwHeadMarker));
+            unNumberOfBytesWritten = (unsigned int) poSocket->Write((const Byte *) &qwHeadMarker, sizeof(qwHeadMarker));
             _ThrowBaseExceptionIf((sizeof(qwHeadMarker) != unNumberOfBytesWritten), "Failed to write the expected number of bytes into the Tls tunnel", nullptr);
-            unNumberOfBytesWritten = (unsigned int) poTlsNode->Write((const Byte *) &unSizeInBytesOfSerializedBuffer, sizeof(unSizeInBytesOfSerializedBuffer));
+            unNumberOfBytesWritten = (unsigned int) poSocket->Write((const Byte *) &unSizeInBytesOfSerializedBuffer, sizeof(unSizeInBytesOfSerializedBuffer));
             _ThrowBaseExceptionIf((sizeof(unSizeInBytesOfSerializedBuffer) != unNumberOfBytesWritten), "Failed to write the expected number of bytes into the Tls tunnel", nullptr);
-            unNumberOfBytesWritten = poTlsNode->Write((const Byte *) c_stlSerializedBuffer.data(), unSizeInBytesOfSerializedBuffer);
+            unNumberOfBytesWritten = poSocket->Write((const Byte *) c_stlSerializedBuffer.data(), unSizeInBytesOfSerializedBuffer);
             _ThrowBaseExceptionIf((unSizeInBytesOfSerializedBuffer != unNumberOfBytesWritten), "Failed to write the expected number of bytes into the Tls tunnel", nullptr);
-            unNumberOfBytesWritten = (unsigned int) poTlsNode->Write((const Byte *) &qwTailMarker, sizeof(qwTailMarker));
+            unNumberOfBytesWritten = (unsigned int) poSocket->Write((const Byte *) &qwTailMarker, sizeof(qwTailMarker));
             _ThrowBaseExceptionIf((sizeof(qwTailMarker) != unNumberOfBytesWritten), "Failed to write the expected number of bytes into the Tls tunnel", nullptr);
             fSuccess = true;
         }
@@ -211,92 +211,3 @@ bool __stdcall PutTlsTransaction(
 
     return fSuccess;
 }
-
-/********************************************************************************************
- *
- * @function PutTlsTransactionAndGetResponse
- * @brief Function used to send a Tls data packet over network and receive a response
- * @param[in] poTlsNode Pointer to the TlsNode object connected to remote node
- * @param[in] c_oTransaction StructuredBuffer with the request
- * @param[in] unMillisecondTimeout The timeout for the start of the packet. It should be
- *              noted that the timout is not the time it will spend to read, this is the
- *              time spent waiting for the first byte of this transaction.
- *              If this value is 0, the call waits for a packet indefinitely
- * @return Byte vector containing the data read.
- *
- ********************************************************************************************/
-
-std::vector<Byte> __stdcall PutTlsTransactionAndGetResponse(
-    _in TlsNode * poTlsNode,
-    _in const StructuredBuffer & c_oTransaction,
-    _in unsigned int unMillisecondTimeout
-    )
-{
-    __DebugFunction();
-
-    _ThrowBaseExceptionIf((false == ::PutTlsTransaction(poTlsNode, c_oTransaction)), "Failed to send Tls transaction", nullptr);
-
-    return ::GetTlsTransaction(poTlsNode, unMillisecondTimeout);
-}
-
-/********************************************************************************************
- *
- * @function PutTlsTransaction
- * @brief Function used to send a Tls data packet over network
- * @param[in] poTlsNode Pointer to the TlsNode object connected to remote node
- * @param[in] c_oTransaction StructuredBuffer with the request
- * @return true on success, otherwise false
- *
- ********************************************************************************************/
-
-bool __stdcall PutTlsTransaction(
-    _in TlsNode * poTlsNode,
-    _in const StructuredBuffer & c_oTransaction
-    ) throw()
-{
-    __DebugFunction();
-
-    return ::PutTlsTransaction(poTlsNode, c_oTransaction.GetSerializedBuffer());
-}
-
-/********************************************************************************************
- *
- * @function PutHttpHeadOnlyResponse
- * @brief Function to send a header only response through a TLS node
- * @param[in] oTlsNode Reference to the TlsNode object connected to remote node
- * @param[in] dStatus The numeric status code to send
- * @param[in] strStatus The string status to send
- * @return true on success, otherwise false
- *
- ********************************************************************************************/
-bool __stdcall PutHttpHeaderOnlyResponse(
-    _in TlsNode& oTlsNode,
-    _in Dword dStatus,
-    _in const std::string& strStatus
-    )
-{
-    __DebugFunction();
-
-    std::string strResponseHeader = "HTTP/1.1 "+ std::to_string(dStatus) + " " + strStatus +" \r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
-    oTlsNode.Write(reinterpret_cast<const Byte*>(strResponseHeader.c_str()), strResponseHeader.length());
-
-    return true;
-}
-
-
-bool __stdcall PutHttpHeaderOnlyResponse(
-    _in Socket& oSocket,
-    _in Dword dStatus,
-    _in const std::string& strStatus
-    )
-{
-    __DebugFunction();
-
-    std::string strResponseHeader = "HTTP/1.1 "+ std::to_string(dStatus) + " " + strStatus +" \r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
-    oSocket.Write(reinterpret_cast<const Byte*>(strResponseHeader.c_str()), strResponseHeader.length());
-
-    return true;
-}
-
-
-/********************************************************************************************/

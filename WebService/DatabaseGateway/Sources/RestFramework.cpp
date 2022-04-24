@@ -10,7 +10,6 @@
 
 #include "RestFramework.h"
 #include "ExceptionRegister.h"
-#include "TlsTransactionHelperFunctions.h"
 
 /********************************************************************************************/
 
@@ -73,12 +72,12 @@ RestFramework::RestFramework(
     gs_poRestFramework = this;
     if (nullptr == gs_poRestFramework)
     {
-      std::cout << "Null pointer" << std::endl;
+        std::cout << "Null pointer" << std::endl;
     }
 
     m_poDictionaryManager = new PluginDictionaryManager();
     this->LoadPlugins(c_strPluginFolderPath);
-    m_poTlsServer = new TlsServer(wPortNumber);
+    m_poRestServer = new SocketServer(wPortNumber);
 }
 
 /********************************************************************************************
@@ -105,7 +104,7 @@ RestFramework::RestFramework(
 
     m_poDictionaryManager = new PluginDictionaryManager();
     this->LoadPlugins(c_strPluginFolderPath);
-    m_poTlsServer = new TlsServer(c_szUnixSocketAddress);
+    m_poRestServer = new SocketServer(c_szUnixSocketAddress);
 }
 
 /********************************************************************************************
@@ -140,7 +139,7 @@ RestFramework::~RestFramework(void)
     __DebugFunction();
 
     m_poDictionaryManager->Release();
-    m_poTlsServer->Release();
+    m_poRestServer->Release();
     m_stlPluginHandles.clear();
 }
 
@@ -201,30 +200,30 @@ void __thiscall RestFramework::RunServer(void)
     {
         try
         {
-            if (true == m_poTlsServer->WaitForConnection(100))  // check if a connection and the resources are available
+            if (true == m_poRestServer->WaitForConnection(100))  // check if a connection and the resources are available
             {
-                TlsNode * poTlsNode = m_poTlsServer->Accept();
-                _ThrowIfNull(poTlsNode, "Could not establish connection", nullptr);
+                Socket * poSocket = m_poRestServer->Accept();
+                _ThrowIfNull(poSocket, "Could not establish connection", nullptr);
                 if (c_unActiveConnectionThreshold <= poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
                 {
                     std::cout << "There are " << poRestFrameworkRuntimeData->GetNumberOfActiveConnections() << " connections alive (max " << c_unActiveConnectionThreshold << ") refusing incoming connection" << std::endl;
                     StructuredBuffer oResponseStructuredBuffer;
                     oResponseStructuredBuffer.PutDword("Status", 503);
-                    ::PutDatabaseGatewayResponse(*poTlsNode, oResponseStructuredBuffer);
-                    poTlsNode->Release();
+                    ::PutDatabaseGatewayResponse(*poSocket, oResponseStructuredBuffer);
+                    poSocket->Release();
                 }
                 else
                 {
-                    poRestFrameworkRuntimeData->HandleConnection(poTlsNode);
+                    poRestFrameworkRuntimeData->HandleConnection(poSocket);
                 }
             }
         }
-        
+
         catch (const BaseException & c_oBaseException)
         {
             ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
-        
+
         catch (...)
         {
             ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -308,13 +307,13 @@ void __thiscall RestFramework::LoadPlugins(
  *
  * @function PutDatabaseGatewayResponse
  * @brief Function to send a serialized StructuredBuffer through a TLS node
- * @param[in] oTlsNode Reference to the TlsNode object connected to remote node
+ * @param[in] oSocket Reference to the Socket object connected to remote node
  * @param[in] oStructuredBuffer The StructuredBuffer to send
  * @return true on success, otherwise false
  *
  ********************************************************************************************/
 bool __stdcall PutDatabaseGatewayResponse(
-    _in TlsNode& oTlsNode,
+    _in Socket& oSocket,
     _in const StructuredBuffer& oStructuredBuffer
     )
 {
@@ -331,16 +330,16 @@ bool __stdcall PutDatabaseGatewayResponse(
         pbSerializedBuffer += oStructuredBuffer.GetSerializedBufferRawDataSizeInBytes();
 
         // Send back response data
-        oTlsNode.Write((const Byte *)stlSerializedBuffer.data(), stlSerializedBuffer.size());
+        oSocket.Write((const Byte *)stlSerializedBuffer.data(), stlSerializedBuffer.size());
         fResult = true;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         fResult = false;
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

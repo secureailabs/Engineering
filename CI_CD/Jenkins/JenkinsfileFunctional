@@ -26,8 +26,6 @@ pipeline {
                     sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Docker/platformservices/InitializationVector.json
                     grep '"Owner": "Nightly"' ./Docker/platformservices/InitializationVector.json
                     make all -j
-                    cp ./Binary/SecureComputationNode.tar.gz ./Binary/platformservices
-                    cp ./Binary/DatabaseTools ./Binary/platformservices
                     '''
                 }
             }
@@ -117,17 +115,18 @@ pipeline {
                     try {
                         echo 'Load Database'
                         sh '''
+                        cd Binary/
                         docker exec -w /app platformservices sh -c "pwd"
                         docker exec -w /app platformservices sh -c "ls -l"
                         docker exec -w /app platformservices sh -c "ps -ef"
-                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        ./DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200
                         '''
                     } catch (exception) {
                         echo getStackTrace(exception)
                         echo 'Error detected, retrying...'
                         sh '''
-                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d"
-                        docker exec -w /app platformservices sh -c "./DatabaseTools --PortalIp=127.0.0.1 --Port=6200"
+                        ./DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d
+                        ./DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200
                         '''
                     }
                 }
@@ -174,8 +173,8 @@ pipeline {
                     echo 'End of stage test in Run SAILTAP!'
                     sh'''
                     docker cp ubuntu_tst_bash:/Test/test-results.xml .
-                    docker cp platformservices:/app/restportal.log .
-                    docker cp dataservices:/app/databasegateway.log .
+                    docker cp platformservices:/app/Binary/platformservices/restportal.log .'
+                    docker cp dataservices:/app/Binary/platformservices/databasegateway.log .
                     '''
                     junit '*.xml'
                     archiveArtifacts artifacts: '*.log'

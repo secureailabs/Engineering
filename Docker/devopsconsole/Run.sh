@@ -24,7 +24,7 @@ mv InitializationVector.json DevopsConsole/
 
 # Run the docker container
 docker run \
-  -it \
+  -dit \
   --rm \
   -v $(pwd)/DevopsConsole:/app \
   -v $(pwd)/DevopsConsole/nginx:/etc/nginx/conf.d \

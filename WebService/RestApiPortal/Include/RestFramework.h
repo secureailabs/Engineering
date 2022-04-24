@@ -24,7 +24,7 @@
 #include "RestFrameworkRuntimeData.h"
 #include "RestFrameworkSharedFunctions.h"
 #include "StructuredBuffer.h"
-#include "TlsServer.h"
+#include "SocketServer.h"
 
 #include <unistd.h>
 #include <uuid/uuid.h>
@@ -84,7 +84,7 @@ class RestFramework : public Object
 
         // Private data members
         std::vector<void *> m_stlPluginHandles;
-        TlsServer * m_poTlsServer;
+        SocketServer * m_poSocketServer;
         PluginDictionaryManager * m_poDictionaryManager;
         StructuredBuffer m_oPluginInitializationVectors;
 };

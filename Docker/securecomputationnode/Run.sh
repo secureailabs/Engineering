@@ -20,13 +20,18 @@ else
     exit 1
 fi
 
-# Move the InitializerVector to the Binary folder
-mv InitializationVector.json Binary/
+# Create a folder to hold all the Binaries
+mkdir -p "$imageName"_dir
+
+# Copy the binaries to the folder
+cp BaseVmImageInit "$imageName"_dir/
 
 # Run the docker container
 docker run \
 -dit \
 -p 3500:3500 \
--p 6800:6800 \
--v $(pwd)/Binary:/app \
+-p 6800:6801 \
+-p 9090:9091 \
+-v $(pwd)/"$imageName"_dir:/app \
+-v $(pwd)/certs:/etc/nginx/certs \
 $imageName

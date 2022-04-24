@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Recreate config file
-rm -rf /app/client/build/_snowpack/env.js
-touch /app/client/build/_snowpack/env.js
+rm -rf client/build/_snowpack/env.js
+touch client/build/_snowpack/env.js
 
 # Add assignment
 echo "export const MODE = 'production';
 export const NODE_ENV = 'production';
-export const SSR = false;" >> /app/client/build/_snowpack/env.js
+export const SSR = false;" >> client/build/_snowpack/env.js
 
 # Read each line in .env file
 # Each line represents key=value pairs
@@ -25,7 +25,7 @@ do
   [[ -z $value ]] && value=${varvalue}
 
   # Append configuration property to JS file
-  echo "export const $varname = \"$value\";" >> /app/client/build/_snowpack/env.js
-done < /app/client/.env
+  echo "export const $varname = \"$value\";" >> client/build/_snowpack/env.js
+done < client/.env
 
-echo "" >> /app/client/build/_snowpack/env.js
+echo "" >> client/build/_snowpack/env.js

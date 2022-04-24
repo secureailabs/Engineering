@@ -5,7 +5,7 @@
  * @date 09 Oct 2020
  * @License Private and Confidential. Internal Use Only.
  * @copyright Copyright (C) 2020 Secure AI Labs, Inc. All Rights Reserved.
- * @brief Implementation of the TlsServer class that is used to create TLS Servers
+ * @brief Implementation of the ThreadManager class that is used to mnaage the threads
  *
  ********************************************************************************************/
 

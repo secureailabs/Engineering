@@ -12,16 +12,18 @@ sudo docker run hello-world
 echo "Printing the current module"
 echo $module
 
-# To cleanup the user details
+mkdir -p /opt/certs
+cp nginx-selfsigned.crt /opt/certs
+cp nginx-selfsigned.key /opt/certs
 cp BaseVmImageInit /opt/
 cp Run.sh /opt/
-cp StartVirtualMachine.sh /opt/
 chmod +x /opt/Run.sh
-chmod +x /opt/StartVirtualMachine.sh
 chmod +x /opt/BaseVmImageInit
+
 
 docker build . -t $module
 
-(crontab -l; echo "@reboot cd /opt; sudo ./StartVirtualMachine.sh > VmImageInit.log") | crontab -
+(crontab -l; echo "@reboot cd /opt; sudo ./Run.sh > VmImageInit.log") | crontab -
 
+# To cleanup the user details
 /usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync

@@ -61,9 +61,7 @@ make package_dataservices -j
 make package_securecomputationnode -j
 make uploadPackageAndInitializationVector -j
 make demoDatabaseTools -j
-
-# Build and Package the Frontend Services
-make package_webfrontend
+make package_webfrontend -j
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir

@@ -81,7 +81,7 @@ RestFramework::RestFramework(
 
     m_poDictionaryManager = new PluginDictionaryManager();
     this->LoadPlugins(c_strPluginFolderPath);
-    m_poTlsServer = new TlsServer(wPortNumber);
+    m_poSocketServer = new SocketServer(wPortNumber);
 }
 
 /********************************************************************************************
@@ -108,7 +108,7 @@ RestFramework::RestFramework(
 
     m_poDictionaryManager = new PluginDictionaryManager();
     this->LoadPlugins(c_strPluginFolderPath);
-    m_poTlsServer = new TlsServer(c_szUnixSocketAddress);
+    m_poSocketServer = new SocketServer(c_szUnixSocketAddress);
 }
 
 /********************************************************************************************
@@ -143,7 +143,7 @@ RestFramework::~RestFramework(void)
     __DebugFunction();
 
     m_poDictionaryManager->Release();
-    m_poTlsServer->Release();
+    m_poSocketServer->Release();
     m_stlPluginHandles.clear();
 }
 
@@ -204,28 +204,28 @@ void __thiscall RestFramework::RunServer(void)
     {
         try
         {
-            if (true == m_poTlsServer->WaitForConnection(100))  // check if a connection and the resources are available
+            if (true == m_poSocketServer->WaitForConnection(100))  // check if a connection and the resources are available
             {
-                TlsNode * poTlsNode = m_poTlsServer->Accept();
-                _ThrowIfNull(poTlsNode, "Could not establish connection", nullptr);
+                Socket * poSocket = m_poSocketServer->Accept();
+                _ThrowIfNull(poSocket, "Could not establish connection", nullptr);
                 if (c_unActiveConnectionThreshold <= poRestFrameworkRuntimeData->GetNumberOfActiveConnections())
                 {
                     std::cout << "There are " << poRestFrameworkRuntimeData->GetNumberOfActiveConnections() << " connections alive (max " << c_unActiveConnectionThreshold << ") refusing incoming connection" << std::endl;
-                    PutHttpHeaderOnlyResponse(*poTlsNode, eServiceUnavailable, g_stlHttpCodes[eServiceUnavailable]);
-                    poTlsNode->Release();
+                    PutHttpHeaderOnlyResponse(*poSocket, eServiceUnavailable, g_stlHttpCodes[eServiceUnavailable]);
+                    poSocket->Release();
                 }
                 else
                 {
-                    poRestFrameworkRuntimeData->HandleConnection(poTlsNode);
+                    poRestFrameworkRuntimeData->HandleConnection(poSocket);
                 }
             }
         }
-        
+
         catch (const BaseException & c_oBaseException)
         {
             ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
         }
-        
+
         catch (...)
         {
             ::RegisterUnknownException(__func__, __FILE__, __LINE__);

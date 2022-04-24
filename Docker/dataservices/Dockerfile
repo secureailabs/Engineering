@@ -18,6 +18,7 @@ RUN apt-get update && \
   make \
   build-essential \
   libcurl4-gnutls-dev \
+  nginx \
   python3-pip && \
   rm -rf /var/lib/apt/lists/*
 
@@ -26,5 +27,7 @@ RUN chmod +x /install.sh && /install.sh
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
+
+COPY nginx.conf /etc/nginx/nginx.conf
 
 CMD ["/bin/bash", "/Entrypoint.sh"]

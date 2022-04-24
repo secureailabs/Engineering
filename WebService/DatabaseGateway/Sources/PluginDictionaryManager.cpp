@@ -91,7 +91,7 @@ bool __thiscall PluginDictionaryManager::RegisterPlugin(
 
         if (0 >= oPluginStructuredBuffer.GetSerializedBufferRawDataSizeInBytes())
         {
-          __DebugError("%s", "Error: Invalid plugin dictionary.");
+            __DebugError("%s", "Error: Invalid plugin dictionary.");
         }
 
         // Save the plugin structured buffer

@@ -12,6 +12,10 @@
 #include "IpcTransactionHelperFunctions.h"
 #include "SocketClient.h"
 #include "TlsClient.h"
+#include "CurlRest.h"
+#include "JsonParser.h"
+
+#include "stdlib.h"
 
 static DatasetDatabase * gs_oDatasetDatabase = nullptr;
 
@@ -345,6 +349,8 @@ uint64_t __thiscall DatasetDatabase::SubmitRequest(
     // in order to speed up comparison. String comparisons WAY expensive.
     std::vector<Byte> stlResponseBuffer;
 
+    // std::cout << c_oRequestStructuredBuffer.ToString() << std::endl << std::endl;
+
     // Route to the requested resource
     if ("GET" == strVerb)
     {
@@ -371,6 +377,8 @@ uint64_t __thiscall DatasetDatabase::SubmitRequest(
             stlResponseBuffer = this->DeleteDataset(c_oRequestStructuredBuffer);
         }
     }
+
+    // std::cout << "Response: " << StructuredBuffer(stlResponseBuffer).ToString() << std::endl << std::endl;
 
     // Return size of response buffer
     *punSerializedResponseSizeInBytes = stlResponseBuffer.size();
@@ -563,7 +571,7 @@ std::vector<Byte> __thiscall DatasetDatabase::GetListOfAvailableDatasets(
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -613,7 +621,7 @@ std::vector<Byte> __thiscall DatasetDatabase::PullDataset(
     Dword dwStatus = 404;
     TlsNode * poTlsNode = nullptr;
 
-    try 
+    try
     {
         // Get user information to check if the user is a digital contract admin or database admin
         StructuredBuffer oUserInfo(this->GetUserInfo(c_oRequest));
@@ -701,50 +709,53 @@ std::vector<Byte> __thiscall DatasetDatabase::RegisterDataset(
     Dword dwStatus = 404;
     TlsNode * poTlsNode = nullptr;
 
-    try 
+    try
     {
         StructuredBuffer oUserInfo = this->GetUserInfo(c_oRequest);
         if (200 == oUserInfo.GetDword("Status"))
         {
-            // TODO: Verify that the user is a "DatasetAdmin"
-            // Make a Tls connection with the database portal
-            poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
-            // Create a request to add dataset metadata to the database
-            StructuredBuffer oRequest;
-            oRequest.PutString("PluginName", "DatabaseManager");
-            oRequest.PutString("Verb", "POST");
-            oRequest.PutString("Resource", "/SAIL/DatabaseManager/RegisterDataset");
-            oRequest.PutString("DatasetGuid", c_oRequest.GetString("DatasetGuid"));
-            oRequest.PutString("DataOwnerGuid", oUserInfo.GetGuid("OrganizationGuid").ToString(eHyphensAndCurlyBraces));
-            oRequest.PutStructuredBuffer("DatasetData", c_oRequest.GetStructuredBuffer("DatasetData"));
-            std::vector<Byte> stlRequest = ::CreateRequestPacket(oRequest);
-            // Send request packet
-            poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
+            std::vector<std::string> stlHeader;
+            long nResponseCode = 200;
+            std::map<std::string, std::string> * stlMapOfHeaders;
 
-            // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
-            _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-            unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
-            _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
-            // Make sure to release the poTlsNode
-            poTlsNode->Release();
-            poTlsNode = nullptr;
-            
+            StructuredBuffer oCopy = c_oRequest;
+            StructuredBuffer oCopyDataset = c_oRequest.GetStructuredBuffer("DatasetData");
+            StructuredBuffer oTablesList = c_oRequest.GetStructuredBuffer("DatasetData").GetStructuredBuffer("Tables");
+            StructuredBuffer oNewTablers;
+            oNewTablers.PutBoolean("__IsArray__", true);
+            int i = 0;
+            for (auto tableId : oTablesList.GetNamesOfElements())
+            {
+                oNewTablers.PutStructuredBuffer(std::to_string(i).c_str(), oTablesList.GetStructuredBuffer(tableId.c_str()));
+                i++;
+            }
+
+            oCopyDataset.PutStructuredBuffer("Tables", oNewTablers);
+            oCopy.PutStructuredBuffer("DatasetData", oCopyDataset);
+
+            StructuredBuffer oRequest;
+            oRequest.PutStructuredBuffer("Eosb", oUserInfo);
+            oRequest.PutString("DatasetGuid", c_oRequest.GetString("DatasetGuid"));
+            oRequest.PutStructuredBuffer("DatasetData", oCopy.GetStructuredBuffer("DatasetData"));
+
+            std::string strRestRequest = ::ConvertStructuredBufferToJson(oRequest);
+            std::cout << strRestRequest << std::endl;
+            auto stlResponse = ::RestApiCallHTTP("127.0.0.1", 6001, "POST", "/dataset", strRestRequest, true, stlHeader, &nResponseCode);
+            std::cout << stlResponse.data() << std::endl;
             // Check if DatabaseManager registered the dataset or not
-            StructuredBuffer oDatabaseResponse(stlResponse);
-            if (201 == oDatabaseResponse.GetDword("Status") )
+            // StructuredBuffer oDatabaseResponse(stlResponse);
+            if (200 == nResponseCode)
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
                 dwStatus = 201;
             }
             else
             {
-                dwStatus = oDatabaseResponse.GetDword("Status");
+                // dwStatus = oDatabaseResponse.GetDword("Status");
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -755,7 +766,7 @@ std::vector<Byte> __thiscall DatasetDatabase::RegisterDataset(
             dwStatus = 408;
         }
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

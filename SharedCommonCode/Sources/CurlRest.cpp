@@ -382,3 +382,85 @@ std::vector<Byte> __stdcall RestApiCall(
 
     return stlResponse;
 }
+
+
+std::vector<Byte> __stdcall RestApiCallHTTP(
+    _in const std::string & c_strHostIpAddress,
+    _in const Word nPort,
+    _in const std::string & c_strVerb,
+    _in const std::string & c_strApiUri,
+    _in const std::string & c_strContent,
+    _in bool fDisableSslCertificateVerification,
+    _in const std::vector<std::string> & c_stlListOfHeaders,
+    _out long * nResponseCode
+    ) throw()
+{
+    __DebugFunction();
+
+    std::vector<Byte> stlResponse;
+
+    try
+    {
+        // Initialize CURL
+        CURL * psCurl = nullptr;
+        ::curl_global_init(CURL_GLOBAL_DEFAULT);
+        psCurl = ::curl_easy_init();
+        _ThrowBaseExceptionIf((nullptr == psCurl), "curl_easy_init() has failed", nullptr);
+
+        // Disable diagnostic messages
+        ::curl_easy_setopt(psCurl, CURLOPT_VERBOSE, 0L);
+
+        std::string strUrl = "http://" + c_strHostIpAddress + ":" + std::to_string(nPort) + c_strApiUri;
+        ::curl_easy_setopt(psCurl, CURLOPT_CUSTOMREQUEST, c_strVerb.c_str());
+        ::curl_easy_setopt(psCurl, CURLOPT_URL, strUrl.c_str());
+        ::curl_easy_setopt(psCurl, CURLOPT_POSTFIELDS, c_strContent.c_str());
+
+        // Disaling the SSL certificate verification
+        if (true == fDisableSslCertificateVerification)
+        {
+            ::curl_easy_setopt(psCurl, CURLOPT_SSL_VERIFYPEER, 0L); //only for https
+            ::curl_easy_setopt(psCurl, CURLOPT_SSL_VERIFYHOST, 0L); //only for https
+        }
+
+        // Setup callback for Header Write
+        ::curl_easy_setopt(psCurl, CURLOPT_HEADERFUNCTION, CurlHeaderWriteCallback);
+        std::map<std::string, std::string> stlMapOfHeaders;
+        ::curl_easy_setopt(psCurl, CURLOPT_HEADERDATA, &stlMapOfHeaders);
+        // Setup callback function for the response body
+        ::curl_easy_setopt(psCurl, CURLOPT_WRITEFUNCTION, CurlWriteCallback);
+        ::curl_easy_setopt(psCurl, CURLOPT_WRITEDATA, &stlResponse);
+        struct curl_slist * psHeaders = nullptr;
+        // Append all the headers to the request
+        for (const std::string & c_strSingleHeader : c_stlListOfHeaders)
+        {
+            psHeaders = ::curl_slist_append(psHeaders, c_strSingleHeader.c_str());
+        }
+        ::curl_easy_setopt(psCurl, CURLOPT_HTTPHEADER, psHeaders);
+
+        // Execute the API call
+        unsigned int unResponse = ::curl_easy_perform(psCurl);
+        ::curl_easy_cleanup(psCurl);
+        stlResponse.insert(stlResponse.end(), 0);
+        if (CURLE_OK == unResponse)
+        {
+            // Save the response HTTP code
+            if (nullptr != nResponseCode)
+            {
+                ::curl_easy_getinfo(psCurl, CURLINFO_RESPONSE_CODE, nResponseCode);
+            }
+        }
+    }
+
+    catch (const BaseException & c_oBaseException)
+    {
+        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
+    }
+
+    catch (...)
+    {
+        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
+    }
+
+    return stlResponse;
+}
+

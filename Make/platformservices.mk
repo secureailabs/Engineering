@@ -7,6 +7,7 @@ WebService/Plugins/RestApiPortal/CryptographicKeyManagement \
 WebService/Plugins/RestApiPortal/AuditLogManager \
 WebService/Plugins/RestApiPortal/RemoteDataConnectorManager \
 WebService/Plugins/RestApiPortal/DatasetDatabase \
+WebService/Plugins/RestApiPortal/DatasetFast \
 WebService/Plugins/RestApiPortal/AccountDatabase \
 WebService/Plugins/RestApiPortal/DigitalContractDatabase \
 WebService/Plugins/RestApiPortal/DataFederationManager \

@@ -24,6 +24,9 @@ RUN rm -rf /var/lib/apt/lists/*
 COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY install.sh /install.sh
+RUN chmod +x /install.sh && /install.sh
+
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

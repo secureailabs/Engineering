@@ -264,31 +264,6 @@ class DatabaseManager : public Object
             _in const StructuredBuffer & c_oRequest
             );
 
-        // Get dataset name associated to a guid
-        std::vector<Byte> __thiscall GetDatasetName(
-            _in const StructuredBuffer & c_oRequest
-            );
-
-        // Fetch list of all available datasets
-        std::vector<Byte> __thiscall ListDatasets(
-            _in const StructuredBuffer & c_oRequest
-            );
-
-        // Fetch the dataset information
-        std::vector<Byte> __thiscall PullDataset(
-            _in const StructuredBuffer & c_oRequest
-            );
-
-        // Register a dataset
-        std::vector<Byte> __thiscall RegisterDataset(
-            _in const StructuredBuffer & c_oRequest
-            );
-
-        // Delete a dataset 
-        std::vector<Byte> __thiscall DeleteDataset(
-            _in const StructuredBuffer & c_oRequest
-            );
-
         // Fetch list of azure settings templates
         std::vector<Byte> __thiscall ListAzureTemplates(
             _in const StructuredBuffer & c_oRequest

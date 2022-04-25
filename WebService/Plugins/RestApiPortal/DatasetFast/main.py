@@ -3,7 +3,7 @@ from typing import List
 from fastapi import Body
 import motor.motor_asyncio
 from fastapi.encoders import jsonable_encoder
-from models import Dataset_Db, RegisterDataset_Out, RegisterDataset_In
+from models import Dataset_Db, GetDataset_In, GetDataset_Out, RegisterDataset_Out, RegisterDataset_In
 
 
 client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://127.0.0.1:27017/")
@@ -20,18 +20,18 @@ async def post_dataset(dataset: RegisterDataset_In = Body(...)):
     return dataset_db
 
 
-@server.get("/datasets", response_description="Get all datasets", response_model=List[Dataset_Db])
-async def get_datasets():
-    created_dataset = await db["datasets"].find().to_list(None)
-    return created_dataset
+@server.get("/datasets", response_description="Get all datasets", response_model=List[GetDataset_Out])
+async def get_datasets(request: GetDataset_In = Body(...)):
+    fetched_datasets = await db["datasets"].find().to_list(None)
+    return fetched_datasets
 
 
-@server.get("/dataset/{id}")
-async def get_dataset(request: RegisterDataset_In = Body(...)):
-    created_dataset = await db["datasets"].find_one({"DatasetGuid": request.DatasetGuid})
+@server.get("/dataset/{id}", response_description="Get dataset by id", response_model=GetDataset_Out)
+async def get_dataset(id: str, request: GetDataset_In = Body(...)):
+    created_dataset = await db["datasets"].find_one({"DatasetGuid": id})
     return created_dataset
 
 
 @server.delete("/dataset/{id}")
-async def delete_dataset(request: RegisterDataset_In = Body(...)):
-    return {"ping": "pong!"}
+async def delete_dataset(id: str, request: RegisterDataset_In = Body(...)):
+    await db["datasets"].delete_one({"DatasetGuid": id})

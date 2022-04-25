@@ -349,8 +349,6 @@ uint64_t __thiscall DatasetDatabase::SubmitRequest(
     // in order to speed up comparison. String comparisons WAY expensive.
     std::vector<Byte> stlResponseBuffer;
 
-    // std::cout << c_oRequestStructuredBuffer.ToString() << std::endl << std::endl;
-
     // Route to the requested resource
     if ("GET" == strVerb)
     {
@@ -377,8 +375,6 @@ uint64_t __thiscall DatasetDatabase::SubmitRequest(
             stlResponseBuffer = this->DeleteDataset(c_oRequestStructuredBuffer);
         }
     }
-
-    // std::cout << "Response: " << StructuredBuffer(stlResponseBuffer).ToString() << std::endl << std::endl;
 
     // Return size of response buffer
     *punSerializedResponseSizeInBytes = stlResponseBuffer.size();
@@ -535,38 +531,27 @@ std::vector<Byte> __thiscall DatasetDatabase::GetListOfAvailableDatasets(
     Dword dwStatus = 404;
     TlsNode * poTlsNode = nullptr;
 
-    try 
+    try
     {
         // Get user information to check if the user is a digital contract admin or database admin
         StructuredBuffer oUserInfo(this->GetUserInfo(c_oRequest));
         if (200 == oUserInfo.GetDword("Status"))
         {
-            // Make a Tls connection with the database portal
-            poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
-            // Create a request to list of all datasets
+            long nResponseCode = 0;
+            std::vector<std::string> stlHeader;
+            stlHeader.push_back("Content-Type: application/json");
+
             StructuredBuffer oRequest;
-            oRequest.PutString("PluginName", "DatabaseManager");
-            oRequest.PutString("Verb", "GET");
-            oRequest.PutString("Resource", "/SAIL/DatabaseManager/ListDatasets");
-            std::vector<Byte> stlRequest = ::CreateRequestPacket(oRequest);
-            // Send request packet
-            poTlsNode->Write(stlRequest.data(), stlRequest.size());
+            oRequest.PutStructuredBuffer("Eosb", oUserInfo);
+            std::string strRestRequest = ::ConvertStructuredBufferToJson(oRequest);
 
-            // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 3000);
-            _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-            unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
-            _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
-            // Make sure to release the poTlsNode
-            poTlsNode->Release();
-            poTlsNode = nullptr;
+            auto stlResponse = ::RestApiCallHTTP("127.0.0.1", 6001, "GET", "/dataset/"+c_oRequest.GetString("DatasetGuid"), strRestRequest, true, stlHeader, &nResponseCode);
 
-            StructuredBuffer oDatabaseResponse(stlResponse);
-            if (200 == oDatabaseResponse.GetDword("Status"))
+            StructuredBuffer oDatabaseResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
+            if (200 == nResponseCode)
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
-                oResponse.PutStructuredBuffer("Datasets", oDatabaseResponse.GetStructuredBuffer("Datasets"));
+                oResponse.PutStructuredBuffer("Dataset", oDatabaseResponse);
                 dwStatus = 200;
             }
         }
@@ -582,7 +567,7 @@ std::vector<Byte> __thiscall DatasetDatabase::GetListOfAvailableDatasets(
             dwStatus = 408;
         }
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -627,30 +612,18 @@ std::vector<Byte> __thiscall DatasetDatabase::PullDataset(
         StructuredBuffer oUserInfo(this->GetUserInfo(c_oRequest));
         if (200 == oUserInfo.GetDword("Status"))
         {
-            // Make a Tls connection with the database portal
-            poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
-            // Create a request to get metadata of the dataset
+            long nResponseCode = 0;
+            std::vector<std::string> stlHeader;
+            stlHeader.push_back("Content-Type: application/json");
+
             StructuredBuffer oRequest;
-            oRequest.PutString("PluginName", "DatabaseManager");
-            oRequest.PutString("Verb", "GET");
-            oRequest.PutString("Resource", "/SAIL/DatabaseManager/PullDataset");
-            oRequest.PutString("DatasetGuid", c_oRequest.GetString("DatasetGuid"));
-            std::vector<Byte> stlRequest = ::CreateRequestPacket(oRequest);
-            // Send request packet
-            poTlsNode->Write(stlRequest.data(), stlRequest.size());
+            oRequest.PutStructuredBuffer("Eosb", oUserInfo);
+            std::string strRestRequest = ::ConvertStructuredBufferToJson(oRequest);
 
-            // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
-            _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-            unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
-            _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
-            // Make sure to release the poTlsNode
-            poTlsNode->Release();
-            poTlsNode = nullptr;
+            auto stlResponse = ::RestApiCallHTTP("127.0.0.1", 6001, "GET", "/dataset/"+c_oRequest.GetString("DatasetGuid"), strRestRequest, true, stlHeader, &nResponseCode);
 
-            StructuredBuffer oDatabaseResponse(stlResponse);
-            if (200 == oDatabaseResponse.GetDword("Status"))
+            StructuredBuffer oDatabaseResponse = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
+            if (200 == nResponseCode)
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
                 oResponse.PutStructuredBuffer("Dataset", oDatabaseResponse.GetStructuredBuffer("Dataset"));
@@ -715,6 +688,8 @@ std::vector<Byte> __thiscall DatasetDatabase::RegisterDataset(
         if (200 == oUserInfo.GetDword("Status"))
         {
             std::vector<std::string> stlHeader;
+            stlHeader.push_back("Content-Type: application/json");
+
             long nResponseCode = 200;
             std::map<std::string, std::string> * stlMapOfHeaders;
 
@@ -729,7 +704,6 @@ std::vector<Byte> __thiscall DatasetDatabase::RegisterDataset(
                 oNewTablers.PutStructuredBuffer(std::to_string(i).c_str(), oTablesList.GetStructuredBuffer(tableId.c_str()));
                 i++;
             }
-
             oCopyDataset.PutStructuredBuffer("Tables", oNewTablers);
             oCopy.PutStructuredBuffer("DatasetData", oCopyDataset);
 
@@ -739,11 +713,9 @@ std::vector<Byte> __thiscall DatasetDatabase::RegisterDataset(
             oRequest.PutStructuredBuffer("DatasetData", oCopy.GetStructuredBuffer("DatasetData"));
 
             std::string strRestRequest = ::ConvertStructuredBufferToJson(oRequest);
-            std::cout << strRestRequest << std::endl;
             auto stlResponse = ::RestApiCallHTTP("127.0.0.1", 6001, "POST", "/dataset", strRestRequest, true, stlHeader, &nResponseCode);
-            std::cout << stlResponse.data() << std::endl;
+
             // Check if DatabaseManager registered the dataset or not
-            // StructuredBuffer oDatabaseResponse(stlResponse);
             if (200 == nResponseCode)
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
@@ -751,7 +723,7 @@ std::vector<Byte> __thiscall DatasetDatabase::RegisterDataset(
             }
             else
             {
-                // dwStatus = oDatabaseResponse.GetDword("Status");
+                dwStatus = 400;
             }
         }
     }
@@ -806,7 +778,7 @@ std::vector<Byte> __thiscall DatasetDatabase::DeleteDataset(
     Dword dwStatus = 404;
     TlsNode * poTlsNode = nullptr;
 
-    try 
+    try
     {
         // Verify that the user is a "DatasetAdmin"
         StructuredBuffer oUserInfo(this->GetUserInfo(c_oRequest));
@@ -814,28 +786,15 @@ std::vector<Byte> __thiscall DatasetDatabase::DeleteDataset(
         {
             if (AccessRights::eDatasetAdmin == oUserInfo.GetQword("AccessRights"))
             {
-                // Make a Tls connection with the database portal
-                poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
-                // Create a request to delete the dataset
-                StructuredBuffer oRequest;
-                oRequest.PutString("PluginName", "DatabaseManager");
-                oRequest.PutString("Verb", "DELETE");
-                oRequest.PutString("Resource", "/SAIL/DatabaseManager/DeleteDataset");
-                oRequest.PutString("DatasetGuid", c_oRequest.GetString("DatasetGuid"));
-                oRequest.PutString("DataOwnerGuid", oUserInfo.GetGuid("OrganizationGuid").ToString(eHyphensAndCurlyBraces));
-                std::vector<Byte> stlRequest = ::CreateRequestPacket(oRequest);
-                // Send request packet
-                poTlsNode->Write(stlRequest.data(), stlRequest.size());
+                long nResponseCode = 0;
+                std::vector<std::string> stlHeader;
+                stlHeader.push_back("Content-Type: application/json");
 
-                // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
-                _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-                unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
-                _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
-                // Make sure to release the poTlsNode
-                poTlsNode->Release();
-                poTlsNode = nullptr;
+                StructuredBuffer oRequest;
+                oRequest.PutStructuredBuffer("Eosb", oUserInfo);
+                std::string strRestRequest = ::ConvertStructuredBufferToJson(oRequest);
+
+                auto stlResponse = ::RestApiCallHTTP("127.0.0.1", 6001, "DELETE", "/dataset/"+c_oRequest.GetString("DatasetGuid"), strRestRequest, true, stlHeader, &nResponseCode);
 
                 StructuredBuffer oDatabaseResponse(stlResponse);
                 if (200 == oDatabaseResponse.GetDword("Status"))
@@ -846,7 +805,7 @@ std::vector<Byte> __thiscall DatasetDatabase::DeleteDataset(
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);

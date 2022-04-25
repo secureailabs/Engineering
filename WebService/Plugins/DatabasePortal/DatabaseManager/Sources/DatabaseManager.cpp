@@ -216,12 +216,6 @@ void __thiscall DatabaseManager::InitializePlugin(void)
     m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/Users");
     // Fetch a list of all users for an organizations
     m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/OrganizationUsers");
-    // Get dataset name associated with the dataset guid
-    m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/GetDatasetName");
-    // Fetch list of all datasets
-    m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/ListDatasets");
-    // Get a dataset's information
-    m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/PullDataset");
     // Get a list of digital contracts associated with a user's organization
     m_oDictionary.AddDictionaryEntry("GET", "/SAIL/DatabaseManager/ListDigitalContracts");
     // Get a digital contract's information
@@ -250,8 +244,6 @@ void __thiscall DatabaseManager::InitializePlugin(void)
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterOrganization");
     // Add a new user
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterUser");
-    // Add metadata of a dataset to the database
-    m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterDataset");
     // Add metadata of a new virtual machine to the database
     m_oDictionary.AddDictionaryEntry("POST", "/SAIL/DatabaseManager/RegisterVirtualMachine");
     // Takes in an EOSB and create a digital contract for a chosen dataset
@@ -282,8 +274,6 @@ void __thiscall DatabaseManager::InitializePlugin(void)
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/DeleteUser");
     // Delete an organization and its users from the database
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/DeleteOrganization");
-    // Delete a dataset record from the database
-    m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/DeleteDataset");
     // Delete an Azure template record from the database
     m_oDictionary.AddDictionaryEntry("DELETE", "/SAIL/DatabaseManager/DeleteAzureTemplate");
     // Remove VM information as waiting for data
@@ -362,18 +352,6 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             else if ("/SAIL/DatabaseManager/OrganizationUsers" == strResource)
             {
                 stlResponseBuffer = this->ListOrganizationUsers(c_oRequestStructuredBuffer);
-            }
-            else if ("/SAIL/DatabaseManager/GetDatasetName" == strResource)
-            {
-                stlResponseBuffer = this->GetDatasetName(c_oRequestStructuredBuffer);
-            }
-            else if ("/SAIL/DatabaseManager/ListDatasets" == strResource)
-            {
-                stlResponseBuffer = this->ListDatasets(c_oRequestStructuredBuffer);
-            }
-            else if ("/SAIL/DatabaseManager/PullDataset" == strResource)
-            {
-                stlResponseBuffer = this->PullDataset(c_oRequestStructuredBuffer);
             }
             else if ("/SAIL/DatabaseManager/ListDigitalContracts" == strResource)
             {
@@ -457,10 +435,6 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             else if ("/SAIL/DatabaseManager/RegisterUser" == strResource)
             {
                 stlResponseBuffer = this->RegisterUser(c_oRequestStructuredBuffer);
-            }
-            else if ("/SAIL/DatabaseManager/RegisterDataset" == strResource)
-            {
-                stlResponseBuffer = this->RegisterDataset(c_oRequestStructuredBuffer);
             }
             else if ("/SAIL/DatabaseManager/RegisterVirtualMachine" == strResource)
             {
@@ -567,10 +541,6 @@ uint64_t __thiscall DatabaseManager::SubmitRequest(
             else if ("/SAIL/DatabaseManager/DeleteOrganization" == strResource)
             {
                 stlResponseBuffer = this->DeleteOrganization(c_oRequestStructuredBuffer);
-            }
-            else if ("/SAIL/DatabaseManager/DeleteDataset" == strResource)
-            {
-                stlResponseBuffer = this->DeleteDataset(c_oRequestStructuredBuffer);
             }
             else if ("/SAIL/DatabaseManager/DeleteDatasetFamily" == strResource)
             {

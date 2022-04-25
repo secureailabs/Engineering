@@ -1340,32 +1340,20 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             // Putting a dummy value in for now until WebUI doesn't need an azure template to provision
             std::string strAzureTemplateGuid = "{00000000-0000-0000-0000-000000000000}";
             oSsb.PutString("AzureTemplateGuid", strAzureTemplateGuid);
+
             // Get Dataset name from the database
-            // Make a Tls connection with the database portal
-            poTlsNode = ::TlsConnectToNetworkSocket(m_strDatabaseServiceIpAddr.c_str(), m_unDatabaseServiceIpPort);
-            // Create a request to get the digital contract information
+            long nResponseCode = 0;
+            std::vector<std::string> stlHeader;
+            stlHeader.push_back("Content-Type: application/json");
+
             StructuredBuffer oRequest;
-            oRequest.PutString("PluginName", "DatabaseManager");
-            oRequest.PutString("Verb", "GET");
-            oRequest.PutString("Resource", "/SAIL/DatabaseManager/GetDatasetName");
-            oRequest.PutString("DatasetGuid", strDsetGuid);
-            oRequest.PutString("DataOwnerOrganization", strDooGuid);
-            std::vector<Byte> stlRequest = ::CreateRequestPacket(oRequest);
-            // Send request packet
-            poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
+            oRequest.PutStructuredBuffer("Eosb", oUserInfo);
+            std::string strRestRequest = ::ConvertStructuredBufferToJson(oRequest);
+            auto stlResponse = ::RestApiCallHTTP("127.0.0.1", 6001, "GET", "/dataset/"+c_oRequest.GetString("DatasetGuid"), strRestRequest, true, stlHeader, &nResponseCode);
+            _ThrowBaseExceptionIf((200 != nResponseCode), "Dataset not found. Check dataset and data owner organization information.", nullptr);
 
-            // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
-            _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-            unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
-            _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
-            // Make sure to release the poTlsNode
-            poTlsNode->Release();
-            poTlsNode = nullptr;
+            StructuredBuffer oDatasetName = ::ConvertJsonStringToStructuredBuffer((const char*)stlResponse.data());
 
-            StructuredBuffer oDatasetName(stlResponse);
-            _ThrowBaseExceptionIf((200 != oDatasetName.GetDword("Status")), "Dataset not found. Check dataset and data owner organization information.", nullptr);
             // Add dataset name to the response
             oSsb.PutString("DatasetName", oDatasetName.GetString("DatasetName"));
 
@@ -1383,14 +1371,14 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             oRequest.PutString("ResearcherOrganization", strOrganizationGuid);
             oRequest.PutString("DataOwnerOrganization", strDooGuid);
             oRequest.PutBuffer("DigitalContractBlob", stlDigitalContractBlob);
-            stlRequest = ::CreateRequestPacket(oRequest);
+            auto stlRequest = ::CreateRequestPacket(oRequest);
             // Send request packet
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 3000);
+            auto stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 3000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
-            unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
+            auto unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
             stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode

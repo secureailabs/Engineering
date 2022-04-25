@@ -83,17 +83,16 @@ class GetDatasets_In(BaseModel):
     pass
 
 
-class GetDatasets_Out(BaseModel):
+class GetDatasets_Out(DatasetModel):
     pass
 
 
 class GetDataset_In(BaseModel):
     Eosb: Eosb
+
+
+class GetDataset_Out(DatasetModel):
     DatasetGuid: StrictStr = Field(...)
-    pass
-
-
-class GetDataset_Out(BaseModel):
     pass
 
 

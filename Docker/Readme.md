@@ -39,6 +39,21 @@ make all -j
 ./RunService.sh -s webfrontend
 ```
 ### Shutdown and Deprovision services
+
+#### All Docker
+```
+./DeprovisionService.sh -s all
+```
+*Alternatively, you can add DeprovisionService.sh to path via symbolic link and trigger from anywhere!*
+```
+eg: 
+echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/bin
+cd /bin
+ln -s <abs_path>/Engineering/Docker/DeprovisionService.sh .
+DeprovisionService.sh -s all
+```
+
 #### Backend
 ```
 ./DeprovisionService.sh -s backend
@@ -63,3 +78,4 @@ make all -j
 #### Note:
 1. Use the `-d` flag to run the services in the background in docker detached mode.
 2. To access the backend portal from any other container use `backend` as a domain name. e.g. the frontend webApp must connect to `https://backend:6200` instead of `https://127.0.0.1:6200/`
+3. Remember you can add DeprovisionService.sh to path and run it from anywhere !!  via `DeprovisionService.sh -s all`

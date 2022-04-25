@@ -55,9 +55,14 @@ jobs:
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
           docker stop dataservices || true && docker rm dataservices || true
           docker stop platformservices || true && docker rm platformservices || true
-          make clean
-          make all -j
-          ll -l Binary/
+          docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
+          docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "docker --version"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "make clean"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "make all  -j"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
           docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
           cd Docker/
           ./BuildImages.sh -i dataservices
@@ -66,7 +71,8 @@ jobs:
           ./RunService.sh -s platformservices -d
           sleep 5
           cd ..
-          ./Binary/DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200 
+          ./Binary/DemoDatabaseTools --PortalIp=10.0.2.4 --Port=6200 -d
+          ./Binary/DemoDatabaseTools --PortalIp=10.0.2.4 --Port=6200 
 
   test:
     runs-on: [self-hosted, Linux, x64, docker]
@@ -75,7 +81,9 @@ jobs:
       - name: Run Tests
         run: |
           set -e
-          docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/test_backend/account_mgmt_api_test.py --ip 10.0.0.5 -m "active or active_m5"
+          docker run --name ubuntu_tst_bash -dit -v /home/gha-runner/actions-runner-Engineering/_work/Engineering/Engineering/EndPointTools/Orchestrator/:/tmp_engineering ubuntu-sailtap:1.0 /bin/bash
+          docker exec -w /Test/ ubuntu_tst_bash git pull
+          docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/test_backend/account_mgmt_api_test.py --ip 10.0.2.4 -m "active" -v
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]

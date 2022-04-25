@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
   start-runner:
     runs-on: ubuntu-latest
     steps:
@@ -27,6 +28,7 @@ jobs:
       - name: Start self-hosted runner
         run: |
           az vm start --subscription Build -g Dev-CI -n github-runner1
+
   clean:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: start-runner
@@ -50,15 +52,43 @@ jobs:
           pwd
           ls -l
           sudo chmod 666 /var/run/docker.sock
-          docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
-          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
-          docker run --name ubuntu_dev_CI -dit -p 6200:6200 -p 27017:27017 -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
-          docker exec -w /Workspace/ ubuntu_dev_CI sudo mongod --port 27017 --dbpath /srv/mongodb/db0 --replSet rs0 --bind_ip localhost --fork --logpath /var/log/mongod3.log
-          docker exec -w /Workspace/ ubuntu_dev_CI ps -ef
-          docker exec -w /Workspace/ ubuntu_dev_CI make all -j
-          docker exec -w /Workspace/Binary/ ubuntu_dev_CI ls -l
-          docker stop ubuntu_dev_CI
-          docker rm ubuntu_dev_CI
+          docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
+          docker stop dataservices || true && docker rm dataservices || true
+          docker stop platformservices || true && docker rm platformservices || true
+          make clean
+          make all -j
+          ll -l Binary/
+          docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
+          cd Docker/
+          ./BuildImages.sh -i dataservices
+          ./BuildImages.sh -i platformservices
+          ./RunService.sh -s dataservices -d -c
+          ./RunService.sh -s platformservices -d
+          sleep 5
+          cd ..
+          ./Binary/DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200 
+
+  test:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: build
+    steps:
+      - name: Run Tests
+        run: |
+          set -e
+          docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/test_backend/account_mgmt_api_test.py --ip 10.0.0.5 -m "active or active_m5"
+
+  teardown:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: test
+    steps:
+      - name: Stop and Remove Docker Containers
+        run: |
+          set -e
+          docker ps -a
+          ./Binary/DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d
+          docker kill $(docker ps -q)
+          docker rm $(docker ps -a -q)
+          make clean
 
   stop-runner:
     # Always stop runner even if build step fails

@@ -37,7 +37,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetOrganizationInformation(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Get organization confidential document
         bsoncxx::stdx::optional<bsoncxx::document::value> oConfidentialDocument = oSailDatabase["ConfidentialOrganizationOrUser"].find_one(document{} 
                                                                                                             << "OrganizationOrUserUuid" << strOrganizationGuid 
@@ -125,7 +125,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetBasicOrganizationRecord(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access BasicOrganization collection
         mongocxx::collection oBasicOrganizationCollection = oSailDatabase["BasicOrganization"];
         // Fetch Basic Organization record associated with the strOrganizationName
@@ -202,7 +202,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetOrganizationName(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access BasicOrganization collection
         mongocxx::collection oBasicOrganizationCollection = oSailDatabase["BasicOrganization"];
         // Fetch Basic Organization record associated with the strOrganizationName
@@ -280,7 +280,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetBasicUserRecord(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access BasicUser collection
         mongocxx::collection oBasicUserCollection = oSailDatabase["BasicUser"];
         // Fetch basic user record associated with the qw64BitHash
@@ -389,7 +389,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetConfidentialUserRecord(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access ConfidentialOrganizationOrUser collection
         mongocxx::collection oConfidentialUserCollection = oSailDatabase["ConfidentialOrganizationOrUser"];
         // Fetch confidential user record associated with the strUserUuid
@@ -520,7 +520,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterOrganization(
             // Each client and transaction can only be used in a single thread
             mongocxx::pool::entry oClient = m_poMongoPool->acquire();
             // Access SailDatabase
-            mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+            mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
             // Access BasicOrganization collection
             mongocxx::collection oBasicOrganziationCollection = oSailDatabase["BasicOrganization"];
             // Access ConfidentialOrganizationOrUser collection
@@ -672,7 +672,7 @@ std::vector<Byte> __thiscall DatabaseManager::AddSuperUser(
         << finalize;
 
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access BasicUser collection
         mongocxx::collection oBasicUserCollection = oSailDatabase["BasicUser"];
         // Access ConfidentialOrganizationOrUser collection
@@ -805,7 +805,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterUser(
             // Each client and transaction can only be used in a single thread
             mongocxx::pool::entry oClient = m_poMongoPool->acquire();
             // Access SailDatabase
-            mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+            mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
             // Access BasicUser collection
             mongocxx::collection oBasicUserCollection = oSailDatabase["BasicUser"];
             // Create a transaction callback
@@ -893,7 +893,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateUserRights(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Get user confidential document
         bsoncxx::stdx::optional<bsoncxx::document::value> oUserConfidentialDocument = oSailDatabase["ConfidentialOrganizationOrUser"].find_one(document{} 
                                                                                                             << "OrganizationOrUserUuid" << strUserGuid 
@@ -984,7 +984,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateOrganizationInformation(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Get organization confidential document
         bsoncxx::stdx::optional<bsoncxx::document::value> oConfidentialDocument = oSailDatabase["ConfidentialOrganizationOrUser"].find_one(document{} 
                                                                                                             << "OrganizationOrUserUuid" << strOrganizationGuid 
@@ -1092,7 +1092,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateUserInformation(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Get user confidential document
         bsoncxx::stdx::optional<bsoncxx::document::value> oUserConfidentialDocument = oSailDatabase["ConfidentialOrganizationOrUser"].find_one(document{} 
                                                                                                             << "OrganizationOrUserUuid" << strUserGuid 
@@ -1201,7 +1201,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdatePassword(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Get basic user document
         // Checks if the user exists and if its the same as the logged in user
         bsoncxx::stdx::optional<bsoncxx::document::value> oBasicUserDocument = oSailDatabase["BasicUser"].find_one(document{} 
@@ -1275,7 +1275,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListOrganizations(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch all basic organization records
         mongocxx::cursor oBasicRecordsCursor = oSailDatabase["BasicOrganization"].find({});
         // Loop through returned documents and add information to the list
@@ -1347,7 +1347,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListUsers(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch all basic user records
         mongocxx::cursor oBasicRecordsCursor = oSailDatabase["BasicUser"].find({});
         // Loop through returned documents and get list of all users
@@ -1432,7 +1432,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListOrganizationUsers(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch all basic user records for the organization
         mongocxx::cursor oBasicRecordsCursor = oSailDatabase["BasicUser"].find(document{} 
                                                                                 << "OrganizationUuid" << strOrganizationGuid
@@ -1519,7 +1519,7 @@ std::vector<Byte> __thiscall DatabaseManager::RecoverUser(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
 
         // Get basic user document
         bsoncxx::stdx::optional<bsoncxx::document::value> oBasicUserDocument = oSailDatabase["BasicUser"].find_one(document{} 
@@ -1604,7 +1604,7 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteUser(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
 
         // Get basic user document
         bsoncxx::stdx::optional<bsoncxx::document::value> oBasicUserDocument = oSailDatabase["BasicUser"].find_one(document{} 
@@ -1707,7 +1707,7 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteOrganization(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Delete all documents from collections associated with organization guid
         mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
         {

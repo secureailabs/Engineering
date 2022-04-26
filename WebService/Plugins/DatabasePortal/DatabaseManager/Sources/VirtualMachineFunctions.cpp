@@ -37,7 +37,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullVirtualMachine(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the virtual machine record
         bsoncxx::stdx::optional<bsoncxx::document::value> oVmDocument = oSailDatabase["VirtualMachine"].find_one(document{}
                                                                                                                     << "VirtualMachineGuid" << strVmGuid
@@ -125,7 +125,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListOfVmsAssociatedWithDc(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the virtual machine records
         mongocxx::cursor oVmCursor = oSailDatabase["VirtualMachine"].find(document{}
                                                                     << "DigitalContractGuid" << strDcGuid
@@ -214,7 +214,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListOfVmIpAddressesAssociatedWithD
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the virtual machine records
         mongocxx::cursor oVmCursor = oSailDatabase["VirtualMachine"].find(document{}
                                                                     << "DigitalContractGuid" << strDcGuid
@@ -309,7 +309,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetVmsWaitingForData(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Create the query
         StructuredBuffer oDatasets = c_oRequest.GetStructuredBuffer("Datasets");
         auto stlDatasetGuids = bsoncxx::builder::basic::array{};
@@ -427,7 +427,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterVirtualMachine(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access VirtualMachine collection
         mongocxx::collection oVirtualMachineCollection = oSailDatabase["VirtualMachine"];
         // Create a transaction callback
@@ -522,7 +522,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateVirtualMachine(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Get virtual machine document
         bsoncxx::stdx::optional<bsoncxx::document::value> oVmDocument = oSailDatabase["VirtualMachine"].find_one(document{} 
                                                                                                             << "VirtualMachineGuid" << strVmGuid 
@@ -624,7 +624,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterVmAsWaitingForData(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access VirtualMachinesWaitingForData collection
         mongocxx::collection oVirtualMachinesWaitingForDataCollection = oSailDatabase["VirtualMachinesWaitingForData"];
         // Create a transaction callback
@@ -697,7 +697,7 @@ std::vector<Byte> __thiscall DatabaseManager::RemoveVmAsWaitingForData(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Delete document from VirtualMachinesWaitingForData collection associated with VirtualMachineGuid
         mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
         {

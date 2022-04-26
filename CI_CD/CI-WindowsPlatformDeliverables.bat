@@ -166,6 +166,7 @@ IF %errorlevel%==0 (
     ECHO TARBALL COPIED to HOME of BATCH script! >> %script_dir%\output.txt
 	ECHO TARBALL COPIED to HOME of BATCH script!
 )
+CD %script_dir%
 
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------

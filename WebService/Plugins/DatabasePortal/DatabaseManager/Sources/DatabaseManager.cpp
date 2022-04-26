@@ -75,10 +75,12 @@ DatabaseManager::DatabaseManager(void)
     std::string strMongoUri = "";
     if (true == ::IsInitializationValuePresent("MongoDbUrl"))
     {
+        std ::cout << "Using local MongoDb" << std::endl;
         strMongoUri = ::GetInitializationValue("MongoDbUrl");
     }
     else
     {
+        std ::cout << "Using Mongodb Atlas.." << std::endl;
         strMongoUri = "mongodb+srv://"+ ::GetInitializationValue("MongoAtlasDbUser") + ":"+ ::GetInitializationValue("MongoAtlasDbPassword") +"@"+ ::GetInitializationValue("MongoDbCluster") +"/"+ ::GetInitializationValue("MongoDbDatabase") +"?retryWrites=true&w=majority";
     }
 

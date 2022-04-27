@@ -32,6 +32,22 @@ def exit_current_session():
 def get_safe_functions():
     return SAILPyAPI.get_safe_functions()
 
+def get_safe_functions_neat():
+    safe_function_dict =  SAILPyAPI.get_safe_functions()
+    if safe_function_dict is None:
+        return None
+    safe_function_dict = json.loads(safe_function_dict)
+    sf_dict = {}
+    for key in safe_function_dict.keys():
+        inputs = []
+        outputs = []
+        for pkey in safe_function_dict[key]['InputParameters'].keys():
+            inputs.append(safe_function_dict[key]['InputParameters'][pkey]['Uuid'])
+        for pkey in safe_function_dict[key]['OutputParameters'].keys():
+            outputs.append(safe_function_dict[key]['OutputParameters'][pkey]['Uuid'])
+        sf_dict[safe_function_dict[key]['Title']] = {'Uuid':safe_function_dict[key]['Uuid'], 'InputParameters':inputs, 'OutputParameters':outputs}
+    return sf_dict
+
 def get_digital_contracts():
     return SAILPyAPI.get_digital_contracts()
 

@@ -2,45 +2,49 @@ import uuid
 
 
 class CodeBlock:
-    '''
+    """
     Class associate with node and code block
-    '''
+    """
+
     def __init__(self, start, end):
-        '''
+        """
         constructor
-        '''
+        """
         self.start = start
         self.end = end
 
     def blockToString(self, lines):
-        '''
+        """
         convert a node to string block
-        '''
+        """
         i = self.start - 1
-        blockString = "".join(lines[i:self.end])
+        blockString = "".join(lines[i : self.end])
         return blockString
 
 
 class ClassBlock(CodeBlock):
-    '''
+    """
     class node code block
-    '''
+    """
+
     def __init__(self, start, end):
         super().__init__(start, end)
 
 
 class ImportBlock(CodeBlock):
-    '''
+    """
     import node code block
-    '''
+    """
+
     def __init__(self, start, end):
         super().__init__(start, end)
 
 
 class FunctionBlock(CodeBlock):
-    '''
+    """
     functiondef node code block
-    '''
+    """
+
     def __init__(self, name, start, end, annotations, doc):
         self.name = name
         super().__init__(start, end)
@@ -48,19 +52,19 @@ class FunctionBlock(CodeBlock):
         self.doc = doc
 
     def blockToStringMajor(self, lines):
-        '''
+        """
         process the entry point function node
-        '''
-        pos = lines[self.start-1].index('(')
-        lines[self.start-1] = \
-            f"{lines[self.start-1][:pos+1]}self, {lines[self.start-1][pos+1:]}"
+        """
+        pos = lines[self.start - 1].index("(")
+        lines[self.start - 1] = f"{lines[self.start-1][:pos+1]}self, {lines[self.start-1][pos+1:]}"
         return super().blockToString(lines)
 
 
 class ScriptContent:
-    '''
+    """
     Data structure to store all code blocks in the parse tree
-    '''
+    """
+
     def __init__(self, classes, imports, functions, libdict):
         self.classes = classes
         self.imports = imports
@@ -69,9 +73,10 @@ class ScriptContent:
 
 
 class SafeFunction:
-    '''
+    """
     safe function info class
-    '''
+    """
+
     def __init__(self, name, doc, args, returns, confidentiality):
         self.name = name
         if doc is None:
@@ -84,28 +89,28 @@ class SafeFunction:
             raise Exception("safe function args must be a dict")
         self.argTypes = self.ProcessArgs(args)
         self.returnsuuid = []
-        if not isinstance(returns, tuple):
-            raise Exception("safe function returns must be a tuple")
+        if not isinstance(returns, list):
+            raise Exception("safe function returns must be a list")
         self.returnTypes = self.ProcessReturns(returns)
         self.confidentiality = confidentiality
         self.template = ""
 
     def ProcessArgs(self, args):
-        '''
+        """
         generate argument uuids
-        '''
+        """
         argTypes = []
         for arg in args:
             argTypes.append(str(args[arg]))
             rawid = uuid.uuid4().hex
-            typedID = self.GenerateUUID(rawid, 0x4c)
+            typedID = self.GenerateUUID(rawid, 0x4C)
             self.argsuuid.append(typedID)
         return argTypes
 
     def ProcessReturns(self, returns):
-        '''
+        """
         generate return variable uuids
-        '''
+        """
         returnTypes = []
         for val in returns:
             returnTypes.append(str(val))
@@ -115,15 +120,15 @@ class SafeFunction:
         return returnTypes
 
     def SaveTemplate(self, template):
-        '''
+        """
         accept template after process
-        '''
+        """
         self.template = template
 
     def GenerateUUID(self, raw, type):
-        '''
+        """
         add uuid types
-        '''
+        """
         mask = 0x03
         prefix = raw[:2]
         print(prefix)

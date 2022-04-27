@@ -7,15 +7,26 @@ USER root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-sudo \
-git \
-make \
-wget \
-systemd \
-iproute2 \
-libcurl4-gnutls-dev \
-python3-pip \
-build-essential
+    sudo \
+    git \
+    make \
+    wget \
+    systemd \
+    iproute2 \
+    libcurl4-gnutls-dev \
+    python3-pip \
+    build-essential \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common
+
+RUN curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey
+RUN add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+    $(lsb_release -cs) stable"
+RUN apt-get update && apt-get -y install docker-ce
 
 # GIT
 ARG git_personal_token

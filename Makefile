@@ -18,8 +18,8 @@ orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all
 	@echo "orchestrator done!"
 
-safefunctioncompiler: SharedCommonCode EndPointTools/SafeObjectTools/SafeObjectCompiler/Source
-	@make all
+safefunctioncompiler: SharedCommonCode
+	@make -C $(SAFE_OBJECT_COMPILER) all
 	@echo "safefunctioncompiler done!"
 
 securecomputationnode: SharedCommonCode VirtualMachine_Shared

@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from models.users import Token, TokenData, User_Db
+from models.accounts import Token, TokenData, User_Db
 
 # to get a string like this run: openssl rand -hex 32
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -71,7 +71,7 @@ async def get_current_active_user(current_user: User_Db = Depends(get_current_us
     return current_user
 
 
-@router.post("/token", response_model=Token)
+@router.post("/token", response_description="login", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:

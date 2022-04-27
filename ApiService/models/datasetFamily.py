@@ -1,42 +1,18 @@
-from typing import List
+from datetime import datetime
 from bson import ObjectId
 from pydantic import BaseModel, Field, StrictStr
-from common import PyObjectId
+from models.common import PyObjectId
 
 
-class Eosb(BaseModel):
-    OrganizationGuid: StrictStr = Field(...)
-    AccessRights: int = Field(...)
-    Eosb: StrictStr = Field(...)
-    UserGuid: StrictStr = Field(...)
-    Status: int = Field(...)
+class DatasetFamily_Base(BaseModel):
+    DatasetFamilyDescription: StrictStr = Field(...)
+    DatasetFamilyTags: StrictStr = Field(...)
+    DatasetFamilyTitle: StrictStr = Field(...)
 
 
-class DatasetTable(BaseModel):
-    Description: StrictStr = Field(...)
-    TableIdentifier: StrictStr = Field(...)
-    Hashtags: StrictStr = Field(...)
-    NumberColumns: int = Field(...)
-    Name: StrictStr = Field(...)
-    NumberRows: int = Field(...)
-    ColumnName: StrictStr = Field(...)
-
-
-class DatasetModel(BaseModel):
-    JurisdictionalLimitations: StrictStr = Field(...)
-    Description: StrictStr = Field(...)
-    DatasetName: StrictStr = Field(...)
-    Keywords: StrictStr = Field(...)
-    VersionNumber: StrictStr = Field(...)
-    PublishDate: int = Field(...)
-    PrivacyLevel: int = Field(...)
-    Tables: List[DatasetTable] = Field(...)
-
-
-class Dataset_Db(DatasetModel):
+class DatasetFamily_Db(DatasetFamily_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    DatasetGuid: StrictStr = Field(...)
-    DataOwnerGuid: StrictStr = Field(...)
+    creationTime: datetime = Field(default_factory=datetime.utcnow)
 
     class Config:
         allow_population_by_field_name = True
@@ -44,38 +20,17 @@ class Dataset_Db(DatasetModel):
         json_encoders = {ObjectId: str}
 
 
-class RegisterDataset_In(BaseModel):
-    Eosb: Eosb
-    DatasetGuid: StrictStr = Field(...)
-    DatasetData: DatasetModel = Field(...)
-
-
-class RegisterDataset_Out(BaseModel):
+class RegisterDatasetFamily_In(DatasetFamily_Base):
     pass
 
 
-class GetDatasets_In(BaseModel):
-    Eosb: Eosb
+class RegisterDatasetFamily_Out(DatasetFamily_Base):
+    id: PyObjectId = Field(...)
+
+
+class GetDatasetFamily_Out(DatasetFamily_Base):
     pass
 
 
-class GetDatasets_Out(DatasetModel):
-    pass
-
-
-class GetDataset_In(BaseModel):
-    Eosb: Eosb
-
-
-class GetDataset_Out(DatasetModel):
-    DatasetGuid: StrictStr = Field(...)
-    pass
-
-
-class DeleteDataset_In(BaseModel):
-    Eosb: Eosb
-    pass
-
-
-class DeleteDataset_Out(BaseModel):
+class UpdateDatasetFamily_In(BaseModel):
     pass

@@ -15,7 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 20
 client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://127.0.0.1:27017/")
 sail_db = client.sailDatabase
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 router = APIRouter()
 
 
@@ -71,7 +71,7 @@ async def get_current_active_user(current_user: User_Db = Depends(get_current_us
     return current_user
 
 
-@router.post("/token", response_description="login", response_model=Token)
+@router.post("/login", description="login", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:

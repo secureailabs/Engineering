@@ -18,7 +18,7 @@ class ScnState(Enum):
     Archived = "Archived"
 
 
-class ScnBase(BaseModel):
+class Scn_Base(BaseModel):
     DatasetIdentifier: PyObjectId = Field(...)
     DigitalContractIdentifier: PyObjectId = Field(...)
     ScnType: StrictStr = Field(...)
@@ -29,12 +29,12 @@ class ScnBase(BaseModel):
         json_encoders = {ObjectId: str}
 
 
-class Provision_Scn_In(ScnBase):
+class ProvisionScn_In(Scn_Base):
     pass
 
 
-class Provision_Scn_Out(BaseModel):
-    id: PyObjectId = Field(alias="_id")
+class ProvisionScn_Out(BaseModel):
+    id: PyObjectId = Field(...)
     State: ScnState = Field(...)
 
     class Config:
@@ -43,7 +43,7 @@ class Provision_Scn_Out(BaseModel):
         json_encoders = {ObjectId: str}
 
 
-class ScnModel_Db(ScnBase):
+class ScnModel_Db(Scn_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     CreationTime: datetime = Field(default_factory=datetime.utcnow)
     ResearcherIdentifier: PyObjectId = Field(...)

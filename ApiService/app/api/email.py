@@ -5,13 +5,13 @@ __license__ = "Private and Confidential. Internal Use Only."
 __date__ = "25 March 2022"
 __file__ = "main.py"
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, StrictStr
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-emailPlugin = FastAPI()
+router = APIRouter()
 
 
 class SenderCredentials(BaseModel):
@@ -108,7 +108,7 @@ class ForgotPassswordRequest(BaseModel):
     Secret: StrictStr
 
 
-@emailPlugin.post("/Email/forgotPassword")
+@router.post("/Email/forgotPassword")
 async def forgotPassword(request: ForgotPassswordRequest):
     try:
         subject = "Secure AI Labs - Reset Password"
@@ -131,7 +131,7 @@ class VerifyEmailRequest(BaseModel):
     Secret: StrictStr
 
 
-@emailPlugin.post("/Email/verifyEmail")
+@router.post("/Email/verifyEmail")
 async def verifyEmail(request: VerifyEmailRequest):
     try:
         subject = "Welcome to Secure AI Labs. Let's verify your email!"
@@ -154,7 +154,7 @@ class AlertRequest(BaseModel):
     Alert: StrictStr
 
 
-@emailPlugin.post("/Email/alert")
+@router.post("/Email/alert")
 async def alert(request: AlertRequest):
     try:
         subject = "Important Alert:" + request.Alert

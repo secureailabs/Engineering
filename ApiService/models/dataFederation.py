@@ -1,25 +1,6 @@
-from typing import List
 from bson import ObjectId
 from pydantic import BaseModel, Field, StrictStr
-from common import PyObjectId
-
-
-class Eosb(BaseModel):
-    OrganizationGuid: StrictStr = Field(...)
-    AccessRights: int = Field(...)
-    Eosb: StrictStr = Field(...)
-    UserGuid: StrictStr = Field(...)
-    Status: int = Field(...)
-
-
-class DatasetTable(BaseModel):
-    Description: StrictStr = Field(...)
-    TableIdentifier: StrictStr = Field(...)
-    Hashtags: StrictStr = Field(...)
-    NumberColumns: int = Field(...)
-    Name: StrictStr = Field(...)
-    NumberRows: int = Field(...)
-    ColumnName: StrictStr = Field(...)
+from models.common import PyObjectId
 
 
 class DatasetModel(BaseModel):
@@ -30,10 +11,9 @@ class DatasetModel(BaseModel):
     VersionNumber: StrictStr = Field(...)
     PublishDate: int = Field(...)
     PrivacyLevel: int = Field(...)
-    Tables: List[DatasetTable] = Field(...)
 
 
-class Dataset_Db(DatasetModel):
+class DataFederation_Db(DatasetModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     DatasetGuid: StrictStr = Field(...)
     DataOwnerGuid: StrictStr = Field(...)
@@ -44,10 +24,12 @@ class Dataset_Db(DatasetModel):
         json_encoders = {ObjectId: str}
 
 
-class RegisterDataset_In(BaseModel):
-    Eosb: Eosb
-    DatasetGuid: StrictStr = Field(...)
-    DatasetData: DatasetModel = Field(...)
+class RegisterDataFederation_In(BaseModel):
+    pass
+
+
+class RegisterDataFederation_Out(BaseModel):
+    pass
 
 
 class RegisterDataset_Out(BaseModel):
@@ -55,7 +37,6 @@ class RegisterDataset_Out(BaseModel):
 
 
 class GetDatasets_In(BaseModel):
-    Eosb: Eosb
     pass
 
 
@@ -64,7 +45,7 @@ class GetDatasets_Out(DatasetModel):
 
 
 class GetDataset_In(BaseModel):
-    Eosb: Eosb
+    pass
 
 
 class GetDataset_Out(DatasetModel):
@@ -73,7 +54,6 @@ class GetDataset_Out(DatasetModel):
 
 
 class DeleteDataset_In(BaseModel):
-    Eosb: Eosb
     pass
 
 

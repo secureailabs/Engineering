@@ -1,15 +1,7 @@
 from typing import List
 from bson import ObjectId
 from pydantic import BaseModel, Field, StrictStr
-from common import PyObjectId
-
-
-class Eosb(BaseModel):
-    OrganizationGuid: StrictStr = Field(...)
-    AccessRights: int = Field(...)
-    Eosb: StrictStr = Field(...)
-    UserGuid: StrictStr = Field(...)
-    Status: int = Field(...)
+from models.common import PyObjectId
 
 
 class DatasetTable(BaseModel):
@@ -45,26 +37,12 @@ class Dataset_Db(DatasetModel):
 
 
 class RegisterDataset_In(BaseModel):
-    Eosb: Eosb
     DatasetGuid: StrictStr = Field(...)
     DatasetData: DatasetModel = Field(...)
 
 
 class RegisterDataset_Out(BaseModel):
-    pass
-
-
-class GetDatasets_In(BaseModel):
-    Eosb: Eosb
-    pass
-
-
-class GetDatasets_Out(DatasetModel):
-    pass
-
-
-class GetDataset_In(BaseModel):
-    Eosb: Eosb
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
 
 
 class GetDataset_Out(DatasetModel):
@@ -73,7 +51,6 @@ class GetDataset_Out(DatasetModel):
 
 
 class DeleteDataset_In(BaseModel):
-    Eosb: Eosb
     pass
 
 

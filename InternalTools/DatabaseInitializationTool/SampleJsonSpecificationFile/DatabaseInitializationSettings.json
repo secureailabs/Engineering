@@ -1,0 +1,149 @@
+{
+	"Organizations":
+	{
+		"International Genetics Research Facility":
+		{
+			"Address": "231 54th Street, New York, New York, 02345",
+			"Contacts":
+			[
+				{
+					"Email":"lbart@igr.com",
+					"Name": "Lily Bart",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator"
+				},
+				{
+					"Email":"pcarey@igr.com",
+					"Name": "Philip Carey",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer"
+				}
+			],
+			"Admins":
+			[
+				{
+					"Email": "lbart@igr.com",
+					"Name": "Lily Bart",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator",
+				}
+			],
+			"Users":
+			[
+				{
+					"Email":"pcarey@igr.com",
+					"Name": "Philip Carey",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email":"abede@igr.com",
+					"Name": "Anna Bede",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer",
+					"Access Rights": "0x0000000000000000"
+				}
+			],
+			"Datasets":
+			[
+				{
+					"Title":"DatasetTitle1",
+					"File":"igr_001.csvp"
+				},
+				{
+					"Title":"DatasetTitle2",
+					"File":"igr_002.csvp"
+				}
+
+			],
+			"DatasetFamilies":
+			[
+				{
+					"Title":"Dataset Family",
+					"Description":"Dataset Description",
+					"Tags":"Dataset Tags"
+				}
+			],
+			"Data Federation":
+			[
+				{
+					"DataFederationName":"Dataset Family",
+					"DataFederationDescription":"Dataset Description"
+				}
+			]
+		},
+		"Mercy General Hospital":
+		{
+			"Address":"4001 J St, Sacramento, CA 95819, United States",
+			"Contacts":
+			[
+				{
+					"Email":"nadams@mghl.com",
+					"Name": "Nick Adams",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator"
+				},
+				{
+					"Email":"nhelmer@mghl.com",
+					"Name": "Nora Helmer",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer"
+				}
+			],
+			"Admins":
+			[
+				{
+					"Email":"nadams@mghl.com",
+					"Name": "Nick Adams",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator",
+				}
+			],
+			"Users":
+			[
+				{
+					"Email":"nhelmer@mghl.com",
+					"Name": "Nora Helmer",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email":"rcory@mghl.com",
+					"Name": "Richard Cory",
+					"Phone Number": "000-000-0000",
+					"Title": "Data Scientist",
+					"Access Rights": "0x0000000000000000"
+				}
+			],
+			"Datasets":
+			[
+				{
+					"Title":"DatasetTitle1",
+					"File":"igr_001.csvp"
+				},
+				{
+					"Title":"DatasetTitle2",
+					"File":"igr_002.csvp"
+				}
+			]
+		}
+	},
+	"Digital Contracts":
+	[
+		{
+			"DataOwnerOrganization":"International Genetics Research Facility",
+			"ResearchOrganization":"Mercy General Hospital",
+			"Dataset":"igr_001.csvp",
+			"Title":"Some digital contact title",
+			"Description":"Some digital contact description",
+			"LegalAgreement":"Some digital contact legal mumbo jumbo",
+			"SubscriptionDays":360,
+			"RetentionTime":720,
+			"HostForVm":"SAIL",
+			"HostRegion":"East US 2",
+			"NumberOfVms":1
+		}
+	]
+}			

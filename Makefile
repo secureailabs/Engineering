@@ -4,7 +4,7 @@ include Make/dataservices.mk
 include Make/webfrontend.mk
 include Make/securecomputationnode.mk
 
-.PHONY: platformservices dataservices securecomputationnode orchestrator databaseTools demoDatabaseTools uploadPackageAndInitializationVector package all clean SharedCommonCode
+.PHONY: platformservices dataservices securecomputationnode orchestrator databaseInitializationTool databaseTools demoDatabaseTools uploadPackageAndInitializationVector package all clean SharedCommonCode
 
 platformservices: SharedCommonCode WebServices_Shared
 	@make restapiportal platformservices_plugins
@@ -26,6 +26,10 @@ package: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend orchestrator
 	@echo "package done!"
 
+databaseInitializationTool: SharedCommonCode
+	@make -C $(DATABASE_INITIALIZATION_TOOL) all
+	@echo "databaseInitializationTool done!"
+    
 databaseTools: SharedCommonCode
 	@make -C $(DATABASE_TOOLS) all
 	@echo "databaseTools done!"
@@ -53,7 +57,7 @@ VirtualMachine_Shared:
 
 all: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 	@make package
-	@make databaseTools demoDatabaseTools baseVmInit uploadPackageAndInitializationVector
+	@make databaseInitializationTool databaseTools demoDatabaseTools baseVmInit uploadPackageAndInitializationVector
 	@echo "All build and packaged!"
 
 clean:

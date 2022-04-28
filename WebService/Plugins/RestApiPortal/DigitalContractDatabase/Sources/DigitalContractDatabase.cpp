@@ -1401,6 +1401,7 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDigitalContract(
             StructuredBuffer oDatabaseResponse(stlResponse);
             if (204 != oDatabaseResponse.GetDword("Status"))
             {
+                oResponse.PutString("DigitalContractIdentifier", strDcGuid);
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
                 dwStatus = 201;
             }

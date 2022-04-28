@@ -34,7 +34,7 @@ An example script in provided in test.py file, which can include heler classes a
 ```
 def Run(param1: type annotation, param2: type annotation...) 
     -> type annotation:
-    '''
+    """
     docstring
         basic task the function does
         Args:
@@ -42,7 +42,7 @@ def Run(param1: type annotation, param2: type annotation...)
         Return:
          ...
         Confidentiality: True
-    '''
+    """
     /*function code*/
 ```
 It is the safe object creator's responsibility to annotate types and confidentiality for the safe function. The type annotation can reference the python types module.
@@ -50,9 +50,9 @@ It is the safe object creator's responsibility to annotate types and confidentia
 The defination of input and output parameter are done via the arguments and returns in the Run function, for example:
 ```
 def Run(a: int, b:int, c:int)->Tuple[int, int, int]:
-    '''
+    """
     Confidentiality:True,True,True
-    '''
+    """
     d = a+b+c
     e = a-b+c
     f = a+b-c
@@ -69,9 +69,9 @@ The input and output types are recorded via python type annotations, to read mor
 Some simple examples are given below:
 ```
 def Run(a: float) -> float:
-    '''
+    """
     Confidentiality:True
-    '''
+    """
     return a
 ```
 This function intake a float input parameter a and returen a float parameter a, the output parameter is not confidential.
@@ -80,18 +80,18 @@ This function intake a float input parameter a and returen a float parameter a, 
 from typing import Any
 
 def Run(a: Any) -> Any:
-    '''
+    """
     Confidentiality:False
-    '''
+    """
     return a
 ```
 This function intakes a parameter which can be any type, and output a parameter which can be any type. The output is not confidential
 
 ```
 def Run(a:dict[str, str]) ->dict[str:str]:
-    '''
+    """
     Confidentiality:True
-    '''
+    """
     return a
 ```
 This function intakes a parameter which can be a dict type and output a parameter which is dict type. The dict has key value pair as str:str. The output is confidential.

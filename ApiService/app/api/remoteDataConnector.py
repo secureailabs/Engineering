@@ -11,7 +11,7 @@ db = client.sailDatabase
 router = APIRouter()
 
 
-@router.post("/remoteDataConnector", description="Register remote data connector", response_model=RegisterRemoteDataConnector_Out)
+@router.post("/remoteDataConnectors", description="Register remote data connector", response_model=RegisterRemoteDataConnector_Out)
 async def register_remote_data_connector(dataset: RegisterRemoteDataConnector_In = Body(...), current_user: User_Db = Depends(get_current_active_user)):
     dataset_db = RemoteDataConnector_db(**dataset.dict())
     await db["datasets"].insert_one(jsonable_encoder(dataset_db))
@@ -24,24 +24,24 @@ async def get_remote_data_connectors(current_user: User_Db = Depends(get_current
     return fetched_datasets
 
 
-@router.get("/remoteDataConnector/{id}", description="Get remote data connectors by id", response_model=GetRemoteDataConnectors_Out)
+@router.get("/remoteDataConnectors/{id}", description="Get remote data connectors by id", response_model=GetRemoteDataConnectors_Out)
 async def get_remote_data_connector(id: str, current_user: User_Db = Depends(get_current_active_user)):
     created_dataset = await db["datasets"].find_one({"DatasetGuid": id})
     return created_dataset
 
 
-@router.put("/remoteDataConnector/{id}", description="Update remote data connectors")
+@router.put("/remoteDataConnectors/{id}", description="Update remote data connectors")
 async def update_remote_data_connector(current_user: User_Db = Depends(get_current_active_user)):
     fetched_datasets = await db["datasets"].find().to_list(None)
     return fetched_datasets
 
 
-@router.put("/remoteDataConnector/{id}/heartbeat", description="remote data connectors heartbeat", response_model=HeartbeatRemoteDataConnector_Out)
+@router.put("/remoteDataConnectors/{id}/heartbeat", description="remote data connectors heartbeat", response_model=HeartbeatRemoteDataConnector_Out)
 async def update_remote_data_connector_heartbeat(id: str, heartbeat: HeartbeatRemoteDataConnector_In = Body(...), current_user: User_Db = Depends(get_current_active_user)):
     fetched_datasets = await db["datasets"].find().to_list(None)
     return fetched_datasets
 
 
-@router.delete("/remoteDataConnector/{id}", description="Delete remote data connectors")
+@router.delete("/remoteDataConnectors/{id}", description="Delete remote data connectors")
 async def delete_dataset(id: str, current_user: User_Db = Depends(get_current_active_user)):
     await db["datasets"].delete_one({"DatasetGuid": id})

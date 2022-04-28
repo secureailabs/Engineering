@@ -12,7 +12,7 @@ db = client.sailDatabase
 router = APIRouter()
 
 
-@router.post("/dataFederation", description="Add new data federation", response_model=RegisterDataFederation_Out)
+@router.post("/dataFederations", description="Add new data federation", response_model=RegisterDataFederation_Out)
 async def register_data_federation(dataFederation: RegisterDataFederation_In = Body(...), current_user: User_Db = Depends(get_current_active_user)):
     organization_db: DataFederation_Db = DataFederation_Db(**dataFederation.dict())
     organization = jsonable_encoder(organization_db)
@@ -26,13 +26,13 @@ async def get_data_federations(current_user: User_Db = Depends(get_current_activ
     return dataFederations
 
 
-@router.get("/dataFederation/{data_federation_id}", description="Get data federation by id", response_model=DataFederation_Db)
+@router.get("/dataFederations/{data_federation_id}", description="Get data federation by id", response_model=DataFederation_Db)
 async def get_data_federation(data_federation_id: PyObjectId, current_user: User_Db = Depends(get_current_active_user)):
     dataFederation = await db["dataFederation"].find_one({"_id": data_federation_id})
     return dataFederation
 
 
-@router.delete("/dataFederation/{data_federation_id}", description="Delete data federation")
+@router.delete("/dataFederations/{data_federation_id}", description="Delete data federation")
 async def delete_data_federation(data_federation_id: PyObjectId, current_user: User_Db = Depends(get_current_active_user)):
     dataFederation = await db["dataFederation"].delete_one({"_id": data_federation_id})
     return dataFederation

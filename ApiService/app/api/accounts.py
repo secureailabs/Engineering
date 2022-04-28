@@ -51,13 +51,13 @@ async def get_users(organization_id: PyObjectId, current_user: User_Db = Depends
     return users
 
 
-@router.get("/organization/{organization_id}/users/{user_id}", description="Get information about a user", response_model=GetUsers_Out)
+@router.get("/organizations/{organization_id}/users/{user_id}", description="Get information about a user", response_model=GetUsers_Out)
 async def get_user(organization_id: PyObjectId, user_id: PyObjectId, current_user: User_Db = Depends(get_current_active_user)):
     user = await db["users"].find_one({"_id": user_id, "OrganizationGuid": organization_id})
     return user
 
 
-@router.put("/organization/{organization_id}", description="Update organization")
+@router.put("/organizations/{organization_id}", description="Update organization")
 async def update_organization(organization_id: PyObjectId, organization: UpdateOrganization_In = Body(...), current_user: User_Db = Depends(get_current_active_user)):
     await db["organizations"].update_one({"_id": organization_id}, {"$set": organization})
     return organization

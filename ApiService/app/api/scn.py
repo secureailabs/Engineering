@@ -17,24 +17,24 @@ db = client.sailDatabase
 router = APIRouter()
 
 
-@router.get("/scns", response_description="Get all scns", response_model=List[ScnModel_Db])
+@router.get("/secureComputationNodes", response_description="Get all scns", response_model=List[ScnModel_Db])
 async def get_scns(current_user: User_Db = Depends(get_current_active_user)):
     scns = await db["scn"].find().to_list(None)
     return scns
 
 
-@router.get("/scn/{id}", response_description="Get scn by id", response_model=ScnModel_Db)
+@router.get("/secureComputationNodes/{id}", response_description="Get scn by id", response_model=ScnModel_Db)
 async def get_scn(id: PyObjectId, current_user: User_Db = Depends(get_current_active_user)):
     scn_info = await db["scn"].find_one({"_id": str(id)})
     return scn_info
 
 
-@router.put("/scn/{id}")
+@router.put("/secureComputationNodes/{id}")
 async def put_scn(current_user: User_Db = Depends(get_current_active_user)):
     return {"ping": "pong!"}
 
 
-@router.delete("/scn/{id}", response_description="Delete scn by id", response_model=ScnModel_Db)
+@router.delete("/secureComputationNodes/{id}", response_description="Delete scn by id", response_model=ScnModel_Db)
 async def delete_scn(background_tasks: BackgroundTasks, id: PyObjectId, current_user: User_Db = Depends(get_current_active_user)):
     scn_info = await db["scn"].find_one({"_id": str(id)})
     scn_db = ScnModel_Db(**scn_info)
@@ -44,7 +44,7 @@ async def delete_scn(background_tasks: BackgroundTasks, id: PyObjectId, current_
     return scn_db
 
 
-@router.post("/scn", response_description="Provision new scn", response_model=ProvisionScn_Out)
+@router.post("/secureComputationNodes", response_description="Provision new scn", response_model=ProvisionScn_Out)
 async def post_scn(background_tasks: BackgroundTasks, scn_info: ProvisionScn_In = Body(...), current_user: User_Db = Depends(get_current_active_user)):
     scn_db = ScnModel_Db(
         **scn_info.dict(),

@@ -13,7 +13,7 @@ db = client.sailDatabase
 router = APIRouter()
 
 
-@router.post("/dataset", description="Add new dataset", response_model=RegisterDataset_Out)
+@router.post("/datasets", description="Add new dataset", response_model=RegisterDataset_Out)
 async def register_dataset(dataset: RegisterDataset_In = Body(...), current_user: User_Db = Depends(get_current_active_user)):
     dataset_db = Dataset_Db(**dataset.DatasetData.dict(), DataOwnerGuid=str(current_user.id), DatasetGuid=dataset.DatasetGuid)
     await db["datasets"].insert_one(jsonable_encoder(dataset_db))
@@ -26,12 +26,12 @@ async def get_datasets(current_user: User_Db = Depends(get_current_active_user))
     return fetched_datasets
 
 
-@router.get("/dataset/{id}", description="Get dataset by id", response_model=GetDataset_Out)
+@router.get("/datasets/{id}", description="Get dataset by id", response_model=GetDataset_Out)
 async def get_dataset(id: str, current_user: User_Db = Depends(get_current_active_user)):
     created_dataset = await db["datasets"].find_one({"DatasetGuid": id})
     return created_dataset
 
 
-@router.delete("/dataset/{id}", description="Delete dataset")
+@router.delete("/datasets/{id}", description="Delete dataset")
 async def delete_dataset(id: str, current_user: User_Db = Depends(get_current_active_user)):
     await db["datasets"].delete_one({"DatasetGuid": id})

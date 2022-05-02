@@ -74,7 +74,6 @@ const DigitalContractsSuccess: React.FC<TDigitalContractsSuccessProps> = ({
   );
   const [current_filter, setCurrentFilter] = useState('1');
   const count = (stage: 1 | 2 | 3 | 4): number => {
-    console.log(Object.entries(getAllDigitalContractsData))
     return Object.entries(getAllDigitalContractsData).filter(
       ([key, value]) => getDCStage(value.ContractStage, value.ExpirationTime) == stage
     ).length;

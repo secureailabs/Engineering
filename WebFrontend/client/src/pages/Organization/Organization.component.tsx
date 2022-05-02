@@ -31,7 +31,7 @@ const Organization: React.FC<TOrganizationProps> = () => {
   console.log("DATA", data);
   return (
     <>
-     <StandardContent title="Digital Contracts">
+     <StandardContent title="Organization">
         <OrganizationSuccess organizationData={data} />
       </StandardContent>
     </>

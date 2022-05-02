@@ -31,7 +31,6 @@ const Login: React.FC<TLoginFormProps> = ({ signInReset, signInStart }) => {
     signInReset();
   }, []);
   const onSubmit: SubmitHandler<IEmailAndPassword> = (data) => {
-    console.log(data);
     signInStart(data);
   };
   return (

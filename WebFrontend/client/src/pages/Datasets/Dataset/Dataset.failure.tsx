@@ -6,7 +6,7 @@ const DatasetFailure: React.FC<TDatasetFailure> = ({ error }) => {
   if(error){
     return <></>;
 }
-return <>An unkown error has occured</>;
+return <>An unknown error has occured</>;
 };
 
 export default DatasetFailure;

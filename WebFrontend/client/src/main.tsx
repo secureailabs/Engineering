@@ -24,7 +24,7 @@ ReactDOM.render(
       <PersistGate persistor={persistor}>
         <BrowserRouter>
           <App />
-          <ReactQueryDevtools initialIsOpen={false} />
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </BrowserRouter>
       </PersistGate>
     </Provider>

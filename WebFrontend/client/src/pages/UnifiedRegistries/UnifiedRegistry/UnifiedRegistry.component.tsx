@@ -44,7 +44,7 @@ const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
   }
   if(status === 'success' && data){
     return (
-        <StandardContent title="Organization">
+        <StandardContent title="Registry">
           <UnifiedRegistrySuccess
             getUnifiedRegistryData={data}
         />

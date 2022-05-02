@@ -45,7 +45,7 @@ const Dataset: React.FC<TDatasetProps> = () => {
   }
   if(status === 'success' && data){
       return (
-          <StandardContent title="Organization">
+          <StandardContent title="Datasets">
             <DatasetSuccess
               getDatasetData={data}
           />

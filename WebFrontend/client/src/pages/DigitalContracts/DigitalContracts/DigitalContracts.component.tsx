@@ -39,7 +39,7 @@ const DigitalContracts: React.FC<TDigitalContractsProps> = ({
   }
   if(status === 'success' && data){
       return (
-          <StandardContent title="Organization">
+          <StandardContent title="Digital Contracts">
             <DigitalContractsSuccess
               getAllDigitalContractsData={data}
               userData={userData}

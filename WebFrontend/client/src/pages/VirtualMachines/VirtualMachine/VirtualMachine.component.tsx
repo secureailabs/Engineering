@@ -55,7 +55,7 @@ const VirtualMachine: React.FC<TVirtualMachineProps> = () => {
   };
   return (
     <>
-      <StandardContent title="VirtualMachine">
+      <StandardContent title="Virtual Machine">
         <VirtualMachineSuccess getVirtualMachineData={temp_data} />
       </StandardContent>
     </>

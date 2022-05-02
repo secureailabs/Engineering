@@ -129,8 +129,8 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
                 type: 'text',
               },
               ProvisioningStatus: {
-                label: 'ProvisioningStatus',
-                placeholder: 'ProvisioningStatus',
+                label: 'Provisioning Status',
+                placeholder: 'Provisioning Status',
                 type: 'text',
               },
             }}

@@ -55,6 +55,7 @@ jobs:
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
           docker stop dataservices || true && docker rm dataservices || true
           docker stop platformservices || true && docker rm platformservices || true
+          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
           docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
           docker exec -w /Workspace ubuntu_dev_CI sh -c "docker --version"

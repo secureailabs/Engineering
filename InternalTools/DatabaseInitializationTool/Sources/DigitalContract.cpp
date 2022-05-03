@@ -96,32 +96,30 @@ bool __thiscall DigitalContract::Register(
         // Setup the application parameters
         StructuredBuffer oApplicationParameters;
         oApplicationParameters.PutString("DataOwnerOrganization", m_strDataOwnerOrganizationIdentifier);
-        oApplicationParameters.PutString("ResearchOrganization", m_strResearchOrganizationIdentifier);
         oApplicationParameters.PutString("Title", m_strTitle);
         oApplicationParameters.PutString("Description", m_strDescription);
         oApplicationParameters.PutString("VersionNumber", m_strVersionNumber);
-        oApplicationParameters.PutFloat64("SubscriptionDays", (float64_t) m_unSubscriptionDays);
+        oApplicationParameters.PutUnsignedInt64("SubscriptionDays", m_unSubscriptionDays);
         oApplicationParameters.PutString("DatasetGuid", m_strAssociatedIdentifier);
         oApplicationParameters.PutString("LegalAgreement", m_strLegalAgreement);
-        oApplicationParameters.PutFloat64("DatasetDRMMetadataSize", 0);
+        oApplicationParameters.PutUnsignedInt32("DatasetDRMMetadataSize", 0);
         StructuredBuffer oEmpty;
         oApplicationParameters.PutStructuredBuffer("DatasetDRMMetadata", oEmpty);
         // Login as researcher and execute step 1 of the digital contract application
         oSailPlatformServicesSession.Login(m_strResearchAdministratorUsername, gsc_strDefaultPassword);
         std::string strDigitalContractIdentifier = oSailPlatformServicesSession.ApplyForDigitalContract(oApplicationParameters);
-
         // Setup the approval parameters
         StructuredBuffer oApprovalParameters;
         oApprovalParameters.PutString("DigitalContractGuid", strDigitalContractIdentifier);
         oApprovalParameters.PutString("Description", m_strDescription);
-        oApplicationParameters.PutString("LegalAgreement", m_strLegalAgreement);
-        oApplicationParameters.PutString("HostForVirtualMachines", m_strHostForVirtualMachines);
+        oApprovalParameters.PutString("LegalAgreement", m_strLegalAgreement);
+        oApprovalParameters.PutString("HostForVirtualMachines", m_strHostForVirtualMachines);
         oApprovalParameters.PutString("HostRegion", m_strHostRegion);
         oApprovalParameters.PutUnsignedInt64("NumberOfVirtualMachines", m_unNumberOfVirtualMachines);
         oApprovalParameters.PutUnsignedInt64("RetentionTime", m_unRetentionTime);
         // Login as data owner and execute step 2 of the digital contract approval
         oSailPlatformServicesSession.Login(m_strDataOwnerAdministratorUsername, gsc_strDefaultPassword);
-        oSailPlatformServicesSession.ApproveDigitalContract(oApplicationParameters);
+        oSailPlatformServicesSession.ApproveDigitalContract(oApprovalParameters);
         
         // Setup the activation parameters
         StructuredBuffer oActivationParameters;

@@ -10,6 +10,7 @@
 
 #include "64BitHashes.h"
 #include "Dataset.h"
+#include "DatasetReInitializer.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
@@ -106,8 +107,8 @@ Organization::Organization(
                 // Just a reality check to make sure the target file is in fact a properly formatted dataset
                 Dataset oDataset(strDatasetFilename.c_str());
                 // Now we persist the dataset information
-                Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("Title").c_str(), false);
-                m_strDatasetFilenames[qwHashOfDatasetName] = strDatasetFilename;
+                Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
+                m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
             }
         }
     }
@@ -156,7 +157,8 @@ bool __thiscall Organization::Register(
         
         // Step 1 --> Register organization, admins, users, dataset families and data federations
         // Step 2 --> Register datasets
-        // Step 3 --> Register everything
+        // Step 3 --> Do nothing, we are only registering Digital Contracts
+        // Step 4 --> Register everything
         if (1 == unStepIdentifier)
         {
             this->RegisterOrganization();
@@ -165,12 +167,14 @@ bool __thiscall Organization::Register(
             this->RegisterUsers();
             this->RegisterDataFederations();
             this->RegisterDatasetFamilies();
+            m_fRegistered = true;
         }
         else if (2 == unStepIdentifier)
         {
+            m_fRegistered = true;
             this->RegisterDatasets();
         }
-        else if (3 == unStepIdentifier)
+        else if (4 == unStepIdentifier)
         {
             this->RegisterOrganization();
             this->RegisterAdministrators();
@@ -178,10 +182,9 @@ bool __thiscall Organization::Register(
             this->RegisterUsers();
             this->RegisterDataFederations();
             this->RegisterDatasetFamilies();
+            m_fRegistered = true;
             this->RegisterDatasets();
         }
-        
-        m_fRegistered = true;
     }
     
     catch (const BaseException & c_oBaseException)
@@ -221,7 +224,8 @@ std::string __thiscall Organization::GetOrganizationalIdentifier(void) const thr
     
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     this->Login(oSailPlatformServicesSession);
-    StructuredBuffer oBasicUserInformation = oSailPlatformServicesSession.GetBasicUserInformation();
+    
+    StructuredBuffer oBasicUserInformation(oSailPlatformServicesSession.GetBasicUserInformation());
     
     return oBasicUserInformation.GetString("OrganizationGuid");
 }
@@ -237,7 +241,7 @@ std::string __thiscall Organization::GetAdminUsername(void) const throw()
     try
     {
         StructuredBuffer oAdministrator(m_stlAdministrators.begin()->c_str());
-        strAdminUserName = oAdministrator.GetString("Name");
+        strAdminUserName = oAdministrator.GetString("Email");
     }
     
     catch (const BaseException & c_oBaseException)
@@ -271,9 +275,10 @@ std::string __thiscall Organization::GetDatasetIdentifier(
     try
     {
         Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(c_strDatasetName.c_str(), false);
-        if (m_strDatasetFilenames.end() != m_strDatasetFilenames.find(qwHashOfDatasetName))
+        if (m_strDatasetInformationByFilename.end() != m_strDatasetInformationByFilename.find(qwHashOfDatasetName))
         {
-            std::string strDatasetFilename = m_strDatasetFilenames.at(qwHashOfDatasetName);
+            StructuredBuffer oDatasetInformation(m_strDatasetInformationByFilename.at(qwHashOfDatasetName).c_str());
+            std::string strDatasetFilename = oDatasetInformation.GetString("File");
             if (true == std::filesystem::exists(strDatasetFilename))
             {
                 Dataset oDataset(strDatasetFilename.c_str());
@@ -393,7 +398,7 @@ void __thiscall Organization::Login(
     // Do the login
     oSailPlatformServicesSession.Login(oAdministrator.GetString("Email"), gsc_strDefaultPassword);
 }
-
+            
 /********************************************************************************************/
 
 void __thiscall Organization::RegisterOrganization(void)
@@ -560,7 +565,11 @@ void __thiscall Organization::RegisterDatasetFamilies(void)
         oRegistrationParameters.PutString("DatasetFamilyTags", oDatasetFamily.GetString("Tags"));
         oRegistrationParameters.PutString("VersionNumber", "0x00000001");
     
-        oSailPlatformServicesSession.RegisterDatasetFamily(oRegistrationParameters);
+        std::string strDatasetFamilyIdentifier = oSailPlatformServicesSession.RegisterDatasetFamily(oRegistrationParameters);
+        // Make sure the register the dataset family identifier that is returned
+        Qword qwHashOfDatasetFamilyName = ::Get64BitHashOfNullTerminatedString(oDatasetFamily.GetString("Title").c_str(), false);
+        m_strDatasetFamilyIdentifiers[qwHashOfDatasetFamilyName] = strDatasetFamilyIdentifier;
+        // Move on to the next item
         c_stlIterator++;
     }
 }
@@ -576,28 +585,63 @@ void __thiscall Organization::RegisterDatasets(void)
     // Start a new session with SAIL Platform Services using the default administrator
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     this->Login(oSailPlatformServicesSession);
+    // Get some basic user information. We will need this in order to update the OrganizationalIdentifier
+    // in the dataset
+    StructuredBuffer oBasicUserInformation(oSailPlatformServicesSession.GetBasicUserInformation());
     // Now that we have skipped the first entry, let's process all of the additional entries
     // Basically, we are adding new users with admin access rights
-    std::unordered_map<Qword, std::string>::const_iterator c_stlIterator = m_strDatasetFilenames.begin();
-    while (m_strDatasetFilenames.end() != c_stlIterator)
-    {
-        Dataset oDataset(c_stlIterator->second.c_str());
-        StructuredBuffer oDatasetMetadata(oDataset.GetSerializedDatasetMetadata());
-        StructuredBuffer oRegistrationParameters;
-        StructuredBuffer oDatasetMetadataToRegister;
+    std::unordered_map<Qword, std::string>::const_iterator c_stlIterator = m_strDatasetInformationByFilename.begin();
+    while (m_strDatasetInformationByFilename.end() != c_stlIterator)
+    {        
+        // Load the serialized dataset information into a StructuredBuffer in order to access it
+        StructuredBuffer oDatasetInformation(c_stlIterator->second.c_str());
+        // Load an existing dataset. This dataset will be modified during registration, hence
+        // the reason why a DatassetReInitializer class was created, which wraps the
+        // shared Dataset class that is designed as an accessor only
+        DatasetReInitializer oDatasetReInitializer(oDatasetInformation.GetString("File"));
+        // Now we start resetting some of the values in the dataset to reflect what is about to be
+        // registered.
+        // Create a new identifier
+        oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
+        // Make sure the corporate identifier is updated
+        oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetString("OrganizationGuid")));
+        // Reset the publish date
+        oDatasetReInitializer.ResetUtcEpochPublishDate();
+        // If a new Title is provided in the JSON, update the title of the dataset
+        if (true == oDatasetInformation.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        {
+            oDatasetReInitializer.SetDatasetTitle(oDatasetInformation.GetString("Title"));
+        }
+        // If a new Description is provided in the JSON, update the description of the dataset
+        if (true == oDatasetInformation.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        {
+            oDatasetReInitializer.SetDatasetDescription(oDatasetInformation.GetString("Description"));
+        }
+        // If a new Tags are provided in the JSON, update the tags of the dataset
+        if (true == oDatasetInformation.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        {
+            oDatasetReInitializer.SetDatasetKeywords(oDatasetInformation.GetString("Tags"));
+        }
+        // If the new dataset has a dataset family assigned to it
+        if (true == oDatasetInformation.IsElementPresent("DatasetFamily", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        {
+            oDatasetReInitializer.SetDatasetFamily(this->GetDatasetFamilyIdentifier(oDatasetInformation.GetString("DatasetFamily")));
+        }
+        else
+        {
+            // If it doesn't have a dataset family assigned, make sure the updated dataset
+            // doesn't have one
+            oDatasetReInitializer.RemoveDatasetFamily();
+        }
+        // Now we register the dataset using the updated information
+        StructuredBuffer oDatasetMetadata(oDatasetReInitializer.GetSerializedDatasetMetadata());
+        oSailPlatformServicesSession.RegisterDataset(oDatasetReInitializer.GetDatasetIdentifier(), oDatasetMetadata);
         
-        oRegistrationParameters.PutString("DatasetGuid", oDataset.GetDatasetIdentifier());
-        oDatasetMetadataToRegister.PutString("VersionNumber", "0.1.0.0");
-        oDatasetMetadataToRegister.PutString("DatasetName", oDataset.GetTitle());
-        oDatasetMetadataToRegister.PutString("Description", oDataset.GetDescription());
-        oDatasetMetadataToRegister.PutString("Keywords", oDataset.GetTags());
-        oDatasetMetadataToRegister.PutUnsignedInt64("PublishDate", oDataset.GetEpochCreationTimeInSeconds());
-        oDatasetMetadataToRegister.PutByte("PrivacyLevel", 1);
-        oDatasetMetadataToRegister.PutString("JurisdictionalLimitations", "N/A");
-        oDatasetMetadataToRegister.PutStructuredBuffer("Tables", oDatasetMetadata.GetStructuredBuffer("Tables"));
-        oRegistrationParameters.PutStructuredBuffer("DatasetData", oDatasetMetadataToRegister);
+        // If we get here, the dataset was successfully registered. As such, let's persist
+        // the dataset changes to file
+        oDatasetReInitializer.SaveDatasetUpdates();
         
-        oSailPlatformServicesSession.RegisterDatasetFamily(oRegistrationParameters);
+        // If we get here, then the registration process has worked. Let's
         c_stlIterator++;
     }
 }

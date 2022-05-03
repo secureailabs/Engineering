@@ -20,6 +20,7 @@ static void __stdcall PrintUsage(void)
     
     std::cout << "Usage: DatabaseInitializationTool --ip=<ipaddress> --settings=<json> --step1" << std::endl
               << "   or: DatabaseInitializationTool --ip=<ipaddress> --settings=<json> --step2" << std::endl
+              << "   or: DatabaseInitializationTool --ip=<ipaddress> --settings=<json> --step3" << std::endl
               << "   or: DatabaseInitializationTool --ip=<ipaddress> --settings=<json> --allsteps" << std::endl
               << "   or: DatabaseInitializationTool --help" << std::endl << std::endl
               << "Where:" << std::endl
@@ -28,7 +29,8 @@ static void __stdcall PrintUsage(void)
               << "       --help,        Print these instructions." << std::endl
               << "       --step1,       Register organizations, users, administrators, dataset families and data federations." << std::endl
               << "       --step2,       Register datasets and digital contracts." << std::endl
-              << "       --allsteps,    Registers everything." << std::endl;
+              << "       --step3,       Register digital contracts only (assumes datasets are already registered)." << std::endl
+              << "       --allsteps,    Registers everything (i.e. step1 + step 2)." << std::endl;
 }
 
 /********************************************************************************************/
@@ -56,6 +58,11 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
     // element is the name of the organization.
     StructuredBuffer oOrganizations = oSettings.GetStructuredBuffer("Organizations");
     std::vector<std::string> strListOfOrganizationNames = oOrganizations.GetNamesOfElements();
+    // Register organizations. Based on the step index, this will either:
+    //  1 --> Register the organization
+    //  2 --> Register the datasets
+    //  3 --> Register nothing
+    //  4 --> Register the organization and then the datasets
     for (const std::string & c_strOrganizationName: strListOfOrganizationNames)
     {
         // Each element should be a StructuredBuffer, otherwise the application should throw
@@ -79,10 +86,12 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
             poOrganization->Release();
         }
     }
-    // Register digital contracts, but only if we are not running step 1
-    if ((2 == unStepIdentifier)||(3 == unStepIdentifier))
+
+    // Register digital contracts. We are assuming that datasets have been registered by the dataset tools
+    if ((2 == unStepIdentifier)||(3 == unStepIdentifier)||(4 == unStepIdentifier))
     {
-        // Now that all of the organizations are registered, let's process the digital contracts
+        // Now that all of the organizations are registered, let's process the digital contracts. We are assuming that the datasets are
+        // already registered.
         StructuredBuffer oDigitalContracts = oSettings.GetStructuredBuffer("Digital Contracts");
         oDigitalContracts.RemoveElement("__IsArray__");
         std::vector<std::string> strListOfDigitalContracts = oDigitalContracts.GetNamesOfElements();
@@ -121,6 +130,39 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
 
 /********************************************************************************************/
 
+static unsigned int GetStep(
+    _in const StructuredBuffer & c_oCommandLineParameters
+    )    
+{
+    __DebugFunction();
+    
+    unsigned int unStepIdentifier = 0;
+    
+    if (true == c_oCommandLineParameters.IsElementPresent("step1", BOOLEAN_VALUE_TYPE))
+    {
+        unStepIdentifier = 1;
+    }
+    else if (true == c_oCommandLineParameters.IsElementPresent("step2", BOOLEAN_VALUE_TYPE))
+    {
+        
+        unStepIdentifier = 2;
+    }
+    else if (true == c_oCommandLineParameters.IsElementPresent("step3", BOOLEAN_VALUE_TYPE))
+    {
+        
+        unStepIdentifier = 3;
+    }
+    else
+    {
+        __DebugAssert(true == c_oCommandLineParameters.IsElementPresent("allsteps", BOOLEAN_VALUE_TYPE));
+        unStepIdentifier = 4;
+    }
+    
+    return unStepIdentifier;
+}
+
+/********************************************************************************************/
+
 int __cdecl main(
     _in int nNumberOfArguments,
     _in const char ** pszCommandLineArguments
@@ -153,21 +195,7 @@ int __cdecl main(
             _ThrowBaseExceptionIf((false == oCommandLineArguments.IsElementPresent("settings", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Invalid command line arguments. No Json file specified.", nullptr);
             _ThrowBaseExceptionIf(((false == oCommandLineArguments.IsElementPresent("step1", BOOLEAN_VALUE_TYPE))&&(false == oCommandLineArguments.IsElementPresent("step2", BOOLEAN_VALUE_TYPE))&&(false == oCommandLineArguments.IsElementPresent("allsteps", BOOLEAN_VALUE_TYPE))), "ERROR: Invalid command line arguments. No steps specified.", nullptr);
             // Figure out which step the tool will try and run
-            unsigned int unStepIdentifier = 0;
-            if (true == oCommandLineArguments.IsElementPresent("step1", BOOLEAN_VALUE_TYPE))
-            {
-                unStepIdentifier = 1;
-            }
-            else if (true == oCommandLineArguments.IsElementPresent("step2", BOOLEAN_VALUE_TYPE))
-            {
-                
-                unStepIdentifier = 2;
-            }
-            else
-            {
-                __DebugAssert(true == oCommandLineArguments.IsElementPresent("allsteps", BOOLEAN_VALUE_TYPE));
-                unStepIdentifier = 2;
-            }
+            unsigned int unStepIdentifier = ::GetStep(oCommandLineArguments);
             // If we get here, all the command line arguments are proper. Let's save the IP address and then load the JSON file
             gs_strIpAddress = oCommandLineArguments.GetString("ip");
             // Load the JSON settings and process/register all of the setting data inside of it

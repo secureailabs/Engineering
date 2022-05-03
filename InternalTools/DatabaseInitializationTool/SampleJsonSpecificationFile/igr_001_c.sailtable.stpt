@@ -1,0 +1,51 @@
+TableProperty,ValueSeparatorCharacter,System.String,","
+TableProperty,AllowComments,System.Boolean,True
+TableProperty,CommentCharacter,System.Char,"#"
+TableProperty,HeadersOnFirstLine,System.Boolean,True
+TableProperty,QuoteCharacter,System.Char,"\""
+TableProperty,EscapeCharacter,System.Char,"\\"
+TableProperty,ColumnCount,System.Int32,4
+TableProperty,Title,System.String,"Financial information table"
+TableProperty,Description,System.String,"Salary information"
+TableProperty,Tags,System.String,""
+TableProperty,DestinationIntermediateFile,System.String,"C:\Users\Luis Miguel Huapaya\Documents\GitHub\Engineering\InternalTools\DatabaseInitializationTool\SampleJsonSpecificationFile\igr_001_c.sailtable"
+ColumnProperty,0,SourceFileHeaderName,System.String,"Columns"
+ColumnProperty,0,Name,System.String,"Columns"
+ColumnProperty,0,Identifier,System.String,"2A811B5D-27F6-414F-8380-1CFF285EB9B7"
+ColumnProperty,0,Units,System.String,"GenericString"
+ColumnProperty,0,Type,System.String,"string"
+ColumnProperty,0,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,0,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,0,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,0,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,0,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,1,SourceFileHeaderName,System.String,"age"
+ColumnProperty,1,Name,System.String,"age"
+ColumnProperty,1,Identifier,System.String,"2AD5255D-3DCA-BC4C-80CE-8C0B5DA3E9EF"
+ColumnProperty,1,Units,System.String,"GenericString"
+ColumnProperty,1,Type,System.String,"string"
+ColumnProperty,1,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,1,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,1,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,1,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,1,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,2,SourceFileHeaderName,System.String,"postcode"
+ColumnProperty,2,Name,System.String,"postcode"
+ColumnProperty,2,Identifier,System.String,"2B4553AB-99E9-C443-96DC-93C0FE9F245A"
+ColumnProperty,2,Units,System.String,"GenericString"
+ColumnProperty,2,Type,System.String,"string"
+ColumnProperty,2,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,2,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,2,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,2,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,2,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,3,SourceFileHeaderName,System.String,"salary"
+ColumnProperty,3,Name,System.String,"salary"
+ColumnProperty,3,Identifier,System.String,"28D45C34-61D6-894B-AF3A-11FC91EA8C01"
+ColumnProperty,3,Units,System.String,"GenericString"
+ColumnProperty,3,Type,System.String,"string"
+ColumnProperty,3,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,3,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,3,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,3,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,3,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True

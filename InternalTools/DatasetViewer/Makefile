@@ -6,13 +6,9 @@ CXXFLAGS+=
 LDFLAGS+=
 
 # Add the new include folders here
-INCLUDE+=-I$(shell realpath ./Include)
-INCLUDE+=-I$(SHARED_COMMON_CODE)/Include
-
-# Add the new source directory here
+INCLUDE+=-I$(shell realpath ./Sources)
 SRCDIRS+=$(shell realpath ./Sources)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
-
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
 
@@ -29,7 +25,7 @@ $(OUTPUT): $(OBJS) SharedCommonCode
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 
 clean:
-	rm -rf $(OUTPUT) $(OBJS)
+	@rm -rf $(OUTPUT) $(OBJS)
 
 cleanall:
-	rm -rf $(ABSROOTDIR)/Binary
+	@rm -rf $(ABSROOTDIR)/Binary

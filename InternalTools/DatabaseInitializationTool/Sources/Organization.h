@@ -34,7 +34,7 @@ class Organization : public Object
             _in Word wSailPlatformServicesPortNumber,
             _in unsigned int unStepIdentifier
             ) throw();
-
+            
         // The following information is needed when trying to register
         // digital contracts. So once an organization is registered, these
         // methods can be used to keep track of data that will be
@@ -90,7 +90,7 @@ class Organization : public Object
         std::unordered_set<std::string> m_stlContacts;
         std::unordered_set<std::string> m_stlAdministrators;
         std::unordered_set<std::string> m_stlUsers;
-        std::unordered_map<Qword, std::string> m_strDatasetFilenames;
+        std::unordered_map<Qword, std::string> m_strDatasetInformationByFilename;
         std::unordered_set<std::string> m_stlDatasetFamilies;
         std::unordered_map<Qword, std::string> m_strDatasetFamilyIdentifiers;
         std::unordered_set<std::string> m_stlDataFederations;

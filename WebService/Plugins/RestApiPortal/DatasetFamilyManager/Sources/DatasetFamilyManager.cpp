@@ -351,11 +351,12 @@ std::vector<Byte> __thiscall DatasetFamilyManager::RegisterDatasetFamily(
             poTlsNode->Release();
             poTlsNode = nullptr;
 
-            // Check if DatabaseManager registered the dataset or not
+            // Check if DatabaseManager registered the dataset family or not
             StructuredBuffer oDatabaseResponse(stlResponse);
-            if (201 == oDatabaseResponse.GetDword("Status") )
+            if (201 == oDatabaseResponse.GetDword("Status"))
             {
                 oResponse.PutBuffer("Eosb", oUserInfo.GetBuffer("Eosb"));
+                oResponse.PutString("DatasetFamilyIdentifier", strNewGuid);
                 dwStatus = 201;
             }
             else

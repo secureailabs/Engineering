@@ -400,35 +400,44 @@ void __thiscall DigitalContractDatabase::InitializePlugin(
     oEosb.PutByte("ElementType", BUFFER_VALUE_TYPE);
     oEosb.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("Eosb", oEosb);
+    
     StructuredBuffer oGuid;
     oGuid.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oGuid.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("DataOwnerOrganization", oGuid);
+    
     StructuredBuffer oTitle;
     oTitle.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oTitle.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("Title", oTitle);
+    
     StructuredBuffer oDescription;
     oDescription.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oDescription.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("Description", oDescription);
+    
     StructuredBuffer oVersionNumber;
     oVersionNumber.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oVersionNumber.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("VersionNumber", oVersionNumber);
+    
     StructuredBuffer oSubscriptionDays;
     oSubscriptionDays.PutByte("ElementType", UINT64_VALUE_TYPE);
     oSubscriptionDays.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("SubscriptionDays", oSubscriptionDays);
+    
     oRegisterDc.PutStructuredBuffer("DatasetGuid", oGuid);
+    
     StructuredBuffer oLegalAgreement;
     oLegalAgreement.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oLegalAgreement.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("LegalAgreement", oLegalAgreement);
+    
     StructuredBuffer oDatasetDRMMetadataSize;
     oDatasetDRMMetadataSize.PutByte("ElementType", UINT32_VALUE_TYPE);
     oDatasetDRMMetadataSize.PutBoolean("IsRequired", true);
     oRegisterDc.PutStructuredBuffer("DatasetDRMMetadataSize", oDatasetDRMMetadataSize);
+    
     StructuredBuffer oDatasetDRMMetadata;
     oDatasetDRMMetadata.PutByte("ElementType", INDEXED_BUFFER_VALUE_TYPE);
     oDatasetDRMMetadata.PutBoolean("IsRequired", true);
@@ -442,13 +451,17 @@ void __thiscall DigitalContractDatabase::InitializePlugin(
     oDcGuid.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oDcGuid.PutBoolean("IsRequired", true);
     oDcAcceptance.PutStructuredBuffer("DigitalContractGuid", oDcGuid);
+  
     oDescription.PutBoolean("IsRequired", false);
     oDcAcceptance.PutStructuredBuffer("Description", oDescription);
+    
     StructuredBuffer oRetentionTime;
     oRetentionTime.PutByte("ElementType", UINT64_VALUE_TYPE);
     oRetentionTime.PutBoolean("IsRequired", true);
     oDcAcceptance.PutStructuredBuffer("RetentionTime", oRetentionTime);
+    
     oDcAcceptance.PutStructuredBuffer("LegalAgreement", oLegalAgreement);
+    
     StructuredBuffer oHostForVM;
     oHostForVM.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
     oHostForVM.PutBoolean("IsRequired", true);

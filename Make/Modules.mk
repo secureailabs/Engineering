@@ -6,6 +6,7 @@ WEB_SERVICES_SHARED:=$(ROOTDIR)/WebService/SharedCommonCode
 REST_API_PORTAL:=$(ROOTDIR)/WebService/RestApiPortal
 DATABASE_PORTAL:=$(ROOTDIR)/WebService/DatabaseGateway
 
+DATASET_VIEWER_TOOL:=$(ROOTDIR)/InternalTools/DatasetViewer
 DATABASE_INITIALIZATION_TOOL:=$(ROOTDIR)/InternalTools/DatabaseInitializationTool
 DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DatabaseTools
 DEMO_DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DemoDatabaseTools

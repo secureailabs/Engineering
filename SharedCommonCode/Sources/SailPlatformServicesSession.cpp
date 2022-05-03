@@ -281,7 +281,7 @@ StructuredBuffer __thiscall SailPlatformServicesSession::GetBasicUserInformation
     // Did the call succeed?
     _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error getting basic user information.", nullptr);
     
-    return oResponse;
+    return StructuredBuffer(oResponse);
 }
 
 /********************************************************************************************
@@ -324,7 +324,7 @@ void __thiscall SailPlatformServicesSession::RegisterUser(
  *
  ********************************************************************************************/
 
-void __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
+std::string __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
     _in const StructuredBuffer & c_oRegistrationParameters
     )
 {
@@ -344,6 +344,9 @@ void __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
     _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error registering new dataset family.", nullptr);
+    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("DatasetFamilyIdentifier", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Missing return value of 'DatasetFamilyIdentifier'.", nullptr);
+    
+    return oResponse.GetString("DatasetFamilyIdentifier");
 }
 
 /********************************************************************************************
@@ -356,7 +359,8 @@ void __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
  ********************************************************************************************/
  
 void __thiscall SailPlatformServicesSession::RegisterDataset(
-    _in const StructuredBuffer & c_oRegistrationParameters
+    _in const Guid & c_oDatasetIdentifier,
+    _in const StructuredBuffer & c_oDatasetMetadata
     )
 {
     __DebugFunction();
@@ -366,10 +370,23 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
     std::string strEosb = this->GetEosb();
+    // Build the API call
+    StructuredBuffer oRequestBody;
+    oRequestBody.PutString("DatasetGuid", c_oDatasetIdentifier.ToString(eHyphensOnly));
+    StructuredBuffer oDatasetMetadataToRegister;
+    oDatasetMetadataToRegister.PutString("VersionNumber", "0.1.0");
+    oDatasetMetadataToRegister.PutString("DatasetName", c_oDatasetMetadata.GetString("Title"));
+    oDatasetMetadataToRegister.PutString("Description", c_oDatasetMetadata.GetString("Description"));
+    oDatasetMetadataToRegister.PutString("Keywords", c_oDatasetMetadata.GetString("Tags"));
+    oDatasetMetadataToRegister.PutUnsignedInt64("PublishDate", c_oDatasetMetadata.GetUnsignedInt64("PublishDate"));
+    oDatasetMetadataToRegister.PutByte("PrivacyLevel", 1);
+    oDatasetMetadataToRegister.PutString("JurisdictionalLimitations", "N/A");
+    oDatasetMetadataToRegister.PutStructuredBuffer("Tables", c_oDatasetMetadata.GetStructuredBuffer("Tables"));
+    oRequestBody.PutStructuredBuffer("DatasetData", oDatasetMetadataToRegister);
     // Prepare the API call
     std::string strVerb = "POST";
     std::string strApiUrl = "/SAIL/DatasetManager/RegisterDataset?Eosb=" + strEosb;
-    std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::string strJsonBody = ::ConvertStructuredBufferToJson(oRequestBody);
     // Make the API call and get REST response
     std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());

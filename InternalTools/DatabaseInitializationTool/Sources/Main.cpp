@@ -7,6 +7,7 @@
 #include "ExceptionRegister.h"
 #include "JsonParser.h"
 #include "Organization.h"
+#include "SailPlatformServicesSession.h"
 
 #include <iostream>
 
@@ -42,6 +43,8 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
 {
     __DebugFunction();
     
+    // Keep track of whether or not we've deleted the database
+    bool fDatabaseDeleted = false;
     // Container used to keep track of the identifiers for each registered organization. This
     // will be needed when registering digital contracts (i.e. registering organizations
     // generated things like identifiers, etc..., and we need to keep track of then for when
@@ -70,8 +73,9 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         StructuredBuffer oOrganization(oOrganizations.GetStructuredBuffer(c_strOrganizationName.c_str()));
         Organization * poOrganization = new Organization(c_strOrganizationName, oOrganization);
         // Register the organization
-        if (true == poOrganization->Register(gs_strIpAddress, 6200, unStepIdentifier))
+        if (true == poOrganization->Register(gs_strIpAddress, 6200, unStepIdentifier, !fDatabaseDeleted))
         {
+            fDatabaseDeleted = true;
             // Keep track of the name-identifier tuple since it will be needed when registering
             // digital contracts
             stlListOfOrganizationsByName[::Get64BitHashOfNullTerminatedString(poOrganization->GetOrganizationalName().c_str(), false)] = poOrganization;

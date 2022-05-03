@@ -119,14 +119,13 @@ pipeline {
                         docker exec -w /app platformservices sh -c "pwd"
                         docker exec -w /app platformservices sh -c "ls -l"
                         docker exec -w /app platformservices sh -c "ps -ef"
-                        ./DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200
+                        ./DatabaseInitializationTool --ip=127.0.0.1 --settings="DatabaseInitializationSettings.json" --allsteps
                         '''
                     } catch (exception) {
                         echo getStackTrace(exception)
                         echo 'Error detected, retrying...'
                         sh '''
-                        ./DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200 -d
-                        ./DemoDatabaseTools --PortalIp=127.0.0.1 --Port=6200
+                        ./DatabaseInitializationTool --ip=127.0.0.1 --settings="DatabaseInitializationSettings.json" --allsteps
                         '''
                     }
                 }

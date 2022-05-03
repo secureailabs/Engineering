@@ -82,7 +82,9 @@ class SailPlatformServicesSession : public Object
         void __thiscall ActivateDigitalContract(
             _in const StructuredBuffer & c_oRegistrationParameters
             );
-            
+        
+        void __thiscall ResetDatabase(void);
+        
     private:
     
         bool __thiscall IsRunning(void) const throw();

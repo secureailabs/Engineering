@@ -32,7 +32,8 @@ class Organization : public Object
         bool __thiscall Register(
             _in const std::string & c_strSailPlatformServicesIpAddress,
             _in Word wSailPlatformServicesPortNumber,
-            _in unsigned int unStepIdentifier
+            _in unsigned int unStepIdentifier,
+            _in bool fDeleteDatabase
             ) throw();
             
         // The following information is needed when trying to register

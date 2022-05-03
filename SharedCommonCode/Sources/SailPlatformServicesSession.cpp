@@ -493,6 +493,32 @@ void __thiscall SailPlatformServicesSession::ActivateDigitalContract(
 /********************************************************************************************
  *
  * @class SailPlatformServicesSession
+ * @function ResetDatabase
+ * @brief This function resets the backend database to zero
+ *
+ ********************************************************************************************/
+ 
+void __thiscall SailPlatformServicesSession::ResetDatabase(void)
+{
+    __DebugFunction();
+    
+    // Get the ip address and port number
+    std::string strServerIpAddress = this->GetServerIpAddress();
+    Word wServerPortNumber = this->GetServerPortNumber();
+    // Prepare the API call
+    std::string strVerb = "DELETE";
+    std::string strApiUrl = "/SAIL/AuthenticationManager/Admin/ResetDatabase";
+    std::string strJsonBody = "";
+    // Make the API call and get REST response
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+    // Did the call succeed?
+    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error deleting database.", nullptr);
+}
+
+/********************************************************************************************
+ *
+ * @class SailPlatformServicesSession
  * @function StartSession
  * @brief Private method used to start a running session
  * @param[in] c_strEosb (string) EOSB for the current session

@@ -60,12 +60,14 @@ make package_platformservices -j
 make package_dataservices -j
 make package_securecomputationnode -j
 make uploadPackageAndInitializationVector -j
+make databaseInitializationTool -j
 make package_webfrontend -j
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir
 
 # Copy the files to the temporary directory
+cp Binary/DatabaseInitializationTool $tempDeployDir
 cp Binary/UploadPackageAndInitializationVector $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 mv Binary/webfrontend.tar.gz $tempDeployDir

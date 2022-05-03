@@ -145,7 +145,8 @@ Organization::~Organization(void)
 bool __thiscall Organization::Register(
     _in const std::string & c_strSailPlatformServicesIpAddress,
     _in Word wSailPlatformServicesPortNumber,
-    _in unsigned int unStepIdentifier
+    _in unsigned int unStepIdentifier,
+    _in bool fDeleteDatabase
     ) throw()
 {
     __DebugFunction();
@@ -161,6 +162,14 @@ bool __thiscall Organization::Register(
         // Step 4 --> Register everything
         if (1 == unStepIdentifier)
         {
+            // When we register the very first organization, we get a flag asking us to
+            // first delete the database
+            if (true == fDeleteDatabase)
+            {
+                SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
+                oSailPlatformServicesSession.ResetDatabase();
+            }
+            
             this->RegisterOrganization();
             this->RegisterAdministrators();
             this->RegisterContacts();
@@ -176,6 +185,15 @@ bool __thiscall Organization::Register(
         }
         else if (4 == unStepIdentifier)
         {
+            // When we register the very first organization, we get a flag asking us to
+            // first delete the database
+            
+            if (true == fDeleteDatabase)
+            {
+                SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
+                oSailPlatformServicesSession.ResetDatabase();
+            }
+            
             this->RegisterOrganization();
             this->RegisterAdministrators();
             this->RegisterContacts();

@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <thread>
 #include <filesystem>
+#include <iostream>
 
 #include <unistd.h>
 
@@ -2035,15 +2036,16 @@ std::vector<Byte> __thiscall DigitalContractDatabase::RegisterDcAuditEvent(
         // Call AuditLogManager plugin to get the guid of DC event log
         std::string strDcEventGuid;
         poIpcAuditLogManager = ::ConnectToUnixDomainSocket("/tmp/{F93879F1-7CFD-400B-BAC8-90162028FC8E}");
-        StructuredBuffer oAuditLogResponse(::PutIpcTransactionAndGetResponse(poIpcAuditLogManager, oGetDcBranchEventRequest, false));
+        std::vector<Byte> stlApiResponse{::PutIpcTransactionAndGetResponse(poIpcAuditLogManager, oGetDcBranchEventRequest, false)};
+        StructuredBuffer oAuditLogResponse{::ConvertJsonStringToStructuredBuffer((const char *) stlApiResponse.data())};
         poIpcAuditLogManager->Release();
         poIpcAuditLogManager = nullptr;
-        if (200 == oAuditLogResponse.GetDword("Status"))
+        if (200 == (unsigned int) oAuditLogResponse.GetFloat64("Status"))
         {
             StructuredBuffer oListOfEvents = oAuditLogResponse.GetStructuredBuffer("ListOfEvents");
             if (0 < oListOfEvents.GetNamesOfElements().size())
             {
-                std::string strRootEventGuid = oListOfEvents.GetStructuredBuffer(oListOfEvents.GetNamesOfElements()[0].c_str()).GetGuid("EventGuid").ToString(eHyphensAndCurlyBraces);
+                std::string strRootEventGuid = oListOfEvents.GetStructuredBuffer(oListOfEvents.GetNamesOfElements()[0].c_str()).GetString("EventGuid");
                 // Create a DC branch event for DCGuid
                 StructuredBuffer oDcBranchEvent;
                 oDcBranchEvent.PutDword("TransactionType", 0x00000001);

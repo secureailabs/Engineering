@@ -4,7 +4,7 @@ include Make/dataservices.mk
 include Make/webfrontend.mk
 include Make/securecomputationnode.mk
 
-.PHONY: platformservices dataservices securecomputationnode orchestrator datasetViewer databaseInitializationTool uploadPackageAndInitializationVector package all clean SharedCommonCode
+.PHONY: platformservices dataservices databaseInitializationTool datasetViewer securecomputationnode orchestrator safefunctioncompiler uploadPackageAndInitializationVector package all clean SharedCommonCode
 
 platformservices: SharedCommonCode WebServices_Shared
 	@make restapiportal platformservices_plugins
@@ -17,6 +17,10 @@ dataservices: SharedCommonCode
 orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all
 	@echo "orchestrator done!"
+
+safefunctioncompiler: SharedCommonCode
+	@make -C $(SAFE_OBJECT_COMPILER) all
+	@echo "safefunctioncompiler done!"
 
 securecomputationnode: SharedCommonCode VirtualMachine_Shared
 	@make scn_componenets
@@ -53,7 +57,7 @@ VirtualMachine_Shared:
 
 all: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 	@make package
-	@make datasetViewer databaseInitializationTool baseVmInit uploadPackageAndInitializationVector
+	@make databaseInitializationTool datasetViewer baseVmInit uploadPackageAndInitializationVector safefunctioncompiler
 	@echo "All build and packaged!"
 
 clean:

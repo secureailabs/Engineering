@@ -39,6 +39,7 @@ $(OBJDIR)%.o: $(ABSROOTDIR)%.c
 $(OUTPUT): $(OBJS) SharedCommonCode
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS) $(LDLIBS)
+	cp $(OUTPUT) $(SRCDIRS)/../SafeObjectCompiler/SafeObjectCompiler
 
 clean:
 	rm -rf $(OUTPUT) $(OBJS)

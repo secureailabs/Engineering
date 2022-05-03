@@ -9,6 +9,7 @@ DATABASE_PORTAL:=$(ROOTDIR)/WebService/DatabaseGateway
 DATASET_VIEWER_TOOL:=$(ROOTDIR)/InternalTools/DatasetViewer
 DATABASE_INITIALIZATION_TOOL:=$(ROOTDIR)/InternalTools/DatabaseInitializationTool
 DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DatabaseTools
+SAFE_OBJECT_COMPILER:=$(ROOTDIR)/EndPointTools/SafeObjectTools/SafeObjectCompiler/Source
 DEMO_DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DemoDatabaseTools
 UPLOAD_TOOL:=$(ROOTDIR)/InternalTools/UploadPackageAndInitializationVector
 CRYPTOGRAPHIC_TOOLS:=$(ROOTDIR)/InternalTools/CryptographicTools

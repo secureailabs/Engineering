@@ -14,6 +14,7 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 
+#include <filesystem>
 #include <iostream>
 
 /********************************************************************************************/
@@ -24,7 +25,7 @@ Dataset::Dataset(
 {
     __DebugFunction();
     __DebugAssert(nullptr != c_szFullFilename);
-
+    
     BinaryFileReader oBinaryFileReader(c_szFullFilename);
     Qword qwMarker;
     oBinaryFileReader.Read((void *) &qwMarker, sizeof(qwMarker));

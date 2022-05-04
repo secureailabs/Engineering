@@ -106,8 +106,6 @@ void __stdcall RegisterBaseException(
         strExceptionMessage += std::to_string(unLineNumber);
         
         ::RegisterException(strExceptionMessage);
-        
-        std::cout << strExceptionMessage << std::endl;
     }
 
     catch(...)
@@ -149,8 +147,6 @@ void __stdcall RegisterStandardException(
         strExceptionMessage += std::to_string(unLineNumber);
 
         ::RegisterException(strExceptionMessage);
-        
-        std::cout << strExceptionMessage << std::endl;
     }
 
     catch(...)
@@ -188,8 +184,6 @@ void __stdcall RegisterUnknownException(
         strExceptionMessage += std::to_string(unLineNumber);
         
         ::RegisterException(strExceptionMessage);
-        
-        std::cout << strExceptionMessage << std::endl;
     }
 
     catch(...)

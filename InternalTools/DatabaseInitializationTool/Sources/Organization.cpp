@@ -613,51 +613,59 @@ void __thiscall Organization::RegisterDatasets(void)
     {        
         // Load the serialized dataset information into a StructuredBuffer in order to access it
         StructuredBuffer oDatasetInformation(c_stlIterator->second.c_str());
-        // Load an existing dataset. This dataset will be modified during registration, hence
-        // the reason why a DatassetReInitializer class was created, which wraps the
-        // shared Dataset class that is designed as an accessor only
-        DatasetReInitializer oDatasetReInitializer(oDatasetInformation.GetString("File"));
-        // Now we start resetting some of the values in the dataset to reflect what is about to be
-        // registered.
-        // Create a new identifier
-        oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
-        // Make sure the corporate identifier is updated
-        oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetString("OrganizationGuid")));
-        // Reset the publish date
-        oDatasetReInitializer.ResetUtcEpochPublishDate();
-        // If a new Title is provided in the JSON, update the title of the dataset
-        if (true == oDatasetInformation.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))
+        std::string strDatasetFile = oDatasetInformation.GetString("File");
+        if (false == std::filesystem::exists(strDatasetFile))
         {
-            oDatasetReInitializer.SetDatasetTitle(oDatasetInformation.GetString("Title"));
-        }
-        // If a new Description is provided in the JSON, update the description of the dataset
-        if (true == oDatasetInformation.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))
-        {
-            oDatasetReInitializer.SetDatasetDescription(oDatasetInformation.GetString("Description"));
-        }
-        // If a new Tags are provided in the JSON, update the tags of the dataset
-        if (true == oDatasetInformation.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE))
-        {
-            oDatasetReInitializer.SetDatasetKeywords(oDatasetInformation.GetString("Tags"));
-        }
-        // If the new dataset has a dataset family assigned to it
-        if (true == oDatasetInformation.IsElementPresent("DatasetFamily", ANSI_CHARACTER_STRING_VALUE_TYPE))
-        {
-            oDatasetReInitializer.SetDatasetFamily(this->GetDatasetFamilyIdentifier(oDatasetInformation.GetString("DatasetFamily")));
+            std::cout << "ERROR: Dataset file not found (" << strDatasetFile << ")" << std::endl;
         }
         else
         {
-            // If it doesn't have a dataset family assigned, make sure the updated dataset
-            // doesn't have one
-            oDatasetReInitializer.RemoveDatasetFamily();
+            // Load an existing dataset. This dataset will be modified during registration, hence
+            // the reason why a DatassetReInitializer class was created, which wraps the
+            // shared Dataset class that is designed as an accessor only
+            DatasetReInitializer oDatasetReInitializer(oDatasetInformation.GetString("File"));
+            // Now we start resetting some of the values in the dataset to reflect what is about to be
+            // registered.
+            // Create a new identifier
+            oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
+            // Make sure the corporate identifier is updated
+            oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetString("OrganizationGuid")));
+            // Reset the publish date
+            oDatasetReInitializer.ResetUtcEpochPublishDate();
+            // If a new Title is provided in the JSON, update the title of the dataset
+            if (true == oDatasetInformation.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            {
+                oDatasetReInitializer.SetDatasetTitle(oDatasetInformation.GetString("Title"));
+            }
+            // If a new Description is provided in the JSON, update the description of the dataset
+            if (true == oDatasetInformation.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            {
+                oDatasetReInitializer.SetDatasetDescription(oDatasetInformation.GetString("Description"));
+            }
+            // If a new Tags are provided in the JSON, update the tags of the dataset
+            if (true == oDatasetInformation.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            {
+                oDatasetReInitializer.SetDatasetKeywords(oDatasetInformation.GetString("Tags"));
+            }
+            // If the new dataset has a dataset family assigned to it
+            if (true == oDatasetInformation.IsElementPresent("DatasetFamily", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            {
+                oDatasetReInitializer.SetDatasetFamily(this->GetDatasetFamilyIdentifier(oDatasetInformation.GetString("DatasetFamily")));
+            }
+            else
+            {
+                // If it doesn't have a dataset family assigned, make sure the updated dataset
+                // doesn't have one
+                oDatasetReInitializer.RemoveDatasetFamily();
+            }
+            // Now we register the dataset using the updated information
+            StructuredBuffer oDatasetMetadata(oDatasetReInitializer.GetSerializedDatasetMetadata());
+            oSailPlatformServicesSession.RegisterDataset(oDatasetReInitializer.GetDatasetIdentifier(), oDatasetMetadata);
+            
+            // If we get here, the dataset was successfully registered. As such, let's persist
+            // the dataset changes to file
+            oDatasetReInitializer.SaveDatasetUpdates();
         }
-        // Now we register the dataset using the updated information
-        StructuredBuffer oDatasetMetadata(oDatasetReInitializer.GetSerializedDatasetMetadata());
-        oSailPlatformServicesSession.RegisterDataset(oDatasetReInitializer.GetDatasetIdentifier(), oDatasetMetadata);
-        
-        // If we get here, the dataset was successfully registered. As such, let's persist
-        // the dataset changes to file
-        oDatasetReInitializer.SaveDatasetUpdates();
         
         // If we get here, then the registration process has worked. Let's
         c_stlIterator++;

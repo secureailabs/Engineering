@@ -2,7 +2,7 @@
   "plugins": ["import", "react", "@typescript-eslint", "react-hooks"],
   
   "parserOptions": {
-    "project": "./tsconfig.json",
+    "project": "client/tsconfig.json",
     "tsconfigRootDir": "./",
     "sourceType": "esnext",
     "ecmaVersion": "latest"

@@ -9,7 +9,12 @@
 #include "Organization.h"
 #include "SailPlatformServicesSession.h"
 
+#include <filesystem>
 #include <iostream>
+
+#include <libgen.h>         // dirname
+#include <unistd.h>         // readlink, chdir
+#include <linux/limits.h>   // PATH_MAX
 
 static std::string gs_strIpAddress;
 
@@ -167,6 +172,22 @@ static unsigned int GetStep(
 
 /********************************************************************************************/
 
+static std::string __stdcall GetExecutableFolder(void) throw()
+{
+    __DebugFunction();
+
+    std::string strExecutableFolder;
+    char szExecutableFullPathName[PATH_MAX] = { 0 };
+    if (-1 != ::readlink("/proc/self/exe", szExecutableFullPathName, PATH_MAX))
+    {
+        strExecutableFolder = ::dirname(szExecutableFullPathName);
+    }
+    
+    return strExecutableFolder;
+}
+
+/********************************************************************************************/
+
 int __cdecl main(
     _in int nNumberOfArguments,
     _in const char ** pszCommandLineArguments
@@ -176,9 +197,14 @@ int __cdecl main(
 
     // By default
     int nReturnValue = -1;
+    std::string strStartingFolder = std::filesystem::current_path();
     
     try
-    {
+    {    
+        // Change the working folder to be that of the executable
+        ::chdir(::GetExecutableFolder().c_str());
+        
+        // Now run the tool
         std::cout << "+=============================================================================================+" << std::endl;
         std::cout << "| Database Initialization Tool, Copyright (C) 2022 Secure AI Labs, Inc., All Rights Reserved. |" << std::endl;
         std::cout << "| by Luis Miguel Huapaya                                                                      |" << std::endl;
@@ -231,6 +257,9 @@ int __cdecl main(
         std::string strRegisteredException = ::GetNextRegisteredException();
         std::cout << strRegisteredException << std::endl << std::endl;
     }
+    
+    // Make sure to return to the starting folder before exiting
+    ::chdir(strStartingFolder.c_str());
     
     return nReturnValue;
 }

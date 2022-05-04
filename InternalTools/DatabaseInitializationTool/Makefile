@@ -26,6 +26,8 @@ $(OUTPUT): $(OBJS) SharedCommonCode
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
 	@cp -f $(SAMPLEFILES)/*.csvp $(ABSROOTDIR)/Binary
 	@cp -f $(SAMPLEFILES)/DatabaseInitializationSettings.json $(ABSROOTDIR)/Binary
+	@chmod a+rw,g+rw,o+rw $(ABSROOTDIR)/Binary/*.csvp
+	@chmod a+rwx,g+rwx,o+rwx $(ABSROOTDIR)/Binary
 
 clean:
 	@rm -rf $(OUTPUT) $(OBJS)

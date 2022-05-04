@@ -210,7 +210,7 @@ router.get(
   }
 );
 
-// -- ListDatasets --
+// -- PullDataset --
 router.get(
   '/DatasetManager/PullDataset',
   eosbManager({ order: 'pre-request' }),

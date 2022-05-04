@@ -9,7 +9,6 @@ const VirtualMachineInfo: React.FC<TVirtualMachineInfoSuccess> = ({
   virtualMachineID,
 }) => {
   console.log('VIRTUAL MACHINE DATA: ', getVirtualMachineData);
-  const [modalIsOpen, setIsOpen] = React.useState(false);
 
   if (getVirtualMachineData) {
     const data = getVirtualMachineData;

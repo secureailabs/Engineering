@@ -41,7 +41,7 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
       },
       {
         Header: 'Dataset Owner',
-        accessor: 'DatasetOwners',
+        accessor: 'OrganizationName',
         width: 200,
       },
     ],
@@ -53,11 +53,16 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
       return {
         key,
         ...value,
-        PublishDate: faker.date.recent(3).toLocaleDateString('en-US', {
+        PublishDate: new Date(value.PublishDate * 1000).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         }),
+        // PublishDate: faker.date.recent(3).toLocaleDateString('en-US', {
+        //   year: 'numeric',
+        //   month: 'long',
+        //   day: 'numeric',
+        // }),
       };
     })
     .sort((elem1, elem2) => elem1.PublishDate.localeCompare(elem2.PublishDate));

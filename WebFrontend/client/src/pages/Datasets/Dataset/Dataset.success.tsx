@@ -11,7 +11,7 @@ import { TDatasetSuccessProps } from './Dataset.types';
 import getPartnerOrg from '@utils/getPartnerOrg';
 
 import Button from '@secureailabs/web-ui/components/Button';
-
+import Modal from '@secureailabs/web-ui/components/Modal';
 import Table from '@components/Table';
 
 const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
@@ -19,6 +19,7 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
     mode: 'onSubmit',
     defaultValues: {
       ...getDatasetData,
+      DataOwner: getDatasetData.OrganizationName,
       NumberOfVersions: Object.keys(getDatasetData?.Versions || {})
         .length,
       PublishDate: new Date(
@@ -62,6 +63,7 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
     return {
       key,
       ...value,
+      DataOwner: value.OrganizationName,
       PublishDate: new Date(value.PublishDate * 1000).toLocaleDateString(
         'en-US',
         {
@@ -72,6 +74,9 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
       ),
     };
   });
+
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+
   return (
     <div>
       <StandardContent back={true} title={getDatasetData?.DatasetName}>
@@ -109,10 +114,42 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
           marginLeft: '5rem',
         }}
       >
-        <Button full={false} button_type="primary">
+        <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
           Request Access
         </Button>
       </div>
+      {modalIsOpen && 
+        <Modal
+          title='Request Dataset Access'
+          description="To request access to this dataset, enter the title of your research, for how long you'll need access to the data, and any comments regarding your request."
+          close={() => { setIsOpen(false) }}
+        >
+          <form className="form">
+            <FormFieldsRenderer
+              register={register}
+              button_text="Request Data Access"
+              formState={formState}
+              fields={{
+                title: {
+                  label: 'Title',
+                  placeholder: 'Title',
+                  type: 'text',
+                },
+                access_duration: {
+                  label: 'Access Duration (days)',
+                  placeholder: 'Access Duration (days)',
+                  type: 'text',
+                },
+                comments: {
+                  label: 'Request Comments',
+                  placeholder: 'Comments',
+                  type: 'textarea',
+                },
+              }}
+            />
+          </form>
+        </Modal>
+      }
     </div>
   );
 };

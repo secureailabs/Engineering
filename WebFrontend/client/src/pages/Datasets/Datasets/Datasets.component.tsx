@@ -17,7 +17,7 @@ import { TGetAllDatasetsSuccess } from '@redux/dataset/dataset.typeDefs';
 import { demo_data } from "@redux/dataset/dataset.data";
 
 const fetch = async (): Promise<TGetAllDatasetsSuccess['Datasets']> => {
-  return demo_data.Datasets;
+  // return demo_data.Datasets;
   const res = await axios.get<TGetAllDatasetsSuccess>
   (`${axiosProxy()}/api/v1/DatasetManager/ListDatasets`, 
   {

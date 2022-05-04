@@ -23,13 +23,13 @@ import { demo_data } from "@redux/dataset/dataset.data";
 
 
 const fetch = async ({ id }: { id: string }): Promise<TGetDatasetSuccess['Dataset']> => {
-  return demo_data?.Datasets?.[id];
-  // const res = await axios.get<TGetDatasetSuccess>
-  // (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-  // {
-  //   withCredentials: true,
-  // });
-  // return res.data.Dataset;
+  // return demo_data?.Datasets?.[id];
+  const res = await axios.get<TGetDatasetSuccess>
+  (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+  {
+    withCredentials: true,
+  });
+  return res.data.Dataset;
 }
 
 

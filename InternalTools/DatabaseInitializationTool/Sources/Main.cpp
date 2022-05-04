@@ -47,98 +47,92 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
     )
 {
     __DebugFunction();
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(c_strJsonSettingsFilename)), "ERROR: JSON specification file not found (%s)", c_strJsonSettingsFilename.c_str());
     
-    if (false == std::filesystem::exists(c_strJsonSettingsFilename))
+    // Keep track of whether or not we've deleted the database
+    bool fDatabaseDeleted = false;
+    // Container used to keep track of the identifiers for each registered organization. This
+    // will be needed when registering digital contracts (i.e. registering organizations
+    // generated things like identifiers, etc..., and we need to keep track of then for when
+    // we register digital contracts.
+    std::unordered_map<Qword, Organization *> stlListOfOrganizationsByName;
+    // Open the target JSON settings file
+    BinaryFileReader oBinaryFileReader(c_strJsonSettingsFilename);
+    // Read the entire file in one single call
+    std::vector<Byte> stlJsonData = oBinaryFileReader.Read(oBinaryFileReader.GetSizeInBytes());
+    // Convert the input file into a StructuredBuffer
+    StructuredBuffer oSettings = ::ConvertJsonStringToStructuredBuffer((const char *) stlJsonData.data());
+    // There are two main portions to the JSON file. Organizations and Digital Contracts
+    // Let's parse through all of the organization first. The names of each StructuredBuffer
+    // element is the name of the organization.
+    StructuredBuffer oOrganizations = oSettings.GetStructuredBuffer("Organizations");
+    std::vector<std::string> strListOfOrganizationNames = oOrganizations.GetNamesOfElements();
+    // Register organizations. Based on the step index, this will either:
+    //  1 --> Register the organization
+    //  2 --> Register the datasets
+    //  3 --> Register nothing
+    //  4 --> Register the organization and then the datasets
+    for (const std::string & c_strOrganizationName: strListOfOrganizationNames)
     {
-        std::cout << "ERROR: JSON specification file not found (" << c_strJsonSettingsFilename << ")" << std::endl;
+        // Each element should be a StructuredBuffer, otherwise the application should throw
+        // an exception and terminate. This is done automatically when calling GetStructuredBuffer()
+        StructuredBuffer oOrganization(oOrganizations.GetStructuredBuffer(c_strOrganizationName.c_str()));
+        Organization * poOrganization = new Organization(c_strOrganizationName, oOrganization);
+        // Register the organization
+        if (true == poOrganization->Register(gs_strIpAddress, 6200, unStepIdentifier, !fDatabaseDeleted))
+        {
+            fDatabaseDeleted = true;
+            // Keep track of the name-identifier tuple since it will be needed when registering
+            // digital contracts
+            stlListOfOrganizationsByName[::Get64BitHashOfNullTerminatedString(poOrganization->GetOrganizationalName().c_str(), false)] = poOrganization;
+            // Print out some information so that we can visibly see what just got registered
+            std::cout << "Registered organization \"" << poOrganization->GetOrganizationalName() << "\" which was given identifier " << poOrganization->GetOrganizationalIdentifier() << std::endl;
+        }
+        else
+        {
+            // Print out some information so that we can visibly see what just failed
+            std::cout << "Failed to registered organization \"" << poOrganization->GetOrganizationalName() << "\"" << std::endl;
+            // Make sure to delete the organization object since it won't be used
+            poOrganization->Release();
+        }
     }
-    else
+
+    // Register digital contracts. We are assuming that datasets have been registered by the dataset tools
+    if ((2 == unStepIdentifier)||(3 == unStepIdentifier)||(4 == unStepIdentifier))
     {
-        // Keep track of whether or not we've deleted the database
-        bool fDatabaseDeleted = false;
-        // Container used to keep track of the identifiers for each registered organization. This
-        // will be needed when registering digital contracts (i.e. registering organizations
-        // generated things like identifiers, etc..., and we need to keep track of then for when
-        // we register digital contracts.
-        std::unordered_map<Qword, Organization *> stlListOfOrganizationsByName;
-        // Open the target JSON settings file
-        BinaryFileReader oBinaryFileReader(c_strJsonSettingsFilename);
-        // Read the entire file in one single call
-        std::vector<Byte> stlJsonData = oBinaryFileReader.Read(oBinaryFileReader.GetSizeInBytes());
-        // Convert the input file into a StructuredBuffer
-        StructuredBuffer oSettings = ::ConvertJsonStringToStructuredBuffer((const char *) stlJsonData.data());
-        // There are two main portions to the JSON file. Organizations and Digital Contracts
-        // Let's parse through all of the organization first. The names of each StructuredBuffer
-        // element is the name of the organization.
-        StructuredBuffer oOrganizations = oSettings.GetStructuredBuffer("Organizations");
-        std::vector<std::string> strListOfOrganizationNames = oOrganizations.GetNamesOfElements();
-        // Register organizations. Based on the step index, this will either:
-        //  1 --> Register the organization
-        //  2 --> Register the datasets
-        //  3 --> Register nothing
-        //  4 --> Register the organization and then the datasets
-        for (const std::string & c_strOrganizationName: strListOfOrganizationNames)
+        // Now that all of the organizations are registered, let's process the digital contracts. We are assuming that the datasets are
+        // already registered.
+        StructuredBuffer oDigitalContracts = oSettings.GetStructuredBuffer("Digital Contracts");
+        oDigitalContracts.RemoveElement("__IsArray__");
+        std::vector<std::string> strListOfDigitalContracts = oDigitalContracts.GetNamesOfElements();
+        for (const std::string & c_strDigitalContractIndex: strListOfDigitalContracts)
         {
             // Each element should be a StructuredBuffer, otherwise the application should throw
             // an exception and terminate. This is done automatically when calling GetStructuredBuffer()
-            StructuredBuffer oOrganization(oOrganizations.GetStructuredBuffer(c_strOrganizationName.c_str()));
-            Organization * poOrganization = new Organization(c_strOrganizationName, oOrganization);
-            // Register the organization
-            if (true == poOrganization->Register(gs_strIpAddress, 6200, unStepIdentifier, !fDatabaseDeleted))
+            StructuredBuffer oDigitalContactParameters(oDigitalContracts.GetStructuredBuffer(c_strDigitalContractIndex.c_str()));
+            // Figure out the organization identifiers for the two participants in the digital contract
+            Qword qwHashOfDataOwnerOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("DataOwnerOrganization").c_str(), false);
+            Qword qwHashOfResearchOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("ResearchOrganization").c_str(), false);
+            // We are dealing with a dataset family. In the JSON specification, this will be the name of a dataset family
+            // Let's point to the target data owner organization since we will need information out of that
+            _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfDataOwnerOrganization)), "ERROR: Unknown data owner organization %s specified in Digital Contract", oDigitalContactParameters.GetString("DataOwnerOrganization").c_str());
+            Organization * poDataOwnerOrganization = stlListOfOrganizationsByName[qwHashOfDataOwnerOrganization];
+            // We are dealing with a dataset family. In the JSON specification, this will be the name of a dataset family
+            // Let's point to the target data owner organization since we will need information out of that
+            _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfResearchOrganization)), "ERROR: Unknown research organization %s specified in Digital Contract", oDigitalContactParameters.GetString("ResearchOrganization").c_str());
+            Organization * poResearchOrganization = stlListOfOrganizationsByName[qwHashOfResearchOrganization];
+            
+            // Okay, let's register the digital contract.
+            DigitalContract oDigitalContract(poDataOwnerOrganization, poResearchOrganization, oDigitalContactParameters);
+            if (true == oDigitalContract.Register(gs_strIpAddress, 6200))
             {
-                fDatabaseDeleted = true;
-                // Keep track of the name-identifier tuple since it will be needed when registering
-                // digital contracts
-                stlListOfOrganizationsByName[::Get64BitHashOfNullTerminatedString(poOrganization->GetOrganizationalName().c_str(), false)] = poOrganization;
                 // Print out some information so that we can visibly see what just got registered
-                std::cout << "Registered organization \"" << poOrganization->GetOrganizationalName() << "\" which was given identifier " << poOrganization->GetOrganizationalIdentifier() << std::endl;
+                std::cout << "Registered digital contract \"" << oDigitalContract.GetContractName() << "\"" << std::endl;
             }
             else
             {
                 // Print out some information so that we can visibly see what just failed
-                std::cout << "Failed to registered organization \"" << poOrganization->GetOrganizationalName() << "\"" << std::endl;
-                // Make sure to delete the organization object since it won't be used
-                poOrganization->Release();
-            }
-        }
-
-        // Register digital contracts. We are assuming that datasets have been registered by the dataset tools
-        if ((2 == unStepIdentifier)||(3 == unStepIdentifier)||(4 == unStepIdentifier))
-        {
-            // Now that all of the organizations are registered, let's process the digital contracts. We are assuming that the datasets are
-            // already registered.
-            StructuredBuffer oDigitalContracts = oSettings.GetStructuredBuffer("Digital Contracts");
-            oDigitalContracts.RemoveElement("__IsArray__");
-            std::vector<std::string> strListOfDigitalContracts = oDigitalContracts.GetNamesOfElements();
-            for (const std::string & c_strDigitalContractIndex: strListOfDigitalContracts)
-            {
-                // Each element should be a StructuredBuffer, otherwise the application should throw
-                // an exception and terminate. This is done automatically when calling GetStructuredBuffer()
-                StructuredBuffer oDigitalContactParameters(oDigitalContracts.GetStructuredBuffer(c_strDigitalContractIndex.c_str()));
-                // Figure out the organization identifiers for the two participants in the digital contract
-                Qword qwHashOfDataOwnerOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("DataOwnerOrganization").c_str(), false);
-                Qword qwHashOfResearchOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("ResearchOrganization").c_str(), false);
-                // We are dealing with a dataset family. In the JSON specification, this will be the name of a dataset family
-                // Let's point to the target data owner organization since we will need information out of that
-                _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfDataOwnerOrganization)), "ERROR: Unknown data owner organization %s specified in Digital Contract", oDigitalContactParameters.GetString("DataOwnerOrganization").c_str());
-                Organization * poDataOwnerOrganization = stlListOfOrganizationsByName[qwHashOfDataOwnerOrganization];
-                // We are dealing with a dataset family. In the JSON specification, this will be the name of a dataset family
-                // Let's point to the target data owner organization since we will need information out of that
-                _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfResearchOrganization)), "ERROR: Unknown research organization %s specified in Digital Contract", oDigitalContactParameters.GetString("ResearchOrganization").c_str());
-                Organization * poResearchOrganization = stlListOfOrganizationsByName[qwHashOfResearchOrganization];
-                
-                // Okay, let's register the digital contract.
-                DigitalContract oDigitalContract(poDataOwnerOrganization, poResearchOrganization, oDigitalContactParameters);
-                if (true == oDigitalContract.Register(gs_strIpAddress, 6200))
-                {
-                    // Print out some information so that we can visibly see what just got registered
-                    std::cout << "Registered digital contract \"" << oDigitalContract.GetContractName() << "\"" << std::endl;
-                }
-                else
-                {
-                    // Print out some information so that we can visibly see what just failed
-                    std::cout << "Failed to registered digital contract \"" << oDigitalContract.GetContractName() << "\"" << std::endl;
-                }
+                std::cout << "Failed to registered digital contract \"" << oDigitalContract.GetContractName() << "\"" << std::endl;
             }
         }
     }

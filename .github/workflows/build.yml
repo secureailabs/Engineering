@@ -71,7 +71,7 @@ jobs:
           sudo ./RunService.sh -s platformservices -d
           sleep 5
           cd ..
-          ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="./Binary/DatabaseInitializationSettings.json" --allsteps
+          ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps
 
   test:
     runs-on: [self-hosted, Linux, x64, docker]
@@ -92,7 +92,7 @@ jobs:
         run: |
           set -e
           docker ps -a
-          ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="./Binary/DatabaseInitializationSettings.json" --allsteps
+          ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps
           docker kill $(docker ps -q)
           docker rm $(docker ps -a -q)
           sudo make clean

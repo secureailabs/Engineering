@@ -23,7 +23,7 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
       NumberOfVersions: Object.keys(getDatasetData?.Versions || {})
         .length,
       PublishDate: new Date(
-        getDatasetData?.PublishDate
+        getDatasetData?.PublishDate * 1000
       ).toLocaleDateString('en-US'),
     },
   });

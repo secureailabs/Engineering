@@ -36,7 +36,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetDatasetName(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the dataset record
         bsoncxx::stdx::optional<bsoncxx::document::value> oDsetDocument = oSailDatabase["Dataset"].find_one(document{}
                                                                                                             << "DatasetGuid" << c_oRequest.GetString("DatasetGuid")
@@ -117,7 +117,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListDatasets(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch all dataset records
         mongocxx::cursor oDsetRecords = oSailDatabase["Dataset"].find({});
         // Loop through returned documents and add them to the list of datasets
@@ -216,7 +216,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullDataset(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the dataset record
         bsoncxx::stdx::optional<bsoncxx::document::value> oDsetDocument = oSailDatabase["Dataset"].find_one(document{}
                                                                                                                     << "DatasetGuid" << strDsetGuid
@@ -353,7 +353,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterDataset(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access Dataset collection
         mongocxx::collection oDatasetCollection = oSailDatabase["Dataset"];
         // Create a transaction callback
@@ -447,7 +447,7 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteDataset(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
         {
             bsoncxx::stdx::optional<bsoncxx::document::value> oDsetDocument = oSailDatabase["Dataset"].find_one(document{}

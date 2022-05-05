@@ -23,6 +23,7 @@
 #include "RestFrameworkSharedFunctions.h"
 #include "StructuredBuffer.h"
 #include "Utils.h"
+#include "InitializationVector.h"
 
 #include <pthread.h>
 #include <string.h>

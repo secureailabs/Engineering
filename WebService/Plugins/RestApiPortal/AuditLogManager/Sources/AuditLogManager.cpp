@@ -743,10 +743,10 @@ std::vector<Byte> __thiscall AuditLogManager::AddNonLeafEvent(
         poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
         // Read header and body of the response
-        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
         _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
         unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-        std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+        std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
         _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
         // Make sure to release the poTlsNode
         poTlsNode->Release();
@@ -829,10 +829,10 @@ std::vector<Byte> __thiscall AuditLogManager::AddLeafEvent(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -917,10 +917,10 @@ std::vector<Byte> __thiscall AuditLogManager::GetListOfEvents(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse= poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            std::vector<Byte> stlResponse= poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1003,10 +1003,10 @@ std::vector<Byte> __thiscall AuditLogManager::DigitalContractBranchExists(
         poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
         // Read header and body of the response
-        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
         _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
         unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-        std::vector<Byte> stlResponse= poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+        std::vector<Byte> stlResponse= poTlsNode->Read(unResponseDataSizeInBytes, 60000);
         _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
         // Make sure to release the poTlsNode
         poTlsNode->Release();

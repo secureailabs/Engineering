@@ -67,7 +67,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterDataFederation(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access Dataset Family collection
         mongocxx::collection oDataFederationCollection = oSailDatabase["DataFederation"];
 
@@ -157,7 +157,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListActiveDataFederations(
     // Each client and transaction can only be used in a single thread
     mongocxx::pool::entry oClient = m_poMongoPool->acquire();
     // Access SailDatabase
-    mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+    mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
     // Fetch all digital contract records associated with a researcher's or data owner's organization
     mongocxx::cursor oDatasetFamilyRecords = oSailDatabase["DataFederation"].find({});
     Guid oRequestingUserOrganization = c_oRequest.GetGuid("RequestingUserOrganizationIdentifier");
@@ -307,7 +307,7 @@ std::optional<DataFederation> __thiscall DatabaseManager::PullDataFederationObje
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         bsoncxx::stdx::optional<bsoncxx::document::value> oDataFederationDocument = oSailDatabase["DataFederation"].find_one(document{}
                                                                                                                 << "DataFederationIdentifier" << c_oIdentifier.ToString(eHyphensAndCurlyBraces)
                                                                                                                 << finalize);
@@ -460,7 +460,7 @@ bool __thiscall DatabaseManager::UpdateDataFederationObject(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         bsoncxx::stdx::optional<bsoncxx::document::value> oDataFederationDocument = oSailDatabase["DataFederation"].find_one(document{}
                                                                                                                 << "DataFederationIdentifier" << c_oDataFederation.Identifier().ToString(eHyphensAndCurlyBraces)
                                                                                                                 << finalize);

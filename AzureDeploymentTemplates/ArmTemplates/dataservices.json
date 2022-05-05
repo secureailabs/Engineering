@@ -117,6 +117,25 @@
             }
           },
           {
+            "name": "OutboundAllow_27017",
+            "properties": {
+              "description": "Interact with Mongodb Atlas",
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 110,
+              "direction": "Outbound",
+              "sourcePortRanges": [],
+              "destinationPortRanges": [
+                "27017"
+              ],
+              "sourceAddressPrefixes": [],
+              "destinationAddressPrefixes": []
+            }
+          },
+          {
             "name": "OutboundDeny_All",
             "properties": {
               "protocol": "*",

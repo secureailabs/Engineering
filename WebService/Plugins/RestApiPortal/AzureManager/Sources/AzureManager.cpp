@@ -799,10 +799,10 @@ std::vector<Byte> __thiscall AzureManager::GetListOfAzureSettingsTemplates(
                 poTlsNode->Write(stlRequest.data(), stlRequest.size());
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 3000);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();
@@ -818,7 +818,7 @@ std::vector<Byte> __thiscall AzureManager::GetListOfAzureSettingsTemplates(
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -829,7 +829,7 @@ std::vector<Byte> __thiscall AzureManager::GetListOfAzureSettingsTemplates(
             dwStatus = 408;
         }
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -889,10 +889,10 @@ std::vector<Byte> __thiscall AzureManager::PullAzureSettingsTemplate(
                 poTlsNode->Write(stlRequest.data(), stlRequest.size());
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();
@@ -1086,10 +1086,10 @@ std::vector<Byte> __thiscall AzureManager::UpdateAzureSettingsTemplate(
                 poTlsNode->Write(stlRequest.data(), stlRequest.size());
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();
@@ -1181,10 +1181,10 @@ std::vector<Byte> __thiscall AzureManager::DeleteAzureSettingsTemplate(
                 poTlsNode->Write(stlRequest.data(), stlRequest.size());
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();
@@ -1464,10 +1464,10 @@ std::vector<Byte> __thiscall AzureManager::UpdateAzureTemplateState(
                 poTlsNode->Write(stlRequest.data(), stlRequest.size());
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 100);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 100);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();

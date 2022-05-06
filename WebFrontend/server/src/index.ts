@@ -14,7 +14,7 @@ const app = express();
 app.use(helmet());
 require('dotenv').config();
 const port = 3000;
-app.use(cors({ credentials: true, origin: process.env.CLIENT ? process.env.CLIENT : 'http://localhost:3001' }));
+app.use(cors({ credentials: true, origin: process.env.CLIENT ? process.env.CLIENT : 'http://127.0.0.1:3001' }));
 
 app.use('/api/v1/', apiRoutes);
 app.use('/api/v1/', logout);

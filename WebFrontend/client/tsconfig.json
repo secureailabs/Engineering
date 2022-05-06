@@ -42,7 +42,7 @@
 
     }
   },
-  "include": ["src", "src/vite-env.d.ts"],
+  "include": ["src", "src/vite-env.d.ts", "src/components/DigitalContractForms/RequestDataAccessForm/.failure.tsx"],
   "exclude": ["node_modules"]
 }
 

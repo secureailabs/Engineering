@@ -14,6 +14,8 @@ import Button from '@secureailabs/web-ui/components/Button';
 import Modal from '@secureailabs/web-ui/components/Modal';
 import Table from '@components/Table';
 
+import RequestDataAccessForm from '@components/DigitalContractForms/RequestDataAccessForm';
+
 const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
   const { register, handleSubmit, formState, trigger } = useForm({
     mode: 'onSubmit',
@@ -118,7 +120,7 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
           Request Access
         </Button>
       </div>
-      {modalIsOpen && 
+      {/* {modalIsOpen && 
         <Modal
           title='Request Dataset Access'
           description="To request access to this dataset, enter the title of your research, for how long you'll need access to the data, and any comments regarding your request."
@@ -149,6 +151,9 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
             />
           </form>
         </Modal>
+      } */}
+      {modalIsOpen &&
+        <RequestDataAccessForm setIsOpen={setIsOpen} DataOwnerOrganization={getDatasetData.DataOwnerGuid} DatasetGuid={getDatasetData.DatasetGuid} />
       }
     </div>
   );

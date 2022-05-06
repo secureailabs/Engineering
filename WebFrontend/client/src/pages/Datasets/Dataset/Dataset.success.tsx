@@ -16,7 +16,7 @@ import Table from '@components/Table';
 
 import RequestDataAccessForm from '@components/DigitalContractForms/RequestDataAccessForm';
 
-const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
+const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userData }) => {
   const { register, handleSubmit, formState, trigger } = useForm({
     mode: 'onSubmit',
     defaultValues: {
@@ -116,42 +116,12 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
           marginLeft: '5rem',
         }}
       >
-        <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
-          Request Access
-        </Button>
+        {
+          getDatasetData.DataOwnerGuid != userData?.OrganizationGuid && <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
+            Request Access
+          </Button>
+        }
       </div>
-      {/* {modalIsOpen && 
-        <Modal
-          title='Request Dataset Access'
-          description="To request access to this dataset, enter the title of your research, for how long you'll need access to the data, and any comments regarding your request."
-          close={() => { setIsOpen(false) }}
-        >
-          <form className="form">
-            <FormFieldsRenderer
-              register={register}
-              button_text="Request Data Access"
-              formState={formState}
-              fields={{
-                title: {
-                  label: 'Title',
-                  placeholder: 'Title',
-                  type: 'text',
-                },
-                access_duration: {
-                  label: 'Access Duration (days)',
-                  placeholder: 'Access Duration (days)',
-                  type: 'text',
-                },
-                comments: {
-                  label: 'Request Comments',
-                  placeholder: 'Comments',
-                  type: 'textarea',
-                },
-              }}
-            />
-          </form>
-        </Modal>
-      } */}
       {modalIsOpen &&
         <RequestDataAccessForm setIsOpen={setIsOpen} DataOwnerOrganization={getDatasetData.DataOwnerGuid} DatasetGuid={getDatasetData.DatasetGuid} />
       }

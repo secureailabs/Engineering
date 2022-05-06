@@ -16,6 +16,7 @@ export type TDatasetProps = {
 
 export type TDatasetSuccessProps = {
   getDatasetData: TGetDatasetSuccess['Dataset'];
+  userData: IUserData;
 };
 
 export type TDatasetFailure = {

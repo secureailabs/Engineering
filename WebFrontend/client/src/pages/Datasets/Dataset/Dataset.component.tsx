@@ -33,7 +33,7 @@ const fetch = async ({ id }: { id: string }): Promise<TGetDatasetSuccess['Datase
 }
 
 
-const Dataset: React.FC<TDatasetProps> = () => {
+const Dataset: React.FC<TDatasetProps> = ({ userData }) => {
 
   const { id } = useParams();
 
@@ -47,7 +47,8 @@ const Dataset: React.FC<TDatasetProps> = () => {
       return (
           <StandardContent title="Dataset">
             <DatasetSuccess
-              getDatasetData={data}
+            getDatasetData={data}
+            userData={userData}
           />
           </StandardContent>
       )

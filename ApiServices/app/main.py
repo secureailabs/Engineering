@@ -7,7 +7,7 @@
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field, StrictStr
-from app.api import authentication, accounts
+from app.api import authentication, accounts, datasets
 from fastapi.exceptions import RequestValidationError
 import fastapi.openapi.utils as utils
 from fastapi.responses import JSONResponse
@@ -19,12 +19,13 @@ server = FastAPI(
     title="Secure AI Labs API Services",
     description="All the private and public APIs for the Secure AI Labs",
     version="0.1.0",
-    docs_url=None
+    docs_url=None,
 )
 
 # Add all the API services here exposed to the public
 server.include_router(authentication.router)
 server.include_router(accounts.router)
+server.include_router(datasets.router)
 
 # Override the default validation error handler as it throws away a lot of information
 # about the schema of the request body.

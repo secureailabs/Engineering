@@ -45,7 +45,7 @@ async def register_digital_contract(
     try:
         # Check of the dataset already exists
         # TODO: Prawal make a HTTP request or use message queues
-        dataset_db = await get_dataset(digital_contract_req.datasetId, current_user)
+        dataset_db = await get_dataset(digital_contract_req.dataset_id, current_user)
         if dataset_db is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
@@ -54,9 +54,9 @@ async def register_digital_contract(
         # Add the digital contract to the database
         digital_contract_db = DigitalContract_Db(
             **digital_contract_req.dict(),
-            dataOwnerId=dataset_db.organizationId,
-            state=DigitalContractState.New,
-            researcherId=current_user.organizationId
+            data_owner_id=dataset_db.organization_id,
+            state=DigitalContractState.NEW,
+            researcher_id=current_user.organization_id
         )
         await data_service.insert_one(DB_COLLECTION_DIGITAL_CONTRACTS, jsonable_encoder(digital_contract_db))
 
@@ -84,11 +84,11 @@ async def get_all_digital_contract(
 ):
     try:
         # TODO: Prawal the current user organization is repeated in the request, find a better way
-        if (data_owner_id is not None) and (data_owner_id == current_user.organizationId):
-            query = {"dataOwnerId": str(data_owner_id)}
-        elif (researcher_id is not None) and (researcher_id == current_user.organizationId):
-            query = {"researcherId": str(researcher_id)}
-        elif current_user.role is UserRole.SailAdmin:
+        if (data_owner_id is not None) and (data_owner_id == current_user.organization_id):
+            query = {"data_owner_id": str(data_owner_id)}
+        elif (researcher_id is not None) and (researcher_id == current_user.organization_id):
+            query = {"researcher_id": str(researcher_id)}
+        elif current_user.role is UserRole.SAILADMIN:
             query = {}
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
@@ -120,9 +120,9 @@ async def get_digital_contract(digital_contract_id: PyObjectId, current_user: To
 
         digital_contract_db = DigitalContract_Db(**digital_contract)
         if (
-            (digital_contract_db.dataOwnerId != current_user.organizationId)
-            and (digital_contract_db.researcherId != current_user.organizationId)
-            and (current_user.role != UserRole.SailAdmin)
+            (digital_contract_db.data_owner_id != current_user.organization_id)
+            and (digital_contract_db.researcher_id != current_user.organization_id)
+            and (current_user.role != UserRole.SAILADMIN)
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
@@ -157,36 +157,36 @@ async def update_digital_contract(
         # Only a new digital contract information can be updated by the researcher
         # Data Owner can only accept or reject a request
         # Only researcher can activate a digital contract
-        if digital_contract_db.state == DigitalContractState.New:
+        if digital_contract_db.state == DigitalContractState.NEW:
             # Only information can be updated by the researcher
-            if digital_contract_db.researcherId == current_user.organizationId:
+            if digital_contract_db.researcher_id == current_user.organization_id:
                 if updated_digital_contract_info.name is not None:
                     digital_contract_db.name = updated_digital_contract_info.name
                 if updated_digital_contract_info.description is not None:
                     digital_contract_db.description = updated_digital_contract_info.description
-                if updated_digital_contract_info.subscriptionDays is not None:
-                    digital_contract_db.subscriptionDays = updated_digital_contract_info.subscriptionDays
-                if updated_digital_contract_info.legalAgreement is not None:
-                    digital_contract_db.legalAgreement = updated_digital_contract_info.legalAgreement
+                if updated_digital_contract_info.subscription_days is not None:
+                    digital_contract_db.subscription_days = updated_digital_contract_info.subscription_days
+                if updated_digital_contract_info.legal_agreement is not None:
+                    digital_contract_db.legal_agreement = updated_digital_contract_info.legal_agreement
                 if updated_digital_contract_info.version is not None:
                     digital_contract_db.version = updated_digital_contract_info.version
             # data owner can only accept the request
-            elif digital_contract_db.dataOwnerId == current_user.organizationId:
-                if updated_digital_contract_info.state == DigitalContractState.Accepted:
-                    digital_contract_db.state = DigitalContractState.Accepted
+            elif digital_contract_db.data_owner_id == current_user.organization_id:
+                if updated_digital_contract_info.state == DigitalContractState.ACCEPTED:
+                    digital_contract_db.state = DigitalContractState.ACCEPTED
                 else:
                     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
             # All other requests are invalid on a new digital contract
             else:
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-        elif digital_contract_db.state == DigitalContractState.Accepted:
+        elif digital_contract_db.state == DigitalContractState.ACCEPTED:
             # Only researcher can activate a digital contract
-            if digital_contract_db.researcherId != current_user.organizationId:
+            if digital_contract_db.researcher_id != current_user.organization_id:
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-            if updated_digital_contract_info.state != DigitalContractState.Activated:
+            if updated_digital_contract_info.state != DigitalContractState.ACTIVATED:
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-            digital_contract_db.state = DigitalContractState.Activated
+            digital_contract_db.state = DigitalContractState.ACTIVATED
 
         else:
             # An activated digital contract can not be updated
@@ -209,7 +209,7 @@ async def update_digital_contract(
 @router.delete(
     path="/digital-contracts/{digital_contract_id}",
     description="Disable the digital_contract",
-    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.Admin]))],
+    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def soft_delete_digital_contract(
@@ -227,21 +227,21 @@ async def soft_delete_digital_contract(
 
         # Only dataownwer or researcher can disable a digital contract
         if (
-            digital_contract_db.dataOwnerId != current_user.organizationId
-            and digital_contract_db.researcherId != current_user.organizationId
+            digital_contract_db.data_owner_id != current_user.organization_id
+            and digital_contract_db.researcher_id != current_user.organization_id
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
         if (
-            digital_contract_db.state == DigitalContractState.New
-            and digital_contract_db.dataOwnerId == current_user.organizationId
+            digital_contract_db.state == DigitalContractState.NEW
+            and digital_contract_db.data_owner_id == current_user.organization_id
         ):
             # A new digital contract can be rejected by the data owner
-            digital_contract_db.state = DigitalContractState.Rejected
+            digital_contract_db.state = DigitalContractState.REJECTED
         else:
             # TODO: Prawal when is a digital contract archived?
             # Other times it is archived
-            digital_contract_db.state = DigitalContractState.Archived
+            digital_contract_db.state = DigitalContractState.ARCHIVED
 
         # Update the digital contract
         await data_service.update_one(

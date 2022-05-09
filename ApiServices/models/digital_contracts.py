@@ -13,26 +13,26 @@ from models.common import PyObjectId, SailBaseModel
 
 
 class DigitalContractState(Enum):
-    New = "New"
-    Accepted = "Accepted"
-    Activated = "Activated"
-    Rejected = "Rejected"
-    Archived = "Archived"
+    NEW = "NEW"
+    ACCEPTED = "ACCEPTED"
+    ACTIVATED = "ACTIVATED"
+    REJECTED = "REJECTED"
+    ARCHIVED = "ARCHIVED"
 
 
 class DigitalContract_Base(SailBaseModel):
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
-    subscriptionDays: int = Field(...)
-    legalAgreement: StrictStr = Field(...)
+    subscription_days: int = Field(...)
+    legal_agreement: StrictStr = Field(...)
     version: StrictStr = Field(...)
-    datasetId: PyObjectId = Field(...)
+    dataset_id: PyObjectId = Field(...)
 
 
 class DigitalContract_Db(DigitalContract_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    dataOwnerId: PyObjectId = Field(...)
-    researcherId: PyObjectId = Field(...)
+    data_owner_id: PyObjectId = Field(...)
+    researcher_id: PyObjectId = Field(...)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     state: DigitalContractState = Field(...)
 
@@ -46,9 +46,9 @@ class RegisterDigitalContract_Out(SailBaseModel):
 
 
 class AcceptDigitalContract_In(SailBaseModel):
-    RetentionTime: int = Field(...)
-    LegalAgreement: StrictStr = Field(...)
-    Region: StrictStr = Field(...)
+    retention_time: int = Field(...)
+    legal_agreement: StrictStr = Field(...)
+    region: StrictStr = Field(...)
 
 
 class GetDigitalContract_Out(DigitalContract_Db):
@@ -56,10 +56,10 @@ class GetDigitalContract_Out(DigitalContract_Db):
 
 
 class UpdateDigitalContract_In(SailBaseModel):
-    # TODO: Prawal add a validator to enure that atleast of the field is present in the request
+    # todo: Prawal add a validator to enure that atleast of the field is present in the request
     name: Optional[StrictStr] = Field(default=None)
     description: Optional[StrictStr] = Field(default=None)
-    subscriptionDays: Optional[int] = Field(default=None)
-    legalAgreement: Optional[StrictStr] = Field(default=None)
+    subscription_days: Optional[int] = Field(default=None)
+    legal_agreement: Optional[StrictStr] = Field(default=None)
     version: Optional[StrictStr] = Field(default=None)
     state: Optional[DigitalContractState] = Field(default=None)

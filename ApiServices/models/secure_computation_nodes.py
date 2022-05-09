@@ -14,35 +14,35 @@ from models.common import PyObjectId, SailBaseModel
 
 
 class SecureComputationNodeType(Enum):
-    Standard_B4ms = "Standard_B4ms"
+    STANDARD_B4MS = "STANDARD_B4MS"
 
 
 class SecureComputationNodeState(Enum):
-    Requested = "Requested"
-    Creating = "Creating"
-    Initializing = "Initializing"
-    Ready = "Ready"
-    Deleted = "Deleted"
-    Deleting = "Deleting"
-    Failed = "Failed"
+    REQUESTED = "REQUESTED"
+    CREATING = "CREATING"
+    INITIALIZING = "INITIALIZING"
+    READY = "READY"
+    DELETED = "DELETED"
+    DELETING = "DELETING"
+    FAILED = "FAILED"
 
 
 class SecureComputationNode_Base(SailBaseModel):
     name: StrictStr = Field(...)
-    digitalContractId: PyObjectId = Field(...)
-    datasetId: PyObjectId = Field(...)
+    digital_contract_id: PyObjectId = Field(...)
+    dataset_id: PyObjectId = Field(...)
     type: SecureComputationNodeType = Field(...)
 
 
 class SecureComputationNode_Db(SecureComputationNode_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    researcherUserId: PyObjectId = Field(...)
+    researcher_user_id: PyObjectId = Field(...)
     state: SecureComputationNodeState = Field(...)
     details: Optional[StrictStr] = Field(default=None)
     ipaddress: Optional[IPv4Address] = Field(default=None)
-    researcherId: PyObjectId = Field(default=None)
-    dataOwnerId: PyObjectId = Field(default=None)
+    researcher_id: PyObjectId = Field(default=None)
+    data_owner_id: PyObjectId = Field(default=None)
 
 
 class RegisterSecureComputationNode_In(SecureComputationNode_Base):

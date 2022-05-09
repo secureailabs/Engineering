@@ -19,12 +19,12 @@ class DatasetState(Enum):
 
 class DatasetTable(SailBaseModel):
     description: StrictStr = Field(...)
-    tableIdentifier: StrictStr = Field(...)
+    table_identifier: StrictStr = Field(...)
     hashtags: StrictStr = Field(...)
-    numberOfColumns: int = Field(...)
+    number_of_columns: int = Field(...)
     name: StrictStr = Field(...)
-    numberOfRows: int = Field(...)
-    columnName: StrictStr = Field(...)
+    number_of_rows: int = Field(...)
+    column_name: StrictStr = Field(...)
 
 
 class Dataset_Base(SailBaseModel):
@@ -33,13 +33,13 @@ class Dataset_Base(SailBaseModel):
     name: str = Field(max_length=255)
     keywords: StrictStr = Field(...)
     version: StrictStr = Field(...)
-    publishDate: int = Field(...)
+    publish_date: int = Field(...)
     tables: List[DatasetTable] = Field(...)
 
 
 class Dataset_Db(Dataset_Base):
-    datasetCreatedTime: datetime = Field(default_factory=datetime.utcnow)
-    organizationId: PyObjectId = Field(...)
+    dataset_created_time: datetime = Field(default_factory=datetime.utcnow)
+    organization_id: PyObjectId = Field(...)
     state: DatasetState = Field(...)
 
 
@@ -52,7 +52,7 @@ class RegisterDataset_Out(SailBaseModel):
 
 
 class UpdateDataset_In(SailBaseModel):
-    # TODO: Prawal add a validator to enure that atleast of the field is present in the request
+    # todo: Prawal add a validator to enure that atleast of the field is present in the request
     description: Optional[StrictStr] = Field(default=None)
     name: Optional[StrictStr] = Field(default=None)
     keywords: Optional[StrictStr] = Field(default=None)

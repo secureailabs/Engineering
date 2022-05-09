@@ -93,7 +93,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         raise exception_authentication_failed
 
     found_user_db = User_Db(**found_user)
-    if not pwd_context.verify(found_user_db.email + form_data.password + PASSWORD_PEPPER, found_user_db.hashedPassword):
+    if not pwd_context.verify(
+        found_user_db.email + form_data.password + PASSWORD_PEPPER, found_user_db.hashed_password
+    ):
         raise exception_authentication_failed
 
     token_data = TokenData(**found_user_db.dict(), exp=int((time() * 1000) + (ACCESS_TOKEN_EXPIRE_MINUTES * 60 * 1000)))
@@ -114,11 +116,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 ########################################################################################################################
-@router.post(
-    path="/refresh-token",
-    description="Refresh the JWT token for the user",
-    response_model=Login_Out
-)
+@router.post(path="/refresh-token", description="Refresh the JWT token for the user", response_model=Login_Out)
 async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body(...)):
 
     credentials_exception = HTTPException(

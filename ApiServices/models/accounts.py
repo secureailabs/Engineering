@@ -25,16 +25,16 @@ class Organization_Base(SailBaseModel):
 
 class Organization_db(Organization_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    accountCreatedTime: datetime = Field(default_factory=datetime.utcnow)
-    organizationState: OrganizationState = Field(...)
+    account_created_time: datetime = Field(default_factory=datetime.utcnow)
+    organization_state: OrganizationState = Field(...)
 
 
 class RegisterOrganization_In(Organization_Base):
-    adminName: StrictStr = Field(...)
-    adminJobTitle: StrictStr = Field(...)
-    adminEmail: EmailStr = Field(...)
-    adminPassword: StrictStr = Field(...)
-    adminAvatar: Optional[StrictStr] = Field(default=None)
+    admin_name: StrictStr = Field(...)
+    admin_job_title: StrictStr = Field(...)
+    admin_email: EmailStr = Field(...)
+    admin_password: StrictStr = Field(...)
+    admin_avatar: Optional[StrictStr] = Field(default=None)
 
 
 class RegisterOrganization_Out(SailBaseModel):
@@ -46,45 +46,45 @@ class GetOrganizations_Out(Organization_Base):
 
 
 class UpdateOrganization_In(SailBaseModel):
-    # TODO: Prawal add a validator to enure that atleast of the field is present in the request
+    # todo: Prawal add a validator to enure that atleast of the field is present in the request
     name: Optional[StrictStr] = Field(...)
     description: Optional[StrictStr] = Field(...)
     avatar: Optional[StrictStr] = Field(...)
 
 
 class UserRole(Enum):
-    Admin = "Admin"
-    Auditor = "Auditor"
-    User = "User"
-    DigitalContractAdmin = "DigitalContractAdmin"
-    DatasetAdmin = "DatasetAdmin"
-    SailAdmin = "SailAdmin"
+    ADMIN = "ADMIN"
+    AUDITOR = "AUDITOR"
+    USER = "USER"
+    DIGITALCONTRACTADMIN = "DIGITALCONTRACTADMIN"
+    DATASETADMIN = "DATASETADMIN"
+    SAILADMIN = "SAILADMIN"
 
 
 class UserAccountState(Enum):
-    Active = "Active"
-    Inactive = "Inactive"
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
 
 
 class User_Base(SailBaseModel):
     username: StrictStr = Field(...)
     email: EmailStr = Field(...)
-    jobTitle: StrictStr = Field(...)
+    job_title: StrictStr = Field(...)
     role: UserRole = Field(...)
     avatar: Optional[StrictStr] = Field(...)
 
 
 class User_Db(User_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    accountCreationTime: datetime = Field(default_factory=datetime.utcnow)
-    hashedPassword: StrictStr = Field(...)
-    accountState: UserAccountState = Field(...)
-    organizationId: PyObjectId = Field(...)
+    account_creation_time: datetime = Field(default_factory=datetime.utcnow)
+    hashed_password: StrictStr = Field(...)
+    account_state: UserAccountState = Field(...)
+    organization_id: PyObjectId = Field(...)
 
 
 class UserInfo_Out(User_Base):
     id: PyObjectId = Field(alias="_id")
-    organizationId: PyObjectId = Field(...)
+    organization_id: PyObjectId = Field(...)
 
 
 class RegisterUser_In(User_Base):
@@ -100,7 +100,7 @@ class GetUsers_Out(User_Base):
 
 
 class UpdateUser_In(SailBaseModel):
-    jobTitle: Optional[StrictStr] = Field(...)
+    job_title: Optional[StrictStr] = Field(...)
     role: Optional[UserRole] = Field(...)
-    accountState: Optional[UserAccountState] = Field(...)
+    account_state: Optional[UserAccountState] = Field(...)
     avatar: Optional[StrictStr] = Field(...)

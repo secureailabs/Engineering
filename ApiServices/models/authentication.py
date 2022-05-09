@@ -18,14 +18,14 @@ class Login_Out(SailBaseModel):
 
 class TokenData(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
-    organizationId: PyObjectId = Field(...)
+    organization_id: PyObjectId = Field(...)
     role: UserRole = Field(...)
     exp: int = Field(...)
 
 
 class RefreshTokenData(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
-    organizationId: PyObjectId = Field(...)
+    organization_id: PyObjectId = Field(...)
     role: UserRole = Field(...)
     exp: int = Field(...)
 

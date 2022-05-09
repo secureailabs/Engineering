@@ -1,3 +1,10 @@
+###################################################################################
+# @author Prawal Gangwar
+# @brief Models used by account management service
+# @License Private and Confidential. Internal Use Only.
+# @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
+###################################################################################
+
 import motor.motor_asyncio
 
 client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://127.0.0.1:27017/")

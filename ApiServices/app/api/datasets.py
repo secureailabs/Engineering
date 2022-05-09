@@ -48,7 +48,7 @@ async def register_dataset(
 
         # Add the dataset to the database
         dataset_db = Dataset_Db(
-            **dataset_req.dict(), organizationId=current_user.organizationId, state=DatasetState.ACTIVE
+            **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.ACTIVE
         )
         await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
 
@@ -118,7 +118,7 @@ async def update_dataset(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         dataset_db = Dataset_Db(**dataset_db)
-        if dataset_db.organizationId != current_user.organizationId:
+        if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         # TODO: Prawal find better way to update the dataset
@@ -149,7 +149,7 @@ async def update_dataset(
 @router.delete(
     path="/datasets/{dataset_id}",
     description="Disable the dataset",
-    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.Admin]))],
+    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
@@ -160,7 +160,7 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         dataset_db = Dataset_Db(**dataset_db)
-        if dataset_db.organizationId != current_user.organizationId:
+        if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         # Disable the dataset

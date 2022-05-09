@@ -91,3 +91,34 @@ StructuredBuffer __stdcall GetInitialziationStructuredBuffer(
 
     return oParameterStructuredBuffer;
 }
+
+/********************************************************************************************
+ *
+ * @function IsInitializationValuePresent
+ * @brief Get the initialization value for the given parameter
+ * @param[in] c_strParameter Key of the value to be retrieved
+ * @throw BaseException if element not found
+ * @returns Valueof the required parameter
+ *
+ ********************************************************************************************/
+bool __stdcall IsInitializationValuePresent(
+    _in const std::string & c_strParameter
+)
+{
+    __DebugFunction();
+    _ThrowBaseExceptionIf((0 == c_strParameter.length()), "Parameter is empty", nullptr);
+
+    std::lock_guard<std::mutex> oLocalInitializationVectorLock(oInitializationVectorLock);
+
+    // Initialize it only once if it is not already initialized.
+    if (true == oInitializationVector.GetNamesOfElements().empty())
+    {
+        std::cout << "InitializationVector not loaded. Initializing it now." << std::endl;
+        std::string strInitializationVectorJson = ::ReadFileAsString("InitializationVector.json");
+        _ThrowBaseExceptionIf((0 == strInitializationVectorJson.length()), "InitializationVector.json is empty", nullptr);
+        oInitializationVector = JsonValue::ParseDataToStructuredBuffer(strInitializationVectorJson.c_str());
+    }
+
+    // Check if the value is present in initialization vector.
+    return oInitializationVector.IsElementPresent(c_strParameter.c_str(), ANSI_CHARACTER_STRING_VALUE_TYPE);
+}

@@ -36,7 +36,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListRemoteDataConnectors(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch all remote data connectors for an organization
         mongocxx::cursor oConnectorRecords = oSailDatabase["RemoteDataConnector"].find(document{} 
                                                                                 << "OrganizationGuid" << c_oRequest.GetString("OrganizationGuid")
@@ -126,7 +126,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullRemoteDataConnector(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the remote data connector metadata
         bsoncxx::stdx::optional<bsoncxx::document::value> oConnectorDocument = oSailDatabase["RemoteDataConnector"].find_one(document{}
                                                                                                                     << "RemoteDataConnectorGuid" << c_oRequest.GetString("RemoteDataConnectorGuid")
@@ -246,7 +246,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterRemoteDataConnector(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access Remote Data Connector collection
         mongocxx::collection oRemoteDataConnectorCollection = oSailDatabase["RemoteDataConnector"];
         // Create a transaction callback
@@ -340,7 +340,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateRemoteDataConnector(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the document in RemoteDataConnector collection associated with ConnectorGuid
         bsoncxx::stdx::optional<bsoncxx::document::value> oTemplateDocument = oSailDatabase["RemoteDataConnector"].find_one(document{} 
                                                                                                                                 << "RemoteDataConnectorGuid" << strConnectorGuid 

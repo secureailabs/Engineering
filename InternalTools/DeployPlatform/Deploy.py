@@ -40,9 +40,21 @@ def deploy_module(account_credentials, deployment_name, module_name):
     return virtual_machine_public_ip
 
 
-def deploy_dataservices(account_credentials, deployment_name):
+def deploy_dataservices(account_credentials, deployment_name, owner, purpose):
     # Deploy the backend server
     dataservices_ip = deploy_module(account_credentials, deployment_name, "dataservices")
+
+    # Create a dataservices initialization vector json
+    with open("dataservices.json", "r") as backend_json_fd:
+        backend_json = json.load(backend_json_fd)
+        backend_json.pop("MongoDbUrl")
+        backend_json["MongoDbDatabase"] = owner + purpose + "_db"
+        backend_json["MongoAtlasDbUser"] = "sailuser"
+        backend_json["MongoAtlasDbPassword"] = "SailPassword_123"
+        backend_json["MongoDbCluster"] = "cluster0.s3vds.mongodb.net"
+
+    with open("dataservices.json", "w") as outfile:
+        json.dump(backend_json, outfile)
 
     upload_status = subprocess.run(
         [
@@ -84,6 +96,13 @@ def deploy_platformservices(account_credentials, deployment_name, data_services_
 
     # Sleeping for a minute
     time.sleep(60)
+
+    # Delete the current database of the existing user
+    database_tools_run = subprocess.run(
+        ["./DemoDatabaseTools", "-d", "--PortalIp=" + platformservices_ip, "--Port=6200"],
+        stdout=subprocess.PIPE,
+    )
+    print("database_tools_run: ", database_tools_run)
 
     # Run database tools for the backend server
     database_tools_run = subprocess.run(
@@ -164,7 +183,7 @@ if __name__ == "__main__":
     # TODO: Prawal deploy the VMs in parallel and initialize them sequesntially
 
     # Deploy the data services
-    data_services_ip = deploy_dataservices(account_credentials, deployment_id)
+    data_services_ip = deploy_dataservices(account_credentials, deployment_id, OWNER, PURPOSE)
     print("Data Services server: ", data_services_ip)
 
     # Deploy the platform services

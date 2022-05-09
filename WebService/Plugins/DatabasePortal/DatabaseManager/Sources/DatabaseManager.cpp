@@ -69,9 +69,22 @@ DatabaseManager::DatabaseManager(void)
     m_sMutex = PTHREAD_MUTEX_INITIALIZER;
     m_unNextAvailableIdentifier = 0;
     m_fTerminationSignalEncountered = false;
+
     // Create only one instance
     mongocxx::instance oMongoInstance{};
-    mongocxx::uri oUri{::GetInitializationValue("MongoDbUrl")+"/?replicaSet=rs0"};
+    std::string strMongoUri = "";
+    if (true == ::IsInitializationValuePresent("MongoDbUrl"))
+    {
+        std ::cout << "Using local MongoDb" << std::endl;
+        strMongoUri = ::GetInitializationValue("MongoDbUrl");
+    }
+    else
+    {
+        std ::cout << "Using Mongodb Atlas.." << std::endl;
+        strMongoUri = "mongodb+srv://"+ ::GetInitializationValue("MongoAtlasDbUser") + ":"+ ::GetInitializationValue("MongoAtlasDbPassword") +"@"+ ::GetInitializationValue("MongoDbCluster") +"/"+ ::GetInitializationValue("MongoDbDatabase") +"?retryWrites=true&w=majority";
+    }
+
+    mongocxx::uri oUri{strMongoUri};
     m_poMongoPool = std::unique_ptr<mongocxx::pool>(new mongocxx::pool(oUri));
 }
 
@@ -739,9 +752,9 @@ std::vector<Byte> __thiscall DatabaseManager::ResetDatabase(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
 
-        mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession) 
+        mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
         {
             // Drop the database
             oSailDatabase.drop();

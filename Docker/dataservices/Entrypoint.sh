@@ -23,6 +23,8 @@ mv InitializationVector.json Binary/$imageName/
 
 # Start the RestApiPortal
 cd Binary/$imageName
+
+# Comment the following line if the mongodb atlas is to be used instead of local mongo installation
 mongod --port 27017 --dbpath /srv/mongodb/db0 --replSet rs0 --bind_ip localhost --fork --logpath /var/log/mongod.log
 ./DatabaseGateway 2>&1 | tee databasegateway.log &
 tail -f /dev/null

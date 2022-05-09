@@ -1,5 +1,5 @@
 # Default Reviewers for all code changes
-* @David-G-SAIL @stanleylinSail
+* @David-G-SAIL @stanleylinSail @prawalgangwar
 # Review for README.md
 *.md @stanleylinSail
 

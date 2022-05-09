@@ -750,10 +750,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetListOfOrganizationVMs(
                     poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                     // Read header and body of the response
-                    std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+                    std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                     _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                     unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                    std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+                    std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                     _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                     // Make sure to release the poTlsNode
                     poTlsNode->Release();
@@ -849,10 +849,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetListOfVmIpAddressesAssoci
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1007,10 +1007,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::GetVmInformation(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1244,10 +1244,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::RegisterVmInstance(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1658,10 +1658,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::UpdateVirtualMachineStatus(
                 poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();
@@ -1701,10 +1701,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::UpdateVirtualMachineStatus(
                             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                             // Read header and body of the response
-                            stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+                            stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                             unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                            stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+                            stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                             // Make sure to release the poTlsNode
                             poTlsNode->Release();
@@ -1732,10 +1732,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::UpdateVirtualMachineStatus(
                         poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                         // Read header and body of the response
-                        stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+                        stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                         _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                         unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                        stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+                        stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                         _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                         // Make sure to release the poTlsNode
                         poTlsNode->Release();
@@ -1838,10 +1838,10 @@ std::vector<Byte> __thiscall VirtualMachineManager::AddVirtualMachineIpAddress(
                 poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();

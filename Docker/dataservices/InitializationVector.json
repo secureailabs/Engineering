@@ -1,5 +1,9 @@
 {
     "MongoDbUrl": "mongodb://localhost:27017",
+    "MongoDbDatabase": "sailDatabase",
+    "MongoAtlasDbUser": "testuser",
+    "MongoAtlasDbPassword": "<Populated_During_Deployment>",
+    "MongoDbCluster": "cluster0.s3vds.mongodb.net",
     "TlsCertificate": "aaaa",
     "TlsPrivateKey": "bbbb"
 }

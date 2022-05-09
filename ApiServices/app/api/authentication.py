@@ -125,6 +125,7 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
         status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials."
     )
     try:
+        # TODO: Prawal harden the security around the refresh token
         payload = jwt.decode(refresh_token_request.refresh_token, REFRESH_SECRET, algorithms=[ALGORITHM])
         token_data = TokenData(**payload)
         user_id = token_data.id

@@ -7,7 +7,7 @@
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field, StrictStr
-from app.api import authentication, accounts, datasets
+from app.api import authentication, accounts, datasets, digital_contracts
 from fastapi.exceptions import RequestValidationError
 import fastapi.openapi.utils as utils
 from fastapi.responses import JSONResponse
@@ -26,6 +26,7 @@ server = FastAPI(
 server.include_router(authentication.router)
 server.include_router(accounts.router)
 server.include_router(datasets.router)
+server.include_router(digital_contracts.router)
 
 # Override the default validation error handler as it throws away a lot of information
 # about the schema of the request body.

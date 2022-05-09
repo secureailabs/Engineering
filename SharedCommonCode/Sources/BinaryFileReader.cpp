@@ -12,6 +12,8 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 
+#include <filesystem>
+#include <iostream>
 #include <limits>
 
 /********************************************************************************************/
@@ -21,7 +23,8 @@ BinaryFileReader::BinaryFileReader(
     )
 {
     __DebugFunction();
-
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(c_strTargetFilename)), "ERROR: File not found (%s)", c_strTargetFilename.c_str());
+    
     m_strFilename = c_strTargetFilename;
     this->Load();
 }
@@ -34,7 +37,8 @@ BinaryFileReader::BinaryFileReader(
 {
     __DebugFunction();
     __DebugAssert(nullptr != c_szTargetFilename);
-
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(c_szTargetFilename)), "ERROR: File not found (%s)", c_szTargetFilename);
+    
     m_strFilename = c_szTargetFilename;
     this->Load();
 }

@@ -14,6 +14,7 @@
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 
+#include <filesystem>
 #include <iostream>
 
 /********************************************************************************************/
@@ -24,7 +25,7 @@ Dataset::Dataset(
 {
     __DebugFunction();
     __DebugAssert(nullptr != c_szFullFilename);
-
+    
     BinaryFileReader oBinaryFileReader(c_szFullFilename);
     Qword qwMarker;
     oBinaryFileReader.Read((void *) &qwMarker, sizeof(qwMarker));
@@ -140,9 +141,15 @@ std::string __thiscall Dataset::GetDatasetIdentifier(void) const throw()
 std::string __thiscall Dataset::GetDatasetFamilyIdentifier(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE));
+    
+    std::string strDatasetFamilyIdentifier = "00000000-0000-0000-0000-000000000000";
+    
+    if (true == m_oDatasetMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE))
+    {
+        strDatasetFamilyIdentifier = m_oDatasetMetadata.GetGuid("DataFamilyIdentifier").ToString(eHyphensOnly);
+    }
 
-    return m_oDatasetMetadata.GetGuid("DataFamilyIdentifier").ToString(eHyphensOnly);
+    return strDatasetFamilyIdentifier;
 }
 
 /********************************************************************************************/

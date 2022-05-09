@@ -276,14 +276,6 @@ void __thiscall DatasetDatabase::InitializePlugin(
     oPublishDate.PutByte("ElementType", UINT64_VALUE_TYPE);
     oPublishDate.PutBoolean("IsRequired", true);
     oDatasetMetadata.PutStructuredBuffer("PublishDate", oPublishDate);
-    StructuredBuffer oPrivacyLevel;
-    oPrivacyLevel.PutByte("ElementType", BYTE_VALUE_TYPE);
-    oPrivacyLevel.PutBoolean("IsRequired", true);
-    oDatasetMetadata.PutStructuredBuffer("PrivacyLevel", oPrivacyLevel);
-    StructuredBuffer oLimitations;
-    oLimitations.PutByte("ElementType", ANSI_CHARACTER_STRING_VALUE_TYPE);
-    oLimitations.PutBoolean("IsRequired", true);
-    oDatasetMetadata.PutStructuredBuffer("JurisdictionalLimitations", oLimitations);
     oRegisterDataset.PutStructuredBuffer("DatasetData", oDatasetMetadata);
 
     // Add parameters for ListDatasets resource

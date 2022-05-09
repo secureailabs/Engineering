@@ -1,0 +1,51 @@
+TableProperty,ValueSeparatorCharacter,System.String,","
+TableProperty,AllowComments,System.Boolean,True
+TableProperty,CommentCharacter,System.Char,"#"
+TableProperty,HeadersOnFirstLine,System.Boolean,True
+TableProperty,QuoteCharacter,System.Char,"\""
+TableProperty,EscapeCharacter,System.Char,"\\"
+TableProperty,ColumnCount,System.Int32,4
+TableProperty,Title,System.String,"Drug Treatment and Condition Lookup Table"
+TableProperty,Description,System.String,"Table containing the age, drug treatment and condition of patients, by patient index"
+TableProperty,Tags,System.String,"Age, Drug, Condition"
+TableProperty,DestinationIntermediateFile,System.String,"C:\Users\Luis Miguel Huapaya\Documents\GitHub\Engineering\InternalTools\DatabaseInitializationTool\SampleJsonSpecificationFile\mgr_001_b.sailtable"
+ColumnProperty,0,SourceFileHeaderName,System.String,"Columns"
+ColumnProperty,0,Name,System.String,"Columns"
+ColumnProperty,0,Identifier,System.String,"2A75A04A-76C6-EE45-91CB-D0C5425077A8"
+ColumnProperty,0,Units,System.String,"GenericString"
+ColumnProperty,0,Type,System.String,"string"
+ColumnProperty,0,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,0,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,0,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,0,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,0,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,1,SourceFileHeaderName,System.String,"AGE"
+ColumnProperty,1,Name,System.String,"AGE"
+ColumnProperty,1,Identifier,System.String,"28C296B9-5392-C243-9DB7-A07EB753339A"
+ColumnProperty,1,Units,System.String,"GenericString"
+ColumnProperty,1,Type,System.String,"string"
+ColumnProperty,1,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,1,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,1,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,1,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,1,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,2,SourceFileHeaderName,System.String,"on drug"
+ColumnProperty,2,Name,System.String,"on drug"
+ColumnProperty,2,Identifier,System.String,"2A8C28BF-9C79-FC42-9465-62B52F7C722A"
+ColumnProperty,2,Units,System.String,"GenericString"
+ColumnProperty,2,Type,System.String,"string"
+ColumnProperty,2,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,2,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,2,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,2,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,2,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,3,SourceFileHeaderName,System.String,"condition"
+ColumnProperty,3,Name,System.String,"condition"
+ColumnProperty,3,Identifier,System.String,"2A6B719A-D4B4-5D43-A7F9-EDD2A32446D0"
+ColumnProperty,3,Units,System.String,"GenericString"
+ColumnProperty,3,Type,System.String,"string"
+ColumnProperty,3,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,3,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,3,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,3,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,3,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True

@@ -8,6 +8,7 @@ LDFLAGS+=
 # Add the new include folders here
 INCLUDE+=-I$(shell realpath ./Sources)
 SRCDIRS+=$(shell realpath ./Sources)
+SAMPLEFILES := $(shell realpath ./SampleFiles)
 SOURCES := $(foreach DIR,$(SRCDIRS),$(FINDFILES))
 OBJS=$(SOURCES:$(ABSROOTDIR)%.cpp=$(OBJDIR)%.o)
 OUTPUT=$(ABSROOTDIR)/Binary/$(notdir $(shell pwd))
@@ -23,6 +24,10 @@ $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 $(OUTPUT): $(OBJS) SharedCommonCode
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
+	@cp -f $(SAMPLEFILES)/*.csvp $(ABSROOTDIR)/Binary
+	@cp -f $(SAMPLEFILES)/DatabaseInitializationSettings.json $(ABSROOTDIR)/Binary
+	@chmod a+rw,g+rw,o+rw $(ABSROOTDIR)/Binary/*.csvp
+	@chmod a+rwx,g+rwx,o+rwx $(ABSROOTDIR)/Binary
 
 clean:
 	@rm -rf $(OUTPUT) $(OBJS)

@@ -6,9 +6,9 @@ WEB_SERVICES_SHARED:=$(ROOTDIR)/WebService/SharedCommonCode
 REST_API_PORTAL:=$(ROOTDIR)/WebService/RestApiPortal
 DATABASE_PORTAL:=$(ROOTDIR)/WebService/DatabaseGateway
 
-DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DatabaseTools
+DATASET_VIEWER_TOOL:=$(ROOTDIR)/InternalTools/DatasetViewer
+DATABASE_INITIALIZATION_TOOL:=$(ROOTDIR)/InternalTools/DatabaseInitializationTool
 SAFE_OBJECT_COMPILER:=$(ROOTDIR)/EndPointTools/SafeObjectTools/SafeObjectCompiler/Source
-DEMO_DATABASE_TOOLS:=$(ROOTDIR)/InternalTools/DemoDatabaseTools
 UPLOAD_TOOL:=$(ROOTDIR)/InternalTools/UploadPackageAndInitializationVector
 CRYPTOGRAPHIC_TOOLS:=$(ROOTDIR)/InternalTools/CryptographicTools
 

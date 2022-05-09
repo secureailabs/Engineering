@@ -1,0 +1,175 @@
+{
+	"Organizations": {
+		"International Genetics Research Facility": {
+			"Address": "231 54th Street, New York, New York, 02345",
+			"Contacts": [
+				{
+					"Email": "lbart@igr.com",
+					"Name": "Lily Bart",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator"
+				},
+				{
+					"Email": "pcarey@igr.com",
+					"Name": "Philip Carey",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer"
+				}
+			],
+			"Admins": [
+				{
+					"Email": "lbart@igr.com",
+					"Name": "Lily Bart",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator",
+				}
+			],
+			"Users": [
+				{
+					"Email": "pcarey@igr.com",
+					"Name": "Philip Carey",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "abede@igr.com",
+					"Name": "Adam Bede",
+					"Phone Number": "000-000-0000",
+					"Title": "Supply Generator",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "iarcher@igr.com",
+					"Name": "Isabel Archar",
+					"Phone Number": "000-000-0000",
+					"Title": "Security Expert",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "achristie@igr.com",
+					"Name": "Anna Christie",
+					"Phone Number": "000-000-0000",
+					"Title": "Research Scientist",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "rcory@igr.com",
+					"Name": "Richard Cory",
+					"Phone Number": "000-000-0000",
+					"Title": "Data Scientist",
+					"Access Rights": "0x0000000000000000"
+				}
+			],
+			"Datasets": [
+				{
+                    "DatasetName": "IGR Dataset #1",
+					"DatasetFamily": "IGR Dataset Family",
+					"File": "igr_001.csvp"
+				},
+				{
+                    "DatasetName": "IGR Dataset #2",
+					"DatasetFamily": "IGR Dataset Family",
+					"File": "igr_002.csvp"
+				}
+
+			],
+			"DatasetFamilies": [
+				{
+					"Title": "IGR Dataset Family",
+					"Description": "Dataset Description",
+					"Tags": "Dataset Tags"
+				}
+			],
+			"Data Federation": [
+				{
+					"DataFederationName": "Dataset Family",
+					"DataFederationDescription": "Dataset Description"
+				}
+			]
+		},
+		"Mercy General Hospital": {
+			"Address": "4001 J St, Sacramento, CA 95819, United States",
+			"Contacts": [
+				{
+					"Email": "nadams@mghl.com",
+					"Name": "Nick Adams",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator"
+				},
+				{
+					"Email": "nhelmer@mghl.com",
+					"Name": "Nora Helmer",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer"
+				}
+			],
+			"Admins": [
+				{
+					"Email": "nadams@mghl.com",
+					"Name": "Nick Adams",
+					"Phone Number": "000-000-0000",
+					"Title": "System Administrator",
+				}
+			],
+			"Users": [
+				{
+					"Email": "nhelmer@mghl.com",
+					"Name": "Nora Helmer",
+					"Phone Number": "000-000-0000",
+					"Title": "Network Engineer",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "sbowles@mghl.com",
+					"Name": "Sally Bowles",
+					"Phone Number": "000-000-0000",
+					"Title": "Hardware Engineer",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "ncarter@mghl.com",
+					"Name": "Nick Carter",
+					"Phone Number": "000-000-0000",
+					"Title": "Supply Generator",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "pmason@mghl.com",
+					"Name": "Perry Mason",
+					"Phone Number": "000-000-0000",
+					"Title": "Research Scientist",
+					"Access Rights": "0x0000000000000000"
+				},
+				{
+					"Email": "dquilp@mghl.com",
+					"Name": "Daniel Quilp",
+					"Phone Number": "000-000-0000",
+					"Title": "Data Scientist",
+					"Access Rights": "0x0000000000000000"
+				}
+			],
+			"Datasets": [
+				{
+                    "DatasetName": "MGR Dataset",
+					"File": "mgr_001.csvp"
+				}
+			]
+		}
+	},
+	"Digital Contracts": [
+		{
+			"DataOwnerOrganization": "International Genetics Research Facility",
+			"ResearchOrganization": "Mercy General Hospital",
+			"Dataset": "igr_001.csvp",
+			"Title": "Kidney Cancer Research Consortium",
+			"Description": "The dataset will be used to train models for academic research purposes.",
+			"LegalAgreement": "The Parties acknowledge and agree that this Agreement represents the entire agreement between the Parties. In the event that the Parties desire to change, add, or otherwise modify any terms, they shall do so in writing to be signed by both parties.",
+			"SubscriptionDays": 360,
+			"RetentionTime": 720,
+			"HostForVm": "SAIL",
+			"HostRegion": "East US 2",
+			"NumberOfVms": 2
+		}
+	]
+}

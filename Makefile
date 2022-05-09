@@ -4,7 +4,7 @@ include Make/dataservices.mk
 include Make/webfrontend.mk
 include Make/securecomputationnode.mk
 
-.PHONY: platformservices dataservices securecomputationnode orchestrator safefunctioncompiler databaseTools demoDatabaseTools uploadPackageAndInitializationVector package all clean SharedCommonCode
+.PHONY: platformservices dataservices securecomputationnode orchestrator datasetViewer databaseInitializationTool uploadPackageAndInitializationVector safeFunctionCompiler package all clean SharedCommonCode
 
 platformservices: SharedCommonCode WebServices_Shared
 	@make restapiportal platformservices_plugins
@@ -18,10 +18,6 @@ orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all
 	@echo "orchestrator done!"
 
-safefunctioncompiler: SharedCommonCode
-	@make -C $(SAFE_OBJECT_COMPILER) all
-	@echo "safefunctioncompiler done!"
-
 securecomputationnode: SharedCommonCode VirtualMachine_Shared
 	@make scn_componenets
 	@echo "securecomputationnode done!"
@@ -30,14 +26,18 @@ package: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend orchestrator
 	@echo "package done!"
 
-databaseTools: SharedCommonCode
-	@make -C $(DATABASE_TOOLS) all
-	@echo "databaseTools done!"
-
-demoDatabaseTools: SharedCommonCode
-	@make -C $(DEMO_DATABASE_TOOLS) all
-	@echo "databaseTools done!"
-
+safeFunctioncompiler: SharedCommonCode
+	@make -C $(SAFE_OBJECT_COMPILER) all
+	@echo "safefunctioncompiler done!"
+    
+datasetViewer: SharedCommonCode
+	@make -C $(DATASET_VIEWER_TOOL) all
+	@echo "datasetViewer done!"
+    
+databaseInitializationTool: SharedCommonCode
+	@make -C $(DATABASE_INITIALIZATION_TOOL) all
+	@echo "databaseInitializationTool done!"
+    
 uploadPackageAndInitializationVector: SharedCommonCode
 	@make -C $(UPLOAD_TOOL) all
 	@echo "databaseTools done!"
@@ -57,7 +57,7 @@ VirtualMachine_Shared:
 
 all: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 	@make package
-	@make databaseTools demoDatabaseTools baseVmInit uploadPackageAndInitializationVector safefunctioncompiler
+	@make datasetViewer databaseInitializationTool baseVmInit uploadPackageAndInitializationVector safeFunctionCompiler
 	@echo "All build and packaged!"
 
 clean:

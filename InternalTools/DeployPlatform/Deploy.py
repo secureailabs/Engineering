@@ -106,10 +106,10 @@ def deploy_platformservices(account_credentials, deployment_name, data_services_
 
     # Run database tools for the backend server
     database_tools_run = subprocess.run(
-        ["./DemoDatabaseTools", "--PortalIp=" + platformservices_ip, "--Port=6200"],
+        ["./DatabaseInitializationTool", "--ip=" + platformservices_ip, "--settings=\"DatabaseInitializationSettings.json\"" + "--allsteps"],
         stdout=subprocess.PIPE,
     )
-    print("database_tools_run: ", database_tools_run)
+    print("Database_Initialization_Tool_run: ", database_tools_run)
 
     return platformservices_ip
 

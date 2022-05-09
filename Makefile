@@ -26,7 +26,7 @@ package: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 	@make package_dataservices package_platformservices package_securecomputationnode package_webfrontend orchestrator
 	@echo "package done!"
 
-safefunctioncompiler: SharedCommonCode
+safeFunctioncompiler: SharedCommonCode
 	@make -C $(SAFE_OBJECT_COMPILER) all
 	@echo "safefunctioncompiler done!"
     

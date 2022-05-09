@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pytest
+requests
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic[email]
+flake8
+black
+motor
+pyflakes
+pymongo
+python-multipart

@@ -41,7 +41,7 @@ std::vector<Byte> __thiscall DatabaseManager::GetListOfEvents(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Get root event if parent guid is "{00000000-0000-0000-0000-000000000000}"
         // Otherwise return all the child events for the given parent guid
         if ("{00000000-0000-0000-0000-000000000000}" == strParentGuid)
@@ -257,7 +257,7 @@ uint32_t __thiscall DatabaseManager::GetNextSequenceNumber(
     // Each client and transaction can only be used in a single thread
     mongocxx::pool::entry oClient = m_poMongoPool->acquire();
     // Access SailDatabase
-    mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+    mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
     // Get root event if it exists
     // Otherwise return 0 as the next sequence number
     
@@ -372,7 +372,7 @@ std::vector<Byte> __thiscall DatabaseManager::AddNonLeafEvent(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access AuditLog collection
         mongocxx::collection oAuditLogCollection = oSailDatabase["AuditLog"];
         // Create a transaction callback
@@ -518,7 +518,7 @@ std::vector<Byte> __thiscall DatabaseManager::AddLeafEvent(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access AuditLog collection
         mongocxx::collection oAuditLogCollection = oSailDatabase["AuditLog"];
         // Create a transaction callback

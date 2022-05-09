@@ -67,7 +67,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterDatasetFamily(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access Dataset Family collection
         mongocxx::collection oDatasetFamilyCollection = oSailDatabase["DatasetFamily"];
 
@@ -158,7 +158,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListDatasetFamilies(
     // Each client and transaction can only be used in a single thread
     mongocxx::pool::entry oClient = m_poMongoPool->acquire();
     // Access SailDatabase
-    mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+    mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
     // Fetch all digital contract records associated with a researcher's or data owner's organization
     mongocxx::cursor oDatasetFamilyRecords = oSailDatabase["DatasetFamily"].find({});
 
@@ -255,7 +255,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateDatasetFamily(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
 
         bsoncxx::stdx::optional<bsoncxx::document::value> oDatasetFamilyDocument = oSailDatabase["DatasetFamily"].find_one(document{}
                                                                                                                 << "$and" << open_array << open_document
@@ -359,7 +359,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullDatasetFamily(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
 
         bsoncxx::stdx::optional<bsoncxx::document::value> oDatasetFamilyDocument = oSailDatabase["DatasetFamily"].find_one(document{}
                                                                                                                 << "DatasetFamilyGuid" << strDatasetFamilyGuid
@@ -464,7 +464,7 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteDatasetFamily(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
         {
             bsoncxx::stdx::optional<bsoncxx::document::value> oDatasetFamilyDocument = oSailDatabase["DatasetFamily"].find_one(document{}

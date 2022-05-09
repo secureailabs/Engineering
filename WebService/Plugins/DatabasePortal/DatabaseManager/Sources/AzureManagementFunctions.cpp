@@ -36,7 +36,7 @@ std::vector<Byte> __thiscall DatabaseManager::ListAzureTemplates(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch all azure templates of an organization
         mongocxx::cursor oTemplateRecords = oSailDatabase["AzureSettingsTemplates"].find(document{} 
                                                                                 << "OrganizationGuid" << c_oRequest.GetString("OrganizationGuid")
@@ -127,7 +127,7 @@ std::vector<Byte> __thiscall DatabaseManager::PullAzureTemplate(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the azure settings template of an organization
         bsoncxx::stdx::optional<bsoncxx::document::value> oTemplateDocument = oSailDatabase["AzureSettingsTemplates"].find_one(document{}
                                                                                                                     << "TemplateGuid" << c_oRequest.GetString("TemplateGuid")
@@ -258,7 +258,7 @@ std::vector<Byte> __thiscall DatabaseManager::RegisterAzureTemplate(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Access Azure Settings Template collection
         mongocxx::collection oAzureTemplateCollection = oSailDatabase["AzureSettingsTemplates"];
         // Create a transaction callback
@@ -352,7 +352,7 @@ std::vector<Byte> __thiscall DatabaseManager::UpdateAzureTemplate(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
         // Fetch the document in AzureSettingsTemplates collection associated with TemplateGuid
         bsoncxx::stdx::optional<bsoncxx::document::value> oTemplateDocument = oSailDatabase["AzureSettingsTemplates"].find_one(document{} 
                                                                                                                                 << "TemplateGuid" << strTemplateGuid 
@@ -484,7 +484,7 @@ std::vector<Byte> __thiscall DatabaseManager::DeleteAzureTemplate(
         // Each client and transaction can only be used in a single thread
         mongocxx::pool::entry oClient = m_poMongoPool->acquire();
         // Access SailDatabase
-        mongocxx::database oSailDatabase = (*oClient)["SailDatabase"];
+        mongocxx::database oSailDatabase = (*oClient)[::GetInitializationValue("MongoDbDatabase")];
 
         mongocxx::client_session::with_transaction_cb oCallback = [&](mongocxx::client_session * poSession)
         {

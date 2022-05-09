@@ -74,7 +74,7 @@ mkdir -p $rootDir/Binary/"$imageName"_dir
 cp $rootDir/Binary/BaseVmImageInit $rootDir/Binary/"$imageName"_dir/
 
 # Prepare the flags for the docker run command
-runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/nginx:/etc/nginx/conf.d -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
+runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # runtimeFlags="$detachFlags --name $imageName"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then

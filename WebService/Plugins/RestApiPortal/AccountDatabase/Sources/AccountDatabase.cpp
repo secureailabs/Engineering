@@ -833,10 +833,10 @@ std::vector<Byte> __thiscall AccountDatabase::GetUserRecords(
         poTlsNode->Write(stlBasicRecordRequest.data(), (stlBasicRecordRequest.size()));
 
         // Read header and body of the response
-        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
         _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
         unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-        std::vector<Byte> stlBasicUser = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+        std::vector<Byte> stlBasicUser = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
         _ThrowBaseExceptionIf((0 == stlBasicUser.size()), "Dead Packet.", nullptr);
         // Make sure to release the poTlsNode
         poTlsNode->Release();
@@ -858,10 +858,10 @@ std::vector<Byte> __thiscall AccountDatabase::GetUserRecords(
             poTlsNode->Write(stlConfidentialRecordRequest.data(), (stlConfidentialRecordRequest.size()));
 
             // Read header and body of the response
-            stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlConfidentialUser = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            std::vector<Byte> stlConfidentialUser = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlConfidentialUser.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1021,10 +1021,10 @@ std::vector<Byte> __thiscall AccountDatabase::GetOrganizationInformation(
             poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
             // Read header and body of the response
-            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+            std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
             _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
             unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+            std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
             _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
             // Make sure to release the poTlsNode
             poTlsNode->Release();
@@ -1109,15 +1109,15 @@ std::vector<Byte> __thiscall AccountDatabase::RegisterOrganizationAndSuperUser(
         poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
         // Read header and body of the response
-        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+        std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
         _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
         unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-        std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+        std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
         _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
         // Make sure to release the poTlsNode
         poTlsNode->Release();
         poTlsNode = nullptr;
-        
+
         // Check if DatabaseManager registered the user or not
         StructuredBuffer oDatabaseResponse(stlResponse);
         if (204 != oDatabaseResponse.GetDword("Status"))
@@ -1156,7 +1156,7 @@ std::vector<Byte> __thiscall AccountDatabase::RegisterOrganizationAndSuperUser(
             }
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -1167,7 +1167,7 @@ std::vector<Byte> __thiscall AccountDatabase::RegisterOrganizationAndSuperUser(
             dwStatus = 408;
         }
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -1198,7 +1198,7 @@ std::vector<Byte> __thiscall AccountDatabase::RegisterOrganizationAndSuperUser(
  * @throw BaseException Error StructuredBuffer element not found
  * @returns status of the transaction
  * @note
- *  If user's organziation not found then, register the organziation first and register 
+ *  If user's organziation not found then, register the organziation first and register
  *  the user as a super admin afterwards.
  *
  ********************************************************************************************/
@@ -1237,15 +1237,15 @@ std::vector<Byte> __thiscall AccountDatabase::RegisterUser(
                 poTlsNode->Write(stlRequest.data(), (stlRequest.size()));
 
                 // Read header and body of the response
-                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 2000);
+                std::vector<Byte> stlRestResponseLength = poTlsNode->Read(sizeof(uint32_t), 60000);
                 _ThrowBaseExceptionIf((0 == stlRestResponseLength.size()), "Dead Packet.", nullptr);
                 unsigned int unResponseDataSizeInBytes = *((uint32_t *) stlRestResponseLength.data());
-                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 2000);
+                std::vector<Byte> stlResponse = poTlsNode->Read(unResponseDataSizeInBytes, 60000);
                 _ThrowBaseExceptionIf((0 == stlResponse.size()), "Dead Packet.", nullptr);
                 // Make sure to release the poTlsNode
                 poTlsNode->Release();
                 poTlsNode = nullptr;
-                
+
                 // Check if DatabaseManager registered the user or not
                 StructuredBuffer oDatabaseResponse(stlResponse);
                 if (204 != oDatabaseResponse.GetDword("Status"))

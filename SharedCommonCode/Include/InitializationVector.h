@@ -22,3 +22,7 @@ extern std::string __stdcall GetInitializationValue(
 extern StructuredBuffer __stdcall GetInitialziationStructuredBuffer(
     _in const std::string & c_strStructuredBufferName
     );
+
+extern bool __stdcall IsInitializationValuePresent(
+    _in const std::string & c_strStructuredBufferName
+    );

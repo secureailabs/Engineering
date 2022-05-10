@@ -88,7 +88,7 @@ async def get_all_digital_contract(
             query = {"data_owner_id": str(data_owner_id)}
         elif (researcher_id is not None) and (researcher_id == current_user.organization_id):
             query = {"researcher_id": str(researcher_id)}
-        elif current_user.role is UserRole.SAILADMIN:
+        elif current_user.role is UserRole.SAIL_ADMIN:
             query = {}
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
@@ -122,7 +122,7 @@ async def get_digital_contract(digital_contract_id: PyObjectId, current_user: To
         if (
             (digital_contract_db.data_owner_id != current_user.organization_id)
             and (digital_contract_db.researcher_id != current_user.organization_id)
-            and (current_user.role != UserRole.SAILADMIN)
+            and (current_user.role != UserRole.SAIL_ADMIN)
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 

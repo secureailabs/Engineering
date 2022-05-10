@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
 
 from models.accounts import User_Db, UserInfo_Out, UserRole
-from models.authentication import RefreshToken_In, TokenData, Login_Out
+from models.authentication import RefreshToken_In, TokenData, LoginSuccess_Out
 from app.data import operations as data_service
 
 
@@ -28,7 +28,7 @@ router = APIRouter()
 
 # To be stored in a secure place like a vault or HSM
 JWT_SECRET = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-REFRESH_SECRET = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+REFRESH_SECRET = "52bb444a1aabb9a76792527e6605349e1cbc7fafb8624de4e0ddde4f84ad4066"
 
 # Using password pepper or secret salt to ensure more security in the event of a hash
 # leak along with salt. The adversary can reverse engineer the password if they know the
@@ -78,7 +78,7 @@ class RoleChecker:
 @router.post(
     path="/login",
     description="User login with email and password",
-    response_model=Login_Out,
+    response_model=LoginSuccess_Out,
     response_model_by_alias=False,
 )
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -112,11 +112,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         algorithm=ALGORITHM,
     )
 
-    return Login_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+    return LoginSuccess_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
 
 ########################################################################################################################
-@router.post(path="/refresh-token", description="Refresh the JWT token for the user", response_model=Login_Out)
+@router.post(path="/refresh-token", description="Refresh the JWT token for the user", response_model=LoginSuccess_Out)
 async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body(...)):
 
     credentials_exception = HTTPException(
@@ -158,7 +158,7 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
     except Exception as exception:
         raise exception
 
-    return Login_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+    return LoginSuccess_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
 
 ########################################################################################################################

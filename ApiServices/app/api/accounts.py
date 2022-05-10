@@ -89,7 +89,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
     response_model=List[GetOrganizations_Out],
     response_model_by_alias=False,
     response_model_exclude_unset=True,
-    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.SAILADMIN]))],
+    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.SAIL_ADMIN]))],
     status_code=status.HTTP_200_OK,
 )
 async def get_all_organizations(current_user: TokenData = Depends(get_current_user)):
@@ -256,7 +256,7 @@ async def register_user(
     response_model=List[GetUsers_Out],
     response_model_by_alias=False,
     response_model_exclude_unset=True,
-    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN, UserRole.SAILADMIN]))],
+    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN, UserRole.SAIL_ADMIN]))],
     status_code=status.HTTP_200_OK,
 )
 async def get_users(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):

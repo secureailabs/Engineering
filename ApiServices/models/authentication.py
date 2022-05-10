@@ -10,7 +10,7 @@ from models.common import PyObjectId, SailBaseModel
 from models.accounts import UserRole
 
 
-class Login_Out(SailBaseModel):
+class LoginSuccess_Out(SailBaseModel):
     access_token: StrictStr
     refresh_token: StrictStr
     token_type: StrictStr

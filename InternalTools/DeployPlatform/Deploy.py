@@ -97,16 +97,9 @@ def deploy_platformservices(account_credentials, deployment_name, data_services_
     # Sleeping for a minute
     time.sleep(60)
 
-    # Delete the current database of the existing user
-    database_tools_run = subprocess.run(
-        ["./DemoDatabaseTools", "-d", "--PortalIp=" + platformservices_ip, "--Port=6200"],
-        stdout=subprocess.PIPE,
-    )
-    print("database_tools_run: ", database_tools_run)
-
     # Run database tools for the backend server
     database_tools_run = subprocess.run(
-        ["./DatabaseInitializationTool", "--ip=" + platformservices_ip, "--settings=\"DatabaseInitializationSettings.json\"" + "--allsteps"],
+        ["./DatabaseInitializationTool", "--ip=" + platformservices_ip, "--settings=\"DatabaseInitializationSettings.json\"", "--allsteps"],
         stdout=subprocess.PIPE,
     )
     print("Database_Initialization_Tool_run: ", database_tools_run)

@@ -30,19 +30,19 @@ import {
 } from '@redux/digitalContract/digitalContract.typeDefs';
 import _ from 'lodash';
 
-const fetch = async ({ id }: { id: string }): Promise<TGetDigitalContractSuccess['DigitalContract']> => {
+const fetch = async ({ id }: { id: string }): Promise<TGetDigitalContractSuccess> => {
     const res = await axios.get<TGetDigitalContractSuccess>(
       `${axiosProxy()}/api/v1/DigitalContractManager/PullDigitalContract?DigitalContractGuid=${id}`, 
       {
       withCredentials: true,
-    });
-    return res.data.DigitalContract;
+      });
+    return res.data;
 }
 
 
 const DigitalContract: React.FC<TDigitalContractProps> = ({ userData }) => {
   const {  id } = useParams();
-  const { data, isLoading, status, error } = useQuery<TGetDigitalContractSuccess['DigitalContract'], AxiosError>
+  const { data, isLoading, status, error } = useQuery<TGetDigitalContractSuccess, AxiosError>
   (['digital-contract', id], () =>  fetch({ id: id ||"" })); 
 
 

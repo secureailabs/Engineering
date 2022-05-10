@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
-import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
+import Button from '@secureailabs/web-ui/components/Button';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 import Card from '@secureailabs/web-ui/components/Card';
 import stageNumberToString from '@utils/stageNumberToString';
 
 import { TDigitalContractSuccessProps } from './DigitalContract.types';
+import AcceptDigitalContractForm from '@components/DigitalContractForms/AcceptDigitalContractForm';
 import getPartnerOrg from '@utils/getPartnerOrg';
 import { unix } from 'dayjs'
 
@@ -15,8 +16,10 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
   getDigitalContractData,
   userData,
 }) => {
+  const [modalIsOpen, setIsOpen] = useState(false)
+
   let provisioning_status;
-  switch (getDigitalContractData.ProvisioningStatus) {
+  switch (getDigitalContractData.DigitalContract.ProvisioningStatus) {
     case 1:
       provisioning_status = '🟡 Provisioning';
       break;
@@ -33,13 +36,12 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
       provisioning_status = '🟠 Not Provisioned';
       break;
   }
-  console.log(unix(getDigitalContractData.ActivationTime));
   const { register, formState } = useForm({
     mode: 'onSubmit',
     defaultValues: {
       ...getDigitalContractData,
       Status: stageNumberToString(
-        getDigitalContractData.ContractStage
+        getDigitalContractData.DigitalContract.ContractStage
       ),
       PartnerOrg: getPartnerOrg(
         userData,
@@ -48,8 +50,8 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
         getDigitalContractData.ROName
       ),
       ProvisioningStatus: provisioning_status,
-      ActivationTime: unix(getDigitalContractData.ActivationTime),
-      ExpirationTime: unix(getDigitalContractData.ExpirationTime),
+      ActivationTime: unix(getDigitalContractData.DigitalContract.ActivationTime),
+      ExpirationTime: unix(getDigitalContractData.DigitalContract.ExpirationTime),
     },
   });
   return (
@@ -135,6 +137,21 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
               },
             }}
           />
+          <div
+            style={{
+              width: '20rem',
+              // marginLeft: '5rem',
+            }}
+          >
+            {
+              (getDigitalContractData.DigitalContract.ContractStage == 1 && getDigitalContractData.DataOwnerOrganization == userData?.OrganizationGuid) && <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
+                Accept Digital Contract
+              </Button>
+            }
+          </div>
+          {modalIsOpen &&
+            <AcceptDigitalContractForm setIsOpen={setIsOpen} DigitalContractGuid={getDigitalContractData.DigitalContract.DigitalContractGuid} />
+          }
         </div>
       </Card>
     </>

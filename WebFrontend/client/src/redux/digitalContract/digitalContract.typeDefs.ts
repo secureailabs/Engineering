@@ -40,6 +40,7 @@ export type TGetAllDigitalContractsSuccess = {
 
 export type TGetDigitalContractSuccess = {
   DigitalContract: {
+    DigitalContractGuid: string;
     Title: string;
     VersionNumber: string;
     ContractStage: number;
@@ -51,10 +52,6 @@ export type TGetDigitalContractSuccess = {
     ExpirationTime: number;
     Eula: string;
     LegalAgreement: string;
-    DataOwnerOrganization: string;
-    DOOName: string;
-    ResearcherOrganization: string;
-    ROName: string;
     LastActivity: number;
     ProvisioningStatus: number;
     HostForVirtualMachines: string;
@@ -63,6 +60,10 @@ export type TGetDigitalContractSuccess = {
     NumberOfVirtualMachines?: number;
     Note: string;
   };
+  DOOName: string;
+  DataOwnerOrganization: string;
+  ROName: string;
+  ResearcherOrganization: string;
 };
 
 export type TGetDigitalContractStart = {

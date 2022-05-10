@@ -8,7 +8,7 @@ export type TDigitalContractProps = {
 };
 
 export type TDigitalContractSuccessProps = {
-  getDigitalContractData: TGetDigitalContractSuccess['DigitalContract'];
+  getDigitalContractData: TGetDigitalContractSuccess;
   userData: IUserData
 };
 

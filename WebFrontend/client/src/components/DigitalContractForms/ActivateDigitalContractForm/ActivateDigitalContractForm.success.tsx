@@ -3,13 +3,13 @@ import React from 'react';
 import Modal from '@secureailabs/web-ui/components/Modal';
 import Button from '@secureailabs/web-ui/components/Button';
 
-import { TAcceptDigitalContractFormSuccessProps } from './AcceptDigitalContractForm.types';
+import { TActivateDigitalContractFormSuccessProps } from './ActivateDigitalContractForm.types';
 
-const AcceptDigitalContractFormSuccess: React.FC<TAcceptDigitalContractFormSuccessProps> = ({ UrlOnSuccess }) => {
+const ActivateDigitalContractFormSuccess: React.FC<TActivateDigitalContractFormSuccessProps> = ({ UrlOnSuccess }) => {
   return (
     <Modal
-      title='Accept Digital Contract'
-      description="You accepted this digital contract successfully."
+      title='Activate Digital Contract'
+      description="You activated this digital contract successfully."
       close={() =>  window.location.href = UrlOnSuccess}
     >
       <Button button_type='primary' full onClick={() => window.location.href = UrlOnSuccess}>Go back to digital contract list</Button>
@@ -17,4 +17,4 @@ const AcceptDigitalContractFormSuccess: React.FC<TAcceptDigitalContractFormSucce
   )
 };
 
-export default AcceptDigitalContractFormSuccess;
+export default ActivateDigitalContractFormSuccess;

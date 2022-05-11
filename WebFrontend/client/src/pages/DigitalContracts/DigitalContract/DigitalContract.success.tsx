@@ -9,6 +9,7 @@ import stageNumberToString from '@utils/stageNumberToString';
 
 import { TDigitalContractSuccessProps } from './DigitalContract.types';
 import AcceptDigitalContractForm from '@components/DigitalContractForms/AcceptDigitalContractForm';
+import ActivateDigitalContractForm from '@components/DigitalContractForms/ActivateDigitalContractForm';
 import getPartnerOrg from '@utils/getPartnerOrg';
 import { unix } from 'dayjs'
 
@@ -16,7 +17,9 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
   getDigitalContractData,
   userData,
 }) => {
-  const [modalIsOpen, setIsOpen] = useState(false)
+  const [acceptModalIsOpen, setAcceptIsOpen] = useState(false)
+  const [activateModalIsOpen, setActivateIsOpen] = useState(false)
+
 
   let provisioning_status;
   switch (getDigitalContractData.DigitalContract.ProvisioningStatus) {
@@ -36,10 +39,12 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
       provisioning_status = '🟠 Not Provisioned';
       break;
   }
+  const acceptAvailable = getDigitalContractData.DigitalContract.ContractStage == 1 && getDigitalContractData.DataOwnerOrganization == userData?.OrganizationGuid;
+  const activateAvailable = getDigitalContractData.DigitalContract.ContractStage == 2 && getDigitalContractData.ResearcherOrganization == userData?.OrganizationGuid;
   const { register, formState } = useForm({
     mode: 'onSubmit',
     defaultValues: {
-      ...getDigitalContractData,
+      ...getDigitalContractData.DigitalContract,
       Status: stageNumberToString(
         getDigitalContractData.DigitalContract.ContractStage
       ),
@@ -49,6 +54,7 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
         getDigitalContractData.DOOName,
         getDigitalContractData.ROName
       ),
+      DOOName: getDigitalContractData.DOOName,
       ProvisioningStatus: provisioning_status,
       ActivationTime: unix(getDigitalContractData.DigitalContract.ActivationTime),
       ExpirationTime: unix(getDigitalContractData.DigitalContract.ExpirationTime),
@@ -98,9 +104,9 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
                 placeholder: 'Allowable Host Regions',
                 type: 'text',
               },
-              NumberOfVCPU: {
-                label: 'Number of Virtual CPUs',
-                placeholder: 'Number of Virtual CPUs',
+              NumberOfVirtualMachines: {
+                label: 'Number of Virtual Machines',
+                placeholder: 'Number of Virtual Machines',
                 type: 'text',
               },
               ActivationTime: {
@@ -115,9 +121,9 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
                 
               },
 
-              ContractDuration: {
-                label: 'Contract Duration',
-                placeholder: 'Contract Duration',
+              SubscriptionDays: {
+                label: 'Contract Duration (days)',
+                placeholder: 'Contract Duration (days)',
                 type: 'text',
               },
               EULA: {
@@ -137,20 +143,30 @@ const DigitalContractSuccess: React.FC<TDigitalContractSuccessProps> = ({
               },
             }}
           />
-          <div
-            style={{
-              width: '20rem',
-              // marginLeft: '5rem',
-            }}
-          >
-            {
-              (getDigitalContractData.DigitalContract.ContractStage == 1 && getDigitalContractData.DataOwnerOrganization == userData?.OrganizationGuid) && <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
-                Accept Digital Contract
-              </Button>
-            }
-          </div>
-          {modalIsOpen &&
-            <AcceptDigitalContractForm setIsOpen={setIsOpen} DigitalContractGuid={getDigitalContractData.DigitalContract.DigitalContractGuid} />
+          {(acceptAvailable || activateAvailable) &&
+            <div
+              style={{
+                width: '20rem',
+                // marginLeft: '5rem',
+              }}
+            >
+              {
+                acceptAvailable && <Button full={false} button_type="primary" onClick={() => { setAcceptIsOpen(true) }}>
+                  Accept Digital Contract
+                </Button>
+              }
+              {
+                (activateAvailable) && <Button full={false} button_type="primary" onClick={() => { setActivateIsOpen(true) }}>
+                  Activate Digital Contract
+                </Button>
+              }
+            </div>
+           }
+          {acceptModalIsOpen &&
+            <AcceptDigitalContractForm setIsOpen={setAcceptIsOpen} DigitalContractGuid={getDigitalContractData.DigitalContract.DigitalContractGuid} />
+          }
+          {activateModalIsOpen &&
+            <ActivateDigitalContractForm setIsOpen={setActivateIsOpen} DigitalContractGuid={getDigitalContractData.DigitalContract.DigitalContractGuid} />
           }
         </div>
       </Card>

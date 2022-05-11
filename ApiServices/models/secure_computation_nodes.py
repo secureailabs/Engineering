@@ -21,10 +21,12 @@ class SecureComputationNodeState(Enum):
     REQUESTED = "REQUESTED"
     CREATING = "CREATING"
     INITIALIZING = "INITIALIZING"
+    WAITING_FOR_DATA = "WAITING_FOR_DATA"
+    FAILED = "FAILED"
     READY = "READY"
     DELETED = "DELETED"
     DELETING = "DELETING"
-    FAILED = "FAILED"
+    DELETE_FAILED = "DELETE_FAILED"
 
 
 class SecureComputationNode_Base(SailBaseModel):

@@ -1,6 +1,6 @@
 ###################################################################################
 # @author Prawal Gangwar
-# @brief Models used by account management service
+# @brief Async operations for the database
 # @License Private and Confidential. Internal Use Only.
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ###################################################################################

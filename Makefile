@@ -40,7 +40,7 @@ databaseInitializationTool: SharedCommonCode
     
 uploadPackageAndInitializationVector: SharedCommonCode
 	@make -C $(UPLOAD_TOOL) all
-	@echo "databaseTools done!"
+	@echo "uploadPackageAndInitializationVector done!"
 
 baseVmInit: SharedCommonCode
 	@make -C $(BASE_VM_INIT) all

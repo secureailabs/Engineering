@@ -5,10 +5,13 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
+from ipaddress import IPv4Address
+import json
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Body, HTTPException, Response, status
+from uuid import uuid4
+from fastapi import APIRouter, BackgroundTasks, Depends, Body, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
-from models.digital_contracts import DigitalContract_Db
+from models.digital_contracts import DigitalContract_Db, DigitalContractState
 from models.datasets import Dataset_Db
 from app.api.datasets import get_dataset
 from app.api.digital_contracts import get_digital_contract
@@ -25,6 +28,9 @@ from models.secure_computation_nodes import (
     RegisterSecureComputationNode_Out,
     UpdateSecureComputationNode_In,
 )
+from app.data import sync_operations as sync_data_service
+import app.azure.azure as azure
+import subprocess
 
 ########################################################################################################################
 DB_COLLECTION_SECURE_COMPUTATION_NODE = "secure-computation-node"
@@ -42,6 +48,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def register_secure_computation_node(
+    backgropund_tasks: BackgroundTasks,
     secure_computation_node_req: RegisterSecureComputationNode_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ):
@@ -69,6 +76,10 @@ async def register_secure_computation_node(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
         digital_contract_db = DigitalContract_Db(**digital_contract_db)
 
+        # Digital Contract must be activated
+        if digital_contract_db.state != DigitalContractState.ACTIVATED:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Digital Contract not activated")
+
         # Check if the digital contract and dataset match each other
         if dataset_db.id != digital_contract_db.dataset_id:
             raise HTTPException(
@@ -88,7 +99,7 @@ async def register_secure_computation_node(
         )
 
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
-        # TODO: Prawal do it later depending on HANU status
+        backgropund_tasks.add_task(provision_virtual_machine, secure_computation_node_db)
 
         return secure_computation_node_db
     except HTTPException as http_exception:
@@ -118,7 +129,7 @@ async def get_all_secure_computation_nodes(
             query = {"dataOwnerId": str(data_owner_id)}
         elif (researcher_id is not None) and (researcher_id == current_user.organization_id):
             query = {"researcher_id": str(researcher_id)}
-        elif current_user.role is UserRole.SAILADMIN:
+        elif current_user.role is UserRole.SAIL_ADMIN:
             query = {}
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
@@ -154,7 +165,7 @@ async def get_secure_computation_node(
         if (
             (secure_computation_node_db.data_owner_id != current_user.organization_id)
             and (secure_computation_node_db.researcher_id != current_user.organization_id)
-            and (current_user.role != UserRole.SAILADMIN)
+            and (current_user.role != UserRole.SAIL_ADMIN)
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
@@ -214,7 +225,9 @@ async def update_secure_computation_node(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def deprovision_secure_computation_node(
-    secure_computation_node_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    backgropund_tasks: BackgroundTasks,
+    secure_computation_node_id: PyObjectId,
+    current_user: TokenData = Depends(get_current_user),
 ):
     try:
         # Check if the secure computation node exists
@@ -231,6 +244,10 @@ async def deprovision_secure_computation_node(
 
         secure_computation_node_db.state = SecureComputationNodeState.DELETING
 
+        # TODO: Prawal do it later depending on HANU status
+        # Start a background task to deprovision the secure computation node which will update the status
+        backgropund_tasks.add_task(deprovision_virtual_machine, secure_computation_node_db)
+
         # Update the secure computation node
         await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
@@ -238,11 +255,139 @@ async def deprovision_secure_computation_node(
             {"$set": jsonable_encoder(secure_computation_node_db)},
         )
 
-        # TODO: Prawal do it later depending on HANU status
-        # Start a background task to deprovision the secure computation node which will update the status
-
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
         raise exception
+
+
+# TODO: Prawal these are temporary functions. They should be removed after the HANU is ready
+def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db):
+    try:
+        # Update the database to mark the VM as being created
+        secure_computation_node_db.state = SecureComputationNodeState.CREATING
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(secure_computation_node_db.id)},
+            {"$set": jsonable_encoder(secure_computation_node_db)},
+        )
+
+        AZURE_SUBSCRIPTION_ID = "3d2b9951-a0c8-4dc3-8114-2776b047b15c"
+        AZURE_TENANT_ID = "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8"
+        AZURE_CLIENT_ID = "4f909fab-ad4c-4685-b7a9-7ddaae4efb22"
+        AZURE_CLIENT_SECRET = "1YEn1Y.bVTVk-dzm9voTWyf7DrgQF29xL2"
+        OWNER = "fastapi"
+
+        deployment_name = OWNER + str(secure_computation_node_db.id) + "-scn"
+
+        # Deploy the secure computation node
+        account_credentials = azure.authenticate(
+            AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
+        )
+        deploy_response: azure.DeploymentResponse = azure.deploy_module(
+            account_credentials, deployment_name, "securecomputationnode"
+        )
+        if deploy_response.status != "Success":
+            raise Exception(deploy_response.note)
+
+        # Update the database to mark the VM as INITIALIZING
+        secure_computation_node_db.ipaddress = IPv4Address(deploy_response.ip_address)
+        secure_computation_node_db.state = SecureComputationNodeState.INITIALIZING
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(secure_computation_node_db.id)},
+            {"$set": jsonable_encoder(secure_computation_node_db)},
+        )
+
+        # Create a SCN initialization vector json
+        securecomputationnode_json = {}
+        securecomputationnode_json["NameOfVirtualMachine"] = secure_computation_node_db.name
+        securecomputationnode_json["IpAddressOfVirtualMachine"] = deploy_response.ip_address
+        securecomputationnode_json["VirtualMachineIdentifier"] = str(secure_computation_node_db.id)
+        securecomputationnode_json["ClusterIdentifier"] = str(uuid4())
+        securecomputationnode_json["DigitalContractIdentifier"] = str(secure_computation_node_db.digital_contract_id)
+        securecomputationnode_json["RootOfTrustDomainIdentifier"] = str(uuid4())
+        securecomputationnode_json["ComputationalDomainIdentifier"] = str(uuid4())
+        securecomputationnode_json["DataConnectorDomainIdentifier"] = str(uuid4())
+        securecomputationnode_json["DatasetIdentifier"] = str(secure_computation_node_db.dataset_id)
+        securecomputationnode_json["VmEosb"] = "TODO"
+
+        with open(deployment_name, "w") as outfile:
+            json.dump(securecomputationnode_json, outfile)
+
+        upload_status = subprocess.run(
+            [
+                "./UploadPackageAndInitializationVector",
+                "--IpAddress=" + deploy_response.ip_address,
+                "--Package=SecureComputationNode.tar.gz",
+                "--InitializationVector=" + deployment_name,
+            ],
+            stdout=subprocess.PIPE,
+        )
+        print("Upload status: ", upload_status.stdout)
+
+        # Update the database to mark the VM as WAITING_FOR_DATA
+        secure_computation_node_db.state = SecureComputationNodeState.WAITING_FOR_DATA
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(secure_computation_node_db.id)},
+            {"$set": jsonable_encoder(secure_computation_node_db)},
+        )
+
+    except Exception as exception:
+        print(exception)
+        # Update the database to mark the VM as FAILED
+        secure_computation_node_db.state = SecureComputationNodeState.FAILED
+        secure_computation_node_db.details = str(exception)
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(secure_computation_node_db.id)},
+            {"$set": jsonable_encoder(secure_computation_node_db)},
+        )
+
+
+def deprovision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db):
+    try:
+        secure_computation_node_db.ipaddress = IPv4Address("0.0.0.0")
+        secure_computation_node_db.state = SecureComputationNodeState.DELETING
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(secure_computation_node_db.id)},
+            {"$set": jsonable_encoder(secure_computation_node_db)},
+        )
+
+        AZURE_SUBSCRIPTION_ID = "3d2b9951-a0c8-4dc3-8114-2776b047b15c"
+        AZURE_TENANT_ID = "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8"
+        AZURE_CLIENT_ID = "4f909fab-ad4c-4685-b7a9-7ddaae4efb22"
+        AZURE_CLIENT_SECRET = "1YEn1Y.bVTVk-dzm9voTWyf7DrgQF29xL2"
+        OWNER = "fastapi"
+
+        # Delete the virtual machine resource group
+        deployment_name = OWNER + str(secure_computation_node_db.id) + "-scn"
+
+        account_credentials = azure.authenticate(
+            AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
+        )
+
+        delete_response = azure.delete_resouce_group(account_credentials, deployment_name)
+        if delete_response.status != "Success":
+            raise Exception(delete_response.note)
+
+        secure_computation_node_db.ipaddress = IPv4Address("0.0.0.0")
+        secure_computation_node_db.state = SecureComputationNodeState.DELETED
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(secure_computation_node_db.id)},
+            {"$set": jsonable_encoder(secure_computation_node_db)},
+        )
+    except Exception as exception:
+        print(exception)
+        # Update the database to mark the VM as FAILED
+        secure_computation_node_db.state = SecureComputationNodeState.DELETE_FAILED
+        secure_computation_node_db.details = str(exception)
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(secure_computation_node_db.id)},
+            {"$set": jsonable_encoder(secure_computation_node_db)},
+        )

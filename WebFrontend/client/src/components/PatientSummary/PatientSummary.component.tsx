@@ -33,6 +33,7 @@ import Card from '@secureailabs/web-ui/components/Card';
 import fake_data_json from '@assets/fake_data.json';
 
 import Select from 'react-select';
+import { GrIndicator } from 'react-icons/gr';
 const STEP = 1;
 const MIN = 0;
 const MAX = 100;
@@ -268,9 +269,9 @@ const PatientSummary = ({
           <Card containerHeight={containerHeight} primaryText="No. of Patients">
             <>
               <div className="patient-summary">
-                <div className="patient-summary__top">
+                <div className="patient-summary__top" style={{ display: 'grid', gridTemplateColumns: '1fr 4fr 1fr 4 fr'}}>
+                  <Text>Hospital</Text>
                   <div>
-                    <Text>Hospital</Text>
                     <Select
                       isClearable={true}
                       isMulti={true}
@@ -288,8 +289,9 @@ const PatientSummary = ({
                       })}
                     />
                   </div>
+                  <div></div>
+                  <Text>Gender</Text>
                   <div>
-                    <Text>Gender</Text>
                     <Select
                       isClearable={true}
                       isMulti={true}
@@ -307,8 +309,8 @@ const PatientSummary = ({
                       })}
                     />
                   </div>
-                   <div>
-                    <Text>Race</Text>
+                  <Text>Race</Text>
+                  <div>
                     <Select
                       isClearable={true}
                       isMulti={true}
@@ -326,8 +328,9 @@ const PatientSummary = ({
                       })}
                     />
                   </div>
+                  <div></div>
+                  <Text>Cancer Type</Text>
                   <div>
-                    <Text>Cancer Type</Text>
                     <Select
                       isClearable={true}
                       isMulti={true}

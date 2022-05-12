@@ -130,7 +130,7 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
         if user_id is None:
             raise credentials_exception
 
-        found_user = await data_service.find_one(DB_COLLECTION_USERS, {"_id": user_id})
+        found_user = await data_service.find_one(DB_COLLECTION_USERS, {"_id": str(user_id)})
         if found_user is None:
             raise credentials_exception
 

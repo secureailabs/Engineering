@@ -16,6 +16,7 @@ from app.data import operations as data_service
 from models.datasets_families import (
     DatasetFamily_Db,
     DatasetFamilyState,
+    GetMultipleDatasetFamily_Out,
     RegisterDatasetFamily_In,
     RegisterDatasetFamily_Out,
     UpdateDatasetFamily_In,
@@ -59,7 +60,7 @@ async def register_dataset_family(
     path="/datasets-families",
     description="Get list of all the dataset families",
     response_description="List of dataset families",
-    response_model=List[GetDatasetFamily_Out],
+    response_model=GetMultipleDatasetFamily_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
@@ -67,7 +68,7 @@ async def register_dataset_family(
 async def get_all_dataset_families(current_user: TokenData = Depends(get_current_user)):
     try:
         dataset_families = await data_service.find_all(DB_COLLECTION_DATASET_FAMILIES)
-        return dataset_families
+        return GetMultipleDatasetFamily_Out(dataset_families=dataset_families)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
@@ -120,8 +121,8 @@ async def update_dataset_family(
         if updated_dataset_family_info.description is not None:
             dataset_family_db.description = updated_dataset_family_info.description
 
-        if updated_dataset_family_info.title is not None:
-            dataset_family_db.title = updated_dataset_family_info.title
+        if updated_dataset_family_info.name is not None:
+            dataset_family_db.name = updated_dataset_family_info.name
 
         if updated_dataset_family_info.version is not None:
             dataset_family_db.version = updated_dataset_family_info.version

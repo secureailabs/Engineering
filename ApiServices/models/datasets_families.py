@@ -19,7 +19,7 @@ class DatasetFamilyState(Enum):
 
 class DatasetFamily_Base(SailBaseModel):
     # TODO: Prawal add a StrictStr validator for string lenght
-    title: StrictStr = Field(...)
+    name: StrictStr = Field(...)
     description: StrictStr = Field(...)
     tag: StrictStr = Field(...)
     version: StrictStr = Field(...)
@@ -42,7 +42,7 @@ class RegisterDatasetFamily_Out(SailBaseModel):
 
 class UpdateDatasetFamily_In(SailBaseModel):
     # todo: Prawal add a validator to enure that atleast of the field is present in the request
-    title: Optional[StrictStr] = Field(default=None)
+    name: Optional[StrictStr] = Field(default=None)
     description: Optional[StrictStr] = Field(default=None)
     tag: Optional[StrictStr] = Field(default=None)
     version: Optional[StrictStr] = Field(default=None)
@@ -50,3 +50,7 @@ class UpdateDatasetFamily_In(SailBaseModel):
 
 class GetDatasetFamily_Out(DatasetFamily_Db):
     pass
+
+
+class GetMultipleDatasetFamily_Out(SailBaseModel):
+    dataset_families: List[GetDatasetFamily_Out] = Field(default_factory=list)

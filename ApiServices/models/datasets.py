@@ -17,14 +17,25 @@ class DatasetState(Enum):
     INACTIVE = "INACTIVE"
 
 
-class DatasetTable(SailBaseModel):
-    description: StrictStr = Field(...)
-    table_identifier: StrictStr = Field(...)
-    hashtags: StrictStr = Field(...)
-    number_of_columns: int = Field(...)
+class DatasetTableCoumn(SailBaseModel):
+    id: PyObjectId = Field(...)
+    units: StrictStr = Field(...)
     name: StrictStr = Field(...)
+    tags: StrictStr = Field(...)
+    type: StrictStr = Field(...)
+    description: StrictStr = Field(...)
+
+
+class DatasetTable(SailBaseModel):
+    id: PyObjectId = Field(...)
     number_of_rows: int = Field(...)
-    column_name: StrictStr = Field(...)
+    name: StrictStr = Field(...)
+    tags: StrictStr = Field(...)
+    number_of_columns: int = Field(...)
+    compressed_data_size_in_bytes: int = Field(...)
+    description: StrictStr = Field(...)
+    all_column_properties: List[DatasetTableCoumn] = Field(...)
+    data_size_in_bytes: int = Field(...)
 
 
 class Dataset_Base(SailBaseModel):

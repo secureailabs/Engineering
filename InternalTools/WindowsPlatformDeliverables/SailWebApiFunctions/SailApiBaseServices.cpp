@@ -419,7 +419,6 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
         
         // Parse the returning value.
         oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-        std::cout << oResponse.ToString() << std::endl;
 
         // Did the transaction succeed?
         _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
@@ -486,51 +485,4 @@ extern "C" __declspec(dllexport) bool __cdecl Logout(void)
     }
 
     return fSuccess;
-}
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name=""></param>
-/// <returns></returns>
-extern "C" __declspec(dllexport) BSTR __cdecl GetSailWebApiPortalImpostorEosb(void)
-{
-    __DebugFunction();
-
-    // [DllImport("SailWebApiPortalFunctions.dll", CallingConvention = CallingConvention.Cdecl )]
-    // [return: MarshalAs(UnmanagedType.BStr)]
-    // static extern public string GetSailWebApiPortalImpostorEosb();
-
-    std::string strSailWebApiPortalImportorEosb = "";
-
-    try
-    {
-
-        // Check to make sure we are logged in before trying to transact
-        _ThrowBaseExceptionIf((false == ::IsLoggedOn()), "No active session, cannot complete requested operation", nullptr);
-        // Build out the REST API call query
-        std::string strVerb = "GET";
-        std::string strApiUri = "/SAIL/CryptographicManager/User/GetIEosb?Eosb=" + ::GetSailPlatformServicesEosb();
-        std::string strJsonBody = "";
-        // Send the REST API call to the SAIL Web Api Portal
-        std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strSailPlatformServicesIpAddress, (Word) 6200, strVerb, strApiUri, strJsonBody, true);
-        // Parse the returning value.
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-        // Did the transaction succeed?
-        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
-        // Extract the IEOSB from the response
-        strSailWebApiPortalImportorEosb = oResponse.GetString("UpdatedEosb");
-    }
-
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __LINE__);
-    }
-
-    return ::ConvertToBSTR(strSailWebApiPortalImportorEosb);
 }

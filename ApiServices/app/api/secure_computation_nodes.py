@@ -25,6 +25,7 @@ from models.common import PyObjectId
 from models.datasets import Dataset_Db
 from models.digital_contracts import DigitalContract_Db, DigitalContractState
 from models.secure_computation_nodes import (
+    GetMultipleSecureComputationNode_Out,
     GetSecureComputationNode_Out,
     RegisterSecureComputationNode_In,
     RegisterSecureComputationNode_Out,
@@ -114,7 +115,7 @@ async def register_secure_computation_node(
     path="/secure-computation-node",
     description="Get list of all the secure_computation_node",
     response_description="List of secure_computation_node",
-    response_model=List[GetSecureComputationNode_Out],
+    response_model=GetMultipleSecureComputationNode_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
@@ -136,7 +137,7 @@ async def get_all_secure_computation_nodes(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
         secure_computation_nodes = await data_service.find_by_query(DB_COLLECTION_SECURE_COMPUTATION_NODE, query)
-        return secure_computation_nodes
+        return GetMultipleSecureComputationNode_Out(secure_computation_nodes=secure_computation_nodes)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

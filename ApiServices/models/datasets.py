@@ -74,3 +74,7 @@ class UpdateDataset_In(SailBaseModel):
 
 class GetDataset_Out(Dataset_Db):
     pass
+
+
+class GetMultipleDataset_Out(SailBaseModel):
+    datasets: List[GetDataset_Out] = Field(...)

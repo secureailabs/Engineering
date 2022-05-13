@@ -20,6 +20,7 @@ from models.digital_contracts import (
     DigitalContract_Db,
     DigitalContractState,
     GetDigitalContract_Out,
+    GetMultipleDigitalContract_Out,
     RegisterDigitalContract_In,
     RegisterDigitalContract_Out,
     UpdateDigitalContract_In,
@@ -73,7 +74,7 @@ async def register_digital_contract(
     path="/digital-contracts",
     description="Get list of all the digital_contract",
     response_description="List of digital_contract",
-    response_model=List[GetDigitalContract_Out],
+    response_model=GetMultipleDigitalContract_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
@@ -95,7 +96,7 @@ async def get_all_digital_contract(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
         digital_contracts = await data_service.find_by_query(DB_COLLECTION_DIGITAL_CONTRACTS, query)
-        return digital_contracts
+        return GetMultipleDigitalContract_Out(digital_contracts=digital_contracts)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

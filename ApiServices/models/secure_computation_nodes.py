@@ -8,7 +8,7 @@
 from datetime import datetime
 from enum import Enum
 from ipaddress import IPv4Address
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
@@ -59,6 +59,10 @@ class RegisterSecureComputationNode_Out(SailBaseModel):
 
 class GetSecureComputationNode_Out(SecureComputationNode_Db):
     pass
+
+
+class GetMultipleSecureComputationNode_Out(SailBaseModel):
+    secure_computation_nodes: List[GetSecureComputationNode_Out] = Field(...)
 
 
 class UpdateSecureComputationNode_In(SailBaseModel):

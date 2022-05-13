@@ -57,6 +57,10 @@ class GetDigitalContract_Out(DigitalContract_Db):
     pass
 
 
+class GetMultipleDigitalContract_Out(SailBaseModel):
+    digital_contracts: List[GetDigitalContract_Out] = Field(...)
+
+
 class UpdateDigitalContract_In(SailBaseModel):
     # todo: Prawal add a validator to enure that atleast of the field is present in the request
     name: Optional[StrictStr] = Field(default=None)

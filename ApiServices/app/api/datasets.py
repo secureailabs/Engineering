@@ -18,6 +18,7 @@ from models.datasets import (
     Dataset_Db,
     DatasetState,
     GetDataset_Out,
+    GetMultipleDataset_Out,
     RegisterDataset_In,
     RegisterDataset_Out,
     UpdateDataset_In,
@@ -65,7 +66,7 @@ async def register_dataset(
     path="/datasets",
     description="Get list of all the datasets",
     response_description="List of datasets",
-    response_model=List[GetDataset_Out],
+    response_model=GetMultipleDataset_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
@@ -73,7 +74,7 @@ async def register_dataset(
 async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
     try:
         datasets = await data_service.find_all(DB_COLLECTION_DATASETS)
-        return datasets
+        return GetMultipleDataset_Out(datasets=datasets)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

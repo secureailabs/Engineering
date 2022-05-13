@@ -7,7 +7,7 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import EmailStr, Field, StrictStr
 
@@ -45,6 +45,10 @@ class RegisterOrganization_Out(SailBaseModel):
 
 class GetOrganizations_Out(Organization_Base):
     id: PyObjectId = Field(alias="_id")
+
+
+class GetMultipleOrganizations_Out(SailBaseModel):
+    organizations: List[GetOrganizations_Out] = Field(...)
 
 
 class UpdateOrganization_In(SailBaseModel):
@@ -99,6 +103,10 @@ class RegisterUser_Out(User_Base):
 
 class GetUsers_Out(User_Base):
     id: PyObjectId = Field(alias="_id")
+
+
+class GetMultipleUsers_Out(SailBaseModel):
+    users: List[GetUsers_Out] = Field(...)
 
 
 class UpdateUser_In(SailBaseModel):

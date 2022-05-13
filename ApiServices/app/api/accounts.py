@@ -12,6 +12,8 @@ from app.data import operations as data_service
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import (
+    GetMultipleOrganizations_Out,
+    GetMultipleUsers_Out,
     GetOrganizations_Out,
     GetUsers_Out,
     Organization_db,
@@ -87,7 +89,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
     path="/organizations",
     description="Get list of all the organizations",
     response_description="List of organizations",
-    response_model=List[GetOrganizations_Out],
+    response_model=GetMultipleOrganizations_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.SAIL_ADMIN]))],
@@ -96,7 +98,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
 async def get_all_organizations(current_user: TokenData = Depends(get_current_user)):
     try:
         organizations = await data_service.find_all(DB_COLLECTION_ORGANIZATIONS)
-        return organizations
+        return GetMultipleOrganizations_Out(organizations=organizations)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
@@ -254,7 +256,7 @@ async def register_user(
 @router.get(
     path="/organizations/{organization_id}/users",
     description="Get all users in the organization",
-    response_model=List[GetUsers_Out],
+    response_model=GetMultipleUsers_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN, UserRole.SAIL_ADMIN]))],
@@ -267,7 +269,7 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         users = await data_service.find_by_query(DB_COLLECTION_USERS, {"organization_id": str(organization_id)})
-        return users
+        return GetMultipleUsers_Out(users=users)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

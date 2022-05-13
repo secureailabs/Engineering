@@ -6,8 +6,9 @@
 ###################################################################################
 
 from pydantic import Field, StrictStr
-from models.common import PyObjectId, SailBaseModel
+
 from models.accounts import UserRole
+from models.common import PyObjectId, SailBaseModel
 
 
 class LoginSuccess_Out(SailBaseModel):

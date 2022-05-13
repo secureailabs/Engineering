@@ -7,16 +7,15 @@
 
 from time import time
 from typing import List
-from fastapi import Body, Depends, status, APIRouter, HTTPException
+
+from app.data import operations as data_service
+from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from passlib.context import CryptContext
-from fastapi.encoders import jsonable_encoder
-
 from models.accounts import User_Db, UserInfo_Out, UserRole
-from models.authentication import RefreshToken_In, TokenData, LoginSuccess_Out
-from app.data import operations as data_service
-
+from models.authentication import LoginSuccess_Out, RefreshToken_In, TokenData
+from passlib.context import CryptContext
 
 ########################################################################################################################
 DB_COLLECTION_USERS = "users"

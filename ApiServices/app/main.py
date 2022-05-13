@@ -5,15 +5,16 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ###################################################################################
 
-from fastapi import FastAPI
-from pydantic import BaseModel, Field, StrictStr
-from app.api import authentication, accounts, datasets, digital_contracts, secure_computation_nodes, datasets_families
-from fastapi.exceptions import RequestValidationError
 import fastapi.openapi.utils as utils
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field, StrictStr
+
+from app.api import accounts, authentication, datasets, datasets_families, digital_contracts, secure_computation_nodes
 
 server = FastAPI(
     title="Secure AI Labs API Services",

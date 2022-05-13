@@ -8,7 +8,9 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional
-from pydantic import Field, EmailStr, StrictStr
+
+from pydantic import EmailStr, Field, StrictStr
+
 from models.common import PyObjectId, SailBaseModel
 
 

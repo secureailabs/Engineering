@@ -6,27 +6,28 @@
 ########################################################################################################################
 
 from typing import List
-from fastapi import APIRouter, Depends, Body, HTTPException, Response, status
+
+from app.api.authentication import RoleChecker, get_current_user, get_password_hash
+from app.data import operations as data_service
+from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
-from models.authentication import TokenData
 from models.accounts import (
     GetOrganizations_Out,
     GetUsers_Out,
+    Organization_db,
     OrganizationState,
     RegisterOrganization_In,
-    Organization_db,
     RegisterOrganization_Out,
     RegisterUser_In,
     RegisterUser_Out,
     UpdateOrganization_In,
     UpdateUser_In,
     User_Db,
-    UserRole,
     UserAccountState,
+    UserRole,
 )
+from models.authentication import TokenData
 from models.common import PyObjectId
-from app.api.authentication import RoleChecker, get_current_user, get_password_hash
-from app.data import operations as data_service
 
 ########################################################################################################################
 DB_COLLECTION_ORGANIZATIONS = "organizations"

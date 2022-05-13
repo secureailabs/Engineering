@@ -9,7 +9,9 @@ from datetime import datetime
 from enum import Enum
 from ipaddress import IPv4Address
 from typing import Optional
+
 from pydantic import Field, StrictStr
+
 from models.common import PyObjectId, SailBaseModel
 
 

@@ -5,15 +5,17 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ###################################################################################
 
-from ipaddress import ip_address
-from azure.mgmt.resource import ResourceManagementClient
-from azure.mgmt.network import NetworkManagementClient
-from azure.mgmt.resource.resources.models import DeploymentMode
-from azure.identity import ClientSecretCredential
-from azure.core.exceptions import AzureError
-import os
 import json
+import os
+from ipaddress import ip_address
+
 from pydantic import BaseModel, Field, StrictStr
+
+from azure.core.exceptions import AzureError
+from azure.identity import ClientSecretCredential
+from azure.mgmt.network import NetworkManagementClient
+from azure.mgmt.resource import ResourceManagementClient
+from azure.mgmt.resource.resources.models import DeploymentMode
 
 
 class DeploymentResponse(BaseModel):

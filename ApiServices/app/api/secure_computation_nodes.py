@@ -5,32 +5,33 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
-from ipaddress import IPv4Address
 import json
+import subprocess
+from ipaddress import IPv4Address
 from typing import List, Optional
 from uuid import uuid4
-from fastapi import APIRouter, BackgroundTasks, Depends, Body, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
-from models.digital_contracts import DigitalContract_Db, DigitalContractState
-from models.datasets import Dataset_Db
+
+import app.azure.azure as azure
+from app.api.authentication import get_current_user
 from app.api.datasets import get_dataset
 from app.api.digital_contracts import get_digital_contract
+from app.data import operations as data_service
+from app.data import sync_operations as sync_data_service
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import PyObjectId
-from app.api.authentication import get_current_user
-from app.data import operations as data_service
+from models.datasets import Dataset_Db
+from models.digital_contracts import DigitalContract_Db, DigitalContractState
 from models.secure_computation_nodes import (
-    SecureComputationNode_Db,
-    SecureComputationNodeState,
     GetSecureComputationNode_Out,
     RegisterSecureComputationNode_In,
     RegisterSecureComputationNode_Out,
+    SecureComputationNode_Db,
+    SecureComputationNodeState,
     UpdateSecureComputationNode_In,
 )
-from app.data import sync_operations as sync_data_service
-import app.azure.azure as azure
-import subprocess
 
 ########################################################################################################################
 DB_COLLECTION_SECURE_COMPUTATION_NODE = "secure-computation-node"
@@ -262,6 +263,7 @@ async def deprovision_secure_computation_node(
         raise exception
 
 
+########################################################################################################################
 # TODO: Prawal these are temporary functions. They should be removed after the HANU is ready
 def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db):
     try:
@@ -347,6 +349,7 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
         )
 
 
+########################################################################################################################
 def deprovision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db):
     try:
         secure_computation_node_db.ipaddress = IPv4Address("0.0.0.0")

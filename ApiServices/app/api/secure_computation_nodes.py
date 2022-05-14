@@ -128,7 +128,7 @@ async def get_all_secure_computation_nodes(
     try:
         # TODO: Prawal the current user organization is repeated in the request, find a better way
         if (data_owner_id is not None) and (data_owner_id == current_user.organization_id):
-            query = {"dataOwnerId": str(data_owner_id)}
+            query = {"data_owner_id": str(data_owner_id)}
         elif (researcher_id is not None) and (researcher_id == current_user.organization_id):
             query = {"researcher_id": str(researcher_id)}
         elif current_user.role is UserRole.SAIL_ADMIN:

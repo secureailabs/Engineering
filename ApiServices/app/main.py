@@ -14,7 +14,9 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictStr
 
-from app.api import accounts, authentication, datasets, datasets_families, digital_contracts, secure_computation_nodes
+from app.api import (accounts, authentication, datasets, datasets_families,
+                     digital_contracts, remote_data_connector,
+                     secure_computation_nodes)
 
 server = FastAPI(
     title="Secure AI Labs API Services",
@@ -30,6 +32,7 @@ server.include_router(datasets.router)
 server.include_router(digital_contracts.router)
 server.include_router(secure_computation_nodes.router)
 server.include_router(datasets_families.router)
+server.include_router(remote_data_connector.router)
 
 # Override the default validation error handler as it throws away a lot of information
 # about the schema of the request body.

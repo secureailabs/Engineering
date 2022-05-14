@@ -95,13 +95,23 @@ Word __thiscall SailPlatformServicesSession::GetServerPortNumber(void) const thr
  *
  ********************************************************************************************/
 
+std::string __thiscall SailPlatformServicesSession::GetAccessToken(void) const throw()
+{
+    __DebugFunction();
+
+    const std::lock_guard<std::mutex> stlLock(m_oLock);
+    std::string strAccessToken{m_strAccessToken};
+
+    return strAccessToken;
+}
+
 std::string __thiscall SailPlatformServicesSession::GetEosb(void) const throw()
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     std::string strEosb{m_strEosb};
-    
+
     return strEosb;
 }
 
@@ -116,17 +126,19 @@ std::string __thiscall SailPlatformServicesSession::GetEosb(void) const throw()
  *
  ********************************************************************************************/
 
-void __thiscall SailPlatformServicesSession::SetEosb(
-    _in const std::string & c_strEosb
+void __thiscall SailPlatformServicesSession::SetAccessTokens(
+    _in const std::string & c_strAccessToken,
+    _in const std::string & c_strRefreshToken
     ) throw()
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     // If someone is setting an EOSB, we'd better have a running session, so let's make sure
-    if ((true == m_fIsRunning)&&(0 < m_strServerIpAddress.size())&&(0 < m_wServerPortNumber)&&(0 < m_strEosb.size()))
+    if ((true == m_fIsRunning)&&(0 < m_strServerIpAddress.size())&&(0 < m_wServerPortNumber)&&(0 < m_strAccessToken.size()))
     {
-        m_strEosb = c_strEosb;
+        m_strAccessToken = c_strAccessToken;
+        m_strRefreshToken = c_strRefreshToken;
     }
 }
 
@@ -187,19 +199,23 @@ void __thiscall SailPlatformServicesSession::Login(
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    // Prepare the API call
+
+    // Build out the REST API call query
     std::string strVerb = "POST";
-    std::string strApiUrl = "/SAIL/AuthenticationManager/User/Login?Email="+ c_strEmail +"&Password="+ c_strUserPassword;
-    std::string strJsonBody = "";
-    // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::string strApiUri = "/login";
+    std::string strBody = "grant_type=&username="+ ::UrlEncodeString(c_strEmail) +"&password=" + ::UrlEncodeString(std::string(c_strUserPassword)) + "&scope=&client_id=&client_secret=";
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Content-Type: application/x-www-form-urlencoded");
+
+    // Send the REST API call to the SAIL Web Api Portal
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUri, strBody, true, stlListOfHeaders);
+
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-    // Did the call succeed?
-    _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error logging in.", nullptr);
-    // If the call succeeded, let's make sure that the format of the return value is correct
-    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID FORMAT. Invalid return value, missing 'Eosb'", nullptr);
+    // Did the transaction succeed?
+    _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Failed to log in. Invalid Credentials.", nullptr);
+
     // Calling SetEosb() will start the update thread automatically
-    this->StartSession(oResponse.GetString("Eosb"));
+    this->StartSession(oResponse.GetString("access_token"), oResponse.GetString("refresh_token"));
 }
 
 /********************************************************************************************
@@ -261,27 +277,30 @@ void __thiscall SailPlatformServicesSession::Logout(void) throw()
  * @param[in] c_oRegistrationParameters (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
- 
+
 StructuredBuffer __thiscall SailPlatformServicesSession::GetBasicUserInformation(void)
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot get basic user information before logging in.", nullptr);
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    std::string strEosb = this->GetEosb();
+    std::string strAccessToken = this->GetAccessToken();
     // Prepare the API call
     std::string strVerb = "GET";
-    std::string strApiUrl = "/SAIL/AuthenticationManager/GetBasicUserInformation?Eosb=" + strEosb;
-    std::string strJsonBody = "";
+    std::string strApiUrl = "/me";
+
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + strAccessToken);
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, "", true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-    // Did the call succeed?
-    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error getting basic user information.", nullptr);
-    
-    return StructuredBuffer(oResponse);
+    // Did the transaction succeed?
+    _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
+    _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("organization_id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
+
+    return oResponse;
 }
 
 /********************************************************************************************
@@ -526,14 +545,17 @@ void __thiscall SailPlatformServicesSession::ResetDatabase(void)
  ********************************************************************************************/
 
 void __thiscall SailPlatformServicesSession::StartSession(
-    _in const std::string & c_strEosb
+    _in const std::string & c_strAccessToken,
+    _in const std::string & c_strRefreshToken
     )
 {
     __DebugFunction();
     
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     // Update the EOSB
-    m_strEosb = c_strEosb;
+    m_strAccessToken = c_strAccessToken;
+    m_strRefreshToken = c_strRefreshToken;
+
     // If the update thread isn't running, start it now after setting the m_strEosb
     if (false == m_fIsRunning)
     {
@@ -541,7 +563,7 @@ void __thiscall SailPlatformServicesSession::StartSession(
         // thread runs a chance of exiting immediately
         m_fIsRunning = true;
         // Start the maintenance thread
-        m_oEosbMaintenanceThread = std::unique_ptr<std::thread>(new std::thread(&SailPlatformServicesSession::EosbMaintenanceFunction, this));
+        m_oAccessTokenMaintenanceThread = std::unique_ptr<std::thread>(new std::thread(&SailPlatformServicesSession::AccessTokenMaintenanceFunction, this));
     }
 }
 
@@ -589,7 +611,7 @@ bool __thiscall SailPlatformServicesSession::IsRunning(void) const throw()
  *
  ********************************************************************************************/
 
-void __thiscall SailPlatformServicesSession::EosbMaintenanceFunction(void) throw()
+void __thiscall SailPlatformServicesSession::AccessTokenMaintenanceFunction(void) throw()
 {
     __DebugFunction();
     
@@ -602,10 +624,11 @@ void __thiscall SailPlatformServicesSession::EosbMaintenanceFunction(void) throw
         do
         {
             bool fIsRunning = false;
-            std::string strCurrentEosb{};
+            std::string strCurrentAccessToken{};
+            std::string strCurrentRefreshToken{};
             std::string strServerIpAddress{};
             Word wServerPortNumber{0};
-            
+
             // Sleep for 100 milliseconds
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             // Now let's check if we are still running. We do this in an artificially
@@ -615,12 +638,14 @@ void __thiscall SailPlatformServicesSession::EosbMaintenanceFunction(void) throw
                 const std::lock_guard<std::mutex> stlLock(m_oLock);
                 // Quick reality check that ensures that the session manager didn't fall into
                 // a weird state
-                __DebugAssert(0 < m_strEosb.size());
+                __DebugAssert(0 < m_strAccessToken.size());
+                __DebugAssert(0 < m_strRefreshToken.size());
                 __DebugAssert(0 < m_strServerIpAddress.size());
                 __DebugAssert(0 < m_wServerPortNumber);
                 // Take an atomic snapshot of the session manager settings
                 fIsRunning = true;
-                strCurrentEosb = m_strEosb;
+                strCurrentAccessToken = m_strAccessToken;
+                strCurrentRefreshToken = m_strRefreshToken;
                 strServerIpAddress = m_strServerIpAddress;
                 wServerPortNumber = m_wServerPortNumber;
             }
@@ -628,22 +653,23 @@ void __thiscall SailPlatformServicesSession::EosbMaintenanceFunction(void) throw
             {
                 fIsRunning = false;
             }
-            
+
             // Check to see if 60 seconds has expired on the chronometer. We only care to
             // try and refresh the EOSB once every minute
             if ((true == fIsRunning)&&(60 < oChronometer.GetElapsedTimeWithPrecision(Second)))
             {
-                __DebugAssert(0 < strCurrentEosb.size());
+                __DebugAssert(0 < strCurrentAccessToken.size());
+                __DebugAssert(0 < strCurrentRefreshToken.size());
                 __DebugAssert(0 < strServerIpAddress.size());
                 __DebugAssert(0 < wServerPortNumber);
-                    
+
                 // Reset the chronometer so we can count down another 10 seconds
                 oChronometer.Reset();
                 oChronometer.Start();
                 // We aren't stopping, update the EOSB
-                std::string strVerb = "GET";
-                std::string strApiUrl = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + strCurrentEosb;
-                std::string strJsonBody = "";
+                std::string strVerb = "POST";
+                std::string strApiUrl = "/refresh-token";
+                std::string strJsonBody = "{\"refresh_token\": \""+ strCurrentRefreshToken +"\"}";
                 // Make the API call and get REST response
                 std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
                 // Check to make sure the response size isn't 0 before trying to convert it into a StructuredBuffer
@@ -651,15 +677,19 @@ void __thiscall SailPlatformServicesSession::EosbMaintenanceFunction(void) throw
                 // Extract the return parameters
                 StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
                 // Make sure the transaction was an actual success and that a new EOSB was provided
-                if ((200 == oResponse.GetFloat64("Status"))&&(true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+                if ((true == oResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                 {
-                    this->SetEosb(oResponse.GetString("Eosb"));
+                    // Check to see if we need to update the internal gs_strSailPlatformServicesEosb
+                    if (true == oResponse.IsElementPresent("refresh_token", ANSI_CHARACTER_STRING_VALUE_TYPE))
+                    {
+                        this->SetAccessTokens(oResponse.GetString("access_token"), oResponse.GetString("refresh_token"));
+                    }
                 }
             }
         }
         while (true == this->IsRunning());
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);

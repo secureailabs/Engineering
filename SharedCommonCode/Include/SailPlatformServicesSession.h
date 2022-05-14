@@ -43,13 +43,15 @@ class SailPlatformServicesSession : public Object
         // Methods used to retrieve information about the running session
         std::string __thiscall GetServerIpAddress(void) const throw();
         Word __thiscall GetServerPortNumber(void) const throw();
+        std::string __thiscall GetAccessToken(void) const throw();
         std::string __thiscall GetEosb(void) const throw();
         // Method called when an API call gets a refreshed EOSB and we
         // need to register it here.
-        void __thiscall SetEosb(
-            _in const std::string & c_strEosb
+        void __thiscall SetAccessTokens(
+            _in const std::string & c_strAccessToken,
+            _in const std::string & c_strRefreshToken
             ) throw();
-            
+
         // This is the only method which can be called before logging in
         void __thiscall RegisterOrganization(
             _in const StructuredBuffer & c_oRegistrationParameters
@@ -89,19 +91,23 @@ class SailPlatformServicesSession : public Object
     
         bool __thiscall IsRunning(void) const throw();
         void __thiscall StartSession(
-            _in const std::string & c_strEosb
+            _in const std::string & c_strAccessToken,
+            _in const std::string & c_strRefreshToken
             );
-            
+
         // This method runs continuously until m_fIsRunning is
         // set back to false
-        void __thiscall EosbMaintenanceFunction(void) throw();
+        void __thiscall AccessTokenMaintenanceFunction(void) throw();
 
         // Private data members
         volatile bool m_fIsRunning{false};
         mutable std::mutex m_oLock{};
         std::string m_strEosb{};
+        std::string m_strAccessToken{};
+        std::string m_strRefreshToken{};
         std::string m_strServerIpAddress{};
         Word m_wServerPortNumber{0};
         std::condition_variable m_oTimedWait{};
         std::unique_ptr<std::thread> m_oEosbMaintenanceThread{nullptr};
+        std::unique_ptr<std::thread> m_oAccessTokenMaintenanceThread{nullptr};
 };

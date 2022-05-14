@@ -25,12 +25,12 @@ DatasetTableColumn::DatasetTableColumn(
     // Deserialize the dataset table column
     StructuredBuffer oDatasetTableColumnMetadata(c_stlSerializedColumnMetadataBuffer);
     // Reality check to ensure all of the data is in place correctly
-    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("ColumnIdentifier", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: ColumnIdentifier is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Title is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Description is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Tags is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("Units", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Units is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("Type", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Type is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: id is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: name is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: description is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("tags", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: tags is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("units", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: units is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetTableColumnMetadata.IsElementPresent("type", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: type is missing", nullptr);
     // Persist the metadata
     m_oDatasetTableColumnMetadata = oDatasetTableColumnMetadata;
 }
@@ -47,9 +47,9 @@ DatasetTableColumn::~DatasetTableColumn(void)
 std::string __thiscall DatasetTableColumn::GetColumnIdentifier(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("ColumnIdentifier", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE));
     
-    return m_oDatasetTableColumnMetadata.GetString("ColumnIdentifier");
+    return m_oDatasetTableColumnMetadata.GetString("id");
 }
 
 /********************************************************************************************/
@@ -57,9 +57,9 @@ std::string __thiscall DatasetTableColumn::GetColumnIdentifier(void) const throw
 std::string __thiscall DatasetTableColumn::GetTitle(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE));
     
-    return m_oDatasetTableColumnMetadata.GetString("Title");
+    return m_oDatasetTableColumnMetadata.GetString("name");
 }
 
 /********************************************************************************************/
@@ -67,9 +67,9 @@ std::string __thiscall DatasetTableColumn::GetTitle(void) const throw()
 std::string __thiscall DatasetTableColumn::GetDescription(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE));
     
-    return m_oDatasetTableColumnMetadata.GetString("Description");
+    return m_oDatasetTableColumnMetadata.GetString("description");
 }
 
 /********************************************************************************************/
@@ -77,9 +77,9 @@ std::string __thiscall DatasetTableColumn::GetDescription(void) const throw()
 std::string __thiscall DatasetTableColumn::GetTags(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("tags", ANSI_CHARACTER_STRING_VALUE_TYPE));
     
-    return m_oDatasetTableColumnMetadata.GetString("Tags");
+    return m_oDatasetTableColumnMetadata.GetString("tags");
 }
 
 /********************************************************************************************/
@@ -87,9 +87,9 @@ std::string __thiscall DatasetTableColumn::GetTags(void) const throw()
 std::string __thiscall DatasetTableColumn::GetUnits(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("Units", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("units", ANSI_CHARACTER_STRING_VALUE_TYPE));
     
-    return m_oDatasetTableColumnMetadata.GetString("Units");
+    return m_oDatasetTableColumnMetadata.GetString("units");
 }
 
 /********************************************************************************************/
@@ -97,9 +97,9 @@ std::string __thiscall DatasetTableColumn::GetUnits(void) const throw()
 std::string __thiscall DatasetTableColumn::GetType(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("Type", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetTableColumnMetadata.IsElementPresent("type", ANSI_CHARACTER_STRING_VALUE_TYPE));
     
-    return m_oDatasetTableColumnMetadata.GetString("Type");
+    return m_oDatasetTableColumnMetadata.GetString("type");
 }
 
 /********************************************************************************************/

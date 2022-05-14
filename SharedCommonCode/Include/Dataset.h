@@ -95,10 +95,10 @@ class Dataset : public Object
         std::string __thiscall GetPublisherIdentifier(void) const throw();
         std::string __thiscall GetTitle(void) const throw();
         std::string __thiscall GetDescription(void) const throw();
-        std::string __thiscall GetTags(void) const throw();
-        uint64_t __thiscall GetEpochCreationTimeInSeconds(void) const throw();
-        unsigned int __thiscall GetTableCount(void) const throw();
-        std::vector<std::string> __thiscall GetTableIdentifiers(void) const throw();
+        std::string __thiscall GetKeywords(void) const throw();
+        uint64_t __thiscall GetPublishDate(void) const throw();
+        unsigned int __thiscall GetNumberOfTables(void) const throw();
+        std::unordered_map<std::string, int> __thiscall GetTableIdentifiers(void) const throw();
         DatasetTable __thiscall GetDatasetTable(
             _in const char * c_szTableIdentifier
             ) const;
@@ -106,7 +106,7 @@ class Dataset : public Object
         std::vector<Byte> __thiscall GetSerializedDatasetMetadata(void) const throw();
         
     private:
-    
+
         // Variable used to track whether or not this object instance is just metadata or
         // is the full file (i.e. metadata + data)
         bool m_fIsMetadataOnly;
@@ -115,7 +115,7 @@ class Dataset : public Object
         // StructuredBuffer containing the metadata for the datasets, all of the tables and all of the columns
         StructuredBuffer m_oDatasetMetadata;
         // List of all of the table identifiers found in the file
-        std::vector<std::string> m_stlListOfTableIdentifiers;
+        std::unordered_map<std::string, int> m_stlMapOfTableIdentifiers;
         // List of all the offsets into the file which point to the 'table marker' (64 bit value making the start of a table data)
         std::map<Qword, uint64_t> m_stlListOfTableMarkerOffsets;
 };

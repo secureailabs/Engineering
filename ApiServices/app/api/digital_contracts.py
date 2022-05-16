@@ -16,7 +16,7 @@ from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import PyObjectId
-from models.datasets import Dataset_Db
+from models.datasets import GetDataset_Out
 from models.digital_contracts import (
     DigitalContract_Db,
     DigitalContractState,
@@ -52,12 +52,12 @@ async def register_digital_contract(
         if dataset_db is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        dataset_db = Dataset_Db(**dataset_db)
+        dataset_db = GetDataset_Out(**dataset_db)
 
         # Add the digital contract to the database
         digital_contract_db = DigitalContract_Db(
             **digital_contract_req.dict(),
-            data_owner_id=dataset_db.organization_id,
+            data_owner_id=dataset_db.organization.id,
             state=DigitalContractState.NEW,
             researcher_id=current_user.organization_id
         )

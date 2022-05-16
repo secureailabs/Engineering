@@ -173,5 +173,14 @@ async def get_current_user_info(current_user: User_Db = Depends(get_current_user
     found_user = await data_service.find_one(DB_COLLECTION_USERS, {"_id": str(current_user.id)})
     if found_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+    found_user_db = User_Db(**found_user)
 
-    return User_Db(**found_user)
+    # Get the user organization information
+    found_organization = await data_service.find_one(
+        DB_COLLECTION_ORGANIZATIONS, {"_id": str(found_user_db.organization_id)}
+    )
+    if found_organization is None:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    found_organization_db = Organization_db(**found_organization)
+
+    return UserInfo_Out(**found_user_db.dict(), organization=BasicObjectInfo(**found_organization_db.dict()))

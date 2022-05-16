@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from pydantic import EmailStr, Field, StrictStr
 
-from models.common import PyObjectId, SailBaseModel
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class OrganizationState(Enum):
@@ -28,7 +28,7 @@ class Organization_Base(SailBaseModel):
 class Organization_db(Organization_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     account_created_time: datetime = Field(default_factory=datetime.utcnow)
-    organization_state: OrganizationState = Field(...)
+    state: OrganizationState = Field(...)
 
 
 class RegisterOrganization_In(Organization_Base):
@@ -90,7 +90,7 @@ class User_Db(User_Base):
 
 class UserInfo_Out(User_Base):
     id: PyObjectId = Field(alias="_id")
-    organization_id: PyObjectId = Field(...)
+    organization: BasicObjectInfo = Field(...)
 
 
 class RegisterUser_In(User_Base):
@@ -103,6 +103,12 @@ class RegisterUser_Out(User_Base):
 
 class GetUsers_Out(User_Base):
     id: PyObjectId = Field(alias="_id")
+    organization: BasicObjectInfo = Field(...)
+    username: StrictStr = Field(...)
+    email: EmailStr = Field(...)
+    job_title: StrictStr = Field(...)
+    role: UserRole = Field(...)
+    avatar: Optional[StrictStr] = Field(...)
 
 
 class GetMultipleUsers_Out(SailBaseModel):

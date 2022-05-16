@@ -29,7 +29,7 @@ from models.accounts import (
     UserRole,
 )
 from models.authentication import TokenData
-from models.common import PyObjectId
+from models.common import BasicObjectInfo, PyObjectId
 
 ########################################################################################################################
 DB_COLLECTION_ORGANIZATIONS = "organizations"
@@ -55,7 +55,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already registered")
 
         # Add the organization to the database if it doesn't already exists
-        organization_db = Organization_db(**organization.dict(), organization_state=OrganizationState.ACTIVE)
+        organization_db = Organization_db(**organization.dict(), state=OrganizationState.ACTIVE)
         await data_service.insert_one(DB_COLLECTION_ORGANIZATIONS, jsonable_encoder(organization_db))
 
         # Create an admin user account
@@ -264,11 +264,25 @@ async def register_user(
 )
 async def get_users(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
+
+        # Get the organization information
+        organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
+        if organization_db is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User organization not found")
+        organization_db = Organization_db(**organization_db)
+
         # User must be part of same organization
         if organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         users = await data_service.find_by_query(DB_COLLECTION_USERS, {"organization_id": str(organization_id)})
+
+        # Add organization to each element in the list
+        for user in users:
+            user["organization"] = organization_db
+            # Remove the organization_id field
+            user.pop("organization_id")
+
         return GetMultipleUsers_Out(users=users)
     except HTTPException as http_exception:
         raise http_exception
@@ -299,8 +313,17 @@ async def get_user(
         )
         if user_db is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        user_db = User_Db(**user_db)
 
-        return user_db
+        # Get the organization information
+        organization_db = await data_service.find_one(
+            DB_COLLECTION_ORGANIZATIONS, {"_id": str(user_db.organization_id)}
+        )
+        if organization_db is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User organization not found")
+        organization_db = Organization_db(**organization_db)
+
+        return GetUsers_Out(**user_db.dict(), organization=BasicObjectInfo(**organization_db.dict()))
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

@@ -12,7 +12,7 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import PyObjectId, SailBaseModel
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class SecureComputationNodeType(Enum):
@@ -57,8 +57,19 @@ class RegisterSecureComputationNode_Out(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
 
 
-class GetSecureComputationNode_Out(SecureComputationNode_Db):
-    pass
+class GetSecureComputationNode_Out(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+    name: StrictStr = Field(...)
+    digital_contract: BasicObjectInfo = Field(...)
+    dataset: BasicObjectInfo = Field(...)
+    researcher: BasicObjectInfo = Field(default=None)
+    data_owner: BasicObjectInfo = Field(default=None)
+    researcher_user: BasicObjectInfo = Field(...)
+    type: SecureComputationNodeType = Field(...)
+    timestamp: datetime = Field(...)
+    state: SecureComputationNodeState = Field(...)
+    details: Optional[StrictStr] = Field(default=None)
+    ipaddress: Optional[IPv4Address] = Field(default=None)
 
 
 class GetMultipleSecureComputationNode_Out(SailBaseModel):

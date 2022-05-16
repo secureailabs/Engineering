@@ -12,6 +12,7 @@ from typing import List, Optional
 from uuid import uuid4
 
 import app.azure.azure as azure
+from app.api.accounts import get_user
 from app.api.authentication import get_current_user
 from app.api.datasets import get_dataset
 from app.api.digital_contracts import get_digital_contract
@@ -23,7 +24,7 @@ from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import PyObjectId
 from models.datasets import Dataset_Db
-from models.digital_contracts import DigitalContract_Db, DigitalContractState
+from models.digital_contracts import DigitalContract_Db, DigitalContractState, GetDigitalContract_Out
 from models.secure_computation_nodes import (
     GetMultipleSecureComputationNode_Out,
     GetSecureComputationNode_Out,
@@ -76,14 +77,13 @@ async def register_secure_computation_node(
         digital_contract_db = await get_digital_contract(secure_computation_node_req.digital_contract_id, current_user)
         if digital_contract_db is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
-        digital_contract_db = DigitalContract_Db(**digital_contract_db)
 
         # Digital Contract must be activated
         if digital_contract_db.state != DigitalContractState.ACTIVATED:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Digital Contract not activated")
 
         # Check if the digital contract and dataset match each other
-        if dataset_db.id != digital_contract_db.dataset_id:
+        if dataset_db.id != digital_contract_db.dataset.id:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="Dataset and Digital Contract do not match"
             )
@@ -137,6 +137,44 @@ async def get_all_secure_computation_nodes(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
         secure_computation_nodes = await data_service.find_by_query(DB_COLLECTION_SECURE_COMPUTATION_NODE, query)
+
+        # Cache the organization information
+        digital_contract_cache = {}
+        user_cache = {}
+
+        for secure_computation_node in secure_computation_nodes:
+            # Add the data owner, researcher and dataset information to the secure computation node from digital contract
+            if secure_computation_node["digital_contract_id"] not in digital_contract_cache:
+                digital_contract_cache[secure_computation_node["digital_contract_id"]] = await get_digital_contract(
+                    digital_contract_id=secure_computation_node["digital_contract_id"], current_user=current_user
+                )
+            secure_computation_node["digital_contract"] = digital_contract_cache[
+                secure_computation_node["digital_contract_id"]
+            ]
+            secure_computation_node.pop("digital_contract_id")
+            secure_computation_node["researcher"] = digital_contract_cache[
+                secure_computation_node["digital_contract_id"]
+            ]["researcher"]
+            secure_computation_node.pop("researcher_id")
+            secure_computation_node["data_owner"] = digital_contract_cache[
+                secure_computation_node["digital_contract_id"]
+            ]["data_owner"]
+            secure_computation_node.pop("data_owner_id")
+            secure_computation_node["dataset"] = digital_contract_cache[secure_computation_node["digital_contract_id"]][
+                "dataset"
+            ]
+            secure_computation_node.pop("dataset_id")
+
+            # Add the user information to the secure computation node
+            if secure_computation_node["researcher_user_id"] not in user_cache:
+                user_cache[secure_computation_node["researcher_user_id"]] = await get_user(
+                    organization_id=secure_computation_node["researcher"]["id"],
+                    user_id=secure_computation_node["researcher_user_id"],
+                    current_user=current_user,
+                )
+            secure_computation_node["researcher_user"] = user_cache[secure_computation_node["researcher_user_id"]]
+            secure_computation_node.pop("researcher_user_id")
+
         return GetMultipleSecureComputationNode_Out(secure_computation_nodes=secure_computation_nodes)
     except HTTPException as http_exception:
         raise http_exception
@@ -170,6 +208,26 @@ async def get_secure_computation_node(
             and (current_user.role != UserRole.SAIL_ADMIN)
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+        # Add the data owner, researcher and dataset information to the secure computation node from digital contract
+        secure_computation_node["digital_contract"] = await get_digital_contract(
+            digital_contract_id=secure_computation_node["digital_contract_id"], current_user=current_user
+        )
+        secure_computation_node["researcher"] = secure_computation_node["digital_contract"]["researcher"]
+        secure_computation_node["data_owner"] = secure_computation_node["digital_contract"]["data_owner"]
+        secure_computation_node["dataset"] = secure_computation_node["digital_contract"]["dataset"]
+        secure_computation_node.pop("dataset_id")
+        secure_computation_node.pop("researcher_id")
+        secure_computation_node.pop("data_owner_id")
+        secure_computation_node.pop("digital_contract_id")
+
+        # Add the user information to the secure computation node
+        secure_computation_node["researcher_user"] = await get_user(
+            organization_id=secure_computation_node["researcher"]["id"],
+            user_id=secure_computation_node["researcher_user_id"],
+            current_user=current_user,
+        )
+        secure_computation_node.pop("researcher_user_id")
 
         return secure_computation_node
     except HTTPException as http_exception:

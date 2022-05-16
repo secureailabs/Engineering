@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import PyObjectId, SailBaseModel
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class DatasetFamilyState(Enum):
@@ -50,8 +50,11 @@ class UpdateDatasetFamily_In(SailBaseModel):
     version: Optional[StrictStr] = Field(default=None)
 
 
-class GetDatasetFamily_Out(DatasetFamily_Db):
-    pass
+class GetDatasetFamily_Out(DatasetFamily_Base):
+    id: PyObjectId = Field(alias="_id")
+    creation_time: datetime = Field(default_factory=datetime.utcnow)
+    organization: BasicObjectInfo = Field(...)
+    state: DatasetFamilyState = Field(...)
 
 
 class GetMultipleDatasetFamily_Out(SailBaseModel):

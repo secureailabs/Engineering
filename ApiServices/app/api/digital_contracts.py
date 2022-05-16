@@ -7,6 +7,7 @@
 
 from typing import List, Optional
 
+from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.api.datasets import get_dataset
 from app.data import operations as data_service
@@ -96,6 +97,36 @@ async def get_all_digital_contract(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
         digital_contracts = await data_service.find_by_query(DB_COLLECTION_DIGITAL_CONTRACTS, query)
+
+        # Cache the organization information
+        organization_cache = {}
+        dataset_cache = {}
+
+        for digital_contract in digital_contracts:
+            # Add the data owner organization information to the dataset
+            if digital_contract["data_owner_id"] not in organization_cache:
+                organization_cache[digital_contract["data_owner_id"]] = await get_organization(
+                    organization_id=digital_contract["data_owner_id"], current_user=current_user
+                )
+            digital_contract["data_owner"] = organization_cache[digital_contract["data_owner_id"]]
+            digital_contract.pop("data_owner_id")
+
+            # Add the researcher organization information to the dataset
+            if digital_contract["researcher_id"] not in organization_cache:
+                organization_cache[digital_contract["researcher_id"]] = await get_organization(
+                    organization_id=digital_contract["researcher_id"], current_user=current_user
+                )
+            digital_contract["researcher"] = organization_cache[digital_contract["researcher_id"]]
+            digital_contract.pop("researcher_id")
+
+            # Add the dataset information to the dataset
+            if digital_contract["dataset_id"] not in dataset_cache:
+                organization_cache[digital_contract["dataset_id"]] = await get_dataset(
+                    dataset_id=digital_contract["dataset_id"], current_user=current_user
+                )
+            digital_contract["dataset"] = organization_cache[digital_contract["dataset_id"]]
+            digital_contract.pop("dataset_id")
+
         return GetMultipleDigitalContract_Out(digital_contracts=digital_contracts)
     except HTTPException as http_exception:
         raise http_exception
@@ -128,7 +159,25 @@ async def get_digital_contract(digital_contract_id: PyObjectId, current_user: To
         ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-        return digital_contract
+        # Add the data owner organization information to the dataset
+        digital_contract["data_owner"] = await get_organization(
+            organization_id=digital_contract["data_owner_id"], current_user=current_user
+        )
+        digital_contract.pop("data_owner_id")
+
+        # Add the researcher organization information to the dataset
+        digital_contract["researcher"] = await get_organization(
+            organization_id=digital_contract["researcher_id"], current_user=current_user
+        )
+        digital_contract.pop("researcher_id")
+
+        # Add the dataset information to the dataset
+        digital_contract["dataset"] = await get_dataset(
+            dataset_id=digital_contract["dataset_id"], current_user=current_user
+        )
+        digital_contract.pop("dataset_id")
+
+        return GetDigitalContract_Out(**digital_contract)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

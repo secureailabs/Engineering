@@ -5,8 +5,9 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
-from typing import List
+from typing import List, Optional
 
+from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
@@ -71,9 +72,30 @@ async def register_dataset(
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
 )
-async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
+async def get_all_datasets(
+    data_owner_id: Optional[PyObjectId] = None,
+    current_user: TokenData = Depends(get_current_user),
+):
     try:
-        datasets = await data_service.find_all(DB_COLLECTION_DATASETS)
+        # TODO: Prawal the current user organization is repeated in the request, find a better way
+        if data_owner_id is not None:
+            query = {"data_owner_id": str(data_owner_id)}
+        else:
+            query = {}
+
+        datasets = await data_service.find_by_query(DB_COLLECTION_DATASETS, query)
+
+        # Cache the organization information
+        organization_cache = {}
+        # Add the organization information to the dataset
+        for dataset in datasets:
+            if dataset["organization_id"] not in organization_cache:
+                organization_cache[dataset["organization_id"]] = await get_organization(
+                    organization_id=dataset["organization_id"], current_user=current_user
+                )
+            dataset["organization"] = organization_cache[dataset["organization_id"]]
+            dataset.pop("organization_id")
+
         return GetMultipleDataset_Out(datasets=datasets)
     except HTTPException as http_exception:
         raise http_exception
@@ -95,6 +117,14 @@ async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(
         dataset = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
         if dataset is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
+
+        # Add the organization information to the dataset
+        organization_info = await get_organization(
+            organization_id=dataset["organization_id"], current_user=current_user
+        )
+        dataset["organization"] = organization_info
+        dataset.pop("organization_id")
+
         return dataset
     except HTTPException as http_exception:
         raise http_exception

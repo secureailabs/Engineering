@@ -7,6 +7,7 @@
 
 from typing import List
 
+from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
@@ -69,6 +70,18 @@ async def register_dataset_family(
 async def get_all_dataset_families(current_user: TokenData = Depends(get_current_user)):
     try:
         dataset_families = await data_service.find_all(DB_COLLECTION_DATASET_FAMILIES)
+
+        # Cache the organization information
+        organization_cache = {}
+        # Add the organization information to the dataset family
+        for dataset_family in dataset_families:
+            if dataset_family["organization_id"] not in organization_cache:
+                organization_cache[dataset_family["organization_id"]] = await get_organization(
+                    organization_id=dataset_family["organization_id"], current_user=current_user
+                )
+            dataset_family["organization"] = organization_cache[dataset_family["organization_id"]]
+            dataset_family.pop("organization_id")
+
         return GetMultipleDatasetFamily_Out(dataset_families=dataset_families)
     except HTTPException as http_exception:
         raise http_exception
@@ -90,6 +103,14 @@ async def get_dataset_family(dataset_family_id: PyObjectId, current_user: TokenD
         dataset_family = await data_service.find_one(DB_COLLECTION_DATASET_FAMILIES, {"_id": str(dataset_family_id)})
         if dataset_family is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DatasetFamily not found")
+
+        # Add the organization information to the dataset
+        organization_info = await get_organization(
+            organization_id=dataset_family["organization_id"], current_user=current_user
+        )
+        dataset_family["organization"] = organization_info
+        dataset_family.pop("organization_id")
+
         return dataset_family
     except HTTPException as http_exception:
         raise http_exception

@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import PyObjectId, SailBaseModel
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class DatasetState(Enum):
@@ -72,8 +72,10 @@ class UpdateDataset_In(SailBaseModel):
     version: Optional[StrictStr] = Field(default=None)
 
 
-class GetDataset_Out(Dataset_Db):
-    pass
+class GetDataset_Out(Dataset_Base):
+    dataset_created_time: datetime = Field(...)
+    organization: BasicObjectInfo = Field(...)
+    state: DatasetState = Field(...)
 
 
 class GetMultipleDataset_Out(SailBaseModel):

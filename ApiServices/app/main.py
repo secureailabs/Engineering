@@ -14,9 +14,15 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictStr
 
-from app.api import (accounts, authentication, datasets, datasets_families,
-                     digital_contracts, remote_data_connector,
-                     secure_computation_nodes)
+from app.api import (
+    accounts,
+    authentication,
+    datasets,
+    datasets_families,
+    digital_contracts,
+    remote_data_connector,
+    secure_computation_nodes,
+)
 
 server = FastAPI(
     title="Secure AI Labs API Services",

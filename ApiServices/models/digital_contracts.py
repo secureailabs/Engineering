@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import PyObjectId, SailBaseModel
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class DigitalContractState(Enum):
@@ -28,7 +28,6 @@ class DigitalContract_Base(SailBaseModel):
     subscription_days: int = Field(...)
     legal_agreement: StrictStr = Field(...)
     version: StrictStr = Field(...)
-    dataset_id: PyObjectId = Field(...)
 
 
 class DigitalContract_Db(DigitalContract_Base):
@@ -37,10 +36,11 @@ class DigitalContract_Db(DigitalContract_Base):
     researcher_id: PyObjectId = Field(...)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     state: DigitalContractState = Field(...)
+    dataset_id: PyObjectId = Field(...)
 
 
 class RegisterDigitalContract_In(DigitalContract_Base):
-    pass
+    dataset_id: PyObjectId = Field(...)
 
 
 class RegisterDigitalContract_Out(SailBaseModel):
@@ -53,8 +53,13 @@ class AcceptDigitalContract_In(SailBaseModel):
     region: StrictStr = Field(...)
 
 
-class GetDigitalContract_Out(DigitalContract_Db):
-    pass
+class GetDigitalContract_Out(DigitalContract_Base):
+    id: PyObjectId = Field(alias="_id")
+    data_owner: BasicObjectInfo = Field(...)
+    researcher: BasicObjectInfo = Field(...)
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    state: DigitalContractState = Field(...)
+    dataset: BasicObjectInfo = Field(...)
 
 
 class GetMultipleDigitalContract_Out(SailBaseModel):

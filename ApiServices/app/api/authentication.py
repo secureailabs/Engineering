@@ -13,12 +13,14 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from models.accounts import User_Db, UserInfo_Out, UserRole
+from models.accounts import Organization_db, User_Db, UserInfo_Out, UserRole
 from models.authentication import LoginSuccess_Out, RefreshToken_In, TokenData
+from models.common import BasicObjectInfo
 from passlib.context import CryptContext
 
 ########################################################################################################################
 DB_COLLECTION_USERS = "users"
+DB_COLLECTION_ORGANIZATIONS = "organizations"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

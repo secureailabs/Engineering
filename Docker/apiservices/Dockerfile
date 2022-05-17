@@ -11,19 +11,30 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && \
   apt-get -y upgrade && \
   apt-get install -y \
+  nginx \
   wget \
   curl \
   sudo \
   build-essential \
   python3-pip
 
+# Install mongodb
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+
+RUN apt-get update && \
+  apt-get install -y \
+  mongodb-org
+
 RUN rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /srv/mongodb/db0 && chown -R mongodb:mongodb /srv/mongodb/db0
+RUN mongod --port 27017 --dbpath /srv/mongodb/db0 --replSet rs0 --bind_ip localhost --fork --logpath /var/log/mongod.log
 
 COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY install.sh /install.sh
-RUN chmod +x /install.sh && /install.sh
+COPY nginx.conf /etc/nginx/nginx.conf
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

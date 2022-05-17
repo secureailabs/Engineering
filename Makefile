@@ -2,6 +2,7 @@ include Make/Modules.mk
 include Make/platformservices.mk
 include Make/dataservices.mk
 include Make/webfrontend.mk
+include Make/apiservices.mk
 include Make/securecomputationnode.mk
 
 .PHONY: platformservices dataservices securecomputationnode orchestrator datasetViewer databaseInitializationTool uploadPackageAndInitializationVector safeFunctionCompiler package all clean SharedCommonCode
@@ -29,15 +30,15 @@ package: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 safeFunctioncompiler: SharedCommonCode
 	@make -C $(SAFE_OBJECT_COMPILER) all
 	@echo "safefunctioncompiler done!"
-    
+
 datasetViewer: SharedCommonCode
 	@make -C $(DATASET_VIEWER_TOOL) all
 	@echo "datasetViewer done!"
-    
+
 databaseInitializationTool: SharedCommonCode
 	@make -C $(DATABASE_INITIALIZATION_TOOL) all
 	@echo "databaseInitializationTool done!"
-    
+
 uploadPackageAndInitializationVector: SharedCommonCode
 	@make -C $(UPLOAD_TOOL) all
 	@echo "uploadPackageAndInitializationVector done!"

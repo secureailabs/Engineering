@@ -19,6 +19,8 @@
 #include <string.h>
 #include <uuid/uuid.h>
 
+#include <algorithm>
+
 /********************************************************************************************
  *
  * @class Guid

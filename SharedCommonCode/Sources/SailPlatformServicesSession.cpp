@@ -105,16 +105,6 @@ std::string __thiscall SailPlatformServicesSession::GetAccessToken(void) const t
     return strAccessToken;
 }
 
-std::string __thiscall SailPlatformServicesSession::GetEosb(void) const throw()
-{
-    __DebugFunction();
-
-    const std::lock_guard<std::mutex> stlLock(m_oLock);
-    std::string strEosb{m_strEosb};
-
-    return strEosb;
-}
-
 /********************************************************************************************
  *
  * @class SailPlatformServicesSession
@@ -151,28 +141,29 @@ void __thiscall SailPlatformServicesSession::SetAccessTokens(
  * @param[in] c_oRegistrationInformation (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
- 
+
 void __thiscall SailPlatformServicesSession::RegisterOrganization(
     _in const StructuredBuffer & c_oRegistrationParameters
     )
 {
     __DebugFunction();
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/SAIL/AccountManager/RegisterUser";
+    std::string strApiUrl = "/organizations";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
     // Did the call succeed?
-    _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error registering new organization and super user.", nullptr);
-    _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("RootEventStatus")), "Error registering root event for the organization.", nullptr);
+    _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Error registering new organization and super user.", nullptr);
 }
-       
+
 /********************************************************************************************
  *
  * @class SailPlatformServicesSession
@@ -230,7 +221,7 @@ void __thiscall SailPlatformServicesSession::Login(
 void __thiscall SailPlatformServicesSession::Logout(void) throw()
 {
     __DebugFunction();
-    
+
     try
     {
         bool fWasRunning = false;
@@ -244,15 +235,16 @@ void __thiscall SailPlatformServicesSession::Logout(void) throw()
         if (true == fWasRunning)
         {
             // Now join the thread (i.e. wait for it to exit properly)
-            m_oEosbMaintenanceThread.get()->join();
+            m_oAccessTokenMaintenanceThread.get()->join();
             // Update member variables to their starting state.
-            m_oEosbMaintenanceThread = nullptr;
-            m_strEosb = "";
+            m_oAccessTokenMaintenanceThread = nullptr;
+            m_strAccessToken = "";
+            m_strRefreshToken = "";
             m_strServerIpAddress = "";
             m_wServerPortNumber = 0;
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -262,7 +254,7 @@ void __thiscall SailPlatformServicesSession::Logout(void) throw()
     {
         ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -298,7 +290,7 @@ StructuredBuffer __thiscall SailPlatformServicesSession::GetBasicUserInformation
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the transaction succeed?
     _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
-    _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("organization_id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
+    _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("organization", INDEXED_BUFFER_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
 
     return oResponse;
 }
@@ -311,27 +303,31 @@ StructuredBuffer __thiscall SailPlatformServicesSession::GetBasicUserInformation
  * @param[in] c_oRegistrationParameters (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
- 
+
 void __thiscall SailPlatformServicesSession::RegisterUser(
-    _in const StructuredBuffer & c_oRegistrationParameters
+    _in const StructuredBuffer & c_oRegistrationParameters,
+    _in const std::string c_strOrganizationId
     )
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot register dataset before logging in.", nullptr);
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    std::string strEosb = this->GetEosb();
+
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/SAIL/AccountManager/Admin/RegisterUser?Eosb=" + strEosb;
+    std::string strApiUrl = "/organizations/" + c_strOrganizationId + "/users";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error registering new user.", nullptr);
+    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Error registering new user.", nullptr);
 }
 
 /********************************************************************************************
@@ -349,23 +345,25 @@ std::string __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot register dataset before logging in.", nullptr);
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    std::string strEosb = this->GetEosb();
+
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/SAIL/DatasetFamilyManager/RegisterDatasetFamily?Eosb=" + strEosb;
+    std::string strApiUrl = "/dataset-families";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error registering new dataset family.", nullptr);
-    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("DatasetFamilyIdentifier", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Missing return value of 'DatasetFamilyIdentifier'.", nullptr);
-    
-    return oResponse.GetString("DatasetFamilyIdentifier");
+    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Missing return value of DatasetFamily id.", nullptr);
+
+    return oResponse.GetString("id");
 }
 
 /********************************************************************************************
@@ -376,7 +374,7 @@ std::string __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
  * @param[in] c_oRegistrationParameters (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
- 
+
 void __thiscall SailPlatformServicesSession::RegisterDataset(
     _in const Guid & c_oDatasetIdentifier,
     _in const StructuredBuffer & c_oDatasetMetadata
@@ -384,11 +382,10 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot register dataset before logging in.", nullptr);
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    std::string strEosb = this->GetEosb();
     // Build the API call
     StructuredBuffer oRequestBody;
     oRequestBody.PutString("DatasetGuid", c_oDatasetIdentifier.ToString(eHyphensOnly));
@@ -404,13 +401,16 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
     oRequestBody.PutStructuredBuffer("DatasetData", oDatasetMetadataToRegister);
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/SAIL/DatasetManager/RegisterDataset?Eosb=" + strEosb;
+    std::string strApiUrl = "/datasets";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(oRequestBody);
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error registering dataset.", nullptr);
+    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Error registering dataset.", nullptr);
 }
 
 /********************************************************************************************
@@ -421,30 +421,32 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
  * @param[in] c_oRegistrationParameters (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
- 
+
 std::string __thiscall SailPlatformServicesSession::ApplyForDigitalContract(
     _in const StructuredBuffer & c_oRegistrationParameters
     )
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot register dataset before logging in.", nullptr);
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    std::string strEosb = this->GetEosb();
+
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/SAIL/DigitalContractManager/Applications?Eosb=" + strEosb;
+    std::string strApiUrl = "/digital-contract";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error applying for a new digital contract.", nullptr);
-    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("DigitalContractIdentifier", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Digital Contract Identifier missing from response", nullptr);
-    
-    return oResponse.GetString("DigitalContractIdentifier");
+    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Error applying for a new digital contract.", nullptr);
+
+    return oResponse.GetString("id");
 }
 
 /********************************************************************************************
@@ -455,27 +457,29 @@ std::string __thiscall SailPlatformServicesSession::ApplyForDigitalContract(
  * @param[in] c_oRegistrationParameters (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
- 
+
 void __thiscall SailPlatformServicesSession::ApproveDigitalContract(
     _in const StructuredBuffer & c_oRegistrationParameters
     )
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot approve a dataset before logging in.", nullptr);
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    std::string strEosb = this->GetEosb();
     // Prepare the API call
-    std::string strVerb = "PATCH";
-    std::string strApiUrl = "/SAIL/DigitalContractManager/DataOwner/Accept?Eosb=" + strEosb;
+    std::string strVerb = "PUT";
+    std::string strApiUrl = "/digital-contract";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error approving digital contract.", nullptr);
+    // TODO: Prawal check the response code to be 204
 }
 
 /********************************************************************************************
@@ -486,27 +490,29 @@ void __thiscall SailPlatformServicesSession::ApproveDigitalContract(
  * @param[in] c_oRegistrationParameters (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
- 
+
 void __thiscall SailPlatformServicesSession::ActivateDigitalContract(
     _in const StructuredBuffer & c_oRegistrationParameters
     )
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot activate a dataset before logging in.", nullptr);
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
-    std::string strEosb = this->GetEosb();
     // Prepare the API call
-    std::string strVerb = "PATCH";
-    std::string strApiUrl = "/SAIL/DigitalContractManager/Researcher/Activate?Eosb=" + strEosb;
+    std::string strVerb = "PUT";
+    std::string strApiUrl = "/digital-contract";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
-    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error approving digital contract.", nullptr);
+    // TODO: Prawal check the response code to be 204
 }
 
 /********************************************************************************************
@@ -516,11 +522,11 @@ void __thiscall SailPlatformServicesSession::ActivateDigitalContract(
  * @brief This function resets the backend database to zero
  *
  ********************************************************************************************/
- 
+
 void __thiscall SailPlatformServicesSession::ResetDatabase(void)
 {
     __DebugFunction();
-    
+
     // Get the ip address and port number
     std::string strServerIpAddress = this->GetServerIpAddress();
     Word wServerPortNumber = this->GetServerPortNumber();
@@ -532,7 +538,8 @@ void __thiscall SailPlatformServicesSession::ResetDatabase(void)
     std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error deleting database.", nullptr);
+    // TODO: Prawal add this
+    //_ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error deleting database.", nullptr);
 }
 
 /********************************************************************************************
@@ -550,7 +557,7 @@ void __thiscall SailPlatformServicesSession::StartSession(
     )
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     // Update the EOSB
     m_strAccessToken = c_strAccessToken;
@@ -572,15 +579,15 @@ void __thiscall SailPlatformServicesSession::StartSession(
 bool __thiscall SailPlatformServicesSession::IsRunning(void) const throw()
 {
     __DebugFunction();
-    
+
     bool fIsRunning = false;
-    
+
     try
     {
         const std::lock_guard<std::mutex> stlLock(m_oLock);
         fIsRunning = m_fIsRunning;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -590,12 +597,12 @@ bool __thiscall SailPlatformServicesSession::IsRunning(void) const throw()
     {
         ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
-    
+
     return fIsRunning;
 }
 
@@ -614,13 +621,13 @@ bool __thiscall SailPlatformServicesSession::IsRunning(void) const throw()
 void __thiscall SailPlatformServicesSession::AccessTokenMaintenanceFunction(void) throw()
 {
     __DebugFunction();
-    
+
     try
     {
         Chronometer oChronometer;
         // Start the chronometer
         oChronometer.Start();
-        
+
         do
         {
             bool fIsRunning = false;
@@ -699,7 +706,7 @@ void __thiscall SailPlatformServicesSession::AccessTokenMaintenanceFunction(void
     {
         ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);

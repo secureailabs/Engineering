@@ -23,7 +23,7 @@ class DatasetFamily_Base(SailBaseModel):
     # TODO: Prawal add a StrictStr validator for string lenght
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
-    tag: StrictStr = Field(...)
+    tags: StrictStr = Field(...)
     version: StrictStr = Field(...)
 
 

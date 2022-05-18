@@ -26,14 +26,14 @@ from models.datasets_families import (
 )
 
 ########################################################################################################################
-DB_COLLECTION_DATASET_FAMILIES = "datasets-families"
+DB_COLLECTION_DATASET_FAMILIES = "dataset-families"
 
 router = APIRouter()
 
 
 ########################################################################################################################
 @router.post(
-    path="/datasets-families",
+    path="/dataset-families",
     description="Register new dataset family",
     response_description="DatasetFamily Id",
     response_model=RegisterDatasetFamily_Out,
@@ -59,7 +59,7 @@ async def register_dataset_family(
 
 ########################################################################################################################
 @router.get(
-    path="/datasets-families",
+    path="/dataset-families",
     description="Get list of all the dataset families",
     response_description="List of dataset families",
     response_model=GetMultipleDatasetFamily_Out,
@@ -91,7 +91,7 @@ async def get_all_dataset_families(current_user: TokenData = Depends(get_current
 
 ########################################################################################################################
 @router.get(
-    path="/datasets-families/{dataset_family_id}",
+    path="/dataset-families/{dataset_family_id}",
     description="Get the information about a dataset family",
     response_model=GetDatasetFamily_Out,
     response_model_by_alias=False,
@@ -120,7 +120,7 @@ async def get_dataset_family(dataset_family_id: PyObjectId, current_user: TokenD
 
 ########################################################################################################################
 @router.put(
-    path="/datasets-families/{dataset_family_id}",
+    path="/dataset-families/{dataset_family_id}",
     description="Update dataset information",
     status_code=status.HTTP_204_NO_CONTENT,
 )
@@ -167,7 +167,7 @@ async def update_dataset_family(
 
 ########################################################################################################################
 @router.delete(
-    path="/datasets-families/{dataset_family_id}",
+    path="/dataset-families/{dataset_family_id}",
     description="Disable the dataset",
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,

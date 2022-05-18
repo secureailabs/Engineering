@@ -84,7 +84,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         StructuredBuffer oOrganization(oOrganizations.GetStructuredBuffer(c_strOrganizationName.c_str()));
         Organization * poOrganization = new Organization(c_strOrganizationName, oOrganization, unStepIdentifier);
         // Register the organization
-        if (true == poOrganization->Register(gs_strIpAddress, 6200, unStepIdentifier))
+        if (true == poOrganization->Register(gs_strIpAddress, 8000, unStepIdentifier))
         {
             // Keep track of the name-identifier tuple since it will be needed when registering
             // digital contracts
@@ -125,7 +125,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
             // Let's point to the target data owner organization since we will need information out of that
             _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfResearchOrganization)), "ERROR: Unknown research organization %s specified in Digital Contract", oDigitalContactParameters.GetString("ResearchOrganization").c_str());
             Organization * poResearchOrganization = stlListOfOrganizationsByName[qwHashOfResearchOrganization];
-            
+
             // Okay, let's register the digital contract.
             DigitalContract oDigitalContract(poDataOwnerOrganization, poResearchOrganization, oDigitalContactParameters);
             if (true == oDigitalContract.Register(gs_strIpAddress, 6200))
@@ -146,12 +146,12 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
 
 static unsigned int GetStep(
     _in const StructuredBuffer & c_oCommandLineParameters
-    )    
+    )
 {
     __DebugFunction();
-    
+
     unsigned int unStepIdentifier = 0;
-    
+
     if (true == c_oCommandLineParameters.IsElementPresent("step1", BOOLEAN_VALUE_TYPE))
     {
         unStepIdentifier = 1;

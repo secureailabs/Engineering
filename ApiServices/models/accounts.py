@@ -77,7 +77,7 @@ class User_Base(SailBaseModel):
     email: EmailStr = Field(...)
     job_title: StrictStr = Field(...)
     role: UserRole = Field(...)
-    avatar: Optional[StrictStr] = Field(...)
+    avatar: Optional[StrictStr] = Field(default=None)
 
 
 class User_Db(User_Base):
@@ -97,7 +97,7 @@ class RegisterUser_In(User_Base):
     password: str = Field(...)
 
 
-class RegisterUser_Out(User_Base):
+class RegisterUser_Out(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
 
 

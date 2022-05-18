@@ -15,35 +15,12 @@
 #include "ExceptionRegister.h"
 #include "Guid.h"
 
+#include <windows.h>
 #include <stdio.h>
 #include <string.h>
 
-#pragma comment(lib, "rpcrt4.lib")
-
-#include <windows.h>
 #include <iostream>
-#include <guiddef.h>
-#include <rpcdce.h>
-
-#define uuid_t UUID
-
-// 0         1         2         3
-// 01234567890123456789012345678901234567
-// 6E574DA3068843FD9690B5E15DE11402 --------> raw
-// 6E574DA3-0688-43FD-9690-B5E15DE11402 ----> with hyphens
-// {6E574DA3-0688-43FD-9690-B5E15DE11402} --> with hyphens and braces
-static const unsigned int gsc_aunStringCharacterIndexes[] =
-{
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-    0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-    1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
-};
-
-// Static lookup array used for ultra fast heaxadecimal translation
-static const Byte gsc_abFastHexadecimalTranslation[256] =
-{
-    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 255, 255, 255, 255, 255, 255, 255, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
-};
+#include <cstdlib>
 
 /********************************************************************************************
  *
@@ -60,8 +37,8 @@ Guid::Guid(void)
 {
     __DebugFunction();
 
-    UUID oUniqueIdentifier;
-    (void) ::UuidCreate(&oUniqueIdentifier);
+    GUID oUniqueIdentifier;
+    (void) ::CoCreateGuid(&oUniqueIdentifier);
     m_stlRawData.resize(16);
     ::memcpy((void *) m_stlRawData.data(), (void *) &oUniqueIdentifier, 16);
 }
@@ -113,8 +90,8 @@ Guid::Guid(
 {
     __DebugFunction();
 
-    uuid_t oUniqueIdentifier;
-    (void) ::UuidCreate(&oUniqueIdentifier);
+    GUID oUniqueIdentifier;
+    (void) ::CoCreateGuid(&oUniqueIdentifier);
     m_stlRawData.resize(16);
     ::memcpy((void *) m_stlRawData.data(), (void *) &oUniqueIdentifier, 16);
     // Change Most significant 6 bits to eObjectType
@@ -430,17 +407,18 @@ std::string __thiscall Guid::ToString(
     __DebugAssert(16 == m_stlRawData.size());
 
     char szGuid[39];
+    GUID * pGuid = (GUID *) m_stlRawData.data();
 
     switch(eGuidFormat)
     {
-        case eHyphensOnly               // 6E574DA3-0688-43FD-9690-B5E15DE11402 ----> with hyphens
-        :   ::snprintf(szGuid, sizeof(szGuid), "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", (unsigned int) m_stlRawData[0], (unsigned int) m_stlRawData[1], (unsigned int) m_stlRawData[2], (unsigned int) m_stlRawData[3], (unsigned int) m_stlRawData[4], (unsigned int) m_stlRawData[5], (unsigned int) m_stlRawData[6], (unsigned int) m_stlRawData[7], (unsigned int) m_stlRawData[8], (unsigned int) m_stlRawData[9], (unsigned int) m_stlRawData[10], (unsigned int) m_stlRawData[11], (unsigned int) m_stlRawData[12], (unsigned int) m_stlRawData[13], (unsigned int) m_stlRawData[14], (unsigned int) m_stlRawData[15]);
+        case eHyphensOnly // 6E574DA3-0688-43FD-9690-B5E15DE11402 ----> with hyphens
+        :   ::snprintf(szGuid, sizeof(szGuid), "%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
-        case eHyphensAndCurlyBraces     // {6E574DA3-0688-43FD-9690-B5E15DE11402} --> with hyphens and braces
-        :   ::snprintf(szGuid, sizeof(szGuid), "{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}", (unsigned int) m_stlRawData[0], (unsigned int) m_stlRawData[1], (unsigned int) m_stlRawData[2], (unsigned int) m_stlRawData[3], (unsigned int) m_stlRawData[4], (unsigned int) m_stlRawData[5], (unsigned int) m_stlRawData[6], (unsigned int) m_stlRawData[7], (unsigned int) m_stlRawData[8], (unsigned int) m_stlRawData[9], (unsigned int) m_stlRawData[10], (unsigned int) m_stlRawData[11], (unsigned int) m_stlRawData[12], (unsigned int) m_stlRawData[13], (unsigned int) m_stlRawData[14], (unsigned int) m_stlRawData[15]);
+        case eHyphensAndCurlyBraces // {6E574DA3-0688-43FD-9690-B5E15DE11402} --> with hyphens and braces
+        :   ::snprintf(szGuid, sizeof(szGuid), "{%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
-        default                         // 6E574DA3068843FD9690B5E15DE11402 --------> raw
-        :   ::snprintf(szGuid, sizeof(szGuid), "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", (unsigned int) m_stlRawData[0], (unsigned int) m_stlRawData[1], (unsigned int) m_stlRawData[2], (unsigned int) m_stlRawData[3], (unsigned int) m_stlRawData[4], (unsigned int) m_stlRawData[5], (unsigned int) m_stlRawData[6], (unsigned int) m_stlRawData[7], (unsigned int) m_stlRawData[8], (unsigned int) m_stlRawData[9], (unsigned int) m_stlRawData[10], (unsigned int) m_stlRawData[11], (unsigned int) m_stlRawData[12], (unsigned int) m_stlRawData[13], (unsigned int) m_stlRawData[14], (unsigned int) m_stlRawData[15]);
+        default // 6E574DA3068843FD9690B5E15DE11402 --------> raw
+        :   ::snprintf(szGuid, sizeof(szGuid), "%08lX%04hX%04hX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
     };
 
@@ -468,6 +446,36 @@ GuidObjectType __thiscall Guid::GetObjectType(void) const throw()
 /********************************************************************************************
  *
  * @class Guid
+ * @function ConvertHexadecimalSubStringIntoIdentifierComponent
+ * @brief Internal method used to convert a portion of a hexadecimal string which represents
+ * a GUID/UUID into binary before storing the result within the internal m_stlRawData at
+ * a particular byte offset. This method is only used by InitializeString
+ * @param[in] strHexadecimalString Plain GUID/UUID string
+ * @param[in] unStartingOffset Starting offset (in character count) to start parsing the hex number
+ * @param[in] unLength Length (in character count) to parse the hex number
+ * @param[in] unByteOffsetDestination Destination (in byte offset) to write converted number into m_stlRawData
+ * 
+ ********************************************************************************************/
+
+void __thiscall Guid::ConvertHexadecimalSubStringIntoIdentifierComponent(
+    _in const std::string & strHexadecimalString,
+    _in unsigned int unStartingOffset,
+    _in unsigned int unLength
+    )
+{
+    __DebugFunction();
+
+    // Extract the target substring from the original hexadecimal string
+    std::string strSubString = strHexadecimalString.substr(unStartingOffset, unLength);
+    // Convert the hexadecimal substring into a number value
+    unsigned int unSubStringValue = std::strtoul(strSubString.c_str(), nullptr, 16);
+    // Copy the number value into m_stlRawData at the desired offset
+    ::memcpy((void * ) &(m_stlRawData[unStartingOffset/2]), (const void *) &unSubStringValue, (unLength/2));
+}
+
+/********************************************************************************************
+ *
+ * @class Guid
  * @function InitializeFromString
  * @brief Method used to initialize the internal GUID/UUID 16 byte buffer with the value represented with an incoming formatted @p c_szGuid string
  * @param[in] c_szGuid Formatted GUID/UUID string
@@ -490,46 +498,56 @@ void __thiscall Guid::InitializeFromString(
     }
     else
     {
-        unsigned int unStartingIndex = 0;
-        unsigned int unSizeInCharactersOfGuidString = (unsigned int) ::strnlen(c_szGuid, 39);
-
-        if ('{' == c_szGuid[0])
+        std::string strGuid = c_szGuid;
+    
+        if ('{' == strGuid[0])
         {
-            if ((38 == unSizeInCharactersOfGuidString)&&('-' == c_szGuid[9])&&('-' == c_szGuid[14])&&('-' == c_szGuid[19])&&('-' == c_szGuid[24])&&('}' == c_szGuid[37]))
+            if ((38 == strGuid.size())&&('-' == strGuid[9])&&('-' == strGuid[14])&&('-' == strGuid[19])&&('-' == strGuid[24])&&('}' == strGuid[37]))
             {
-                unStartingIndex = 64;
+                // We need to remove the {, } and - from the string
+                strGuid.erase(std::remove(strGuid.begin(), strGuid.end(), '{'), strGuid.end());
+                strGuid.erase(std::remove(strGuid.begin(), strGuid.end(), '}'), strGuid.end());
+                strGuid.erase(std::remove(strGuid.begin(), strGuid.end(), '-'), strGuid.end());
             }
             else
             {
                 _ThrowSimpleException("INVALID FORMAT. Invalid format provided in incoming string.");
             }
         }
-        else if ('-' == c_szGuid[8])
+        else if ('-' == strGuid[8])
         {
-            if ((36 == unSizeInCharactersOfGuidString)&&('-' == c_szGuid[13])&&('-' == c_szGuid[18])&&('-' == c_szGuid[23]))
+            if ((36 == strGuid.size())&&('-' == strGuid[13])&&('-' == strGuid[18])&&('-' == strGuid[23]))
             {
-                unStartingIndex = 32;
+                // We need to remove the - from the string
+                strGuid.erase(std::remove(strGuid.begin(), strGuid.end(), '-'), strGuid.end());   
             }
             else
             {
                 _ThrowSimpleException("INVALID FORMAT. Invalid format provided in incoming string.");
             }
         }
-        else if (32 != unSizeInCharactersOfGuidString)
+        else if (32 != strGuid.size())
         {
             _ThrowSimpleException("INVALID FORMAT. Invalid format provided in incoming string.");
         }
 
-        unsigned int unMovingIndex = 0;
-        while (32 > unMovingIndex)
-        {
-            Byte bHighCharacter = gsc_abFastHexadecimalTranslation[(unsigned int) c_szGuid[gsc_aunStringCharacterIndexes[unStartingIndex + unMovingIndex]]];
-            Byte bLowCharacter = gsc_abFastHexadecimalTranslation[(unsigned int) c_szGuid[gsc_aunStringCharacterIndexes[unStartingIndex + unMovingIndex + 1]]];
-
-            _ThrowBaseExceptionIf(((255 == bHighCharacter)||(255 == bLowCharacter)), "Illegal character found in UUID string.", nullptr);
-
-            m_stlRawData[unMovingIndex / 2] = (bHighCharacter << 4) | bLowCharacter;
-            unMovingIndex += 2;
-        }
+        // Parse the strGuid string. The format is:
+        // 
+        //   1111111122223333445566778899AABB
+        // 
+        // where each number is one of the elements of the guid object which needs
+        // to be parsed from a hexadecimal value string into a number which is then
+        // persisted into m_stlRawData by ConvertHexadecimalSubStringIntoIdentifierComponent()
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 0, 8);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 8, 4);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 12, 4);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 16, 2);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 18, 2);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 20, 2);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 22, 2);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 24, 2);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 26, 2);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 28, 2);
+        this ->ConvertHexadecimalSubStringIntoIdentifierComponent(strGuid, 30, 2);
     }
 }

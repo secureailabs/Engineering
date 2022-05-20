@@ -78,24 +78,24 @@ Organization::Organization(
         }
     }
     // Extract the datasets
-    // if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
-    // {
-    //     StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
-    //     oDatasets.RemoveElement("__IsArray__");
-    //     for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
-    //     {
-    //         StructuredBuffer oDatasetInformation{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
-    //         std::string strDatasetFilename = oDatasetInformation.GetString("File");
-    //         if (true == std::filesystem::exists(strDatasetFilename))
-    //         {
-    //             // Just a reality check to make sure the target file is in fact a properly formatted dataset
-    //             Dataset oDataset(strDatasetFilename.c_str());
-    //             // Now we persist the dataset information
-    //             Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
-    //             m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
-    //         }
-    //     }
-    // }
+    if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
+    {
+        StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
+        oDatasets.RemoveElement("__IsArray__");
+        for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
+        {
+            StructuredBuffer oDatasetInformation{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
+            std::string strDatasetFilename = oDatasetInformation.GetString("File");
+            if (true == std::filesystem::exists(strDatasetFilename))
+            {
+                // Just a reality check to make sure the target file is in fact a properly formatted dataset
+                Dataset oDataset(strDatasetFilename.c_str());
+                // Now we persist the dataset information
+                Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
+                m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
+            }
+        }
+    }
     // Extract the dataset families
     if (true == c_oOrganizationalData.IsElementPresent("DatasetFamilies", INDEXED_BUFFER_VALUE_TYPE))
     {
@@ -168,7 +168,7 @@ bool __thiscall Organization::Register(
         // Step 3 --> Do nothing, we are only registering Digital Contracts
         // Step 4 --> Register everything
         if (1 == unStepIdentifier)
-        {   
+        {
             std::cout << "001" << std::endl;
             this->RegisterOrganization();
             std::cout << "002" << std::endl;
@@ -535,7 +535,7 @@ void __thiscall Organization::RegisterDatasets(void)
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
     __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-    
+
     // Start a new session with SAIL Platform Services using the default administrator
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     this->Login(oSailPlatformServicesSession);
@@ -546,7 +546,7 @@ void __thiscall Organization::RegisterDatasets(void)
     // Basically, we are adding new users with admin access rights
     std::unordered_map<Qword, std::string>::const_iterator c_stlIterator = m_strDatasetInformationByFilename.begin();
     while (m_strDatasetInformationByFilename.end() != c_stlIterator)
-    {        
+    {
         // Load the serialized dataset information into a StructuredBuffer in order to access it
         StructuredBuffer oDatasetInformation(c_stlIterator->second.c_str());
         std::string strDatasetFile = oDatasetInformation.GetString("File");
@@ -565,7 +565,7 @@ void __thiscall Organization::RegisterDatasets(void)
             // Create a new identifier
             oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
             // Make sure the corporate identifier is updated
-            oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetString("OrganizationGuid")));
+            oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetStructuredBuffer("organization").GetString("id")));
             // Reset the publish date
             oDatasetReInitializer.ResetUtcEpochPublishDate();
             // If a new Title is provided in the JSON, update the title of the dataset
@@ -597,12 +597,12 @@ void __thiscall Organization::RegisterDatasets(void)
             // Now we register the dataset using the updated information
             StructuredBuffer oDatasetMetadata(oDatasetReInitializer.GetSerializedDatasetMetadata());
             oSailPlatformServicesSession.RegisterDataset(oDatasetReInitializer.GetDatasetIdentifier(), oDatasetMetadata);
-            
+
             // If we get here, the dataset was successfully registered. As such, let's persist
             // the dataset changes to file
             oDatasetReInitializer.SaveDatasetUpdates();
         }
-        
+
         // If we get here, then the registration process has worked. Let's
         c_stlIterator++;
     }

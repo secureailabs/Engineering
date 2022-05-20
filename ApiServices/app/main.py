@@ -20,6 +20,7 @@ from app.api import (
     datasets,
     datasets_families,
     digital_contracts,
+    internal_utils,
     remote_data_connector,
     secure_computation_nodes,
 )
@@ -39,6 +40,7 @@ server.include_router(digital_contracts.router)
 server.include_router(secure_computation_nodes.router)
 server.include_router(datasets_families.router)
 server.include_router(remote_data_connector.router)
+server.include_router(internal_utils.router)
 
 # Override the default validation error handler as it throws away a lot of information
 # about the schema of the request body.

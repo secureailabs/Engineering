@@ -388,17 +388,14 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
     Word wServerPortNumber = this->GetServerPortNumber();
     // Build the API call
     StructuredBuffer oRequestBody;
-    oRequestBody.PutString("DatasetGuid", c_oDatasetIdentifier.ToString(eHyphensOnly));
-    StructuredBuffer oDatasetMetadataToRegister;
-    oDatasetMetadataToRegister.PutString("VersionNumber", "0.1.0");
-    oDatasetMetadataToRegister.PutString("DatasetName", c_oDatasetMetadata.GetString("Title"));
-    oDatasetMetadataToRegister.PutString("Description", c_oDatasetMetadata.GetString("Description"));
-    oDatasetMetadataToRegister.PutString("Keywords", c_oDatasetMetadata.GetString("Tags"));
-    oDatasetMetadataToRegister.PutUnsignedInt64("PublishDate", c_oDatasetMetadata.GetUnsignedInt64("PublishDate"));
-    oDatasetMetadataToRegister.PutByte("PrivacyLevel", 1);
-    oDatasetMetadataToRegister.PutString("JurisdictionalLimitations", "N/A");
-    oDatasetMetadataToRegister.PutStructuredBuffer("Tables", c_oDatasetMetadata.GetStructuredBuffer("Tables"));
-    oRequestBody.PutStructuredBuffer("DatasetData", oDatasetMetadataToRegister);
+    oRequestBody.PutString("id", c_oDatasetIdentifier.ToString(eHyphensOnly));
+    oRequestBody.PutString("description", c_oDatasetMetadata.GetString("Description"));
+    oRequestBody.PutString("name", c_oDatasetMetadata.GetString("Title"));
+    oRequestBody.PutString("keywords", c_oDatasetMetadata.GetString("Tags"));
+    oRequestBody.PutString("version", "0.1.0");
+    oRequestBody.PutUnsignedInt64("publish_date", c_oDatasetMetadata.GetUnsignedInt64("PublishDate"));
+    oRequestBody.PutStructuredBuffer("tables", c_oDatasetMetadata.GetStructuredBuffer("Tables"));
+
     // Prepare the API call
     std::string strVerb = "POST";
     std::string strApiUrl = "/datasets";
@@ -459,7 +456,7 @@ std::string __thiscall SailPlatformServicesSession::ApplyForDigitalContract(
  ********************************************************************************************/
 
 void __thiscall SailPlatformServicesSession::ApproveDigitalContract(
-    _in const StructuredBuffer & c_oRegistrationParameters
+    _in const std::string & c_strDigitalContractId
     )
 {
     __DebugFunction();
@@ -470,8 +467,11 @@ void __thiscall SailPlatformServicesSession::ApproveDigitalContract(
     Word wServerPortNumber = this->GetServerPortNumber();
     // Prepare the API call
     std::string strVerb = "PUT";
-    std::string strApiUrl = "/digital-contract";
-    std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::string strApiUrl = "/digital-contract/" + c_strDigitalContractId;
+
+    StructuredBuffer oRequestBody;
+    oRequestBody.PutString("state", "ACCEPTED");
+    std::string strJsonBody = ::ConvertStructuredBufferToJson(oRequestBody);
     std::vector<std::string> stlListOfHeaders;
     stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
     stlListOfHeaders.push_back("Content-Type: application/json");
@@ -492,7 +492,7 @@ void __thiscall SailPlatformServicesSession::ApproveDigitalContract(
  ********************************************************************************************/
 
 void __thiscall SailPlatformServicesSession::ActivateDigitalContract(
-    _in const StructuredBuffer & c_oRegistrationParameters
+    _in const std::string & c_strDigitalContractId
     )
 {
     __DebugFunction();
@@ -503,8 +503,10 @@ void __thiscall SailPlatformServicesSession::ActivateDigitalContract(
     Word wServerPortNumber = this->GetServerPortNumber();
     // Prepare the API call
     std::string strVerb = "PUT";
-    std::string strApiUrl = "/digital-contract";
-    std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
+    std::string strApiUrl = "/digital-contract/" + c_strDigitalContractId;
+    StructuredBuffer oRequestBody;
+    oRequestBody.PutString("state", "ACTIVATED");
+    std::string strJsonBody = ::ConvertStructuredBufferToJson(oRequestBody);
     std::vector<std::string> stlListOfHeaders;
     stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
     stlListOfHeaders.push_back("Content-Type: application/json");
@@ -532,14 +534,10 @@ void __thiscall SailPlatformServicesSession::ResetDatabase(void)
     Word wServerPortNumber = this->GetServerPortNumber();
     // Prepare the API call
     std::string strVerb = "DELETE";
-    std::string strApiUrl = "/SAIL/AuthenticationManager/Admin/ResetDatabase";
+    std::string strApiUrl = "/database";
     std::string strJsonBody = "";
     // Make the API call and get REST response
     std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
-    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-    // Did the call succeed?
-    // TODO: Prawal add this
-    //_ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error deleting database.", nullptr);
 }
 
 /********************************************************************************************

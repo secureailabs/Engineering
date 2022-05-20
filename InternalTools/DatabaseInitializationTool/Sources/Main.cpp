@@ -158,12 +158,12 @@ static unsigned int GetStep(
     }
     else if (true == c_oCommandLineParameters.IsElementPresent("step2", BOOLEAN_VALUE_TYPE))
     {
-        
+
         unStepIdentifier = 2;
     }
     else if (true == c_oCommandLineParameters.IsElementPresent("step3", BOOLEAN_VALUE_TYPE))
     {
-        
+
         unStepIdentifier = 3;
     }
     else
@@ -171,7 +171,7 @@ static unsigned int GetStep(
         __DebugAssert(true == c_oCommandLineParameters.IsElementPresent("allsteps", BOOLEAN_VALUE_TYPE));
         unStepIdentifier = 4;
     }
-    
+
     return unStepIdentifier;
 }
 
@@ -187,7 +187,7 @@ static std::string __stdcall GetExecutableFolder(void) throw()
     {
         strExecutableFolder = ::dirname(szExecutableFullPathName);
     }
-    
+
     return strExecutableFolder;
 }
 
@@ -203,18 +203,18 @@ int __cdecl main(
     // By default
     int nReturnValue = -1;
     std::string strStartingFolder = std::filesystem::current_path();
-    
+
     try
-    {    
+    {
         // Change the working folder to be that of the executable
         ::chdir(::GetExecutableFolder().c_str());
-        
+
         // Now run the tool
         std::cout << "+=============================================================================================+" << std::endl;
         std::cout << "| Database Initialization Tool, Copyright (C) 2022 Secure AI Labs, Inc., All Rights Reserved. |" << std::endl;
         std::cout << "| by Luis Miguel Huapaya                                                                      |" << std::endl;
         std::cout << "+=============================================================================================+" << std::endl;
-        // Parse the command line arguments if any exist   
+        // Parse the command line arguments if any exist
         StructuredBuffer oCommandLineArguments(ParseCommandLineParameters(nNumberOfArguments, pszCommandLineArguments));
         // Now do some quick checks to see if we want to print usage or just cleanall
         if (true == oCommandLineArguments.IsElementPresent("help", BOOLEAN_VALUE_TYPE))
@@ -236,35 +236,35 @@ int __cdecl main(
             // Load the JSON settings and process/register all of the setting data inside of it
             ::LoadAndProcessJsonSettingsFile(oCommandLineArguments.GetString("settings"), unStepIdentifier);
         }
-        
+
         // If we get here, everything worked, so the return value should be 0
         nReturnValue = 0;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (const std::exception & c_oException)
     {
         ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
-    
+
     // Print out any lingered exceptions before exiting
     while (0 < ::GetRegisteredExceptionsCount())
     {
         std::string strRegisteredException = ::GetNextRegisteredException();
         std::cout << strRegisteredException << std::endl << std::endl;
     }
-    
+
     // Make sure to return to the starting folder before exiting
     ::chdir(strStartingFolder.c_str());
-    
+
     return nReturnValue;
 }

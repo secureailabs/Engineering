@@ -79,10 +79,10 @@ class SailPlatformServicesSession : public Object
             _in const StructuredBuffer & c_oRegistrationParameters
             );
         void __thiscall ApproveDigitalContract(
-            _in const StructuredBuffer & c_oRegistrationParameters
+            _in const std::string & c_strDigitalContractId
             );
         void __thiscall ActivateDigitalContract(
-            _in const StructuredBuffer & c_oRegistrationParameters
+            _in const std::string & c_strDigitalContractId
             );
 
         void __thiscall ResetDatabase(void);

@@ -33,3 +33,7 @@ async def update_one(collection, query, data):
 
 async def delete(collection, query):
     return await sail_db[collection].delete_one(query)
+
+
+async def drop():
+    return await client.drop_database(sail_db)

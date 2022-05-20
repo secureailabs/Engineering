@@ -43,12 +43,12 @@
 			],
 			"Datasets": [
 				{
-                    "DatasetName": "IGR Dataset #1",
+					"Name": "IGR Dataset #1",
 					"DatasetFamily": "IGR Dataset Family",
 					"File": "igr_001.csvp"
 				},
 				{
-                    "DatasetName": "IGR Dataset #2",
+					"Name": "IGR Dataset #2",
 					"DatasetFamily": "IGR Dataset Family",
 					"File": "igr_002.csvp"
 				}
@@ -111,7 +111,7 @@
 			],
 			"Datasets": [
 				{
-                    "Name": "MGR Dataset",
+					"Name": "MGR Dataset",
 					"File": "mgr_001.csvp"
 				}
 			]
@@ -125,11 +125,7 @@
 			"Name": "Kidney Cancer Research Consortium",
 			"Description": "The dataset will be used to train models for academic research purposes.",
 			"LegalAgreement": "The Parties acknowledge and agree that this Agreement represents the entire agreement between the Parties. In the event that the Parties desire to change, add, or otherwise modify any terms, they shall do so in writing to be signed by both parties.",
-			"SubscriptionDays": 360,
-			"RetentionTime": 720,
-			"HostForVm": "SAIL",
-			"HostRegion": "East US 2",
-			"NumberOfVms": 2
+			"SubscriptionDays": 360
 		}
 	]
 }

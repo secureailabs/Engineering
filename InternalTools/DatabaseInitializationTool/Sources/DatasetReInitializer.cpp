@@ -48,7 +48,7 @@ void __thiscall DatasetReInitializer::SetDatasetIdentifier(
     )
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.PutGuid("DatasetGuid", c_oDatasetIdentifier);
 }
 
@@ -59,7 +59,7 @@ void __thiscall DatasetReInitializer::SetCorporateIdentifier(
     )
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.PutGuid("OrganizationGuid", c_oCorporateIdentifier);
 }
 
@@ -68,7 +68,7 @@ void __thiscall DatasetReInitializer::SetCorporateIdentifier(
 void __thiscall DatasetReInitializer::ResetUtcEpochPublishDate(void)
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.PutUnsignedInt64("PublishDate", ::GetEpochTimeInSeconds());
 }
 
@@ -79,7 +79,7 @@ void __thiscall DatasetReInitializer::SetDatasetTitle(
     )
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.PutString("Title", c_strDatasetTitle);
 }
 
@@ -90,7 +90,7 @@ void __thiscall DatasetReInitializer::SetDatasetDescription(
     )
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.PutString("Description", c_strDatasetDescription);
 }
 
@@ -101,7 +101,7 @@ void __thiscall DatasetReInitializer::SetDatasetKeywords(
     )
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.PutString("Tags", c_strDatasetKeywords);
 }
 
@@ -112,16 +112,16 @@ void __thiscall DatasetReInitializer::SetDatasetFamily(
     )
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.PutString("DataFamilyIdentifier", c_strDatasetFamily);
 }
 
 /********************************************************************************************/
-    
+
 void __thiscall DatasetReInitializer::RemoveDatasetFamily(void)
 {
     __DebugFunction();
-    
+
     m_oUpdatedDatasetMetadata.RemoveElement("DataFamilyIdentifier");
 }
 
@@ -130,7 +130,7 @@ void __thiscall DatasetReInitializer::RemoveDatasetFamily(void)
 Guid __thiscall DatasetReInitializer::GetDatasetIdentifier(void) const
 {
     __DebugFunction();
-    
+
     return m_oUpdatedDatasetMetadata.GetGuid("DatasetGuid");
 }
 
@@ -139,7 +139,7 @@ Guid __thiscall DatasetReInitializer::GetDatasetIdentifier(void) const
 std::vector<Byte> __thiscall DatasetReInitializer::GetSerializedDatasetMetadata(void) const
 {
     __DebugFunction();
-    
+
     return m_oUpdatedDatasetMetadata.GetSerializedBuffer();
 }
 
@@ -148,7 +148,7 @@ std::vector<Byte> __thiscall DatasetReInitializer::GetSerializedDatasetMetadata(
 void __thiscall DatasetReInitializer::SaveDatasetUpdates(void) const
 {
     __DebugFunction();
-    
+
     // This is a complex operation. We will:
     // 1. Write the updated dataset metadata to a new dataset file with a temp filename
     // 2. Figure out the offset of the first table in the original dataset file
@@ -157,7 +157,7 @@ void __thiscall DatasetReInitializer::SaveDatasetUpdates(void) const
     // 4. Close the new dataset file.
     // 5. Delete the original dataset file.
     // 6. Rename the new dataset file to the name of the old dataset file.
-    
+
     // Serialize the updated dataset metadata
     std::vector<Byte> stlSerializedUpdatedDatasetMetadata{m_oUpdatedDatasetMetadata.GetSerializedBuffer()};
     // Select a temporary filename for the new dataset file

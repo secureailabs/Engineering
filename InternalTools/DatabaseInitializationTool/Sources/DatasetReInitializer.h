@@ -20,12 +20,12 @@
 class DatasetReInitializer : public Object
 {
     public:
-    
+
         DatasetReInitializer(
             _in const std::string & c_strDatasetFilename
             );
         virtual ~DatasetReInitializer(void);
-        
+
         void __thiscall SetDatasetIdentifier(
             _in const Guid & c_oDatasetIdentifier
             );
@@ -46,14 +46,14 @@ class DatasetReInitializer : public Object
             _in const std::string c_strDatasetFamily
             );
         void __thiscall RemoveDatasetFamily(void);
-        
+
         Guid __thiscall GetDatasetIdentifier(void) const;
         std::vector<Byte> __thiscall GetSerializedDatasetMetadata(void) const;
-        
+
         void __thiscall SaveDatasetUpdates(void) const;
-        
+
     private:
-    
+
         std::string m_strOriginalDatasetFilename;
         StructuredBuffer m_oOriginalDatasetMetadata;
         StructuredBuffer m_oUpdatedDatasetMetadata;

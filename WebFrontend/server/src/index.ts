@@ -7,7 +7,6 @@ import fs from 'fs';
 
 import apiRoutes from '@routes/api.routes';
 import logout from '@controllers/logout';
-import me from '@controllers/me';
 
 const app = express();
 
@@ -18,7 +17,6 @@ app.use(cors({ credentials: true, origin: process.env.CLIENT ? process.env.CLIEN
 
 app.use('/api/v1/', apiRoutes);
 app.use('/api/v1/', logout);
-app.use('/api/v1/', me);
 
 // Removed for testing
 // if (process.env.NODE_ENV === 'production') {

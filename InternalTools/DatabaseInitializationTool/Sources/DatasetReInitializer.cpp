@@ -49,7 +49,7 @@ void __thiscall DatasetReInitializer::SetDatasetIdentifier(
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutGuid("DatasetGuid", c_oDatasetIdentifier);
+    m_oUpdatedDatasetMetadata.PutGuid("id", c_oDatasetIdentifier);
 }
 
 /********************************************************************************************/
@@ -60,7 +60,7 @@ void __thiscall DatasetReInitializer::SetCorporateIdentifier(
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutGuid("OrganizationGuid", c_oCorporateIdentifier);
+    m_oUpdatedDatasetMetadata.PutGuid("organization_id", c_oCorporateIdentifier);
 }
 
 /********************************************************************************************/
@@ -69,18 +69,18 @@ void __thiscall DatasetReInitializer::ResetUtcEpochPublishDate(void)
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutUnsignedInt64("PublishDate", ::GetEpochTimeInSeconds());
+    m_oUpdatedDatasetMetadata.PutUnsignedInt64("publish_date", ::GetEpochTimeInSeconds());
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SetDatasetTitle(
+void __thiscall DatasetReInitializer::SetDatasetName(
     _in const std::string c_strDatasetTitle
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutString("Title", c_strDatasetTitle);
+    m_oUpdatedDatasetMetadata.PutString("name", c_strDatasetTitle);
 }
 
 /********************************************************************************************/
@@ -91,7 +91,7 @@ void __thiscall DatasetReInitializer::SetDatasetDescription(
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutString("Description", c_strDatasetDescription);
+    m_oUpdatedDatasetMetadata.PutString("description", c_strDatasetDescription);
 }
 
 /********************************************************************************************/
@@ -102,7 +102,7 @@ void __thiscall DatasetReInitializer::SetDatasetKeywords(
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutString("Tags", c_strDatasetKeywords);
+    m_oUpdatedDatasetMetadata.PutString("keywords", c_strDatasetKeywords);
 }
 
 /********************************************************************************************/
@@ -131,7 +131,7 @@ Guid __thiscall DatasetReInitializer::GetDatasetIdentifier(void) const
 {
     __DebugFunction();
 
-    return m_oUpdatedDatasetMetadata.GetGuid("DatasetGuid");
+    return m_oUpdatedDatasetMetadata.GetGuid("id");
 }
 
 /********************************************************************************************/

@@ -128,7 +128,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
 
             // Okay, let's register the digital contract.
             DigitalContract oDigitalContract(poDataOwnerOrganization, poResearchOrganization, oDigitalContactParameters);
-            if (true == oDigitalContract.Register(gs_strIpAddress, 6200))
+            if (true == oDigitalContract.Register(gs_strIpAddress, 8000))
             {
                 // Print out some information so that we can visibly see what just got registered
                 std::cout << "Registered digital contract \"" << oDigitalContract.GetContractName() << "\"" << std::endl;

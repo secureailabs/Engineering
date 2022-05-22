@@ -33,7 +33,7 @@ class DatasetReInitializer : public Object
             _in const Guid & c_oCorporateIdentifier
             );
         void __thiscall ResetUtcEpochPublishDate(void);
-        void __thiscall SetDatasetTitle(
+        void __thiscall SetDatasetName(
             _in const std::string c_strDatasetTitle
             );
         void __thiscall SetDatasetDescription(

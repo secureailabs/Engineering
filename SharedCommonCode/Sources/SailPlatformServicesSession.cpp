@@ -389,12 +389,12 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
     // Build the API call
     StructuredBuffer oRequestBody;
     oRequestBody.PutString("id", c_oDatasetIdentifier.ToString(eHyphensOnly));
-    oRequestBody.PutString("description", c_oDatasetMetadata.GetString("Description"));
-    oRequestBody.PutString("name", c_oDatasetMetadata.GetString("Title"));
-    oRequestBody.PutString("keywords", c_oDatasetMetadata.GetString("Tags"));
+    oRequestBody.PutString("description", c_oDatasetMetadata.GetString("description"));
+    oRequestBody.PutString("name", c_oDatasetMetadata.GetString("name"));
+    oRequestBody.PutString("keywords", c_oDatasetMetadata.GetString("keywords"));
     oRequestBody.PutString("version", "0.1.0");
-    oRequestBody.PutUnsignedInt64("publish_date", c_oDatasetMetadata.GetUnsignedInt64("PublishDate"));
-    oRequestBody.PutStructuredBuffer("tables", c_oDatasetMetadata.GetStructuredBuffer("Tables"));
+    oRequestBody.PutUnsignedInt64("publish_date", c_oDatasetMetadata.GetUnsignedInt64("publish_date"));
+    oRequestBody.PutStructuredBuffer("tables", c_oDatasetMetadata.GetStructuredBuffer("tables"));
 
     // Prepare the API call
     std::string strVerb = "POST";
@@ -432,7 +432,7 @@ std::string __thiscall SailPlatformServicesSession::ApplyForDigitalContract(
 
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/digital-contract";
+    std::string strApiUrl = "/digital-contracts";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
     std::vector<std::string> stlListOfHeaders;
     stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
@@ -467,7 +467,7 @@ void __thiscall SailPlatformServicesSession::ApproveDigitalContract(
     Word wServerPortNumber = this->GetServerPortNumber();
     // Prepare the API call
     std::string strVerb = "PUT";
-    std::string strApiUrl = "/digital-contract/" + c_strDigitalContractId;
+    std::string strApiUrl = "/digital-contracts/" + c_strDigitalContractId;
 
     StructuredBuffer oRequestBody;
     oRequestBody.PutString("state", "ACCEPTED");
@@ -477,7 +477,6 @@ void __thiscall SailPlatformServicesSession::ApproveDigitalContract(
     stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
     std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
-    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
     // TODO: Prawal check the response code to be 204
 }
@@ -503,7 +502,7 @@ void __thiscall SailPlatformServicesSession::ActivateDigitalContract(
     Word wServerPortNumber = this->GetServerPortNumber();
     // Prepare the API call
     std::string strVerb = "PUT";
-    std::string strApiUrl = "/digital-contract/" + c_strDigitalContractId;
+    std::string strApiUrl = "/digital-contracts/" + c_strDigitalContractId;
     StructuredBuffer oRequestBody;
     oRequestBody.PutString("state", "ACTIVATED");
     std::string strJsonBody = ::ConvertStructuredBufferToJson(oRequestBody);
@@ -512,7 +511,6 @@ void __thiscall SailPlatformServicesSession::ActivateDigitalContract(
     stlListOfHeaders.push_back("Content-Type: application/json");
     // Make the API call and get REST response
     std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
-    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
     // TODO: Prawal check the response code to be 204
 }

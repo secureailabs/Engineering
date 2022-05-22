@@ -91,7 +91,7 @@ Organization::Organization(
                 // Just a reality check to make sure the target file is in fact a properly formatted dataset
                 Dataset oDataset(strDatasetFilename.c_str());
                 // Now we persist the dataset information
-                Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
+                Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("Name").c_str(), false);
                 m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
             }
         }
@@ -569,9 +569,9 @@ void __thiscall Organization::RegisterDatasets(void)
             // Reset the publish date
             oDatasetReInitializer.ResetUtcEpochPublishDate();
             // If a new Title is provided in the JSON, update the title of the dataset
-            if (true == oDatasetInformation.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            if (true == oDatasetInformation.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))
             {
-                oDatasetReInitializer.SetDatasetTitle(oDatasetInformation.GetString("Title"));
+                oDatasetReInitializer.SetDatasetName(oDatasetInformation.GetString("Name"));
             }
             // If a new Description is provided in the JSON, update the description of the dataset
             if (true == oDatasetInformation.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))

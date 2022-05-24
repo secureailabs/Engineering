@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, StrictStr
 from app.api import (
     accounts,
     authentication,
+    data_federations,
     datasets,
     datasets_families,
     digital_contracts,
@@ -41,6 +42,7 @@ server.include_router(secure_computation_nodes.router)
 server.include_router(datasets_families.router)
 server.include_router(remote_data_connector.router)
 server.include_router(internal_utils.router)
+server.include_router(data_federations.router)
 
 # Override the default validation error handler as it throws away a lot of information
 # about the schema of the request body.

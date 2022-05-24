@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConditionalRender } from '@components/ConditionalRender';
+import { ConditionalRender } from '@components/ConditionalRenderRQuery';
 
 import { TLoginProps } from './Login.types';
 
@@ -10,12 +10,11 @@ import LoginFailure from './Login.failure';
 const Login: React.FC<TLoginProps> = ({
   signInReset,
   signInStart,
-  userState,
+  status,
 }) => {
   return (
     <ConditionalRender
-      //@ts-ignore
-      state={userState}
+      status={status}
       success={LoginSuccess}
       failure={() => <LoginFailure signInReset={signInReset} />}
     >

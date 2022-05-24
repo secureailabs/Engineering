@@ -25,8 +25,25 @@ import default_profile_image from '@assets/user.png';
 import newLogo from '@assets/newLogo.png';
 
 import { FaServer } from 'react-icons/fa';
+import { removeToken } from '@redux/user/user.utils';
+import axios from 'axios';
+import { axiosProxy } from '@redux/utils';
+import { useMutation, useQueryClient } from 'react-query';
+
 //@ts-ignore
-const Dashboard = ({ logout, userData }) => {
+const Dashboard = ({ userData }) => {
+  const logout = async () => {
+    removeToken()
+    await axios.delete(
+      `${axiosProxy()}/api/v1/logout`,
+      {
+        withCredentials: true,
+      });
+  }
+  
+  const queryClient = useQueryClient()
+  const logoutMutation = useMutation(logout, { onSettled: () => queryClient.invalidateQueries('userData'), retry: false})
+
   const primary = [
     { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },
     { text: 'Datasets', Icon: MdViewColumn, link: '/dashboard/datasets' },
@@ -73,7 +90,9 @@ const Dashboard = ({ logout, userData }) => {
     {
       text: 'Logout',
       Icon: MdLogout,
-      onClick: logout,
+      onClick: () => {
+        logoutMutation.mutate()
+      },
     },
   ];
 

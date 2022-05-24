@@ -11,7 +11,7 @@ export type IUserData = {
 } | null;
 
 export interface IEmailAndPassword {
-  email: string;
+  username: string;
   password: string;
 }
 

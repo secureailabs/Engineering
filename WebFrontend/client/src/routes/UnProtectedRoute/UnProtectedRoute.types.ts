@@ -7,6 +7,4 @@ export interface IUnProtectedRoutes {
   exact: boolean;
   path: string;
   redirect: string;
-  userData: IState['user']['userData'];
-  userState: IState['user']['userState'];
 }

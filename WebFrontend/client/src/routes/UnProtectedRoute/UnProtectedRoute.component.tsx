@@ -1,21 +1,23 @@
 import React, { ReactElement } from 'react';
 
+import { useQueryClient } from 'react-query';
+
 import { Navigate } from 'react-router-dom';
 
 import { IUnProtectedRoutes } from './UnProtectedRoute.types';
 
 import Spinner from '@components/Spinner';
 
-const ProtectedRoute: React.FC<IUnProtectedRoutes> = ({
-  userState,
+const UnProtectedRoute: React.FC<IUnProtectedRoutes> = ({
   children,
   redirect,
-  userData,
 }): ReactElement => {
+  const userState = useQueryClient().getQueryState('userData')
+
   // check if user finished loading, else run spinner
-  if (userState !== 'isLoading' && userState !== null) {
+  if (!userState?.isFetching) {
     // if there is not user, render register page
-    if (userData !== null) {
+    if (userState?.data !== undefined && !userState.error) {
       return <Navigate replace to={window.localStorage.getItem("login-redirect") || redirect} />;
     }
     // if there is a user, redirect to dashboard dashboard
@@ -23,6 +25,7 @@ const ProtectedRoute: React.FC<IUnProtectedRoutes> = ({
   }
 
   return <Spinner />;
+  // return children;
 };
 
-export default ProtectedRoute;
+export default UnProtectedRoute;

@@ -1,3 +1,3 @@
-import Datasets from './Datasets.container';
+import Datasets from './Datasets.component';
 
 export default Datasets;

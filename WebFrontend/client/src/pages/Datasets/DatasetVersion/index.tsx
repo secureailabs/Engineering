@@ -1,3 +1,3 @@
-import DatasetVersion from './DatasetVersion.container';
+import DatasetVersion from './DatasetVersion.component';
 
 export default DatasetVersion;

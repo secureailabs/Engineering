@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App.container';
+import App from './App';
 import './index.css';
 import '@secureailabs/web-ui/css/style.css';
 import 'react-grid-layout/css/styles.css';
@@ -21,12 +21,10 @@ ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
     <Provider store={store}>
-      <PersistGate persistor={persistor}>
         <BrowserRouter>
           <App />
           {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </BrowserRouter>
-      </PersistGate>
     </Provider>
     </QueryClientProvider>
   </React.StrictMode>,

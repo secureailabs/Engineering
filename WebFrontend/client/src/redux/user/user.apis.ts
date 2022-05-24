@@ -30,11 +30,11 @@ export const userLogin = (
 > => {
   return axios
     .post(
-      `${axiosProxy()}/api/v1/AuthenticationManager/User/Login`,
-      {
-        Email: email,
-        Password: password,
-      },
+      `${axiosProxy()}/api/v1/login`,
+      new URLSearchParams({
+        username: email,
+        password: password,
+      }),
       { withCredentials: true }
     )
     .then((res) => {
@@ -74,7 +74,7 @@ export const userSignup = (
 export const checkAuth = () =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/AuthenticationManager/GetBasicUserInformation`,
+      `${axiosProxy()}/api/v1/me`,
       { withCredentials: true }
     )
     .then((res) => {

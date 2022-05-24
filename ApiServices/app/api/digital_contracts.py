@@ -93,6 +93,13 @@ async def get_all_digital_contract(
             query = {"researcher_id": str(researcher_id)}
         elif current_user.role is UserRole.SAIL_ADMIN:
             query = {}
+        elif (researcher_id is None) and (data_owner_id is None):
+            query = {
+                "$or": [
+                    {"researcher_id": str(current_user.organization_id)},
+                    {"data_owner_id": str(current_user.organization_id)},
+                ]
+            }
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 

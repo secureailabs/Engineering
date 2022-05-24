@@ -36,7 +36,7 @@ extern "C" __declspec(dllexport) bool __cdecl UpdateDatasetFamilyInformation(voi
         _ThrowBaseExceptionIf((false == ::IsLoggedOn()), "No active session, cannot complete requested operation", nullptr);
         // Build out the REST API call query
         std::string strVerb = "GET";
-        std::string strApiUri = "/datasets-families";
+        std::string strApiUri = "/dataset-families";
         std::vector<std::string> stlListOfHeaders;
         stlListOfHeaders.push_back("Authorization: Bearer " + ::GetSailPlatformServicesAccessToken());
         std::string strBody = "";

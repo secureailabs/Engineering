@@ -422,10 +422,10 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
 
         // Did the transaction succeed?
         _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
-        _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("organization_id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
+        _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("organization", INDEXED_BUFFER_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
 
         // Extract all values and cache them in global variables
-        ::SetCurrentUserOrganizationIdentifier(oResponse.GetString("organization_id"));
+        ::SetCurrentUserOrganizationIdentifier(oResponse.GetStructuredBuffer("organization").GetString("id"));
         ::SetCurrentUserIdentifier(oResponse.GetString("id"));
         // If we get here, no exceptions were thrown, so the transaction was successfull!!!
         gs_fIsLoggedOn = true;

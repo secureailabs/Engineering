@@ -60,7 +60,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
 
         # Create an admin user account
         admin_user_db = User_Db(
-            username=organization.admin_name,
+            name=organization.admin_name,
             email=organization.admin_email,
             job_title=organization.admin_job_title,
             role=UserRole.ADMIN,

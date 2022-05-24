@@ -471,7 +471,7 @@ void __thiscall Organization::RegisterUsers(void)
         StructuredBuffer oUser(c_stlIterator->c_str());
         StructuredBuffer oRegistrationParameters;
 
-        oRegistrationParameters.PutString("username", oUser.GetString("Name"));
+        oRegistrationParameters.PutString("name", oUser.GetString("Name"));
         oRegistrationParameters.PutString("email", oUser.GetString("Email"));
         oRegistrationParameters.PutString("job_title", oUser.GetString("Title"));
         oRegistrationParameters.PutString("role", oUser.GetString("Role"));

@@ -92,7 +92,10 @@ void InfiniteLoop(
                 std::vector<Byte> stlDatasetFiledata = ::ReadFileAsByteBuffer(strFileName);
                 std::string strEncoded = ::Base64Encode(stlDatasetFiledata.data(), (unsigned int)stlDatasetFiledata.size());
                 oVirtualMachineInformation.PutString("Base64EncodedDataset", strEncoded);
-
+                oVirtualMachineInformation.PutString("DataOwnerAccessToken", oSailPlatformServicesSession.GetAccessToken());
+                oVirtualMachineInformation.PutString("SailWebApiPortalIpAddress", c_strIpAddress);
+                oVirtualMachineInformation.PutString("DataOwnerUserIdentifier", oSailPlatformServicesSession.GetBasicUserInformation().GetString("id"));
+                oVirtualMachineInformation.PutString("DataOwnerOrganizationIdentifier", oSailPlatformServicesSession.GetBasicUserInformation().GetStructuredBuffer("organization").GetString("id"));
                 // Prepare the JSON string
                 std::string strJson = ::ConvertStructuredBufferToJson(oVirtualMachineInformation);
                 // Execute the upload transaction

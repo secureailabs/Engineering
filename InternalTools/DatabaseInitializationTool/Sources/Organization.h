@@ -21,7 +21,7 @@
 class Organization : public Object
 {
     public:
-    
+
         Organization(
             _in const std::string & c_strOrganizationName,
             _in const StructuredBuffer & c_oOrganizationalData,

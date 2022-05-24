@@ -162,7 +162,7 @@ void __thiscall DatasetReInitializer::SaveDatasetUpdates(void) const
     std::vector<Byte> stlSerializedUpdatedDatasetMetadata{m_oUpdatedDatasetMetadata.GetSerializedBuffer()};
     // Select a temporary filename for the new dataset file
     Guid oNewGuid;
-    std::string strTemporaryDatasetFilename = oNewGuid.ToString(eHyphensAndCurlyBraces) + ".csvp";
+    std::string strTemporaryDatasetFilename = oNewGuid.ToString(eHyphensOnly) + ".csvp";
     // Figure out the starting offset in the original file
     unsigned int unSerializedOriginalDatasetSizeInBytes = m_oOriginalDatasetMetadata.GetSerializedBuffer().size();
     unsigned int unStartingTableDataOffsetInSourceFile = 12 + unSerializedOriginalDatasetSizeInBytes;

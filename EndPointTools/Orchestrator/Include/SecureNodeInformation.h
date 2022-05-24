@@ -14,13 +14,13 @@
 
 struct HostedDatasetInformation
 {
-    Guid oDatsetGuid{};
+    std::string strDatsetGuid{""};
     unsigned int unUsageCount{0};
 };
 
 struct SecureNodeInformation
 {
-    VirtualMachineState eProvisionStatus{VirtualMachineState::eStarting};
+    std::string strProvisionStatus{""};
     std::string strDigitalContractGUID{""};
     std::string strRemoteIpAddress{""};
     std::string strVMGUID{""};

@@ -384,36 +384,36 @@ StructuredBuffer __stdcall RegisterVirtualMachineResearchUser(
 /// <param name="c_strLoggedOnUserIdentifier">Virtual machine state as defined by VirtualMachineState</param>
 /// <returns>Nothing</returns>
 bool __stdcall VirtualMachineStatusUpdate(
-	_in const std::string & c_strEosb,
-	_in const std::string & c_strVirtualMachineIdentifier,
-	_in Dword dwState,
-	_in const std::string & c_strLoggedOnUserIdentifier
-	) throw()
+    _in const std::string & c_strAccessToken,
+    _in const std::string & c_strVirtualMachineIdentifier,
+    _in const std::string & strScnState
+    ) throw()
 {
-	__DebugFunction();
-	__DebugAssert(0 < c_strEosb.size());
-	__DebugAssert(0 < c_strVirtualMachineIdentifier.size());
-	__DebugAssert((1 <= dwState)&&(10 >= dwState));
-	
-	bool fSuccess = false;
-	
-	try
+    __DebugFunction();
+    __DebugAssert(0 < c_strAccessToken.size());
+    __DebugAssert(0 < c_strVirtualMachineIdentifier.size());
+
+    bool fSuccess = false;
+
+    try
     {
         // Build the HTTP request string
         StructuredBuffer oApiCallContent;
         std::string strVerb = "PUT";
-        std::string strApiUrl = "/SAIL/VirtualMachineManager/UpdateStatus?Eosb=" + c_strEosb;
-		oApiCallContent.PutString("VirtualMachineGuid", c_strVirtualMachineIdentifier);
-		oApiCallContent.PutDword("State", dwState);
-		oApiCallContent.PutString("VMLoggedInUser", c_strLoggedOnUserIdentifier);
-		// Make the API call and get REST response
-        std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfWebPortalGateway, (Word) gs_unPortAddressOfWebPortalGateway, strVerb, strApiUrl, ::ConvertStructuredBufferToJson(oApiCallContent), true);
-		// Convert the API call response into a StructuredBuffer
+        std::string strApiUrl = "/secure-computation-node/" + c_strVirtualMachineIdentifier;
+        oApiCallContent.PutString("state", strScnState);
+
+        std::vector<std::string> stlListOfHeaders;
+        stlListOfHeaders.push_back("Authorization: Bearer " + c_strAccessToken);
+        stlListOfHeaders.push_back("Content-Type: application/json");
+        // Make the API call and get REST response
+        std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfWebPortalGateway, (Word) gs_unPortAddressOfWebPortalGateway, strVerb, strApiUrl, ::ConvertStructuredBufferToJson(oApiCallContent), true, stlListOfHeaders);
+        // Convert the API call response into a StructuredBuffer
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-		// Throw an exception if the API call did not succeed.
+        // Throw an exception if the API call did not succeed.
         _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error while processing the transaction.", nullptr);
-		// Api call has succeeded if we get here
-		fSuccess = true;
+        // Api call has succeeded if we get here
+        fSuccess = true;
     }
 
     catch (const BaseException & c_oBaseException)

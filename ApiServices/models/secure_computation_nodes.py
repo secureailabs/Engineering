@@ -26,6 +26,7 @@ class SecureComputationNodeState(Enum):
     WAITING_FOR_DATA = "WAITING_FOR_DATA"
     FAILED = "FAILED"
     READY = "READY"
+    IN_USE = "IN_USE"
     DELETED = "DELETED"
     DELETING = "DELETING"
     DELETE_FAILED = "DELETE_FAILED"
@@ -43,7 +44,7 @@ class SecureComputationNode_Db(SecureComputationNode_Base):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     researcher_user_id: PyObjectId = Field(...)
     state: SecureComputationNodeState = Field(...)
-    details: Optional[StrictStr] = Field(default=None)
+    detail: Optional[StrictStr] = Field(default=None)
     ipaddress: Optional[IPv4Address] = Field(default=None)
     researcher_id: PyObjectId = Field(default=None)
     data_owner_id: PyObjectId = Field(default=None)
@@ -68,7 +69,7 @@ class GetSecureComputationNode_Out(SailBaseModel):
     type: SecureComputationNodeType = Field(...)
     timestamp: datetime = Field(...)
     state: SecureComputationNodeState = Field(...)
-    details: Optional[StrictStr] = Field(default=None)
+    detail: Optional[StrictStr] = Field(default=None)
     ipaddress: Optional[IPv4Address] = Field(default=None)
 
 

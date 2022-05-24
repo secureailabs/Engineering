@@ -16,7 +16,7 @@ if [ $retVal -ne 0 ]; then
 fi
 
 # Unpack the tar package
-tar -xvf package.tar.gz
+tar -xf package.tar.gz
 
 # Move the InitializerVector to the Binary folder
 mv InitializationVector.json ApiServices/
@@ -33,6 +33,7 @@ mv UploadPackageAndInitializationVector ApiServices/
 mongod --port 27017 --dbpath /srv/mongodb/db0 --bind_ip localhost --fork --logpath /var/log/mongod.log
 
 # Start the Public API Server
+cd ApiServices
 uvicorn app.main:server --reload --host 0.0.0.0 --port 8000
 
 # To keep the container running

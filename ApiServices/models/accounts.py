@@ -73,7 +73,7 @@ class UserAccountState(Enum):
 
 
 class User_Base(SailBaseModel):
-    username: StrictStr = Field(...)
+    name: StrictStr = Field(...)
     email: EmailStr = Field(...)
     job_title: StrictStr = Field(...)
     role: UserRole = Field(...)
@@ -104,7 +104,7 @@ class RegisterUser_Out(SailBaseModel):
 class GetUsers_Out(User_Base):
     id: PyObjectId = Field(alias="_id")
     organization: BasicObjectInfo = Field(...)
-    username: StrictStr = Field(...)
+    name: StrictStr = Field(...)
     email: EmailStr = Field(...)
     job_title: StrictStr = Field(...)
     role: UserRole = Field(...)

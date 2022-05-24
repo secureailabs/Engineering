@@ -88,22 +88,6 @@ enum class DigitalContractProvisiongStatus
 
 /********************************************************************************************/
 
-typedef enum virtual_machine_state
-{
-    eStarting = 1,
-    eConfiguring = 2,
-    eWaitingForData = 4,
-    eReadyForComputation = 5,
-    eInUse = 6,
-    eShuttingDown = 7,
-    eDeleted = 8,
-    eDeleteFailed = 9,
-    eProvisioningFailed = 10
-}
-VirtualMachineState;
-
-/********************************************************************************************/
-
 enum class AzureTemplateState
 {
     eInitializing = 1,

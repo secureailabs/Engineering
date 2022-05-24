@@ -13,13 +13,13 @@ import { TDatasetProps } from './Dataset.types';
 
 import DatasetSuccess from './Dataset.success';
 import DatasetFailure from "./Dataset.failure";
-import { TGetDatasetSuccess } from '@redux/dataset/dataset.typeDefs';
+import { TGetDatasetSuccess } from '@app/redux/dataset/dataset.typeDefs';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@app/redux/utils';
 import { useQuery } from 'react-query';
 
-import { demo_data } from "@redux/dataset/dataset.data";
+import { demo_data } from "@app/redux/dataset/dataset.data";
 
 
 const fetch = async ({ id }: { id: string }): Promise<TGetDatasetSuccess['Dataset']> => {

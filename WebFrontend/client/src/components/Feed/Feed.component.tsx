@@ -10,32 +10,31 @@ import Spinner from '@components/Spinner/SpinnerOnly.component';
 import { HiArrowLeft } from 'react-icons/hi';
 import VirtualMachineInfo from '@components/VirtualMachineInfo';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
+import { demo_data } from '@app/redux/feed/feed.data';
 
 const Feed: React.FC<TFeedProps> = ({
-  getAllFeedsReset,
-  getAllFeedsStart,
-  getAllFeedsState,
-  getAllFeedsData,
+  // getAllFeedsReset,
+  // getAllFeedsStart,
+  // getAllFeedsState,
   limit,
   containerHeight,
 }) => {
-  useEffect(() => {
-    getAllFeedsReset();
-    getAllFeedsStart();
-  }, []);
-
-  console.log(getAllFeedsData);
+  // useEffect(() => {
+  //   getAllFeedsReset();
+  //   getAllFeedsStart();
+  // }, []);
 
   return (
     <ConditionalRender
       //@ts-ignore
       // state={getAllFeedsState}
-      state={getAllFeedsState}
+      state={'success'}
       success={() => (
         <FeedsSuccess
           containerHeight={containerHeight}
           limit={limit}
-          getAllFeedsData={getAllFeedsData}
+          // @ts-ignore
+          getAllFeedsData={demo_data}
         />
       )}
       failure={FeedsFailure}

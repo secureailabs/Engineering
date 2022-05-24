@@ -1,18 +1,10 @@
-import { connect } from 'react-redux';
-import { compose, Dispatch } from 'redux';
-
-import {
-  getDatasetStart,
-  getDatasetReset,
-} from '@redux/dataset/dataset.actions';
-import { selectUser } from '@redux/user/user.selectors';
 import Customizabledashboard from './CustomizableDashboard.component';
-import { IState } from '@redux/root-reducer';
+import { useQueryClient } from 'react-query';
 
-const mapStateToProps = (state: IState) => {
-  return {
-    userData: selectUser(state).userData,
-  };
-};
+const CustomizableDashboardContainer: React.FC = () => {
+  
+  // @ts-ignore
+  return Customizabledashboard({userData: useQueryClient().getQueryData('userData') })
+}
 
-export default compose(connect(mapStateToProps))(Customizabledashboard);
+export default CustomizableDashboardContainer

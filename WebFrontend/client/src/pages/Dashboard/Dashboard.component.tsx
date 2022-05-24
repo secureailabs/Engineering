@@ -25,9 +25,9 @@ import default_profile_image from '@assets/user.png';
 import newLogo from '@assets/newLogo.png';
 
 import { FaServer } from 'react-icons/fa';
-import { removeToken } from '@redux/user/user.utils';
+import { removeToken } from '@app/redux/user/user.utils';
 import axios from 'axios';
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@app/redux/utils';
 import { useMutation, useQueryClient } from 'react-query';
 
 //@ts-ignore

@@ -4,11 +4,11 @@ import { compose, Dispatch } from 'redux';
 import {
   getAllDatasetsStart,
   getAllDatasetsReset,
-} from '@redux/dataset/dataset.actions';
-import { selectDataset } from '@redux/dataset/dataset.selectors';
+} from '@app/redux/dataset/dataset.actions';
+import { selectDataset } from '@app/redux/dataset/dataset.selectors';
 import Datasets from './Datasets.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
 
 const mapStateToProps = (state: IState) => {
   return {

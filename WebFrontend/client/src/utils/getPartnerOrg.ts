@@ -1,4 +1,4 @@
-import { IUserData } from '@redux/user/user.typeDefs';
+import { IUserData } from '@app/redux/user/user.typeDefs';
 
 const getPartnerOrg = (
   userData: IUserData,

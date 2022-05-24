@@ -39,7 +39,7 @@ import type {
   TPutUnifiedRegistrySuccess,
 } from './unifiedRegistry.types';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IUnifiedRegistryState {
   // GET ALL

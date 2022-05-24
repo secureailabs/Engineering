@@ -60,7 +60,7 @@ import type {
   TPutAccountManagerSuccess,
 } from './accountManager.typeDefs';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IAccountManagerState {
   // GET ALL

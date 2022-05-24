@@ -39,7 +39,7 @@ import type {
   TPutFeedSuccess,
 } from './feed.types';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IFeedState {
   // GET ALL

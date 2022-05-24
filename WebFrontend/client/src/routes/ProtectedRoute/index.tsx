@@ -1,3 +1,3 @@
-import ProtectedRouteContainer from './ProtectedRoute.container';
+import ProtectedRouteContainer from './ProtectedRoute.component';
 
 export default ProtectedRouteContainer;

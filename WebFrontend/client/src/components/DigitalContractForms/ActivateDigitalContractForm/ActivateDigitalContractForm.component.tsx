@@ -8,14 +8,14 @@ import { TActivateDigitalContractFormProps } from './ActivateDigitalContractForm
 
 import ActivateDigitalContractFormSuccess from './ActivateDigitalContractForm.success';
 import ActivateDigitalContractFormFailure from "./ActivateDigitalContractForm.failure";
-import { TPatchActivateDigitalContractStart, TPatchActivateDigitalContractSuccess } from '@redux/digitalContract/digitalContract.typeDefs';
+import { TPatchActivateDigitalContractStart, TPatchActivateDigitalContractSuccess } from '@app/redux/digitalContract/digitalContract.typeDefs';
 import Modal from '@secureailabs/web-ui/components/Modal';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@app/redux/utils';
 import { useMutation } from 'react-query';
 
-import { demo_data } from "@redux/dataset/dataset.data";
+import { demo_data } from "@app/redux/dataset/dataset.data";
 
 
 const activateContract = async (digitalContractInfo: TPatchActivateDigitalContractStart): Promise<any> => {

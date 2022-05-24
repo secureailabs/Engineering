@@ -10,8 +10,8 @@ import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 import { ConditionalRender } from '@components/ConditionalRender';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 import Card from '@secureailabs/web-ui/components/Card';
-import { axiosProxy, tokenConfig } from '@redux/utils';
-import type { IDefaults } from '@redux/typedefs';
+import { axiosProxy, tokenConfig } from '@app/redux/utils';
+import type { IDefaults } from '@app/redux/typedefs';
 
 import Spinner from '@components/Spinner/SpinnerOnly.component';
 
@@ -27,7 +27,7 @@ import {
 
   TGetDigitalContractSuccess,
 
-} from '@redux/digitalContract/digitalContract.typeDefs';
+} from '@app/redux/digitalContract/digitalContract.typeDefs';
 import _ from 'lodash';
 
 const fetch = async ({ id }: { id: string }): Promise<TGetDigitalContractSuccess> => {

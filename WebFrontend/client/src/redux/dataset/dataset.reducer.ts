@@ -33,7 +33,7 @@ import type {
   TPatchAcceptDatasetSuccess,
 } from './dataset.typeDefs';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IDatasetState {
   // GET ALL

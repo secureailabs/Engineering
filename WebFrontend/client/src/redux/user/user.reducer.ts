@@ -22,7 +22,7 @@ import {
   signUpSuccess,
 } from './user.actions';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IUserState {
   userData: IUserData;

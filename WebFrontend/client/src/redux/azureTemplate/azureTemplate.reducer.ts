@@ -46,7 +46,7 @@ import type {
   TDeleteAzureTemplateSuccess,
 } from './azureTemplate.typesDefs';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IAzureTemplateState {
   // POST

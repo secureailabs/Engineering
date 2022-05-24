@@ -1,6 +1,6 @@
-import { TGetVirtualMachineSuccess } from '@redux/virtualMachineManager/virtualMachineManager.typeDefs';
-import { IUserData } from '@redux/user/user.typeDefs';
-import { IDefaults } from '@redux/typedefs';
+import { TGetVirtualMachineSuccess } from '@app/redux/virtualMachineManager/virtualMachineManager.typeDefs';
+import { IUserData } from '@app/redux/user/user.typeDefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export type TVirtualMachineProps = {
   getVirtualMachineStart(): void;

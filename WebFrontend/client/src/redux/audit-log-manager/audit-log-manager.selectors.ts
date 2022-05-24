@@ -1,4 +1,4 @@
-import { IState } from '@redux/root-reducer';
+import { IState } from '@app/redux/root-reducer';
 
 export const selectContact = (state: IState): IState['audit-log-manager'] =>
   state['audit-log-manager'];

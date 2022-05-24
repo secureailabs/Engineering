@@ -19,7 +19,7 @@ import type {
   IGetAllEventsSuccess,
 } from './audit-log-manager.typeDefs';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IEventState {
   // GET ALL

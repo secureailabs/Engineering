@@ -10,15 +10,15 @@ import { TRequestDataAccessFormProps } from './RequestDataAccessForm.types';
 
 import RequestDataAccessFormSuccess from './RequestDataAccessForm.success';
 import RequestDataAccessFormFailure from "./RequestDataAccessForm.failure";
-import { TGetDatasetSuccess } from '@redux/dataset/dataset.typeDefs';
-import { TPostDigitalContractStart, TPostDigitalContractSuccess } from '@redux/digitalContract/digitalContract.typeDefs';
+import { TGetDatasetSuccess } from '@app/redux/dataset/dataset.typeDefs';
+import { TPostDigitalContractStart, TPostDigitalContractSuccess } from '@app/redux/digitalContract/digitalContract.typeDefs';
 import Modal from '@secureailabs/web-ui/components/Modal';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@app/redux/utils';
 import { useMutation } from 'react-query';
 
-import { demo_data } from "@redux/dataset/dataset.data";
+import { demo_data } from "@app/redux/dataset/dataset.data";
 
 
 const postContract = async (digitalContractInfo: TPostDigitalContractStart): Promise<any> => {

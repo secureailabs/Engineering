@@ -6,7 +6,7 @@ import {
   checkUserSessionAsync,
 } from './redux/user/user.actions';
 
-import { RootAction } from '@redux/root.types';
+import { RootAction } from '@app/redux/root.types';
 
 import App from './App';
 

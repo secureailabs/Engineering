@@ -1,6 +1,6 @@
 import { UseMutateFunction } from 'react-query';
 import { AxiosError } from 'axios';
-import { IEmailAndPassword } from '@redux/user/user.typeDefs';
+import { IEmailAndPassword } from '@app/redux/user/user.typeDefs';
 
 export type TLoginProps = {
   signInStart: UseMutateFunction<IEmailAndPassword, AxiosError<any>, void, unknown>;

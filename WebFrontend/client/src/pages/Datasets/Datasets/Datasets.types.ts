@@ -1,5 +1,5 @@
-import { TGetAllDatasetsSuccess } from '@redux/dataset/dataset.typeDefs';
-import { IDefaults } from '@redux/typedefs';
+import { TGetAllDatasetsSuccess } from '@app/redux/dataset/dataset.typeDefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 import { AxiosError } from 'axios';
 

@@ -13,10 +13,10 @@ import { useParams } from 'react-router';
 import { ConditionalRender } from '@components/ConditionalRender';
 import Spinner from '@components/Spinner/SpinnerOnly.component';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
-import { demo_data } from "@redux/unifiedRegistry/unifiedRegistry.data";
-import { TGetUnifiedRegistrySuccess } from '@redux/unifiedRegistry/unifiedRegistry.types';
+import { demo_data } from "@app/redux/unifiedRegistry/unifiedRegistry.data";
+import { TGetUnifiedRegistrySuccess } from '@app/redux/unifiedRegistry/unifiedRegistry.types';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@app/redux/utils';
 import { useQuery } from 'react-query';
 
 

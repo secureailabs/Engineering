@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 import { IUserData, IPostUserStart } from './user.typeDefs';
-import { axiosProxy, formatData } from '@redux/utils';
+import { axiosProxy, formatData } from '@app/redux/utils';
 
 // Setup config/headers and token
 export const tokenConfig = (token: string) => {

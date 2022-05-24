@@ -1,3 +1,3 @@
-import SettingsContainer from './Settings.container';
+import SettingsContainer from './Settings.component';
 
 export default SettingsContainer;

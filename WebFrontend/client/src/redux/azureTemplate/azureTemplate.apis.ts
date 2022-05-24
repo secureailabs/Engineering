@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@app/redux/utils';
 
 import {
   TPostAzureTemplateStart,
@@ -14,7 +14,7 @@ import {
   TDeleteAzureTemplateSuccess,
 } from './azureTemplate.typesDefs';
 
-import type { IDefaults } from '@redux/typedefs';
+import type { IDefaults } from '@app/redux/typedefs';
 
 // POST REGISTER TEMPLATE
 

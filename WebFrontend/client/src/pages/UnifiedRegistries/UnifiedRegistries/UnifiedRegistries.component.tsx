@@ -11,10 +11,10 @@ import { HiArrowLeft } from 'react-icons/hi';
 import VirtualMachineInfo from '@components/VirtualMachineInfo';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
-import { demo_data } from "@redux/unifiedRegistry/unifiedRegistry.data";
+import { demo_data } from "@app/redux/unifiedRegistry/unifiedRegistry.data";
 
 import { useQuery } from 'react-query';
-import { TGetAllUnifiedRegistriesSuccess } from '@redux/unifiedRegistry/unifiedRegistry.types';
+import { TGetAllUnifiedRegistriesSuccess } from '@app/redux/unifiedRegistry/unifiedRegistry.types';
 import { AxiosError } from 'axios';
 
 const UnifiedRegistries: React.FC<TUnifiedRegistriesProps> = () => {

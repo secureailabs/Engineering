@@ -15,9 +15,9 @@ import axios, { AxiosError } from 'axios';
 import {
   TGetAllDigitalContractsSuccess,
 
-} from '@redux/digitalContract/digitalContract.typeDefs';
+} from '@app/redux/digitalContract/digitalContract.typeDefs';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@app/redux/utils';
 
 
 const fetch = async (): Promise<TGetAllDigitalContractsSuccess['DigitalContracts']> => {

@@ -1,13 +1,14 @@
 export type IUserData = {
-  AccessRights: 1 | 2 | 3 | 4 | 5 | 6;
-  OrganizationGuid: string;
-  OrganizationName: string;
-  UserGuid: string;
-  Status: number;
-  Username: string;
-  PhoneNumber: string;
-  Email: string;
-  Title: string;
+  username: string;
+  email: string;
+  job_title: string;
+  role: 'ADMIN' | 'AUDITOR' | 'USER' | 'DIGITALCONTRACTADMIN' | 'DATASETADMIN' | 'SAILADMIN';
+  avatar: string;
+  id: string;
+  organization: {
+    id: string;
+    name: string;
+  }
 } | null;
 
 export interface IEmailAndPassword {

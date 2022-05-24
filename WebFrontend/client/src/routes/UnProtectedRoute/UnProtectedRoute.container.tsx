@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
-import { selectUser } from '@redux/user/user.selectors';
+import { selectUser } from '@app/redux/user/user.selectors';
 
-import { IState } from '@redux/root-reducer';
+import { IState } from '@app/redux/root-reducer';
 
 import UnProtectedRoute from './UnProtectedRoute.component';
 

@@ -61,7 +61,7 @@ import type {
   TDeprovisionDigitalContractSuccess
 } from './digitalContract.typeDefs';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IDigitalContractState {
   // GET ALL

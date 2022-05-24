@@ -14,7 +14,7 @@ import Title from '@components/Title';
 
 import axios from 'axios';
 
-import { axiosProxy, tokenConfig } from '@redux/utils';
+import { axiosProxy, tokenConfig } from '@app/redux/utils';
 
 import Spinner, { SpinnerOnly } from '@components/Spinner';
 

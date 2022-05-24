@@ -1,3 +1,3 @@
-import Organization from './Organization.container';
+import Organization from './Organization.component';
 
 export default Organization;

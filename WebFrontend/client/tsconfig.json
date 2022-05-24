@@ -29,7 +29,7 @@
     "noEmit": false,
     "baseUrl": "./",
     "paths": {
-      "@redux/*": ["./src/redux/*"],
+      "@redux/*": ["src/redux/*"],
       "@assets/*": ["./src/assets/*"],
       "@sass/*": ["./src/sass/*"],
       "@pages/*": ["./src/pages/*"],

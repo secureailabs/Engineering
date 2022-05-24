@@ -1,4 +1,4 @@
-import { TGetAllAccountManagersSuccess } from '@redux/accountManager/accountManager.typeDefs';
+import { TGetAllAccountManagersSuccess } from '@app/redux/accountManager/accountManager.typeDefs';
 
 export type TUserManagerList = {
   // setDatasetID(dataset: string): void;

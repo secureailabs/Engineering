@@ -1,6 +1,6 @@
-import { TGetAllDigitalContractsSuccess } from '@redux/digitalContract/digitalContract.typeDefs';
-import { IUserData } from '@redux/user/user.typeDefs';
-import { IDefaults } from '@redux/typedefs';
+import { TGetAllDigitalContractsSuccess } from '@app/redux/digitalContract/digitalContract.typeDefs';
+import { IUserData } from '@app/redux/user/user.typeDefs';
+import { IDefaults } from '@app/redux/typedefs';
 import { AxiosError } from 'axios';
 
 

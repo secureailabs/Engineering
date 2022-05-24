@@ -4,7 +4,7 @@ import Table from '@components/Table';
 
 import { TVirtualMachinesSuccessProps } from './VirtualMachines.types';
 
-import { TGetVirtualMachineSuccess } from '@redux/virtualMachineManager/virtualMachineManager.typeDefs';
+import { TGetVirtualMachineSuccess } from '@app/redux/virtualMachineManager/virtualMachineManager.typeDefs';
 
 import TableFilter from '@secureailabs/web-ui/components/TableFilter';
 

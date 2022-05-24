@@ -7,25 +7,21 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
-import { Provider } from 'react-redux';
-import { store, persistor } from './redux/store';
-import { PersistGate } from 'redux-persist/integration/react';
-
 import { BrowserRouter } from 'react-router-dom';
 
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 const queryClient = new QueryClient()
 
 ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-    <Provider store={store}>
+    {/* <Provider store={store}> */}
         <BrowserRouter>
           <App />
           {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </BrowserRouter>
-    </Provider>
+    {/* </Provider> */}
     </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root')

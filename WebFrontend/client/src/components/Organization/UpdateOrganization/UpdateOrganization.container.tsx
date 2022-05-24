@@ -5,13 +5,13 @@ import {
   putOrganizationStart,
   putOrganizationReset,
   getOrganizationStart,
-} from '@redux/organization/organization.actions';
+} from '@app/redux/organization/organization.actions';
 import UpdateOrganization from './UpdateOrganization.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
-import { selectOrganization } from '@redux/organization/organization.selectors';
-import { selectUser } from '@redux/user/user.selectors';
-import { TPutOrganizationStart } from '@redux/organization/organization.typeDefs';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
+import { selectOrganization } from '@app/redux/organization/organization.selectors';
+import { selectUser } from '@app/redux/user/user.selectors';
+import { TPutOrganizationStart } from '@app/redux/organization/organization.typeDefs';
 
 const mapStateToProps = (state: IState) => {
   return {

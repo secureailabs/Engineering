@@ -6,7 +6,7 @@ import {
   PayloadAction,
 } from 'typesafe-actions';
 
-import type { IDefaults } from '@redux/typedefs';
+import type { IDefaults } from '@app/redux/typedefs';
 
 import type {
   TPostFeedStart,

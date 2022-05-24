@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy, tokenConfig } from '@redux/utils';
+import { axiosProxy, tokenConfig } from '@app/redux/utils';
 
 import {
   TPutOrganizationStart,
@@ -9,7 +9,7 @@ import {
   TGetOrganizationStart,
 } from './organization.typeDefs';
 
-import type { IDefaults } from '@redux/typedefs';
+import type { IDefaults } from '@app/redux/typedefs';
 
 export const putOrganizationAPI = ({
   data,

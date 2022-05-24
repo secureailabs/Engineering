@@ -11,10 +11,10 @@ import Spinner from '@components/Spinner/SpinnerOnly.component';
 import { TDatasetVersionProps } from './DatasetVersion.types';
 
 import DatasetVersionSuccess from './DatasetVersion.success';
-import { TGetDatasetVersionSuccess, TGetDatasetSuccess } from '@redux/dataset/dataset.typeDefs';
+import { TGetDatasetVersionSuccess, TGetDatasetSuccess } from '@app/redux/dataset/dataset.typeDefs';
 import DatasetVersionFailure from "./DatasetVersion.failure";
 import { useQuery } from 'react-query';
-import { demo_data } from "@redux/dataset/dataset.data";
+import { demo_data } from "@app/redux/dataset/dataset.data";
 
 
 

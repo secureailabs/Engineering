@@ -25,7 +25,7 @@ import type {
   TGetAllVirtualMachinesSuccess,
 } from './virtualMachineManager.typeDefs';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IVirtualMachineState {
   // GET ONE

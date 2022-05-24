@@ -14,7 +14,6 @@ const ProtectedRoute: React.FC<IProtectedRoutes> = ({
   const userState = useQueryClient().getQueryState('userData')
   
   const { pathname } = useLocation();
-  console.log(userState)
   // check if user finished loading, else run spinner
   if (userState && !userState.isFetching) {
     // if there is not user, render register page

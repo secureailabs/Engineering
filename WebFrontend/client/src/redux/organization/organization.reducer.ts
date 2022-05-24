@@ -19,7 +19,7 @@ import type {
   TPutOrganizationSuccess,
 } from './organization.typeDefs';
 
-import { IDefaults } from '@redux/typedefs';
+import { IDefaults } from '@app/redux/typedefs';
 
 export interface IOrganizationState {
   // GET ONE

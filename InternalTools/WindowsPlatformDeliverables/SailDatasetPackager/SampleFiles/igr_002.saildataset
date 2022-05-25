@@ -1,0 +1,8 @@
+DatasetProperty,Title,"KCA Consortium Data - KCA"
+DatasetProperty,Description,"Patient data from the KCA patient arm. Covers patients registered from May, 2021 to present. Historical longitudinal data may go back several years. Conforms to KCA Consortium Data Model ver 1.0"
+DatasetProperty,Tags,""
+DatasetProperty,DatasetFamily,""
+DatasetProperty,DatasetFamilyDescription,""
+TablePackage,"igr_002_a.sailtable"
+TablePackage,"igr_002_b.sailtable"
+TablePackage,"igr_002_c.sailtable"

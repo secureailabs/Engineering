@@ -1,0 +1,8 @@
+DatasetProperty,Title,"KCA Consortium Data - CRH"
+DatasetProperty,Description,"Patient data derived from internal kidney cancer patient registry. Covers patient data collected from 1980 to present. Conforms to KCA Consortium Data Model ver 1.0"
+DatasetProperty,Tags,""
+DatasetProperty,DatasetFamily,""
+DatasetProperty,DatasetFamilyDescription,""
+TablePackage,"mgr_001_a.sailtable"
+TablePackage,"mgr_001_b.sailtable"
+TablePackage,"mgr_001_c.sailtable"

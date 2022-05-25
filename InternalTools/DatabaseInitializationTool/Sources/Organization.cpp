@@ -25,7 +25,8 @@ static const std::string gsc_strDefaultPassword{"SailPassword@123"};
 
 Organization::Organization(
     _in const std::string & c_strOrganizationName,
-    _in const StructuredBuffer & c_oOrganizationalData
+    _in const StructuredBuffer & c_oOrganizationalData,
+    _in unsigned int unStepIdentifier
     )
 {
     __DebugFunction();
@@ -93,25 +94,7 @@ Organization::Organization(
             }
         }
     }
-    // Extract the datasets
-    if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
-    {
-        StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
-        oDatasets.RemoveElement("__IsArray__");
-        for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
-        {
-            StructuredBuffer oDatasetInformation{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
-            std::string strDatasetFilename = oDatasetInformation.GetString("File");
-            if (true == std::filesystem::exists(strDatasetFilename))
-            {
-                // Just a reality check to make sure the target file is in fact a properly formatted dataset
-                Dataset oDataset(strDatasetFilename.c_str());
-                // Now we persist the dataset information
-                Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
-                m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
-            }
-        }
-    }
+    
     // Extract the dataset families
     if (true == c_oOrganizationalData.IsElementPresent("DatasetFamilies", INDEXED_BUFFER_VALUE_TYPE))
     {
@@ -122,12 +105,36 @@ Organization::Organization(
             StructuredBuffer oDatasetFamily{oDatasetFamilies.GetStructuredBuffer(c_strElementName.c_str())};
             if ((true == oDatasetFamily.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDatasetFamily.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDatasetFamily.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
+                std::cout << oDatasetFamily.GetString("Title") << std::endl;
                 // Insert the contact m_stlContacts
                 m_stlDatasetFamilies.insert(oDatasetFamily.GetBase64SerializedBuffer());
             }
             else
             {
                 std::cout << "ERROR: Invalid dataset family entry encountered" << std::endl;
+            }
+        }
+    }
+        
+    if (1 != unStepIdentifier)
+    {
+        // Extract the datasets
+        if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
+        {
+            StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
+            oDatasets.RemoveElement("__IsArray__");
+            for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
+            {
+                StructuredBuffer oDatasetInformation{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
+                std::string strDatasetFilename = oDatasetInformation.GetString("File");
+                if (true == std::filesystem::exists(strDatasetFilename))
+                {
+                    // Just a reality check to make sure the target file is in fact a properly formatted dataset
+                    Dataset oDataset(strDatasetFilename.c_str());
+                    // Now we persist the dataset information
+                    Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
+                    m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
+                }
             }
         }
     }
@@ -145,8 +152,7 @@ Organization::~Organization(void)
 bool __thiscall Organization::Register(
     _in const std::string & c_strSailPlatformServicesIpAddress,
     _in Word wSailPlatformServicesPortNumber,
-    _in unsigned int unStepIdentifier,
-    _in bool fDeleteDatabase
+    _in unsigned int unStepIdentifier
     ) throw()
 {
     __DebugFunction();
@@ -161,21 +167,20 @@ bool __thiscall Organization::Register(
         // Step 3 --> Do nothing, we are only registering Digital Contracts
         // Step 4 --> Register everything
         if (1 == unStepIdentifier)
-        {
-            // When we register the very first organization, we get a flag asking us to
-            // first delete the database
-            if (true == fDeleteDatabase)
-            {
-                SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
-                oSailPlatformServicesSession.ResetDatabase();
-            }
-            
+        {   
+            std::cout << "001" << std::endl;
             this->RegisterOrganization();
+            std::cout << "002" << std::endl;
             this->RegisterAdministrators();
+            std::cout << "003" << std::endl;
             this->RegisterContacts();
+            std::cout << "004" << std::endl;
             this->RegisterUsers();
+            std::cout << "005" << std::endl;
             this->RegisterDataFederations();
+            std::cout << "006" << std::endl;
             this->RegisterDatasetFamilies();
+            std::cout << "007" << std::endl;
             m_fRegistered = true;
         }
         else if (2 == unStepIdentifier)
@@ -185,15 +190,6 @@ bool __thiscall Organization::Register(
         }
         else if (4 == unStepIdentifier)
         {
-            // When we register the very first organization, we get a flag asking us to
-            // first delete the database
-            
-            if (true == fDeleteDatabase)
-            {
-                SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
-                oSailPlatformServicesSession.ResetDatabase();
-            }
-            
             this->RegisterOrganization();
             this->RegisterAdministrators();
             this->RegisterContacts();
@@ -589,6 +585,8 @@ void __thiscall Organization::RegisterDatasetFamilies(void)
         m_strDatasetFamilyIdentifiers[qwHashOfDatasetFamilyName] = strDatasetFamilyIdentifier;
         // Move on to the next item
         c_stlIterator++;
+        
+        std::cout << "Registered data family " << oDatasetFamily.GetString("Title") << std::endl;
     }
 }
 

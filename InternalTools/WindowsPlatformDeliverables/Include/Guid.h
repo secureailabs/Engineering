@@ -21,7 +21,9 @@ typedef enum name
 {
     eRaw = 1,
     eHyphensOnly = 2,
-    eHyphensAndCurlyBraces = 3
+    eHyphensAndCurlyBraces = 3,
+    eForceRaw = 4,
+    eForceHyphensAndCurlyBraces = 5
 }
 GuidFormat;
 
@@ -149,6 +151,11 @@ class Guid : public Object
 
     private:
 
+        void __thiscall ConvertHexadecimalSubStringIntoIdentifierComponent(
+            _in const std::string & strHexadecimalString,
+            _in unsigned int unStartingOffset,
+            _in unsigned int unLength
+            );
         void __thiscall InitializeFromString(
             _in const char * c_szGuid
             );

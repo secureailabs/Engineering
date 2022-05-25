@@ -153,4 +153,7 @@
     <Content Include="SAIL Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /B /Y "$(ProjectDir)SampleFiles\*.*" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -243,6 +243,27 @@ namespace SailTablePackagerForCsv
         }
 
         /// <summary>
+        /// Method needed to convert escape characters in a string properly to write to file
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private static string ToLiteral(
+            string input
+            )
+        {
+            using (var writer = new StringWriter())
+            {
+                using (var provider = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("CSharp"))
+                {
+                    provider.GenerateCodeFromExpression(new System.CodeDom.CodePrimitiveExpression(input), writer, new System.CodeDom.Compiler.CodeGeneratorOptions { IndentString = "\t" });
+                    var literal = writer.ToString();
+                    literal = literal.Replace(string.Format("\" +{0}\t\"", Environment.NewLine), "");
+                    return literal;
+                }
+            }
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
@@ -261,7 +282,9 @@ namespace SailTablePackagerForCsv
                 string outputString = null;
                 if ("System.String" == propertyValue.GetType().ToString())
                 {
-                    outputString = "TableProperty," + propertyName + "," + propertyValue.GetType() + ",\"" + propertyValue.ToString() + "\"";
+                    // We need to escape the string in case it contains special characters
+                    string stringValue = propertyValue.ToString();
+                    outputString = "TableProperty," + propertyName + "," + propertyValue.GetType() + "," + TableProperties.ToLiteral(propertyValue.ToString());
                 }
                 else if ("System.Char" == propertyValue.GetType().ToString())
                 {
@@ -294,7 +317,7 @@ namespace SailTablePackagerForCsv
                     string outputString = null;
                     if ("System.String" == propertyValue.GetType().ToString())
                     {
-                        outputString = "ColumnProperty," + index + "," + propertyName + "," + propertyValue.GetType() + ",\"" + propertyValue.ToString() + "\"";
+                        outputString = "ColumnProperty," + index + "," + propertyName + "," + propertyValue.GetType() + "," + TableProperties.ToLiteral(propertyValue.ToString());
                     }
                     else if ("System.Char" == propertyValue.GetType().ToString())
                     {
@@ -390,16 +413,13 @@ namespace SailTablePackagerForCsv
                             }
                             break;
                         case "System.Boolean"
-                        :
-                            this.SetColumnProperty(index, record[2], bool.Parse(record[4]));
+                        :   this.SetColumnProperty(index, record[2], bool.Parse(record[4]));
                             break;
                         case "System.Char"
-                        :
-                            this.SetColumnProperty(index, record[2], char.Parse(record[4]));
+                        :   this.SetColumnProperty(index, record[2], char.Parse(record[4]));
                             break;
                         case "System.Int32"
-                        :
-                            this.SetColumnProperty(index, record[2], Int32.Parse(record[4]));
+                        :   this.SetColumnProperty(index, record[2], Int32.Parse(record[4]));
                             break;
                         default
                         :

@@ -100,8 +100,11 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetListOfDatasetFamilyIdentifiers(
             strCommaDelimitedListOfDatasetFamilyIdentifiers += strDatasetFamilyIdentifier;
             strCommaDelimitedListOfDatasetFamilyIdentifiers.push_back(',');
         }
-        // Delete the last character in the string, since it's a superfluous comma
-        strCommaDelimitedListOfDatasetFamilyIdentifiers.erase(strCommaDelimitedListOfDatasetFamilyIdentifiers.end() - 1);
+        if (0 < strCommaDelimitedListOfDatasetFamilyIdentifiers.length())
+        {
+            // Delete the last character in the string, since it's a superfluous comma
+            strCommaDelimitedListOfDatasetFamilyIdentifiers.erase(strCommaDelimitedListOfDatasetFamilyIdentifiers.end() - 1);
+        }
     }
 
     catch (const BaseException & c_oBaseException)

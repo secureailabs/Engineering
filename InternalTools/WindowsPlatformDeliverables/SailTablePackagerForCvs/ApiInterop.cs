@@ -8,7 +8,7 @@ public class ApiInterop
     /// </summary>
     /// <returns></returns>
     [DllImport("kernel32")]
-    static extern public int AllocConsole();
+    static extern public int AttachConsole(uint processIdentifier);
 
     /// <summary>
     /// 

@@ -97,7 +97,9 @@ namespace SailTablePackagerForCsv
         /// 
         /// </summary>
         /// <returns></returns>
-        public void PackageTable()
+        public void PackageTable(
+            bool runSilent
+            )
         {
             try
             {
@@ -132,7 +134,10 @@ namespace SailTablePackagerForCsv
                 }
                 // Now we commit the CsvFile to disk. We need to do a fixup on the title first
                 ApiInterop.CompleteTablePackageFile(m_TableProperties.Identifier, m_TableProperties.GetTableProperty("Title"), m_TableProperties.GetTableProperty("Description"), m_TableProperties.GetTableProperty("Tags"), m_TableProperties.ColumnCount, (int) m_NotificationsAndProgressTracker.Progress);
-                m_NotificationsAndProgressTracker.AddNotification("Done!!!");
+                if (false == runSilent)
+                {
+                    m_NotificationsAndProgressTracker.AddNotification("Done!!!");
+                }
                 m_NotificationsAndProgressTracker.Done = true;
             }
 

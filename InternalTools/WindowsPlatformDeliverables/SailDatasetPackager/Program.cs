@@ -13,17 +13,12 @@ namespace SailDatasetPackager
         /// </summary>
         static void PrintUsage()
         {
-            Console.WriteLine("Usage: SailDatasetPackager.exe --template <templateFilename> [--workingfolder]");
-            Console.WriteLine("       SailDatasetPackager.exe --template <templateFilename> --datasetfilename <datasetFilename> --publish --sailplatformaddress <address> --username <username> --password <password> [--workingfolder]");
+            Console.WriteLine("Usage: SailDatasetPackager.exe --template <templateFilename> --datasetfilename <datasetFilename> --sailplatformaddress <address> --username <username> --password <password> [--workingfolder <workingFolder>]");
             Console.WriteLine("");
             Console.WriteLine("where:");
             Console.WriteLine("");
-            Console.WriteLine("  --template,            A mandatory binary command line argument used to specify the input template");
-            Console.WriteLine("                         to used.");
-            Console.WriteLine("  --datasetfilename,     An optional binary command line argument used to specify the name of the");
-            Console.WriteLine("                         dataset file used to package the dataset automatically.");
-            Console.WriteLine("  --publish,             An optional unary command line argument used to specify whether or not the");
-            Console.WriteLine("                         newly packaged dataset should be published to the SAIL Platform automatically.");
+            Console.WriteLine("  --template,            A mandatory argument used to specify the input template to be used.");
+            Console.WriteLine("  --datasetfilename,     A mandatory argument used to specify the output dataset filename to be used.");
             Console.WriteLine("  --sailplatformaddress, An optional binary command line argument that must be specified is --publish");
             Console.WriteLine("                         is used. Represents the SAIL platform address.");
             Console.WriteLine("  --username,            An optional binary command line argument that must be specified is --publish");
@@ -43,32 +38,30 @@ namespace SailDatasetPackager
             string[] arguments
             )
         {
+            int returnValue = -1;
             DatasetProperties datasetProperties = null;
             NotificationsAndProgressTracker notificationsAndProgressTracker = new NotificationsAndProgressTracker();
 
             if (0 < arguments.Length)
             {
-                ApiInterop.AllocConsole();
+                // Attach to the current console. Use 0xFFFFFFFF to use the current process
+                ApiInterop.AttachConsole(0xFFFFFFFF);
 
-                Console.WriteLine("===========================================================================================================");
-                Console.WriteLine("SAIL Dataset Packager v1.0");
-                Console.WriteLine("Copyright (C) 2021 Secure AI Labs Inc., All Rights Reserved.");
-                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
-                Console.WriteLine("");
-
+                // Extract the required command line parameters. What we need is
+                // the template file, the source csv file and the destination file
+                string originalWorkingFolder = System.IO.Directory.GetCurrentDirectory();
                 string templateFilename = null;
                 string datasetFilename = null;
                 string sailPlatformAddress = null;
                 string username = null;
                 string password = null;
-                bool publishDataset = false;
-
+                
                 // The index is incremented by the loop, but within the loop, binary arguments require the
                 // index to be manually incremented to skip an argument (i.e. the value of a binary argument).
                 // Unary arguments don't need that.
                 for (int index = 0; index < arguments.Length; index++)
                 {
-                    if ("--template" == arguments[index])
+                    if ("--template" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
@@ -76,7 +69,7 @@ namespace SailDatasetPackager
                             index++;
                         }
                     }
-                    else if ("--datasetfilename" == arguments[index])
+                    else if ("--datasetfilename" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
@@ -84,11 +77,7 @@ namespace SailDatasetPackager
                             index++;
                         }
                     }
-                    else if ("--publish" == arguments[index])
-                    {
-                        publishDataset = true;
-                    }
-                    else if ("--sailplatformaddress" == arguments[index])
+                    else if ("--sailplatformaddress" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
@@ -96,7 +85,7 @@ namespace SailDatasetPackager
                             index++;
                         }
                     }
-                    else if ("--username" == arguments[index])
+                    else if ("--username" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
@@ -104,7 +93,7 @@ namespace SailDatasetPackager
                             index++;
                         }
                     }
-                    else if ("--password" == arguments[index])
+                    else if ("--password" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
@@ -112,7 +101,7 @@ namespace SailDatasetPackager
                             index++;
                         }
                     }
-                    else if ("--workingfolder" == arguments[index])
+                    else if ("--workingfolder" == arguments[index].ToLower())
                     {
                         System.IO.Directory.SetCurrentDirectory(arguments[index + 1]);
                     }
@@ -125,51 +114,35 @@ namespace SailDatasetPackager
                     }
                 }
 
-                // First we check for an instant error, which is to specify --publish, but then fail to specify username and password
-                if ((true == publishDataset)&&((null == username) || (null == password) || (null == sailPlatformAddress)))
+                if ((null == templateFilename)||(null == datasetFilename)||(null == username)||(null == password)||(null == sailPlatformAddress))
                 {
-                    Console.WriteLine("ERROR: Missing <address>,<username> or <password> parameters required when the --publish parameter is specified.");
-                    Console.WriteLine("");
-                }
-                else if (null != templateFilename)
-                {
-                    if (null == datasetFilename)
-                    {
-                        // A template was specified, but not a datasetFilename. This means that the user 
-                        datasetProperties = new DatasetProperties(templateFilename);
-                        Application.EnableVisualStyles();
-                        Application.SetCompatibleTextRenderingDefault(false);
-                        Application.Run(new MainDialog(ref datasetProperties, ref notificationsAndProgressTracker));
-                    }
-                    else
-                    {
-                        datasetProperties = new DatasetProperties(templateFilename);
-                        DatasetPackagerCli datasetPackagerCli = new DatasetPackagerCli(ref datasetProperties, ref notificationsAndProgressTracker, datasetFilename);
-                        datasetPackagerCli.PackageDataset(publishDataset, sailPlatformAddress, username, password);
-                        Console.WriteLine("");
-                        Console.WriteLine("------------------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("Press a key when done");
-                        Console.ReadKey();
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("ERROR: Missing command line parameters.");
+                    Console.WriteLine("ERROR: Missing command line parameter(s).");
                     Console.WriteLine("");
                     Program.PrintUsage();
+                    Application.Exit();
                 }
+
+                // Package up the dataset
+                datasetProperties = new DatasetProperties(templateFilename);
+                DatasetPackagerCli datasetPackagerCli = new DatasetPackagerCli(ref datasetProperties, ref notificationsAndProgressTracker, datasetFilename);
+                datasetPackagerCli.PackageDataset(sailPlatformAddress, username, password);
+                returnValue = 0;
+
+                // Restore the original working folder
+                System.IO.Directory.SetCurrentDirectory(originalWorkingFolder);
             }
             else
             {
-                // Everything is from scratch
+                // Everything is from scratch through the GUI
                 datasetProperties = new DatasetProperties();
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 //Application.Run(new StructuredBufferTestDialog());
                 Application.Run(new MainDialog(ref datasetProperties, ref notificationsAndProgressTracker));
+                returnValue = 0;
             }
 
-            return 0;
+            return returnValue;
         }
     }
 }

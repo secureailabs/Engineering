@@ -52,7 +52,7 @@ Guid::Guid(void)
     uuid_generate(oUniqueIdentifier);
     m_stlRawData.resize(16);
     ::memcpy((void *) m_stlRawData.data(), (void *) &oUniqueIdentifier, 16);
-    // Because linux sucks, the endianness of the UUID is not compatible with RFC 4122, section 4.1.2
+    // The endianness of the UUID in Linux is not compatible with RFC 4122, section 4.1.2
     // Most of the bits are random, but we need to switch out bytes at ince 6 and 7
     Byte bByteSeven = m_stlRawData[7];
     m_stlRawData[7] = m_stlRawData[6];
@@ -110,7 +110,7 @@ Guid::Guid(
     ::uuid_generate(oUniqueIdentifier);
     m_stlRawData.resize(16);
     ::memcpy((void *) m_stlRawData.data(), (void *) &oUniqueIdentifier, 16);
-    // Because linux sucks, the endianness of the UUID is not compatible with RFC 4122, section 4.1.2
+    // The endianness of the UUID in Linux is not compatible with RFC 4122, section 4.1.2
     // Most of the bits are random, but we need to switch out bytes at ince 6 and 7
     Byte bByteSeven = m_stlRawData[7];
     m_stlRawData[7] = m_stlRawData[6];

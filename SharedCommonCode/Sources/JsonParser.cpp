@@ -130,6 +130,7 @@ static std::string __stdcall ParseJsonString(
     bool fDone = false;
     unsigned int unCurrentOffset = *punOffset;
     unsigned int unTemporaryStringSize = 0;
+    unsigned int unActualStringSize = 0;
     char szTemporaryString[1000];
     std::string strReturnString;
 
@@ -729,10 +730,34 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
             }
             else if (FLOAT32_VALUE_TYPE == bElementType)
             {
-                strJsonString += strIndentationHeader + strElementName + std::to_string(c_oStructuredBuffer.GetFloat32(c_strElementName.c_str()));
+                // If the float value has .00000 decimal component, output as integer
+                float32_t fl32Value = c_oStructuredBuffer.GetFloat32(c_strElementName.c_str());
+                if (0 == (fl32Value % 1))
+                {
+                    uint32_t un32Value = (uint32_t) fl32Value;
+                    
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(un32Value);
+                }
+                else
+                {
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(fl32Value);
+                }
             }
             else if (FLOAT64_VALUE_TYPE == bElementType)
             {
+                // If the float value has .00000 decimal component, output as integer
+                float64_t fl64Value = c_oStructuredBuffer.GetFloat64(c_strElementName.c_str());
+                if (0 == (fl64Value % 1))
+                {
+                    uint64_t un32Value = (uint64_t) fl64Value;
+                    
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(un64Value);
+                }
+                else
+                {
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(fl64Value);
+                }
+                
                 strJsonString += strIndentationHeader + strElementName + std::to_string(c_oStructuredBuffer.GetFloat64(c_strElementName.c_str()));
             }
             else if (INT8_VALUE_TYPE == bElementType)

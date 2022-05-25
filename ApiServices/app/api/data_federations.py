@@ -31,6 +31,23 @@ DB_COLLECTION_DATA_FEDERATIONS = "data-federations"
 router = APIRouter()
 
 
+def getForgetPasswordContent(secret: str):
+    htmlText = (
+        """
+        <html>
+            <head></head>
+            <body>
+                Hello, <br><br> <br>Visit to reset your password:
+                    <a href = "http://www.secureailabs.com">http://www.secureailabs.com/"""
+        + secret
+        + """</a>
+            </body>
+        </html>
+    """
+    )
+    return htmlText
+
+
 ########################################################################################################################
 @router.post(
     path="/data-federations",
@@ -205,7 +222,7 @@ async def get_data_federation(data_federation_id: PyObjectId, current_user: Toke
 ########################################################################################################################
 @router.put(
     path="/data-federations/{data_federation_id}",
-    description="Update dataset information",
+    description="Update data federation information",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def update_data_federation(
@@ -225,7 +242,7 @@ async def update_data_federation(
         if data_federation_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        # TODO: Prawal find better way to update the dataset
+        # TODO: Prawal find better way to update the data federation
         if updated_data_federation_info.description:
             data_federation_db.description = updated_data_federation_info.description
 
@@ -246,9 +263,51 @@ async def update_data_federation(
 
 
 ########################################################################################################################
+@router.put(
+    path="/data-federations/{data_federation_id}/researcher/{organization_id}",
+    description="Invite a researcher to join a data federation",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def invite_researcher(
+    data_federation_id: PyObjectId, organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+):
+    try:
+        data_federation_db = await data_service.find_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+        )
+        if not data_federation_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+
+        data_federation_db = DataFederation_Db(**data_federation_db)
+        # If the organization is already part of the data federation, then return 200 OK
+        if (organization_id in data_federation_db.research_organizations_id) or (
+            organization_id in data_federation_db.invites_id
+        ):
+            return Response(status_code=status.HTTP_200_OK)
+
+        # If the organization is not part of the data federation, then add it to the invites list
+        data_federation_db.invites_id.append(organization_id)
+
+        # Create a background process to send the invitation email
+
+        await data_service.update_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id)},
+            {"$set": jsonable_encoder(data_federation_db)},
+        )
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+########################################################################################################################
 @router.delete(
     path="/data-federations/{data_federation_id}",
-    description="Disable the dataset",
+    description="Disable the data federation",
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,
 )
@@ -267,7 +326,7 @@ async def soft_delete_data_federation(
         if data_federation_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        # Disable the dataset
+        # Disable the data federation
         data_federation_db.state = DataFederationState.INACTIVE
         await data_service.update_one(
             DB_COLLECTION_DATA_FEDERATIONS,

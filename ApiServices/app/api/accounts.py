@@ -260,16 +260,15 @@ async def register_user(
 )
 async def get_users(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
+        # User must be part of same organization
+        if organization_id != current_user.organization_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         # Get the organization information
         organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
         if not organization_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User organization not found")
         organization_db = Organization_db(**organization_db)
-
-        # User must be part of same organization
-        if organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         users = await data_service.find_by_query(DB_COLLECTION_USERS, {"organization_id": str(organization_id)})
 

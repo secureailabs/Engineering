@@ -18,7 +18,6 @@ from models.authentication import LoginSuccess_Out, RefreshToken_In, TokenData
 from models.common import BasicObjectInfo
 from passlib.context import CryptContext
 
-########################################################################################################################
 DB_COLLECTION_USERS = "users"
 DB_COLLECTION_ORGANIZATIONS = "organizations"
 
@@ -42,12 +41,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 20
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-########################################################################################################################
 def get_password_hash(salt, password):
     return pwd_context.hash(salt + password + PASSWORD_PEPPER)
 
 
-########################################################################################################################
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -58,7 +55,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
         token_data = TokenData(**payload)
         user_id = token_data.id
-        if user_id is None:
+        if not user_id:
             raise credentials_exception
     except JWTError as exception:
         raise credentials_exception
@@ -70,7 +67,7 @@ class RoleChecker:
     def __init__(self, allowed_roles: List[UserRole]):
         self.allowed_roles = allowed_roles
 
-    def __call__(self, user: User_Db = Depends(get_current_user)):
+    def __call__(self, user: TokenData = Depends(get_current_user)):
         if user.role not in self.allowed_roles:
             raise HTTPException(status_code=403, detail="Operation not permitted")
 
@@ -90,7 +87,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
 
     found_user = await data_service.find_one(DB_COLLECTION_USERS, {"email": form_data.username})
-    if found_user is None:
+    if not found_user:
         raise exception_authentication_failed
 
     found_user_db = User_Db(**found_user)
@@ -128,11 +125,11 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
         payload = jwt.decode(refresh_token_request.refresh_token, REFRESH_SECRET, algorithms=[ALGORITHM])
         token_data = TokenData(**payload)
         user_id = token_data.id
-        if user_id is None:
+        if not user_id:
             raise credentials_exception
 
         found_user = await data_service.find_one(DB_COLLECTION_USERS, {"_id": str(user_id)})
-        if found_user is None:
+        if not found_user:
             raise credentials_exception
 
         found_user_db = User_Db(**found_user)
@@ -173,7 +170,7 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
 )
 async def get_current_user_info(current_user: User_Db = Depends(get_current_user)):
     found_user = await data_service.find_one(DB_COLLECTION_USERS, {"_id": str(current_user.id)})
-    if found_user is None:
+    if not found_user:
         raise HTTPException(status_code=404, detail="User not found")
     found_user_db = User_Db(**found_user)
 
@@ -181,7 +178,7 @@ async def get_current_user_info(current_user: User_Db = Depends(get_current_user
     found_organization = await data_service.find_one(
         DB_COLLECTION_ORGANIZATIONS, {"_id": str(found_user_db.organization_id)}
     )
-    if found_organization is None:
+    if not found_organization:
         raise HTTPException(status_code=404, detail="Organization not found")
     found_organization_db = Organization_db(**found_organization)
 

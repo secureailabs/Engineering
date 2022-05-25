@@ -5,8 +5,6 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
-from typing import List
-
 from app.api.authentication import RoleChecker, get_current_user, get_password_hash
 from app.data import operations as data_service
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
@@ -31,7 +29,6 @@ from models.accounts import (
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 
-########################################################################################################################
 DB_COLLECTION_ORGANIZATIONS = "organizations"
 DB_COLLECTION_USERS = "users"
 
@@ -51,7 +48,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
     try:
         # Check if the admin is already registered
         user_db = await data_service.find_one(DB_COLLECTION_USERS, {"email": organization.admin_email})
-        if user_db is not None:
+        if user_db:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already registered")
 
         # Add the organization to the database if it doesn't already exists
@@ -71,7 +68,6 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
         )
 
         admin_user = await data_service.insert_one(DB_COLLECTION_USERS, jsonable_encoder(admin_user_db))
-        print(admin_user)
 
         return organization_db
     except HTTPException as http_exception:
@@ -117,7 +113,7 @@ async def get_all_organizations(current_user: TokenData = Depends(get_current_us
 async def get_organization(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
         organization = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
-        if organization is None:
+        if not organization:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
         return organization
     except HTTPException as http_exception:
@@ -144,17 +140,17 @@ async def update_organization(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
-        if organization_db is None:
+        if not organization_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
 
         organization_db = Organization_db(**organization_db)
-        if update_organization_info.name is not None:
+        if update_organization_info.name:
             organization_db.name = update_organization_info.name
 
-        if update_organization_info.description is not None:
+        if update_organization_info.description:
             organization_db.description = update_organization_info.description
 
-        if update_organization_info.avatar is not None:
+        if update_organization_info.avatar:
             organization_db.avatar = update_organization_info.avatar
 
         await data_service.update_one(
@@ -184,7 +180,7 @@ async def soft_delete_organization(organization_id: PyObjectId, current_user: To
         # TODO: Transaction. Make this atomic transaction
         # Check if the organization exists
         organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
-        if organization_db is None:
+        if not organization_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
 
         # Disable all the users except admin
@@ -232,7 +228,7 @@ async def register_user(
 
         # Check if the user already exists
         user_db = await data_service.find_one(DB_COLLECTION_USERS, {"email": str(user.email)})
-        if user_db is not None:
+        if user_db:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
 
         # Create the user and add it to the database
@@ -267,7 +263,7 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
 
         # Get the organization information
         organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
-        if organization_db is None:
+        if not organization_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User organization not found")
         organization_db = Organization_db(**organization_db)
 
@@ -311,7 +307,7 @@ async def get_user(
         user_db = await data_service.find_one(
             DB_COLLECTION_USERS, {"_id": str(user_id), "organization_id": str(organization_id)}
         )
-        if user_db is None:
+        if not user_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         user_db = User_Db(**user_db)
 
@@ -319,7 +315,7 @@ async def get_user(
         organization_db = await data_service.find_one(
             DB_COLLECTION_ORGANIZATIONS, {"_id": str(user_db.organization_id)}
         )
-        if organization_db is None:
+        if not organization_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User organization not found")
         organization_db = Organization_db(**organization_db)
 
@@ -351,22 +347,22 @@ async def update_user_info(
         user = await data_service.find_one(
             DB_COLLECTION_USERS, {"_id": str(user_id), "organization_id": str(organization_id)}
         )
-        if user is None:
+        if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         user_db = User_Db(**user)
         # Only admin can update the role and account state
         if current_user.role is UserRole.ADMIN:
-            if update_user_info.role is not None:
+            if update_user_info.role:
                 user_db.role = update_user_info.role
-            if update_user_info.account_state is not None:
+            if update_user_info.account_state:
                 user_db.account_state = update_user_info.account_state
 
         # Other info can be updated by the same user only
         if current_user.id == user_id:
-            if update_user_info.job_title is not None:
+            if update_user_info.job_title:
                 user_db.job_title = update_user_info.job_title
-            if update_user_info.avatar is not None:
+            if update_user_info.avatar:
                 user_db.avatar = update_user_info.avatar
 
         await data_service.update_one(
@@ -401,7 +397,7 @@ async def soft_delete_user(
             user = await data_service.find_one(
                 DB_COLLECTION_USERS, {"_id": str(user_id), "organization_id": str(organization_id)}
             )
-            if user is None:
+            if not user:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
             user_db = User_Db(**user)

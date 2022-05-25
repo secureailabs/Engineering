@@ -5,7 +5,7 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
-from typing import List, Optional
+from typing import Optional
 
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
@@ -25,7 +25,6 @@ from models.datasets import (
     UpdateDataset_In,
 )
 
-########################################################################################################################
 DB_COLLECTION_DATASETS = "datasets"
 
 router = APIRouter()
@@ -46,7 +45,7 @@ async def register_dataset(
     try:
         # Check if the dataset is already registered
         dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_req.id)})
-        if dataset_db is not None:
+        if dataset_db:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dataset already registered")
 
         # Add the dataset to the database
@@ -78,7 +77,7 @@ async def get_all_datasets(
 ):
     try:
         # TODO: Prawal the current user organization is repeated in the request, find a better way
-        if data_owner_id is not None:
+        if data_owner_id:
             query = {"data_owner_id": str(data_owner_id)}
         else:
             query = {}
@@ -115,7 +114,7 @@ async def get_all_datasets(
 async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
         dataset = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
-        if dataset is None:
+        if not dataset:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         # Add the organization information to the dataset
@@ -146,7 +145,7 @@ async def update_dataset(
     try:
         # Dataset must be part of same organization
         dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
-        if dataset_db is None:
+        if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         dataset_db = Dataset_Db(**dataset_db)
@@ -154,16 +153,16 @@ async def update_dataset(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         # TODO: Prawal find better way to update the dataset
-        if updated_dataset_info.description is not None:
+        if updated_dataset_info.description:
             dataset_db.description = updated_dataset_info.description
 
-        if updated_dataset_info.name is not None:
+        if updated_dataset_info.name:
             dataset_db.name = updated_dataset_info.name
 
-        if updated_dataset_info.version is not None:
+        if updated_dataset_info.version:
             dataset_db.version = updated_dataset_info.version
 
-        if updated_dataset_info.keywords is not None:
+        if updated_dataset_info.keywords:
             dataset_db.keywords = updated_dataset_info.keywords
 
         await data_service.update_one(
@@ -188,7 +187,7 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
     try:
         # Dataset must be part of same organization
         dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
-        if dataset_db is None:
+        if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         dataset_db = Dataset_Db(**dataset_db)

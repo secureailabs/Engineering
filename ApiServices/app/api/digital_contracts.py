@@ -1,11 +1,11 @@
 ########################################################################################################################
 # @author Prawal Gangwar
-# @brief APIs to manage datasets
+# @brief APIs to manage digital contracts
 # @License Private and Confidential. Internal Use Only.
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
-from typing import List, Optional
+from typing import Optional
 
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
@@ -27,7 +27,6 @@ from models.digital_contracts import (
     UpdateDigitalContract_In,
 )
 
-########################################################################################################################
 DB_COLLECTION_DIGITAL_CONTRACTS = "digital-contracts"
 
 router = APIRouter()
@@ -49,7 +48,7 @@ async def register_digital_contract(
         # Check of the dataset already exists
         # TODO: Prawal make a HTTP request or use message queues
         dataset_db = await get_dataset(digital_contract_req.dataset_id, current_user)
-        if dataset_db is None:
+        if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         dataset_db = GetDataset_Out(**dataset_db)
@@ -87,13 +86,13 @@ async def get_all_digital_contract(
 ):
     try:
         # TODO: Prawal the current user organization is repeated in the request, find a better way
-        if (data_owner_id is not None) and (data_owner_id == current_user.organization_id):
+        if (data_owner_id) and (data_owner_id == current_user.organization_id):
             query = {"data_owner_id": str(data_owner_id)}
-        elif (researcher_id is not None) and (researcher_id == current_user.organization_id):
+        elif (researcher_id) and (researcher_id == current_user.organization_id):
             query = {"researcher_id": str(researcher_id)}
         elif current_user.role is UserRole.SAIL_ADMIN:
             query = {}
-        elif (researcher_id is None) and (data_owner_id is None):
+        elif (not researcher_id) and (not data_owner_id):
             query = {
                 "$or": [
                     {"researcher_id": str(current_user.organization_id)},
@@ -155,7 +154,7 @@ async def get_digital_contract(digital_contract_id: PyObjectId, current_user: To
         digital_contract = await data_service.find_one(
             DB_COLLECTION_DIGITAL_CONTRACTS, {"_id": str(digital_contract_id)}
         )
-        if digital_contract is None:
+        if not digital_contract:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
 
         digital_contract_db = DigitalContract_Db(**digital_contract)
@@ -207,7 +206,7 @@ async def update_digital_contract(
         digital_contract_db = await data_service.find_one(
             DB_COLLECTION_DIGITAL_CONTRACTS, {"_id": str(digital_contract_id)}
         )
-        if digital_contract_db is None:
+        if not digital_contract_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
 
         digital_contract_db = DigitalContract_Db(**digital_contract_db)
@@ -218,15 +217,15 @@ async def update_digital_contract(
         if digital_contract_db.state == DigitalContractState.NEW:
             # Only information can be updated by the researcher
             if digital_contract_db.researcher_id == current_user.organization_id:
-                if updated_digital_contract_info.name is not None:
+                if updated_digital_contract_info.name:
                     digital_contract_db.name = updated_digital_contract_info.name
-                if updated_digital_contract_info.description is not None:
+                if updated_digital_contract_info.description:
                     digital_contract_db.description = updated_digital_contract_info.description
-                if updated_digital_contract_info.subscription_days is not None:
+                if updated_digital_contract_info.subscription_days:
                     digital_contract_db.subscription_days = updated_digital_contract_info.subscription_days
-                if updated_digital_contract_info.legal_agreement is not None:
+                if updated_digital_contract_info.legal_agreement:
                     digital_contract_db.legal_agreement = updated_digital_contract_info.legal_agreement
-                if updated_digital_contract_info.version is not None:
+                if updated_digital_contract_info.version:
                     digital_contract_db.version = updated_digital_contract_info.version
             # data owner can only accept the request
             elif digital_contract_db.data_owner_id == current_user.organization_id:
@@ -278,7 +277,7 @@ async def soft_delete_digital_contract(
         digital_contract_db = await data_service.find_one(
             DB_COLLECTION_DIGITAL_CONTRACTS, {"_id": str(digital_contract_id)}
         )
-        if digital_contract_db is None:
+        if not digital_contract_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
 
         digital_contract_db = DigitalContract_Db(**digital_contract_db)

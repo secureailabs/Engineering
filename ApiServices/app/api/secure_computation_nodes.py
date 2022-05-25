@@ -8,7 +8,7 @@
 import json
 import subprocess
 from ipaddress import IPv4Address
-from typing import List, Optional
+from typing import Optional
 from uuid import uuid4
 
 import app.azure.azure as azure
@@ -24,7 +24,7 @@ from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import PyObjectId
 from models.datasets import GetDataset_Out
-from models.digital_contracts import DigitalContractState, GetDigitalContract_Out
+from models.digital_contracts import DigitalContractState
 from models.secure_computation_nodes import (
     GetMultipleSecureComputationNode_Out,
     GetSecureComputationNode_Out,
@@ -35,7 +35,6 @@ from models.secure_computation_nodes import (
     UpdateSecureComputationNode_In,
 )
 
-########################################################################################################################
 DB_COLLECTION_SECURE_COMPUTATION_NODE = "secure-computation-node"
 
 router = APIRouter()
@@ -61,7 +60,7 @@ async def register_secure_computation_node(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"name": secure_computation_node_req.name, "researcher_id": str(current_user.organization_id)},
         )
-        if secure_computation_node_db is not None:
+        if secure_computation_node_db:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="Secure Computation Node already registered"
             )
@@ -69,13 +68,13 @@ async def register_secure_computation_node(
         # Check if the digital contract and dataset exist
         # TODO: Prawal make a HTTP request or use message queues
         dataset_db = await get_dataset(secure_computation_node_req.dataset_id, current_user)
-        if dataset_db is None:
+        if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
         dataset_db = GetDataset_Out(**dataset_db)
 
         # Check if the digital contract exists
         digital_contract_db = await get_digital_contract(secure_computation_node_req.digital_contract_id, current_user)
-        if digital_contract_db is None:
+        if not digital_contract_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
 
         # Digital Contract must be activated
@@ -127,13 +126,13 @@ async def get_all_secure_computation_nodes(
 ):
     try:
         # TODO: Prawal the current user organization is repeated in the request, find a better way
-        if (data_owner_id is not None) and (data_owner_id == current_user.organization_id):
+        if (data_owner_id) and (data_owner_id == current_user.organization_id):
             query = {"data_owner_id": str(data_owner_id)}
-        elif (researcher_id is not None) and (researcher_id == current_user.organization_id):
+        elif (researcher_id) and (researcher_id == current_user.organization_id):
             query = {"researcher_id": str(researcher_id)}
         elif current_user.role is UserRole.SAIL_ADMIN:
             query = {}
-        elif (researcher_id is None) and (data_owner_id is None):
+        elif (not researcher_id) and (not data_owner_id):
             query = {
                 "$or": [
                     {"researcher_id": str(current_user.organization_id)},
@@ -206,7 +205,7 @@ async def get_secure_computation_node(
         secure_computation_node = await data_service.find_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE, {"_id": str(secure_computation_node_id)}
         )
-        if secure_computation_node is None:
+        if not secure_computation_node:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Secure Computation Node not found")
 
         secure_computation_node_db = SecureComputationNode_Db(**secure_computation_node)
@@ -261,7 +260,7 @@ async def update_secure_computation_node(
         secure_computation_node_db = await data_service.find_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE, {"_id": str(secure_computation_node_id)}
         )
-        if secure_computation_node_db is None:
+        if not secure_computation_node_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Secure Computation Node not found")
         secure_computation_node_db = SecureComputationNode_Db(**secure_computation_node_db)
 
@@ -304,7 +303,7 @@ async def deprovision_secure_computation_node(
         secure_computation_node_db = await data_service.find_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE, {"_id": str(secure_computation_node_id)}
         )
-        if secure_computation_node_db is None:
+        if not secure_computation_node_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Secure Computation Node not found")
         secure_computation_node_db = SecureComputationNode_Db(**secure_computation_node_db)
 

@@ -1,11 +1,9 @@
 ########################################################################################################################
 # @author Prawal Gangwar
-# @brief APIs to manage datasets
+# @brief APIs to manage dataset families
 # @License Private and Confidential. Internal Use Only.
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
-
-from typing import List
 
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
@@ -25,7 +23,6 @@ from models.datasets_families import (
     UpdateDatasetFamily_In,
 )
 
-########################################################################################################################
 DB_COLLECTION_DATASET_FAMILIES = "dataset-families"
 
 router = APIRouter()
@@ -101,7 +98,7 @@ async def get_all_dataset_families(current_user: TokenData = Depends(get_current
 async def get_dataset_family(dataset_family_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
         dataset_family = await data_service.find_one(DB_COLLECTION_DATASET_FAMILIES, {"_id": str(dataset_family_id)})
-        if dataset_family is None:
+        if not dataset_family:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DatasetFamily not found")
 
         # Add the organization information to the dataset
@@ -132,7 +129,7 @@ async def update_dataset_family(
     try:
         # DatasetFamily must be part of same organization
         dataset_family_db = await data_service.find_one(DB_COLLECTION_DATASET_FAMILIES, {"_id": str(dataset_family_id)})
-        if dataset_family_db is None:
+        if not dataset_family_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DatasetFamily not found")
 
         dataset_family_db = DatasetFamily_Db(**dataset_family_db)
@@ -140,16 +137,16 @@ async def update_dataset_family(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         # TODO: Prawal find better way to update the dataset
-        if updated_dataset_family_info.description is not None:
+        if updated_dataset_family_info.description:
             dataset_family_db.description = updated_dataset_family_info.description
 
-        if updated_dataset_family_info.name is not None:
+        if updated_dataset_family_info.name:
             dataset_family_db.name = updated_dataset_family_info.name
 
-        if updated_dataset_family_info.version is not None:
+        if updated_dataset_family_info.version:
             dataset_family_db.version = updated_dataset_family_info.version
 
-        if updated_dataset_family_info.tag is not None:
+        if updated_dataset_family_info.tag:
             dataset_family_db.tag = updated_dataset_family_info.tag
 
         await data_service.update_one(
@@ -178,7 +175,7 @@ async def soft_delete_dataset_family(
     try:
         # DatasetFamily must be part of same organization
         dataset_family_db = await data_service.find_one(DB_COLLECTION_DATASET_FAMILIES, {"_id": str(dataset_family_id)})
-        if dataset_family_db is None:
+        if not dataset_family_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DatasetFamily not found")
 
         dataset_family_db = DatasetFamily_Db(**dataset_family_db)

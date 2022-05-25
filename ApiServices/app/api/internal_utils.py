@@ -1,14 +1,12 @@
 ########################################################################################################################
 # @author Prawal Gangwar
-# @brief APIs to manage datasets
+# @brief SAIL internal util API functions
 # @License Private and Confidential. Internal Use Only.
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
 from app.data import operations as data_service
 from fastapi import APIRouter, HTTPException, Response, status
-
-########################################################################################################################
 
 router = APIRouter()
 

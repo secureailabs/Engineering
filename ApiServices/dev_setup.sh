@@ -1,4 +1,4 @@
-# Install python3.10
+# Install python3
 sudo apt-get install python3
 
 # Install python venv

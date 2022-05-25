@@ -26,7 +26,6 @@ from models.data_federations import (
     UpdateDataFederation_In,
 )
 
-########################################################################################################################
 DB_COLLECTION_DATA_FEDERATIONS = "data-federations"
 
 router = APIRouter()
@@ -75,15 +74,15 @@ async def get_all_data_federations(
     current_user: TokenData = Depends(get_current_user),
 ):
     try:
-        if (data_submitter_id is not None) and (data_submitter_id == current_user.organization_id):
+        if (data_submitter_id) and (data_submitter_id == current_user.organization_id):
             query = {"data_submitter_id": {"$all": [str(current_user.organization_id)]}}
-        elif (researcher_id is not None) and (researcher_id == current_user.organization_id):
+        elif (researcher_id) and (researcher_id == current_user.organization_id):
             query = {"researcher_id": {"$all": [str(current_user.organization_id)]}}
-        elif data_families_id is not None:
+        elif data_families_id:
             query = {"researcher_id": {"$all": [str(data_families_id)]}}
         elif current_user.role is UserRole.SAIL_ADMIN:
             query = {}
-        elif (data_submitter_id is None) and (researcher_id is None) and (data_families_id is None):
+        elif (not data_submitter_id) and (not researcher_id) and (not data_families_id):
             query = {
                 "$or": [
                     {"organization_id": str(current_user.organization_id)},
@@ -162,7 +161,7 @@ async def get_all_data_federations(
 async def get_data_federation(data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
         data_federation = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
-        if data_federation is None:
+        if not data_federation:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
         data_federation = DataFederation_Db(**data_federation)
@@ -219,7 +218,7 @@ async def update_data_federation(
         data_federation_db = await data_service.find_one(
             DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)}
         )
-        if data_federation_db is None:
+        if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
         data_federation_db = DataFederation_Db(**data_federation_db)
@@ -227,10 +226,10 @@ async def update_data_federation(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         # TODO: Prawal find better way to update the dataset
-        if updated_data_federation_info.description is not None:
+        if updated_data_federation_info.description:
             data_federation_db.description = updated_data_federation_info.description
 
-        if updated_data_federation_info.name is not None:
+        if updated_data_federation_info.name:
             data_federation_db.name = updated_data_federation_info.name
 
         await data_service.update_one(
@@ -261,7 +260,7 @@ async def soft_delete_data_federation(
         data_federation_db = await data_service.find_one(
             DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)}
         )
-        if data_federation_db is None:
+        if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
         data_federation_db = DataFederation_Db(**data_federation_db)

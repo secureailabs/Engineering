@@ -1,31 +1,17 @@
-import { connect } from 'react-redux';
-import { compose, Dispatch } from 'redux';
+import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
 
-import {
-  getAllDatasetsStart,
-  getAllDatasetsReset,
-} from '@app/redux/dataset/dataset.actions';
-import { selectDataset } from '@app/redux/dataset/dataset.selectors';
+import { TGetAllDatasetsSuccess } from '@APIs/dataset/dataset.typeDefs';
+import { getAllDatasetsAPI } from '@APIs/dataset/dataset.apis';
+
 import Datasets from './Datasets.component';
-import { IState } from '@app/redux/root-reducer';
-import { RootAction } from '@app/redux/root.types';
 
-const mapStateToProps = (state: IState) => {
-  return {
-    getAllDatasetsError: selectDataset(state).getAllDatasetsError,
-    getAllDatasetsState: selectDataset(state).getAllDatasetsState,
-    getAllDatasetsData: selectDataset(state).getAllDatasetsData,
-  };
-};
-
-//trying to remove func from dispatch functions
-
-const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => ({
-  getAllDatasetsStart: () => dispatch(getAllDatasetsStart()),
-  getAllDatasetsReset: () => dispatch(getAllDatasetsReset()),
-});
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(
+const DatasetsDashboard: React.FC = () => {
+  const { data, isLoading, status, error, refetch} =
+    // @ts-ignore
+    useQuery<TGetAllDatasetsSuccess['datasets'], AxiosError>(['datasets'], getAllDatasetsAPI);
   //@ts-ignore
-  Datasets
-);
+  return Datasets({ status: status, getAllDatasetsData: data, refetch: refetch, error: error})
+}
+
+export default DatasetsDashboard

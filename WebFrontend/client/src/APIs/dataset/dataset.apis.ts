@@ -3,36 +3,13 @@ import axios, { AxiosResponse } from 'axios';
 import { axiosProxy, tokenConfig } from '@APIs/utils';
 
 import {
-  TPostDatasetStart,
-  TPostDatasetSuccess,
-  TPatchAcceptDatasetStart,
-  TPatchAcceptDatasetSuccess,
-  TPatchActivateDatasetStart,
-  TPatchActivateDatasetSuccess,
+  TGetAllDatasetsStart,
   TGetAllDatasetsSuccess,
   TGetDatasetSuccess,
   TGetDatasetStart,
 } from './dataset.typeDefs';
 
 import type { IDefaults } from '@APIs/typedefs';
-
-export const postDatasetAPI = ({
-  data,
-}: {
-  data: TPostDatasetStart;
-}): Promise<
-  AxiosResponse<{ data: TPostDatasetSuccess }> | IDefaults['error']
-> =>
-  axios
-    .post(
-      `${axiosProxy()}/api/v1/DatasetManager/Application`,
-      { ...data },
-      tokenConfig()
-    )
-    .then((res): AxiosResponse<{ data: TPostDatasetSuccess }> => res)
-    .catch((err): IDefaults['error'] => {
-      throw err;
-    });
 
 export const getDatasetAPI = ({
   data,
@@ -41,9 +18,9 @@ export const getDatasetAPI = ({
 }): Promise<AxiosResponse<{ data: TGetDatasetSuccess }> | IDefaults['error']> =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${data.DatasetGuid
-      }`,
+      `${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${data.dataset_id}`,
       {
+        data: data,
         withCredentials: true,
       }
     )
@@ -52,14 +29,12 @@ export const getDatasetAPI = ({
       throw err;
     });
 
-export const getAllDatasetsAPI = (): Promise<
-  AxiosResponse<{ data: TGetAllDatasetsSuccess }> | IDefaults['error']
-> =>
-  axios
-    .get(`${axiosProxy()}/api/v1/DatasetManager/ListDatasets`, {
-      withCredentials: true,
-    })
-    .then((res): AxiosResponse<{ data: TGetAllDatasetsSuccess }> => res)
-    .catch((err): IDefaults['error'] => {
-      throw err;
-    });
+export const getAllDatasetsAPI = async({data} : {data: TGetAllDatasetsStart}): Promise<TGetAllDatasetsSuccess['datasets']> => {
+  const res = await axios.get<TGetAllDatasetsSuccess>
+    (`${axiosProxy()}/api/v1/datasets`,
+      {
+        data: data,
+        withCredentials: true,
+      });
+  return res.data.datasets;
+}

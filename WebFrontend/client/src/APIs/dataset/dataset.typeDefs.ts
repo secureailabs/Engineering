@@ -1,61 +1,38 @@
-export type TPostDatasetStart = {
-  DataOwnerOrganization: string;
-  Title: string;
-  VersionNumber: string;
-  SubscriptionDays: number;
-  DatasetGuid: string;
-  Description: string;
-  LegalAgreement: string;
-  DatasetDRMMetadataSize: number;
-  DatasetDRMMetadata: string;
-};
-export type TPostDatasetSuccess = null;
-
-export type TPatchAcceptDatasetStart = {
-  DatasetGuid: string;
-  RetentionTime: number;
-  EULA: string;
-  LegalAgreement: number;
-};
-
-export type TPatchAcceptDatasetSuccess = null;
-
-export type TPatchActivateDatasetStart = {
-  DatasetGuid: string;
-  EULA: string;
-  LegalAgreement: number;
-};
-
-export type TPatchActivateDatasetSuccess = null;
+export type TGetAllDatasetsStart = {
+  data_owner_id?: string;
+}
 
 export type TGetAllDatasetsSuccess = {
-  Datasets: Record<string, TGetDatasetSuccess['Dataset']>;
+  datasets: Array<TGetDatasetSuccess>;
 };
 
 
 export type TGetDatasetSuccess = {
-  Dataset: {
-    DataOwnerGuid: string;
-    DatasetGuid: string;
-    DatasetName: string;
-    Description: string;
-    Versions?: Record<string, TGetDatasetSuccess['Dataset']>;
-    Version?: number;
-    JurisdictionalLimitations: string;
-    Comments?: string;
-    Keywords: string;
-    OrganizationName: string;
-    PrivacyLevel: number;
-    PublishDate: number;
-  };
+  id: string;
+  description: string;
+  name: string;
+  keywords: string;
+  version: string;
+  publish_date: number;
+  tables: Array<{
+    id: string;
+    number_of_rows: number;
+    name: string;
+    tags: string;
+    number_of_columns: number;
+    compressed_data_size_in_bytes: number;
+    description: string;
+    all_column_properties: Array<{
+      id: string;
+      units: string;
+      name: string;
+      tags: string;
+      type: string;
+      description: string;
+    }>
+  }>
 };
 
 export type TGetDatasetStart = {
-  DatasetGuid: string;
-};
-
-export type TGetDatasetVersionSuccess = TGetDatasetSuccess;
-
-export type TGetDatasetVersionStart = TGetDatasetStart & {
-  Version: string;
+  dataset_id: string;
 };

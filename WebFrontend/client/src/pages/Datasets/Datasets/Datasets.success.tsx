@@ -5,8 +5,7 @@ import Table from '@components/Table';
 import { TDatasetsSuccessProps } from './Datasets.types';
 
 import Text from '@secureailabs/web-ui/components/Text';
-
-import faker from 'faker';
+import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
 const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
   getAllDatasetsData,
@@ -16,32 +15,24 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
     () => [
       {
         Header: 'Name',
-        accessor: 'DatasetName',
+        accessor: 'name',
         width: 300,
       },
-      // {
-      //   Header: 'No. of Versions',
-      //   accessor: 'Versions',
-      //   width: 300,
-      //   Cell: ({ value }: { value: Record<string, any> }) => (
-      //     <Text color="primary">{Object.keys(value).length}</Text>
-      //   ),
-      // },
       {
         Header: 'Publish Date',
-        accessor: 'PublishDate',
+        accessor: 'publish_date',
         width: 300,
       },
 
       {
         Header: 'Keywords',
-        accessor: 'Keywords',
+        accessor: 'keywords',
 
         width: 200,
       },
       {
         Header: 'Dataset Owner',
-        accessor: 'OrganizationName',
+        accessor: 'organization.name',
         width: 200,
       },
     ],
@@ -53,28 +44,23 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
       return {
         key,
         ...value,
-        PublishDate: new Date(value.PublishDate * 1000).toLocaleDateString('en-US', {
+        PublishDate: new Date(value.publish_date * 1000).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         }),
-        // PublishDate: faker.date.recent(3).toLocaleDateString('en-US', {
-        //   year: 'numeric',
-        //   month: 'long',
-        //   day: 'numeric',
-        // }),
       };
     })
     .sort((elem1, elem2) => elem1.PublishDate.localeCompare(elem2.PublishDate));
   return (
-    <>
-      <Table
-        base_url="/dashboard/datasets"
-        id_accessor="key"
-        columns={columns}
-        data={parsedData}
-      />
-    </>
+    <StandardContent title='Datasets'>
+        <Table
+          base_url="/dashboard/datasets"
+          id_accessor="key"
+          columns={columns}
+          data={parsedData}
+        />
+    </StandardContent>
   );
 };
 

@@ -754,7 +754,7 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
                 float64_t fl64DecimalComponent = ::modf(fl64Value, &fl64IntegralComponent);
                 if (0.0 == fl64DecimalComponent)
                 {
-                    uint64_t un32Value = (uint64_t) fl64Value;
+                    uint64_t un64Value = (uint64_t) fl64Value;
                     
                     strJsonString += strIndentationHeader + strElementName + std::to_string(un64Value);
                 }

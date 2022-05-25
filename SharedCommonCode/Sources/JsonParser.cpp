@@ -18,6 +18,7 @@
 #include "StringHelperFunctions.h"
 #include "StructuredBuffer.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -732,9 +733,11 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
             {
                 // If the float value has .00000 decimal component, output as integer
                 float32_t fl32Value = c_oStructuredBuffer.GetFloat32(c_strElementName.c_str());
-                if (0 == (fl32Value % 1))
+                float32_t fl32IntegralComponent;
+                float32_t fl32DecimalComponent = ::modf(fl32Value, &fl32IntegralComponent);
+                if (0.0 == fl32DecimalComponent)
                 {
-                    uint32_t un32Value = (uint32_t) fl32Value;
+                    uint32_t un32Value = (uint32_t) fl32IntegralComponent;
                     
                     strJsonString += strIndentationHeader + strElementName + std::to_string(un32Value);
                 }
@@ -747,7 +750,9 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
             {
                 // If the float value has .00000 decimal component, output as integer
                 float64_t fl64Value = c_oStructuredBuffer.GetFloat64(c_strElementName.c_str());
-                if (0 == (fl64Value % 1))
+                float64_t fl64IntegralComponent;
+                float64_t fl64DecimalComponent = ::modf(fl64Value, &fl64IntegralComponent);
+                if (0.0 == fl64DecimalComponent)
                 {
                     uint64_t un32Value = (uint64_t) fl64Value;
                     

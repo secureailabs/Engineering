@@ -762,8 +762,6 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
                 {
                     strJsonString += strIndentationHeader + strElementName + std::to_string(fl64Value);
                 }
-                
-                strJsonString += strIndentationHeader + strElementName + std::to_string(c_oStructuredBuffer.GetFloat64(c_strElementName.c_str()));
             }
             else if (INT8_VALUE_TYPE == bElementType)
             {

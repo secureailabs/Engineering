@@ -18,6 +18,7 @@
 #include "StringHelperFunctions.h"
 #include "StructuredBuffer.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -130,6 +131,7 @@ static std::string __stdcall ParseJsonString(
     bool fDone = false;
     unsigned int unCurrentOffset = *punOffset;
     unsigned int unTemporaryStringSize = 0;
+    unsigned int unActualStringSize = 0;
     char szTemporaryString[1000];
     std::string strReturnString;
 
@@ -729,11 +731,37 @@ static void __stdcall ConvertStructuredBufferToStandardJson(
             }
             else if (FLOAT32_VALUE_TYPE == bElementType)
             {
-                strJsonString += strIndentationHeader + strElementName + std::to_string(c_oStructuredBuffer.GetFloat32(c_strElementName.c_str()));
+                // If the float value has .00000 decimal component, output as integer
+                float32_t fl32Value = c_oStructuredBuffer.GetFloat32(c_strElementName.c_str());
+                float32_t fl32IntegralComponent;
+                float32_t fl32DecimalComponent = ::modf(fl32Value, &fl32IntegralComponent);
+                if (0.0 == fl32DecimalComponent)
+                {
+                    uint32_t un32Value = (uint32_t) fl32IntegralComponent;
+                    
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(un32Value);
+                }
+                else
+                {
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(fl32Value);
+                }
             }
             else if (FLOAT64_VALUE_TYPE == bElementType)
             {
-                strJsonString += strIndentationHeader + strElementName + std::to_string(c_oStructuredBuffer.GetFloat64(c_strElementName.c_str()));
+                // If the float value has .00000 decimal component, output as integer
+                float64_t fl64Value = c_oStructuredBuffer.GetFloat64(c_strElementName.c_str());
+                float64_t fl64IntegralComponent;
+                float64_t fl64DecimalComponent = ::modf(fl64Value, &fl64IntegralComponent);
+                if (0.0 == fl64DecimalComponent)
+                {
+                    uint64_t un64Value = (uint64_t) fl64Value;
+                    
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(un64Value);
+                }
+                else
+                {
+                    strJsonString += strIndentationHeader + strElementName + std::to_string(fl64Value);
+                }
             }
             else if (INT8_VALUE_TYPE == bElementType)
             {

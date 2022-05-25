@@ -171,7 +171,7 @@ CryptographicKey::CryptographicKey(
 {
     __DebugFunction();
 
-    std::ifstream oKeyFile(oGuid.ToString(eRaw)+".key", std::ios::binary | std::ios::ate);
+    std::ifstream oKeyFile(oGuid.ToString(eForceRaw)+".key", std::ios::binary | std::ios::ate);
     std::streamsize size = oKeyFile.tellg();
     _ThrowBaseExceptionIf((0 >= size), "No stored key found", nullptr);
     m_oKeyGuid = oGuid;
@@ -488,7 +488,7 @@ void __thiscall CryptographicKey::StoreKey()
 {
     __DebugFunction();
 
-    std::ofstream oKeyFile(m_oKeyGuid.ToString(eRaw)+".key", std::ios::binary);
+    std::ofstream oKeyFile(m_oKeyGuid.ToString(eForceRaw)+".key", std::ios::binary);
     StructuredBuffer oStructuredBufferKey;
     oStructuredBufferKey.PutString("KeySpec", ::GetStringForKeySpec(m_KeySpec));
 
@@ -549,7 +549,7 @@ std::string __thiscall CryptographicKey::GetPublicKeyPEM(void)
 
     std::string strPemPublicKey;
 
-    std::ifstream oKeyFile(m_oKeyGuid.ToString(eRaw)+".key", std::ios::binary | std::ios::ate);
+    std::ifstream oKeyFile(m_oKeyGuid.ToString(eForceRaw)+".key", std::ios::binary | std::ios::ate);
     std::streamsize size = oKeyFile.tellg();
     _ThrowBaseExceptionIf((0 >= size), "No stored key found", nullptr);
     oKeyFile.seekg(0, std::ios::beg);

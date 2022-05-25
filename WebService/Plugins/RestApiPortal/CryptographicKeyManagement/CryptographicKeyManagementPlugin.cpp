@@ -984,7 +984,7 @@ std::vector<Byte> __thiscall CryptographicKeyManagementPlugin::CreateEosbFromPla
     stlEncryptedSsb.resize(stlEncryptedSsb.size() - AES_TAG_LENGTH);
 
     // Fill the output buffer
-    const unsigned int unSizeOfEsobInBytes = m_stlEosbHeader.size() + stlAesInitializationVector.size() + stlAesGcmTag.size() + oGuidEncryptKey.ToString(eRaw).length() +  sizeof(uint32_t) + stlEncryptedSsb.size() + m_stlEosbFooter.size();
+    const unsigned int unSizeOfEsobInBytes = m_stlEosbHeader.size() + stlAesInitializationVector.size() + stlAesGcmTag.size() + oGuidEncryptKey.ToString(eForceRaw).length() +  sizeof(uint32_t) + stlEncryptedSsb.size() + m_stlEosbFooter.size();
     // Call reserve to just allocate memory and not initialize with
     stlResponseEosb.reserve(unSizeOfEsobInBytes);
 

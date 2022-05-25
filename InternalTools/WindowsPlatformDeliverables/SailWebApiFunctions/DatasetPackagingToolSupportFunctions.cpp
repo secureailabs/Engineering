@@ -593,7 +593,7 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
         oDatasetMetadata.PutString("Tags", c_szDatasetTags);
         oDatasetMetadata.PutUnsignedInt64("EpochCreationTimeInSeconds", ::GetEpochTimeInSeconds());
         oDatasetMetadata.PutUnsignedInt32("TableCount", (unsigned int) gs_ImportedTableMetadata.size());
-        if (0 < ::strnlen(c_szDatasetFamilyIdentifier, 2))
+        if ((nullptr != c_szDatasetFamilyIdentifier)&&(0 < ::strnlen(c_szDatasetFamilyIdentifier, 2)))
         {
             oDatasetMetadata.PutGuid("DataFamilyIdentifier", Guid(c_szDatasetFamilyIdentifier));
         }

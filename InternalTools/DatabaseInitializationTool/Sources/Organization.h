@@ -24,7 +24,8 @@ class Organization : public Object
     
         Organization(
             _in const std::string & c_strOrganizationName,
-            _in const StructuredBuffer & c_oOrganizationalData
+            _in const StructuredBuffer & c_oOrganizationalData,
+            _in unsigned int unStepIdentifier
             );
         virtual ~Organization(void);
         
@@ -32,8 +33,7 @@ class Organization : public Object
         bool __thiscall Register(
             _in const std::string & c_strSailPlatformServicesIpAddress,
             _in Word wSailPlatformServicesPortNumber,
-            _in unsigned int unStepIdentifier,
-            _in bool fDeleteDatabase
+            _in unsigned int unStepIdentifier
             ) throw();
             
         // The following information is needed when trying to register

@@ -49,8 +49,13 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
     __DebugFunction();
     _ThrowBaseExceptionIf((false == std::filesystem::exists(c_strJsonSettingsFilename)), "ERROR: JSON specification file not found (%s)", c_strJsonSettingsFilename.c_str());
     
-    // Keep track of whether or not we've deleted the database
-    bool fDatabaseDeleted = false;
+    // Reset the database, but only if we are registering organizations
+    if ((1 == unStepIdentifier)||(4 == unStepIdentifier))
+    {
+        SailPlatformServicesSession oSailPlatformServicesSession(gs_strIpAddress, 6200);
+        oSailPlatformServicesSession.ResetDatabase();
+        std::cout << "Database has been reset" << std::endl;
+    }
     // Container used to keep track of the identifiers for each registered organization. This
     // will be needed when registering digital contracts (i.e. registering organizations
     // generated things like identifiers, etc..., and we need to keep track of then for when
@@ -77,11 +82,10 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         // Each element should be a StructuredBuffer, otherwise the application should throw
         // an exception and terminate. This is done automatically when calling GetStructuredBuffer()
         StructuredBuffer oOrganization(oOrganizations.GetStructuredBuffer(c_strOrganizationName.c_str()));
-        Organization * poOrganization = new Organization(c_strOrganizationName, oOrganization);
+        Organization * poOrganization = new Organization(c_strOrganizationName, oOrganization, unStepIdentifier);
         // Register the organization
-        if (true == poOrganization->Register(gs_strIpAddress, 6200, unStepIdentifier, !fDatabaseDeleted))
+        if (true == poOrganization->Register(gs_strIpAddress, 6200, unStepIdentifier))
         {
-            fDatabaseDeleted = true;
             // Keep track of the name-identifier tuple since it will be needed when registering
             // digital contracts
             stlListOfOrganizationsByName[::Get64BitHashOfNullTerminatedString(poOrganization->GetOrganizationalName().c_str(), false)] = poOrganization;

@@ -30,7 +30,7 @@ namespace SailTablePackagerForCsv
         private void WorkerThread()
         {
             TablePackager tablePackager = new TablePackager(ref m_TableProperties, ref m_NotificationsAndProgressTracker);
-            tablePackager.PackageTable();
+            tablePackager.PackageTable(true);
         }
 
         /// <summary>
@@ -56,7 +56,6 @@ namespace SailTablePackagerForCsv
                 }
                 while (null != notificationMessage);
             }
-            Console.WriteLine("Done!!!");
 
             return 15;
         }

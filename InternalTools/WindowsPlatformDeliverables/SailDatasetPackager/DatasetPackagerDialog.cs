@@ -38,7 +38,7 @@ namespace SailDatasetPackager
         /// </summary>
         private void WorkerThread()
         {
-            m_DatasetPackager.PackageDataset();
+            m_DatasetPackager.PackageDataset(false);
             m_NotificationsAndProgressTracker.Done = true;
             m_DoneButton.Enabled = false;
         }

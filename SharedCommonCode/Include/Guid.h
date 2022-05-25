@@ -21,7 +21,9 @@ typedef enum name
 {
     eRaw = 1,
     eHyphensOnly = 2,
-    eHyphensAndCurlyBraces = 3
+    eHyphensAndCurlyBraces = 3,
+    eForceRaw = 4,
+    eForceHyphensAndCurlyBraces = 5
 }
 GuidFormat;
 

@@ -35,7 +35,7 @@ namespace SailTablePackagerForCsv
         private void WorkerThread()
         {
             TablePackager tablePackager = new TablePackager(ref m_TableProperties, ref m_NotificationsAndProgressTracker);
-            tablePackager.PackageTable();
+            tablePackager.PackageTable(false);
         }
 
         /// <summary>
@@ -53,11 +53,14 @@ namespace SailTablePackagerForCsv
             string[] tableProperties = m_TableProperties.GetTableProperties();
             this.m_SaveFileDialog.Filter = "Packaged Table|*.sailtable";
             this.m_SaveFileDialog.Title = "Select the name of the SAIL Table Package file to save to...";
-            if ((false == tableProperties.Contains("DestinationIntermediateFile")) && (DialogResult.OK == m_SaveFileDialog.ShowDialog()))
+            if (false == tableProperties.Contains("DestinationIntermediateFile"))
             {
-                // Update the m_TableProperties structure with the destination file
-                m_TableProperties.SetTableProperty("DestinationIntermediateFile", m_SaveFileDialog.FileName);
-                tableProperties = m_TableProperties.GetTableProperties();
+                while (DialogResult.OK != m_SaveFileDialog.ShowDialog())
+                {
+                    // Update the m_TableProperties structure with the destination file
+                    m_TableProperties.SetTableProperty("DestinationIntermediateFile", m_SaveFileDialog.FileName);
+                    tableProperties = m_TableProperties.GetTableProperties();
+                }
             }
             // By now, regardless of whether or not the save file dialog was displayed, we should
             // have a value "DestinationIntermediateFile" table property. If not, exit.

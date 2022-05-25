@@ -20,6 +20,18 @@
 #include <uuid/uuid.h>
 
 #include <algorithm>
+#include <iostream>
+
+#pragma pack(push, 1)
+typedef struct _GUID
+{
+    uint32_t Data1;
+    uint16_t Data2;
+    uint16_t Data3;
+    uint8_t  Data4[8];
+}
+GUID;
+#pragma pack(pop)
 
 /********************************************************************************************
  *
@@ -40,6 +52,11 @@ Guid::Guid(void)
     uuid_generate(oUniqueIdentifier);
     m_stlRawData.resize(16);
     ::memcpy((void *) m_stlRawData.data(), (void *) &oUniqueIdentifier, 16);
+    // Because linux sucks, the endianness of the UUID is not compatible with RFC 4122, section 4.1.2
+    // Most of the bits are random, but we need to switch out bytes at ince 6 and 7
+    Byte bByteSeven = m_stlRawData[7];
+    m_stlRawData[7] = m_stlRawData[6];
+    m_stlRawData[6] = bByteSeven;
 }
 
 /********************************************************************************************
@@ -90,9 +107,14 @@ Guid::Guid(
     __DebugFunction();
 
     uuid_t oUniqueIdentifier;
-    uuid_generate(oUniqueIdentifier);
+    ::uuid_generate(oUniqueIdentifier);
     m_stlRawData.resize(16);
     ::memcpy((void *) m_stlRawData.data(), (void *) &oUniqueIdentifier, 16);
+    // Because linux sucks, the endianness of the UUID is not compatible with RFC 4122, section 4.1.2
+    // Most of the bits are random, but we need to switch out bytes at ince 6 and 7
+    Byte bByteSeven = m_stlRawData[7];
+    m_stlRawData[7] = m_stlRawData[6];
+    m_stlRawData[6] = bByteSeven;
     // Change Most significant 6 bits to eObjectType
     m_stlRawData[0] = (m_stlRawData[0] & eNegativeGuidTypeMask) | eObjectType;
 }
@@ -439,21 +461,21 @@ std::string __thiscall Guid::ToString(
     _in GuidFormat eGuidFormat
     ) const throw()
 {
-    __DebugFunction();
     __DebugAssert(16 == m_stlRawData.size());
 
-    char szGuid[39];
+    char szGuid[40];
+    GUID * pGuid = (GUID *) m_stlRawData.data();
 
     switch(eGuidFormat)
     {
-        case eHyphensOnly               // 6E574DA3-0688-43FD-9690-B5E15DE11402 ----> with hyphens
-        :   ::snprintf(szGuid, sizeof(szGuid), "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", (unsigned int) m_stlRawData[0], (unsigned int) m_stlRawData[1], (unsigned int) m_stlRawData[2], (unsigned int) m_stlRawData[3], (unsigned int) m_stlRawData[4], (unsigned int) m_stlRawData[5], (unsigned int) m_stlRawData[6], (unsigned int) m_stlRawData[7], (unsigned int) m_stlRawData[8], (unsigned int) m_stlRawData[9], (unsigned int) m_stlRawData[10], (unsigned int) m_stlRawData[11], (unsigned int) m_stlRawData[12], (unsigned int) m_stlRawData[13], (unsigned int) m_stlRawData[14], (unsigned int) m_stlRawData[15]);
+        case eForceRaw // 6E574DA3068843FD9690B5E15DE11402 --------> raw
+        :   ::snprintf(szGuid, sizeof(szGuid), "%08X%04hX%04hX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
-        case eHyphensAndCurlyBraces     // {6E574DA3-0688-43FD-9690-B5E15DE11402} --> with hyphens and braces
-        :   ::snprintf(szGuid, sizeof(szGuid), "{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}", (unsigned int) m_stlRawData[0], (unsigned int) m_stlRawData[1], (unsigned int) m_stlRawData[2], (unsigned int) m_stlRawData[3], (unsigned int) m_stlRawData[4], (unsigned int) m_stlRawData[5], (unsigned int) m_stlRawData[6], (unsigned int) m_stlRawData[7], (unsigned int) m_stlRawData[8], (unsigned int) m_stlRawData[9], (unsigned int) m_stlRawData[10], (unsigned int) m_stlRawData[11], (unsigned int) m_stlRawData[12], (unsigned int) m_stlRawData[13], (unsigned int) m_stlRawData[14], (unsigned int) m_stlRawData[15]);
+        case eForceHyphensAndCurlyBraces // {6E574DA3-0688-43FD-9690-B5E15DE11402} --> with hyphens and braces
+        :   ::snprintf(szGuid, sizeof(szGuid), "{%08X-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
-        default                         // 6E574DA3068843FD9690B5E15DE11402 --------> raw
-        :   ::snprintf(szGuid, sizeof(szGuid), "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", (unsigned int) m_stlRawData[0], (unsigned int) m_stlRawData[1], (unsigned int) m_stlRawData[2], (unsigned int) m_stlRawData[3], (unsigned int) m_stlRawData[4], (unsigned int) m_stlRawData[5], (unsigned int) m_stlRawData[6], (unsigned int) m_stlRawData[7], (unsigned int) m_stlRawData[8], (unsigned int) m_stlRawData[9], (unsigned int) m_stlRawData[10], (unsigned int) m_stlRawData[11], (unsigned int) m_stlRawData[12], (unsigned int) m_stlRawData[13], (unsigned int) m_stlRawData[14], (unsigned int) m_stlRawData[15]);
+        default // 6e574da3-0688-43fd-9690-b5e15de11402 ----> with hyphens
+        :   ::snprintf(szGuid, sizeof(szGuid), "%08x-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
     };
 

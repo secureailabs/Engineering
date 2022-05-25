@@ -9,6 +9,23 @@ namespace SailTablePackagerForCsv
     internal static class Program
     {
         /// <summary>
+        /// 
+        /// </summary>
+        static void PrintUsage()
+        {
+            Console.WriteLine("Usage: SailTablePackagerForCsv.exe --template <templateFilename> --sourcecsv <sourceCsv> --destinationfile <destinationFile> [--workingfolder <workingFolder>]");
+            Console.WriteLine("");
+            Console.WriteLine("where:");
+            Console.WriteLine("");
+            Console.WriteLine("  --template,            A mandatory argument used to specify the input template to be used.");
+            Console.WriteLine("  --sourcecsv,           A mandatory argument used to specify which CSV file to get the data from.");
+            Console.WriteLine("  --destinationFile,     A mandatory argument used to specify the name of the output sailtable to generate");
+            Console.WriteLine("  --workingfolder,       An optional binary command line argument used to speficy which directory");
+            Console.WriteLine("                         to use when running this application.");
+            Console.WriteLine("");
+        }
+
+        /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
@@ -19,41 +36,23 @@ namespace SailTablePackagerForCsv
             int step = 1;
             TableProperties tableProperties = null;
 
+            // If there are arguments, then someone is running the application from the command
+            // line. Let's extract command line arguments
             if (0 < arguments.Length)
             {
-                ApiInterop.AllocConsole();
+                // Attach to the current console. Use 0xFFFFFFFF to use the current process
+                ApiInterop.AttachConsole(0xFFFFFFFF);
 
-                Console.WriteLine("===========================================================================================================");
-                Console.WriteLine("SAIL Table Packager v1.0");
-                Console.WriteLine("Copyright (C) 2021 Secure AI Labs Inc., All Rights Reserved.");
-                Console.WriteLine("------------------------------------------------------------------------------------------------------------");
-                Console.WriteLine("");
-
+                // Extract the required command line parameters. What we need is
+                // the template file, the source csv file and the destination file
+                string originalWorkingFolder = System.IO.Directory.GetCurrentDirectory();
                 string templateFilename = null;
                 string sourceCsvFile = null;
-                string destinationPackage = null;
-                string sourceSailTableFile = null;
-                string newSailTableFile = null;
+                string destinationFile = null;
 
                 for (int index = 0; index < arguments.Length; index++)
                 {
-                    if ("--new" == arguments[index])
-                    {
-                        if ((index + 1) < arguments.Length)
-                        {
-                            newSailTableFile = arguments[index + 1];
-                            index++;
-                        }
-                    }
-                    else if ("--edit" == arguments[index])
-                    {
-                        if ((index + 1) < arguments.Length)
-                        {
-                            sourceSailTableFile = arguments[index + 1];
-                            index++;
-                        }
-                    }
-                    else if ("--template" == arguments[index])
+                    if ("--template" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
@@ -61,7 +60,7 @@ namespace SailTablePackagerForCsv
                             index++;
                         }
                     }
-                    else if ("--sourcecsv" == arguments[index])
+                    else if ("--sourcecsv" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
@@ -69,15 +68,15 @@ namespace SailTablePackagerForCsv
                             index++;
                         }
                     }
-                    else if ("--destinationpackage" == arguments[index])
+                    else if ("--destinationfile" == arguments[index].ToLower())
                     {
                         if ((index + 1) < arguments.Length)
                         {
-                            destinationPackage = arguments[index + 1];
+                            destinationFile = arguments[index + 1];
                             index++;
                         }
                     }
-                    else if ("--workingfolder" == arguments[index])
+                    else if ("--workingfolder" == arguments[index].ToLower())
                     {
                         System.IO.Directory.SetCurrentDirectory(arguments[index + 1]);
                     }
@@ -85,43 +84,35 @@ namespace SailTablePackagerForCsv
                     {
                         Console.WriteLine("ERROR: Unknown command line parameters specified.");
                         Console.WriteLine("");
+                        Program.PrintUsage();
                         Application.Exit();
                     }
                 }
 
-                // Now that we presumably have all the information we need, let's verify that we have everything that
-                // is required
-                if ((null != templateFilename) && (null != sourceCsvFile) && (null != destinationPackage))
+                // Check to make sure we have all of our command line parameters
+                if ((null == templateFilename)||(null == sourceCsvFile)||(null == destinationFile))
                 {
-                    tableProperties = new TableProperties(templateFilename);
-                    tableProperties.SourceFilename = sourceCsvFile;
-                    TablePackagerCli tablePackagerCli = new TablePackagerCli(ref tableProperties, destinationPackage);
-                    step = tablePackagerCli.PackageTable();
+                    Console.WriteLine("ERROR: Missing command line parameter(s).");
                     Console.WriteLine("");
-                    Console.WriteLine("------------------------------------------------------------------------------------------------------------");
-                    Console.WriteLine("Press a key when done");
-                    Console.ReadKey();
+                    Program.PrintUsage();
+                    Application.Exit();
                 }
-                else if (null != newSailTableFile)
-                {
-                    // Everything is from scratch, but the destination file is already defined
-                    tableProperties = new TableProperties();
-                    tableProperties.SetTableProperty("DestinationIntermediateFile", newSailTableFile);
-                    step = 1;
-                    step = InteractiveEngine(ref tableProperties, step);
-                }
-                else if (null != sourceSailTableFile)
-                {
-                    // Everything is from scratch, but the destination file is already defined
-                    tableProperties = new TableProperties();
-                    ///tableProperties.LoadFromIntermediateFile(sourceSailTableFile);
-                    step = 3;
-                    step = InteractiveEngine(ref tableProperties, step);
-                }
+
+                // Package up the table
+                tableProperties = new TableProperties(templateFilename);
+                tableProperties.SourceFilename = sourceCsvFile;
+                TablePackagerCli tablePackagerCli = new TablePackagerCli(ref tableProperties, destinationFile);
+                tablePackagerCli.PackageTable();
+                Console.WriteLine("Done packaging " + destinationFile);
+                // The CLI return code for when things work is 0
+                step = 0;
+
+                // Restore the original working folder
+                System.IO.Directory.SetCurrentDirectory(originalWorkingFolder);
             }
             else
             {
-                // Everything is from scratch
+                // Use the GUI
                 tableProperties = new TableProperties();
                 step = 1;
                 step = InteractiveEngine(ref tableProperties, step);

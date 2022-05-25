@@ -30,16 +30,17 @@ namespace SailDatasetPackager
         /// </summary>
         private void WorkerThread()
         {
-            m_DatasetPackager.PackageDataset();
+            m_DatasetPackager.PackageDataset(true);
             m_NotificationsAndProgressTracker.Done = true;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="fPublish"></param>
+        /// <param name="sailPlatformAddress"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         public void PackageDataset(
-            bool fPublish,
             string sailPlatformAddress,
             string username,
             string password
@@ -57,7 +58,6 @@ namespace SailDatasetPackager
             }
             else
             {
-                m_NotificationsAndProgressTracker.AddNotification("Connected to SAIL Platform Services.");
                 // Start the worker thread
                 Thread workerThread = new Thread(new ThreadStart(WorkerThread));
                 workerThread.Start();
@@ -75,7 +75,6 @@ namespace SailDatasetPackager
                     }
                     while (null != notificationMessage);
                 }
-                Console.WriteLine("Done!!!");
             }
         }
 

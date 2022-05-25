@@ -411,14 +411,14 @@ std::string __thiscall Guid::ToString(
 
     switch(eGuidFormat)
     {
-        case eHyphensOnly // 6E574DA3-0688-43FD-9690-B5E15DE11402 ----> with hyphens
-        :   ::snprintf(szGuid, sizeof(szGuid), "%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
+        case eForceRaw // 6E574DA3068843FD9690B5E15DE11402 --------> raw
+        :   ::snprintf(szGuid, sizeof(szGuid), "%08X%04hX%04hX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
-        case eHyphensAndCurlyBraces // {6E574DA3-0688-43FD-9690-B5E15DE11402} --> with hyphens and braces
-        :   ::snprintf(szGuid, sizeof(szGuid), "{%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
+        case eForceHyphensAndCurlyBraces // {6E574DA3-0688-43FD-9690-B5E15DE11402} --> with hyphens and braces
+        :   ::snprintf(szGuid, sizeof(szGuid), "{%08X-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
-        default // 6E574DA3068843FD9690B5E15DE11402 --------> raw
-        :   ::snprintf(szGuid, sizeof(szGuid), "%08lX%04hX%04hX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
+        default // 6e574da3-0688-43fd-9690-b5e15de11402 ----> with hyphens
+        :   ::snprintf(szGuid, sizeof(szGuid), "%08x-%04hx-%04hx-%02hhx%02hhx-%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx", pGuid->Data1, pGuid->Data2, pGuid->Data3, pGuid->Data4[0], pGuid->Data4[1], pGuid->Data4[2], pGuid->Data4[3], pGuid->Data4[4], pGuid->Data4[5], pGuid->Data4[6], pGuid->Data4[7]);
             break;
     };
 

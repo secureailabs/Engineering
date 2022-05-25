@@ -27,17 +27,29 @@ namespace SailDatasetPackager
         /// <summary>
         /// 
         /// </summary>
-        public void PackageDataset()
+        public void PackageDataset(
+            bool runSilent
+            )
         {
             try
             {
-                m_NotificationsAndProgressTracker.AddNotification("Process to package the dataset to disk started...");
+                if (false == runSilent)
+                {
+                    m_NotificationsAndProgressTracker.AddNotification("Process to package the dataset to disk started...");
+                }
                 bool success = ApiInterop.GenerateDataset(m_DatasetFilename, m_DatasetProperties.Identifier, m_DatasetProperties.Title, m_DatasetProperties.Description, m_DatasetProperties.Tags, m_DatasetProperties.DatasetFamily);
                 if (false == success) throw new Exception();
-                m_NotificationsAndProgressTracker.AddNotification("Process to publish the dataset to the SAIL Platform started...");
+                if (false == runSilent)
+                {
+                    m_NotificationsAndProgressTracker.AddNotification("Process to publish the dataset to the SAIL Platform started...");
+                }
                 success = ApiInterop.PublishDataset(m_DatasetFilename);
                 if (false == success) throw new Exception();
-                m_NotificationsAndProgressTracker.AddNotification("Done.");
+                if (false == runSilent)
+                {
+                    m_NotificationsAndProgressTracker.AddNotification("Done.");
+                }
+                m_NotificationsAndProgressTracker.AddNotification("Dataset " + m_DatasetFilename + " has been packaged and published.");
             }
 
             catch

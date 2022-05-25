@@ -1,8 +1,0 @@
-DatasetProperty,Title,"MGR Patient Registry #1"
-DatasetProperty,Description,"Patient Registry from MGR"
-DatasetProperty,Tags,""
-DatasetProperty,DatasetFamily,"1c3d20ac-514c-4962-8a04-bb99ae86048b"
-DatasetProperty,DatasetFamilyDescription,"Dataset Family,{1C3D20AC-514C-4962-8A04-BB99AE86048B}"
-TablePackage,"mgr_001_a.sailtable"
-TablePackage,"mgr_001_b.sailtable"
-TablePackage,"mgr_001_c.sailtable"

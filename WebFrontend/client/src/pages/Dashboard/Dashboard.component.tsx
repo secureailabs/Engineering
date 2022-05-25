@@ -1,10 +1,5 @@
 import React from 'react';
 
-import NavBar from '@components/NavBar';
-import DashboardRouter from '@routes/Dashboard.routes';
-import Sidebar from '@secureailabs/web-ui/layout/Sidebar';
-import Header from '@secureailabs/web-ui/components/Header';
-import Footer from '@secureailabs/web-ui/components/Footer';
 import {
   MdDashboard,
   MdViewColumn,
@@ -13,37 +8,21 @@ import {
   MdLaunch,
   MdLogout,
 } from 'react-icons/md';
-
 import { IoMdDocument } from 'react-icons/io';
-
 import { HiOutlineDesktopComputer } from 'react-icons/hi';
+import { FaServer } from 'react-icons/fa';
 
-import { CgTemplate } from 'react-icons/cg';
+import DashboardRouter from '@routes/Dashboard.routes';
+
+import Sidebar from '@secureailabs/web-ui/layout/Sidebar';
+import Header from '@secureailabs/web-ui/components/Header';
 
 import default_profile_image from '@assets/user.png';
-
 import newLogo from '@assets/newLogo.png';
 
-import { FaServer } from 'react-icons/fa';
-import { removeToken } from '@app/redux/user/user.utils';
-import axios from 'axios';
-import { axiosProxy } from '@app/redux/utils';
-import { useMutation, useQueryClient } from 'react-query';
+import { TDashboardProps } from './Dashboard.types';
 
-//@ts-ignore
-const Dashboard = ({ userData }) => {
-  const logout = async () => {
-    removeToken()
-    await axios.delete(
-      `${axiosProxy()}/api/v1/logout`,
-      {
-        withCredentials: true,
-      });
-  }
-  
-  const queryClient = useQueryClient()
-  const logoutMutation = useMutation(logout, { onSettled: () => queryClient.invalidateQueries('userData'), retry: false})
-
+const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}) => {
   const primary = [
     { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },
     { text: 'Datasets', Icon: MdViewColumn, link: '/dashboard/datasets' },
@@ -91,8 +70,8 @@ const Dashboard = ({ userData }) => {
       text: 'Logout',
       Icon: MdLogout,
       onClick: () => {
-        logoutMutation.mutate()
-      },
+        logoutMutationFunction()
+    },
     },
   ];
 
@@ -103,9 +82,9 @@ const Dashboard = ({ userData }) => {
         <div className="standard-grid-row">
           <Header
             search={() => {}}
-            username={userData?.Username}
+            username={userData?.username}
             profile_image={default_profile_image}
-            organization={userData?.Organization}
+            organization={userData?.organization.name}
           />
           <DashboardRouter />
         </div>

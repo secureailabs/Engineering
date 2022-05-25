@@ -9,7 +9,7 @@ export type IUserData = {
     id: string;
     name: string;
   }
-} | null;
+} | undefined;
 
 export interface IEmailAndPassword {
   username: string;

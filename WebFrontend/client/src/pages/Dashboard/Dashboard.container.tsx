@@ -1,21 +1,16 @@
-import { connect } from 'react-redux';
-import { compose, Dispatch } from 'redux';
+import { useMutation, useQueryClient } from 'react-query';
 
-import { signOutStart } from '@app/redux/user/user.actions';
-import { selectUser } from '@app/redux/user/user.selectors';
+import { logout } from '@redux/user/user.utils';
+
 import Dashboard from './Dashboard.component';
-import { IState } from '@app/redux/root-reducer';
-import { RootAction } from '@app/redux/root.types';
 
-//trying to remove func from dispatch functions
-const mapStateToProps = (state: IState) => {
-  return {
-    userData: selectUser(state).userData,
-  };
-};
 
-const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => ({
-  logout: () => dispatch(signOutStart()),
-});
+const DashboardContainer: React.FC = () => {
+  const queryClient = useQueryClient()
+  const logoutMutation = useMutation(logout, { onSettled: () => { queryClient.invalidateQueries('userData');
+ console.log(queryClient.getQueryData('userData'))}, retry: false })
 
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Dashboard);
+  return Dashboard({userData : queryClient.getQueryData('userData'), logoutMutationFunction : logoutMutation.mutate})
+}
+
+export default DashboardContainer

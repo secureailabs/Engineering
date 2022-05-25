@@ -4,7 +4,7 @@ import { Route, Navigate ,  useLocation } from 'react-router-dom';
 
 import { IProtectedRoutes } from './ProtectedRoute.types';
 
-import Spinner from '@components/Spinner';
+import { AbsoluteSpinner } from '@components/Spinner';
 
 const ProtectedRoute: React.FC<IProtectedRoutes> = ({
   // userState,
@@ -27,7 +27,7 @@ const ProtectedRoute: React.FC<IProtectedRoutes> = ({
     return children;
   }
 
-  return <Spinner />;
+  return <AbsoluteSpinner />;
 };
 
 export default ProtectedRoute;

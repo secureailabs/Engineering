@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 
 import { IUnProtectedRoutes } from './UnProtectedRoute.types';
 
-import Spinner from '@components/Spinner';
+import { AbsoluteSpinner } from '@components/Spinner';
 
 const UnProtectedRoute: React.FC<IUnProtectedRoutes> = ({
   children,
@@ -24,7 +24,7 @@ const UnProtectedRoute: React.FC<IUnProtectedRoutes> = ({
     return children;
   }
 
-  return <Spinner />;
+  return <AbsoluteSpinner />;
   // return children;
 };
 

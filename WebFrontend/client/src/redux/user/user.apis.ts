@@ -46,47 +46,29 @@ export const userLogin = (
     });
 };
 
-export const userSignup = (
-  data: IPostUserStart
-): Promise<
-  AxiosResponse<{ data: { doc: IUserData } }> | IDefaults['error']
-> => {
-  // console.log("/#>#>#>#>#>#>#>#>#>#>#>#>#>#>#>#>/")
-  // console.log(formatData(data))
-  return axios
-    .post(
-      `${axiosProxy()}/api/v1/AccountManager/RegisterUser`,
-      formatData(data)
-    )
-    .then((res) => {
-      // The backend sometimes returns status 200 or 204 even when the org couldnt be created
-      console.log(res);
-      if (res.status != 201) {
-        throw new Error('Backend didnt return 201');
-      }
-      return res;
-    })
-    .catch((err) => {
-      throw err;
-    });
-};
-
-export const checkAuth = () =>
-  axios
-    .get(
-      `${axiosProxy()}/api/v1/me`,
-      { withCredentials: true }
-    )
-    .then((res) => {
-      if (res) {
-        console.log(axiosProxy());
-        return res;
-      }
-      throw new Error('Token expired');
-    })
-    .catch((err) => {
-      throw err.response.data;
-    });
+export const checkUserSession = async (): Promise<IUserData> => {
+  try {
+    const res = await axios.get<IUserData>
+      (`${axiosProxy()}/api/v1/me`,
+        {
+          withCredentials: true,
+        });
+    return res.data;
+  }
+  catch {
+    await axios.post
+      (`${axiosProxy()}/api/v1/refresh-token`,
+        {
+          withCredentials: true,
+        });
+    const res = await axios.get<IUserData>
+      (`${axiosProxy()}/api/v1/me`,
+        {
+          withCredentials: true,
+        });
+    return res.data;
+  }
+}
 
 export const me = () =>
   axios

@@ -1,8 +1,8 @@
 import {
   TGetUnifiedRegistryStart,
   TGetUnifiedRegistrySuccess,
-} from '@app/redux/unifiedRegistry/unifiedRegistry.types';
-import { IDefaults } from '@app/redux/typedefs';
+} from '@APIs/unifiedRegistry/unifiedRegistry.types';
+import { IDefaults } from '@APIs/typedefs';
 import { AxiosError } from 'axios';
 
 export type TUnifiedRegistryProps = {

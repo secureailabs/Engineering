@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy, tokenConfig } from '@app/redux/utils';
+import { axiosProxy, tokenConfig } from '@APIs/utils';
 
 import {
   TPostFeedStart,
@@ -15,7 +15,7 @@ import {
   TDeleteFeedStart,
 } from './feed.types';
 
-import type { IDefaults } from '@app/redux/typedefs';
+import type { IDefaults } from '@APIs/typedefs';
 
 export const postFeedAPI = ({
   data,
@@ -48,8 +48,7 @@ export const getFeedAPI = ({
 }): Promise<AxiosResponse<{ data: TGetFeedSuccess }> | IDefaults['error']> =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/FeedManager/PullUnifiedRegistry?UnifiedRegistryGuid=${
-        data.ID
+      `${axiosProxy()}/api/v1/FeedManager/PullUnifiedRegistry?UnifiedRegistryGuid=${data.ID
       }`,
       {
         withCredentials: true,

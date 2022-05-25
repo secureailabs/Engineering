@@ -1,7 +1,7 @@
 import { MutationFunction, useMutation, useQueryClient } from 'react-query';
 import axios, { AxiosError } from 'axios';
-import { axiosProxy } from '@app/redux/utils';
-import { IEmailAndPassword } from '@app/redux/user/user.typeDefs';
+import { axiosProxy } from '@APIs/utils';
+import { IEmailAndPassword } from '@APIs/user/user.typeDefs';
 import Login from './Login.component';
 
 const LoginContainer: React.FC = () => {

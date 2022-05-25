@@ -1,6 +1,6 @@
-import { TGetAllFeedsSuccess } from '@app/redux/feed/feed.types';
-import { IUserData } from '@app/redux/user/user.typeDefs';
-import { IDefaults } from '@app/redux/typedefs';
+import { TGetAllFeedsSuccess } from '@APIs/feed/feed.types';
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 
 export type TFeedProps = {
   // getAllFeedsStart(): void;

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy, tokenConfig } from '@app/redux/utils';
+import { axiosProxy, tokenConfig } from '@APIs/utils';
 
 import {
   TPostDatasetStart,
@@ -14,7 +14,7 @@ import {
   TGetDatasetStart,
 } from './dataset.typeDefs';
 
-import type { IDefaults } from '@app/redux/typedefs';
+import type { IDefaults } from '@APIs/typedefs';
 
 export const postDatasetAPI = ({
   data,
@@ -41,8 +41,7 @@ export const getDatasetAPI = ({
 }): Promise<AxiosResponse<{ data: TGetDatasetSuccess }> | IDefaults['error']> =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${
-        data.DatasetGuid
+      `${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${data.DatasetGuid
       }`,
       {
         withCredentials: true,

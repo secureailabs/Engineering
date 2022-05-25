@@ -1,6 +1,6 @@
-import { TGetAllUnifiedRegistriesSuccess } from '@app/redux/unifiedRegistry/unifiedRegistry.types';
-import { IUserData } from '@app/redux/user/user.typeDefs';
-import { IDefaults } from '@app/redux/typedefs';
+import { TGetAllUnifiedRegistriesSuccess } from '@APIs/unifiedRegistry/unifiedRegistry.types';
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 import { AxiosError } from 'axios';
 
 export type TUnifiedRegistriesProps = {

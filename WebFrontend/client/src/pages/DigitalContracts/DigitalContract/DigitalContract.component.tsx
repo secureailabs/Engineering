@@ -10,12 +10,12 @@ import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 import { ConditionalRender } from '@components/ConditionalRender';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 import Card from '@secureailabs/web-ui/components/Card';
-import { axiosProxy, tokenConfig } from '@app/redux/utils';
-import type { IDefaults } from '@app/redux/typedefs';
+import { axiosProxy, tokenConfig } from '@APIs/utils';
+import type { IDefaults } from '@APIs/typedefs';
 
 import Spinner from '@components/Spinner/SpinnerOnly.component';
 
-import {useQuery} from 'react-query';
+import { useQuery } from 'react-query';
 
 import { TDigitalContractProps } from './DigitalContract.types';
 
@@ -27,41 +27,41 @@ import {
 
   TGetDigitalContractSuccess,
 
-} from '@app/redux/digitalContract/digitalContract.typeDefs';
+} from '@APIs/digitalContract/digitalContract.typeDefs';
 import _ from 'lodash';
 
 const fetch = async ({ id }: { id: string }): Promise<TGetDigitalContractSuccess> => {
-    const res = await axios.get<TGetDigitalContractSuccess>(
-      `${axiosProxy()}/api/v1/DigitalContractManager/PullDigitalContract?DigitalContractGuid=${id}`, 
-      {
+  const res = await axios.get<TGetDigitalContractSuccess>(
+    `${axiosProxy()}/api/v1/DigitalContractManager/PullDigitalContract?DigitalContractGuid=${id}`,
+    {
       withCredentials: true,
-      });
-    return res.data;
+    });
+  return res.data;
 }
 
 
 const DigitalContract: React.FC<TDigitalContractProps> = ({ userData }) => {
-  const {  id } = useParams();
+  const { id } = useParams();
   const { data, isLoading, status, error } = useQuery<TGetDigitalContractSuccess, AxiosError>
-  (['digital-contract', id], () =>  fetch({ id: id ||"" })); 
+    (['digital-contract', id], () => fetch({ id: id || "" }));
 
 
-  if(isLoading) {
+  if (isLoading) {
     return (
       <>
-      <Spinner />
-    </>
+        <Spinner />
+      </>
     )
   }
-  if(status === 'success' && data && !_.isEmpty(data)) {
-      return <>
-       <StandardContent title="Digital Contract">
+  if (status === 'success' && data && !_.isEmpty(data)) {
+    return <>
+      <StandardContent title="Digital Contract">
         <DigitalContractSuccess getDigitalContractData={data} userData={userData} />
-       </StandardContent>
-      </>
+      </StandardContent>
+    </>
   }
 
-  return <DigitalContractFailure error={error}  />;
+  return <DigitalContractFailure error={error} />;
 
 
 };

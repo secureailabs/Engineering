@@ -5,7 +5,7 @@ import login_background from '@assets/login_background.jpg';
 import ImageBackground from '@secureailabs/web-ui/components/ImageBackground';
 
 import { TLoginFormProps } from './Login.types';
-import { IEmailAndPassword } from '@app/redux/user/user.typeDefs';
+import { IEmailAndPassword } from '@APIs/user/user.typeDefs';
 
 
 import CardForm from '@secureailabs/web-ui/components/CardForm';

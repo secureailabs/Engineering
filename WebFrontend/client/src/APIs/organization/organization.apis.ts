@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy, tokenConfig } from '@app/redux/utils';
+import { axiosProxy, tokenConfig } from '@APIs/utils';
 
 import {
   TPutOrganizationStart,
@@ -9,7 +9,7 @@ import {
   TGetOrganizationStart,
 } from './organization.typeDefs';
 
-import type { IDefaults } from '@app/redux/typedefs';
+import type { IDefaults } from '@APIs/typedefs';
 
 export const putOrganizationAPI = ({
   data,
@@ -40,8 +40,8 @@ export const putOrganizationAPI = ({
 
 export const getOrganizationAPI = (): Promise<
   | AxiosResponse<{
-      data: { OrganizationInformation: TGetOrganizationSuccess };
-    }>
+    data: { OrganizationInformation: TGetOrganizationSuccess };
+  }>
   | IDefaults['error']
 > =>
   axios

@@ -13,10 +13,10 @@ import { useParams } from 'react-router';
 import { ConditionalRender } from '@components/ConditionalRender';
 import Spinner from '@components/Spinner/SpinnerOnly.component';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
-import { demo_data } from "@app/redux/unifiedRegistry/unifiedRegistry.data";
-import { TGetUnifiedRegistrySuccess } from '@app/redux/unifiedRegistry/unifiedRegistry.types';
+import { demo_data } from "@APIs/unifiedRegistry/unifiedRegistry.data";
+import { TGetUnifiedRegistrySuccess } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 
-import { axiosProxy } from '@app/redux/utils';
+import { axiosProxy } from '@APIs/utils';
 import { useQuery } from 'react-query';
 
 
@@ -35,20 +35,20 @@ const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
     // return res.data.UnifiedRegistry;
   }
 
-  const { data, isLoading, status, error } = 
-  useQuery<TGetUnifiedRegistrySuccess['UnifiedRegistry'], AxiosError>(['unified', id], () => fetch());
-  
+  const { data, isLoading, status, error } =
+    useQuery<TGetUnifiedRegistrySuccess['UnifiedRegistry'], AxiosError>(['unified', id], () => fetch());
 
-  if(isLoading){
-    return <><Spinner/></>
+
+  if (isLoading) {
+    return <><Spinner /></>
   }
-  if(status === 'success' && data){
+  if (status === 'success' && data) {
     return (
-        <StandardContent title="Registry">
-          <UnifiedRegistrySuccess
-            getUnifiedRegistryData={data}
+      <StandardContent title="Registry">
+        <UnifiedRegistrySuccess
+          getUnifiedRegistryData={data}
         />
-        </StandardContent>
+      </StandardContent>
     )
   }
   return <UnifiedRegistryFailure error={error} />

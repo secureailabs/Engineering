@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { axiosProxy } from '@app/redux/utils';
+import { axiosProxy } from '@APIs/utils';
 
 import { IUserData } from './user.typeDefs';
 

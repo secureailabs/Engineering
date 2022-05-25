@@ -1,6 +1,6 @@
 import kca_logo from '@assets/kca.png';
 
-import Datasets from '@app/redux/dataset/dataset.data';
+import Datasets from '@APIs/dataset/dataset.data';
 
 import faker from 'faker';
 

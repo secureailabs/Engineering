@@ -7,7 +7,7 @@ import SignUp from './SignUp.component';
 import { IState } from '@app/redux/root-reducer';
 import { RootAction } from '@app/redux/root.types';
 
-import { IPostUserStart } from '@app/redux/user/user.typeDefs';
+import { IPostUserStart } from '@APIs/user/user.typeDefs';
 
 const mapStateToProps = (state: IState) => {
   return {

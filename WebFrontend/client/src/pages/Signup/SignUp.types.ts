@@ -1,5 +1,5 @@
-import { IPostUserStart } from '@app/redux/user/user.typeDefs';
-import { IDefaults } from '@app/redux/typedefs';
+import { IPostUserStart } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 
 export type TSignUpProps = {
   signUpStart(data: IPostUserStart): void;

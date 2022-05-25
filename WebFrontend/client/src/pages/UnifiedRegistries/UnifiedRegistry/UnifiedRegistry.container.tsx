@@ -10,7 +10,7 @@ import { selectUser } from '@app/redux/user/user.selectors';
 import UnifiedRegistry from './UnifiedRegistry.component';
 import { IState } from '@app/redux/root-reducer';
 import { RootAction } from '@app/redux/root.types';
-import { TGetUnifiedRegistryStart } from '@app/redux/unifiedRegistry/unifiedRegistry.types';
+import { TGetUnifiedRegistryStart } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 
 const mapStateToProps = (state: IState) => {
   return {

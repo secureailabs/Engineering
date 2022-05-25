@@ -1,9 +1,9 @@
 import {
   TPutOrganizationStart,
   TGetOrganizationSuccess,
-} from '@app/redux/organization/organization.typeDefs';
-import { IDefaults } from '@app/redux/typedefs';
-import { IUserData } from '@app/redux/user/user.typeDefs';
+} from '@APIs/organization/organization.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
 
 export type TUpdateOrganizationProps = {
   putOrganizationStart(data: TPutOrganizationStart): void;

@@ -11,7 +11,7 @@ import { IState } from '@app/redux/root-reducer';
 import { RootAction } from '@app/redux/root.types';
 import { selectOrganization } from '@app/redux/organization/organization.selectors';
 import { selectUser } from '@app/redux/user/user.selectors';
-import { TPutOrganizationStart } from '@app/redux/organization/organization.typeDefs';
+import { TPutOrganizationStart } from '@APIs/organization/organization.typeDefs';
 
 const mapStateToProps = (state: IState) => {
   return {

@@ -13,22 +13,22 @@ import { TDatasetProps } from './Dataset.types';
 
 import DatasetSuccess from './Dataset.success';
 import DatasetFailure from "./Dataset.failure";
-import { TGetDatasetSuccess } from '@app/redux/dataset/dataset.typeDefs';
+import { TGetDatasetSuccess } from '@APIs/dataset/dataset.typeDefs';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
-import { axiosProxy } from '@app/redux/utils';
+import { axiosProxy } from '@APIs/utils';
 import { useQuery } from 'react-query';
 
-import { demo_data } from "@app/redux/dataset/dataset.data";
+import { demo_data } from "@APIs/dataset/dataset.data";
 
 
 const fetch = async ({ id }: { id: string }): Promise<TGetDatasetSuccess['Dataset']> => {
   // return demo_data?.Datasets?.[id];
   const res = await axios.get<TGetDatasetSuccess>
-  (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-  {
-    withCredentials: true,
-  });
+    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`,
+      {
+        withCredentials: true,
+      });
   return res.data.Dataset;
 }
 
@@ -37,21 +37,21 @@ const Dataset: React.FC<TDatasetProps> = ({ userData }) => {
 
   const { id } = useParams();
 
-  
-  const { data, isLoading, status, error } = 
+
+  const { data, isLoading, status, error } =
     useQuery<TGetDatasetSuccess['Dataset'], AxiosError>(['dataset', id], () => fetch({ id: id || "" }));
-  if(isLoading){
-      return <><Spinner/></>
+  if (isLoading) {
+    return <><Spinner /></>
   }
-  if(status === 'success' && data){
-      return (
-          <StandardContent title="Dataset">
-            <DatasetSuccess
-            getDatasetData={data}
-            userData={userData}
-          />
-          </StandardContent>
-      )
+  if (status === 'success' && data) {
+    return (
+      <StandardContent title="Dataset">
+        <DatasetSuccess
+          getDatasetData={data}
+          userData={userData}
+        />
+      </StandardContent>
+    )
   }
   return <DatasetFailure error={error} />
 

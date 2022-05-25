@@ -18,7 +18,7 @@ import Stats from '@secureailabs/web-ui/components/Stats';
 
 import { FaUsers } from 'react-icons/fa';
 import { HiViewBoards } from 'react-icons/hi';
-import { IUserData } from '@app/redux/user/user.typeDefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
 
 const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
   userData,

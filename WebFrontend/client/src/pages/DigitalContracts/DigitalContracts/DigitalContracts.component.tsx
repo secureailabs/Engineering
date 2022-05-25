@@ -15,17 +15,17 @@ import axios, { AxiosError } from 'axios';
 import {
   TGetAllDigitalContractsSuccess,
 
-} from '@app/redux/digitalContract/digitalContract.typeDefs';
+} from '@APIs/digitalContract/digitalContract.typeDefs';
 
-import { axiosProxy } from '@app/redux/utils';
+import { axiosProxy } from '@APIs/utils';
 
 
 const fetch = async (): Promise<TGetAllDigitalContractsSuccess['DigitalContracts']> => {
   const res = await axios.get<TGetAllDigitalContractsSuccess>(
-    `${axiosProxy()}/api/v1/DigitalContractManager/DigitalContracts`, 
+    `${axiosProxy()}/api/v1/DigitalContractManager/DigitalContracts`,
     {
-    withCredentials: true,
-  });
+      withCredentials: true,
+    });
   return res.data.DigitalContracts;
 }
 
@@ -34,18 +34,18 @@ const DigitalContracts: React.FC<TDigitalContractsProps> = ({
 }) => {
 
   const { data, isLoading, status, error } = useQuery<TGetAllDigitalContractsSuccess['DigitalContracts'], AxiosError>(['digital-contracts'], fetch);
-  if(isLoading){
-      return <><Spinner/></>
+  if (isLoading) {
+    return <><Spinner /></>
   }
-  if(status === 'success' && data){
-      return (
-          <StandardContent title="Digital Contracts">
-            <DigitalContractsSuccess
-              getAllDigitalContractsData={data}
-              userData={userData}
-          />
-          </StandardContent>
-      )
+  if (status === 'success' && data) {
+    return (
+      <StandardContent title="Digital Contracts">
+        <DigitalContractsSuccess
+          getAllDigitalContractsData={data}
+          userData={userData}
+        />
+      </StandardContent>
+    )
   }
   return <DigitalContractsFailure error={error} />
 

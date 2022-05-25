@@ -1,6 +1,6 @@
-import { IDefaults } from '@app/redux/typedefs';
+import { IDefaults } from '@APIs/typedefs';
 import { TGetVirtualMachineSuccess } from '@app/redux/virtualMachineManager/virtualMachineManager.typeDefs';
-import { IUserData } from '@app/redux/user/user.typeDefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
 
 export type TVirtualMachineInfoSuccess = {
   getVirtualMachineData: TGetVirtualMachineSuccess | null;

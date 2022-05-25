@@ -10,7 +10,7 @@ import Spinner from '@components/Spinner/SpinnerOnly.component';
 import { HiArrowLeft } from 'react-icons/hi';
 import VirtualMachineInfo from '@components/VirtualMachineInfo';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
-import { demo_data } from '@app/redux/feed/feed.data';
+import { demo_data } from '@APIs/feed/feed.data';
 
 const Feed: React.FC<TFeedProps> = ({
   // getAllFeedsReset,

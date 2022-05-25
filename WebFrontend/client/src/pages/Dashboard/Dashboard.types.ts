@@ -1,5 +1,5 @@
 import { UseMutateFunction } from "react-query";
-import { IUserData } from "@redux/user/user.typeDefs"
+import { IUserData } from "@APIs/user/user.typeDefs"
 
 export type TDashboardProps = {
     userData: IUserData;

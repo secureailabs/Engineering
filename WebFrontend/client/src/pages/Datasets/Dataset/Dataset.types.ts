@@ -1,9 +1,9 @@
 import {
   TGetDatasetSuccess,
   TGetDatasetStart,
-} from '@app/redux/dataset/dataset.typeDefs';
-import { IUserData } from '@app/redux/user/user.typeDefs';
-import { IDefaults } from '@app/redux/typedefs';
+} from '@APIs/dataset/dataset.typeDefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 import { AxiosError } from 'axios';
 
 export type TDatasetProps = {

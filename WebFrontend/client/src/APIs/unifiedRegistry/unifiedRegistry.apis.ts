@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy, tokenConfig } from '@app/redux/utils';
+import { axiosProxy, tokenConfig } from '@APIs/utils';
 
 import {
   TPostUnifiedRegistryStart,
@@ -15,7 +15,7 @@ import {
   TDeleteUnifiedRegistryStart,
 } from './unifiedRegistry.types';
 
-import type { IDefaults } from '@app/redux/typedefs';
+import type { IDefaults } from '@APIs/typedefs';
 
 export const postUnifiedRegistryAPI = ({
   data,
@@ -52,8 +52,7 @@ export const getUnifiedRegistryAPI = ({
 > =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/UnifiedRegistryManager/PullUnifiedRegistry?UnifiedRegistryGuid=${
-        data.ID
+      `${axiosProxy()}/api/v1/UnifiedRegistryManager/PullUnifiedRegistry?UnifiedRegistryGuid=${data.ID
       }`,
       {
         withCredentials: true,

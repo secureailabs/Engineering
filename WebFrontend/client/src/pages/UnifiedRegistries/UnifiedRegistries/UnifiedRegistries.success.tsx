@@ -4,7 +4,7 @@ import Table from '@components/Table';
 
 import { TUnifiedRegistriesSuccessProps } from './UnifiedRegistries.types';
 
-import { TGetAllUnifiedRegistriesSuccess } from '@app/redux/unifiedRegistry/unifiedRegistry.types';
+import { TGetAllUnifiedRegistriesSuccess } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 
 import TableFilter from '@secureailabs/web-ui/components/TableFilter';
 

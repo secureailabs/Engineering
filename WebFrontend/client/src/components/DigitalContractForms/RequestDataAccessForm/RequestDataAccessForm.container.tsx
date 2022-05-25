@@ -10,7 +10,7 @@ import { selectUser } from '@app/redux/user/user.selectors';
 import Dataset from './RequestDataAccessForm.component';
 import { IState } from '@app/redux/root-reducer';
 import { RootAction } from '@app/redux/root.types';
-import { TGetDatasetStart } from '@app/redux/dataset/dataset.typeDefs';
+import { TGetDatasetStart } from '@APIs/dataset/dataset.typeDefs';
 
 const mapStateToProps = (state: IState) => {
   return {

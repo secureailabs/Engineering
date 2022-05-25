@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy, tokenConfig } from '@app/redux/utils';
+import { axiosProxy, tokenConfig } from '@APIs/utils';
 
 import {
   TPostDigitalContractStart,
@@ -19,7 +19,7 @@ import {
   TDeprovisionDigitalContractSuccess,
 } from './digitalContract.typeDefs';
 
-import type { IDefaults } from '@app/redux/typedefs';
+import type { IDefaults } from '@APIs/typedefs';
 
 export const getProvisioningStatusAPI = ({
   data,
@@ -30,8 +30,7 @@ export const getProvisioningStatusAPI = ({
 > =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/DigitalContractManager/GetProvisioningStatus?DigitalContractGuid=${
-        data.DigitalContractGuid
+      `${axiosProxy()}/api/v1/DigitalContractManager/GetProvisioningStatus?DigitalContractGuid=${data.DigitalContractGuid
       }`,
       { withCredentials: true }
     )
@@ -156,8 +155,7 @@ export const getDigitalContractAPI = ({
 > =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/DigitalContractManager/PullDigitalContract?DigitalContractGuid=${
-        data.DigitalContractGuid
+      `${axiosProxy()}/api/v1/DigitalContractManager/PullDigitalContract?DigitalContractGuid=${data.DigitalContractGuid
       }`,
       {
         withCredentials: true,

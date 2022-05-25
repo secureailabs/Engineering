@@ -10,7 +10,7 @@ import { selectUser } from '@app/redux/user/user.selectors';
 import DatasetVersion from './DatasetVersion.component';
 import { IState } from '@app/redux/root-reducer';
 import { RootAction } from '@app/redux/root.types';
-import { TGetDatasetVersionStart } from '@app/redux/dataset/dataset.typeDefs';
+import { TGetDatasetVersionStart } from '@APIs/dataset/dataset.typeDefs';
 
 const mapStateToProps = (state: IState) => {
   return {

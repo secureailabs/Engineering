@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { axiosProxy, tokenConfig } from '@app/redux/utils';
+import { axiosProxy } from '@APIs/utils';
 
 import {
   TPostAccountManagerStart,
@@ -21,7 +21,7 @@ import {
   TPutAccountManagerStart,
 } from './accountManager.typeDefs';
 
-import type { IDefaults } from '@app/redux/typedefs';
+import type { IDefaults } from '@APIs/typedefs';
 
 export const postAccountManagerAPI = ({
   data,
@@ -140,8 +140,7 @@ export const getAccountManagerAPI = ({
 > =>
   axios
     .get(
-      `${axiosProxy()}/api/v1/AccountManagerManager/PullAccountManager?AccountManagerGuid=${
-        data.AccountManagerGuid
+      `${axiosProxy()}/api/v1/AccountManagerManager/PullAccountManager?AccountManagerGuid=${data.AccountManagerGuid
       }`,
       {
         withCredentials: true,
@@ -158,8 +157,9 @@ export const getAllAccountManagersAPI = ({
   data: TGetAllAccountManagersStart;
 }): Promise<
   AxiosResponse<{ data: TGetAllAccountManagersSuccess }> | IDefaults['error']
-> => { console.log('api data');
-console.log(data)
+> => {
+  console.log('api data');
+  console.log(data)
   return axios
     .get(`${axiosProxy()}/api/v1/AccountManager/Organization/Users`, {
       params: data,
@@ -169,7 +169,7 @@ console.log(data)
     .catch((err): IDefaults['error'] => {
       throw err;
     });
-  }
+}
 
 export const deleteAccountManagerAPI = ({
   data,

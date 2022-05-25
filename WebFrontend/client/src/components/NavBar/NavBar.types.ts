@@ -1,5 +1,5 @@
-import { IUserData } from '@app/redux/user/user.typeDefs';
-import { IDefaults } from '@app/redux/typedefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 
 export type TNavBarProps = {
   userData: IUserData;

@@ -63,8 +63,8 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 
       <Margin size={10} />
       <DatasetsSuccess
-        getAllDatasetsData={getUnifiedRegistryData.Datasets
-        }
+        // getAllDatasetsData={getUnifiedRegistryData.Datasets}
+        getAllDatasetsData={[]}
       />
     </>
   );

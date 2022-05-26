@@ -6,17 +6,14 @@ import { TOrganizationProps } from './Organization.types';
 
 import OrganizationSuccess from './Organization.success';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
-import OrganizationFailure from './Organization.failure';
 
 import { useQuery } from 'react-query';
 
-import Title from '@components/Title';
-
 import axios from 'axios';
 
-import { axiosProxy, tokenConfig } from '@APIs/utils';
+import { axiosProxy } from '@APIs/utils';
 
-import Spinner, { SpinnerOnly } from '@components/Spinner';
+import Spinner from '@components/Spinner';
 
 
 //@ts-ignore

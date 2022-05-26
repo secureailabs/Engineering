@@ -27,11 +27,6 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
     { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },
     { text: 'Datasets', Icon: MdViewColumn, link: '/dashboard/datasets' },
     {
-      text: 'Digital Contracts',
-      Icon: IoMdDocument,
-      link: '/dashboard/digital-contracts',
-    },
-    {
       text: 'Virtual Machines',
       Icon: HiOutlineDesktopComputer,
       link: '/dashboard/virtual-machines',

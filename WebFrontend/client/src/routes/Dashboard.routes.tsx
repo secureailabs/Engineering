@@ -6,9 +6,6 @@ import UnProtectedRoute from './UnProtectedRoute';
 import RestrictedRoute from './RestrictedRoute';
 import Datasets from '@pages/Datasets/Datasets';
 import Dataset from '@pages/Datasets/Dataset';
-import DigitalContracts from '@pages/DigitalContracts/DigitalContracts';
-import DigitalContract from '@pages/DigitalContracts/DigitalContract';
-import MainMenu from '@pages/MainMenu';
 import SettingsPage from '@pages/Settings';
 import Organization from '@pages/Organization';
 import UnderConstruction from '@pages/UnderConstruction';
@@ -17,7 +14,6 @@ import VirtualMachine from '@pages/VirtualMachines/VirtualMachine';
 import UnifiedRegistries from '@pages/UnifiedRegistries/UnifiedRegistries';
 import UnifiedRegistry from '@pages/UnifiedRegistries/UnifiedRegistry';
 import CustomizableDashboard from '@components/CustomizableDashboard';
-import DatasetVersion from '@pages/Datasets/DatasetVersion';
 import ViewOrganization from '@pages/ViewOrganization';
 
 const DashboardRouter: React.FC = (): React.ReactElement => (
@@ -26,6 +22,7 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       path="/registries"
       element={
         <ProtectedRoute redirect="/login">
+          {/* @ts-ignore */}
           <UnifiedRegistries />
         </ProtectedRoute>
       }
@@ -34,6 +31,7 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       path="/registries/:id"
       element={
         <ProtectedRoute redirect="/login">
+          {/* @ts-ignore */}
           <UnifiedRegistry />
         </ProtectedRoute>
       }
@@ -44,22 +42,6 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       element={
         <ProtectedRoute redirect="/login">
           <CustomizableDashboard />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/digital-contracts"
-      element={
-        <ProtectedRoute redirect="/login">
-          <DigitalContracts />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/digital-contracts/:id"
-      element={
-        <ProtectedRoute redirect="/login">
-          <DigitalContract />
         </ProtectedRoute>
       }
     />
@@ -95,14 +77,14 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
         </ProtectedRoute>
       }
     />
-    <Route
+    {/* <Route
       path="/datasets/:id/:version"
       element={
         <ProtectedRoute redirect="/login">
           <DatasetVersion />
         </ProtectedRoute>
       }
-    />
+    /> */}
     <Route
       path="/organizations/:id"
       element={
@@ -115,6 +97,7 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       path="/settings"
       element={
         <ProtectedRoute redirect="/login">
+          {/* @ts-ignore */}
           <SettingsPage />
         </ProtectedRoute>
       }
@@ -123,6 +106,7 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       path="/my-organization"
       element={
         <ProtectedRoute redirect="/login">
+          {/* @ts-ignore */}
           <Organization />
         </ProtectedRoute>
       }

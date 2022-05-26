@@ -10,9 +10,9 @@ import DatasetFailure from "./Dataset.failure";
 import { ConditionalRender } from '@components/ConditionalRenderRQuery';
 
 
-const Dataset: React.FC<TDatasetProps> = ({ status, getDatasetData, error, userData }) => {
+const Dataset: React.FC<TDatasetProps> = ({ status, getDatasetData, error }) => {
   return (
-    <ConditionalRender status={status} success={() => <DatasetSuccess getDatasetData={getDatasetData} userData={userData}/>} failure={() => <DatasetFailure error={error}/>}>
+    <ConditionalRender status={status} success={() => <DatasetSuccess getDatasetData={getDatasetData} />} failure={() => <DatasetFailure error={error}/>}>
       <Spinner />
     </ConditionalRender>
   )

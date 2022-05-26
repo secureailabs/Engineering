@@ -1,18 +1,11 @@
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-
-import { selectUser } from '@app/redux/user/user.selectors';
-
-import ProtectedRoute from './ProtectedRoute.component';
-import { IState } from '@app/redux/root-reducer';
-
 import { useQueryClient } from 'react-query';
+import { IProtectedRoutesContainer } from './ProtectedRoute.types';
+import ProtectedRoute from './ProtectedRoute.component';
 
-const mapStateToProps = (state: IState) => {
-  return {
-    userState: selectUser(state).userState,
-    userData: selectUser(state).userData,
-  };
-};
+const ProtectedRouteContainer: React.FC<IProtectedRoutesContainer> = (props) => {
+  const userState = useQueryClient().getQueryState('userData')
 
-export default compose(connect(mapStateToProps))(ProtectedRoute);
+  return ProtectedRoute({ ...props, userState: userState})
+}
+
+export default ProtectedRouteContainer;

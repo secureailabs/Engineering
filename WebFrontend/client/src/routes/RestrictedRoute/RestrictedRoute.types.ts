@@ -1,13 +1,18 @@
 import { ReactElement } from 'react';
 
-import { IState } from '@app/redux/root-reducer';
-
 export interface IRestrictedRoutes {
   children: ReactElement;
   exact: boolean;
   path: string;
-  requiredAccessRights: number;
+  requiredAccessRights: string;
   redirect: string;
-  userData: IState['user']['userData'];
-  userState: IState['user']['userState'];
+  userState: any;
+}
+
+export interface IRestrictedRoutesContainer {
+  children: ReactElement;
+  exact: boolean;
+  path: string;
+  requiredAccessRights: string;
+  redirect: string;
 }

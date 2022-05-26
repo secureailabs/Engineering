@@ -1,3 +1,3 @@
-import UpdateOrganization from './UpdateOrganization.container';
+import UpdateOrganization from "./UpdateOrganization.component";
 
 export default UpdateOrganization;

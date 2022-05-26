@@ -6,7 +6,7 @@ const getPartnerOrg = (
   DOOName: string,
   ROName: string
 ): string => {
-  return userData?.OrganizationGuid == dataOwnerOrganization ? ROName : DOOName;
+  return userData?.organization.name == dataOwnerOrganization ? ROName : DOOName;
 };
 
 export default getPartnerOrg;

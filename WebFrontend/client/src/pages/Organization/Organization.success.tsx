@@ -1,6 +1,6 @@
 import React from 'react';
 
-import UpdateOrganization from '@components/Organization/UpdateOrganization2';
+import UpdateOrganization from '@components/Organization/UpdateOrganization';
 
 import { TOrganizationSuccessProps } from './Organization.types';
 

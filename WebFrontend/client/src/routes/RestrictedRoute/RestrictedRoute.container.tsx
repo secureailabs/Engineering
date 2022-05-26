@@ -1,16 +1,14 @@
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { useQueryClient } from 'react-query';
 
-import { selectUser } from '@app/redux/user/user.selectors';
+import { IRestrictedRoutesContainer } from './RestrictedRoute.types';
 
 import RestrictedRoute from './RestrictedRoute.component';
-import { IState } from '@app/redux/root-reducer';
 
-const mapStateToProps = (state: IState) => {
-  return {
-    userState: selectUser(state).userState,
-    userData: selectUser(state).userData,
-  };
-};
 
-export default compose(connect(mapStateToProps))(RestrictedRoute);
+const RestrictedRouteContainer: React.FC<IRestrictedRoutesContainer> = (props) => {
+  const userState = useQueryClient().getQueryState('userData')
+
+  return RestrictedRoute({ ...props, userState: userState})
+}
+
+export default RestrictedRouteContainer;

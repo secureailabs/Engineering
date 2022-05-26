@@ -1,15 +1,17 @@
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+// import { connect } from 'react-redux';
+// import { compose } from 'redux';
 
-import { selectUser } from '@app/redux/user/user.selectors';
+// import { selectUser } from '@app/redux/user/user.selectors';
 
-import MainMenu from './MainMenu.component';
-import { IState } from '@app/redux/root-reducer';
+// import MainMenu from './MainMenu.component';
+// import { IState } from '@app/redux/root-reducer';
 
-const mapStateToProps = (state: IState) => {
-  return {
-    userData: selectUser(state).userData,
-  };
-};
+// const mapStateToProps = (state: IState) => {
+//   return {
+//     userData: selectUser(state).userData,
+//   };
+// };
 
-export default compose(connect(mapStateToProps))(MainMenu);
+// export default compose(connect(mapStateToProps))(MainMenu);
+
+export { }

@@ -12,7 +12,6 @@ const RestrictedRoute: React.FC<IRestrictedRoutes> = ({
   userState,
   children,
   redirect,
-  userData,
   path,
   requiredAccessRights,
 }): ReactElement => (
@@ -24,18 +23,18 @@ const RestrictedRoute: React.FC<IRestrictedRoutes> = ({
         path={path}
         render={(): ReactElement => {
           // check if user finished loading, else run spinner
-          if (userState !== 'isLoading' && userState !== null) {
+          if (!userState.isLoading && userState !== undefined) {
             // if there is not user, render register page
             if (
-              userData === null ||
-              userData.AccessRights != requiredAccessRights
+              userState.data === undefined ||
+              userData.data.role != requiredAccessRights
             ) {
               return <Navigate replace to={redirect} />;
             }
             // if there is a user, redirect to dashboard dashboard
             return <>{children}</>;
           }
-          if (userState == null && userData == null) {
+          if (userState == null && userState.data == null) {
             return <Navigate replace to={redirect} />;
           }
           return <Spinner />;
@@ -47,11 +46,11 @@ const RestrictedRoute: React.FC<IRestrictedRoutes> = ({
         path={path}
         render={(): ReactElement => {
           // check if user finished loading, else run spinner
-          if (userState !== 'isLoading' && userState !== null) {
+          if (!userState.isLoading && userState !== null) {
             // if there is not user, render register page
             if (
-              userData === null ||
-              userData.AccessRights != requiredAccessRights
+              userState.data === null ||
+              userState.data.role != requiredAccessRights
             ) {
               return <Navigate replace to={redirect} />;
             }

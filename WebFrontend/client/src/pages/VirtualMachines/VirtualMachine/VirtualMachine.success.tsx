@@ -6,22 +6,21 @@ import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 import Card from '@secureailabs/web-ui/components/Card';
 
-import { TVirtualMachineSuccessProps } from './VirtualMachine.types';
+// import { TVirtualMachineSuccessProps } from './VirtualMachine.types';
 
-const VirtualMachineSuccess: React.FC<TVirtualMachineSuccessProps> = ({
-  getVirtualMachineData,
-}) => {
-  const { register, handleSubmit, formState, trigger } = useForm({
-    mode: 'onSubmit',
-    defaultValues: {
-      ...getVirtualMachineData,
-      DOOName: getVirtualMachineData.DigitalContract.DOOName,
-    },
-  });
+// const VirtualMachineSuccess: React.FC<TVirtualMachineSuccessProps> = ({
+const VirtualMachineSuccess: React.FC = () => {
+  // const { register, handleSubmit, formState, trigger } = useForm({
+  //   mode: 'onSubmit',
+  //   defaultValues: {
+  //     ...getVirtualMachineData,
+  //     DOOName: getVirtualMachineData.DigitalContract.DOOName,
+  //   },
+  // });
   return (
     <>
-      <Card primaryText="">
-        <div className="form-double">
+      {/* <Card primaryText="">
+        {/* <div className="form-double">
           <FormFieldsRenderer
             register={register}
             formState={formState}
@@ -58,8 +57,8 @@ const VirtualMachineSuccess: React.FC<TVirtualMachineSuccessProps> = ({
               },
             }}
           />
-        </div>
-      </Card>
+        </div> */}
+      {/* </Card> */}
     </>
   );
 };

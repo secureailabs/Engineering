@@ -7,12 +7,10 @@ import { IProtectedRoutes } from './ProtectedRoute.types';
 import { AbsoluteSpinner } from '@components/Spinner';
 
 const ProtectedRoute: React.FC<IProtectedRoutes> = ({
-  // userState,
+  userState,
   children,
   redirect,
-}): ReactElement => {
-  const userState = useQueryClient().getQueryState('userData')
-  
+}): ReactElement => {  
   const { pathname } = useLocation();
   // check if user finished loading, else run spinner
   if (userState && !userState.isFetching) {

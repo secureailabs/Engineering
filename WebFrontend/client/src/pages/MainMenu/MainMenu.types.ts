@@ -1,5 +1,7 @@
-import { IState } from '@app/redux/root-reducer';
+// import { IState } from '@app/redux/root-reducer';
 
-export interface IMainMenu {
-  userData: IState['user']['userData'];
-}
+// export interface IMainMenu {
+//   userData: IState['user']['userData'];
+// }
+
+export { }

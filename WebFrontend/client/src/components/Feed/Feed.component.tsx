@@ -8,7 +8,7 @@ import FeedsSuccess from './Feed.success';
 import FeedsFailure from './Feed.failure';
 import Spinner from '@components/Spinner/SpinnerOnly.component';
 import { HiArrowLeft } from 'react-icons/hi';
-import VirtualMachineInfo from '@components/VirtualMachineInfo';
+
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 import { demo_data } from '@APIs/feed/feed.data';
 

@@ -1,3 +1,3 @@
-import RestrictedRouteContainer from './RestrictedRoute.component';
+import RestrictedRouteContainer from './RestrictedRoute.container';
 
 export default RestrictedRouteContainer;

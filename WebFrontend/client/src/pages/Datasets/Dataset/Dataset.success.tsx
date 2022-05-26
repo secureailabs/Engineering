@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
@@ -8,12 +8,10 @@ import Card from '@secureailabs/web-ui/components/Card';
 
 import { TDatasetSuccessProps } from './Dataset.types';
 
-import Button from '@secureailabs/web-ui/components/Button';
 import Table from '@components/Table';
 
-import RequestDataAccessForm from '@components/DigitalContractForms/RequestDataAccessForm';
 
-const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userData }) => {
+const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
   const { register, handleSubmit, formState, trigger } = useForm({
     mode: 'onSubmit',
     defaultValues: {
@@ -88,21 +86,6 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userDa
           data={[]}
         />
       </StandardContent>
-      <div
-        style={{
-          width: '20rem',
-          marginLeft: '5rem',
-        }}
-      >
-        {
-          getDatasetData.organization.id != userData?.organization.id && <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
-            Request Access
-          </Button>
-        }
-      </div>
-      {modalIsOpen &&
-        <RequestDataAccessForm setIsOpen={setIsOpen} DataOwnerOrganization={getDatasetData.organization.id} DatasetGuid={getDatasetData.id} />
-      }
     </div>
   );
 };

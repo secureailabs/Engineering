@@ -1,46 +1,87 @@
-import React, { useEffect, useState } from 'react';
-import { ConditionalRender } from '@components/ConditionalRender';
+//@ts-nocheck
+import React from 'react';
 
-import { TUpdateOrganizationProps } from './UpdateOrganization.types';
+import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
-import UpdateOrganizationForm from './UpdateOrganization.form';
-import UpdateOrganizationSuccess from './UpdateOrganization.success';
-import UpdateOrganizationFailure from './UpdateOrganization.failure';
+import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
+import Card from '@secureailabs/web-ui/components/Card';
+import stageNumberToString from '@utils/stageNumberToString';
 
-const UpdateOrganization: React.FC<TUpdateOrganizationProps> = ({
-  putOrganizationReset,
-  putOrganizationStart,
-  putOrganizationState,
-  organizationData,
-  getOrganizationStart,
-  userData,
-}) => {
-  const [success, updateSuccess] = useState(false);
-  useEffect(() => {
-    putOrganizationReset();
-  }, []);
-  return (
-    <ConditionalRender
-      //@ts-ignore
-      state={putOrganizationState}
-      success={() => (
-        <UpdateOrganizationSuccess
-          updateSuccess={updateSuccess}
-          getOrganizationStart={getOrganizationStart}
-          putOrganizationStart={putOrganizationStart}
-          putOrganizationState={putOrganizationState}
-        />
-      )}
-      failure={UpdateOrganizationFailure}
-    >
-      <UpdateOrganizationForm
-        userData={userData}
-        organizationData={organizationData}
-        putOrganizationReset={putOrganizationReset}
-        putOrganizationStart={putOrganizationStart}
-      />
-    </ConditionalRender>
-  );
+import { TDigitalContractSuccessProps } from './DigitalContract.types';
+import getPartnerOrg from '@utils/getPartnerOrg';
+import { useForm, SubmitHandler } from 'react-hook-form';
+
+
+const UpdateOrganization = ({ organizationData }: any) => {
+    const { register, handleSubmit, formState, trigger } = useForm({
+        mode: 'onSubmit',
+        defaultValues: organizationData,
+      });
+    return (
+        <>
+        <Card primaryText="">
+          <div className="form-double">
+            <FormFieldsRenderer
+              register={register}
+              formState={formState}
+              fields={{
+                OrganizationName: {
+                  label: 'Organization Name',
+                  placeholder: 'Organization Name',
+                  type: 'text',
+                },
+                OrganizationAddress: {
+                  label: 'Organization Address',
+                  placeholder: 'Organization Address',
+                  type: 'text',
+                },
+                PrimaryContactName: {
+                  label: 'Primary Contact Name',
+                  placeholder: 'Priamry Contact Job Title',
+                  type: 'text',
+                },
+                PriamryContactPhoneNumber: {
+                  label: 'Primary Contact Phone Number',
+                  placeholder: 'Primary Contact Phone Number',
+                  type: 'text',
+                },
+                SecondaryContactName: {
+                  label: 'Secondary Contact Name',
+                  placeholder: 'Secondary Contact Name',
+                  type: 'text',
+                },
+                SecondaryContactJobTitle: {
+                  label: 'Secondary Contact Job Title',
+                  placeholder: 'Secondary Contact Job Title',
+                  type: 'text',
+                },
+
+                SecondaryContactEmail: {
+                  label: 'Secondary Contact Email',
+                  placeholder: 'Secondary Contact Email',
+                  type: 'text',
+                },
+                SecondaryContactPhoneNumber: {
+                  label: 'Secondary Contact Phone Number',
+                  placeholder: 'Number of Virtual CPUs',
+                  type: 'text',
+                },
+                Description: {
+                  label: 'Description',
+                  placeholder: 'Description',
+                  type: 'text',
+                },
+                Logo: {
+                  label: 'Logo',
+                  placeholder: 'Logo',
+                  type: 'image',
+                },
+              }}
+            />
+          </div>
+        </Card>
+      </>
+    )
 };
 
 export default UpdateOrganization;

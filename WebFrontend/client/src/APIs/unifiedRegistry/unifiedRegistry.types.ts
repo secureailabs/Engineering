@@ -31,7 +31,7 @@ export type TGetUnifiedRegistrySuccess = {
     Image: string;
     CreatedAt: Date;
     UpdateAt: Date;
-    Datasets: Record<string, TGetDatasetSuccess['Dataset']>;
+    Datasets: Record<string, TGetDatasetSuccess>;
   };
 };
 

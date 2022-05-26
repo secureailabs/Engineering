@@ -8,12 +8,10 @@ export type TDatasetProps = {
   status: IConditionalRender['status'];
   getDatasetData: TGetDatasetSuccess;
   error: AxiosError<any>;
-  userData: IUserData;
 };
 
 export type TDatasetSuccessProps = {
   getDatasetData: TGetDatasetSuccess;
-  userData: IUserData;
 };
 
 

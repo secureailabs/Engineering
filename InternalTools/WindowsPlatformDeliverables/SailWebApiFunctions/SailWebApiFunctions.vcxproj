@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="DatasetPackagingToolSupportFunctions.cpp" />
     <ClCompile Include="DatasetFamilySupportFunctions.cpp" />
-    <ClCompile Include="DigitalContractSupportFunctions.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="MiscellaneousSupportFunctions.cpp" />
     <ClCompile Include="RemoteDataConnectorFunctions.cpp" />

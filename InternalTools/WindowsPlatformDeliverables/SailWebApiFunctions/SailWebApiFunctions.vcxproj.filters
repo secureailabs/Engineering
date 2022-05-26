@@ -33,9 +33,6 @@
     <ClCompile Include="SharedUtilityFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DigitalContractSupportFunctions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MiscellaneousSupportFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

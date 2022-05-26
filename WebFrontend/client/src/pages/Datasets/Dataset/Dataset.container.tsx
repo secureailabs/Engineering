@@ -14,7 +14,7 @@ const DatasetContainer: React.FC = () => {
 
   const { data, isLoading, status, error, refetch } =
     // @ts-ignore
-    useQuery<TGetDatasetSuccess, AxiosError>(['dataset'], () => { console.log(id); return getDatasetAPI({ dataset_id: id }) }, { refetch: 'always' });
+    useQuery<TGetDatasetSuccess, AxiosError>([`dataset-${id}`], () => getDatasetAPI({ dataset_id: id }), { refetchOnMount: 'always' });
   //@ts-ignore
   return Dataset({ status: status, getDatasetData: data, refetch: refetch, error: error, userData: queryClient.getQueryData('userData') })
 }

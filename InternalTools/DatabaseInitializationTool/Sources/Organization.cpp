@@ -133,7 +133,7 @@ Organization::Organization(
                     // Just a reality check to make sure the target file is in fact a properly formatted dataset
                     Dataset oDataset(strDatasetFilename.c_str());
                     // Now we persist the dataset information
-                    Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
+                    Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("Name").c_str(), false);
                     m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
                 }
             }
@@ -171,8 +171,6 @@ bool __thiscall Organization::Register(
         {
             std::cout << "001" << std::endl;
             this->RegisterOrganization();
-            std::cout << "002" << std::endl;
-            this->RegisterAdministrators();
             std::cout << "003" << std::endl;
             this->RegisterContacts();
             std::cout << "004" << std::endl;

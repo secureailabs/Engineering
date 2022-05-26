@@ -48,11 +48,11 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
 {
     __DebugFunction();
     _ThrowBaseExceptionIf((false == std::filesystem::exists(c_strJsonSettingsFilename)), "ERROR: JSON specification file not found (%s)", c_strJsonSettingsFilename.c_str());
-    
+
     // Reset the database, but only if we are registering organizations
     if ((1 == unStepIdentifier)||(4 == unStepIdentifier))
     {
-        SailPlatformServicesSession oSailPlatformServicesSession(gs_strIpAddress, 6200);
+        SailPlatformServicesSession oSailPlatformServicesSession(gs_strIpAddress, 8000);
         oSailPlatformServicesSession.ResetDatabase();
         std::cout << "Database has been reset" << std::endl;
     }

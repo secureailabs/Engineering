@@ -5,13 +5,10 @@ import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 import Card from '@secureailabs/web-ui/components/Card';
-import stageNumberToString from '@utils/stageNumberToString';
 
 import { TDatasetSuccessProps } from './Dataset.types';
-import getPartnerOrg from '@utils/getPartnerOrg';
 
 import Button from '@secureailabs/web-ui/components/Button';
-import Modal from '@secureailabs/web-ui/components/Modal';
 import Table from '@components/Table';
 
 import RequestDataAccessForm from '@components/DigitalContractForms/RequestDataAccessForm';
@@ -21,12 +18,11 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userDa
     mode: 'onSubmit',
     defaultValues: {
       ...getDatasetData,
-      DataOwner: getDatasetData.OrganizationName,
-      NumberOfVersions: Object.keys(getDatasetData?.Versions || {})
-        .length,
-      PublishDate: new Date(
-        getDatasetData?.PublishDate * 1000
+      DataOwner: getDatasetData.organization.name,
+      publish_date: new Date(
+        getDatasetData?.publish_date * 1000
       ).toLocaleDateString('en-US'),
+      NumberOfVersions: 1,
     },
   });
 
@@ -34,13 +30,13 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userDa
     () => [
       {
         Header: 'Version',
-        accessor: 'Version',
+        accessor: 'version',
         width: 300,
       },
 
       {
         Header: 'Publish Date',
-        accessor: 'PublishDate',
+        accessor: 'publish_date',
         width: 300,
       },
 
@@ -59,29 +55,11 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userDa
     []
   );
 
-  const parsedData = Object.entries(
-    getDatasetData?.Versions || {}
-  ).map(([key, value]) => {
-    return {
-      key,
-      ...value,
-      DataOwner: value.OrganizationName,
-      PublishDate: new Date(value.PublishDate * 1000).toLocaleDateString(
-        'en-US',
-        {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }
-      ),
-    };
-  });
-
   const [modalIsOpen, setIsOpen] = React.useState(false);
 
   return (
     <div>
-      <StandardContent back={true} title={getDatasetData?.DatasetName}>
+      <StandardContent back={true} title={getDatasetData?.name}>
         <Card primaryText="">
           <div className="form-double">
             <FormFieldsRenderer
@@ -93,21 +71,21 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userDa
                   placeholder: 'No. of Versions',
                   type: 'text',
                 },
-                PublishDate: {},
+                publish_date: {},
                 DataOwner: {},
-                Keywords: {},
-                Description: {},
+                keywords: {},
+                description: {},
               }}
             />
           </div>
         </Card>
       </StandardContent>
-      <StandardContent title={getDatasetData?.DatasetName}>
+      <StandardContent title={getDatasetData?.name}>
         <Table
-          base_url={`/dashboard/datasets/${getDatasetData?.DatasetGuid}`}
+          base_url={`/dashboard/datasets/${getDatasetData?.id}`}
           id_accessor="key"
           columns={columns}
-          data={parsedData}
+          data={[]}
         />
       </StandardContent>
       <div
@@ -117,13 +95,13 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData, userDa
         }}
       >
         {
-          getDatasetData.DataOwnerGuid != userData?.OrganizationGuid && <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
+          getDatasetData.organization.id != userData?.organization.id && <Button full={false} button_type="primary" onClick={() => { setIsOpen(true) }}>
             Request Access
           </Button>
         }
       </div>
       {modalIsOpen &&
-        <RequestDataAccessForm setIsOpen={setIsOpen} DataOwnerOrganization={getDatasetData.DataOwnerGuid} DatasetGuid={getDatasetData.DatasetGuid} />
+        <RequestDataAccessForm setIsOpen={setIsOpen} DataOwnerOrganization={getDatasetData.organization.id} DatasetGuid={getDatasetData.id} />
       }
     </div>
   );

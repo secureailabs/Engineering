@@ -6,7 +6,6 @@ import { IConditionalRender } from '@components/ConditionalRenderRQuery/Conditio
 export type TDatasetsProps = {
   status: IConditionalRender['status'];
   getAllDatasetsData: TGetAllDatasetsSuccess['datasets'];
-  refetch: () => void;
   error: AxiosError<any>;
 };
 

@@ -31,6 +31,12 @@ export type TGetDatasetSuccess = {
       description: string;
     }>
   }>
+  dataset_created_time: string;
+  organization: {
+    id: string;
+    name: string;
+  }
+  state: 'ACTIVE' | 'INACTIVE';
 };
 
 export type TGetDatasetStart = {

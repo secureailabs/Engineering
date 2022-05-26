@@ -10,7 +10,6 @@ import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
   getAllDatasetsData,
 }) => {
-  console.log(getAllDatasetsData);
   const columns = React.useMemo(
     () => [
       {
@@ -44,19 +43,19 @@ const DatasetsSuccess: React.FC<TDatasetsSuccessProps> = ({
       return {
         key,
         ...value,
-        PublishDate: new Date(value.publish_date * 1000).toLocaleDateString('en-US', {
+        publish_date: new Date(value.publish_date * 1000).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         }),
       };
     })
-    .sort((elem1, elem2) => elem1.PublishDate.localeCompare(elem2.PublishDate));
+    .sort((elem1, elem2) => elem2.publish_date.localeCompare(elem1.publish_date));
   return (
     <StandardContent title='Datasets'>
         <Table
           base_url="/dashboard/datasets"
-          id_accessor="key"
+          id_accessor="id"
           columns={columns}
           data={parsedData}
         />

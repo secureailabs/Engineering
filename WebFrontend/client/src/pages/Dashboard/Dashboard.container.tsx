@@ -10,7 +10,6 @@ const DashboardContainer: React.FC = () => {
   const logoutMutation = useMutation(logout, {
     onSettled: () => {
       queryClient.invalidateQueries('userData');
-      console.log(queryClient.getQueryData('userData'))
     }, retry: false
   })
 

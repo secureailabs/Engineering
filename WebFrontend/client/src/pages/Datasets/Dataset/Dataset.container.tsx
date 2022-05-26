@@ -1,31 +1,22 @@
-import { connect } from 'react-redux';
-import { compose, Dispatch } from 'redux';
+import { useQuery, useQueryClient } from 'react-query';
+import { AxiosError } from 'axios';
+import { useParams } from 'react-router';
 
-import {
-  getDatasetStart,
-  getDatasetReset,
-} from '@app/redux/dataset/dataset.actions';
-import { selectDataset } from '@app/redux/dataset/dataset.selectors';
-import { selectUser } from '@app/redux/user/user.selectors';
+import { TGetDatasetSuccess } from '@APIs/dataset/dataset.typeDefs';
+import { getDatasetAPI } from '@APIs/dataset/dataset.apis';
+
 import Dataset from './Dataset.component';
-import { IState } from '@app/redux/root-reducer';
-import { RootAction } from '@app/redux/root.types';
-import { TGetDatasetStart } from '@APIs/dataset/dataset.typeDefs';
 
-const mapStateToProps = (state: IState) => {
-  return {
-    getDatasetError: selectDataset(state).getDatasetError,
-    getDatasetState: selectDataset(state).getDatasetState,
-    getDatasetData: selectDataset(state).getDatasetData,
-    userData: selectUser(state).userData,
-  };
-};
+const DatasetContainer: React.FC = () => {
+  const { id } = useParams() || ''
 
-//trying to remove func from dispatch functions
+  const queryClient = useQueryClient()
 
-const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => ({
-  getDatasetStart: (data: TGetDatasetStart) => dispatch(getDatasetStart(data)),
-  getDatasetReset: () => dispatch(getDatasetReset()),
-});
-//@ts-ignore
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Dataset);
+  const { data, isLoading, status, error, refetch } =
+    // @ts-ignore
+    useQuery<TGetDatasetSuccess, AxiosError>(['dataset'], () => { console.log(id); return getDatasetAPI({ dataset_id: id }) }, { refetch: 'always' });
+  //@ts-ignore
+  return Dataset({ status: status, getDatasetData: data, refetch: refetch, error: error, userData: queryClient.getQueryData('userData') })
+}
+
+export default DatasetContainer;

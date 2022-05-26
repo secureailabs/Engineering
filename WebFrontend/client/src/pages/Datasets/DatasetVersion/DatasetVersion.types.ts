@@ -2,9 +2,9 @@ import {
   TGetDatasetVersionSuccess,
   TGetDatasetVersionStart,
   TGetDatasetSuccess,
-} from '@redux/dataset/dataset.typeDefs';
-import { IUserData } from '@redux/user/user.typeDefs';
-import { IDefaults } from '@redux/typedefs';
+} from '@APIs/dataset/dataset.typeDefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 import { AxiosError } from 'axios';
 
 export type TDatasetVersionProps = {

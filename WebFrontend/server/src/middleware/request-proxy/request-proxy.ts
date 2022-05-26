@@ -17,13 +17,15 @@ const stringifyParams = (data: any) => {
 
 export default function (options: RequestProxyOptionTypes) {
   return catchAsync(async (req, res, next) => {
+    console.log(req.path)
     axios({
       method: options.method || 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': options.contentType ? options.contentType : 'application/x-www-form-urlencoded',
+        ...(req.headers.authorization && { 'Authorization': req.headers.authorization })
       },
-      url: `${process.env.SAIL_API}/SAIL/${options.path}`,
-      data: req.body,
+      url: `${process.env.SAIL_API}/${options.path ? options.path : req.path.substring('/'.length)}`,
+      data: options.contentType == 'application/json' ?  req.body : new URLSearchParams(req.body),
       params: req.query,
       paramsSerializer: function (params) {
         console.log('PARAMS', params);

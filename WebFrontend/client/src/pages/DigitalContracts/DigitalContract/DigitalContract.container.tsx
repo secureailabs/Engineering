@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
-import { selectUser } from '@redux/user/user.selectors';
+import { selectUser } from '@app/redux/user/user.selectors';
 import DigitalContract from './DigitalContract.component';
-import { IState } from '@redux/root-reducer';
-import { IUserData } from '@redux/user/user.typeDefs';
+import { IState } from '@app/redux/root-reducer';
+import { IUserData } from '@APIs/user/user.typeDefs';
 
 const mapStateToProps = (state: IState): { userData: IUserData } => {
   return {

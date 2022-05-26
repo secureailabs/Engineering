@@ -1,13 +1,15 @@
-import { IEmailAndPassword } from '@redux/user/user.typeDefs';
-import { IDefaults } from '@redux/typedefs';
+import { UseMutateFunction } from 'react-query';
+import { AxiosError } from 'axios';
+import { IEmailAndPassword } from '@APIs/user/user.typeDefs';
 
 export type TLoginProps = {
-  signInStart(data: IEmailAndPassword): void;
+  signInStart: UseMutateFunction<IEmailAndPassword, AxiosError<any>, void, unknown>;
   signInReset(): void;
-  userState: IDefaults['state'] | 'noUserSession' | 'signup-success';
+  status: 'success' | 'error' | 'loading' | 'idle';
+
 };
 
 export type TLoginFormProps = {
-  signInStart(data: IEmailAndPassword): void;
+  signInStart: UseMutateFunction<IEmailAndPassword, AxiosError<any>, void, unknown>;
   signInReset(): void;
 };

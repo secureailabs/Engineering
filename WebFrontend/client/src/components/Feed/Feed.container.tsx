@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 import { compose, Dispatch } from 'redux';
 
-import { getAllFeedsStart, getAllFeedsReset } from '@redux/feed/feed.actions';
-import { selectFeed } from '@redux/feed/feed.selector';
+import { getAllFeedsStart, getAllFeedsReset } from '@app/redux/feed/feed.actions';
+import { selectFeed } from '@app/redux/feed/feed.selector';
 import Feed from './Feed.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
 
 const mapStateToProps = (state: IState) => {
   return {

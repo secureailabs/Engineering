@@ -11,17 +11,17 @@ import Spinner from '@components/Spinner/SpinnerOnly.component';
 import { TDatasetVersionProps } from './DatasetVersion.types';
 
 import DatasetVersionSuccess from './DatasetVersion.success';
-import { TGetDatasetVersionSuccess, TGetDatasetSuccess } from '@redux/dataset/dataset.typeDefs';
+import { TGetDatasetVersionSuccess, TGetDatasetSuccess } from '@APIs/dataset/dataset.typeDefs';
 import DatasetVersionFailure from "./DatasetVersion.failure";
 import { useQuery } from 'react-query';
-import { demo_data } from "@redux/dataset/dataset.data";
+import { demo_data } from "@APIs/dataset/dataset.data";
 
 const mode = localStorage.getItem("mode")
 
 
 
 const DatasetVersion: React.FC<TDatasetVersionProps> = () => {
-  const  { version, id } = useParams();
+  const { version, id } = useParams();
 
   const fetch = (): TGetDatasetVersionSuccess['Dataset'] => {
     if(mode == "demo"){
@@ -37,7 +37,7 @@ const DatasetVersion: React.FC<TDatasetVersionProps> = () => {
     });
     return res.data.Dataset;
   }
-  
+
   const fetch2 = (): TGetDatasetSuccess['Dataset'] => {
     //@ts-ignore
     if(mode == "demo"){
@@ -51,24 +51,24 @@ const DatasetVersion: React.FC<TDatasetVersionProps> = () => {
     });
     return res.data.Dataset;
   }
-   
-  const { data, isLoading, status, error } = 
+
+  const { data, isLoading, status, error } =
     useQuery<TGetDatasetVersionSuccess['Dataset'], AxiosError>(['dataset', id], () => fetch());
 
-    const { data: dataset_data, isLoading: dataset_is_loading, status: datasets_status, error: dataset_error } = 
+  const { data: dataset_data, isLoading: dataset_is_loading, status: datasets_status, error: dataset_error } =
     useQuery<TGetDatasetSuccess['Dataset'], AxiosError>(['dataset', id], () => fetch2());
-  if(isLoading || dataset_is_loading){
-      return <><Spinner/></>
+  if (isLoading || dataset_is_loading) {
+    return <><Spinner /></>
   }
-  if(status === 'success' && data && datasets_status ==='success' && dataset_data){
-      return (
-          <StandardContent title="Organization">
-            <DatasetVersionSuccess
-              getDatasetVersionData={data}
-              getDatasetData={dataset_data}
-          />
-          </StandardContent>
-      )
+  if (status === 'success' && data && datasets_status === 'success' && dataset_data) {
+    return (
+      <StandardContent title="Organization">
+        <DatasetVersionSuccess
+          getDatasetVersionData={data}
+          getDatasetData={dataset_data}
+        />
+      </StandardContent>
+    )
   }
   return <DatasetVersionFailure error={error} />
 

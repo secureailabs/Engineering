@@ -1,23 +1,21 @@
-import {
-  TGetDatasetSuccess,
-  TGetDatasetStart,
-} from '@redux/dataset/dataset.typeDefs';
-import { IUserData } from '@redux/user/user.typeDefs';
-import { IDefaults } from '@redux/typedefs';
 import { AxiosError } from 'axios';
 
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { TGetDatasetSuccess } from '@APIs/dataset/dataset.typeDefs';
+import { IConditionalRender } from '@components/ConditionalRenderRQuery/ConditionalRender/ConditionalRender.types';
+
 export type TDatasetProps = {
-  getDatasetStart(data: TGetDatasetStart): void;
-  getDatasetReset(): void;
-  getDatasetState: IDefaults['state'];
+  status: IConditionalRender['status'];
   getDatasetData: TGetDatasetSuccess;
+  error: AxiosError<any>;
   userData: IUserData;
 };
 
 export type TDatasetSuccessProps = {
-  getDatasetData: TGetDatasetSuccess['Dataset'];
+  getDatasetData: TGetDatasetSuccess;
   userData: IUserData;
 };
+
 
 export type TDatasetFailure = {
   error: AxiosError<any> | null

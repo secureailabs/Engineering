@@ -4,13 +4,13 @@ import { compose, Dispatch } from 'redux';
 import {
   getUnifiedRegistryStart,
   getUnifiedRegistryReset,
-} from '@redux/unifiedRegistry/unifiedRegistry.actions';
-import { selectUnifiedRegistry } from '@redux/unifiedRegistry/unifiedRegistry.selector';
-import { selectUser } from '@redux/user/user.selectors';
+} from '@app/redux/unifiedRegistry/unifiedRegistry.actions';
+import { selectUnifiedRegistry } from '@app/redux/unifiedRegistry/unifiedRegistry.selector';
+import { selectUser } from '@app/redux/user/user.selectors';
 import UnifiedRegistry from './UnifiedRegistry.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
-import { TGetUnifiedRegistryStart } from '@redux/unifiedRegistry/unifiedRegistry.types';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
+import { TGetUnifiedRegistryStart } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 
 const mapStateToProps = (state: IState) => {
   return {

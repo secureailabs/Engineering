@@ -1,23 +1,24 @@
 import React from 'react';
-import { ConditionalRender } from '@components/ConditionalRender';
+import { ConditionalRender } from '@components/ConditionalRenderRQuery';
 
 import { TLoginProps } from './Login.types';
 
 import LoginForm from './Login.form';
 import LoginSuccess from './Login.success';
 import LoginFailure from './Login.failure';
+import { AbsoluteSpinner } from '@components/Spinner';
 
 const Login: React.FC<TLoginProps> = ({
   signInReset,
   signInStart,
-  userState,
+  status,
 }) => {
   return (
     <ConditionalRender
-      //@ts-ignore
-      state={userState}
+      status={status}
       success={LoginSuccess}
       failure={() => <LoginFailure signInReset={signInReset} />}
+      Loading={<AbsoluteSpinner />}
     >
       <LoginForm signInReset={signInReset} signInStart={signInStart} />
     </ConditionalRender>

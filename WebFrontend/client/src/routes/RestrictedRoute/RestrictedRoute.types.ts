@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 
-import { IState } from '@redux/root-reducer';
+import { IState } from '@app/redux/root-reducer';
 
 export interface IRestrictedRoutes {
   children: ReactElement;

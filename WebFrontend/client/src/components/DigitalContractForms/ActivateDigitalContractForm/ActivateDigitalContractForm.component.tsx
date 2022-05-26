@@ -8,23 +8,23 @@ import { TActivateDigitalContractFormProps } from './ActivateDigitalContractForm
 
 import ActivateDigitalContractFormSuccess from './ActivateDigitalContractForm.success';
 import ActivateDigitalContractFormFailure from "./ActivateDigitalContractForm.failure";
-import { TPatchActivateDigitalContractStart, TPatchActivateDigitalContractSuccess } from '@redux/digitalContract/digitalContract.typeDefs';
+import { TPatchActivateDigitalContractStart, TPatchActivateDigitalContractSuccess } from '@APIs/digitalContract/digitalContract.typeDefs';
 import Modal from '@secureailabs/web-ui/components/Modal';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@APIs/utils';
 import { useMutation } from 'react-query';
 
-import { demo_data } from "@redux/dataset/dataset.data";
+import { demo_data } from "@APIs/dataset/dataset.data";
 
 
 const activateContract = async (digitalContractInfo: TPatchActivateDigitalContractStart): Promise<any> => {
   // return demo_data?.Datasets?.[id];
   const res = await axios.patch<TPatchActivateDigitalContractSuccess>
     (`${axiosProxy()}/api/v1/DigitalContractManager/Researcher/Activate`,
-    digitalContractInfo,
-  {
-    withCredentials: true,
+      digitalContractInfo,
+      {
+        withCredentials: true,
       });
   return res
 }
@@ -34,20 +34,20 @@ const ActivateDigitalContractForm: React.FC<TActivateDigitalContractFormProps> =
 
   // @ts-ignore
   const mutation = useMutation<TPatchActivateDigitalContractStart, AxiosError>((formData) => activateContract(formData));
-  
+
   const { register, handleSubmit, formState, trigger } = useForm<{}>({ mode: 'onSubmit' });
 
   const onSubmit = (
     // @ts-ignore
-  ) => mutation.mutate({DigitalContractGuid: DigitalContractGuid})
-  
+  ) => mutation.mutate({ DigitalContractGuid: DigitalContractGuid })
+
   if (mutation.isLoading) {
-    return <Modal title='Activate Digital Contract' description='Loading...' close={() => setIsOpen(false)}><Spinner/></Modal>
+    return <Modal title='Activate Digital Contract' description='Loading...' close={() => setIsOpen(false)}><Spinner /></Modal>
   }
   if (mutation.isSuccess && mutation.data) {
-      return (
-          <ActivateDigitalContractFormSuccess UrlOnSuccess={UrlOnSuccess} />
-      )
+    return (
+      <ActivateDigitalContractFormSuccess UrlOnSuccess={UrlOnSuccess} />
+    )
   }
   if (mutation.error) {
     console.log('failure')

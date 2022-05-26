@@ -1,4 +1,4 @@
-import { IUserData } from '@redux/user/user.typeDefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
 
 export type TSettings = {
   userData: IUserData;

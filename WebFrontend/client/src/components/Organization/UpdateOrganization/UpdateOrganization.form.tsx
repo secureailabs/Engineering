@@ -15,7 +15,7 @@ import { TUpdateOrganizationFormProps } from './UpdateOrganization.types';
 import {
   TPutOrganizationStart,
   TGetOrganizationSuccess,
-} from '@redux/organization/organization.typeDefs';
+} from '@APIs/organization/organization.typeDefs';
 
 import { formData } from './UpdateOrganization.data';
 

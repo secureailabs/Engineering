@@ -1,14 +1,16 @@
-import { TGetAllDatasetsSuccess } from '@redux/dataset/dataset.typeDefs';
-import { IDefaults } from '@redux/typedefs';
-
 import { AxiosError } from 'axios';
 
-export type TDatasetsProps = {
+import { TGetAllDatasetsSuccess } from '@APIs/dataset/dataset.typeDefs';
+import { IConditionalRender } from '@components/ConditionalRenderRQuery/ConditionalRender/ConditionalRender.types';
 
+export type TDatasetsProps = {
+  status: IConditionalRender['status'];
+  getAllDatasetsData: TGetAllDatasetsSuccess['datasets'];
+  error: AxiosError<any>;
 };
 
 export type TDatasetsSuccessProps = {
-  getAllDatasetsData: TGetAllDatasetsSuccess['Datasets'];
+  getAllDatasetsData: TGetAllDatasetsSuccess['datasets'];
 };
 
 

@@ -14,7 +14,7 @@ import Title from '@components/Title';
 
 import axios from 'axios';
 
-import { axiosProxy, tokenConfig } from '@redux/utils';
+import { axiosProxy, tokenConfig } from '@APIs/utils';
 
 import Spinner, { SpinnerOnly } from '@components/Spinner';
 
@@ -25,13 +25,13 @@ const Organization: React.FC<TOrganizationProps> = () => {
   const { data, status } = useQuery('my-organization', () => axios.get(`${axiosProxy()}/api/v1/AccountManager/Organization/Information`, {
     withCredentials: true,
   }).then((res) => res.data.OrganizationInformation));
-  if(status === 'loading'){
-      return <Spinner />;
+  if (status === 'loading') {
+    return <Spinner />;
   }
   console.log("DATA", data);
   return (
     <>
-     <StandardContent title="Organization">
+      <StandardContent title="Organization">
         <OrganizationSuccess organizationData={data} />
       </StandardContent>
     </>

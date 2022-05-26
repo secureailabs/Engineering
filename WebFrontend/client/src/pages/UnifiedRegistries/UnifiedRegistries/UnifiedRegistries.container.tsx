@@ -4,12 +4,12 @@ import { compose, Dispatch } from 'redux';
 import {
   getAllUnifiedRegistriesStart,
   getAllUnifiedRegistriesReset,
-} from '@redux/unifiedRegistry/unifiedRegistry.actions';
-import { selectUnifiedRegistry } from '@redux/unifiedRegistry/unifiedRegistry.selector';
-import { selectUser } from '@redux/user/user.selectors';
+} from '@app/redux/unifiedRegistry/unifiedRegistry.actions';
+import { selectUnifiedRegistry } from '@app/redux/unifiedRegistry/unifiedRegistry.selector';
+import { selectUser } from '@app/redux/user/user.selectors';
 import UnifiedRegistries from './UnifiedRegistries.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
 
 const mapStateToProps = (state: IState) => {
   return {

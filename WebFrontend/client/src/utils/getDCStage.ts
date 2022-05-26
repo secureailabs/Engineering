@@ -1,4 +1,4 @@
-import { TGetAllDigitalContractsSuccess } from '@redux/digitalContract/digitalContract.typeDefs';
+import { TGetAllDigitalContractsSuccess } from '@APIs/digitalContract/digitalContract.typeDefs';
 
 const getDCStage = (
   stage: Exclude<

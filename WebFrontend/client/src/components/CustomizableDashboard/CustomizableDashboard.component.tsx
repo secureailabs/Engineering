@@ -18,7 +18,7 @@ import Stats from '@secureailabs/web-ui/components/Stats';
 
 import { FaUsers } from 'react-icons/fa';
 import { HiViewBoards } from 'react-icons/hi';
-import { IUserData } from '@redux/user/user.typeDefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
 
 const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
   userData,
@@ -53,7 +53,7 @@ const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
     { i: 'c', x: 8, y: 0, w: 3, h: 7, static: true },
     { i: 'd', x: 8, y: 7, w: 3, h: 5, static: true },
   ];
-  if (userData?.AccessRights === 1) {
+  if (userData?.role === 'ADMIN') {
     return (
       <div className='standard-content-scroll'>
       <StandardContent title="Dashboard">

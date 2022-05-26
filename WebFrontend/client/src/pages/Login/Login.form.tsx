@@ -1,19 +1,12 @@
 //@ts-nocheck
 import React, { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import login_background from '@assets/login_background.jpg';
 import ImageBackground from '@secureailabs/web-ui/components/ImageBackground';
-import Form from '@components/Form';
-// import FormFieldsRenderer from '@components/FormFieldsRenderer';
 
 import { TLoginFormProps } from './Login.types';
-// import LoginScheme from 'src/formSchemes/LoginScheme';
-import { IEmailAndPassword } from '@redux/user/user.typeDefs';
+import { IEmailAndPassword } from '@APIs/user/user.typeDefs';
 
-import { formData } from './Login.data';
-
-import Button from '@components/Button';
 
 import CardForm from '@secureailabs/web-ui/components/CardForm';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
@@ -27,9 +20,7 @@ const Login: React.FC<TLoginFormProps> = ({ signInReset, signInStart }) => {
     // resolver: yupResolver(LoginScheme),
     mode: 'onSubmit',
   });
-  useEffect(() => {
-    signInReset();
-  }, []);
+
   const onSubmit: SubmitHandler<IEmailAndPassword> = (data) => {
     signInStart(data);
   };
@@ -44,7 +35,7 @@ const Login: React.FC<TLoginFormProps> = ({ signInReset, signInStart }) => {
                 button_text="Login"
                 formState={formState}
                 fields={{
-                  email: {
+                  username: {
                     label: 'Email',
                     placeholder: 'Email',
                     type: 'text',

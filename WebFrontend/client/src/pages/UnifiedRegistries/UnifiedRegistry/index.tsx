@@ -1,3 +1,3 @@
-import UnifiedRegistryContainer from './UnifiedRegistry.container';
+import UnifiedRegistryContainer from './UnifiedRegistry.component';
 
 export default UnifiedRegistryContainer;

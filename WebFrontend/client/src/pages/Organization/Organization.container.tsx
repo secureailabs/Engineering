@@ -4,12 +4,12 @@ import { compose, Dispatch } from 'redux';
 import {
   getOrganizationStart,
   getOrganizationReset,
-} from '@redux/organization/organization.actions';
+} from '@app/redux/organization/organization.actions';
 import Organization from './Organization.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
-import { selectOrganization } from '@redux/organization/organization.selectors';
-import { selectUser } from '@redux/user/user.selectors';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
+import { selectOrganization } from '@app/redux/organization/organization.selectors';
+import { selectUser } from '@app/redux/user/user.selectors';
 
 const mapStateToProps = (state: IState) => {
   return {

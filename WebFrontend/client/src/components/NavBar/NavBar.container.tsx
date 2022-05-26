@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 import { compose, Dispatch } from 'redux';
-import { signOutStart } from '@redux/user/user.actions';
+import { signOutStart } from '@app/redux/user/user.actions';
 
-import { selectUser } from '@redux/user/user.selectors';
+import { selectUser } from '@app/redux/user/user.selectors';
 import NavBar from './NavBar.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
 
 const mapStateToProps = (state: IState) => {
   return {

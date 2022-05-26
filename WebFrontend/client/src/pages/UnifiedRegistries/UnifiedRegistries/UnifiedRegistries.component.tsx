@@ -12,10 +12,10 @@ import { HiArrowLeft } from 'react-icons/hi';
 import VirtualMachineInfo from '@components/VirtualMachineInfo';
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
 
-import { demo_data } from "@redux/unifiedRegistry/unifiedRegistry.data";
+import { demo_data } from "@APIs/unifiedRegistry/unifiedRegistry.data";
 
 import { useQuery } from 'react-query';
-import { TGetAllUnifiedRegistriesSuccess } from '@redux/unifiedRegistry/unifiedRegistry.types';
+import { TGetAllUnifiedRegistriesSuccess } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 import { AxiosError } from 'axios';
 import { axiosProxy } from '@redux/utils';
 
@@ -43,16 +43,16 @@ const UnifiedRegistries: React.FC<TUnifiedRegistriesProps> = () => {
   // eslint-disable-next-line max-len
   const { data, status, isLoading, error } = useQuery<TGetAllUnifiedRegistriesSuccess, AxiosError>(["organizations"], () => demo_data);
 
-  if(isLoading){
-    return <><Spinner/></>
+  if (isLoading) {
+    return <><Spinner /></>
   }
-  if(status === 'success' && data){
+  if (status === 'success' && data) {
     return (
-        <StandardContent title="Unified Registries">
-          <UnifiedRegistriesSuccess
-            getAllUnifiedRegistriesData={data}
+      <StandardContent title="Unified Registries">
+        <UnifiedRegistriesSuccess
+          getAllUnifiedRegistriesData={data}
         />
-        </StandardContent>
+      </StandardContent>
     )
   }
   return <UnifiedRegistriesFailure error={error} />

@@ -1,25 +1,27 @@
-import { connect } from 'react-redux';
-import { compose, Dispatch } from 'redux';
-
-import { signInStart, signInReset } from '@redux/user/user.actions';
-import { selectUser } from '@redux/user/user.selectors';
+import { MutationFunction, useMutation, useQueryClient } from 'react-query';
+import axios, { AxiosError } from 'axios';
+import { axiosProxy } from '@APIs/utils';
+import { IEmailAndPassword } from '@APIs/user/user.typeDefs';
 import Login from './Login.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
 
-const mapStateToProps = (state: IState) => {
-  return {
-    userError: selectUser(state).userError,
-    userState: selectUser(state).userState,
-  };
-};
+const LoginContainer: React.FC = () => {
+  const post = async (data: IEmailAndPassword): Promise<IEmailAndPassword> => {
+    const res = await axios.post<IEmailAndPassword>(
+      `${axiosProxy()}/api/v1/login`,
+      // @ts-ignore
+      new URLSearchParams(data),
+      {
+        withCredentials: true,
+      });
+    return res.data;
+  }
 
-//trying to remove func from dispatch functions
+  const queryClient = useQueryClient()
+  //@ts-ignore
+  const loginMutation = useMutation<IEmailAndPassword, AxiosError>(post, { onSuccess: () => queryClient.invalidateQueries('userData') });
 
-const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => ({
-  signInStart: ({ email, password }: { email: string; password: string }) =>
-    dispatch(signInStart({ email, password })),
-  signInReset: () => dispatch(signInReset()),
-});
 
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Login);
+  return Login({ signInStart: loginMutation.mutate, signInReset: loginMutation.reset, status: loginMutation.status })
+}
+
+export default LoginContainer

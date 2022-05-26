@@ -1,56 +1,27 @@
 import React from 'react';
 
-import axios, {AxiosError} from 'axios';
-
-import { axiosProxy } from '@redux/utils';
-import { useQuery } from 'react-query';
+import { ConditionalRender } from '@components/ConditionalRenderRQuery';
+import Spinner from '@components/Spinner/SpinnerOnly.component';
 
 import { TDatasetsProps } from './Datasets.types';
 
 import DatasetsSuccess from './Datasets.success';
 import DatasetsFailure from './Datasets.failure';
-import Spinner from '@components/Spinner/SpinnerOnly.component';
-
-import StandardContent from '@secureailabs/web-ui/components/StandardContent';
-import { TGetAllDatasetsSuccess } from '@redux/dataset/dataset.typeDefs';
-
-import { demo_data } from "@redux/dataset/dataset.data";
-
-const mode = localStorage.getItem("mode")
-
-const fetch = async (): Promise<TGetAllDatasetsSuccess['Datasets']> => {
-  if(mode == "demo"){
-    return demo_data?.Datasets;
-  }
-  const res = await axios.get<TGetAllDatasetsSuccess>
-  (`${axiosProxy()}/api/v1/DatasetManager/ListDatasets`, 
-  {
-    withCredentials: true,
-  });
-  return res.data.Datasets;
-}
 
 
-const Datasets: React.FC<TDatasetsProps> = () => {
-
-  
-  const { data, isLoading, status, error } = 
-    useQuery<TGetAllDatasetsSuccess['Datasets'], AxiosError>(['datasets'], fetch);
-  if(isLoading){
-      return <><Spinner/></>
-  }
-  if(status === 'success' && data){
-      return (
-          <StandardContent title="Datasets">
-            <DatasetsSuccess
-              getAllDatasetsData={data}
-          />
-          </StandardContent>
-      )
-  }
-  return <DatasetsFailure error={error} />
-
-
+const Datasets: React.FC<TDatasetsProps> = ({ status, getAllDatasetsData, error }) => {
+  return (
+  <ConditionalRender
+    status={status}
+    success={() =>
+      <DatasetsSuccess getAllDatasetsData={getAllDatasetsData} />
+    }
+    failure={() =>
+      <DatasetsFailure error={error}/>
+    }>
+    <Spinner />
+  </ConditionalRender>
+  )
 };
 
 export default Datasets;

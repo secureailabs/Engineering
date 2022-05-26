@@ -1,3 +1,3 @@
-import DigitalContracts from './DigitalContracts.container';
+import DigitalContracts from './DigitalContracts.component';
 
 export default DigitalContracts;

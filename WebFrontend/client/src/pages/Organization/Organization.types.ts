@@ -1,7 +1,7 @@
-import { TGetOrganizationSuccess } from '@redux/organization/organization.typeDefs';
+import { TGetOrganizationSuccess } from '@APIs/organization/organization.typeDefs';
 
-import { IUserData } from '@redux/user/user.typeDefs';
-import { IDefaults } from '@redux/typedefs';
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 
 export type TOrganizationProps = {
   getOrganizationStart(): void;

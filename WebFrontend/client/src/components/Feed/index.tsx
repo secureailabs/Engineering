@@ -1,3 +1,3 @@
-import FeedContainer from './Feed.container';
+import FeedContainer from './Feed.component';
 
 export default FeedContainer;

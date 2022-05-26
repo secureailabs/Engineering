@@ -4,13 +4,13 @@ import { compose, Dispatch } from 'redux';
 import {
   getDatasetStart,
   getDatasetReset,
-} from '@redux/dataset/dataset.actions';
-import { selectDataset } from '@redux/dataset/dataset.selectors';
-import { selectUser } from '@redux/user/user.selectors';
+} from '@app/redux/dataset/dataset.actions';
+import { selectDataset } from '@app/redux/dataset/dataset.selectors';
+import { selectUser } from '@app/redux/user/user.selectors';
 import Dataset from './RequestDataAccessForm.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
-import { TGetDatasetStart } from '@redux/dataset/dataset.typeDefs';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
+import { TGetDatasetStart } from '@APIs/dataset/dataset.typeDefs';
 
 const mapStateToProps = (state: IState) => {
   return {

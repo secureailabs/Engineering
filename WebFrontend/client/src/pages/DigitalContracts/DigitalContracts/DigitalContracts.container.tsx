@@ -4,12 +4,12 @@ import { compose, Dispatch } from 'redux';
 import {
   getAllDigitalContractsStart,
   getAllDigitalContractsReset,
-} from '@redux/digitalContract/digitalContract.actions';
-import { selectDigitalContract } from '@redux/digitalContract/digitalContract.selectors';
-import { selectUser } from '@redux/user/user.selectors';
+} from '@app/redux/digitalContract/digitalContract.actions';
+import { selectDigitalContract } from '@app/redux/digitalContract/digitalContract.selectors';
+import { selectUser } from '@app/redux/user/user.selectors';
 import DigitalContracts from './DigitalContracts.component';
-import { IState } from '@redux/root-reducer';
-import { RootAction } from '@redux/root.types';
+import { IState } from '@app/redux/root-reducer';
+import { RootAction } from '@app/redux/root.types';
 
 const mapStateToProps = (state: IState) => {
   return {

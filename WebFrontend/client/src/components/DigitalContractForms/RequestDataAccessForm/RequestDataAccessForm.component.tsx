@@ -10,24 +10,24 @@ import { TRequestDataAccessFormProps } from './RequestDataAccessForm.types';
 
 import RequestDataAccessFormSuccess from './RequestDataAccessForm.success';
 import RequestDataAccessFormFailure from "./RequestDataAccessForm.failure";
-import { TGetDatasetSuccess } from '@redux/dataset/dataset.typeDefs';
-import { TPostDigitalContractStart, TPostDigitalContractSuccess } from '@redux/digitalContract/digitalContract.typeDefs';
+import { TGetDatasetSuccess } from '@APIs/dataset/dataset.typeDefs';
+import { TPostDigitalContractStart, TPostDigitalContractSuccess } from '@APIs/digitalContract/digitalContract.typeDefs';
 import Modal from '@secureailabs/web-ui/components/Modal';
 import FormFieldsRenderer from '@secureailabs/web-ui/components/FormFieldsRenderer';
 
-import { axiosProxy } from '@redux/utils';
+import { axiosProxy } from '@APIs/utils';
 import { useMutation } from 'react-query';
 
-import { demo_data } from "@redux/dataset/dataset.data";
+import { demo_data } from "@APIs/dataset/dataset.data";
 
 
 const postContract = async (digitalContractInfo: TPostDigitalContractStart): Promise<any> => {
   // return demo_data?.Datasets?.[id];
   const res = await axios.post<TPostDigitalContractSuccess>
     (`${axiosProxy()}/api/v1/DigitalContractManager/Applications`,
-    digitalContractInfo,
-  {
-    withCredentials: true,
+      digitalContractInfo,
+      {
+        withCredentials: true,
       });
   return res
 }
@@ -37,21 +37,21 @@ const RequestDataAccessForm: React.FC<TRequestDataAccessFormProps> = ({ setIsOpe
 
   // @ts-ignore
   const mutation = useMutation<TPostDigitalContractStart, AxiosError>((formData) => postContract(formData));
-  
-  const { register, handleSubmit, formState, trigger } = useForm<{Title: string, Description: string, SubscriptionDays: number}>({ mode: 'onSubmit' });
 
-  const onSubmit = (data : {
+  const { register, handleSubmit, formState, trigger } = useForm<{ Title: string, Description: string, SubscriptionDays: number }>({ mode: 'onSubmit' });
+
+  const onSubmit = (data: {
     Title: string, SubscriptionDays: number, Description: string
     // @ts-ignore
-  }) => mutation.mutate({ ...data, DatasetGuid: DatasetGuid, DataOwnerOrganization: DataOwnerOrganization, VersionNumber: '', LegalAgreement: '', DatasetDRMMetadataSize: 0, DatasetDRMMetadata: {}})
-  
+  }) => mutation.mutate({ ...data, DatasetGuid: DatasetGuid, DataOwnerOrganization: DataOwnerOrganization, VersionNumber: '', LegalAgreement: '', DatasetDRMMetadataSize: 0, DatasetDRMMetadata: {} })
+
   if (mutation.isLoading) {
-    return <Modal title='Request Dataset Access' description='Loading...' close={() => setIsOpen(false)}><Spinner/></Modal>
+    return <Modal title='Request Dataset Access' description='Loading...' close={() => setIsOpen(false)}><Spinner /></Modal>
   }
   if (mutation.isSuccess && mutation.data) {
-      return (
-          <RequestDataAccessFormSuccess UrlOnSuccess={UrlOnSuccess} />
-      )
+    return (
+      <RequestDataAccessFormSuccess UrlOnSuccess={UrlOnSuccess} />
+    )
   }
   if (mutation.error) {
     console.log('failure')

@@ -18,10 +18,10 @@ const VirtualMachines: React.FC<TVirtualMachinesProps> = ({
   getAllVirtualMachinesData,
   userData,
 }) => {
-  useEffect(() => {
-    getAllVirtualMachinesReset();
-    getAllVirtualMachinesStart();
-  }, []);
+  // useEffect(() => {
+  //   getAllVirtualMachinesReset();
+  //   getAllVirtualMachinesStart();
+  // }, []);
 
   return (
     <StandardContent title="Virtual Machines">

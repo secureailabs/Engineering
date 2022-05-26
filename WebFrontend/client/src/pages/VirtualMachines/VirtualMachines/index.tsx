@@ -1,3 +1,3 @@
-import DigitalContracts from './VirtualMachines.container';
+import DigitalContracts from './VirtualMachines.component';
 
 export default DigitalContracts;

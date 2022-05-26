@@ -1,12 +1,12 @@
-import { TGetAllFeedsSuccess } from '@redux/feed/feed.types';
-import { IUserData } from '@redux/user/user.typeDefs';
-import { IDefaults } from '@redux/typedefs';
+import { TGetAllFeedsSuccess } from '@APIs/feed/feed.types';
+import { IUserData } from '@APIs/user/user.typeDefs';
+import { IDefaults } from '@APIs/typedefs';
 
 export type TFeedProps = {
-  getAllFeedsStart(): void;
-  getAllFeedsReset(): void;
-  getAllFeedsState: IDefaults['state'];
-  getAllFeedsData: TGetAllFeedsSuccess;
+  // getAllFeedsStart(): void;
+  // getAllFeedsReset(): void;
+  // getAllFeedsState: IDefaults['state'];
+  // getAllFeedsData: TGetAllFeedsSuccess;
   limit?: number;
   containerHeight?: boolean;
 };

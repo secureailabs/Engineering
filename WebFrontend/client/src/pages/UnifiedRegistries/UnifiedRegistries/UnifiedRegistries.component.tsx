@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import ConditionalRender from '@components/ConditionalRender2';
+import axios from 'axios'
+import ConditionalRender  from '@components/ConditionalRender2';
 
 import { TUnifiedRegistriesProps } from './UnifiedRegistries.types';
 import { CSSTransition } from 'react-transition-group';
@@ -16,6 +17,12 @@ import { demo_data } from "@APIs/unifiedRegistry/unifiedRegistry.data";
 import { useQuery } from 'react-query';
 import { TGetAllUnifiedRegistriesSuccess } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 import { AxiosError } from 'axios';
+import { axiosProxy } from '@redux/utils';
+
+
+const mode = localStorage.getItem("mode")
+
+
 
 const UnifiedRegistries: React.FC<TUnifiedRegistriesProps> = () => {
 

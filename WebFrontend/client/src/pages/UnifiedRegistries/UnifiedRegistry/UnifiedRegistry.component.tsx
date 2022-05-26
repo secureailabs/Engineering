@@ -19,6 +19,9 @@ import { TGetUnifiedRegistrySuccess } from '@APIs/unifiedRegistry/unifiedRegistr
 import { axiosProxy } from '@APIs/utils';
 import { useQuery } from 'react-query';
 
+const mode = localStorage.getItem("mode")
+
+
 
 const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
   const { id } = useParams();
@@ -26,13 +29,15 @@ const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
 
   const fetch = (): TGetUnifiedRegistrySuccess['UnifiedRegistry'] => {
     //@ts-nocheck
-    return demo_data?.UnifiedRegistries?.[id || ""];
-    // const res = await axios.get<TGetUnifiedRegistrySuccess>
-    // (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-    // {
-    //   withCredentials: true,
-    // });
-    // return res.data.UnifiedRegistry;
+    if(mode == "demo"){
+      return demo_data?.UnifiedRegistries?.[id || ""];
+    }
+    const res = await axios.get<TGetUnifiedRegistrySuccess>
+    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+    {
+      withCredentials: true,
+    });
+    return res.data.UnifiedRegistry;
   }
 
   const { data, isLoading, status, error } =

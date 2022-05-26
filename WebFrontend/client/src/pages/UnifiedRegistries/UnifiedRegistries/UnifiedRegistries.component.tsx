@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios'
 import ConditionalRender  from '@components/ConditionalRender2';
 
 import { TUnifiedRegistriesProps } from './UnifiedRegistries.types';
@@ -16,17 +17,27 @@ import { demo_data } from "@redux/unifiedRegistry/unifiedRegistry.data";
 import { useQuery } from 'react-query';
 import { TGetAllUnifiedRegistriesSuccess } from '@redux/unifiedRegistry/unifiedRegistry.types';
 import { AxiosError } from 'axios';
+import { axiosProxy } from '@redux/utils';
+
+
+const mode = localStorage.getItem("mode")
+
+
 
 const UnifiedRegistries: React.FC<TUnifiedRegistriesProps> = () => {
 
-  const fetch = (): TGetAllUnifiedRegistriesSuccess['UnifiedRegistries'] => {
-    return demo_data.UnifiedRegistries;
-    // const res = await axios.get<TGetAllUnifiedRegistriesSuccess>
-    // (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-    // {
-    //   withCredentials: true,
-    // });
-    // return res.data.UnifiedRegistry;
+  const fetch = async (): TGetAllUnifiedRegistriesSuccess['UnifiedRegistries'] => {
+    if(mode == "demo"){
+      return demo_data.UnifiedRegistries;
+
+    }
+    
+    const res = await axios.get<TGetAllUnifiedRegistriesSuccess>
+    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid`, 
+    {
+      withCredentials: true,
+    });
+    return res.data.UnifiedRegistries;
   }
 
   // eslint-disable-next-line max-len

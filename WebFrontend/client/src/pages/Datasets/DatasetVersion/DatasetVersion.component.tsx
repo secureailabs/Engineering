@@ -16,31 +16,40 @@ import DatasetVersionFailure from "./DatasetVersion.failure";
 import { useQuery } from 'react-query';
 import { demo_data } from "@redux/dataset/dataset.data";
 
+const mode = localStorage.getItem("mode")
+
 
 
 const DatasetVersion: React.FC<TDatasetVersionProps> = () => {
   const  { version, id } = useParams();
 
   const fetch = (): TGetDatasetVersionSuccess['Dataset'] => {
+    if(mode == "demo"){
+      return demo_data?.Datasets[id]?.Versions[version];
+    }
+    
     //@ts-ignore
-    return demo_data?.Datasets[id]?.Versions[version];
-    // const res = await axios.get<TGetDatasetVersionSuccess>
-    // (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-    // {
-    //   withCredentials: true,
-    // });
-    // return res.data.Dataset;
+
+    const res = await axios.get<TGetDatasetVersionSuccess>
+    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+    {
+      withCredentials: true,
+    });
+    return res.data.Dataset;
   }
   
   const fetch2 = (): TGetDatasetSuccess['Dataset'] => {
     //@ts-ignore
-    return demo_data?.Datasets[id];
-    // const res = await axios.get<TGetDatasetSuccess>
-    // (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-    // {
-    //   withCredentials: true,
-    // });
-    // return res.data.Dataset;
+    if(mode == "demo"){
+    
+      return demo_data?.Datasets[id];
+    }
+    const res = await axios.get<TGetDatasetSuccess>
+    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+    {
+      withCredentials: true,
+    });
+    return res.data.Dataset;
   }
    
   const { data, isLoading, status, error } = 

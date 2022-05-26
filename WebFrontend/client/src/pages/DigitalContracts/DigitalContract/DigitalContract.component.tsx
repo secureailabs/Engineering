@@ -23,6 +23,11 @@ import DigitalContractFailure from './DigitalContract.failure';
 
 import DigitalContractSuccess from './DigitalContract.success';
 
+// There is no demo data for digital contracts, kinda makes sense
+
+// import { demo_data } from "@redux/digitalContract/digitalContract.data";
+
+
 import {
 
   TGetDigitalContractSuccess,
@@ -30,7 +35,12 @@ import {
 } from '@redux/digitalContract/digitalContract.typeDefs';
 import _ from 'lodash';
 
+const mode = localStorage.getItem("demo")
+
 const fetch = async ({ id }: { id: string }): Promise<TGetDigitalContractSuccess> => {
+  if(mode == "demo"){
+    return []
+  }
     const res = await axios.get<TGetDigitalContractSuccess>(
       `${axiosProxy()}/api/v1/DigitalContractManager/PullDigitalContract?DigitalContractGuid=${id}`, 
       {

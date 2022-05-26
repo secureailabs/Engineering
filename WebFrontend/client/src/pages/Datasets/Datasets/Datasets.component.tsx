@@ -16,8 +16,12 @@ import { TGetAllDatasetsSuccess } from '@redux/dataset/dataset.typeDefs';
 
 import { demo_data } from "@redux/dataset/dataset.data";
 
+const mode = localStorage.getItem("mode")
+
 const fetch = async (): Promise<TGetAllDatasetsSuccess['Datasets']> => {
-  // return demo_data.Datasets;
+  if(mode == "demo"){
+    return demo_data?.Datasets;
+  }
   const res = await axios.get<TGetAllDatasetsSuccess>
   (`${axiosProxy()}/api/v1/DatasetManager/ListDatasets`, 
   {

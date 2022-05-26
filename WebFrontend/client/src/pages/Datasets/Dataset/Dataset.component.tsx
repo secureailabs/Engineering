@@ -21,9 +21,13 @@ import { useQuery } from 'react-query';
 
 import { demo_data } from "@redux/dataset/dataset.data";
 
+const mode = localStorage.getItem("mode")
+
 
 const fetch = async ({ id }: { id: string }): Promise<TGetDatasetSuccess['Dataset']> => {
-  // return demo_data?.Datasets?.[id];
+  if(mode == "demo"){
+    return demo_data?.Datasets?.[id];
+  }
   const res = await axios.get<TGetDatasetSuccess>
   (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
   {

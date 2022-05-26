@@ -2,10 +2,15 @@ include Make/Modules.mk
 include Make/platformservices.mk
 include Make/dataservices.mk
 include Make/webfrontend.mk
-include Make/apiservices.mk
 include Make/securecomputationnode.mk
 
 .PHONY: platformservices dataservices securecomputationnode orchestrator datasetViewer databaseInitializationTool uploadPackageAndInitializationVector safeFunctionCompiler package all clean SharedCommonCode
+
+package_apiservices: SharedCommonCode uploadPackageAndInitializationVector package_securecomputationnode
+	@cp AzureDeploymentTemplates/ArmTemplates/securecomputationnode.json ApiServices
+	@cp Binary/UploadPackageAndInitializationVector ApiServices
+	@cp Binary/SecureComputationNode.tar.gz ApiServices
+	@tar --exclude='ApiServices/dev_env2' -czvf Binary/apiservices.tar.gz ApiServices
 
 platformservices: SharedCommonCode WebServices_Shared
 	@make restapiportal platformservices_plugins

@@ -21,14 +21,6 @@ tar -xf package.tar.gz
 # Move the InitializerVector to the Binary folder
 mv InitializationVector.json ApiServices/
 
-if [ -e SecureComputationNode.tar.gz ]
-then
-    mv SecureComputationNode.tar.gz ApiServices/
-fi
-
-# Move the uploaded tool to upload the package and InitializationVector to the SecureComputationNode
-mv UploadPackageAndInitializationVector ApiServices/
-
 # Start the local mongodb database
 mongod --port 27017 --dbpath /srv/mongodb/db0 --bind_ip localhost --fork --logpath /var/log/mongod.log
 

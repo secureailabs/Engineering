@@ -56,10 +56,7 @@ if [ -z "${AZURE_CLIENT_SECRET}" ]; then
 fi
 
 # Build and Package the Platform Services
-make package_platformservices -j
-make package_dataservices -j
-make package_securecomputationnode -j
-make uploadPackageAndInitializationVector -j
+make package_apiservices -j
 make databaseInitializationTool -j
 make package_webfrontend -j
 
@@ -75,22 +72,11 @@ cp Binary/DatabaseInitializationSettings.json $tempDeployDir
 cp Binary/UploadPackageAndInitializationVector $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 mv Binary/webfrontend.tar.gz $tempDeployDir
-mv Binary/PlatformServices.tar.gz $tempDeployDir/platformservices.tar.gz
-mv Binary/DataServices.tar.gz $tempDeployDir/dataservices.tar.gz
-mv Binary/SecureComputationNode.tar.gz $tempDeployDir/
+cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
 cp -r InternalTools/DeployPlatform/* $tempDeployDir
 
-# Add the SCN package to the platformservices.tar.gz
-pushd $tempDeployDir
-tar xvf platformservices.tar.gz
-rm platformservices.tar.gz
-cp SecureComputationNode.tar.gz Binary/platformservices/
-tar czvf platformservices.tar.gz Binary
-popd
-
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime
-cp Docker/dataservices/InitializationVector.json $tempDeployDir/dataservices.json
-cp Docker/platformservices/InitializationVector.json $tempDeployDir/platformservices.json
+cp Docker/apiservices/InitializationVector.json $tempDeployDir/apiservices.json
 
 # Check for the docker image and create it if it does not exist
 docker images | grep -x "azuredeploymenttools"

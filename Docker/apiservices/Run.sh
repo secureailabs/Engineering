@@ -29,6 +29,8 @@ cp BaseVmImageInit "$imageName"_dir/
 # Run the docker container
 docker run \
 -dit \
--p 8000:8000 \
+-p 8000:8001 \
+-p 9090:9091 \
 -v $(pwd)/"$imageName"_dir:/app \
+-v $(pwd)/certs:/etc/nginx/certs \
 $imageName

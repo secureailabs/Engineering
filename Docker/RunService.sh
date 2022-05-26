@@ -107,14 +107,10 @@ elif [ "platformservices" == "$imageName" ]; then
     cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/platformservices_dir/
     runtimeFlags="$runtimeFlags -p 6200:6201 -v $rootDir/Binary/platformservices_dir:/app $imageName"
 elif [ "apiservices" == "$imageName" ]; then
-    make -C $rootDir package_securecomputationnode -s -j
     make -C $rootDir package_apiservices -s -j
-    make -C $rootDir uploadPackageAndInitializationVector -s -j
     cp apiservices/InitializationVector.json $rootDir/Binary/apiservices_dir
-    cp $rootDir/Binary/ApiServices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
-    cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/apiservices_dir/
-    cp $rootDir/Binary/UploadPackageAndInitializationVector $rootDir/Binary/apiservices_dir/
-    runtimeFlags="$runtimeFlags -p 8000:1234 -v $rootDir/Binary/apiservices_dir:/app $imageName"
+    cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
+    runtimeFlags="$runtimeFlags -p 8000:8001 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
     make -C $rootDir package_webfrontend -s -j
     cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir

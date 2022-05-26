@@ -19,6 +19,7 @@ namespace SailTablePackagerForCsv
             )
         {
             InitializeComponent();
+            this.Text = Program.m_AssemblyTitle;
 
             // Make sure to record incoming parameters
             m_ColumnIndex = columnIndex;

@@ -28,6 +28,7 @@ namespace SailTablePackagerForCsv
             )
         {
             InitializeComponent();
+            this.Text = Program.m_AssemblyTitle;
             // Make sure to register the filename
             m_TableProperties = tableProperties;
             // Make sure to validate character input

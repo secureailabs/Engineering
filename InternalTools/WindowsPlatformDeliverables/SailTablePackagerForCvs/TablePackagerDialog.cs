@@ -24,6 +24,7 @@ namespace SailTablePackagerForCsv
             )
         {
             InitializeComponent();
+            this.Text = Program.m_AssemblyTitle;
 
             m_TableProperties = tableProperties;
             m_NotificationsAndProgressTracker = new NotificationsAndProgressTracker();

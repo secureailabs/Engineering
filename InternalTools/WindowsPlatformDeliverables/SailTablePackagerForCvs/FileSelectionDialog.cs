@@ -19,6 +19,7 @@ namespace SailTablePackagerForCsv
         {
             InitializeComponent();
 
+            this.Text = Program.m_AssemblyTitle;
             // By default, the next button is disabled, until a valid filename has been
             // selected
             m_NextButton.Enabled = false;

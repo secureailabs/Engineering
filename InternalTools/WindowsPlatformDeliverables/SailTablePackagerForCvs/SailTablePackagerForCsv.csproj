@@ -180,4 +180,7 @@
   <PropertyGroup>
     <PostBuildEvent>copy /B /Y "$(ProjectDir)SampleFiles\*.*" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>call "$(SolutionDir)..\..\VersionManagement\UpdateAssemblyInfo.cmd" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>
+  </PropertyGroup>
 </Project>

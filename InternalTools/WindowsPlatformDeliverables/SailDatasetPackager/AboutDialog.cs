@@ -15,6 +15,8 @@ namespace SailDatasetPackager
         public AboutDialog()
         {
             InitializeComponent();
+
+            this.Text = Program.m_AssemblyTitle;
         }
     }
 }

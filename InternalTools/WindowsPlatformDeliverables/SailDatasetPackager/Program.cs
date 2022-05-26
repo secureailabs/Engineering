@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -42,6 +43,12 @@ namespace SailDatasetPackager
             DatasetProperties datasetProperties = null;
             NotificationsAndProgressTracker notificationsAndProgressTracker = new NotificationsAndProgressTracker();
 
+            // Extract the assembly title from the running assembly
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute));
+            m_AssemblyTitle = titleAttribute.Title;
+
+            // Handle arguments
             if (0 < arguments.Length)
             {
                 // Attach to the current console. Use 0xFFFFFFFF to use the current process
@@ -144,5 +151,7 @@ namespace SailDatasetPackager
 
             return returnValue;
         }
+
+        static public string m_AssemblyTitle;
     }
 }

@@ -23,6 +23,7 @@ namespace SailTablePackagerForCsv
             )
         {
             InitializeComponent();
+            this.Text = Program.m_AssemblyTitle;
 
             // Initialize table properties
             m_TableProperties = tableProperties;

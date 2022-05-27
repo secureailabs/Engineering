@@ -6,6 +6,10 @@ include Make/securecomputationnode.mk
 
 .PHONY: platformservices dataservices securecomputationnode orchestrator datasetViewer databaseInitializationTool uploadPackageAndInitializationVector safeFunctionCompiler package all clean SharedCommonCode
 
+remoteDataConnector: SharedCommonCode
+	@make -C $(REMOTE_DATA_CONNECTOR) all
+	@echo "orchestrator done!"
+
 package_apiservices: SharedCommonCode uploadPackageAndInitializationVector package_securecomputationnode
 	@cp AzureDeploymentTemplates/ArmTemplates/securecomputationnode.json ApiServices
 	@cp Binary/UploadPackageAndInitializationVector ApiServices

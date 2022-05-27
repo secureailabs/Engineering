@@ -408,10 +408,8 @@ bool __stdcall VirtualMachineStatusUpdate(
         stlListOfHeaders.push_back("Content-Type: application/json");
         // Make the API call and get REST response
         std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strIpAddressOfWebPortalGateway, (Word) gs_unPortAddressOfWebPortalGateway, strVerb, strApiUrl, ::ConvertStructuredBufferToJson(oApiCallContent), true, stlListOfHeaders);
-        // Convert the API call response into a StructuredBuffer
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-        // Throw an exception if the API call did not succeed.
-        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Error while processing the transaction.", nullptr);
+        // TODO: BOARD-1731 have a way to check the response code of the API call
+        std::cout << "VirtualMachineStatusUpdate response " << stlRestResponse.data() << std::endl;
         // Api call has succeeded if we get here
         fSuccess = true;
     }

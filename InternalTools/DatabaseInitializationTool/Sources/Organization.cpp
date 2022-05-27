@@ -561,7 +561,7 @@ void __thiscall Organization::RegisterDatasets(void)
             // Now we start resetting some of the values in the dataset to reflect what is about to be
             // registered.
             // Create a new identifier
-            oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
+            // oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
             // Make sure the corporate identifier is updated
             oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetStructuredBuffer("organization").GetString("id")));
             // Reset the publish date

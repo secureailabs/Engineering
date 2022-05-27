@@ -655,7 +655,8 @@ bool __thiscall RootOfTrustCore::RegisterDataOwnerEosb(void)
 
     try
     {
-        StructuredBuffer oResponse(::RegisterVirtualMachineDataOwner(m_oRootOfTrustCoreProperties.GetProperty("DataOwnerAccessToken"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier")));
+        // TODO: BOARD-1747 re-enable this
+        //StructuredBuffer oResponse(::RegisterVirtualMachineDataOwner(m_oRootOfTrustCoreProperties.GetProperty("DataOwnerAccessToken"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier")));
         // HACK-DG Filling in random data for now
         //m_oRootOfTrustCoreProperties.SetProperty("DataOwnerUserIdentifier", oResponse.GetString("DataOwnerUserIdentifier"));
         //m_oRootOfTrustCoreProperties.SetProperty("DataOrganizationAuditEventParentBranchNodeIdentifier", oResponse.GetString("DataOrganizationAuditEventParentBranchNodeIdentifier"));
@@ -687,9 +688,10 @@ bool __thiscall RootOfTrustCore::RegisterResearcherEosb(void)
 
     try
     {
-        StructuredBuffer oResponse(::RegisterVirtualMachineResearchUser(m_oRootOfTrustCoreProperties.GetProperty("ResearchUserEosb"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier")));
-        m_oRootOfTrustCoreProperties.SetProperty("ResearchUserIdentifier", oResponse.GetString("ResearchUserIdentifier"));
-        m_oRootOfTrustCoreProperties.SetProperty("ResearchOrganizationAuditEventParentBranchNodeIdentifier", oResponse.GetString("ResearchOrganizationAuditEventParentBranchNodeIdentifier"));
+        // TODO: BOARD-1747 re-enable this
+        //StructuredBuffer oResponse(::RegisterVirtualMachineResearchUser(m_oRootOfTrustCoreProperties.GetProperty("ResearchUserEosb"), m_oRootOfTrustCoreProperties.GetProperty("VirtualMachineIdentifier")));
+        // m_oRootOfTrustCoreProperties.SetProperty("ResearchUserIdentifier", oResponse.GetString("ResearchUserIdentifier"));
+        // m_oRootOfTrustCoreProperties.SetProperty("ResearchOrganizationAuditEventParentBranchNodeIdentifier", oResponse.GetString("ResearchOrganizationAuditEventParentBranchNodeIdentifier"));
         fSuccess = true;
     }
 

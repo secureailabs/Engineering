@@ -120,11 +120,11 @@ bool __thiscall DataConnector::LoadAndVerify(
     // Build the table metadata
     StructuredBuffer oAllTablesMetadata;
     // Seek to each tables metadata and store the StructuredBuffer into the class member
-    std::unordered_map<std::string, int> stlListOfTableIdentifiers = oDataset.GetTableIdentifiers();
+    std::vector<std::string> stlListOfTableIdentifiers = oDataset.GetTableIdentifiers();
     __DebugAssert(stlListOfTableIdentifiers.size() == oDataset.GetNumberOfTables());
     for (const auto & c_stlTableIdentifier: stlListOfTableIdentifiers)
     {
-        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_stlTableIdentifier.first.c_str());
+        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_stlTableIdentifier.c_str());
         // Build the metadata blob for the current table
         StructuredBuffer oTableMedata;
         oTableMedata.PutString("TableIdentifier", oDatasetTable.GetTableIdentifier());
@@ -148,7 +148,7 @@ bool __thiscall DataConnector::LoadAndVerify(
         // Where to store your individual table.
         std::vector<std::vector<std::string>> stlIndividualTable;
         // Get the dataset table
-        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_stlTableIdentifier.first.c_str());
+        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_stlTableIdentifier.c_str());
         // Extract the table into plain-text
         StructuredBuffer oInformationForDataAccess(oDatasetTable.GetInformationForDataAccess());
         BinaryFileReader oBinaryFileReader(oInformationForDataAccess.GetString("DatasetFilename"));

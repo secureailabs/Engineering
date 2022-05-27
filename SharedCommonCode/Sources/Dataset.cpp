@@ -230,11 +230,17 @@ unsigned int __thiscall Dataset::GetNumberOfTables(void) const throw()
 
 /********************************************************************************************/
 
-std::unordered_map<std::string, int> __thiscall Dataset::GetTableIdentifiers(void) const throw()
+std::vector<std::string> __thiscall Dataset::GetTableIdentifiers(void) const throw()
 {
     __DebugFunction();
 
-    return m_stlMapOfTableIdentifiers;
+    std::vector<std::string> stlResponseListOfTableIdentifiers;
+    for (const auto & strIdentifier : m_stlMapOfTableIdentifiers)
+    {
+        stlResponseListOfTableIdentifiers.push_back(strIdentifier.first);
+    }
+
+    return stlResponseListOfTableIdentifiers;
 }
 
 /********************************************************************************************/

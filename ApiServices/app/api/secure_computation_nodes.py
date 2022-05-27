@@ -50,7 +50,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def register_secure_computation_node(
-    backgropund_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks,
     secure_computation_node_req: RegisterSecureComputationNode_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ):
@@ -100,7 +100,7 @@ async def register_secure_computation_node(
         )
 
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
-        backgropund_tasks.add_task(provision_virtual_machine, secure_computation_node_db)
+        background_tasks.add_task(provision_virtual_machine, secure_computation_node_db)
 
         return secure_computation_node_db
     except HTTPException as http_exception:
@@ -294,7 +294,7 @@ async def update_secure_computation_node(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def deprovision_secure_computation_node(
-    backgropund_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks,
     secure_computation_node_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
 ):
@@ -315,7 +315,7 @@ async def deprovision_secure_computation_node(
 
         # TODO: Prawal do it later depending on HANU status
         # Start a background task to deprovision the secure computation node which will update the status
-        backgropund_tasks.add_task(deprovision_virtual_machine, secure_computation_node_db)
+        background_tasks.add_task(deprovision_virtual_machine, secure_computation_node_db)
 
         # Update the secure computation node
         await data_service.update_one(

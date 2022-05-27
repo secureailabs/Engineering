@@ -5,11 +5,12 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ########################################################################################################################
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.api.datasets_families import get_dataset_family
+from app.api.internal_utils import cache_get_basic_info_dataset_families, cache_get_basic_info_organization
 from app.data import operations as data_service
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
@@ -31,7 +32,7 @@ DB_COLLECTION_DATA_FEDERATIONS = "data-federations"
 router = APIRouter()
 
 
-def getForgetPasswordContent(secret: str):
+def getEmailInviteContent(secret: str):
     htmlText = (
         """
         <html>
@@ -115,41 +116,34 @@ async def get_all_data_federations(
         response_list_of_data_federations: List[GetDataFederation_Out] = []
 
         # Cache the organization information
-        organization_cache = {}
-        data_family_cache = {}
+        organization_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+        data_family_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+
         # Add the organization information to the data federation
         for data_federation in data_federations:
             data_federation = DataFederation_Db(**data_federation)
-            if data_federation.organization_id not in organization_cache:
-                organization_cache[data_federation.organization_id] = await get_organization(
-                    organization_id=data_federation.organization_id, current_user=current_user
-                )
 
-            data_submitter_basic_info_list: List[BasicObjectInfo] = []
-            for data_submitter in data_federation.data_submitter_organizations_id:
-                if data_submitter not in organization_cache:
-                    organization_cache[data_submitter] = await get_organization(
-                        organization_id=data_submitter, current_user=current_user
-                    )
-                data_submitter_basic_info_list.append(organization_cache[data_submitter])
+            # Add the organization information to the data federation
+            organization_cache, data_submitter_basic_info_list = await cache_get_basic_info_organization(
+                organization_cache, [data_federation.organization_id], current_user
+            )
 
-            researcher_basic_info_list: List[BasicObjectInfo] = []
-            for researcher in data_federation.research_organizations_id:
-                if researcher not in organization_cache:
-                    organization_cache[researcher] = await get_organization(
-                        organization_id=researcher, current_user=current_user
-                    )
-                researcher_basic_info_list.append(organization_cache[researcher])
+            # Add the data submitter organization information to the data federation
+            organization_cache, data_submitter_basic_info_list = await cache_get_basic_info_organization(
+                organization_cache, data_federation.data_submitter_organizations_id, current_user
+            )
 
-            data_family_basic_info_list: List[BasicObjectInfo] = []
-            for data_family in data_federation.dataset_families_id:
-                if data_family not in data_family_cache:
-                    data_family_cache[data_family] = await get_dataset_family(
-                        dataset_family_id=data_family, current_user=current_user
-                    )
-                data_family_basic_info_list.append(data_family_cache[data_family])
+            # Add the research organization information to the data federation
+            organization_cache, researcher_basic_info_list = await cache_get_basic_info_organization(
+                organization_cache, data_federation.research_organizations_id, current_user
+            )
 
-            respose_data_federation = GetDataFederation_Out(
+            # Add the data family information to the data federation
+            data_family_cache, data_family_basic_info_list = await cache_get_basic_info_dataset_families(
+                data_family_cache, data_federation.dataset_families_id, current_user
+            )
+
+            response_data_federation = GetDataFederation_Out(
                 **data_federation.dict(),
                 organization=organization_cache[data_federation.organization_id],
                 data_submitter_organizations=data_submitter_basic_info_list,
@@ -157,7 +151,7 @@ async def get_all_data_federations(
                 dataset_families=data_family_basic_info_list,
                 invites=[]
             )
-            response_list_of_data_federations.append(respose_data_federation)
+            response_list_of_data_federations.append(response_data_federation)
 
         return GetMultipleDataFederation_Out(data_federations=response_list_of_data_federations)
     except HTTPException as http_exception:
@@ -182,37 +176,33 @@ async def get_data_federation(data_federation_id: PyObjectId, current_user: Toke
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
         data_federation = DataFederation_Db(**data_federation)
-        organization = await get_organization(
-            organization_id=data_federation.organization_id, current_user=current_user
+
+        # Add the organization information to the data federation
+        _, organization = await cache_get_basic_info_organization({}, [data_federation.organization_id], current_user)
+
+        _, data_submitter_basic_info_list = await cache_get_basic_info_organization(
+            {}, data_federation.data_submitter_organizations_id, current_user
         )
 
-        data_submitter_basic_info_list: List[BasicObjectInfo] = []
-        for data_submitter in data_federation.data_submitter_organizations_id:
-            data_submitter_organization = await get_organization(
-                organization_id=data_submitter, current_user=current_user
-            )
-            data_submitter_basic_info_list.append(data_submitter_organization)
+        _, researcher_basic_info_list = await cache_get_basic_info_organization(
+            {}, data_federation.research_organizations_id, current_user
+        )
 
-        researcher_basic_info_list: List[BasicObjectInfo] = []
-        for researcher in data_federation.research_organizations_id:
-            researcher_organization = await get_organization(organization_id=researcher, current_user=current_user)
-            researcher_basic_info_list.append(researcher_organization)
+        # Add the data family information to the data federation
+        _, data_family_basic_info_list = await cache_get_basic_info_dataset_families(
+            {}, data_federation.dataset_families_id, current_user
+        )
 
-        data_family_basic_info_list: List[BasicObjectInfo] = []
-        for data_family in data_federation.dataset_families_id:
-            data_family = await get_dataset_family(dataset_family_id=data_family, current_user=current_user)
-            data_family_basic_info_list.append(data_family)
-
-        respose_data_federation = GetDataFederation_Out(
+        response_data_federation = GetDataFederation_Out(
             **data_federation.dict(),
-            organization=organization,
+            organization=organization[0],
             data_submitter_organizations=data_submitter_basic_info_list,
             research_organizations=researcher_basic_info_list,
             dataset_families=data_family_basic_info_list,
             invites=[]
         )
 
-        return respose_data_federation
+        return response_data_federation
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

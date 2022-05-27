@@ -99,10 +99,10 @@ int main(
                 std::cout << "| Table Count = " << std::to_string(oDataset.GetNumberOfTables()) << std::endl;
                 std::cout << "+======================================================================================+" << std::endl;
                 // Now loop through all of the tables
-                std::unordered_map<std::string, int> stlListOfTables = oDataset.GetTableIdentifiers();
+                std::vector<std::string> stlListOfTables = oDataset.GetTableIdentifiers();
                 for (const auto & c_strTableIdentifier: stlListOfTables)
                 {
-                    DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_strTableIdentifier.first.c_str());
+                    DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_strTableIdentifier.c_str());
                     std::cout << "Table Identifier = " << oDatasetTable.GetTableIdentifier() << std::endl;
                     std::cout << "Title = " << oDatasetTable.GetTitle() << std::endl;
                     std::cout << "Description = " << oDatasetTable.GetDescription() << std::endl;
@@ -134,7 +134,7 @@ int main(
                 {
                     for (const auto & c_strTableIdentifier: stlListOfTables)
                     {
-                        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_strTableIdentifier.first.c_str());
+                        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_strTableIdentifier.c_str());
                         StructuredBuffer oInformationForDataAccess(oDatasetTable.GetInformationForDataAccess());
                         BinaryFileReader oBinaryFileReader(oInformationForDataAccess.GetString("DatasetFilename"));
                         oBinaryFileReader.Seek(eFromBeginningOfFile, oInformationForDataAccess.GetUnsignedInt64("OffsetToFirstByteOfCompressedData"));

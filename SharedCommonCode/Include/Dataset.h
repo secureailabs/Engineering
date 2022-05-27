@@ -98,7 +98,7 @@ class Dataset : public Object
         std::string __thiscall GetKeywords(void) const throw();
         uint64_t __thiscall GetPublishDate(void) const throw();
         unsigned int __thiscall GetNumberOfTables(void) const throw();
-        std::unordered_map<std::string, int> __thiscall GetTableIdentifiers(void) const throw();
+        std::vector<std::string> __thiscall GetTableIdentifiers(void) const throw();
         DatasetTable __thiscall GetDatasetTable(
             _in const char * c_szTableIdentifier
             ) const;

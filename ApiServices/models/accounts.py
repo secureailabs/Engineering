@@ -52,7 +52,7 @@ class GetMultipleOrganizations_Out(SailBaseModel):
 
 
 class UpdateOrganization_In(SailBaseModel):
-    # todo: Prawal add a validator to enure that atleast of the field is present in the request
+    # TODO: Prawal add a validator to enure that atleast of the field is present in the request
     name: Optional[StrictStr] = Field(...)
     description: Optional[StrictStr] = Field(...)
     avatar: Optional[StrictStr] = Field(...)

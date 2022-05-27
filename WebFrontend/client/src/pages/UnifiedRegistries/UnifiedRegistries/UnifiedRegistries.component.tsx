@@ -17,7 +17,6 @@ import { demo_data } from "@APIs/unifiedRegistry/unifiedRegistry.data";
 import { useQuery } from 'react-query';
 import { TGetAllUnifiedRegistriesSuccess } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 import { AxiosError } from 'axios';
-import { axiosProxy } from '@redux/utils';
 
 
 const mode = localStorage.getItem("mode")

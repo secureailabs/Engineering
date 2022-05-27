@@ -29,15 +29,15 @@ const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
 
   const fetch = (): TGetUnifiedRegistrySuccess['UnifiedRegistry'] => {
     //@ts-nocheck
-    if(mode == "demo"){
+    // if(mode == "demo"){
       return demo_data?.UnifiedRegistries?.[id || ""];
-    }
-    const res = await axios.get<TGetUnifiedRegistrySuccess>
-    (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-    {
-      withCredentials: true,
-    });
-    return res.data.UnifiedRegistry;
+    // }
+  //   const res = axios.get<TGetUnifiedRegistrySuccess>
+  //   (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+  //   {
+  //     withCredentials: true,
+  //   });
+  //   return res.data.UnifiedRegistry;
   }
 
   const { data, isLoading, status, error } =

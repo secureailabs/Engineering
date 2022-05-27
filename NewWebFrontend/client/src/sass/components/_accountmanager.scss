@@ -1,0 +1,51 @@
+
+.getallaccounts {
+    @include list-view;
+    @include table;
+
+    &__listtitle {
+      &__options {
+        width: 20vw;
+        grid-template-columns: 1fr 1fr;
+        text-align: justify;
+      }
+    }
+}
+
+.accountmanager {
+    width: 200vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    // height: 50px;
+    // max-height: 50px;
+    padding: 4rem 0rem;
+
+    transition: all 0.5s ease-in-out;
+    &--active {
+      transform: translateX(-50%);
+      //   height: 500px;
+      max-height: 100vh;
+    }
+    &__details__header {
+      margin: 0 0 0;
+      display: grid;
+      grid-template-columns: 1fr 100fr;
+      align-items: center;
+      &__text {
+        border-bottom: 1px solid grey;
+        font: {
+          size: var(--fontsize-xxl);
+          weight: bold;
+        }
+      }
+      svg {
+        padding: 0 3rem;
+      }
+    }
+}
+
+.accountinfo {
+  button {
+    width: 20rem;
+  }
+}

@@ -23,44 +23,16 @@ import newLogo from '@assets/newLogo.png';
 import { TDashboardProps } from './Dashboard.types';
 
 const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}) => {
-  const primary = [
+  let primary : any[] = [
     { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },
     { text: 'Datasets', Icon: MdViewColumn, link: '/dashboard/datasets' },
     {
       text: 'Virtual Machines',
       Icon: HiOutlineDesktopComputer,
       link: '/dashboard/virtual-machines',
-    },
-    {
-      text: 'Launch Notebook',
-      Icon: MdLaunch,
-      onClick: () => {
-        // @ts-ignore
-        window.location.href = import.meta.env.VITE_PUBLIC_JUPYTER_URL || "http://52.152.225.54:8080/lab?token=fa8dfcf5a8cfd55402f687698847adabced336cd0423172c"
-      },
-    },
-    {
-      text: 'Unified Registries',
-      Icon: FaServer,
-      link: '/dashboard/registries',
-    },
+    }
   ];
-  const secondary = [
-    {
-      text: 'Settings',
-      Icon: MdSettings,
-      link: '/dashboard/settings',
-    },
-    {
-      text: 'My Organization',
-      Icon: MdSettings,
-      link: '/dashboard/my-organization',
-    },
-    {
-      text: 'Help',
-      Icon: MdHelpOutline,
-      link: '/dashboard/help',
-    },
+  let secondary: any[] = [
     {
       text: 'Logout',
       Icon: MdLogout,
@@ -69,6 +41,39 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
     },
     },
   ];
+
+  if (localStorage.getItem('mode') == 'demo') {
+    primary = primary.concat([{
+      text: 'Launch Notebook',
+      Icon: MdLaunch,
+      onClick: () => {
+        // @ts-ignore
+        window.location.href = import.meta.env.VITE_PUBLIC_JUPYTER_URL || "http://52.152.225.54:8080/lab?token=fa8dfcf5a8cfd55402f687698847adabced336cd0423172c"
+      },
+    },
+      {
+        text: 'Unified Registries',
+        Icon: FaServer,
+        link: '/dashboard/registries',
+      }])
+
+    secondary = secondary.concat([{
+      text: 'Settings',
+      Icon: MdSettings,
+      link: '/dashboard/settings',
+    },
+      {
+        text: 'My Organization',
+        Icon: MdSettings,
+        link: '/dashboard/my-organization',
+      },
+      {
+        text: 'Help',
+        Icon: MdHelpOutline,
+        link: '/dashboard/help',
+      }])
+  }
+
 
   // <DashboardRouter />
   return (

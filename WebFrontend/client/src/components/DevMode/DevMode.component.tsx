@@ -6,17 +6,15 @@ const DevMode = () => {
     const [params] = useSearchParams();
     const mode = params.get("mode")
 
-    if(mode =="demo"){
-        localStorage.setItem("mode", "demo")
-    } else {
-        if (!localStorage.getItem("mode")) {
-            localStorage.setItem("mode", "prod")
-        }
-    }
-    
     if (mode) {
+        localStorage.setItem('mode', mode == 'demo' ? 'demo' : 'prod')
         return <Navigate to={location.pathname.slice(0, location.pathname.indexOf('?'))} />
     }
+
+    if (!localStorage.getItem("mode")) {
+            localStorage.setItem("mode", "prod")
+    }
+
     return <></>
 }
 

@@ -18,7 +18,8 @@ import ViewOrganization from '@pages/ViewOrganization';
 
 const DashboardRouter: React.FC = (): React.ReactElement => (
   <Routes>
-    <Route
+    {localStorage.getItem('mode') == 'demo' && <>
+      <Route
       path="/registries"
       element={
         <ProtectedRoute redirect="/login">
@@ -27,15 +28,42 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
         </ProtectedRoute>
       }
     />
-    <Route
-      path="/registries/:id"
-      element={
-        <ProtectedRoute redirect="/login">
-          {/* @ts-ignore */}
-          <UnifiedRegistry />
-        </ProtectedRoute>
-      }
-    />
+      <Route
+        path="/registries/:id"
+        element={
+          <ProtectedRoute redirect="/login">
+            {/* @ts-ignore */}
+            <UnifiedRegistry />
+          </ProtectedRoute>
+        }
+      
+      />
+      <Route
+        path="/organizations/:id"
+        element={
+          <ProtectedRoute redirect="/login">
+            <ViewOrganization />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute redirect="/login">
+            {/* @ts-ignore */}
+            <SettingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-organization"
+        element={
+          <ProtectedRoute redirect="/login">
+            {/* @ts-ignore */}
+            <Organization />
+          </ProtectedRoute>
+        }
+      /></>}
 
     <Route
       path="/"
@@ -85,32 +113,6 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
         </ProtectedRoute>
       }
     /> */}
-    <Route
-      path="/organizations/:id"
-      element={
-        <ProtectedRoute redirect="/login">
-          <ViewOrganization />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/settings"
-      element={
-        <ProtectedRoute redirect="/login">
-          {/* @ts-ignore */}
-          <SettingsPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/my-organization"
-      element={
-        <ProtectedRoute redirect="/login">
-          {/* @ts-ignore */}
-          <Organization />
-        </ProtectedRoute>
-      }
-    />
   </Routes>
 );
 

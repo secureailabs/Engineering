@@ -57,21 +57,21 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
         link: '/dashboard/registries',
       }])
 
-    secondary = secondary.concat([{
+    secondary = [{
       text: 'Settings',
       Icon: MdSettings,
       link: '/dashboard/settings',
     },
-      {
-        text: 'My Organization',
-        Icon: MdSettings,
-        link: '/dashboard/my-organization',
-      },
-      {
-        text: 'Help',
-        Icon: MdHelpOutline,
-        link: '/dashboard/help',
-      }])
+    {
+      text: 'My Organization',
+      Icon: MdSettings,
+      link: '/dashboard/my-organization',
+    },
+    {
+      text: 'Help',
+      Icon: MdHelpOutline,
+      link: '/dashboard/help',
+    }].concat(secondary)
   }
 
 

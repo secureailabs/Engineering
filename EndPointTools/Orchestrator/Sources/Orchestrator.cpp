@@ -368,7 +368,7 @@ int __thiscall Orchestrator::LoadSafeObjects(
                         {
                             StructuredBuffer oSafeObject(stlFileContents);
                             Guid oSafeObjectGuid(oSafeObject.GetString("Uuid"));
-                            m_stlAvailableSafeFunctions.emplace(oSafeObjectGuid.ToString(eRaw), oSafeObject);
+                            m_stlAvailableSafeFunctions.emplace(oSafeObjectGuid.ToString(eForceRaw), oSafeObject);
                             ++nReturnValue;
                         }
                     }
@@ -524,11 +524,11 @@ std::string Orchestrator::RunJob(
         if ("" != m_oSessionManager.GetAccessToken())
         {
             Guid oSafeFunctionGuid(c_strSafeFunctionIdentifier);
-            if (m_stlAvailableSafeFunctions.end() != m_stlAvailableSafeFunctions.find(oSafeFunctionGuid.ToString(eRaw)))
+            if (m_stlAvailableSafeFunctions.end() != m_stlAvailableSafeFunctions.find(oSafeFunctionGuid.ToString(eForceRaw)))
             {
                 std::vector<std::string> stlInputParameters;
                 Guid oJobIdentifier(eJobIdentifier);
-                StructuredBuffer oSafeFunction = m_stlAvailableSafeFunctions[oSafeFunctionGuid.ToString(eRaw)];
+                StructuredBuffer oSafeFunction = m_stlAvailableSafeFunctions[oSafeFunctionGuid.ToString(eForceRaw)];
                 StructuredBuffer oInputParameters = oSafeFunction.GetStructuredBuffer("InputParameters");
                 for (const std::string & strInputParameterId : oInputParameters.GetNamesOfElements() )
                 {
@@ -646,7 +646,7 @@ std::string Orchestrator::SetParameter(
 
                 if (true == oJobInformation.SetInputParameter(c_strInputParamId, c_strParamValue))
                 {
-                    strParameterIdentifier = oJobIdentifier.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+                    strParameterIdentifier = oJobIdentifier.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eForceRaw);
                     this->UpdateJobIPAddressForParameter(oJobInformation, oParameterGuid);
                 }
             }
@@ -657,7 +657,7 @@ std::string Orchestrator::SetParameter(
                 std::string strRawOutputParam = oJobOutputPieces.ToString();
                 if (true == oJobInformation.SetInputParameter(c_strInputParamId, strRawOutputParam))
                 {
-                    strParameterIdentifier = oJobIdentifier.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eHyphensAndCurlyBraces);
+                    strParameterIdentifier = oJobIdentifier.ToString(eHyphensAndCurlyBraces) + "." + oInputParameterGuid.ToString(eForceRaw);
                 }
 
                 // We aren't aware of this parameter yet, pull it
@@ -736,7 +736,7 @@ void __thiscall Orchestrator::UpdateJobIPAddressForParameter(
 
     if ( oTargetSecureComputationalNode.has_value() )
     {
-        auto oSecureNodeInformation = m_stlProvisionInformation.find(oTargetSecureComputationalNode.value().ToString(eRaw));
+        auto oSecureNodeInformation = m_stlProvisionInformation.find(oTargetSecureComputationalNode.value().ToString(eHyphensOnly));
         __DebugAssert(m_stlProvisionInformation.end() != oSecureNodeInformation);
 
         std::string strTargetIP = oSecureNodeInformation->second.strRemoteIpAddress;
@@ -770,7 +770,7 @@ void Orchestrator::UpdateJobIPAddressForAnySecureComputationalNode(
 
     if ( oTargetSecureComputationalNode.has_value() )
     {
-        auto oSecureNodeInformation = m_stlProvisionInformation.find(oTargetSecureComputationalNode.value().ToString(eRaw));
+        auto oSecureNodeInformation = m_stlProvisionInformation.find(oTargetSecureComputationalNode.value().ToString(eHyphensOnly));
         __DebugAssert(m_stlProvisionInformation.end() != oSecureNodeInformation);
 
         std::string strTargetIP = oSecureNodeInformation->second.strRemoteIpAddress;
@@ -1065,7 +1065,7 @@ std::string __thiscall Orchestrator::WaitForAllSecureNodesToBeProvisioned(
                         Guid oDigitalContractGuid(stlSecureComputationNodeItr.second.strDigitalContractGUID);
                         std::string strProvisionState = GetSecureComputationNodeInformation(stlSecureComputationNodeItr.first);
 
-                        if ("READY" == strProvisionState || "IN_USE" == strProvisionState || "WAITING_FOR_DATA" == strProvisionState)
+                        if ("READY" == strProvisionState || "IN_USE" == strProvisionState)
                         {
                             stlSucceededProvisions.insert(stlSecureComputationNodeItr.first);
                             stlInProgressProvisions.erase(stlSecureComputationNodeItr.first);
@@ -1281,7 +1281,7 @@ std::optional<Guid> Orchestrator::GetSecureComputationalNodeServingTable(
     std::optional<Guid> oSecureComputationalNodeGuid;
     for ( auto oTableItr : m_stlAvailableTables )
     {
-        Guid oTableItrGuid(oTableItr.second.m_oInformation.GetString("TableIdentifier"));
+        Guid oTableItrGuid(oTableItr.second.m_oInformation.GetString("id"));
 
         if ( oTableGuid == oTableItrGuid )
         {
@@ -1336,7 +1336,7 @@ std::string __thiscall Orchestrator::PullJobData(
             for ( auto oOutputParameter : oOutputParameterNames )
             {
                 const StructuredBuffer c_currentOutput = c_oOutputParameters.GetStructuredBuffer(oOutputParameter.c_str());
-                if ( oJobOutput.m_strOutputIdentifier.ToString(eRaw) == c_currentOutput.GetString("Uuid") )
+                if ( oJobOutput.m_strOutputIdentifier.ToString(eForceRaw) == c_currentOutput.GetString("Uuid") )
                 {
                     oOutputParameterBuffer = c_currentOutput;
                     break;
@@ -1345,7 +1345,7 @@ std::string __thiscall Orchestrator::PullJobData(
 
             if ( !oOutputParameterBuffer.has_value() )
             {
-                strResult = "Parameter not found in safe function: " + oJobOutput.m_strOutputIdentifier.ToString(eHyphensAndCurlyBraces);
+                strResult = "Parameter not found in safe function: " + oJobOutput.m_strOutputIdentifier.ToString(eForceRaw);
             }
             else
             {
@@ -1720,7 +1720,7 @@ void __thiscall Orchestrator::SetParameterOnJob(
         oParameterSetBuffer.PutByte("RequestType", (Byte)EngineRequest::eSetParameters);
         oParameterSetBuffer.PutString("EndPoint", "JobEngine");
         oParameterSetBuffer.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
-        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eRaw));
+        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eForceRaw));
         oParameterSetBuffer.PutString("ValueUuid", oParameterValueGuid.ToString(eRaw));
         oParameterSetBuffer.PutUnsignedInt32("ValuesExpected", 1);
         oParameterSetBuffer.PutUnsignedInt32("ValueIndex", 0);
@@ -1774,7 +1774,7 @@ void __thiscall Orchestrator::SetJobParameterForJobOutput(
         oParameterSetBuffer.PutByte("RequestType", (Byte)EngineRequest::eSetParameters);
         oParameterSetBuffer.PutString("EndPoint", "JobEngine");
         oParameterSetBuffer.PutString("JobUuid", oJob.GetJobId().ToString(eRaw));
-        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eRaw));
+        oParameterSetBuffer.PutString("ParameterUuid", oParameterGuid.ToString(eForceRaw));
         oParameterSetBuffer.PutString("ValueUuid", strParameterValue);
         oParameterSetBuffer.PutUnsignedInt32("ValuesExpected", 1);
         oParameterSetBuffer.PutUnsignedInt32("ValueIndex", 0);

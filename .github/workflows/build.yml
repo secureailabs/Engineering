@@ -67,7 +67,7 @@ jobs:
           cd Docker/
           ./BuildImages.sh -i apiservices
           sudo ./RunService.sh -s apiservices -d
-          sleep 5
+          sleep 60
           cd ..
           ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps
 

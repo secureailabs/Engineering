@@ -25,7 +25,7 @@ pipeline {
                     ls -l
                     sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Docker/platformservices/InitializationVector.json
                     grep '"Owner": "Nightly"' ./Docker/platformservices/InitializationVector.json
-                    make all -j
+                    // make all -j
                     '''
                 }
             }
@@ -114,7 +114,7 @@ pipeline {
                     sh label:
                     'Running Tests',
                     script:'''
-                    docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/ --ip 10.0.0.5 -m "functional or stress" -sv --junitxml=test-results.xml
+                    // docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/ --ip 10.0.0.5 -m "functional or stress" -sv --junitxml=test-results.xml
                     '''
                 }
             }

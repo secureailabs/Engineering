@@ -141,7 +141,7 @@ void __thiscall RootOfTrustNode::RecordAuditEvent(
             oTransactionData.PutDword("Transaction", 0x00000009);
             oTransactionData.PutWord("TargetChannelsBitMask", wTargetChannelsBitMask);
             // Persistent properties of audit event
-            oTransactionData.PutString("EventGuid", oEventGuid.ToString(eHyphensAndCurlyBraces));
+            oTransactionData.PutString("EventGuid", oEventGuid.ToString(eHyphensOnly));
             oTransactionData.PutQword("EventType", dwEventType);
             oTransactionData.PutUnsignedInt64("Timestamp", ::GetEpochTimeInMilliseconds());
             // Make sure that the encrypted data contains the EventName property

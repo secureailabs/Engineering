@@ -49,8 +49,4 @@ class DigitalContract : public Object
         std::string m_strVersionNumber;
         std::string m_strLegalAgreement;
         unsigned int m_unSubscriptionDays;
-        unsigned int m_unRetentionTime;
-        std::string m_strHostForVirtualMachines;
-        std::string m_strHostRegion;
-        unsigned int m_unNumberOfVirtualMachines;
 };

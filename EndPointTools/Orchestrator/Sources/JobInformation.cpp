@@ -347,7 +347,7 @@ void __thiscall JobInformation::unlock(void)
 std::string __thiscall JobInformation::GetSafeFunctionId(void) const
 {
     __DebugFunction();
-    return m_oSafeFunctionId.ToString(eRaw);
+    return m_oSafeFunctionId.ToString(eForceRaw);
 }
 
 /********************************************************************************************

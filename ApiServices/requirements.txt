@@ -11,3 +11,9 @@ motor
 pyflakes
 pymongo
 python-multipart
+
+azure-mgmt-resource
+msrestazure
+azure-identity
+azure-mgmt-compute
+azure-mgmt-network

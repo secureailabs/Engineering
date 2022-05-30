@@ -36,18 +36,22 @@ extern "C" __declspec(dllexport) bool __cdecl UpdateDatasetFamilyInformation(voi
         _ThrowBaseExceptionIf((false == ::IsLoggedOn()), "No active session, cannot complete requested operation", nullptr);
         // Build out the REST API call query
         std::string strVerb = "GET";
-        std::string strApiUri = "/SAIL/DatasetFamilyManager/ListDatasetFamilies?Eosb=" + ::GetSailPlatformServicesEosb();
-        std::string strJsonBody = "";
+        std::string strApiUri = "/dataset-families";
+        std::vector<std::string> stlListOfHeaders;
+        stlListOfHeaders.push_back("Authorization: Bearer " + ::GetSailPlatformServicesAccessToken());
+        std::string strBody = "";
         // Get the list of Dataset Families
-        std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word) 6200, strVerb, strApiUri, strJsonBody, true);
+        std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word)8000, strVerb, strApiUri, strBody, true, stlListOfHeaders);
         // Parse the returning value.
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Failed to log in. Invalid Credentials.", nullptr);
+        _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("dataset_families", INDEXED_BUFFER_VALUE_TYPE)), "Failed to get dataset families.", nullptr);
+
         // Now we extract the digital families information
-        if (true == oResponse.IsElementPresent("DatasetFamilies", INDEXED_BUFFER_VALUE_TYPE))
+        if (true == oResponse.IsElementPresent("dataset_families", INDEXED_BUFFER_VALUE_TYPE))
         {
-            StructuredBuffer oDatasetFamilies(oResponse.GetStructuredBuffer("DatasetFamilies"));
+            StructuredBuffer oDatasetFamilies(oResponse.GetStructuredBuffer("dataset_families"));
 
             std::vector<std::string> stlListOfDatasetFamilies = oDatasetFamilies.GetNamesOfElements();
             const std::lock_guard<std::mutex> lock(gs_stlMutex);
@@ -56,12 +60,12 @@ extern "C" __declspec(dllexport) bool __cdecl UpdateDatasetFamilyInformation(voi
                 if (true == oDatasetFamilies.IsElementPresent(strDatasetFamilyIdentifier.c_str(), INDEXED_BUFFER_VALUE_TYPE))
                 {
                     StructuredBuffer oDatasetFamily(oDatasetFamilies.GetStructuredBuffer(strDatasetFamilyIdentifier.c_str()));
-                    Qword qwHashOfDatasetFamilyIdentifier = ::Get64BitHashOfNullTerminatedString(strDatasetFamilyIdentifier.c_str(), false);
+                    Qword qwHashOfDatasetFamilyIdentifier = ::Get64BitHashOfNullTerminatedString(oDatasetFamily.GetString("id").c_str(), false);
 
-                    __DebugAssert(true == oDatasetFamily.IsElementPresent("DatasetFamilyTitle", ANSI_CHARACTER_STRING_VALUE_TYPE));
+                    __DebugAssert(true == oDatasetFamily.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE));
 
-                    gs_stlListOfDatasetFamiliesIdentifiers.insert(strDatasetFamilyIdentifier);
-                    gs_stlListOfDatasetFamiliesTitles[qwHashOfDatasetFamilyIdentifier] = oDatasetFamily.GetString("DatasetFamilyTitle");
+                    gs_stlListOfDatasetFamiliesIdentifiers.insert(oDatasetFamily.GetString("id"));
+                    gs_stlListOfDatasetFamiliesTitles[qwHashOfDatasetFamilyIdentifier] = oDatasetFamily.GetString("name");
                 }
             }
         }

@@ -49,9 +49,9 @@ static PyObject* login(PyObject* self, PyObject* args)
     return Py_BuildValue("I", unLoginStatus);
 }
 
-static PyObject* get_current_eosb(PyObject * self, PyObject * args)
+static PyObject* get_current_access_token(PyObject * self, PyObject * args)
 {
-    std::string strEosb = getFrontend().GetCurrentEosb();
+    std::string strEosb = getFrontend().GetCurrentAccessToken();
     PyObject* poPythonReturn;
     if ( !strEosb.empty() )
     {
@@ -155,19 +155,21 @@ static PyObject* provision_secure_computational_node(
     _in PyObject* args
     )
 {
+    char* pszVirtualMachineName;
     char* pszDigitalContractGuid;
     char* pszDatasetGuid;
     char* pszVirtualMachineType;
 
-    if(!PyArg_ParseTuple(args, "sss", &pszDigitalContractGuid, &pszDatasetGuid, &pszVirtualMachineType))
+    if(!PyArg_ParseTuple(args, "ssss", &pszVirtualMachineName, &pszDigitalContractGuid, &pszDatasetGuid, &pszVirtualMachineType))
     {
         return nullptr;
     }
 
+    std::string strVirtualMachineName(pszVirtualMachineName);
     std::string strDigitalContractGuid(pszDigitalContractGuid);
     std::string strDatasetGuid(pszDatasetGuid);
     std::string strVirtualMachineType(pszVirtualMachineType);
-    std::string strProvisionStatus = getFrontend().ProvisionSecureComputationalNode(strDigitalContractGuid, strDatasetGuid, strVirtualMachineType);
+    std::string strProvisionStatus = getFrontend().ProvisionSecureComputationalNode(strVirtualMachineName, strDigitalContractGuid, strDatasetGuid, strVirtualMachineType);
     PyObject* poPythonReturn;
     if ( !strProvisionStatus.empty() )
     {
@@ -403,20 +405,20 @@ static PyObject* get_ip_for_job(
     return poPythonReturn;
 }
 
-static PyObject* deprovision_digital_contract(
+static PyObject* deprovision_secure_computational_node(
     _in PyObject* self,
     _in PyObject* args
     )
 {
-    char* pszDigitalContractIdentifier;
+    char* pszSecureComputationNodeIdentifier;
 
-    if(!PyArg_ParseTuple(args, "s", &pszDigitalContractIdentifier))
+    if(!PyArg_ParseTuple(args, "s", &pszSecureComputationNodeIdentifier))
     {
         return nullptr;
     }
-    std::string strDigitalContractIdentifier(pszDigitalContractIdentifier);
+    std::string strSecureComputationNodeIdentifier(pszSecureComputationNodeIdentifier);
 
-    bool fReturn = getFrontend().DeprovisionDigitalContract(strDigitalContractIdentifier);
+    bool fReturn = getFrontend().DeprovisionSecureComputationNode(strSecureComputationNodeIdentifier);
 
     return Py_BuildValue("i", fReturn);
 }
@@ -424,7 +426,7 @@ static PyObject* deprovision_digital_contract(
 static PyMethodDef SAILAPIMethods [] =
 {
     {"login", (PyCFunction)login, METH_VARARGS, NULL},
-    {"get_current_eosb", (PyCFunction)get_current_eosb, METH_NOARGS, NULL},
+    {"get_current_access_token", (PyCFunction)get_current_access_token, METH_NOARGS, NULL},
     {"exit_current_session", (PyCFunction)exit_current_session, METH_NOARGS, NULL},
     {"load_safe_objects", (PyCFunction)load_safe_objects, METH_VARARGS,NULL},
     {"get_safe_functions", (PyCFunction)get_safe_functions, METH_NOARGS, NULL},
@@ -440,7 +442,7 @@ static PyMethodDef SAILAPIMethods [] =
     {"pull_data", (PyCFunction)pull_data, METH_VARARGS, NULL},
     {"wait_for_data", (PyCFunction)wait_for_data, METH_VARARGS, NULL},
     {"get_ip_for_job", (PyCFunction)get_ip_for_job, METH_VARARGS, NULL},
-    {"deprovision_digital_contract", (PyCFunction)deprovision_digital_contract, METH_VARARGS, NULL},
+    {"deprovision_secure_computational_node", (PyCFunction)deprovision_secure_computational_node, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}
 };
 

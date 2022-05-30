@@ -9,7 +9,7 @@ import { getAllDatasetsAPIdemo } from '@APIs/dataset/dataset.demo-apis';
 import Datasets from './Datasets.component';
 
 const DatasetsContainer: React.FC = () => {
-  const apiFunction = localStorage.getItem('mode') ? getAllDatasetsAPIdemo : getAllDatasetsAPI;
+  const apiFunction = localStorage.getItem('mode') == 'demo' ? getAllDatasetsAPIdemo : getAllDatasetsAPI;
 
   const { data, isLoading, status, error, refetch} =
     // @ts-ignore

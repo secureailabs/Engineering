@@ -74,15 +74,13 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
     }].concat(secondary)
   }
 
-
-  // <DashboardRouter />
   return (
     <>
       <Sidebar primary={primary} secondary={secondary} logo={newLogo}>
         <div className="standard-grid-row">
           <Header
             search={() => {}}
-            username={userData?.username}
+            username={userData?.name}
             profile_image={default_profile_image}
             organization={userData?.organization.name}
           />

@@ -1,18 +1,19 @@
-// import { TGetAllVirtualMachinesSuccess }
-//   from '@APIs/virtualMachineManager/virtualMachineManager.typeDefs';
-// import { IUserData } from '@APIs/user/user.typeDefs';
-// import { IDefaults } from '@APIs/typedefs';
+import { AxiosError } from 'axios';
 
-// export type TVirtualMachinesProps = {
-//   getAllVirtualMachinesStart(): void;
-//   getAllVirtualMachinesReset(): void;
-//   getAllVirtualMachinesState: IDefaults['state'];
-//   getAllVirtualMachinesData: TGetAllVirtualMachinesSuccess;
-//   userData: IUserData;
-// };
+import { TGetAllVirtualMachinesSuccess } from '@APIs/virtualMachineManager/virtualMachineManager.typedefs';
+import { IConditionalRender } from '@components/ConditionalRenderRQuery/ConditionalRender/ConditionalRender.types';
 
-// export type TVirtualMachinesSuccessProps = {
-//   getAllVirtualMachinesData: TGetAllVirtualMachinesSuccess;
-// };
 
-export {}
+export type TVirtualMachinesProps = {
+    status: IConditionalRender['status'];
+    getAllDatasetsData: TGetAllVirtualMachinesSuccess['secure_computation_nodes'];
+    error: AxiosError<any>;
+};
+
+export type TVirtualMachinesFailureProps = {
+    error: AxiosError<any>;
+}
+
+export type TVirtualMachinesSuccessProps = {
+  getAllVirtualMachinesData: TGetAllVirtualMachinesSuccess;
+};

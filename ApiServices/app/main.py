@@ -5,15 +5,26 @@
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ###################################################################################
 
-from fastapi import FastAPI
-from pydantic import BaseModel, Field, StrictStr
-from app.api import authentication, accounts, datasets, digital_contracts, secure_computation_nodes
-from fastapi.exceptions import RequestValidationError
 import fastapi.openapi.utils as utils
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field, StrictStr
+
+from app.api import (
+    accounts,
+    authentication,
+    data_federations,
+    datasets,
+    datasets_families,
+    digital_contracts,
+    internal_utils,
+    remote_data_connector,
+    secure_computation_nodes,
+)
 
 server = FastAPI(
     title="Secure AI Labs API Services",
@@ -28,6 +39,10 @@ server.include_router(accounts.router)
 server.include_router(datasets.router)
 server.include_router(digital_contracts.router)
 server.include_router(secure_computation_nodes.router)
+server.include_router(datasets_families.router)
+server.include_router(remote_data_connector.router)
+server.include_router(internal_utils.router)
+server.include_router(data_federations.router)
 
 # Override the default validation error handler as it throws away a lot of information
 # about the schema of the request body.

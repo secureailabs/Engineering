@@ -10,10 +10,11 @@
 #
 ################################################################################
 
-from .. import SAILPyAPI
 import getpass
-import pickle
 import json
+import pickle
+
+from .. import SAILPyAPI
 
 
 def login(email, password, port, IP):
@@ -73,8 +74,10 @@ def get_tables():
     return SAILPyAPI.get_tables()
 
 
-def provision_secure_computational_node(digital_contract_guid, dataset_guid, virtual_machine_type):
-    return SAILPyAPI.provision_secure_computational_node(digital_contract_guid, dataset_guid, virtual_machine_type)
+def provision_secure_computational_node(scn_name, digital_contract_guid, dataset_guid, virtual_machine_type):
+    return SAILPyAPI.provision_secure_computational_node(
+        scn_name, digital_contract_guid, dataset_guid, virtual_machine_type
+    )
 
 
 def run_job(safe_object_guid):
@@ -109,5 +112,5 @@ def get_ip_for_job(job_guid):
     return SAILPyAPI.get_ip_for_job(job_guid)
 
 
-def deprovision_digital_contract(digital_contract_guid):
-    return SAILPyAPI.deprovision_digital_contract(digital_contract_guid)
+def deprovision_secure_computational_node(secure_computational_node_guid):
+    return SAILPyAPI.deprovision_secure_computational_node(secure_computational_node_guid)

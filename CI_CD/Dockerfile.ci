@@ -34,7 +34,7 @@ RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf
 RUN git clone https://$git_personal_token@github.com/secureailabs/Engineering.git /Engineering
 RUN sh /Engineering/install.sh
 
-EXPOSE 27017 6200
+EXPOSE 27017 8000
 WORKDIR /Engineering
 
 CMD ["/bin/bash"]

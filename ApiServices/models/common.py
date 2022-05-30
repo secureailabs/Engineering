@@ -6,7 +6,8 @@
 ###################################################################################
 
 from uuid import UUID, uuid4
-from pydantic import BaseModel
+
+from pydantic import BaseModel, Field, StrictStr
 
 
 class PyObjectId(UUID):
@@ -32,3 +33,8 @@ class SailBaseModel(BaseModel):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {PyObjectId: str}
+
+
+class BasicObjectInfo(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+    name: StrictStr = Field(...)

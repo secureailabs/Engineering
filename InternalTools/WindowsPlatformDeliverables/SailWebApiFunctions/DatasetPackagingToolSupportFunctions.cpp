@@ -81,15 +81,15 @@ extern "C" __declspec(dllexport) void __cdecl AddColumnToTablePackageFile(
     {
         unsigned int unColumnIndex = (unsigned int) gs_stlColumnProperties.size();
         gs_stlColumnProperties[unColumnIndex] = new StructuredBuffer();
-        gs_stlColumnProperties[unColumnIndex]->PutString("ColumnIdentifier", c_szColumnIdentifier);
-        gs_stlColumnProperties[unColumnIndex]->PutString("Title", c_szColumnName);
-        gs_stlColumnProperties[unColumnIndex]->PutString("Description", c_szColumnDescription);
-        gs_stlColumnProperties[unColumnIndex]->PutString("Tags", c_szColumnTags);
-        gs_stlColumnProperties[unColumnIndex]->PutString("Units", c_szColumnUnits);
-        gs_stlColumnProperties[unColumnIndex]->PutString("Type", c_szColumnType);
+        gs_stlColumnProperties[unColumnIndex]->PutString("id", c_szColumnIdentifier);
+        gs_stlColumnProperties[unColumnIndex]->PutString("name", c_szColumnName);
+        gs_stlColumnProperties[unColumnIndex]->PutString("description", c_szColumnDescription);
+        gs_stlColumnProperties[unColumnIndex]->PutString("tags", c_szColumnTags);
+        gs_stlColumnProperties[unColumnIndex]->PutString("units", c_szColumnUnits);
+        gs_stlColumnProperties[unColumnIndex]->PutString("type", c_szColumnType);
         if (0 != c_szColumnUnitCategories[0])
         {
-            gs_stlColumnProperties[unColumnIndex]->PutString("UnitCategories", c_szColumnUnitCategories);
+            gs_stlColumnProperties[unColumnIndex]->PutString("unit_categories", c_szColumnUnitCategories);
         }
     }
 
@@ -169,14 +169,14 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
         StructuredBuffer oColumnProperties;
         StructuredBuffer oCompressedData = ::CompressToStructuredBuffer((const void *) gs_stlTablePackageRecordsBuffer.data(), (uint64_t) gs_stlTablePackageRecordsBuffer.size());
         // Build the StructuredBuffer containing table properties
-        oTableProperties.PutGuid("TableIdentifier", Guid(c_szTableIdentifier));
-        oTableProperties.PutString("Title", c_szTableTitle);
-        oTableProperties.PutString("Description", c_szTableDescription);
-        oTableProperties.PutString("Tags", c_szTableTags);
-        oTableProperties.PutUnsignedInt32("NumberOfColumns", nNumberOfColumns);
-        oTableProperties.PutUnsignedInt64("NumberOfRows", nNumberOfRows);
-        oTableProperties.PutUnsignedInt64("DataSizeInBytes", oCompressedData.GetUnsignedInt64("OriginalSize"));
-        oTableProperties.PutUnsignedInt64("CompressedDataSizeInBytes", oCompressedData.GetSerializedBufferRawDataSizeInBytes());
+        oTableProperties.PutGuid("id", Guid(c_szTableIdentifier));
+        oTableProperties.PutString("name", c_szTableTitle);
+        oTableProperties.PutString("description", c_szTableDescription);
+        oTableProperties.PutString("tags", c_szTableTags);
+        oTableProperties.PutUnsignedInt32("number_of_columns", nNumberOfColumns);
+        oTableProperties.PutUnsignedInt64("number_of_rows", nNumberOfRows);
+        oTableProperties.PutUnsignedInt64("data_size_in_bytes", oCompressedData.GetUnsignedInt64("OriginalSize"));
+        oTableProperties.PutUnsignedInt64("compressed_data_size_in_bytes", oCompressedData.GetSerializedBufferRawDataSizeInBytes());
         // Build the StructuredBuffer containing column properties
         __DebugAssert(nNumberOfColumns == gs_stlColumnProperties.size());
         for (auto const & columnProperties : gs_stlColumnProperties)
@@ -187,8 +187,9 @@ extern "C" __declspec(dllexport) void __cdecl CompleteTablePackageFile(
             __DebugAssert(nullptr != columnProperties.second);
             oColumnProperties.PutStructuredBuffer(columnIndexAsString, *(columnProperties.second));
         }
+        oColumnProperties.PutBoolean("__IsArray__", true);
         // Add the column properties to the table properties
-        oTableProperties.PutStructuredBuffer("AllColumnProperties", oColumnProperties);
+        oTableProperties.PutStructuredBuffer("all_column_properties", oColumnProperties);
         //
         // Prepare to write everything to file. We need to figure out the size of both of the sections
         // Format is
@@ -340,18 +341,18 @@ extern "C" __declspec(dllexport) unsigned int __cdecl AddTablePackageFromFile(
         bool fDuplicate = false;
         StructuredBuffer oNewTableMetadata(stlSerializedTableMetadata);
         // Reality checks
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("TableIdentifier", GUID_VALUE_TYPE));
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE));
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE));
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("NumberOfColumns", UINT32_VALUE_TYPE));
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("NumberOfRows", UINT64_VALUE_TYPE));
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE));
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("DataSizeInBytes", UINT64_VALUE_TYPE));
-        __DebugAssert(true == oNewTableMetadata.IsElementPresent("CompressedDataSizeInBytes", UINT64_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("id", GUID_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("number_of_columns", UINT32_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("number_of_rows", UINT64_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("tags", ANSI_CHARACTER_STRING_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("data_size_in_bytes", UINT64_VALUE_TYPE));
+        __DebugAssert(true == oNewTableMetadata.IsElementPresent("compressed_data_size_in_bytes", UINT64_VALUE_TYPE));
         // Now go through the existing table and check to see if any of them have the same identifier
         for (const auto stlElement: gs_ImportedTableMetadata)
         {
-            if (stlElement.second->GetGuid("TableIdentifier") == oNewTableMetadata.GetGuid("TableIdentifier"))
+            if (stlElement.second->GetGuid("id") == oNewTableMetadata.GetGuid("id"))
             {
                 fDuplicate = true;
             }
@@ -440,7 +441,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageIdentifierByIndex(
         _ThrowBaseExceptionIf((gs_ImportedTableMetadata.end() == gs_ImportedTableMetadata.find(unTableIndex)), "Table index not found %d (Exclusive Max = %d)", unTableIndex, gs_unTableIndex);
         __DebugAssert(gs_ImportedTableFilename.end() != gs_ImportedTableFilename.find(unTableIndex));
         // Fetch the identifier
-        strTablePackageIdentifier = gs_ImportedTableMetadata[unTableIndex]->GetGuid("TableIdentifier").ToString(eHyphensOnly);
+        strTablePackageIdentifier = gs_ImportedTableMetadata[unTableIndex]->GetGuid("id").ToString(eHyphensOnly);
     }
 
     catch (const BaseException & c_oBaseException)
@@ -475,7 +476,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageTitleByIndex(
         _ThrowBaseExceptionIf((gs_ImportedTableMetadata.end() == gs_ImportedTableMetadata.find(unTableIndex)), "Table index not found %d (Exclusive Max = %d)", unTableIndex, gs_unTableIndex);
         __DebugAssert(gs_ImportedTableFilename.end() != gs_ImportedTableFilename.find(unTableIndex));
         // Fetch the title
-        strTablePackageTitle = gs_ImportedTableMetadata[unTableIndex]->GetString("Title");
+        strTablePackageTitle = gs_ImportedTableMetadata[unTableIndex]->GetString("name");
     }
 
     catch (const BaseException & c_oBaseException)
@@ -510,7 +511,7 @@ extern "C" __declspec(dllexport) BSTR __cdecl GetTablePackageDescriptionByIndex(
         _ThrowBaseExceptionIf((gs_ImportedTableMetadata.end() == gs_ImportedTableMetadata.find(unTableIndex)), "Table index not found %d (Exclusive Max = %d)", unTableIndex, gs_unTableIndex);
         __DebugAssert(gs_ImportedTableFilename.end() != gs_ImportedTableFilename.find(unTableIndex));
         // Fetch the title
-        strTablePackageDescription = gs_ImportedTableMetadata[unTableIndex]->GetString("Description");
+        strTablePackageDescription = gs_ImportedTableMetadata[unTableIndex]->GetString("description");
     }
 
     catch (const BaseException & c_oBaseException)
@@ -585,26 +586,27 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
         // The first part of generating a dataset is to build the StructuredBuffer which contains the dataset metadata
         StructuredBuffer oDatasetMetadata;
         // STEP 1: Generic dataset level metadata
-        oDatasetMetadata.PutString("Version", "0.1.0");
-        oDatasetMetadata.PutGuid("DatasetGuid", Guid(c_szDatasetIdentifier));
-        oDatasetMetadata.PutGuid("OrganizationGuid", Guid(::GetSailPlatformServicesUserOrganizationIdentifier().c_str()));
-        oDatasetMetadata.PutString("Title", c_szDatasetTitle);
-        oDatasetMetadata.PutString("Description", c_szDatasetDescription);
-        oDatasetMetadata.PutString("Tags", c_szDatasetTags);
-        oDatasetMetadata.PutUnsignedInt64("EpochCreationTimeInSeconds", ::GetEpochTimeInSeconds());
-        oDatasetMetadata.PutUnsignedInt32("TableCount", (unsigned int) gs_ImportedTableMetadata.size());
+        oDatasetMetadata.PutString("version", "0.1.0");
+        oDatasetMetadata.PutGuid("id", Guid(c_szDatasetIdentifier));
+        oDatasetMetadata.PutGuid("organization_id", Guid(::GetSailPlatformServicesUserOrganizationIdentifier().c_str()));
+        oDatasetMetadata.PutString("name", c_szDatasetTitle);
+        oDatasetMetadata.PutString("description", c_szDatasetDescription);
+        oDatasetMetadata.PutString("keywords", c_szDatasetTags);
+        oDatasetMetadata.PutUnsignedInt64("publish_date", ::GetEpochTimeInSeconds());
+        oDatasetMetadata.PutUnsignedInt32("number_of_tables", (unsigned int) gs_ImportedTableMetadata.size());
         if ((nullptr != c_szDatasetFamilyIdentifier)&&(0 < ::strnlen(c_szDatasetFamilyIdentifier, 2)))
         {
-            oDatasetMetadata.PutGuid("DataFamilyIdentifier", Guid(c_szDatasetFamilyIdentifier));
+            oDatasetMetadata.PutGuid("data_family_id", Guid(c_szDatasetFamilyIdentifier));
         }
         // STEP 2: Tables information
         StructuredBuffer oTablePackageMetadata;
+        oTablePackageMetadata.PutBoolean("__IsArray__", true);
         for (std::pair<unsigned int, StructuredBuffer *> tablePackageEntry : gs_ImportedTableMetadata)
         {
-            std::string tableIdentifier = tablePackageEntry.second->GetGuid("TableIdentifier").ToString(eHyphensOnly);
-            oTablePackageMetadata.PutStructuredBuffer(tableIdentifier.c_str(), *tablePackageEntry.second);
+            std::string tableIdentifier = tablePackageEntry.second->GetGuid("id").ToString(eHyphensOnly);
+            oTablePackageMetadata.PutStructuredBuffer(std::to_string(tablePackageEntry.first).c_str(), *tablePackageEntry.second);
         }
-        oDatasetMetadata.PutStructuredBuffer("Tables", oTablePackageMetadata);
+        oDatasetMetadata.PutStructuredBuffer("tables", oTablePackageMetadata);
         //
         // Prepare to write everything to file. Format is:
         // 
@@ -682,12 +684,12 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
             _ThrowBaseExceptionIf((unNumberOfBytesRead != sizeof(un64SerializedSizeInBytesOfCompressedData)), "Failed to read in the file header marker", nullptr);
             // Read in the compressed data from the file. There are a lot of reality checks here to ensure that
             // the table we are reading in is the correct table
-            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("TableIdentifier", GUID_VALUE_TYPE));
-            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("CompressedDataSizeInBytes", UINT64_VALUE_TYPE));
-            std::string tableIdentifier = oTableMetadata.GetGuid("TableIdentifier").ToString(eHyphensOnly);
-            uint64_t un64CompressedDataSizeInBytes = oTableMetadata.GetUnsignedInt64("CompressedDataSizeInBytes");
-            _ThrowBaseExceptionIf((tableIdentifier != c_stlTablePackageEntry.second->GetGuid("TableIdentifier").ToString(eHyphensOnly)), "ERROR: Table identifiers do not match %s != %s", tableIdentifier.c_str(), c_stlTablePackageEntry.second->GetGuid("TableIdentifier").ToString(eHyphensOnly).c_str());
-            _ThrowBaseExceptionIf((un64CompressedDataSizeInBytes != c_stlTablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes")), "ERROR: Table compressed data sizes do not match %ld != %ld", un64CompressedDataSizeInBytes, c_stlTablePackageEntry.second->GetUnsignedInt64("CompressedDataSizeInBytes"));
+            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("id", GUID_VALUE_TYPE));
+            __DebugAssert(true == c_stlTablePackageEntry.second->IsElementPresent("compressed_data_size_in_bytes", UINT64_VALUE_TYPE));
+            std::string tableIdentifier = oTableMetadata.GetGuid("id").ToString(eHyphensOnly);
+            uint64_t un64CompressedDataSizeInBytes = oTableMetadata.GetUnsignedInt64("compressed_data_size_in_bytes");
+            _ThrowBaseExceptionIf((tableIdentifier != c_stlTablePackageEntry.second->GetGuid("id").ToString(eHyphensOnly)), "ERROR: Table identifiers do not match %s != %s", tableIdentifier.c_str(), c_stlTablePackageEntry.second->GetGuid("id").ToString(eHyphensOnly).c_str());
+            _ThrowBaseExceptionIf((un64CompressedDataSizeInBytes != c_stlTablePackageEntry.second->GetUnsignedInt64("compressed_data_size_in_bytes")), "ERROR: Table compressed data sizes do not match %ld != %ld", un64CompressedDataSizeInBytes, c_stlTablePackageEntry.second->GetUnsignedInt64("compressed_data_size_in_bytes"));
             stlBuffer.resize(un64SerializedSizeInBytesOfCompressedData);
             (void) ::ReadFile(hTableFileHandle, (void *) stlBuffer.data(), (unsigned int) stlBuffer.size(), (DWORD *) &unNumberOfBytesRead, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesRead != stlBuffer.size()), "Failed to read table metadate", nullptr);
@@ -702,7 +704,7 @@ extern "C" __declspec(dllexport) bool __cdecl GenerateDataset(
             (void) ::WriteFile(hFileHandle, (const void *) &qwFileMarker, (DWORD) sizeof(qwFileMarker), (DWORD *) &unNumberOfBytesWritten, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesWritten != sizeof(qwFileMarker)), "Failed to write the special header to file", nullptr);
             // Write the table identifier to file
-            (void) ::WriteFile(hFileHandle, (const void *) c_stlTablePackageEntry.second->GetGuid("TableIdentifier").GetRawDataPtr(), (DWORD) 16, (DWORD *) &unNumberOfBytesWritten, nullptr);
+            (void) ::WriteFile(hFileHandle, (const void *) c_stlTablePackageEntry.second->GetGuid("id").GetRawDataPtr(), (DWORD) 16, (DWORD *) &unNumberOfBytesWritten, nullptr);
             _ThrowBaseExceptionIf((unNumberOfBytesWritten != 16), "Failed to write the table identifier to file", nullptr);
             // Write the compressed table data size in bytes to file
             (void) ::WriteFile(hFileHandle, (const void *) &un64SerializedSizeInBytesOfCompressedData, (DWORD) sizeof(un64SerializedSizeInBytesOfCompressedData), (DWORD *) &unNumberOfBytesWritten, nullptr);
@@ -785,26 +787,28 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
 
         // Build out the REST API call query
         std::string strVerb = "POST";
-        std::string strApiUri = "/SAIL/DatasetManager/RegisterDataset?Eosb=" + ::GetSailPlatformServicesEosb();
+        std::string strApiUri = "/datasets";
+        std::vector<std::string> stlListOfHeaders;
+        stlListOfHeaders.push_back("Authorization: Bearer " + ::GetSailPlatformServicesAccessToken());
+        stlListOfHeaders.push_back("Content-Type: application/json");
+
         StructuredBuffer oRestApiCall;
-        StructuredBuffer oDatasetMetadataToRegister;
-        oRestApiCall.PutString("DatasetGuid", oDatasetMetadata.GetGuid("DatasetGuid").ToString(eHyphensOnly));
-        oDatasetMetadataToRegister.PutString("VersionNumber", "0.1.0.0");
-        oDatasetMetadataToRegister.PutString("DatasetName", oDatasetMetadata.GetString("Title"));
-        oDatasetMetadataToRegister.PutString("Description", oDatasetMetadata.GetString("Description"));
-        oDatasetMetadataToRegister.PutString("Keywords", oDatasetMetadata.GetString("Tags"));
-        oDatasetMetadataToRegister.PutUnsignedInt64("PublishDate", oDatasetMetadata.GetUnsignedInt64("EpochCreationTimeInSeconds"));
-        oDatasetMetadataToRegister.PutByte("PrivacyLevel", 1);
-        oDatasetMetadataToRegister.PutString("JurisdictionalLimitations", "N/A");
-        oDatasetMetadataToRegister.PutStructuredBuffer("Tables", oDatasetMetadata.GetStructuredBuffer("Tables"));
-        oRestApiCall.PutStructuredBuffer("DatasetData", oDatasetMetadataToRegister);
+        oRestApiCall.PutString("id", oDatasetMetadata.GetGuid("id").ToString(eHyphensOnly));
+        oRestApiCall.PutString("version", "0.1.0.0");
+        oRestApiCall.PutString("name", oDatasetMetadata.GetString("name"));
+        oRestApiCall.PutString("description", oDatasetMetadata.GetString("name"));
+        oRestApiCall.PutString("keywords", oDatasetMetadata.GetString("keywords"));
+        oRestApiCall.PutUnsignedInt64("publish_date", oDatasetMetadata.GetUnsignedInt64("publish_date"));
+        oRestApiCall.PutStructuredBuffer("tables", oDatasetMetadata.GetStructuredBuffer("tables"));
         // Send the REST API call to the SAIL Web Api Portal
         std::string strJson = ::ConvertStructuredBufferToJson(oRestApiCall);
-        std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word) 6200, strVerb, strApiUri, strJson, true);
+        std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word)8000, strVerb, strApiUri, strJson, true, stlListOfHeaders);
+
         // Parse the returning value.
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Failed to register dataset.", nullptr);
+        _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Failed to register dataset.", nullptr);
         fSuccess = true;
     }
 

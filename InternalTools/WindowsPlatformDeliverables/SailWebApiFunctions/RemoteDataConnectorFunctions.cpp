@@ -120,7 +120,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
             // Send the ping to the REST portal and get a response stating if any
             // Virtual Machine is waiting for this dataset
             std::string strVerb = "PUT";
-            std::string strApiUrl = "/SAIL/RemoteDataConnectorManager/HeartBeat?Eosb=" + ::GetSailPlatformServicesEosb();
+            std::string strApiUrl = "/SAIL/RemoteDataConnectorManager/HeartBeat?Eosb=" + ::GetSailPlatformServicesAccessToken();
             std::string strJsonBody = ::ConvertStructuredBufferToJson(oHeartbeatRequest);
             std::vector<Byte> stlRestResponse = ::RestApiCall(::GetSailPlatformServicesIpAddress(), (Word) 6200, strVerb, strApiUrl, strJsonBody, true);
             // Parse the returning value.
@@ -176,7 +176,7 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorHeartbeat(void)
                                 _ThrowBaseExceptionIf((0 == strDatasetFilename.size()), "Invalid dataset request from VM %s", strVirtualMachineIdentifier.c_str());
                                 oVirtualMachineInformation.PutString("DatasetFilename", strDatasetFilename);
                                 oVirtualMachineInformation.PutString("SailWebApiPortalIpAddress", ::GetSailPlatformServicesIpAddress());
-                                oVirtualMachineInformation.PutString("DataOwnerAccessToken", ::GetSailPlatformServicesEosb());
+                                oVirtualMachineInformation.PutString("DataOwnerAccessToken", ::GetSailPlatformServicesAccessToken());
                                 oVirtualMachineInformation.PutString("DataOwnerUserIdentifier", ::GetSailPlatformServicesUserIdentifier());
                                 oVirtualMachineInformation.PutString("DataOwnerOrganizationIdentifier", ::GetSailPlatformServicesUserOrganizationIdentifier());
                                 std::string strBase64EncodedSerializedBuffer = oVirtualMachineInformation.GetBase64SerializedBuffer();
@@ -242,14 +242,14 @@ extern "C" __declspec(dllexport) int __cdecl RemoteDataConnectorUpdateDatasets(v
             {
                 // Register the DatasetConnector on finding the first valid dataset
                 strVerb = "POST";
-                strApiUrl = "/SAIL/RemoteDataConnectorManager/RegisterConnector?Eosb=" + ::GetSailPlatformServicesEosb();
+                strApiUrl = "/SAIL/RemoteDataConnectorManager/RegisterConnector?Eosb=" + ::GetSailPlatformServicesAccessToken();
                 gs_fIsRemoteDataConnectorRegistered = true;
             }
             else
             {
                 // Register the DatasetConnector on finding the first valid dataset
                 strVerb = "PUT";
-                strApiUrl = "/SAIL/RemoteDataConnectorManager/UpdateConnector?Eosb=" + ::GetSailPlatformServicesEosb();
+                strApiUrl = "/SAIL/RemoteDataConnectorManager/UpdateConnector?Eosb=" + ::GetSailPlatformServicesAccessToken();
             }
 
             StructuredBuffer oUpdateDataConnector;

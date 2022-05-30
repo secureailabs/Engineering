@@ -53,18 +53,19 @@ class Orchestrator : public Object
             _in const std::string & c_strServerIpAddress
             ) throw();
         void __thiscall ExitCurrentSession(void) throw();
-        
-        std::string __thiscall GetCurrentEosb(void) const throw();
+
+        std::string __thiscall GetCurrentAccessToken(void) const throw();
         std::string __thiscall GetSafeFunctions(void) const throw();
         std::string __thiscall GetDatasets(void) const throw();
         std::string __thiscall GetDigitalContracts(void) const throw();
         std::string __thiscall GetTables(void) const throw();
-        
+
         int __thiscall LoadSafeObjects(
             _in const std::string & c_strSafeObjectDirectory
             ) throw();
 
         std::string __thiscall ProvisionSecureComputationalNode(
+            _in const std::string & c_strVirtualMachineName,
             _in const std::string & c_strDigitalContractGUID,
             _in const std::string & c_strDatasetGUID,
             _in const std::string & c_strVmType
@@ -110,12 +111,12 @@ class Orchestrator : public Object
             _in const std::string & c_strJobGUID
             );
 
-        bool __thiscall DeprovisionDigitalContract(
-            _in const std::string & c_strDigitalContractGUID
+        bool __thiscall DeprovisionSecureComputationNode(
+            _in const std::string & c_strSecureComputationNodeId
             );
 
     private:
-    
+
         void __thiscall CacheDigitalContractsFromRemote(void);
         void __thiscall CacheDatasetsFromRemote(void);
 
@@ -123,7 +124,7 @@ class Orchestrator : public Object
             _in const Guid & oDatasetGuid
             ) const;
 
-       std::optional<Guid> __thiscall GetSecureComputationalNodeServingTable(
+        std::optional<Guid> __thiscall GetSecureComputationalNodeServingTable(
             _in const Guid & oDatasetGuid
             ) const;
 
@@ -178,8 +179,8 @@ class Orchestrator : public Object
             _in const Guid & oParameterGuid
             );
 
-        VirtualMachineState __thiscall GetSecureComputationNodeInformation(
-            _in const Guid & oSecureNodeGuid
+        std::string __thiscall GetSecureComputationNodeInformation(
+            _in const std::string & c_strSecureNodeGuid
             );
 
         void __thiscall SubmitJob(

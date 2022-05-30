@@ -118,12 +118,12 @@
             }
           },
           {
-            "name": "OutboundAllow_6200",
+            "name": "OutboundAllow_8000",
             "properties": {
               "description": "Interact with SAIL Platform Services ",
               "protocol": "TCP",
               "sourcePortRange": "*",
-              "destinationPortRange": "6200",
+              "destinationPortRange": "8000",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",

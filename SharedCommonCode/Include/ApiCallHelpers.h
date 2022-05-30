@@ -52,10 +52,9 @@ extern StructuredBuffer __stdcall RegisterVirtualMachineResearchUser(
     _in const std::string & c_strEosb,
     _in const std::string & c_strVirtualMachineIdentifier
     ) throw();
-	
+
 extern bool __stdcall VirtualMachineStatusUpdate(
-	_in const std::string & c_strEosb,
-	_in const std::string & c_strVirtualMachineIdentifier,
-	_in Dword dwState,
-	_in const std::string & c_strLoggedOnUserIdentifier
-	) throw();
+    _in const std::string & c_strAccessToken,
+    _in const std::string & c_strVirtualMachineIdentifier,
+    _in const std::string & strScnState
+    ) throw();

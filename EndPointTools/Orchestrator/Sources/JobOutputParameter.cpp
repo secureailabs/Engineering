@@ -22,7 +22,7 @@
  ********************************************************************************************/
 std::string JobOutputParameter::ToString() const
 {
-    return m_strJobIdentifier.ToString(eRaw) + "." + m_strOutputIdentifier.ToString(eRaw);
+    return m_strJobIdentifier.ToString(eRaw) + "." + m_strOutputIdentifier.ToString(eForceRaw);
 }
 
 

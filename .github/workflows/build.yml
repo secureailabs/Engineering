@@ -53,8 +53,7 @@ jobs:
           ls -l
           sudo chmod 666 /var/run/docker.sock
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
-          docker stop dataservices || true && docker rm dataservices || true
-          docker stop platformservices || true && docker rm platformservices || true
+          docker stop apiservices || true && docker rm apiservices || true
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
           docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
@@ -66,11 +65,9 @@ jobs:
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
           docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
           cd Docker/
-          ./BuildImages.sh -i dataservices
-          ./BuildImages.sh -i platformservices
-          sudo ./RunService.sh -s dataservices -d -c
-          sudo ./RunService.sh -s platformservices -d
-          sleep 5
+          ./BuildImages.sh -i apiservices
+          sudo ./RunService.sh -s apiservices -d
+          sleep 60
           cd ..
           ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps
 
@@ -83,7 +80,7 @@ jobs:
           set -e
           docker run --name ubuntu_tst_bash -dit -v /home/gha-runner/actions-runner-Engineering/_work/Engineering/Engineering/EndPointTools/Orchestrator/:/tmp_engineering ubuntu-sailtap:1.0 /bin/bash
           docker exec -w /Test/ ubuntu_tst_bash git pull
-          docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/test_backend/account_mgmt_api_test.py -k "not information and not access" --ip 10.0.2.4 -m "active" -v
+          # docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/test_backend/account_mgmt_api_test.py -k "not information and not access" --ip 10.0.2.4 -m "active" -v
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]

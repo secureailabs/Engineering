@@ -1,0 +1,12 @@
+.underconstruction {
+    height: 87.5%;
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+    align-content: center;
+    &__text {
+        font: {
+            size: var(--fontsize-9xl)
+        }
+    }
+}

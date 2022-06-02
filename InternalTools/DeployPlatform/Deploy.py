@@ -1,8 +1,8 @@
 import json
 import os
 import subprocess
-import uuid
 import time
+import uuid
 
 import sailazure
 
@@ -40,71 +40,46 @@ def deploy_module(account_credentials, deployment_name, module_name):
     return virtual_machine_public_ip
 
 
-def deploy_dataservices(account_credentials, deployment_name, owner, purpose):
-    # Deploy the backend server
-    dataservices_ip = deploy_module(account_credentials, deployment_name, "dataservices")
-
-    # Create a dataservices initialization vector json
-    with open("dataservices.json", "r") as backend_json_fd:
-        backend_json = json.load(backend_json_fd)
-        backend_json.pop("MongoDbUrl")
-        backend_json["MongoDbDatabase"] = owner + purpose + "_db"
-        backend_json["MongoAtlasDbUser"] = "sailuser"
-        backend_json["MongoAtlasDbPassword"] = "SailPassword_123"
-        backend_json["MongoDbCluster"] = "cluster0.s3vds.mongodb.net"
-
-    with open("dataservices.json", "w") as outfile:
-        json.dump(backend_json, outfile)
-
-    upload_status = subprocess.run(
-        [
-            "./UploadPackageAndInitializationVector",
-            "--IpAddress=" + dataservices_ip,
-            "--Package=dataservices.tar.gz",
-            "--InitializationVector=dataservices.json",
-        ],
-        stdout=subprocess.PIPE,
-    )
-    print("Upload status: ", upload_status.stdout)
-
-    return dataservices_ip
-
-
-def deploy_platformservices(account_credentials, deployment_name, data_services_ip, owner):
+def deploy_apiservices(account_credentials, deployment_name, owner):
     # Deploy the frontend server
-    platformservices_ip = deploy_module(account_credentials, deployment_name, "platformservices")
+    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices")
 
     # Read backend json from file
-    with open("platformservices.json", "r") as backend_json_fd:
-        backend_json = json.load(backend_json_fd)
-        backend_json["Owner"] = owner
-        backend_json["DataservicesURL"] = data_services_ip
+    # with open("apiservices.json", "r") as backend_json_fd:
+    #     backend_json = json.load(backend_json_fd)
+    backend_json = {}
+    backend_json["Owner"] = owner
 
-    with open("platformservices.json", "w") as outfile:
+    with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
 
     upload_status = subprocess.run(
         [
             "./UploadPackageAndInitializationVector",
-            "--IpAddress=" + platformservices_ip,
-            "--Package=platformservices.tar.gz",
-            "--InitializationVector=platformservices.json",
+            "--IpAddress=" + apiservices_ip,
+            "--Package=apiservices.tar.gz",
+            "--InitializationVector=apiservices.json",
         ],
         stdout=subprocess.PIPE,
     )
     print("Upload status: ", upload_status.stdout)
 
-    # Sleeping for a minute
-    time.sleep(60)
+    # Sleeping for two minutes
+    time.sleep(2 * 60)
 
     # Run database tools for the backend server
     database_tools_run = subprocess.run(
-        ["./DatabaseInitializationTool", "--ip=" + platformservices_ip, "--settings=\"DatabaseInitializationSettings.json\"", "--allsteps"],
+        [
+            "./DatabaseInitializationTool",
+            "--ip=" + apiservices_ip,
+            "--settings=./DatabaseInitializationSettings.json",
+            "--allsteps",
+        ],
         stdout=subprocess.PIPE,
     )
-    print("Database_Initialization_Tool_run: ", database_tools_run)
+    print("Api Services Database Initialization Tool run: ", database_tools_run)
 
-    return platformservices_ip
+    return apiservices_ip
 
 
 def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
@@ -113,7 +88,7 @@ def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
-        "PlatformServicesUrl": "https://" + platform_services_ip + ":6200",
+        "apiservicesUrl": "https://" + platform_services_ip + ":8000",
         "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":3000",
     }
 
@@ -139,7 +114,7 @@ def deploy_orchestrator(account_credentials, deployment_name):
     orchestrator_server_ip = deploy_module(account_credentials, deployment_name, "orchestrator")
 
     # There is no initialization vector for the orchestrator
-    initialization_vector = {"PlatformServicesUrl": "https://" + platform_services_ip + ":6200"}
+    initialization_vector = {"apiservicesUrl": "https://" + platform_services_ip + ":8000"}
 
     with open("orchestrator.json", "w") as outfile:
         json.dump(initialization_vector, outfile)
@@ -173,14 +148,8 @@ if __name__ == "__main__":
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
 
-    # TODO: Prawal deploy the VMs in parallel and initialize them sequesntially
-
-    # Deploy the data services
-    data_services_ip = deploy_dataservices(account_credentials, deployment_id, OWNER, PURPOSE)
-    print("Data Services server: ", data_services_ip)
-
     # Deploy the platform services
-    platform_services_ip = deploy_platformservices(account_credentials, deployment_id, data_services_ip, OWNER)
+    platform_services_ip = deploy_apiservices(account_credentials, deployment_id, OWNER)
     print("Platform Services server: ", platform_services_ip)
 
     # Deploy the frontend server

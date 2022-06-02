@@ -133,7 +133,7 @@ extern "C" __declspec(dllexport) bool __cdecl UploadInitializationParametersToVi
         oInitializationParameters.PutString("DataConnectorDomainIdentifier", c_szDataConnectorDomainIdentifier);
         oInitializationParameters.PutString("SailWebApiPortalIpAddress", c_szSailWebApiPortalIpAddress);
         oInitializationParameters.PutString("Base64EncodedDataset", c_szBase64EncodedDataset);
-        oInitializationParameters.PutString("DataOwnerAccessToken", ::GetSailPlatformServicesEosb());
+        oInitializationParameters.PutString("DataOwnerAccessToken", ::GetSailPlatformServicesAccessToken());
         oInitializationParameters.PutString("DataOwnerOrganizationIdentifier", ::GetSailPlatformServicesUserOrganizationIdentifier());
         oInitializationParameters.PutString("DataOwnerUserIdentifier", ::GetSailPlatformServicesUserIdentifier());
         // Now we blast out the transaction

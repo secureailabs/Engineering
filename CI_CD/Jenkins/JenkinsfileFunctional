@@ -25,7 +25,7 @@ pipeline {
                     ls -l
                     sed -i 's/"Owner": "default"/"Owner": "Nightly"/' ./Docker/platformservices/InitializationVector.json
                     grep '"Owner": "Nightly"' ./Docker/platformservices/InitializationVector.json
-                    make all -j
+                    // make all -j
                     '''
                 }
             }
@@ -35,7 +35,7 @@ pipeline {
                 }
             }
         }
-        stage('Build Data Services') {
+        stage('Build API Services') {
             steps {
                 pwd(tmp: true)
                 sh '''
@@ -43,70 +43,22 @@ pipeline {
                 ls -l
                 '''
                 script {
-                    echo 'Starting to build docker image: Data Services Api Portal Server '
-                    echo ' Build Data Services Docker Image'
+                    echo 'Starting to build docker image: API Services Server '
+                    echo ' Build API Services Docker Image'
                     sh label:
-                    'Build Docker',
+                    'Build API Services',
                     script:'''
                     pwd
                     cd Docker/
-                    ./BuildImages.sh -i dataservices
+                    ./BuildImages.sh -i apiservices
                     '''
-                    echo 'Start Data Services Container'
+                    echo 'Start API Services Container'
                     sh label:
-                    'Run Data Services Docker',
+                    'Run API Services Docker',
                     script:'''
                     pwd
                     cd Docker/
-                    ./RunService.sh -s dataservices -d -c
-                    docker ps -q
-                    sleep 5
-                    '''
-                }
-                script {
-                    try {
-                        sh '''
-                        docker exec -w /app dataservices sh -c "pwd"
-                        docker exec -w /app dataservices sh -c "ls -l"
-                        docker exec -w /app dataservices sh -c "ps -ef"
-                        '''
-                    } catch (exception) {
-                        echo getStackTrace(exception)
-                        echo 'Error detected, retrying...'
-                    }
-                }
-                echo 'Data Services Server is Deployed and Ready to use'
-            }
-            post {
-                failure {
-                    echo 'Failed Setting Data Services'
-                }
-            }
-        }
-        stage('Build Platform Services') {
-            steps {
-                pwd(tmp: true)
-                sh '''
-                pwd
-                ls -l
-                '''
-                script {
-                    echo 'Starting to build docker image: Platform Services Server '
-                    echo ' Build Platform Services Docker Image'
-                    sh label:
-                    'Build Platform Services',
-                    script:'''
-                    pwd
-                    cd Docker/
-                    ./BuildImages.sh -i platformservices
-                    '''
-                    echo 'Start Platform Services Container'
-                    sh label:
-                    'Run Platform Services Docker',
-                    script:'''
-                    pwd
-                    cd Docker/
-                    ./RunService.sh -s platformservices -d
+                    ./RunService.sh -s apiservices -d
                     docker ps -q
                     sleep 5
                     '''
@@ -116,9 +68,9 @@ pipeline {
                         echo 'Load Database'
                         sh '''
                         cd Binary/
-                        docker exec -w /app platformservices sh -c "pwd"
-                        docker exec -w /app platformservices sh -c "ls -l"
-                        docker exec -w /app platformservices sh -c "ps -ef"
+                        docker exec -w /app apiservices sh -c "pwd"
+                        docker exec -w /app apiservices sh -c "ls -l"
+                        docker exec -w /app apiservices sh -c "ps -ef"
                         ./DatabaseInitializationTool --ip=127.0.0.1 --settings="DatabaseInitializationSettings.json" --allsteps
                         '''
                     } catch (exception) {
@@ -129,7 +81,7 @@ pipeline {
                         '''
                     }
                 }
-                echo 'Platform Services Server is Deployed and Ready to use'
+                echo 'API Services Server is Deployed and Ready to use'
                 script {
                     echo ' Copy Orchestrator Folder to tmp directory'
 
@@ -138,7 +90,7 @@ pipeline {
             }
             post {
                 failure {
-                    echo 'Failed Setting Platform Services'
+                    echo 'Failed Setting API Services'
                 }
             }
         }
@@ -162,7 +114,7 @@ pipeline {
                     sh label:
                     'Running Tests',
                     script:'''
-                    docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/ --ip 10.0.0.5 -m "functional or stress" -sv --junitxml=test-results.xml
+                    // docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/ --ip 10.0.0.5 -m "functional or stress" -sv --junitxml=test-results.xml
                     '''
                 }
             }
@@ -172,8 +124,7 @@ pipeline {
                     echo 'End of stage test in Run SAILTAP!'
                     sh'''
                     docker cp ubuntu_tst_bash:/Test/test-results.xml .
-                    docker cp platformservices:/app/Binary/platformservices/restportal.log .'
-                    docker cp dataservices:/app/Binary/platformservices/databasegateway.log .
+                    // docker cp apiservices:/app/Binary/platformservices/restportal.log .'
                     '''
                     junit '*.xml'
                     archiveArtifacts artifacts: '*.log'

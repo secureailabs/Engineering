@@ -131,7 +131,7 @@
               "sourcePortRanges": [],
               "destinationPortRanges": [
                 "3500",
-                "6200"
+                "8000"
               ],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []

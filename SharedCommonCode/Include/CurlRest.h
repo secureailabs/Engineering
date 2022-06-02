@@ -48,3 +48,8 @@ std::vector<Byte> __stdcall RestApiCall(
     _in const std::map<std::string, std::string> * stlMapOfHeaders,
     _inout long * nResponseCode
     ) throw();
+
+
+std::string __stdcall UrlEncodeString(
+    const std::string c_strToEncode
+    );

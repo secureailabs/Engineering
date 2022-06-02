@@ -72,23 +72,26 @@ bool __thiscall SessionManager::Login(
     
     try
     {
-        // Prepare the API call
+        // Build out the REST API call query
         std::string strVerb = "POST";
-        std::string strApiUrl = "/SAIL/AuthenticationManager/User/Login?Email="+ c_strEmail +"&Password="+ c_strUserPassword;
-        std::string strJsonBody = "";
-        // Make the API call and get REST response
-        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, wServerPort, strVerb, strApiUrl, strJsonBody, true);
+        std::string strApiUri = "/login";
+        std::string strBody = "grant_type=&username="+ ::UrlEncodeString(c_strEmail) +"&password=" + ::UrlEncodeString(std::string(c_strUserPassword)) + "&scope=&client_id=&client_secret=";
+        std::vector<std::string> stlListOfHeaders;
+        stlListOfHeaders.push_back("Content-Type: application/x-www-form-urlencoded");
+
+        // Send the REST API call to the SAIL Web Api Portal
+        std::vector<Byte> stlRestResponse = ::RestApiCall(c_strServerIpAddress, wServerPort, strVerb, strApiUri, strBody, true, stlListOfHeaders);
+
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
-        // Did the call succeed?
-        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Error logging in.", nullptr);
-        // If the call succeeded, let's make sure that the format of the return value is correct
-        _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID FORMAT. Invalid return value, missing 'Eosb'", nullptr);
+        // Did the transaction succeed?
+        _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Failed to log in. Invalid Credentials.", nullptr);
+
         // Calling SetEosb() will start the update thread automatically
-        this->SetSessionParameters(c_strServerIpAddress, wServerPort, oResponse.GetString("Eosb"));
+        this->SetSessionParameters(c_strServerIpAddress, wServerPort, oResponse.GetString("access_token"), oResponse.GetString("refresh_token"));
         // If we get here, we were successful
         fSuccess = true;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -133,15 +136,16 @@ void __thiscall SessionManager::Logout(void) throw()
         if (true == fWasRunning)
         {
             // Now join the thread (i.e. wait for it to exit properly)
-            m_oEosbMaintenanceThread.get()->join();
+            m_oAccessTokenMaintenanceThread.get()->join();
             // Update member variables to their starting state.
-            m_oEosbMaintenanceThread = nullptr;
-            m_strEosb = "";
+            m_oAccessTokenMaintenanceThread = nullptr;
+            m_strAccessToken = "";
+            m_strRefreshToken = "";
             m_strServerIpAddress = "";
             m_wServerPortNumber = 0;
         }
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -151,7 +155,7 @@ void __thiscall SessionManager::Logout(void) throw()
     {
         ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
@@ -171,10 +175,10 @@ void __thiscall SessionManager::Logout(void) throw()
 std::string __thiscall SessionManager::GetServerIpAddress(void) const throw()
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     std::string strServerIpAddress{m_strServerIpAddress};
-    
+
     return strServerIpAddress;
 }
 
@@ -192,10 +196,10 @@ std::string __thiscall SessionManager::GetServerIpAddress(void) const throw()
 Word __thiscall SessionManager::GetServerPortNumber(void) const throw()
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     Word wServerPortNumber = m_wServerPortNumber;
-    
+
     return wServerPortNumber;
 }
 
@@ -209,14 +213,14 @@ Word __thiscall SessionManager::GetServerPortNumber(void) const throw()
  *
  ********************************************************************************************/
 
-std::string __thiscall SessionManager::GetEosb(void) const throw()
+std::string __thiscall SessionManager::GetAccessToken(void) const throw()
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
-    std::string strEosb{m_strEosb};
-    
-    return strEosb;
+    std::string strAccessToken{m_strAccessToken};
+
+    return strAccessToken;
 }
 
 /********************************************************************************************
@@ -224,23 +228,24 @@ std::string __thiscall SessionManager::GetEosb(void) const throw()
  * @class SessionManager
  * @function SetEosb
  * @brief This function allows external code to update the EOSB. This is required since a lot
- *        
+ *
  * @return (string) Base64 string of the EOSB for a valid session
  * @return (string) Empty string if there is no current session
  *
  ********************************************************************************************/
 
-void __thiscall SessionManager::SetEosb(
-    _in const std::string & c_strEosb
+void __thiscall SessionManager::SetAccessTokens(
+    _in const std::string & c_strAccessToken,
+    _in const std::string & c_strRefreshToken
     ) throw()
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     // If someone is setting an EOSB, we'd better have a running session, so let's make sure
-    if ((true == m_fIsRunning)&&(0 < m_strServerIpAddress.size())&&(0 < m_wServerPortNumber)&&(0 < m_strEosb.size()))
+    if ((true == m_fIsRunning)&&(0 < m_strServerIpAddress.size())&&(0 < m_wServerPortNumber)&&(0 < m_strAccessToken.size())&&(0 < m_strRefreshToken.size()))
     {
-        m_strEosb = c_strEosb;
+        m_strAccessToken = c_strAccessToken;
     }
 }
 
@@ -258,16 +263,18 @@ void __thiscall SessionManager::SetEosb(
 void __thiscall SessionManager::SetSessionParameters(
     _in const std::string & c_strServerIpAddress,
     _in Word wServerPortNumber,
-    _in const std::string & c_strEosb
+    _in const std::string & c_strAccessToken,
+    _in const std::string & c_strRefreshToken
     )
 {
     __DebugFunction();
-    
+
     const std::lock_guard<std::mutex> stlLock(m_oLock);
     // Update the EOSB
     m_strServerIpAddress = c_strServerIpAddress;
     m_wServerPortNumber = wServerPortNumber;
-    m_strEosb = c_strEosb;
+    m_strAccessToken = c_strAccessToken;
+    m_strRefreshToken = c_strRefreshToken;
     // If the update thread isn't running, start it now after setting the m_strEosb
     if (false == m_fIsRunning)
     {
@@ -275,7 +282,7 @@ void __thiscall SessionManager::SetSessionParameters(
         // thread runs a chance of exiting immediately
         m_fIsRunning = true;
         // Start the maintenance thread
-        m_oEosbMaintenanceThread = std::unique_ptr<std::thread>(new std::thread(&SessionManager::EosbMaintenanceFunction, this));
+        m_oAccessTokenMaintenanceThread = std::unique_ptr<std::thread>(new std::thread(&SessionManager::AccessTokenMaintenanceFunction, this));
     }
 }
 
@@ -284,15 +291,15 @@ void __thiscall SessionManager::SetSessionParameters(
 bool __thiscall SessionManager::IsRunning(void) const throw()
 {
     __DebugFunction();
-    
+
     bool fIsRunning = false;
-    
+
     try
     {
         const std::lock_guard<std::mutex> stlLock(m_oLock);
         fIsRunning = m_fIsRunning;
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
@@ -302,12 +309,12 @@ bool __thiscall SessionManager::IsRunning(void) const throw()
     {
         ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
     }
-    
+
     catch (...)
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
-    
+
     return fIsRunning;
 }
 
@@ -323,23 +330,24 @@ bool __thiscall SessionManager::IsRunning(void) const throw()
  *
  ********************************************************************************************/
 
-void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
+void __thiscall SessionManager::AccessTokenMaintenanceFunction(void) throw()
 {
     __DebugFunction();
-    
+
     try
     {
         Chronometer oChronometer;
         // Start the chronometer
         oChronometer.Start();
-        
+
         do
         {
             bool fIsRunning = false;
-            std::string strCurrentEosb{};
+            std::string strCurrentAccessToken{};
+            std::string strCurrentRefreshToken{};
             std::string strServerIpAddress{};
             Word wServerPortNumber{0};
-            
+
             // Sleep for 100 milliseconds
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             // Now let's check if we are still running. We do this in an artificially
@@ -349,12 +357,14 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
                 const std::lock_guard<std::mutex> stlLock(m_oLock);
                 // Quick reality check that ensures that the session manager didn't fall into
                 // a weird state
-                __DebugAssert(0 < m_strEosb.size());
+                __DebugAssert(0 < m_strAccessToken.size());
+                __DebugAssert(0 < m_strRefreshToken.size());
                 __DebugAssert(0 < m_strServerIpAddress.size());
                 __DebugAssert(0 < m_wServerPortNumber);
                 // Take an atomic snapshot of the session manager settings
                 fIsRunning = true;
-                strCurrentEosb = m_strEosb;
+                strCurrentAccessToken = m_strAccessToken;
+                strCurrentRefreshToken = m_strRefreshToken;
                 strServerIpAddress = m_strServerIpAddress;
                 wServerPortNumber = m_wServerPortNumber;
             }
@@ -362,22 +372,23 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
             {
                 fIsRunning = false;
             }
-            
+
             // Check to see if 60 seconds has expired on the chronometer. We only care to
             // try and refresh the EOSB once every minute
             if ((true == fIsRunning)&&(60 < oChronometer.GetElapsedTimeWithPrecision(Second)))
             {
-                __DebugAssert(0 < strCurrentEosb.size());
+                __DebugAssert(0 < strCurrentRefreshToken.size());
+                __DebugAssert(0 < strCurrentAccessToken.size());
                 __DebugAssert(0 < strServerIpAddress.size());
                 __DebugAssert(0 < wServerPortNumber);
-                    
+
                 // Reset the chronometer so we can count down another 10 seconds
                 oChronometer.Reset();
                 oChronometer.Start();
                 // We aren't stopping, update the EOSB
-                std::string strVerb = "GET";
-                std::string strApiUrl = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + strCurrentEosb;
-                std::string strJsonBody = "";
+                std::string strVerb = "POST";
+                std::string strApiUrl = "/refresh-token";
+                std::string strJsonBody = "{\"refresh_token\": \""+ strCurrentRefreshToken +"\"}";
                 // Make the API call and get REST response
                 std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true);
                 // Check to make sure the response size isn't 0 before trying to convert it into a StructuredBuffer
@@ -385,15 +396,19 @@ void __thiscall SessionManager::EosbMaintenanceFunction(void) throw()
                 // Extract the return parameters
                 StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer(reinterpret_cast<const char*>(stlRestResponse.data()));
                 // Make sure the transaction was an actual success and that a new EOSB was provided
-                if ((200 == oResponse.GetFloat64("Status"))&&(true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+                if ((true == oResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                 {
-                    this->SetEosb(oResponse.GetString("Eosb"));
+                    // Check to see if we need to update the internal gs_strSailPlatformServicesEosb
+                    if (true == oResponse.IsElementPresent("refresh_token", ANSI_CHARACTER_STRING_VALUE_TYPE))
+                    {
+                        this->SetAccessTokens(oResponse.GetString("access_token"), oResponse.GetString("refresh_token"));
+                    }
                 }
             }
         }
         while (true == this->IsRunning());
     }
-    
+
     catch (const BaseException & c_oBaseException)
     {
         ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);

@@ -21,21 +21,21 @@
 class Organization : public Object
 {
     public:
-    
+
         Organization(
             _in const std::string & c_strOrganizationName,
             _in const StructuredBuffer & c_oOrganizationalData,
             _in unsigned int unStepIdentifier
             );
         virtual ~Organization(void);
-        
+
         // Register() registers all aspects of an organization
         bool __thiscall Register(
             _in const std::string & c_strSailPlatformServicesIpAddress,
             _in Word wSailPlatformServicesPortNumber,
             _in unsigned int unStepIdentifier
             ) throw();
-            
+
         // The following information is needed when trying to register
         // digital contracts. So once an organization is registered, these
         // methods can be used to keep track of data that will be
@@ -60,10 +60,10 @@ class Organization : public Object
         std::string __thiscall GetDataFederationIdentifier(
             _in const std::string & c_strDataFederationName
             ) const throw();
-        
-        
+
+
     private:
-    
+
         // Since all of the functions to register have the same login code in
         // common, we made a function for it
         void __thiscall Login(
@@ -71,8 +71,6 @@ class Organization : public Object
             ) const;
         // This registers both the organization and the original admin user.
         void __thiscall RegisterOrganization(void);
-        // This registers any administrators above and beyond the 1st admin
-        void __thiscall RegisterAdministrators(void);
         // Registers contacts associated with the organization. Contacts are not1
         // users (and don't need to be users). This is for SAIL purposes
         void __thiscall RegisterContacts(void);
@@ -81,13 +79,13 @@ class Organization : public Object
         void __thiscall RegisterDataFederations(void);
         void __thiscall RegisterDatasetFamilies(void);
         void __thiscall RegisterDatasets(void);
-        
+
         // Private data members
         std::string m_strSailPlatformServicesIpAddress;
         Word m_wSailPlatformServicesPortNumber;
         bool m_fRegistered;
         std::string m_strOrganizationalName;
-        std::string m_strOrganizationalAddress;
+        std::string m_strOrganizationalDescription;
         std::unordered_set<std::string> m_stlContacts;
         std::unordered_set<std::string> m_stlAdministrators;
         std::unordered_set<std::string> m_stlUsers;

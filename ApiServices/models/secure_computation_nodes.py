@@ -8,9 +8,11 @@
 from datetime import datetime
 from enum import Enum
 from ipaddress import IPv4Address
-from typing import Optional
+from typing import List, Optional
+
 from pydantic import Field, StrictStr
-from models.common import PyObjectId, SailBaseModel
+
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class SecureComputationNodeType(Enum):
@@ -21,10 +23,13 @@ class SecureComputationNodeState(Enum):
     REQUESTED = "REQUESTED"
     CREATING = "CREATING"
     INITIALIZING = "INITIALIZING"
+    WAITING_FOR_DATA = "WAITING_FOR_DATA"
+    FAILED = "FAILED"
     READY = "READY"
+    IN_USE = "IN_USE"
     DELETED = "DELETED"
     DELETING = "DELETING"
-    FAILED = "FAILED"
+    DELETE_FAILED = "DELETE_FAILED"
 
 
 class SecureComputationNode_Base(SailBaseModel):
@@ -39,7 +44,7 @@ class SecureComputationNode_Db(SecureComputationNode_Base):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     researcher_user_id: PyObjectId = Field(...)
     state: SecureComputationNodeState = Field(...)
-    details: Optional[StrictStr] = Field(default=None)
+    detail: Optional[StrictStr] = Field(default=None)
     ipaddress: Optional[IPv4Address] = Field(default=None)
     researcher_id: PyObjectId = Field(default=None)
     data_owner_id: PyObjectId = Field(default=None)
@@ -53,8 +58,23 @@ class RegisterSecureComputationNode_Out(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
 
 
-class GetSecureComputationNode_Out(SecureComputationNode_Db):
-    pass
+class GetSecureComputationNode_Out(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+    name: StrictStr = Field(...)
+    digital_contract: BasicObjectInfo = Field(...)
+    dataset: BasicObjectInfo = Field(...)
+    researcher: BasicObjectInfo = Field(default=None)
+    data_owner: BasicObjectInfo = Field(default=None)
+    researcher_user: BasicObjectInfo = Field(...)
+    type: SecureComputationNodeType = Field(...)
+    timestamp: datetime = Field(...)
+    state: SecureComputationNodeState = Field(...)
+    detail: Optional[StrictStr] = Field(default=None)
+    ipaddress: Optional[IPv4Address] = Field(default=None)
+
+
+class GetMultipleSecureComputationNode_Out(SailBaseModel):
+    secure_computation_nodes: List[GetSecureComputationNode_Out] = Field(...)
 
 
 class UpdateSecureComputationNode_In(SailBaseModel):

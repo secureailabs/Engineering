@@ -1,0 +1,32 @@
+button {
+  @include form-element;
+  width: 100%;
+  font-weight: bold;
+  padding: 0.25rem;
+  &:disabled {
+    cursor: not-allowed;
+    background-color: black;
+    color: white;
+    &:hover {
+      background-color: black;
+    }
+  }
+  &:not(disabled) {
+    cursor: pointer;
+    background-color: var(--orange-1);
+    &:hover {
+      background-color: var(--orange-2);
+    }
+    &:active {
+      text-decoration: underline;
+    }
+  }
+}
+
+.button {
+  &--small {
+    display: block;
+    width: 20rem;
+    margin: auto;
+  }
+}

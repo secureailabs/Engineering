@@ -1,0 +1,23 @@
+.info-display {
+  @include sliding-view;
+  &__header {
+    margin: 2rem 0 1rem;
+    // display: grid;
+    grid-template-columns: 1fr 100fr;
+    align-items: center;
+    border-bottom: 1px solid grey;
+    font: {
+      size: var(--fontsize-xxl);
+      weight: bold;
+    }
+  }
+  &__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  &__section__text {
+    max-width: 28vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

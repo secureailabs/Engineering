@@ -17,7 +17,8 @@ static bool gs_fIsLoggedOn = false;
 static HANDLE gs_EosbMaintenanceThread = INVALID_HANDLE_VALUE;
 static Dword gs_dwEosbMaintenanceThreadIdentifier = 0;
 static std::string gs_strSailPlatformServicesIpAddress;
-static std::string gs_strSailPlatformServicesEosb;
+static std::string gs_strSailPlatformServicesAccessToken;
+static std::string gs_strSailPlatformServicesRefreshToken;
 static std::string gs_strCurrentUserIdentifier;
 static std::string gs_strCurrentUserOrganizationalIdentifier;
 static Qword gs_qwCurrentUserAccessRightsMask;
@@ -27,7 +28,7 @@ static Qword gs_qwCurrentUserAccessRightsMask;
 /// </summary>
 /// <param name="pParameter"></param>
 /// <returns></returns>
-static Dword __stdcall EosbMaintenanceThread(
+static Dword __stdcall AccessTokenMaintenanceThread(
     _in void * pParameter
 )
 {
@@ -45,46 +46,53 @@ static Dword __stdcall EosbMaintenanceThread(
             // Check to see if we are still logged on. If not, then this thread ends
             gs_stlMutex.lock();
             fIsLoggedOn = gs_fIsLoggedOn;
-            std::string strSailPlatformServicesEosb = gs_strSailPlatformServicesEosb;
+            std::string strSailPlatformServicesAccessToken = gs_strSailPlatformServicesAccessToken;
+            std::string strSailPlatformServicesRefreshToken = gs_strSailPlatformServicesRefreshToken;
             std::string strSailPlatformServicesIpAddress = gs_strSailPlatformServicesIpAddress;
-            Word wSailPlatformServicesPortAddress = 6200;
+            Word wSailPlatformServicesPortAddress = 8000;
             gs_stlMutex.unlock();
             if (true == fIsLoggedOn)
             {
                 // Sanity check against all of our global variables, and make thread
                 // safe copies of each value
-                __DebugAssert(0 < strSailPlatformServicesEosb.size());
+                __DebugAssert(0 < strSailPlatformServicesAccessToken.size());
+                __DebugAssert(0 < strSailPlatformServicesRefreshToken.size());
                 __DebugAssert(0 < strSailPlatformServicesIpAddress.size());
                 __DebugAssert(0 < wSailPlatformServicesPortAddress);
                 // Now we call into the SAIL Platform Services API portal to refresh our
                 // EOSB if needed.
                 // Build out the REST API call query
-                std::string strVerb = "GET";
-                std::string strApiUri = "/SAIL/AuthenticationManager/CheckEosb?Eosb=" + strSailPlatformServicesEosb;
-                std::string strJsonBody = "";
+                std::string strVerb = "POST";
+                std::string strApiUri = "/refresh-token";
+                std::string strJsonBody = "{\"refresh_token\": \""+ strSailPlatformServicesRefreshToken +"\"}";
+
                 // Send the REST API call to the SAIL Web Api Portal
                 std::vector<Byte> stlRestResponse = ::RestApiCall(strSailPlatformServicesIpAddress, (Word) wSailPlatformServicesPortAddress, strVerb, strApiUri, strJsonBody, true);
+
                 // Parse the returning value.
                 StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+
                 // Did the transaction succeed?
-                if ((true == oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE)) && (200 == oResponse.GetFloat64("Status")))
+                if ((true == oResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                 {
                     // Check to see if we need to update the internal gs_strSailPlatformServicesEosb
-                    if (true == oResponse.IsElementPresent("Eosb", ANSI_CHARACTER_STRING_VALUE_TYPE))
+                    if (true == oResponse.IsElementPresent("refresh_token", ANSI_CHARACTER_STRING_VALUE_TYPE))
                     {
                         const std::lock_guard<std::mutex> lock(gs_stlMutex);
                         // There is a race condition which exists where someone can call Logout()
                         // while the CheckEosb transaction is running. By the time you get the
                         // result, we might suddenly be no longer logged in. We need to check
-                         // before updating the internal EOSB
+                        // before updating the internal EOSB
                         if (true == gs_fIsLoggedOn)
                         {    
-                            gs_strSailPlatformServicesEosb = oResponse.GetString("Eosb");
+                            gs_strSailPlatformServicesAccessToken = oResponse.GetString("access_token");
+                            gs_strSailPlatformServicesRefreshToken = oResponse.GetString("refresh_token");
                         }
                         else
                         {
                             // Quick sanity check on global variables
-                            __DebugAssert(0 == gs_strSailPlatformServicesEosb.size());
+                            __DebugAssert(0 == gs_strSailPlatformServicesRefreshToken.size());
+                            __DebugAssert(0 == gs_strSailPlatformServicesAccessToken.size());
                             __DebugAssert(INVALID_HANDLE_VALUE == gs_EosbMaintenanceThread);
                             __DebugAssert(0 == gs_dwEosbMaintenanceThreadIdentifier);
                             // Stop looping
@@ -92,12 +100,13 @@ static Dword __stdcall EosbMaintenanceThread(
                         }
                     }
                 }
-                else if ((true == oResponse.IsElementPresent("Status", FLOAT64_VALUE_TYPE)) && (401 == oResponse.GetFloat64("Status")))
+                else if ((true == oResponse.IsElementPresent("error", ANSI_CHARACTER_STRING_VALUE_TYPE)))
                 {
                     // We are no longer logged on. We need to update the internal global variables
                     // to reflect this.
                     const std::lock_guard<std::mutex> lock(gs_stlMutex);
-                    gs_strSailPlatformServicesEosb = "";
+                    gs_strSailPlatformServicesAccessToken = "";
+                    gs_strSailPlatformServicesRefreshToken = "";
                     gs_EosbMaintenanceThread = INVALID_HANDLE_VALUE;
                     gs_dwEosbMaintenanceThreadIdentifier = 0;
                     gs_fIsLoggedOn = false;
@@ -162,14 +171,14 @@ std::string __stdcall GetSailPlatformServicesIpAddress(void)
 /// </summary>
 /// <param name=""></param>
 /// <returns></returns>
-std::string __stdcall GetSailPlatformServicesEosb(void)
+std::string __stdcall GetSailPlatformServicesAccessToken(void)
 {
     __DebugFunction();
 
     const std::lock_guard<std::mutex> lock(gs_stlMutex);
-    std::string strSailPlatformServicesEosb = gs_strSailPlatformServicesEosb;
+    std::string strSailPlatformServicesAccessToken = gs_strSailPlatformServicesAccessToken;
 
-    return strSailPlatformServicesEosb;
+    return strSailPlatformServicesAccessToken;
 }
 
 /// <summary>
@@ -222,23 +231,25 @@ static void __stdcall SetSailPlatformServicesIpAddress(
 /// </summary>
 /// <param name="c_strSailPlatformServicesEosb"></param>
 /// <returns></returns>
-static void __stdcall SetSailPlatformServicesEosb(
-    _in const std::string & c_strSailPlatformServicesEosb
+static void __stdcall SetSailPlatformServicesTokens(
+    _in const std::string& c_strSailPlatformServicesAccessToken,
+    _in const std::string& c_strSailPlatformServicesRefreshToken
     )
 {
     __DebugFunction();
 
     const std::lock_guard<std::mutex> lock(gs_stlMutex);
-    gs_strSailPlatformServicesEosb = c_strSailPlatformServicesEosb;
+    gs_strSailPlatformServicesAccessToken = c_strSailPlatformServicesAccessToken;
+    gs_strSailPlatformServicesRefreshToken = c_strSailPlatformServicesRefreshToken;
     // Set global variables
-    if ((false == gs_fIsLoggedOn)&&(0 < c_strSailPlatformServicesEosb.size()))
+    if ((false == gs_fIsLoggedOn)&&(0 < c_strSailPlatformServicesAccessToken.size()))
     {
         __DebugAssert(INVALID_HANDLE_VALUE == gs_EosbMaintenanceThread);
         __DebugAssert(0 == gs_dwEosbMaintenanceThreadIdentifier);
 
         // If we were not logged on before, we need to begin a thread
-        // which effectively keeps the EOSB fresh
-        gs_EosbMaintenanceThread = ::CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE) EosbMaintenanceThread, nullptr, 0, (DWORD *)  &gs_dwEosbMaintenanceThreadIdentifier);
+        // which effectively keeps the Access Token fresh
+        gs_EosbMaintenanceThread = ::CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE) AccessTokenMaintenanceThread, nullptr, 0, (DWORD *)  &gs_dwEosbMaintenanceThreadIdentifier);
         _ThrowBaseExceptionIf((INVALID_HANDLE_VALUE == gs_EosbMaintenanceThread), "CreateThread() failed with GetLastError() = %d", ::GetLastError());
         gs_fIsLoggedOn = true;
     }
@@ -372,34 +383,50 @@ extern "C" __declspec(dllexport) bool __cdecl Login(
     try
     {
         _ThrowBaseExceptionIf((true == ::IsLoggedOn()), "Cannot call Login() when already logged on", nullptr);
+
         // Establish the target IP address and port address. This function throws if we are currently
         // running an existing session
         ::SetIpAndPortAddress(c_szSailPlatformsServicesIpAddress);
+
         // Build out the REST API call query
         std::string strVerb = "POST";
-        std::string strApiUri = "/SAIL/AuthenticationManager/User/Login?Email=" + std::string(c_szUsername) + "&Password=" + std::string(c_szPassword);
-        std::string strJsonBody = "";
+        std::string strApiUri = "/login";
+        std::string strBody = "grant_type=&username="+ ::UrlEncodeString(std::string(c_szUsername)) +"&password=" + ::UrlEncodeString(std::string(c_szPassword)) + "&scope=&client_id=&client_secret=";
+        std::vector<std::string> stlListOfHeaders;
+        stlListOfHeaders.push_back("Content-Type: application/x-www-form-urlencoded");
+
         // Send the REST API call to the SAIL Web Api Portal
-        std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strSailPlatformServicesIpAddress, (Word) 6200, strVerb, strApiUri, strJsonBody, true);
+        std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strSailPlatformServicesIpAddress, (Word)8000, strVerb, strApiUri, strBody, true, stlListOfHeaders);
+
         // Parse the returning value.
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((201 != oResponse.GetFloat64("Status")), "Failed to log in. Invalid Credentials.", nullptr);
+        _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("access_token", ANSI_CHARACTER_STRING_VALUE_TYPE)), "Failed to log in. Invalid Credentials.", nullptr);
+
         // Make sure to record the EOSB
-        ::SetSailPlatformServicesEosb(oResponse.GetString("Eosb"));
+        ::SetSailPlatformServicesTokens(oResponse.GetString("access_token"), oResponse.GetString("refresh_token"));
 
         // By default, we automatically get the basic user information since some of those
         // values are useful in other SAIL Web API Portal transactions
         strVerb = "GET";
-        strApiUri = "/SAIL/AuthenticationManager/GetBasicUserInformation?Eosb=" + ::GetSailPlatformServicesEosb();
-        stlRestResponse = ::RestApiCall(gs_strSailPlatformServicesIpAddress, (Word) 6200, strVerb, strApiUri, strJsonBody, true);
+        strApiUri = "/me";
+        stlListOfHeaders.clear();
+        stlListOfHeaders.push_back("Authorization: Bearer " + ::GetSailPlatformServicesAccessToken());
+
+        // Send the REST API call to the SAIL Web Api Portal
+        stlRestResponse = ::RestApiCall(gs_strSailPlatformServicesIpAddress, (Word)8000, strVerb, strApiUri, strBody, true, stlListOfHeaders);
+        
         // Parse the returning value.
         oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "GetBasicUsedInformation() has failed", nullptr);
+        _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
+        _ThrowBaseExceptionIf((true != oResponse.IsElementPresent("organization", INDEXED_BUFFER_VALUE_TYPE)), "GetBasicUsedInformation() has failed", nullptr);
+
         // Extract all values and cache them in global variables
-        ::SetCurrentUserOrganizationIdentifier(oResponse.GetString("OrganizationGuid"));
-        ::SetCurrentUserIdentifier(oResponse.GetString("OrganizationGuid"));
+        ::SetCurrentUserOrganizationIdentifier(oResponse.GetStructuredBuffer("organization").GetString("id"));
+        ::SetCurrentUserIdentifier(oResponse.GetString("id"));
         // If we get here, no exceptions were thrown, so the transaction was successfull!!!
         gs_fIsLoggedOn = true;
     }
@@ -438,7 +465,8 @@ extern "C" __declspec(dllexport) bool __cdecl Logout(void)
         if (true == ::IsLoggedOn())
         {
             const std::lock_guard<std::mutex> lock(gs_stlMutex);
-            gs_strSailPlatformServicesEosb = "";
+            gs_strSailPlatformServicesAccessToken = "";
+            gs_strSailPlatformServicesRefreshToken = "";
             gs_EosbMaintenanceThread = INVALID_HANDLE_VALUE;
             gs_dwEosbMaintenanceThreadIdentifier = 0;
             gs_fIsLoggedOn = false;
@@ -457,51 +485,4 @@ extern "C" __declspec(dllexport) bool __cdecl Logout(void)
     }
 
     return fSuccess;
-}
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name=""></param>
-/// <returns></returns>
-extern "C" __declspec(dllexport) BSTR __cdecl GetSailWebApiPortalImpostorEosb(void)
-{
-    __DebugFunction();
-
-    // [DllImport("SailWebApiPortalFunctions.dll", CallingConvention = CallingConvention.Cdecl )]
-    // [return: MarshalAs(UnmanagedType.BStr)]
-    // static extern public string GetSailWebApiPortalImpostorEosb();
-
-    std::string strSailWebApiPortalImportorEosb = "";
-
-    try
-    {
-
-        // Check to make sure we are logged in before trying to transact
-        _ThrowBaseExceptionIf((false == ::IsLoggedOn()), "No active session, cannot complete requested operation", nullptr);
-        // Build out the REST API call query
-        std::string strVerb = "GET";
-        std::string strApiUri = "/SAIL/CryptographicManager/User/GetIEosb?Eosb=" + ::GetSailPlatformServicesEosb();
-        std::string strJsonBody = "";
-        // Send the REST API call to the SAIL Web Api Portal
-        std::vector<Byte> stlRestResponse = ::RestApiCall(gs_strSailPlatformServicesIpAddress, (Word) 6200, strVerb, strApiUri, strJsonBody, true);
-        // Parse the returning value.
-        StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
-        // Did the transaction succeed?
-        _ThrowBaseExceptionIf((200 != oResponse.GetFloat64("Status")), "Sail Web Api Portal Transaction has failed.", nullptr);
-        // Extract the IEOSB from the response
-        strSailWebApiPortalImportorEosb = oResponse.GetString("UpdatedEosb");
-    }
-
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __LINE__);
-    }
-
-    return ::ConvertToBSTR(strSailWebApiPortalImportorEosb);
 }

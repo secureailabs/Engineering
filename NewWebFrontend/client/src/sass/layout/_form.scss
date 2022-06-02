@@ -1,0 +1,24 @@
+.form {
+
+  // border: {
+  //   style: solid;
+  //   width: 1px;
+  //   color: rgba(0, 0, 0, 0.5);
+  //   radius: 5px;
+  // }
+
+  // Where do i put media queries?
+  @media (max-width: 768px) {
+    border-style: none;
+  }
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  .gobackbuttoncontainer {
+    width: 100%;
+    margin-top: 1.25rem;
+  }
+}

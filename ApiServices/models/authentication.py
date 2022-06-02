@@ -6,11 +6,12 @@
 ###################################################################################
 
 from pydantic import Field, StrictStr
-from models.common import PyObjectId, SailBaseModel
+
 from models.accounts import UserRole
+from models.common import PyObjectId, SailBaseModel
 
 
-class Login_Out(SailBaseModel):
+class LoginSuccess_Out(SailBaseModel):
     access_token: StrictStr
     refresh_token: StrictStr
     token_type: StrictStr

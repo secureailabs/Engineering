@@ -6,6 +6,16 @@ include Make/securecomputationnode.mk
 
 .PHONY: platformservices dataservices securecomputationnode orchestrator datasetViewer databaseInitializationTool uploadPackageAndInitializationVector safeFunctionCompiler package all clean SharedCommonCode
 
+remoteDataConnector: SharedCommonCode
+	@make -C $(REMOTE_DATA_CONNECTOR) all
+	@echo "orchestrator done!"
+
+package_apiservices: SharedCommonCode uploadPackageAndInitializationVector package_securecomputationnode
+	@cp AzureDeploymentTemplates/ArmTemplates/securecomputationnode.json ApiServices
+	@cp Binary/UploadPackageAndInitializationVector ApiServices
+	@cp Binary/SecureComputationNode.tar.gz ApiServices
+	@tar --exclude='ApiServices/dev_env2' -czvf Binary/apiservices.tar.gz ApiServices
+
 platformservices: SharedCommonCode WebServices_Shared
 	@make restapiportal platformservices_plugins
 	@echo "platformservices done!"
@@ -29,18 +39,18 @@ package: SharedCommonCode WebServices_Shared VirtualMachine_Shared
 safeFunctioncompiler: SharedCommonCode
 	@make -C $(SAFE_OBJECT_COMPILER) all
 	@echo "safefunctioncompiler done!"
-    
+
 datasetViewer: SharedCommonCode
 	@make -C $(DATASET_VIEWER_TOOL) all
 	@echo "datasetViewer done!"
-    
+
 databaseInitializationTool: SharedCommonCode
 	@make -C $(DATABASE_INITIALIZATION_TOOL) all
 	@echo "databaseInitializationTool done!"
-    
+
 uploadPackageAndInitializationVector: SharedCommonCode
 	@make -C $(UPLOAD_TOOL) all
-	@echo "databaseTools done!"
+	@echo "uploadPackageAndInitializationVector done!"
 
 baseVmInit: SharedCommonCode
 	@make -C $(BASE_VM_INIT) all

@@ -1,6 +1,6 @@
 ###################################################################################
 # @author Prawal Gangwar
-# @brief Models used by account management service
+# @brief Async operations for the database
 # @License Private and Confidential. Internal Use Only.
 # @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
 ###################################################################################
@@ -33,3 +33,7 @@ async def update_one(collection, query, data):
 
 async def delete(collection, query):
     return await sail_db[collection].delete_one(query)
+
+
+async def drop():
+    return await client.drop_database(sail_db)

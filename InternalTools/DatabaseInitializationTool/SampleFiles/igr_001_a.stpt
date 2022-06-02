@@ -1,0 +1,101 @@
+TableProperty,ValueSeparatorCharacter,System.String,","
+TableProperty,AllowComments,System.Boolean,True
+TableProperty,CommentCharacter,System.Char,"#"
+TableProperty,HeadersOnFirstLine,System.Boolean,True
+TableProperty,QuoteCharacter,System.Char,"\""
+TableProperty,EscapeCharacter,System.Char,"\\"
+TableProperty,ColumnCount,System.Int32,9
+TableProperty,Title,System.String,"Age related medical metrics"
+TableProperty,Description,System.String,"Enumeration of BMI, PD-L1, PD-L2, PD1 levels by age."
+TableProperty,Tags,System.String,""
+TableProperty,DestinationIntermediateFile,System.String,"igr_001_a.sailtable"
+ColumnProperty,0,SourceFileHeaderName,System.String,"Columns"
+ColumnProperty,0,Name,System.String,"Columns"
+ColumnProperty,0,Identifier,System.String,"165CDE29-1438-41EC-BC2F-C8EE4F33B33A"
+ColumnProperty,0,Units,System.String,"GenericString"
+ColumnProperty,0,Type,System.String,"string"
+ColumnProperty,0,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,0,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,0,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,0,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,0,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,1,SourceFileHeaderName,System.String,"AGE"
+ColumnProperty,1,Name,System.String,"AGE"
+ColumnProperty,1,Identifier,System.String,"A0ECB12A-9F99-47E0-99DC-2F20823FC017"
+ColumnProperty,1,Units,System.String,"GenericString"
+ColumnProperty,1,Type,System.String,"string"
+ColumnProperty,1,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,1,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,1,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,1,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,1,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,2,SourceFileHeaderName,System.String,"BMI"
+ColumnProperty,2,Name,System.String,"BMI"
+ColumnProperty,2,Identifier,System.String,"4B6CFC2B-653D-438C-8C79-D7CC51702C1A"
+ColumnProperty,2,Units,System.String,"GenericString"
+ColumnProperty,2,Type,System.String,"string"
+ColumnProperty,2,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,2,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,2,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,2,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,2,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,3,SourceFileHeaderName,System.String,"PD-L1 level before treatment"
+ColumnProperty,3,Name,System.String,"PD-L1 level before treatment"
+ColumnProperty,3,Identifier,System.String,"759DDD2A-30F1-464F-853F-56F91BDA7696"
+ColumnProperty,3,Units,System.String,"GenericString"
+ColumnProperty,3,Type,System.String,"string"
+ColumnProperty,3,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,3,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,3,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,3,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,3,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,4,SourceFileHeaderName,System.String,"PD-L1 level after treatment"
+ColumnProperty,4,Name,System.String,"PD-L1 level after treatment"
+ColumnProperty,4,Identifier,System.String,"2D5A952A-DC02-4462-B0D8-F641BB4FCA1B"
+ColumnProperty,4,Units,System.String,"GenericString"
+ColumnProperty,4,Type,System.String,"string"
+ColumnProperty,4,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,4,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,4,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,4,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,4,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,5,SourceFileHeaderName,System.String,"PD-L2 level before treatment"
+ColumnProperty,5,Name,System.String,"PD-L2 level before treatment"
+ColumnProperty,5,Identifier,System.String,"86100029-C55B-48B7-8FF8-8671E50BFE17"
+ColumnProperty,5,Units,System.String,"GenericString"
+ColumnProperty,5,Type,System.String,"string"
+ColumnProperty,5,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,5,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,5,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,5,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,5,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,6,SourceFileHeaderName,System.String,"PD-L2 level after treatment"
+ColumnProperty,6,Name,System.String,"PD-L2 level after treatment"
+ColumnProperty,6,Identifier,System.String,"AFCE6228-125C-4252-ADD9-014928CC557E"
+ColumnProperty,6,Units,System.String,"GenericString"
+ColumnProperty,6,Type,System.String,"string"
+ColumnProperty,6,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,6,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,6,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,6,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,6,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,7,SourceFileHeaderName,System.String,"PD1 level before treatment"
+ColumnProperty,7,Name,System.String,"PD1 level before treatment"
+ColumnProperty,7,Identifier,System.String,"6E359F29-538F-4CD9-B896-BDA05CAFCF37"
+ColumnProperty,7,Units,System.String,"GenericString"
+ColumnProperty,7,Type,System.String,"string"
+ColumnProperty,7,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,7,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,7,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,7,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,7,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True
+ColumnProperty,8,SourceFileHeaderName,System.String,"PD1 level after treatment"
+ColumnProperty,8,Name,System.String,"PD1 level after treatment"
+ColumnProperty,8,Identifier,System.String,"4DCACB29-8BF3-47CA-BF1A-2E186A1DAF84"
+ColumnProperty,8,Units,System.String,"GenericString"
+ColumnProperty,8,Type,System.String,"string"
+ColumnProperty,8,Description,System.String,"EDIT ME <This is the description of a column containing generic text>"
+ColumnProperty,8,Tags,System.String,"EDIT ME <#Column>"
+ColumnProperty,8,RejectRowDataIfInvalidData,System.Boolean,False
+ColumnProperty,8,RejectRowDataIfMissingData,System.Boolean,False
+ColumnProperty,8,ReplaceCellDataWithEmptyIfInvalidData,System.Boolean,True

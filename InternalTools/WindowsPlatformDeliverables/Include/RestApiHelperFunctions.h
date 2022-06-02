@@ -39,3 +39,9 @@ extern std::vector<Byte> __stdcall RestApiCall(
     _in bool fDisableSslCertificateVerification,
     _in const std::vector<std::string> & c_stlListOfHeaders
     ) throw();
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+extern std::string UrlEncodeString(
+    const std::string c_strToEncode
+    );

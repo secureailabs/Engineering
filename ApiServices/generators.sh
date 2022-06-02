@@ -1,3 +1,6 @@
+# delete existing openapi.json
+rm -f docs/openapi.json
+
 # Download the API spec
 wget http://127.0.0.1:8000/openapi.json -P docs/
 

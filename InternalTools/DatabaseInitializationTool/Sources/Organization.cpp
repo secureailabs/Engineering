@@ -30,31 +30,14 @@ Organization::Organization(
     )
 {
     __DebugFunction();
-    
+
     // Register the basic information
     m_fRegistered = false;
     m_strSailPlatformServicesIpAddress = "";
     m_wSailPlatformServicesPortNumber = 0;
     m_strOrganizationalName = c_strOrganizationName;
-    m_strOrganizationalAddress = c_oOrganizationalData.GetString("Address");
-    // Extract the contacts
-    StructuredBuffer oContacts{c_oOrganizationalData.GetStructuredBuffer("Contacts")};
-    oContacts.RemoveElement("__IsArray__");
-    for (const std::string & c_strElementName: oContacts.GetNamesOfElements())
-    {
-        StructuredBuffer oContact{oContacts.GetStructuredBuffer(c_strElementName.c_str())};
-        // Make sure the incoming contact is properly formatted
-        if ((true == oContact.IsElementPresent("Email", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oContact.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oContact.IsElementPresent("Phone Number", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oContact.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE)))
-        {
-            // Insert the contact m_stlContacts
-            m_stlContacts.insert(oContact.GetBase64SerializedBuffer());
-        }
-        else
-        {
-            std::cout << "ERROR: Invalid contact entry encountered" << std::endl;
-        }
-    }
-    _ThrowBaseExceptionIf((2 != m_stlContacts.size()), "INVALID ORGANIZATIONAL SPECIFICATION. You need at to specify exactly 2 contacts", nullptr);
+    m_strOrganizationalDescription = c_oOrganizationalData.GetString("Description");
+
     // Extract the administrators
     StructuredBuffer oAdministrators{c_oOrganizationalData.GetStructuredBuffer("Admins")};
     oAdministrators.RemoveElement("__IsArray__");
@@ -62,7 +45,7 @@ Organization::Organization(
     {
         StructuredBuffer oAdministrator{oAdministrators.GetStructuredBuffer(c_strElementName.c_str())};
         // Make sure the incoming contact is properly formatted
-        if ((true == oAdministrator.IsElementPresent("Email", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oAdministrator.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oAdministrator.IsElementPresent("Phone Number", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oAdministrator.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+        if ((true == oAdministrator.IsElementPresent("Email", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oAdministrator.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oAdministrator.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE)))
         {
             // Insert the contact m_stlContacts
             m_stlAdministrators.insert(oAdministrator.GetBase64SerializedBuffer());
@@ -71,7 +54,7 @@ Organization::Organization(
         {
             std::cout << "ERROR: Invalid administrator entry encountered" << std::endl;
         }
-        
+
     }
     _ThrowBaseExceptionIf((0 == m_stlAdministrators.size()), "INVALID ORGANIZATIONAL SPECIFICATION. You need at to specify at least one administrator", nullptr);
     // Extract the users
@@ -83,7 +66,7 @@ Organization::Organization(
         {
             StructuredBuffer oUser{oUsers.GetStructuredBuffer(c_strElementName.c_str())};
             // Make sure the incoming contact is properly formatted
-            if ((true == oUser.IsElementPresent("Email", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oUser.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oUser.IsElementPresent("Phone Number", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oUser.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oUser.IsElementPresent("Access Rights", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+            if ((true == oUser.IsElementPresent("Email", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oUser.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oUser.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oUser.IsElementPresent("Role", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
                 // Insert the contact m_stlContacts
                 m_stlUsers.insert(oUser.GetBase64SerializedBuffer());
@@ -94,7 +77,25 @@ Organization::Organization(
             }
         }
     }
-    
+    // Extract the datasets
+    if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
+    {
+        StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
+        oDatasets.RemoveElement("__IsArray__");
+        for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
+        {
+            StructuredBuffer oDatasetInformation{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
+            std::string strDatasetFilename = oDatasetInformation.GetString("File");
+            if (true == std::filesystem::exists(strDatasetFilename))
+            {
+                // Just a reality check to make sure the target file is in fact a properly formatted dataset
+                Dataset oDataset(strDatasetFilename.c_str());
+                // Now we persist the dataset information
+                Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("Name").c_str(), false);
+                m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
+            }
+        }
+    }
     // Extract the dataset families
     if (true == c_oOrganizationalData.IsElementPresent("DatasetFamilies", INDEXED_BUFFER_VALUE_TYPE))
     {
@@ -132,7 +133,7 @@ Organization::Organization(
                     // Just a reality check to make sure the target file is in fact a properly formatted dataset
                     Dataset oDataset(strDatasetFilename.c_str());
                     // Now we persist the dataset information
-                    Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("DatasetName").c_str(), false);
+                    Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDatasetInformation.GetString("Name").c_str(), false);
                     m_strDatasetInformationByFilename[qwHashOfDatasetName] = oDatasetInformation.GetBase64SerializedBuffer();
                 }
             }
@@ -156,22 +157,20 @@ bool __thiscall Organization::Register(
     ) throw()
 {
     __DebugFunction();
-    
+
     try
     {
         m_strSailPlatformServicesIpAddress = c_strSailPlatformServicesIpAddress;
         m_wSailPlatformServicesPortNumber = wSailPlatformServicesPortNumber;
-        
+
         // Step 1 --> Register organization, admins, users, dataset families and data federations
         // Step 2 --> Register datasets
         // Step 3 --> Do nothing, we are only registering Digital Contracts
         // Step 4 --> Register everything
         if (1 == unStepIdentifier)
-        {   
+        {
             std::cout << "001" << std::endl;
             this->RegisterOrganization();
-            std::cout << "002" << std::endl;
-            this->RegisterAdministrators();
             std::cout << "003" << std::endl;
             this->RegisterContacts();
             std::cout << "004" << std::endl;
@@ -191,7 +190,6 @@ bool __thiscall Organization::Register(
         else if (4 == unStepIdentifier)
         {
             this->RegisterOrganization();
-            this->RegisterAdministrators();
             this->RegisterContacts();
             this->RegisterUsers();
             this->RegisterDataFederations();
@@ -238,10 +236,9 @@ std::string __thiscall Organization::GetOrganizationalIdentifier(void) const thr
     
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     this->Login(oSailPlatformServicesSession);
-    
-    StructuredBuffer oBasicUserInformation(oSailPlatformServicesSession.GetBasicUserInformation());
-    
-    return oBasicUserInformation.GetString("OrganizationGuid");
+
+    StructuredBuffer oBasicUserInformation = oSailPlatformServicesSession.GetBasicUserInformation();
+    return oBasicUserInformation.GetStructuredBuffer("organization").GetString("id");
 }
 
 /********************************************************************************************/
@@ -412,7 +409,7 @@ void __thiscall Organization::Login(
     // Do the login
     oSailPlatformServicesSession.Login(oAdministrator.GetString("Email"), gsc_strDefaultPassword);
 }
-            
+
 /********************************************************************************************/
 
 void __thiscall Organization::RegisterOrganization(void)
@@ -420,84 +417,24 @@ void __thiscall Organization::RegisterOrganization(void)
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
     __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-    
+
     StructuredBuffer oRegistrationParameters;
     // Record the basic information
-    oRegistrationParameters.PutString("OrganizationName", m_strOrganizationalName);
-    oRegistrationParameters.PutString("OrganizationAddress", m_strOrganizationalAddress);
-    // First we need to extract information about the primary contact
-    std::unordered_set<std::string>::const_iterator c_stlIterator = m_stlContacts.begin();
-    if (m_stlContacts.end() != c_stlIterator)
-    {
-        StructuredBuffer oContact(c_stlIterator->c_str());
-        
-        oRegistrationParameters.PutString("PrimaryContactName", oContact.GetString("Name"));
-        oRegistrationParameters.PutString("PrimaryContactTitle", oContact.GetString("Title"));
-        oRegistrationParameters.PutString("PrimaryContactEmail", oContact.GetString("Email"));
-        oRegistrationParameters.PutString("PrimaryContactPhoneNumber", oContact.GetString("Phone Number"));
-        c_stlIterator++;
-    }
-    // Now let's try to get the secondary contact
-    if (m_stlContacts.end() != c_stlIterator)
-    {
-        StructuredBuffer oContact(c_stlIterator->c_str());
-        
-        oRegistrationParameters.PutString("SecondaryContactName", oContact.GetString("Name"));
-        oRegistrationParameters.PutString("SecondaryContactTitle", oContact.GetString("Title"));
-        oRegistrationParameters.PutString("SecondaryContactEmail", oContact.GetString("Email"));
-        oRegistrationParameters.PutString("SecondaryContactPhoneNumber", oContact.GetString("Phone Number"));
-    }
+    oRegistrationParameters.PutString("name", m_strOrganizationalName);
+    oRegistrationParameters.PutString("description", m_strOrganizationalDescription);
     // Now we need to know who the default administrator (i.e. initial user) is going to begin
-    c_stlIterator = m_stlAdministrators.begin();
+    auto c_stlIterator = m_stlAdministrators.begin();
     if (m_stlAdministrators.end() != c_stlIterator)
     {
         StructuredBuffer oAdministrator(c_stlIterator->c_str());
-        
-        oRegistrationParameters.PutString("Name", oAdministrator.GetString("Name"));
-        oRegistrationParameters.PutString("Title", oAdministrator.GetString("Title"));
-        oRegistrationParameters.PutString("Email", oAdministrator.GetString("Email"));
-        oRegistrationParameters.PutString("PhoneNumber", oAdministrator.GetString("Phone Number"));
-        oRegistrationParameters.PutString("Password", gsc_strDefaultPassword);
+        oRegistrationParameters.PutString("admin_name", oAdministrator.GetString("Name"));
+        oRegistrationParameters.PutString("admin_job_title", oAdministrator.GetString("Title"));
+        oRegistrationParameters.PutString("admin_email", oAdministrator.GetString("Email"));
+        oRegistrationParameters.PutString("admin_password", gsc_strDefaultPassword);
     }
-    
     // RegisterOrganization doesn't need you to be logged in at first.
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     oSailPlatformServicesSession.RegisterOrganization(oRegistrationParameters);
-}
-
-/********************************************************************************************/
-
-void __thiscall Organization::RegisterAdministrators(void)
-{
-    __DebugFunction();
-    __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
-    __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-    
-    // Start a new session with SAIL Platform Services using the default administrator
-    SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
-    this->Login(oSailPlatformServicesSession);
-    // Now that we have skipped the first entry, let's process all of the additional entries
-    // Basically, we are adding new users with admin access rights
-    std::unordered_set<std::string>::const_iterator c_stlIterator = m_stlAdministrators.begin();
-    // We need to skip the first administrator, since that user was registered when the
-    // organization was registered
-    c_stlIterator++;
-    // Now let's parse through the remaining admins and register then
-    while (m_stlAdministrators.end() != c_stlIterator)
-    {
-        StructuredBuffer oAdministrator(c_stlIterator->c_str());
-        StructuredBuffer oRegistrationParameters;
-
-        oRegistrationParameters.PutString("Email", oAdministrator.GetString("Email"));
-        oRegistrationParameters.PutString("Password", gsc_strDefaultPassword);
-        oRegistrationParameters.PutString("Name", oAdministrator.GetString("Name"));
-        oRegistrationParameters.PutString("PhoneNumber", oAdministrator.GetString("Phone Number"));
-        oRegistrationParameters.PutString("Title", oAdministrator.GetString("Title"));
-        oRegistrationParameters.PutQword("AccessRights", 0x1111111111111111);
-        
-        oSailPlatformServicesSession.RegisterUser(oRegistrationParameters);
-        c_stlIterator++;
-    }
 }
 
 /********************************************************************************************/
@@ -520,7 +457,7 @@ void __thiscall Organization::RegisterUsers(void)
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
     __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-    
+
     // Start a new session with SAIL Platform Services using the default administrator
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     this->Login(oSailPlatformServicesSession);
@@ -532,14 +469,13 @@ void __thiscall Organization::RegisterUsers(void)
         StructuredBuffer oUser(c_stlIterator->c_str());
         StructuredBuffer oRegistrationParameters;
 
-        oRegistrationParameters.PutString("Email", oUser.GetString("Email"));
-        oRegistrationParameters.PutString("Password", gsc_strDefaultPassword);
-        oRegistrationParameters.PutString("Name", oUser.GetString("Name"));
-        oRegistrationParameters.PutString("PhoneNumber", oUser.GetString("Phone Number"));
-        oRegistrationParameters.PutString("Title", oUser.GetString("Title"));
-        oRegistrationParameters.PutQword("AccessRights", 0x1111111111111111);
-        
-        oSailPlatformServicesSession.RegisterUser(oRegistrationParameters);
+        oRegistrationParameters.PutString("name", oUser.GetString("Name"));
+        oRegistrationParameters.PutString("email", oUser.GetString("Email"));
+        oRegistrationParameters.PutString("job_title", oUser.GetString("Title"));
+        oRegistrationParameters.PutString("role", oUser.GetString("Role"));
+        oRegistrationParameters.PutString("password", gsc_strDefaultPassword);
+
+        oSailPlatformServicesSession.RegisterUser(oRegistrationParameters, this->GetOrganizationalIdentifier());
         c_stlIterator++;
     }
 }
@@ -551,7 +487,7 @@ void __thiscall Organization::RegisterDataFederations(void)
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
     __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-    
+
     // This is a placeholder for now since data federations aren't implemented yet
 }
 
@@ -562,7 +498,7 @@ void __thiscall Organization::RegisterDatasetFamilies(void)
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
     __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-    
+
     // Start a new session with SAIL Platform Services using the default administrator
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     this->Login(oSailPlatformServicesSession);
@@ -573,12 +509,12 @@ void __thiscall Organization::RegisterDatasetFamilies(void)
     {
         StructuredBuffer oDatasetFamily(c_stlIterator->c_str());
         StructuredBuffer oRegistrationParameters;
-        
-        oRegistrationParameters.PutString("DatasetFamilyTitle", oDatasetFamily.GetString("Title"));
-        oRegistrationParameters.PutString("DatasetFamilyDescription", oDatasetFamily.GetString("Description"));
-        oRegistrationParameters.PutString("DatasetFamilyTags", oDatasetFamily.GetString("Tags"));
-        oRegistrationParameters.PutString("VersionNumber", "0x00000001");
-    
+
+        oRegistrationParameters.PutString("name", oDatasetFamily.GetString("Title"));
+        oRegistrationParameters.PutString("description", oDatasetFamily.GetString("Description"));
+        oRegistrationParameters.PutString("tags", oDatasetFamily.GetString("Tags"));
+        oRegistrationParameters.PutString("version", "0.0.1");
+
         std::string strDatasetFamilyIdentifier = oSailPlatformServicesSession.RegisterDatasetFamily(oRegistrationParameters);
         // Make sure the register the dataset family identifier that is returned
         Qword qwHashOfDatasetFamilyName = ::Get64BitHashOfNullTerminatedString(oDatasetFamily.GetString("Title").c_str(), false);
@@ -597,7 +533,7 @@ void __thiscall Organization::RegisterDatasets(void)
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
     __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-    
+
     // Start a new session with SAIL Platform Services using the default administrator
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
     this->Login(oSailPlatformServicesSession);
@@ -608,7 +544,7 @@ void __thiscall Organization::RegisterDatasets(void)
     // Basically, we are adding new users with admin access rights
     std::unordered_map<Qword, std::string>::const_iterator c_stlIterator = m_strDatasetInformationByFilename.begin();
     while (m_strDatasetInformationByFilename.end() != c_stlIterator)
-    {        
+    {
         // Load the serialized dataset information into a StructuredBuffer in order to access it
         StructuredBuffer oDatasetInformation(c_stlIterator->second.c_str());
         std::string strDatasetFile = oDatasetInformation.GetString("File");
@@ -625,15 +561,15 @@ void __thiscall Organization::RegisterDatasets(void)
             // Now we start resetting some of the values in the dataset to reflect what is about to be
             // registered.
             // Create a new identifier
-            oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
+            // oDatasetReInitializer.SetDatasetIdentifier(Guid(eDataset));
             // Make sure the corporate identifier is updated
-            oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetString("OrganizationGuid")));
+            oDatasetReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetStructuredBuffer("organization").GetString("id")));
             // Reset the publish date
             oDatasetReInitializer.ResetUtcEpochPublishDate();
             // If a new Title is provided in the JSON, update the title of the dataset
-            if (true == oDatasetInformation.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            if (true == oDatasetInformation.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))
             {
-                oDatasetReInitializer.SetDatasetTitle(oDatasetInformation.GetString("Title"));
+                oDatasetReInitializer.SetDatasetName(oDatasetInformation.GetString("Name"));
             }
             // If a new Description is provided in the JSON, update the description of the dataset
             if (true == oDatasetInformation.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))
@@ -659,12 +595,12 @@ void __thiscall Organization::RegisterDatasets(void)
             // Now we register the dataset using the updated information
             StructuredBuffer oDatasetMetadata(oDatasetReInitializer.GetSerializedDatasetMetadata());
             oSailPlatformServicesSession.RegisterDataset(oDatasetReInitializer.GetDatasetIdentifier(), oDatasetMetadata);
-            
+
             // If we get here, the dataset was successfully registered. As such, let's persist
             // the dataset changes to file
             oDatasetReInitializer.SaveDatasetUpdates();
         }
-        
+
         // If we get here, then the registration process has worked. Let's
         c_stlIterator++;
     }

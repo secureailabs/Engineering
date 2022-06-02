@@ -285,3 +285,18 @@ std::vector<Byte> __stdcall RestApiCall(
 
     return stlResponse;
 }
+
+std::string UrlEncodeString(const std::string c_strToEncode)
+{
+    std::string strResponse;
+    CURL* curl = curl_easy_init();
+    if (curl) {
+        char* output = curl_easy_escape(curl, c_strToEncode.c_str(), c_strToEncode.length());
+        if (output) {
+            strResponse = std::string(output);
+            curl_free(output);
+        }
+        curl_easy_cleanup(curl);
+    }
+    return strResponse;
+}

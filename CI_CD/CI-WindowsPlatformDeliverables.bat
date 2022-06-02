@@ -87,7 +87,7 @@ ECHO STEP VERIFY BUILD: START
 (FOR %%a IN (%buildlist%) DO (
     ECHO SEARCHING FOR %%a
     ECHO SEARCHING FOR %%a >> %script_dir%\output.txt
-	cd %windows_deliverables_path%\Binaries\x64\Debug
+	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
 	    ECHO %%a Found! >> %script_dir%\output.txt
@@ -114,7 +114,7 @@ ECHO STEP COPYING COPYLIST [libcurl.dll, libcurl-d.dll, zlib1.dll, zlibd1.dll ] 
 ECHO ---------------------------------------------------------------------------------------------- >> output.txt
 ECHO ----------------------------------------------------------------------------------------------
 ECHO COPYING .dll [libcurl.dll, libcurl-d.dll, zlib1.dll, zlibd1.dll ]
-copy %windows_deliverables_path%\Libraries\*.dll %windows_deliverables_path%\Binaries\x64\Debug\ >> output.txt && echo %errorlevel%
+copy /B /Y "%windows_deliverables_path%\Libraries\*.dll" "%windows_deliverables_path%\Binaries\x64\Debug\" >> output.txt && echo %errorlevel%
 IF %errorlevel% NEQ 0 (
     ECHO EXIT CODE: %errorlevel%, .dll failed to copy >> output.txt
 	ECHO EXIT CODE: %errorlevel%, .dll failed to copy && EXIT /b %errorlevel%
@@ -129,7 +129,7 @@ ECHO VERIFY COPYLIST
 (for %%a in (%copylist%) do (
     echo SEARCHING FOR %%a
     echo SEARCHING FOR %%a >> output.txt
-	cd %windows_deliverables_path%\Binaries\x64\Debug
+	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
 	    ECHO %%a Found! >> %script_dir%\output.txt

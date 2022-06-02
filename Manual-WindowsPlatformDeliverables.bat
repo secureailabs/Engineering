@@ -90,7 +90,7 @@ ECHO STEP VERIFY BUILD: START
 (FOR %%a IN (%buildlist%) DO (
     ECHO SEARCHING FOR %%a
     ECHO SEARCHING FOR %%a >> %script_dir%\output.txt
-	cd %windows_deliverables_path%\Binaries\x64\Debug
+	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
 	    ECHO %%a Found! >> %script_dir%\output.txt
@@ -113,11 +113,11 @@ ECHO.
 
 
 ECHO ---------------------------------------------------------------------------------------------- >> output.txt
-ECHO STEP COPYING COPYLIST [libcurl.dll, libcurl-d.dll, zlib1.dll, zlibd1.dll ] >> output.txt
+ECHO STEP COPYING COPYLIST [libcurl.dll, zlib1.dll ] >> output.txt
 ECHO ---------------------------------------------------------------------------------------------- >> output.txt
 ECHO ----------------------------------------------------------------------------------------------
-ECHO COPYING .dll [libcurl.dll, libcurl-d.dll, zlib1.dll, zlibd1.dll ]
-copy %windows_deliverables_path%\Libraries\*.dll %windows_deliverables_path%\Binaries\x64\Debug\ >> output.txt && echo %errorlevel%
+ECHO COPYING .dll [libcurl.dll, zlib1.dll ]
+copy /B /Y "%windows_deliverables_path%\Libraries\*.dll" "%windows_deliverables_path%\Binaries\x64\Debug\" >> output.txt && echo %errorlevel%
 IF %errorlevel% NEQ 0 (
     ECHO EXIT CODE: %errorlevel%, .dll failed to copy >> output.txt
 	ECHO EXIT CODE: %errorlevel%, .dll failed to copy && PAUSE && EXIT /b %errorlevel%
@@ -132,7 +132,7 @@ ECHO VERIFY COPYLIST
 (for %%a in (%copylist%) do (
     echo SEARCHING FOR %%a
     echo SEARCHING FOR %%a >> output.txt
-	cd %windows_deliverables_path%\Binaries\x64\Debug
+	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
 	    ECHO %%a Found! >> %script_dir%\output.txt
@@ -164,7 +164,8 @@ CD "%windows_deliverables_path%\Binaries\x64\Debug"
 MKDIR WindowsPlatformDeliverables
 COPY *.exe WindowsPlatformDeliverables
 COPY *.dll WindowsPlatformDeliverables
-tar -cvzf WindowsPlatformDeliverables.tar WindowsPlatformDeliverables >> %script_dir%\output.txt 2>&1
+CD "%windows_deliverables_path%\Binaries\x64\Debug\WindowsPlatformDeliverables"
+tar -cvzf WindowsPlatformDeliverables.tar "%windows_deliverables_path%\Binaries\x64\Debug\WindowsPlatformDeliverables\*.*" >> %script_dir%\output.txt 2>&1
 
 IF %errorlevel% NEQ 0 (
     ECHO TARBALL CREATION FAILED! >> %script_dir%\output.txt

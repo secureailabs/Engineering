@@ -46,9 +46,9 @@ ECHO SPECIFIED PATH of VersionManagement
 ECHO %version_management_path%
 ECHO.
 
-ECHO ---------------------------------------------------------------------------------------------- > output.txt
+ECHO ---------------------------------------------------------------------------------------------- > "%script_dir%\output.txt"
 ECHO STEP CLEANUP: START >> output.txt
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
 ECHO ----------------------------------------------------------------------------------------------
 ECHO STEP CLEANUP: START 
 START /WAIT "VERIFY" cmd.exe /c DIR && CD "%windows_deliverables_path%\Binaries\x64\" && DEL /F /Q Debug && RMDIR /S /Q Debug && DEL /F /Q WindowsPlatformDeliverables.tar && CD "%script_dir%"
@@ -61,15 +61,15 @@ ECHO ---------------------------------------------------------------------------
 echo.
 
 
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
-ECHO STEP BUILDING WINDOWS DELIVERABLES: START >> output.txt
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
+ECHO STEP BUILDING WINDOWS DELIVERABLES: START >> "%script_dir%\output.txt"
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
 ECHO ----------------------------------------------------------------------------------------------
 ECHO BUILDING WINDOWS DELIVERABLES: START 
 START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsBuildVersionGenerator.exe"
 START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailDatasetPackager\Properties\AssemblyInfo.cs"
 START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailTablePackagerForCvs\Properties\AssemblyInfo.cs"
-START /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild "%windows_deliverables_path%\Windows Platform Deliverables.sln" >> output.txt && ECHO %errorlevel%"
+START /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild "%windows_deliverables_path%\Windows Platform Deliverables.sln"" >> "%script_dir%\output.txt" && ECHO %errorlevel%
 ECHO BUILD COMMAND EXIT CODE: %errorlevel%
 
 echo.
@@ -80,9 +80,9 @@ ECHO ---------------------------------------------------------------------------
 echo.
 
 
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
-ECHO STEP VERIFY BUILD: START >> output.txt
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
+ECHO STEP VERIFY BUILD: START >> "%script_dir%\output.txt"
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
 ECHO ----------------------------------------------------------------------------------------------
 ECHO STEP VERIFY BUILD: START 
 (FOR %%a IN (%buildlist%) DO (
@@ -110,26 +110,26 @@ ECHO ---------------------------------------------------------------------------
 ECHO.
 
 
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
-ECHO STEP COPYING COPYLIST [libcurl.dll, libcurl-d.dll, zlib1.dll, zlibd1.dll ] >> output.txt
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
+ECHO STEP COPYING COPYLIST [libcurl.dll, libcurl-d.dll, zlib1.dll, zlibd1.dll ] >> "%script_dir%\output.txt"
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
 ECHO ----------------------------------------------------------------------------------------------
 ECHO COPYING .dll [libcurl.dll, libcurl-d.dll, zlib1.dll, zlibd1.dll ]
-copy /B /Y "%windows_deliverables_path%\Libraries\*.dll" "%windows_deliverables_path%\Binaries\x64\Debug\" >> output.txt && echo %errorlevel%
+copy /B /Y "%windows_deliverables_path%\Libraries\*.dll" "%windows_deliverables_path%\Binaries\x64\Debug\" >> "%script_dir%\output.txt" && echo %errorlevel%
 IF %errorlevel% NEQ 0 (
-    ECHO EXIT CODE: %errorlevel%, .dll failed to copy >> output.txt
+    ECHO EXIT CODE: %errorlevel%, .dll failed to copy >> "%script_dir%\output.txt"
 	ECHO EXIT CODE: %errorlevel%, .dll failed to copy && EXIT /b %errorlevel%
 ) 
 
 
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
-ECHO VERIFY COPYLIST >> output.txt
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
+ECHO VERIFY COPYLIST >> "%script_dir%\output.txt"
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
 ECHO ----------------------------------------------------------------------------------------------
 ECHO VERIFY COPYLIST
 (for %%a in (%copylist%) do (
     echo SEARCHING FOR %%a
-    echo SEARCHING FOR %%a >> output.txt
+    echo SEARCHING FOR %%a >> "%script_dir%\output.txt"
 	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
@@ -153,9 +153,9 @@ ECHO ---------------------------------------------------------------------------
 ECHO.
 
 
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
-ECHO STEP TARBALL Debug Folder >> output.txt
-ECHO ---------------------------------------------------------------------------------------------- >> output.txt
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
+ECHO STEP TARBALL Debug Folder >> "%script_dir%\output.txt"
+ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
 ECHO ----------------------------------------------------------------------------------------------
 ECHO STEP TARBALL
 CD "%windows_deliverables_path%\Binaries\x64\Debug"

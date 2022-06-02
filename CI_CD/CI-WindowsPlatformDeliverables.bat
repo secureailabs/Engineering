@@ -69,7 +69,7 @@ ECHO BUILDING WINDOWS DELIVERABLES: START
 START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsBuildVersionGenerator.exe"
 START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailDatasetPackager\Properties\AssemblyInfo.cs"
 START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailTablePackagerForCvs\Properties\AssemblyInfo.cs"
-START /B /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild "%windows_deliverables_path%\Windows Platform Deliverables.sln"" >> "%script_dir%\output.txt" && ECHO %errorlevel%
+START /B /WAIT "BUILDS" cmd.exe /c ""C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" && msbuild "C:\actions-runner\_work\Engineering\Engineering\InternalTools\WindowsPlatformDeliverables\Windows Platform Deliverables.sln""
 ECHO BUILD COMMAND EXIT CODE: %errorlevel%
 
 echo.

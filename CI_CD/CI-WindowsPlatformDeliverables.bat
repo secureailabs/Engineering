@@ -66,10 +66,10 @@ ECHO STEP BUILDING WINDOWS DELIVERABLES: START >> "%script_dir%\output.txt"
 ECHO ---------------------------------------------------------------------------------------------- >> "%script_dir%\output.txt"
 ECHO ----------------------------------------------------------------------------------------------
 ECHO BUILDING WINDOWS DELIVERABLES: START 
-START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsBuildVersionGenerator.exe"
-START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailDatasetPackager\Properties\AssemblyInfo.cs"
-START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailTablePackagerForCvs\Properties\AssemblyInfo.cs"
-START /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild "%windows_deliverables_path%\Windows Platform Deliverables.sln"" >> "%script_dir%\output.txt" && ECHO %errorlevel%
+START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsBuildVersionGenerator.exe"
+START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailDatasetPackager\Properties\AssemblyInfo.cs"
+START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailTablePackagerForCvs\Properties\AssemblyInfo.cs"
+START /B /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild "%windows_deliverables_path%\Windows Platform Deliverables.sln"" >> "%script_dir%\output.txt" && ECHO %errorlevel%
 ECHO BUILD COMMAND EXIT CODE: %errorlevel%
 
 echo.
@@ -174,7 +174,7 @@ IF NOT EXIST WindowsPlatformDeliverables.tar (
 )
 
 ECHO.
-COPY WindowsPlatformDeliverables.tar "%script_dir%\" /V
+COPY /B /Y WindowsPlatformDeliverables.tar "%script_dir%\"
 IF %errorlevel%==0 (
     ECHO TARBALL COPIED to HOME of BATCH script! >> "%script_dir%\output.txt"
 	ECHO TARBALL COPIED to HOME of BATCH script!

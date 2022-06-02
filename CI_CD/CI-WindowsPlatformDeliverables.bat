@@ -1,4 +1,5 @@
 ECHO OFF
+SET original_dir=%~dp0
 SET script_dir=%cd%
 SET buildlist=WindowsRemoteDataConnector.exe SailTablePackagerForCsv.exe SailDatasetPackager.exe
 SET copylist=libcurl.dll libcurl-d.dll zlib1.dll zlibd1.dll
@@ -68,7 +69,7 @@ ECHO BUILDING WINDOWS DELIVERABLES: START
 START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsBuildVersionGenerator.exe"
 START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailDatasetPackager\Properties\AssemblyInfo.cs"
 START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailTablePackagerForCvs\Properties\AssemblyInfo.cs"
-START /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild  "%windows_deliverables_path%\Windows Platform Deliverables.sln" >> output.txt && ECHO %errorlevel%"
+START /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild "%windows_deliverables_path%\Windows Platform Deliverables.sln" >> output.txt && ECHO %errorlevel%"
 ECHO BUILD COMMAND EXIT CODE: %errorlevel%
 
 echo.
@@ -86,20 +87,20 @@ ECHO ---------------------------------------------------------------------------
 ECHO STEP VERIFY BUILD: START 
 (FOR %%a IN (%buildlist%) DO (
     ECHO SEARCHING FOR %%a
-    ECHO SEARCHING FOR %%a >> %script_dir%\output.txt
+    ECHO SEARCHING FOR %%a >> "%script_dir%\output.txt"
 	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
-	    ECHO %%a Found! >> %script_dir%\output.txt
+	    ECHO %%a Found! >> "%script_dir%\output.txt"
 		ECHO %%a Found!
 		ECHO.
 	) ELSE (
-		ECHO %%a Not Found! >> %script_dir%\output.txt
+		ECHO %%a Not Found! >> "%script_dir%\output.txt"
 	    ECHO %%a Not Found! && EXIT /b %errorlevel%
 		ECHO.
 	)
 ))
-cd %script_dir%
+cd "%script_dir%"
 
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
@@ -132,16 +133,16 @@ ECHO VERIFY COPYLIST
 	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
-	    ECHO %%a Found! >> %script_dir%\output.txt
+	    ECHO %%a Found! >> "%script_dir%\output.txt"
 		ECHO %%a Found!
 		ECHO.
 	) ELSE (
-		ECHO %%a Not Found! >> %script_dir%\output.txt
+		ECHO %%a Not Found! >> "%script_dir%\output.txt"
 	    ECHO %%a Not Found! && EXIT /b %errorlevel%
 		ECHO.
 	)
 ))
-cd %script_dir%
+cd "%script_dir%"
 
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
@@ -159,25 +160,32 @@ ECHO ---------------------------------------------------------------------------
 ECHO STEP TARBALL
 CD "%windows_deliverables_path%\Binaries\x64\Debug"
 MKDIR WindowsPlatformDeliverables
-COPY *.exe WindowsPlatformDeliverables
-COPY *.dll WindowsPlatformDeliverables
-tar -cvzf WindowsPlatformDeliverables.tar WindowsPlatformDeliverables >> %script_dir%\output.txt 2>&1
-IF %errorlevel% NEQ 0 (
-    ECHO TARBALL CREATION FAILED! >> %script_dir%\output.txt
+COPY /B /Y *.exe WindowsPlatformDeliverables
+COPY /B /Y *.dll WindowsPlatformDeliverables
+if EXIST WindowsPlatformDeliverables.tar (
+    DEL /F /Q WindowsPlatformDeliverables.tar
+)
+
+tar -cvzf WindowsPlatformDeliverables.tar WindowsPlatformDeliverables >> "%script_dir%\output.txt" 2>&1
+
+IF NOT EXIST WindowsPlatformDeliverables.tar (
+    ECHO TARBALL CREATION FAILED! >> "%script_dir%\output.txt"
     ECHO TARBALL CREATION FAILED! && EXIT /b %errorlevel%
 )
 
 ECHO.
-COPY WindowsPlatformDeliverables.tar %script_dir%\ /V
+COPY WindowsPlatformDeliverables.tar "%script_dir%\" /V
 IF %errorlevel%==0 (
-    ECHO TARBALL COPIED to HOME of BATCH script! >> %script_dir%\output.txt
+    ECHO TARBALL COPIED to HOME of BATCH script! >> "%script_dir%\output.txt"
 	ECHO TARBALL COPIED to HOME of BATCH script!
 )
-CD %script_dir%
 
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
 ECHO FINISHED CLOSING PROGRAM
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
+
+CD "%original_dir%"
+
 EXIT /b %errorlevel%

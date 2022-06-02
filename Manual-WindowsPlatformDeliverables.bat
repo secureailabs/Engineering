@@ -1,4 +1,5 @@
 ECHO OFF
+SET original_dir=%~dp0
 SET script_dir=%cd%
 SET buildlist=WindowsRemoteDataConnector.exe SailTablePackagerForCsv.exe SailDatasetPackager.exe
 SET copylist=libcurl.dll libcurl-d.dll zlib1.dll zlibd1.dll
@@ -68,10 +69,10 @@ ECHO STEP BUILDING WINDOWS DELIVERABLES: START >> output.txt
 ECHO ---------------------------------------------------------------------------------------------- >> output.txt
 ECHO ----------------------------------------------------------------------------------------------
 ECHO BUILDING WINDOWS DELIVERABLES: START 
-START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsBuildVersionGenerator.exe"
-START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailDatasetPackager\Properties\AssemblyInfo.cs"
-START /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailTablePackagerForCvs\Properties\AssemblyInfo.cs"
-START /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild  "%windows_deliverables_path%\Windows Platform Deliverables.sln" >> output.txt && ECHO %errorlevel%"
+START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsBuildVersionGenerator.exe"
+START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailDatasetPackager\Properties\AssemblyInfo.cs"
+START /B /WAIT "VERSION_MANAGEMENT" "%version_management_path%\WindowsAssemblyInfoVersionUpdater.exe" "%windows_deliverables_path%\SailTablePackagerForCvs\Properties\AssemblyInfo.cs"
+START /B /WAIT "BUILDS" cmd.exe /c ""%vcvars64_path%\vcvars64.bat" && msbuild "%windows_deliverables_path%\Windows Platform Deliverables.sln"" >> output.txt && ECHO %errorlevel%"
 ECHO BUILD COMMAND EXIT CODE: %errorlevel%
 
 echo.
@@ -89,20 +90,20 @@ ECHO ---------------------------------------------------------------------------
 ECHO STEP VERIFY BUILD: START 
 (FOR %%a IN (%buildlist%) DO (
     ECHO SEARCHING FOR %%a
-    ECHO SEARCHING FOR %%a >> %script_dir%\output.txt
+    ECHO SEARCHING FOR %%a >> "%script_dir%\output.txt"
 	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
-	    ECHO %%a Found! >> %script_dir%\output.txt
+	    ECHO %%a Found! >> "%script_dir%\output.txt"
 		ECHO %%a Found!
 		ECHO.
 	) ELSE (
-		ECHO %%a Not Found! >> %script_dir%\output.txt
+		ECHO %%a Not Found! >> "%script_dir%\output.txt"
 	    ECHO %%a Not Found! && PAUSE && EXIT /b %errorlevel%
 		ECHO.
 	)
 ))
-cd %script_dir%
+cd "%script_dir%"
 
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
@@ -135,16 +136,16 @@ ECHO VERIFY COPYLIST
 	cd "%windows_deliverables_path%\Binaries\x64\Debug"
 	ECHO Current DIR: %cd%
 	IF EXIST %%a (
-	    ECHO %%a Found! >> %script_dir%\output.txt
+	    ECHO %%a Found! >> "%script_dir%\output.txt"
 		ECHO %%a Found!
 		ECHO.
 	) ELSE (
-		ECHO %%a Not Found! >> %script_dir%\output.txt
+		ECHO %%a Not Found! >> "%script_dir%\output.txt"
 	    ECHO %%a Not Found! && PAUSE && EXIT /b %errorlevel%
 		ECHO.
 	)
 ))
-cd %script_dir%
+cd "%script_dir%"
 
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
@@ -162,20 +163,23 @@ ECHO ---------------------------------------------------------------------------
 ECHO STEP TARBALL
 CD "%windows_deliverables_path%\Binaries\x64\Debug"
 MKDIR WindowsPlatformDeliverables
-COPY *.exe WindowsPlatformDeliverables
-COPY *.dll WindowsPlatformDeliverables
-CD "%windows_deliverables_path%\Binaries\x64\Debug\WindowsPlatformDeliverables"
-tar -cvzf WindowsPlatformDeliverables.tar "%windows_deliverables_path%\Binaries\x64\Debug\WindowsPlatformDeliverables\*.*" >> %script_dir%\output.txt 2>&1
+COPY /B /Y *.exe WindowsPlatformDeliverables
+COPY /B /Y *.dll WindowsPlatformDeliverables
+if EXIST WindowsPlatformDeliverables.tar (
+    DEL /F /Q WindowsPlatformDeliverables.tar
+)
 
-IF %errorlevel% NEQ 0 (
-    ECHO TARBALL CREATION FAILED! >> %script_dir%\output.txt
+tar -cvzf WindowsPlatformDeliverables.tar WindowsPlatformDeliverables >> "%script_dir%\output.txt" 2>&1
+
+IF NOT EXIST WindowsPlatformDeliverables.tar (
+    ECHO TARBALL CREATION FAILED! >> "%script_dir%\output.txt"
     ECHO TARBALL CREATION FAILED! && PAUSE && EXIT /b %errorlevel%
 )
 
 ECHO.
-COPY WindowsPlatformDeliverables.tar %script_dir%\ /V
+COPY /B /Y WindowsPlatformDeliverables.tar "%script_dir%\"
 IF %errorlevel%==0 (
-    ECHO TARBALL COPIED to HOME of BATCH script! >> %script_dir%\output.txt
+    ECHO TARBALL COPIED to HOME of BATCH script! >> "%script_dir%\output.txt"
 	ECHO TARBALL COPIED to HOME of BATCH script!
 )
 
@@ -184,4 +188,5 @@ ECHO ---------------------------------------------------------------------------
 ECHO FINISHED CLOSING PROGRAM
 ECHO.
 ECHO ----------------------------------------------------------------------------------------------
-PAUSE
+
+CD "%original_dir%"

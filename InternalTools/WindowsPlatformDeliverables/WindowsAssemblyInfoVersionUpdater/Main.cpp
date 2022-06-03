@@ -16,6 +16,13 @@
 #include <sstream>
 #include <string>
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="c_strInputString"></param>
+/// <param name="c_strStringToLookFor"></param>
+/// <param name="c_strStringToReplaceWith"></param>
+/// <returns></returns>
 static std::string __stdcall ReplaceInString(
     _in const std::string & c_strInputString,
     _in const std::string & c_strStringToLookFor,
@@ -43,7 +50,7 @@ static std::string __stdcall GetVersionString(void)
 {
     __DebugFunction();
 
-    std::string strVersionString;
+    std::string strVersionString = "0.0.0.0";
     HKEY hRegistryKey;
     if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_CURRENT_USER, "Environment", 0, (KEY_WOW64_64KEY | KEY_QUERY_VALUE), &hRegistryKey))
     {
@@ -69,7 +76,7 @@ static std::string __stdcall GetCommitIdentifier(void)
 {
     __DebugFunction();
 
-    std::string strCommitIdentifier;
+    std::string strCommitIdentifier = "000000";
     HKEY hRegistryKey;
     if (ERROR_SUCCESS == ::RegOpenKeyExA(HKEY_CURRENT_USER, "Environment", 0, (KEY_WOW64_64KEY | KEY_QUERY_VALUE), &hRegistryKey))
     {

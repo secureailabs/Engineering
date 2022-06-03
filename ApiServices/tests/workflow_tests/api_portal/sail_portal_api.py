@@ -52,59 +52,6 @@ class SailPortalFastApi:
         # Return request response: status code
         return response, response.json()
 
-    # TODO Move to account_managment.py
-    def get_current_user_info(self):
-        """
-        Get current User Information
-
-        :return: _description_
-        :rtype: _type_
-        """
-        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
-        headers = {"Authorization": f"Bearer {authed_user_access_token}", "Accept": "application/json"}
-        try:
-            response = requests.get(f"{self.base_url}/me", headers=headers, verify=False)
-        except requests.exceptions.RequestException as error:
-            print(f"\n{error}")
-        return response, response.json()
-
-    # TODO Move to account_managment.py
-    def get_all_organization_info(self):
-        """
-        SAIL_ACTOR resticted get all organizations
-
-        :return: _description_
-        :rtype: _type_
-        """
-        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
-        headers = {"Authorization": f"Bearer {authed_user_access_token}", "Accept": "application/json"}
-        try:
-            response = requests.get(f"{self.base_url}/organizations", headers=headers, verify=False)
-        except requests.exceptions.RequestException as error:
-            print(f"\n{error}")
-        return response, response.json()
-
-    # TODO Move to account_managment.py
-    def get_current_user_organization_info(self):
-        """
-        Get current User Organization Information
-
-        :return: _description_
-        :rtype: _type_
-        """
-        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
-        headers = {"Authorization": f"Bearer {authed_user_access_token}", "Accept": "application/json"}
-        current_user_org_id = (
-            requests.get(f"{self.base_url}/me", headers=headers, verify=False).json()["organization"].get("id")
-        )
-        try:
-            response = requests.get(
-                f"{self.base_url}/organizations/{current_user_org_id}", headers=headers, verify=False
-            )
-        except requests.exceptions.RequestException as error:
-            print(f"\n{error}")
-        return response, response.json()
-
 
 class SailPortalApi:
     """

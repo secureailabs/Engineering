@@ -30,10 +30,10 @@ def debug_helper(response):
 def test_get_current_user_info(sail_portal, account_management_fast_api, request):
     """
 
-    :param sail_portal: _description_
-    :type sail_portal: _type_
-    :param request: _description_
-    :type request: _type_
+    :param sail_portal: sailportal
+    :type sail_portal: object
+    :param request:
+    :type request:
     """
     # Arrange
     sail_portal = request.getfixturevalue(sail_portal)
@@ -111,12 +111,12 @@ def test_get_list_organizations_info(sail_portal, account_management_fast_api, r
 )
 def test_get_current_user_organization_info(sail_portal, account_management_fast_api, request):
     """
-    _summary_
+    Test gets current authenticated user organization information
 
-    :param sail_portal: _description_
-    :type sail_portal: _type_
-    :param request: _description_
-    :type request: _type_
+    :param sail_portal: sail_portal
+    :type sail_portal: object
+    :param request:
+    :type request:
     """
     # Arrange
     sail_portal = request.getfixturevalue(sail_portal)

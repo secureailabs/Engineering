@@ -22,8 +22,8 @@ class AccountManagementFastApi:
         """
         Get current User Information
 
-        :return: _description_
-        :rtype: _type_
+        :return: response, response.json()
+        :rtype: (string, string)
         """
         authed_user_access_token = sail_portal.login_for_access_token()[1].get("access_token")
         headers = {"Authorization": f"Bearer {authed_user_access_token}", "Accept": "application/json"}
@@ -38,8 +38,8 @@ class AccountManagementFastApi:
         """
         SAIL_ACTOR resticted get all organizations
 
-        :return: _description_
-        :rtype: _type_
+        :return: response, response.json()
+        :rtype: (string, string)
         """
         authed_user_access_token = sail_portal.login_for_access_token()[1].get("access_token")
         headers = {"Authorization": f"Bearer {authed_user_access_token}", "Accept": "application/json"}
@@ -54,8 +54,8 @@ class AccountManagementFastApi:
         """
         Get current User Organization Information
 
-        :return: _description_
-        :rtype: _type_
+        :return: response, response.json()
+        :rtype: (string, string)
         """
         authed_user_access_token = sail_portal.login_for_access_token()[1].get("access_token")
         headers = {"Authorization": f"Bearer {authed_user_access_token}", "Accept": "application/json"}

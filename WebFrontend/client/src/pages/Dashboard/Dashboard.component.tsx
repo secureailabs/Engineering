@@ -86,8 +86,10 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
             profile_image={default_profile_image}
             organization={userData?.organization.name}
           />
+          <div>
             <BreadcrumbRoutes />
             <DashboardRouter />
+          </div>
         </div>
       </Sidebar>
     </>

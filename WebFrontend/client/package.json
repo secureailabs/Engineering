@@ -10,7 +10,7 @@
   "dependencies": {
     "@hookform/resolvers": "^2.5.1",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
-    "@secureailabs/web-ui": "^1.4.6",
+    "@secureailabs/web-ui": "1.5",
     "@types/faker": "5.5.3",
     "@types/react-grid-layout": "^1.1.2",
     "@types/react-measure": "^2.0.8",

@@ -4,16 +4,18 @@ import { AxiosError } from 'axios';
 import { TGetAllDatasetsSuccess } from '@APIs/dataset/dataset.typeDefs';
 import { getAllDatasetsAPI } from '@APIs/dataset/dataset.apis';
 
-import demo_data from '@APIs/dataset/dataset.data';
+import { getAllDatasetsAPIdemo } from '@APIs/dataset/dataset.demo-apis';
 
 import Datasets from './Datasets.component';
 
 const DatasetsContainer: React.FC = () => {
+  const apiFunction = localStorage.getItem('mode') == 'demo' ? getAllDatasetsAPIdemo : getAllDatasetsAPI;
+
   const { data, isLoading, status, error, refetch} =
     // @ts-ignore
-    useQuery<TGetAllDatasetsSuccess['datasets'], AxiosError>(['datasets'], getAllDatasetsAPI, { refetchOnMount: 'always' });
+    useQuery<TGetAllDatasetsSuccess['datasets'], AxiosError>(['datasets'], apiFunction, { refetchOnMount: 'always' });
   //@ts-ignore
-  return localStorage.getItem('mode') == 'demo' ? Datasets({ status: 'success', getAllDatasetsData: demo_data, error: null }) : Datasets({ status: status, getAllDatasetsData: data, error: error })
+  return Datasets({ status: status, getAllDatasetsData: data, error: error })
   
 }
 

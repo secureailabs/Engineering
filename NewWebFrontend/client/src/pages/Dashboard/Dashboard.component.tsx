@@ -20,6 +20,8 @@ import Header from '@secureailabs/web-ui/components/Header';
 import default_profile_image from '@assets/user.png';
 import newLogo from '@assets/newLogo.png';
 
+import BreadcrumbRoutes from '@routes/Breadcrumbs/breadcrumbs.routes';
+
 import { TDashboardProps } from './Dashboard.types';
 
 const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}) => {
@@ -74,19 +76,20 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
     }].concat(secondary)
   }
 
-
-  // <DashboardRouter />
   return (
     <>
       <Sidebar primary={primary} secondary={secondary} logo={newLogo}>
         <div className="standard-grid-row">
           <Header
             search={() => {}}
-            username={userData?.username}
+            username={userData?.name}
             profile_image={default_profile_image}
             organization={userData?.organization.name}
           />
-          <DashboardRouter />
+          <div>
+            <BreadcrumbRoutes />
+            <DashboardRouter />
+          </div>
         </div>
       </Sidebar>
     </>

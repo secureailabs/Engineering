@@ -1,0 +1,49 @@
+.radio-input {
+  @include form-element;
+  margin-top: 0.5rem;
+  &__options {
+    @include form-element;
+    border-style: solid;
+    padding: 2vh;
+    margin-top: 0.5rem;
+    margin-bottom: 1.4rem;
+
+    display: grid;
+
+    &__option {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 18.5px;
+      label {
+        margin: 0 1rem;
+      }
+      .tool-tip {
+        position: relative;
+        display: inline-block;
+        &__text {
+          padding: 0.4rem;
+          // border-radius: 3px;
+          border-radius: 5px;
+          padding: 5px 4px;
+          left: -11rem;
+          bottom: 3rem;
+          width: 15vw;
+
+          text-align: justify;
+        }
+        &__text::after {
+          content: '';
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -5px;
+          border-width: 5px;
+          border-style: solid;
+          border-color: black transparent transparent transparent;
+        }
+      }
+    }
+  }
+}

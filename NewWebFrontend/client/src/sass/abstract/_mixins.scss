@@ -1,0 +1,321 @@
+// Used by form inputs and submit button
+@mixin form-element {
+  font-size: var(--fontsize-base);
+  background-color: white;
+  margin-top: 0.5rem;
+
+  border: {
+    width: 0.5px;
+    radius: 5px;
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+// Used by the Login and Signup components
+@mixin single-form-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  form {
+    max-height: 90%;
+    margin-bottom: 5vh;
+  }
+  .form {
+    max-height: 100%;
+    width: 40rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 3rem;
+    border-radius: 5px;
+  }
+  color: black;
+  font: {
+    size: var(--fontsize-base);
+  }
+  .formsfieldsdescription {
+    text-align: center;
+    font: {
+      size: var(--fontsize-sm);
+    }
+  }
+}
+
+@mixin list-view {
+  &__listtitle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 90vw;
+    margin: 0 5vw;
+    justify-content: space-between;
+    align-items: baseline;
+    font: {
+      size: var(--fontsize-xxl);
+      weight: bold;
+    }
+    border-bottom: 1px solid grey;
+    &__options {
+      justify-self: end;
+      display: grid;
+      &__choice {
+        padding: 0.15rem 0.25rem;
+        border: {
+          radius: 0;
+          bottom: none;
+        }
+        background-color: white;
+        font: {
+          size: var(--fontsize-sm);
+          weight: normal;
+        }
+        &:hover {
+          text-decoration: underline;
+          background-color: white;
+        }
+        &__current {
+          padding: 0 0.25rem;
+          text-decoration: underline;
+          border: {
+            radius: 0;
+            bottom: none;
+          }
+          background-color: rgb(221, 221, 221);
+          font: {
+            size: var(--fontsize-sm);
+            weight: normal;
+          }
+          &:hover {
+            background-color: rgb(221, 221, 221);
+          }
+        }
+      }
+    }
+    &__titlewbutton {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 1.5vw;
+      align-items: center;
+      button {
+        width: max-content;
+        margin: 0;
+      }
+    }
+  }
+  &__columntitles {
+    padding: 1% 2%;
+    display: grid;
+    text-align: left;
+    text-decoration: underline;
+    font: {
+      size: var(--fontsize-lg);
+      weight: bold;
+    }
+  }
+  &__item {
+    margin: 0 2%;
+    border: {
+      style: solid;
+      radius: 5px;
+      width: 0.1px;
+      color: black;
+    }
+    text-align: left;
+    font: {
+      size: var(--fontsize-sm);
+    }
+    &__base {
+      padding: 1% 0;
+      display: grid;
+      cursor: pointer;
+    }
+  }
+  .darkbg {
+    background-color: var(--orange-0);
+  }
+  .opened {
+    border-bottom: none;
+  }
+}
+
+@mixin table {
+  table {
+    margin: auto;
+    margin-top: 1rem;
+    width: 90vw;
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    font-size: 1.4rem;
+
+    td,
+    th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    tr {
+      cursor: pointer;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #ddd;
+    }
+
+    th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+
+      text-align: left;
+      background-color: #fcd0b7;
+      color: black;
+    }
+
+    td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 15vw;
+    }
+  }
+}
+
+@mixin sliding-view {
+  text-align: start;
+  padding: 2rem 9rem 3%;
+  &__name {
+    // font: {
+    //   size: var(--fontsize-9xl);
+    //   weight: bold;
+    // }
+    // text-decoration: underline;
+    margin: 3% 2% 1%;
+    font: {
+      size: var(--fontsize-xxl);
+      weight: bold;
+    }
+    border-bottom: 1px solid grey;
+  }
+  &__section {
+    padding: 1% 0;
+    &__title {
+      font: {
+        size: var(--fontsize-base);
+        weight: bold;
+      }
+    }
+    &__text {
+      font: {
+        size: var(--fontsize-base);
+      }
+    }
+  }
+  .form {
+    border-style: none;
+    margin: 0 90px;
+    input {
+      padding: 2vh;
+    }
+    textArea {
+      padding: 2vh;
+    }
+  }
+  &__button {
+    display: flex;
+    justify-content: center;
+    button {
+      margin: 0;
+      padding: 0.5rem;
+      min-width: 20rem;
+    }
+  }
+}
+
+// MEDIA QUERY MANAGER
+/*
+0 - 600px:          PHONE
+600 - 900px:        TABLET PORTRAIT
+900 - 1200px:       TABLET LANDSCAPE
+1200 - 1800px:      DESKTOP (NORMAL STYLES)
+1800px +:           BIG DESKTOP
+$breakpoint argument choices:
+- phone
+- tab-port
+- tab-land
+- big
+ORDER: BASE + typography > general layout + grid > page layout > components
+*/
+@mixin respond($breakpoint) {
+  //REM AND EM NOT AFFECTED BY ROOT FONT-SIZE SETTINGS (IN MEDIA QUERIES) -> ALWAYS EQUAL TO DEFAULT BROWSER FONT SIZE
+  // EM BEST OPTION FOR MEDIA QUERIES
+  // 1 EM 16px
+
+  //500px
+  @if $breakpoint==phone-small {
+    @media only screen and (max-width: 31.25em) {
+      @content;
+    }
+  }
+
+  //600px
+  @if $breakpoint==phone {
+    @media only screen and (max-width: 37.5em) {
+      @content;
+    }
+  }
+
+  //640px
+  @if $breakpoint==sm {
+    @media only screen and (max-width: 40em) {
+      @content;
+    }
+  }
+
+  //768px
+  @if $breakpoint==md {
+    @media only screen and (max-width: 48em) {
+      @content;
+    }
+  }
+
+  //800px
+  @if $breakpoint==tab-small {
+    @media only screen and (max-width: 50em) {
+      @content;
+    }
+  }
+
+  //900px
+  @if $breakpoint==tab-port {
+    @media only screen and (max-width: 56.25em) {
+      @content;
+    }
+  }
+
+  //1024px
+  @if $breakpoint==lg {
+    @media only screen and (max-width: 64em) {
+      @content;
+    }
+  }
+
+  //1200px
+  @if $breakpoint==tab-land {
+    @media only screen and (max-width: 75em) {
+      @content;
+    }
+  }
+
+  //1280px
+  @if $breakpoint==xl {
+    @media only screen and (max-width: 80em) {
+      @content;
+    }
+  }
+
+  //1800px
+  @if $breakpoint==big-desktop {
+    @media only screen and (min-width: 112.5em) {
+      @content;
+    }
+  }
+}

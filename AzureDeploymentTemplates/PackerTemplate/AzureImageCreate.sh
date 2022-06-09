@@ -9,7 +9,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -m [Image Name]"
     echo "Usage: $0"
-    echo -e "\t-m Module Name:  apiservices | platformservices | dataservices | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
+    echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | securecomputationnode"
     exit 1 # Exit script after printing help
 }
 

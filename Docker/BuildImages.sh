@@ -5,7 +5,7 @@ PrintHelp() {
     echo ""
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0"
-    echo -e "\t-i Image Name: apiservices | devopsconsole | dataservices | platformservices | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
+    echo -e "\t-i Image Name: apiservices | devopsconsole | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
     exit 1 # Exit script after printing help
 }
 
@@ -52,9 +52,7 @@ fi
 
 # Check if all the required files are present on the machine
 declare -a ListOfDockerImages=(
-    "platformservices"
     "apiservices"
-    "dataservices"
     "orchestrator"
     "remotedataconnector"
     "webfrontend"

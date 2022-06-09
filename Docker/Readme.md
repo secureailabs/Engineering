@@ -19,11 +19,11 @@ make all -j
 
 ### Backend Api Services Portal
 ```
-./RunService.sh -s platformservices
+./RunService.sh -s apiservices
 ```
 ### Orchestrator
 ```
-./RunService.sh -s orchestrator 
+./RunService.sh -s orchestrator
 ```
 ### Remote Data Connector
 ```
@@ -46,7 +46,7 @@ make all -j
 ```
 *Alternatively, you can add DeprovisionService.sh to path via symbolic link and trigger from anywhere!*
 ```
-eg: 
+eg:
 echo $PATH
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/bin
 cd /bin
@@ -56,7 +56,7 @@ DeprovisionService.sh -s all
 
 #### Platformservices
 ```
-./DeprovisionService.sh -s platformservices
+./DeprovisionService.sh -s apiservices
 ```
 #### Orchestrator
 ```
@@ -77,5 +77,5 @@ DeprovisionService.sh -s all
 
 #### Note:
 1. Use the `-d` flag to run the services in the background in docker detached mode.
-2. To access the backend portal from any other container use `platformservices` as a domain name. e.g. the frontend webApp must connect to `https://platformservices:6200` instead of `https://127.0.0.1:6200/`
+2. To access the backend portal from any other container use `apiservices` as a domain name. e.g. the frontend webApp must connect to `https://apiservices:6200` instead of `https://127.0.0.1:6200/`
 3. Remember you can add DeprovisionService.sh to path and run it from anywhere !!  via `DeprovisionService.sh -s all`

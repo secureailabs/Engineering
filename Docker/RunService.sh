@@ -4,7 +4,7 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
@@ -102,6 +102,11 @@ elif [ "webfrontend" == "$imageName" ]; then
     cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
     cp $rootDir/Binary/webfrontend.tar.gz $rootDir/Binary/webfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/Binary/webfrontend_dir:/app $imageName"
+elif [ "newwebfrontend" == "$imageName" ]; then
+    make -C $rootDir package_webfrontend -s -j
+    cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
+    cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
+    runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName"
 elif [ "securecomputationnode" == "$imageName" ]; then
     make -C $rootDir package_securecomputationnode -s -j
     cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/securecomputationnode_dir/package.tar.gz

@@ -84,7 +84,7 @@ def deploy_apiservices(account_credentials, deployment_name, owner):
 
 def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
     # Deploy the frontend server
-    frontend_server_ip = deploy_module(account_credentials, deployment_name, "webfrontend")
+    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend")
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
@@ -92,15 +92,15 @@ def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
         "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":3000",
     }
 
-    with open("webfrontend.json", "w") as outfile:
+    with open("newwebfrontend.json", "w") as outfile:
         json.dump(initialization_vector, outfile)
 
     upload_status = subprocess.run(
         [
             "./UploadPackageAndInitializationVector",
             "--IpAddress=" + frontend_server_ip,
-            "--Package=webfrontend.tar.gz",
-            "--InitializationVector=webfrontend.json",
+            "--Package=newwebfrontend.tar.gz",
+            "--InitializationVector=newwebfrontend.json",
         ],
         stdout=subprocess.PIPE,
     )
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
     print("\n\n===============================================================")
     print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip + ":3000")
-    print("SAIL Platorm Services is hosted on: https://" + platform_services_ip + ":6200")
+    print("SAIL Platorm Services is hosted on: https://" + platform_services_ip + ":8000")
     print("Deployment ID: ", deployment_id)
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")

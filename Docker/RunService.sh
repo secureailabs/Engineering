@@ -103,7 +103,7 @@ elif [ "webfrontend" == "$imageName" ]; then
     cp $rootDir/Binary/webfrontend.tar.gz $rootDir/Binary/webfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/Binary/webfrontend_dir:/app $imageName"
 elif [ "newwebfrontend" == "$imageName" ]; then
-    make -C $rootDir package_webfrontend -s -j
+    make -C $rootDir package_newwebfrontend -s -j
     cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
     cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName"

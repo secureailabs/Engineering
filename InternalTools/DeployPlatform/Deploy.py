@@ -88,7 +88,7 @@ def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
-        "apiservicesUrl": "https://" + platform_services_ip + ":8000",
+        "ApiServicesUrl": "http://" + platform_services_ip + ":8000",
         "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":3000",
     }
 

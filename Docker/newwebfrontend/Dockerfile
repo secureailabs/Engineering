@@ -23,4 +23,5 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
-CMD ["/bin/bash", "/Entrypoint.sh"]
+ENTRYPOINT [ "/Entrypoint.sh" ]
+CMD ["/bin/bash"]

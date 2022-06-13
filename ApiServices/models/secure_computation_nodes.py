@@ -16,7 +16,7 @@ from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class SecureComputationNodeType(Enum):
-    STANDARD_B4MS = "STANDARD_B4MS"
+    Standard_D4s_v4 = "Standard_D4s_v4"
 
 
 class SecureComputationNodeState(Enum):

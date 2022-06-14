@@ -25,12 +25,12 @@ const demo_data : TGetAllVirtualMachinesSuccess = {
                 id: 'uuid1',
                 name: 'Nick Adams'
             },
-            type: 'STANDARD_B4MS',
+            type: 'Standard_D4s_v4',
             timestamp: '2075-05-30T20:17:32.522Z',
             state: 'READY',
             detail: 'Nick Adams is the only person allowed to use this SCN.',
             ipaddress: '198.51.100.42'
-         }
+        }
     ]
 }
 

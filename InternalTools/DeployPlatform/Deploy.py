@@ -148,9 +148,9 @@ if __name__ == "__main__":
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
 
-    # Deploy the platform services
+    # Deploy the API services
     platform_services_ip = deploy_apiservices(account_credentials, deployment_id, OWNER)
-    print("Platform Services server: ", platform_services_ip)
+    print("API Services server: ", platform_services_ip)
 
     # Deploy the frontend server
     frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip)
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
     print("\n\n===============================================================")
     print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip + ":3000")
-    print("SAIL Platorm Services is hosted on: https://" + platform_services_ip + ":6200")
+    print("SAIL API Services is hosted on: https://" + platform_services_ip + ":8000")
     print("Deployment ID: ", deployment_id)
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")

@@ -9,8 +9,7 @@ import DatasetsSuccess from './Datasets.success';
 import DatasetsFailure from './Datasets.failure';
 
 
-const Datasets: React.FC<TDatasetsProps> = ({ status, getAllDatasetsData, error }) => {
-  return (
+const Datasets: React.FC<TDatasetsProps> = ({ status, getAllDatasetsData, error }) => (
   <ConditionalRender
     status={status}
     success={() =>
@@ -21,7 +20,6 @@ const Datasets: React.FC<TDatasetsProps> = ({ status, getAllDatasetsData, error 
     }>
     <Spinner />
   </ConditionalRender>
-  )
-};
+  );
 
 export default Datasets;

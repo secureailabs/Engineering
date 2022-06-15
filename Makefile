@@ -1,5 +1,6 @@
 include Make/Modules.mk
 include Make/webfrontend.mk
+include Make/newwebfrontend.mk
 include Make/securecomputationnode.mk
 
 .PHONY: securecomputationnode orchestrator datasetViewer databaseInitializationTool uploadPackageAndInitializationVector safeFunctionCompiler package all clean SharedCommonCode
@@ -23,7 +24,7 @@ securecomputationnode: SharedCommonCode VirtualMachine_Shared
 	@echo "securecomputationnode done!"
 
 package: SharedCommonCode VirtualMachine_Shared
-	@make package_apiservices package_securecomputationnode package_webfrontend orchestrator
+	@make package_apiservices package_securecomputationnode package_webfrontend package_newwebfrontend orchestrator
 	@echo "package done!"
 
 safeFunctioncompiler: SharedCommonCode

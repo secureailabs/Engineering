@@ -5,7 +5,7 @@ PrintHelp() {
     echo ""
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0"
-    echo -e "\t-i Image Name: apiservices | devopsconsole | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
+    echo -e "\t-i Image Name: apiservices | devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode"
     exit 1 # Exit script after printing help
 }
 
@@ -26,6 +26,13 @@ while getopts "i:" opt; do
     esac
 done
 
+echo "--------------------------------------------------"
+echo "--------------------------------------------------"
+# Prune unused docker networks
+docker network prune -f
+echo "--------------------------------------------------"
+echo "--------------------------------------------------"
+
 # Create sailNetwork if it does not exist
 networkName="sailNetwork"
 foundNetworkName=$(docker network ls --filter name=$networkName --format {{.Name}})
@@ -36,6 +43,10 @@ else
     echo "Creating network"
     docker network create --subnet=172.31.252.0/24 $networkName
 fi
+echo "--------------------------------------------------"
+docker network ls
+echo "--------------------------------------------------"
+echo "--------------------------------------------------"
 
 # Build the asked image if it specified in the input parameters
 if [ -z "$imageName" ]; then
@@ -56,6 +67,7 @@ declare -a ListOfDockerImages=(
     "orchestrator"
     "remotedataconnector"
     "webfrontend"
+    "newwebfrontend"
     "securecomputationnode"
     "devopsconsole"
 )

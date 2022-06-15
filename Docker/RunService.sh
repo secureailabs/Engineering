@@ -4,7 +4,7 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | dataservices | platformservices | webfrontend | orchestrator | remotedataconnector | securecomputationnode"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
@@ -64,18 +64,17 @@ if $cleanDatabase; then
 fi
 
 # Build the bootstrap tool to create the database
-make -C $rootDir baseVmInit -s -j
+make -C $rootDir vmInitializer -s -j
 
 # Create a folder to hold all the Binaries
 rm -rf $rootDir/Binary/"$imageName"_dir
 mkdir -p $rootDir/Binary/"$imageName"_dir
 
 # Copy the binaries to the folder
-cp $rootDir/Binary/BaseVmImageInit $rootDir/Binary/"$imageName"_dir/
+cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
-# runtimeFlags="$detachFlags --name $imageName"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
     cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail
@@ -83,7 +82,7 @@ if [ "orchestrator" == "$imageName" ]; then
 elif [ "devopsconsole" == "$imageName" ]; then
     cp devopsconsole/InitializationVector.json $rootDir/DevopsConsole
     runtimeFlags="$runtimeFlags -v $rootDir/DevopsConsole:/app -p 5050:443 $imageName"
-elif [ "dataservices" == "$imageName" ]; then
+elif [ "apiservices" == "$imageName" ]; then
     # Create database volume if it does not exist
     foundVolumeName=$(docker volume ls --filter name=$sailDatabaseVolumeName --format {{.Name}})
     echo "$foundVolumeName"
@@ -93,29 +92,20 @@ elif [ "dataservices" == "$imageName" ]; then
         echo "Creating database volume"
         docker volume create $sailDatabaseVolumeName
     fi
-    # Copy InitializationVector.json to the dataservices
-    make -C $rootDir package_dataservices -s -j
-    cp dataservices/InitializationVector.json $rootDir/Binary/dataservices_dir
-    cp $rootDir/Binary/DataServices.tar.gz $rootDir/Binary/dataservices_dir/package.tar.gz
-    runtimeFlags="$runtimeFlags -p 6500:6500 --ip 172.31.252.2 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/dataservices_dir:/app $imageName"
-elif [ "platformservices" == "$imageName" ]; then
-    # Copy InitializationVector.json to the platformservices
-    make -C $rootDir package_securecomputationnode -s -j
-    make -C $rootDir package_platformservices -s -j
-    cp platformservices/InitializationVector.json $rootDir/Binary/platformservices_dir
-    cp $rootDir/Binary/PlatformServices.tar.gz $rootDir/Binary/platformservices_dir/package.tar.gz
-    cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/platformservices_dir/
-    runtimeFlags="$runtimeFlags -p 6200:6201 -v $rootDir/Binary/platformservices_dir:/app $imageName"
-elif [ "apiservices" == "$imageName" ]; then
     make -C $rootDir package_apiservices -s -j
     cp apiservices/InitializationVector.json $rootDir/Binary/apiservices_dir
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
-    runtimeFlags="$runtimeFlags -p 8000:8001 -v $rootDir/Binary/apiservices_dir:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 8000:8001 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
     make -C $rootDir package_webfrontend -s -j
     cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
     cp $rootDir/Binary/webfrontend.tar.gz $rootDir/Binary/webfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/Binary/webfrontend_dir:/app $imageName"
+elif [ "newwebfrontend" == "$imageName" ]; then
+    make -C $rootDir package_newwebfrontend -s -j
+    cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
+    cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
+    runtimeFlags="$runtimeFlags -p 3000:3000 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName"
 elif [ "securecomputationnode" == "$imageName" ]; then
     make -C $rootDir package_securecomputationnode -s -j
     cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/securecomputationnode_dir/package.tar.gz

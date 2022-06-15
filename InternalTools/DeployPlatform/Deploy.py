@@ -4,7 +4,21 @@ import subprocess
 import time
 import uuid
 
+import requests
+
 import sailazure
+
+
+def upload_package(virtual_machine_ip, initialization_vector_file, package_file):
+    headers = {"accept": "application/json"}
+    files = {
+        "initialization_vector": open(initialization_vector_file, "rb"),
+        "bin_package": open(package_file, "rb"),
+    }
+    response = requests.put(
+        "https://" + virtual_machine_ip + ":9090/initialization-data", headers=headers, files=files, verify=False
+    )
+    print("Upload package status: ", response.status_code)
 
 
 def deploy_module(account_credentials, deployment_name, module_name):
@@ -25,7 +39,7 @@ def deploy_module(account_credentials, deployment_name, module_name):
     parameters = {
         "vmName": module_name,
         "vmSize": "Standard_D4s_v4",
-        "vmImageResourceId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/NginxImageStorageRg/providers/Microsoft.Compute/images/"
+        "vmImageResourceId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/InitializerImageStorageRg/providers/Microsoft.Compute/images/"
         + module_name,
         "adminUserName": "sailuser",
         "adminPassword": "SailPassword@123",
@@ -53,19 +67,13 @@ def deploy_apiservices(account_credentials, deployment_name, owner):
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
 
-    upload_status = subprocess.run(
-        [
-            "./UploadPackageAndInitializationVector",
-            "--IpAddress=" + apiservices_ip,
-            "--Package=apiservices.tar.gz",
-            "--InitializationVector=apiservices.json",
-        ],
-        stdout=subprocess.PIPE,
-    )
-    print("Upload status: ", upload_status.stdout)
+    # Sleeping for a minute
+    time.sleep(60)
 
-    # Sleeping for two minutes
-    time.sleep(2 * 60)
+    upload_package(apiservices_ip, "apiservices.json", "apiservices.tar.gz")
+
+    # Sleeping for some time
+    time.sleep(90)
 
     # Run database tools for the backend server
     database_tools_run = subprocess.run(
@@ -84,27 +92,21 @@ def deploy_apiservices(account_credentials, deployment_name, owner):
 
 def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
     # Deploy the frontend server
-    frontend_server_ip = deploy_module(account_credentials, deployment_name, "webfrontend")
+    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend")
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
-        "apiservicesUrl": "https://" + platform_services_ip + ":8000",
+        "ApiServicesUrl": "https://" + platform_services_ip + ":8000",
         "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":3000",
     }
 
-    with open("webfrontend.json", "w") as outfile:
+    with open("newwebfrontend.json", "w") as outfile:
         json.dump(initialization_vector, outfile)
 
-    upload_status = subprocess.run(
-        [
-            "./UploadPackageAndInitializationVector",
-            "--IpAddress=" + frontend_server_ip,
-            "--Package=webfrontend.tar.gz",
-            "--InitializationVector=webfrontend.json",
-        ],
-        stdout=subprocess.PIPE,
-    )
-    print("Upload status: ", upload_status.stdout)
+    # Sleeping for two minutes
+    time.sleep(90)
+
+    upload_package(frontend_server_ip, "newwebfrontend.json", "newwebfrontend.tar.gz")
 
     return frontend_server_ip
 
@@ -119,16 +121,7 @@ def deploy_orchestrator(account_credentials, deployment_name):
     with open("orchestrator.json", "w") as outfile:
         json.dump(initialization_vector, outfile)
 
-    upload_status = subprocess.run(
-        [
-            "./UploadPackageAndInitializationVector",
-            "--IpAddress=" + orchestrator_server_ip,
-            "--Package=orchestrator.tar.gz",
-            "--InitializationVector=orchestrator.json",
-        ],
-        stdout=subprocess.PIPE,
-    )
-    print("Upload status: ", upload_status.stdout)
+    upload_package(orchestrator_server_ip, "orchestrator.json", "orchestrator.tar.gz")
 
     return orchestrator_server_ip
 
@@ -141,6 +134,10 @@ if __name__ == "__main__":
     OWNER = os.environ.get("OWNER")
     PURPOSE = os.environ.get("PURPOSE")
 
+    if not OWNER or not PURPOSE:
+        print("Please set the OWNER and PURPOSE environment variables")
+        exit(0)
+
     deployment_id = OWNER + "-" + str(uuid.uuid1()) + "-" + PURPOSE
 
     # Authenticate the azure credentials
@@ -148,9 +145,9 @@ if __name__ == "__main__":
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
 
-    # Deploy the platform services
+    # Deploy the API services
     platform_services_ip = deploy_apiservices(account_credentials, deployment_id, OWNER)
-    print("Platform Services server: ", platform_services_ip)
+    print("API Services server: ", platform_services_ip)
 
     # Deploy the frontend server
     frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip)
@@ -158,7 +155,8 @@ if __name__ == "__main__":
 
     print("\n\n===============================================================")
     print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip + ":3000")
-    print("SAIL Platorm Services is hosted on: https://" + platform_services_ip + ":6200")
+    print("SAIL API Services is hosted on: https://" + platform_services_ip + ":8000")
+
     print("Deployment ID: ", deployment_id)
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")

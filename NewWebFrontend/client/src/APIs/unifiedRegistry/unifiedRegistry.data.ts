@@ -16,7 +16,7 @@ export const demo_data = {
       NumberOfPatients: 29,
       CreatedAt: faker.date.recent(2),
       UpdateAt: faker.date.recent(1),
-      Datasets: Datasets.Datasets,
+      Datasets: Datasets.datasets,
     },
   },
 };

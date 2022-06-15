@@ -43,9 +43,9 @@ uploadPackageAndInitializationVector: SharedCommonCode
 	@make -C $(UPLOAD_TOOL) all
 	@echo "uploadPackageAndInitializationVector done!"
 
-baseVmInit: SharedCommonCode
-	@make -C $(BASE_VM_INIT) all
-	@echo "baseVmInit done!"
+vmInitializer:
+	@make -C $(VM_INITIALIZER) all
+	@echo "vmInitializer done!"
 
 SharedCommonCode:
 	@make -C $(SHARED_COMMON_CODE) all
@@ -55,7 +55,7 @@ VirtualMachine_Shared:
 
 all: SharedCommonCode VirtualMachine_Shared
 	@make package
-	@make datasetViewer databaseInitializationTool baseVmInit uploadPackageAndInitializationVector safeFunctionCompiler remoteDataConnector
+	@make datasetViewer databaseInitializationTool vmInitializer uploadPackageAndInitializationVector safeFunctionCompiler remoteDataConnector
 	@echo "All build and packaged!"
 
 clean:

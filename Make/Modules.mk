@@ -1,11 +1,6 @@
 # Define ROOTDIR only if not already defined
 ROOTDIR?=$(shell realpath .)
 
-WEB_SERVICES:=$(ROOTDIR)/WebService
-WEB_SERVICES_SHARED:=$(ROOTDIR)/WebService/SharedCommonCode
-REST_API_PORTAL:=$(ROOTDIR)/WebService/RestApiPortal
-DATABASE_PORTAL:=$(ROOTDIR)/WebService/DatabaseGateway
-
 DATASET_VIEWER_TOOL:=$(ROOTDIR)/InternalTools/DatasetViewer
 DATABASE_INITIALIZATION_TOOL:=$(ROOTDIR)/InternalTools/DatabaseInitializationTool
 SAFE_OBJECT_COMPILER:=$(ROOTDIR)/EndPointTools/SafeObjectTools/SafeObjectCompiler/Source

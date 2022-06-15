@@ -1,5 +1,5 @@
 export type IUserData = {
-  username: string;
+  name: string;
   email: string;
   job_title: string;
   role: 'ADMIN' | 'AUDITOR' | 'USER' | 'DIGITALCONTRACTADMIN' | 'DATASETADMIN' | 'SAILADMIN';

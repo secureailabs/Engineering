@@ -1479,7 +1479,8 @@ void __thiscall Orchestrator::UpdateJobsWaitingForData(
     )
 {
     std::string strValueParameter(c_oPushDataMessage.GetString("ValueName"));
-    __DebugAssert(true == IsJobOutputParameter(strValueParameter));
+    // TODO: re-enabled if BOARD-1771 is done
+    // __DebugAssert(true == ::IsJobOutputParameter(strValueParameter));
     __DebugAssert(m_stlJobResults.end() != m_stlJobResults.find(strValueParameter));
 
     for ( auto& oJobInformation : m_stlJobInformation )

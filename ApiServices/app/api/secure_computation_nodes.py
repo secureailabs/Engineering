@@ -8,6 +8,7 @@
 import json
 import subprocess
 from ipaddress import IPv4Address
+from time import time
 from typing import Optional
 from uuid import uuid4
 
@@ -386,6 +387,9 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
 
         with open(deployment_name, "w") as outfile:
             json.dump(securecomputationnode_json, outfile)
+
+        # Sleeping for two minutes
+        time.sleep(90)
 
         headers = {"accept": "application/json"}
         files = {

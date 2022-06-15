@@ -9,7 +9,9 @@ RUN apt-get update && \
   apt-get install -y \
   jq \
   curl \
-  nginx
+  nginx \
+  python3 \
+  python3-pip
 
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs  && \
@@ -19,6 +21,9 @@ RUN npm install --global yarn
 RUN node --version
 
 COPY nginx.conf /etc/nginx/nginx.conf
+
+COPY requirements.txt /requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

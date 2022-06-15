@@ -7,9 +7,10 @@ cd /app || exit
 # Start the nginx server
 nginx -g 'daemon off;' 2>&1 | tee /app/nginx.log &
 
-# BaseVmImageInit will download the package.tar.gz and InitializationVector.json
+# vm_initializer.py will download the package.tar.gz and InitializationVector.json
 # if they are not already present on the file system.
-./BaseVmImageInit
+# Forcing a zero exit status as the api server is killed from within and there is no graceful way to do this.
+python3 vm_initializer.py || true
 retVal=$?
 if [ $retVal -ne 0 ]; then
     exit $retVal

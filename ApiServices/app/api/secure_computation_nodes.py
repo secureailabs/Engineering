@@ -8,10 +8,12 @@
 import json
 import subprocess
 from ipaddress import IPv4Address
+from time import time
 from typing import Optional
 from uuid import uuid4
 
 import app.azure.azure as azure
+import requests
 from app.api.accounts import get_user
 from app.api.authentication import get_current_user
 from app.api.datasets import get_dataset
@@ -386,16 +388,21 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
         with open(deployment_name, "w") as outfile:
             json.dump(securecomputationnode_json, outfile)
 
-        upload_status = subprocess.run(
-            [
-                "./UploadPackageAndInitializationVector",
-                "--IpAddress=" + deploy_response.ip_address,
-                "--Package=SecureComputationNode.tar.gz",
-                "--InitializationVector=" + deployment_name,
-            ],
-            stdout=subprocess.PIPE,
+        # Sleeping for two minutes
+        time.sleep(90)
+
+        headers = {"accept": "application/json"}
+        files = {
+            "initialization_vector": open(deployment_name, "rb"),
+            "bin_package": open("SecureComputationNode.tar.gz", "rb"),
+        }
+        response = requests.put(
+            "https://" + deploy_response.ip_address + ":9090/initialization-data",
+            headers=headers,
+            files=files,
+            verify=False,
         )
-        print("Upload status: ", upload_status.stdout)
+        print("Upload package status: ", response.status_code)
 
         # Update the database to mark the VM as WAITING_FOR_DATA
         secure_computation_node_db.state = SecureComputationNodeState.WAITING_FOR_DATA

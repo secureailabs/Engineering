@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ResourceGroup="NginxImageStorageRg"
-StorageAccountName="sailvmimages9891"
+ResourceGroup="InitializerImageStorageRg"
+StorageAccountName="sailvmimages9821"
 Location="eastus"
 
 PrintHelp()

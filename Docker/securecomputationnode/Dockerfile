@@ -24,6 +24,9 @@ RUN pip3 install torch --no-cache-dir
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
+COPY requirements.txt /requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
+
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

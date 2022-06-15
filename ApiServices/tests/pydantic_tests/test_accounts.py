@@ -40,21 +40,11 @@ def test_get_organizations():
     payload = f"username=johndoe4@kca.com&password=secret"
     headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
     login_response = client.post("/login", headers=headers, data=payload, verify=False)
-    import ipdb
-
-    ipdb.set_trace()
     authed_user_access_token = login_response.json().get("access_token")
     headers = {"Authorization": f"Bearer {authed_user_access_token}", "Accept": "application/json"}
     # headers = {"Accept": "application/json", "Authorization": f"Bearer {authed_user_access_token}"}
     authorization_response = client.get("/me", headers=headers, verify=False)
-    import ipdb
-
-    ipdb.set_trace()
-
     response = client.get("/organizations")
-    import ipdb
-
-    ipdb.set_trace()
     assert response.status_code == 200
     # assert RegisterOrganization_Out(**response.json()) is not None
 

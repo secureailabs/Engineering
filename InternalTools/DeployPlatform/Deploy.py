@@ -67,12 +67,12 @@ def deploy_apiservices(account_credentials, deployment_name, owner):
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
 
-    # Sleeping for two minutes
+    # Sleeping for a minute
     time.sleep(60)
 
     upload_package(apiservices_ip, "apiservices.json", "apiservices.tar.gz")
 
-    # Sleeping for two minutes
+    # Sleeping for some time
     time.sleep(90)
 
     # Run database tools for the backend server
@@ -102,6 +102,9 @@ def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
 
     with open("newwebfrontend.json", "w") as outfile:
         json.dump(initialization_vector, outfile)
+
+    # Sleeping for two minutes
+    time.sleep(90)
 
     upload_package(frontend_server_ip, "newwebfrontend.json", "newwebfrontend.tar.gz")
 

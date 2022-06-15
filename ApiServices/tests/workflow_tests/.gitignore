@@ -1,0 +1,5 @@
+**/venv*/
+*.pyc
+result.xml
+**/lzma1900/
+.vscode/

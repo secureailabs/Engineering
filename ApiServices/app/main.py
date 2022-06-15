@@ -44,19 +44,20 @@ server.include_router(remote_data_connector.router)
 server.include_router(internal_utils.router)
 server.include_router(data_federations.router)
 
+
 # Override the default validation error handler as it throws away a lot of information
 # about the schema of the request body.
-class ValidataionError(BaseModel):
+class ValidationError(BaseModel):
     error: StrictStr = Field(default="Invalid Schema")
 
 
 @server.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc):
-    error = ValidataionError(error="Invalid Schema")
+    error = ValidationError(error="Invalid Schema")
     return JSONResponse(status_code=422, content=jsonable_encoder(error))
 
 
-utils.validation_error_response_definition = ValidataionError.schema()
+utils.validation_error_response_definition = ValidationError.schema()
 
 # Run the uvicorn server
 # uvicorn.run("app.main:server", host="127.0.0.1", port=8000, log_level="info")

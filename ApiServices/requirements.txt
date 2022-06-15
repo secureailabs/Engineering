@@ -1,19 +1,19 @@
-fastapi # Test
+fastapi
 uvicorn
-pytest # Test
-requests # Test
-python-jose[cryptography]  # Test
-passlib[bcrypt]  # Test
-pydantic[email] # Test
-flake8 # Test
-black # Test
-motor # Test
+pytest
+requests
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic[email]
+flake8
+black
+motor
 pyflakes
 pymongo
-python-multipart # Test
+python-multipart
 
-azure-mgmt-resource  # Test
-msrestazure # Test
-azure-identity # Test
-azure-mgmt-compute # Test
-azure-mgmt-network # Test
+azure-mgmt-resource
+msrestazure
+azure-identity
+azure-mgmt-compute
+azure-mgmt-network

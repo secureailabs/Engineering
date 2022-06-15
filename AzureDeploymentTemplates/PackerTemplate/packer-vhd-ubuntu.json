@@ -49,8 +49,8 @@
         },
         {
             "type": "file",
-            "source": "../../Binary/BaseVmImageInit",
-            "destination": "BaseVmImageInit"
+            "source": "../../Binary/vm_initializer.py",
+            "destination": "vm_initializer.py"
         },
         {
             "type": "shell",

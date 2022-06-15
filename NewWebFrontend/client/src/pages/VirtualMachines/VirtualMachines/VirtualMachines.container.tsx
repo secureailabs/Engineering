@@ -1,38 +1,23 @@
-// import { connect } from 'react-redux';
-// import { compose, Dispatch } from 'redux';
+import { useQuery } from 'react-query';
+import { AxiosError } from 'axios';
 
-// import {
-//   getAllVirtualMachinesStart,
-//   getAllVirtualMachinesReset,
-// } from '@app/redux/virtualMachineManager/virtualMachineManager.actions';
-// import { selectVirtualMachine } from '@app/redux/virtualMachineManager/virtualMachineManager.selectors';
-// import { selectUser } from '@app/redux/user/user.selectors';
-// import VirtualMachines from './VirtualMachines.component';
-// import { IState } from '@app/redux/root-reducer';
-// import { RootAction } from '@app/redux/root.types';
+import { TGetAllVirtualMachinesSuccess } from '@APIs/virtualMachineManager/virtualMachineManager.typedefs';
 
-// const mapStateToProps = (state: IState) => {
-//   return {
-//     getAllVirtualMachinesError: selectVirtualMachine(state)
-//       .getAllVirtualMachinesError,
-//     getAllVirtualMachinesState: selectVirtualMachine(state)
-//       .getAllVirtualMachinesState,
-//     getAllVirtualMachinesData: selectVirtualMachine(state)
-//       .getAllVirtualMachinesData,
-//     userData: selectUser(state).userData,
-//   };
-// };
+import { getAllVirtualMachinesAPIdemo } from '@APIs/virtualMachineManager/virtualMachineManager.demo-apis';
 
-// //trying to remove func from dispatch functions
+import Datasets from './VirtualMachines.component';
 
-// const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => ({
-//   getAllVirtualMachinesStart: () => dispatch(getAllVirtualMachinesStart()),
-//   getAllVirtualMachinesReset: () => dispatch(getAllVirtualMachinesReset()),
-// });
+const VirtualMachinesContainer: React.FC = () => {
+    // const apiFunction = localStorage.getItem('mode') == 'demo' ? getAllDatasetsAPIdemo : getAllDatasetsAPI;
+    const apiFunction = getAllVirtualMachinesAPIdemo;
 
-// export default compose(connect(mapStateToProps, mapDispatchToProps))(
-//   //@ts-ignore
-//   VirtualMachines
-// );
 
-export {}
+    const { data, isLoading, status, error, refetch } =
+        // @ts-ignore
+        useQuery<TGetAllDatasetsSuccess['datasets'], AxiosError>(['datasets'], apiFunction, { refetchOnMount: 'always' });
+    //@ts-ignore
+    return Datasets({ status: status, getAllDatasetsData: data, error: error })
+
+}
+
+export default VirtualMachinesContainer;

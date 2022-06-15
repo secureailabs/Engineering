@@ -15,11 +15,9 @@ echo $module
 mkdir -p /opt/certs
 cp nginx-selfsigned.crt /opt/certs
 cp nginx-selfsigned.key /opt/certs
-cp BaseVmImageInit /opt/
+cp vm_initializer.py /opt/
 cp Run.sh /opt/
 chmod +x /opt/Run.sh
-chmod +x /opt/BaseVmImageInit
-
 
 docker build . -t $module
 

@@ -64,18 +64,17 @@ if $cleanDatabase; then
 fi
 
 # Build the bootstrap tool to create the database
-make -C $rootDir baseVmInit -s -j
+make -C $rootDir vmInitializer -s -j
 
 # Create a folder to hold all the Binaries
 rm -rf $rootDir/Binary/"$imageName"_dir
 mkdir -p $rootDir/Binary/"$imageName"_dir
 
 # Copy the binaries to the folder
-cp $rootDir/Binary/BaseVmImageInit $rootDir/Binary/"$imageName"_dir/
+cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
-# runtimeFlags="$detachFlags --name $imageName"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
     cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail

@@ -24,7 +24,7 @@ fi
 mkdir -p "$imageName"_dir
 
 # Copy the binaries to the folder
-cp BaseVmImageInit "$imageName"_dir/
+cp vm_initializer.py "$imageName"_dir/
 
 # Run the docker container
 docker run \

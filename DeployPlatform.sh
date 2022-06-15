@@ -69,7 +69,6 @@ cp Binary/igr_001.csvp $tempDeployDir
 cp Binary/igr_002.csvp $tempDeployDir
 cp Binary/mgr_001.csvp $tempDeployDir
 cp Binary/DatabaseInitializationSettings.json $tempDeployDir
-cp Binary/UploadPackageAndInitializationVector $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 mv Binary/newwebfrontend.tar.gz $tempDeployDir
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz

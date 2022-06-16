@@ -1,15 +1,22 @@
 # SAIL API Services Portal
 
-## Build virtual development environment
-To get started with the developemt environment, build a virtual development environment and install all the requirements usign:
-```
-./dev_setup.sh
-```
+## Developer Virtual Environment
+To get started with the developemt environment, build a virtual development environment and install all the requirements using:
+`./build/dev_setup.sh`
 
-To activate the virtual development environment, run:
-```
-source ./dev_env2/bin/activate
-```
+To activate the virtual development environment on Linux, run:
+`source venv38-sail_dev/bin/activate`
+To activate the virtual development environment on Windows, run:
+`.\venv38-sail_dev\Scripts\activate`
+
+## Tester Virtual Environment
+To get started with the developemt environment, build a virtual development environment and install all the requirements using:
+`./build/test_setup.sh`
+
+To activate the virtual development environment on Linux, run:
+`source venv38-sail_test/bin/activate`
+To activate the virtual development environment on Windows, run:
+`.\venv38-sail_test\Scripts\activate`
 ## Generators
 <TBD>
 

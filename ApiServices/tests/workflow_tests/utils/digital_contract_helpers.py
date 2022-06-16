@@ -1,8 +1,16 @@
-# -----------------------------------------------------------
-#
-# Digital Contract Helpers
-#
-# -----------------------------------------------------------
+# -------------------------------------------------------------------------------
+# Engineering
+# digital_contract_helpers.py
+# -------------------------------------------------------------------------------
+"""Digital Contract Management Helpers"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 
 
 def get_digital_contract_payload(data_owner_guid, dataset_guid):

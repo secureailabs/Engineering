@@ -1,9 +1,16 @@
-###################################################################################
-# @author Prawal Gangwar
-# @brief The main entrypoint of the API Services
-# @License Private and Confidential. Internal Use Only.
-# @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
-###################################################################################
+# -------------------------------------------------------------------------------
+# Engineering
+# main.py
+# -------------------------------------------------------------------------------
+"""The main entrypoint of the API Services"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 
 import fastapi.openapi.utils as utils
 from fastapi import FastAPI

@@ -1,8 +1,16 @@
-# -----------------------------------------------------------
-#
-# Class AccountManagementApi
-#
-# -----------------------------------------------------------
+# -------------------------------------------------------------------------------
+# Engineering
+# account_management_api.py
+# -------------------------------------------------------------------------------
+"""Account Management Api Module"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 import requests
 from tests.workflow_tests.api_portal.sail_portal_api import SailPortalApi
 from tests.workflow_tests.utils.helpers import get_response_values, url_encoded

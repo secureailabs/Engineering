@@ -5,13 +5,14 @@ sudo apt-get install python3
 sudo apt-get install python3-venv
 
 # Create a virutal environment
-python3 -m venv dev_env2
+python3 -m venv venv38-sail_test
 
 # Activate it
-source dev_env2/bin/activate
+source venv38-sail_test/bin/activate
 
 # Install all the requirements
-pip3 install -r requirements.txt
+pip3 install -r config/requirements/all_requirements.txt
 
 # Install redoc-cli for static document generation
-npm install -g redoc-cli
+sudo apt install nodejs npm
+sudo npm install -g redoc-cli

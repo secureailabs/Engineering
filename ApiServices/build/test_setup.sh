@@ -14,5 +14,6 @@ source venv38-sail_test/bin/activate
 pip3 install -r config/requirements/all_requirements.txt
 
 # Install redoc-cli for static document generation
-sudo apt install nodejs npm
+curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
+sudo apt-get install -y nodejs
 sudo npm install -g redoc-cli

@@ -1,6 +1,7 @@
 # Secure AI Labs
 
-## PRE-REQISITE
+## PREREQUISITE
+
 - Navigate to root of Project ApiServices
 - Run ./build/test_setup.sh
 - test_setup.sh: Will install Python 3.8 and add python to PATH

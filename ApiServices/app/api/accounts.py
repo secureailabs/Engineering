@@ -1,10 +1,16 @@
-########################################################################################################################
-# @author Prawal Gangwar
-# @brief APIs to manage user accounts and organizations
-# @License Private and Confidential. Internal Use Only.
-# @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
-########################################################################################################################
-
+# -------------------------------------------------------------------------------
+# Engineering
+# accounts.py
+# -------------------------------------------------------------------------------
+"""APIs to manage user accounts and organizations"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 from app.api.authentication import RoleChecker, get_current_user, get_password_hash
 from app.data import operations as data_service
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status

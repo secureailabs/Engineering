@@ -1,10 +1,17 @@
 ########################################################################################################################
-# @author Prawal Gangwar
-# @brief Temporary APIs to server remote data connector
-# @License Private and Confidential. Internal Use Only.
-# @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
-########################################################################################################################
-
+# -------------------------------------------------------------------------------
+# Engineering
+# remote_data_connector.py
+# -------------------------------------------------------------------------------
+"""Temporary APIs to server remote data connector"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 from ipaddress import IPv4Address
 from typing import List
 

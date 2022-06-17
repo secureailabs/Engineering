@@ -1,3 +1,16 @@
+# -------------------------------------------------------------------------------
+# Engineering
+# config.py
+# -------------------------------------------------------------------------------
+"""Global configs"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 # API_PORTAL_IP = "52.191.26.161"
 API_PORTAL_IP = "192.168.12.10"
 API_PORTAL_HOSTNAME = "localhost"

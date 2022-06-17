@@ -11,7 +11,8 @@ python3 -m venv venv38-sail_dev
 source venv38-sail_dev/bin/activate
 
 # Install all the requirements
-pip3 install -r config/requirements/prod_requirements.txt
+pip install -U pip setuptools wheel
+pip install -r config/requirements/prod_requirements.txt --only-binary=:all: --no-binary=python-multipart
 
 # Install redoc-cli for static document generation
 curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -

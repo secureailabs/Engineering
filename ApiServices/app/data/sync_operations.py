@@ -1,10 +1,16 @@
-###################################################################################
-# @author Prawal Gangwar
-# @brief Sync operations for the database
-# @License Private and Confidential. Internal Use Only.
-# @copyright Copyright (C) 2022 Secure AI Labs, Inc. All Rights Reserved.
-###################################################################################
-
+# -------------------------------------------------------------------------------
+# Engineering
+# sync_operations.py
+# -------------------------------------------------------------------------------
+"""Sync operations for the database"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 from pymongo import MongoClient
 
 client = MongoClient("mongodb://127.0.0.1:27017/")

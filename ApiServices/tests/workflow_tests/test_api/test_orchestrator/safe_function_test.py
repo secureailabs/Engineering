@@ -1,8 +1,16 @@
-# -----------------------------------------------------------
-#
-# Orchestrator Unit test file - Safe functions
-#
-# -----------------------------------------------------------
+# -------------------------------------------------------------------------------
+# Engineering
+# safe_function_test.py
+# -------------------------------------------------------------------------------
+"""Orchestrator Safe Function Api Tests"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 
 import json
 

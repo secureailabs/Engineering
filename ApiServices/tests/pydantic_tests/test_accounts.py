@@ -1,3 +1,17 @@
+# -------------------------------------------------------------------------------
+# Engineering
+# test_accounts.py
+# -------------------------------------------------------------------------------
+"""Test Account Api's"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
 from app.main import server
 from fastapi.encoders import jsonable_encoder
 from models.accounts import RegisterOrganization_In, RegisterOrganization_Out

@@ -180,4 +180,8 @@
   <PropertyGroup>
     <PostBuildEvent>copy /B /Y "$(ProjectDir)SampleFiles\*.*" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

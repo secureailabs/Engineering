@@ -20,6 +20,7 @@ namespace SailDatasetPackager
         {
             InitializeComponent();
 
+            this.Text = Program.m_AssemblyTitle;
             // Load default settings from the registry of they exist
             RegistryKey registryKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\SAIL");
             string[] registryKeyValues = registryKey.GetValueNames();

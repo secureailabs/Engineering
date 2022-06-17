@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace SailTablePackagerForCsv
@@ -35,6 +36,11 @@ namespace SailTablePackagerForCsv
         {
             int step = 1;
             TableProperties tableProperties = null;
+
+            // Extract the assembly title from the running assembly
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute) assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute));
+            m_AssemblyTitle = titleAttribute.Title;
 
             // If there are arguments, then someone is running the application from the command
             // line. Let's extract command line arguments
@@ -196,5 +202,7 @@ namespace SailTablePackagerForCsv
 
             return step;
         }
+
+        static public string m_AssemblyTitle;
     }
 }

@@ -19,6 +19,7 @@ namespace SailDatasetPackager
         {
             InitializeComponent();
 
+            this.Text = Program.m_AssemblyTitle;
             m_DatasetProperties = datasetProperties;
             m_NotificationAndProgressTracker = notificationsAndProgressTracker;
             m_SailWebApiPortalLoginDialog = new SailWebApiPortalLoginDialog();

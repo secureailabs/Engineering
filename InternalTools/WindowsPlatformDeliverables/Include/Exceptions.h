@@ -19,15 +19,15 @@ class BaseException
 	public:
 
         BaseException(
-			_in const char *c_szFilename,
-			_in const char *c_szFunctionName,
+			_in const char * c_szFilename,
+			_in const char * c_szFunctionName,
 			_in unsigned int unLineNumber,
-			_in const char *c_szExceptionFormat,
+			_in const char * c_szExceptionFormat,
 			... );
 		BaseException(
 			_in const BaseException & c_oBaseException
 			);
-        ~BaseException( void );
+        ~BaseException(void);
 
         const char * GetFilename(void) const;
         const char * GetFunctionName(void) const;

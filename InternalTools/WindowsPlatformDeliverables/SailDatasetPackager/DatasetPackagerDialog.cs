@@ -24,6 +24,7 @@ namespace SailDatasetPackager
         {
             InitializeComponent();
 
+            this.Text = Program.m_AssemblyTitle;
             m_DatasetPackager = new DatasetPackager(ref datasetProperties, ref notificationsAndProgressTracker, datasetFilename);
             m_NotificationsAndProgressTracker = notificationsAndProgressTracker;
             // Now let's run the worker thread. Make sure to update button states since they

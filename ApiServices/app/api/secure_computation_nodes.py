@@ -17,7 +17,7 @@ from ipaddress import IPv4Address
 from typing import Optional
 from uuid import uuid4
 
-import app.utilities.azure as azure
+import app.utils.azure as azure
 import requests
 from app.api.accounts import get_user
 from app.api.authentication import get_current_user
@@ -25,7 +25,7 @@ from app.api.datasets import get_dataset
 from app.api.digital_contracts import get_digital_contract
 from app.data import operations as data_service
 from app.data import sync_operations as sync_data_service
-from app.utilities.secrets import get_secret
+from app.utils.secrets import get_secret
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole

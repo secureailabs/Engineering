@@ -15,7 +15,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from app.utilities.secrets import get_secret
+from app.utils.secrets import get_secret
 from fastapi import APIRouter, HTTPException, status
 from models.emails import EmailRequest
 
@@ -26,7 +26,7 @@ router = APIRouter()
 async def send_email(request: EmailRequest):
     message = MIMEMultipart()
     message["Subject"] = request.subject
-    message["From"] = "Secure AI Labs <" + get_secret("SAIL_EMAIL") + ">"
+    message["From"] = "Secure AI Labs <{0}>".format(get_secret("sail_email"))
     message["To"] = request.to
     part = MIMEText(request.body, "html")
     message.attach(part)
@@ -34,8 +34,8 @@ async def send_email(request: EmailRequest):
     try:
         server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
-        server.login(get_secret("SAIL_EMAIL"), get_secret("sail_password"))
-        server.sendmail(get_secret("SAIL_EMAIL"), [request.to], message.as_string())
+        server.login(get_secret("sail_email"), get_secret("sail_password"))
+        server.sendmail(get_secret("sail_email"), [request.to], message.as_string())
         server.close()
     except smtplib.SMTPResponseException as exception:
         raise HTTPException(status_code=exception.smtp_code, detail=str(exception.smtp_error))

@@ -14,7 +14,7 @@
 import json
 import os
 
-from app.utilities.secrets import get_secret
+from app.utils.secrets import get_secret
 from pydantic import BaseModel, Field, StrictStr
 
 from azure.core.exceptions import AzureError

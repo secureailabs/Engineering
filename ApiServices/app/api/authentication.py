@@ -15,7 +15,7 @@ from time import time
 from typing import List
 
 from app.data import operations as data_service
-from app.utilities.secrets import get_secret
+from app.utils.secrets import get_secret
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm

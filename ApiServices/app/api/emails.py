@@ -41,7 +41,7 @@ async def send_email(request: EmailRequest):
     except smtplib.SMTPResponseException as exception:
         raise HTTPException(status_code=exception.smtp_code, detail=str(exception.smtp_error))
     except smtplib.SMTPRecipientsRefused as exception:
-        raise HTTPException(status_code=450, detail=f"Failed sending email to: + {str(exception)}")
+        raise HTTPException(status_code=450, detail=f"Failed sending email to: {str(exception)}")
     except smtplib.SMTPServerDisconnected:
         raise HTTPException(
             status_code=554,

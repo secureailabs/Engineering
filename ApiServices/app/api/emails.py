@@ -24,9 +24,10 @@ router = APIRouter()
 ########################################################################################################################
 # Since this is supposed to be a private API no public facing endpoints are needed
 async def send_email(request: EmailRequest):
+    sail_email = get_secret("sail_email")
     message = MIMEMultipart()
     message["Subject"] = request.subject
-    message["From"] = "Secure AI Labs <{0}>".format(get_secret("sail_email"))
+    message["From"] = f"Secure AI Labs <{sail_email}>"
     message["To"] = request.to
     part = MIMEText(request.body, "html")
     message.attach(part)
@@ -34,13 +35,13 @@ async def send_email(request: EmailRequest):
     try:
         server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
         server.ehlo()
-        server.login(get_secret("sail_email"), get_secret("sail_password"))
-        server.sendmail(get_secret("sail_email"), [request.to], message.as_string())
+        server.login(sail_email, get_secret("sail_password"))
+        server.sendmail(sail_email, [request.to], message.as_string())
         server.close()
     except smtplib.SMTPResponseException as exception:
         raise HTTPException(status_code=exception.smtp_code, detail=str(exception.smtp_error))
     except smtplib.SMTPRecipientsRefused as exception:
-        raise HTTPException(status_code=450, detail="Failed sending email to: " + str(exception))
+        raise HTTPException(status_code=450, detail=f"Failed sending email to: + {str(exception)}")
     except smtplib.SMTPServerDisconnected:
         raise HTTPException(
             status_code=554,
@@ -55,6 +56,5 @@ async def send_email(request: EmailRequest):
         raise HTTPException(status_code=510, detail="Unknown SMTP error. Should not happen")
     except Exception as exception:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Send Email Error: " + str(exception),
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=f"Send Email Error: {str(exception)}"
         )

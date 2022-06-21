@@ -15,6 +15,7 @@ from time import time
 from typing import List
 
 from app.data import operations as data_service
+from app.utilities.secrets import get_secret
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -31,16 +32,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter()
 
-
-# To be stored in a secure place like a vault or HSM
-JWT_SECRET = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-REFRESH_SECRET = "52bb444a1aabb9a76792527e6605349e1cbc7fafb8624de4e0ddde4f84ad4066"
-
-# Using password pepper or secret salt to ensure more security in the event of a hash
-# leak along with salt. The adversary can reverse engineer the password if they know the
-# salt and hash.
-PASSWORD_PEPPER = "06ac6368872b368a8c67e41c1a8faa46e8471818cdbb442345fbb2205b9fc225"
-
 # Authentication settings
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 20
@@ -48,7 +39,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def get_password_hash(salt, password):
-    return pwd_context.hash(salt + password + PASSWORD_PEPPER)
+    return pwd_context.hash(salt + password + get_secret("password_pepper"))
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -58,7 +49,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, get_secret("jwt_secret"), algorithms=[ALGORITHM])
         token_data = TokenData(**payload)
         user_id = token_data.id
         if not user_id:
@@ -98,7 +89,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
     found_user_db = User_Db(**found_user)
     if not pwd_context.verify(
-        found_user_db.email + form_data.password + PASSWORD_PEPPER, found_user_db.hashed_password
+        found_user_db.email + form_data.password + get_secret("password_pepper"), found_user_db.hashed_password
     ):
         raise exception_authentication_failed
 
@@ -106,13 +97,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
     access_token = jwt.encode(
         claims=jsonable_encoder(token_data),
-        key=JWT_SECRET,
+        key=get_secret("jwt_secret"),
         algorithm=ALGORITHM,
     )
 
     refresh_token = jwt.encode(
         claims=jsonable_encoder(token_data),
-        key=REFRESH_SECRET,
+        key=get_secret("refresh_secret"),
         algorithm=ALGORITHM,
     )
 
@@ -128,7 +119,7 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
     )
     try:
         # TODO: Prawal harden the security around the refresh token
-        payload = jwt.decode(refresh_token_request.refresh_token, REFRESH_SECRET, algorithms=[ALGORITHM])
+        payload = jwt.decode(refresh_token_request.refresh_token, get_secret("refresh_secret"), algorithms=[ALGORITHM])
         token_data = TokenData(**payload)
         user_id = token_data.id
         if not user_id:
@@ -145,13 +136,13 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
 
         access_token = jwt.encode(
             claims=jsonable_encoder(token_data),
-            key=JWT_SECRET,
+            key=get_secret("jwt_secret"),
             algorithm=ALGORITHM,
         )
 
         refresh_token = jwt.encode(
             claims=jsonable_encoder(token_data),
-            key=REFRESH_SECRET,
+            key=get_secret("refresh_secret"),
             algorithm=ALGORITHM,
         )
 

@@ -12,13 +12,12 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 import json
-import subprocess
+import time
 from ipaddress import IPv4Address
-from time import time
 from typing import Optional
 from uuid import uuid4
 
-import app.azure.azure as azure
+import app.utilities.azure as azure
 import requests
 from app.api.accounts import get_user
 from app.api.authentication import get_current_user
@@ -26,6 +25,7 @@ from app.api.datasets import get_dataset
 from app.api.digital_contracts import get_digital_contract
 from app.data import operations as data_service
 from app.data import sync_operations as sync_data_service
+from app.utilities.secrets import get_secret
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
@@ -351,20 +351,17 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
             {"$set": jsonable_encoder(secure_computation_node_db)},
         )
 
-        AZURE_SUBSCRIPTION_ID = "3d2b9951-a0c8-4dc3-8114-2776b047b15c"
-        AZURE_TENANT_ID = "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8"
-        AZURE_CLIENT_ID = "4f909fab-ad4c-4685-b7a9-7ddaae4efb22"
-        AZURE_CLIENT_SECRET = "1YEn1Y.bVTVk-dzm9voTWyf7DrgQF29xL2"
-        OWNER = "fastapi"
-
-        deployment_name = OWNER + str(secure_computation_node_db.id) + "-scn"
+        deployment_name = get_secret("owner") + str(secure_computation_node_db.id) + "-scn"
 
         # Deploy the secure computation node
         account_credentials = azure.authenticate(
-            AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
+            get_secret("azure_client_id"),
+            get_secret("azure_client_secret"),
+            get_secret("azure_tenant_id"),
+            get_secret("azure_subscription_id"),
         )
         deploy_response: azure.DeploymentResponse = azure.deploy_module(
-            account_credentials, deployment_name, "securecomputationnode"
+            account_credentials, deployment_name, "securecomputationnode", "Standard_D4s_v4"
         )
         if deploy_response.status != "Success":
             raise Exception(deploy_response.note)
@@ -441,17 +438,14 @@ def deprovision_virtual_machine(secure_computation_node_db: SecureComputationNod
             {"$set": jsonable_encoder(secure_computation_node_db)},
         )
 
-        AZURE_SUBSCRIPTION_ID = "3d2b9951-a0c8-4dc3-8114-2776b047b15c"
-        AZURE_TENANT_ID = "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8"
-        AZURE_CLIENT_ID = "4f909fab-ad4c-4685-b7a9-7ddaae4efb22"
-        AZURE_CLIENT_SECRET = "1YEn1Y.bVTVk-dzm9voTWyf7DrgQF29xL2"
-        OWNER = "fastapi"
-
         # Delete the virtual machine resource group
-        deployment_name = OWNER + str(secure_computation_node_db.id) + "-scn"
+        deployment_name = get_secret("owner") + str(secure_computation_node_db.id) + "-scn"
 
         account_credentials = azure.authenticate(
-            AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
+            get_secret("azure_client_id"),
+            get_secret("azure_client_secret"),
+            get_secret("azure_tenant_id"),
+            get_secret("azure_subscription_id"),
         )
 
         delete_response = azure.delete_resouce_group(account_credentials, deployment_name)

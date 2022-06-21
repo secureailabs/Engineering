@@ -12,7 +12,9 @@ remoteDataConnector: SharedCommonCode
 package_apiservices: SharedCommonCode package_securecomputationnode
 	@cp AzureDeploymentTemplates/ArmTemplates/securecomputationnode.json ApiServices
 	@cp Binary/SecureComputationNode.tar.gz ApiServices
-	@tar --exclude='ApiServices/dev_env2' -czvf Binary/apiservices.tar.gz ApiServices
+	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
+	@rm ApiServices/SecureComputationNode.tar.gz
+	@rm ApiServices/securecomputationnode.json
 
 orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all

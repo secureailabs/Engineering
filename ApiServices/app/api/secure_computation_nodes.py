@@ -101,7 +101,7 @@ async def register_secure_computation_node(
             researcher_user_id=current_user.id,
             state=SecureComputationNodeState.REQUESTED,
             researcher_id=current_user.organization_id,
-            data_owner_id=dataset_db.organization.id
+            data_owner_id=dataset_db.organization.id,
         )
         await data_service.insert_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE, jsonable_encoder(secure_computation_node_db)
@@ -350,8 +350,8 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
             {"_id": str(secure_computation_node_db.id)},
             {"$set": jsonable_encoder(secure_computation_node_db)},
         )
-
-        deployment_name = get_secret("owner") + str(secure_computation_node_db.id) + "-scn"
+        owner = get_secret("owner")
+        deployment_name = f"{owner}-{str(secure_computation_node_db.id)}-scn"
 
         # Deploy the secure computation node
         account_credentials = azure.authenticate(
@@ -439,7 +439,8 @@ def deprovision_virtual_machine(secure_computation_node_db: SecureComputationNod
         )
 
         # Delete the virtual machine resource group
-        deployment_name = get_secret("owner") + str(secure_computation_node_db.id) + "-scn"
+        owner = get_secret("owner")
+        deployment_name = f"{owner}-{str(secure_computation_node_db.id)}-scn"
 
         account_credentials = azure.authenticate(
             get_secret("azure_client_id"),

@@ -39,7 +39,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def get_password_hash(salt, password):
-    return pwd_context.hash(salt + password + get_secret("password_pepper"))
+    password_pepper = get_secret("password_pepper")
+    return pwd_context.hash(f"{salt}{password}{password_pepper}")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -88,8 +89,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         raise exception_authentication_failed
 
     found_user_db = User_Db(**found_user)
+    password_pepper = get_secret("password_pepper")
     if not pwd_context.verify(
-        found_user_db.email + form_data.password + get_secret("password_pepper"), found_user_db.hashed_password
+        f"{found_user_db.email}{form_data.password}{password_pepper}", found_user_db.hashed_password
     ):
         raise exception_authentication_failed
 

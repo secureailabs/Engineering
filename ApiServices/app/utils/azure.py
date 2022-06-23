@@ -13,8 +13,8 @@
 # -------------------------------------------------------------------------------
 import json
 import os
-from ipaddress import ip_address
 
+from app.utils.secrets import get_secret
 from pydantic import BaseModel, Field, StrictStr
 
 from azure.core.exceptions import AzureError
@@ -95,7 +95,7 @@ def get_ip(accountCredentials, resource_group_name, ip_resource_name):
     return foo.ip_address
 
 
-def deploy_module(account_credentials, deployment_name, module_name) -> DeploymentResponse:
+def deploy_module(account_credentials, deployment_name, module_name, vm_size) -> DeploymentResponse:
     """Deploy the template to a resource group."""
     try:
         print("Deploying module: ", module_name)
@@ -113,13 +113,12 @@ def deploy_module(account_credentials, deployment_name, module_name) -> Deployme
 
         parameters = {
             "vmName": module_name,
-            "vmSize": "Standard_D4s_v4",
-            "vmImageResourceId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/NginxImageStorageRg/providers/Microsoft.Compute/images/"
-            + module_name,
-            "adminUserName": "sailuser",
-            "adminPassword": "SailPassword@123",
-            "subnetName": "PlatformService_eastus",
-            "virtualNetworkId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
+            "vmSize": vm_size,
+            "vmImageResourceId": get_secret("azure_scn_image_id") + module_name,
+            "adminUserName": get_secret("azure_scn_user_name"),
+            "adminPassword": get_secret("azure_scn_password"),
+            "subnetName": get_secret("azure_scn_subnet_name"),
+            "virtualNetworkId": get_secret("azure_scn_virtual_network_id"),
         }
         deploy_status = deploy_template(account_credentials, resource_group_name, template, parameters)
         print(module_name + " server status: ", deploy_status)

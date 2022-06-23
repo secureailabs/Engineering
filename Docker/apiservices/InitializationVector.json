@@ -1,0 +1,17 @@
+{
+    "jwt_secret": "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7",
+    "refresh_secret": "52bb444a1aabb9a76792527e6605349e1cbc7fafb8624de4e0ddde4f84ad4066",
+    "password_pepper": "06ac6368872b368a8c67e41c1a8faa46e8471818cdbb442345fbb2205b9fc225",
+    "sail_email": "no-reply@secureailabs.com",
+    "sail_password": "password",
+    "azure_subscription_id":"3d2b9951-a0c8-4dc3-8114-2776b047b15c",
+    "azure_tenant_id": "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8",
+    "azure_client_id": "4f909fab-ad4c-4685-b7a9-7ddaae4efb22",
+    "azure_client_secret": "1YEn1Y.bVTVk-dzm9voTWyf7DrgQF29xL2",
+    "azure_scn_image_id": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/InitializerImageStorageRg/providers/Microsoft.Compute/images/",
+    "azure_scn_user_name": "sailuser",
+    "azure_scn_password": "SailPassword@123",
+    "azure_scn_subnet_name": "PlatformService_eastus",
+    "azure_scn_virtual_network_id": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
+    "owner": "default"
+}

@@ -59,10 +59,9 @@ def deploy_apiservices(account_credentials, deployment_name, owner):
     apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices")
 
     # Read backend json from file
-    # with open("apiservices.json", "r") as backend_json_fd:
-    #     backend_json = json.load(backend_json_fd)
-    backend_json = {}
-    backend_json["Owner"] = owner
+    with open("apiservices.json", "r") as backend_json_fd:
+        backend_json = json.load(backend_json_fd)
+    backend_json["owner"] = owner
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)

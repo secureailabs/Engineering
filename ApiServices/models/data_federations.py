@@ -80,20 +80,9 @@ class InviteState(Enum):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     REJECTED = "REJECTED"
-    EXPIRED = "EXPIRED"
-    DELETED = "DELETED"
-
-
-class DataFederationResearcherInvite(SailBaseModel):
-    data_federation_id: PyObjectId
-
-
-class DataFederationDataSubmitterInvite(SailBaseModel):
-    data_federation_id: PyObjectId
 
 
 class Invite_Base(SailBaseModel):
-    # description: Union[DataFederationResearcherInvite, DataFederationDataSubmitterInvite] = Field(...)
     data_federation_id: PyObjectId
     invitee_organization_id: PyObjectId = Field(...)
     inviter_user_id: PyObjectId = Field(...)

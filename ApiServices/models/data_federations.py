@@ -38,7 +38,8 @@ class DataFederation_Db(DataFederation_Base):
     data_submitter_organizations_id: List[PyObjectId] = Field(default_factory=list)
     research_organizations_id: List[PyObjectId] = Field(default_factory=list)
     dataset_families_id: List[PyObjectId] = Field(default_factory=list)
-    invites_id: List[PyObjectId] = Field(default_factory=list)
+    data_submitter_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
+    research_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
 
 
 class RegisterDataFederation_In(DataFederation_Base):
@@ -62,8 +63,73 @@ class GetDataFederation_Out(DataFederation_Base):
     data_submitter_organizations: List[BasicObjectInfo] = Field(...)
     research_organizations: List[BasicObjectInfo] = Field(...)
     dataset_families: List[BasicObjectInfo] = Field(...)
-    invites: List[PyObjectId] = Field(...)
+    data_submitter_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
+    research_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
 
 
 class GetMultipleDataFederation_Out(SailBaseModel):
     data_federations: List[GetDataFederation_Out] = Field(default_factory=list)
+
+
+class InviteType(Enum):
+    DF_RESEARCHER = "DF_RESEARCHER"
+    DF_SUBMITTER = "DF_SUBMITTER"
+
+
+class InviteState(Enum):
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    EXPIRED = "EXPIRED"
+    DELETED = "DELETED"
+
+
+class DataFederationResearcherInvite(SailBaseModel):
+    data_federation_id: PyObjectId
+
+
+class DataFederationDataSubmitterInvite(SailBaseModel):
+    data_federation_id: PyObjectId
+
+
+class Invite_Base(SailBaseModel):
+    # description: Union[DataFederationResearcherInvite, DataFederationDataSubmitterInvite] = Field(...)
+    data_federation_id: PyObjectId
+    invitee_organization_id: PyObjectId = Field(...)
+    inviter_user_id: PyObjectId = Field(...)
+    inviter_organization_id: PyObjectId = Field(...)
+    type: InviteType = Field(...)
+
+
+class Invite_Db(Invite_Base):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    created_time: datetime = Field(default_factory=datetime.utcnow)
+    expiry_time: datetime = Field(...)
+    state: InviteState = Field(...)
+
+
+class RegisterInvite_In(Invite_Base):
+    pass
+
+
+class RegisterInvite_Out(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+
+
+class PatchInvite_In(SailBaseModel):
+    state: InviteState = Field(...)
+
+
+class GetInvite_Out(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+    data_federation: BasicObjectInfo = Field(...)
+    inviter_user: BasicObjectInfo = Field(...)
+    inviter_organization: BasicObjectInfo = Field(...)
+    state: InviteState = Field(...)
+    created_time: datetime = Field(...)
+    expiry_time: datetime = Field(...)
+    type: InviteType = Field(...)
+
+
+class GetMultipleInvite_Out(SailBaseModel):
+    invites: List[GetInvite_Out] = Field(...)

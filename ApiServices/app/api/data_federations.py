@@ -56,7 +56,7 @@ def getEmailInviteContent(data_federation: str, inviter_organization: str) -> st
             <head></head>
             <body>
                 Hello, <br><br> <br>Hi, You are invited to be part of data federation {data_federation} by {inviter_organization}. Kindly visit:
-                    <a href = "http://www.secureailabs.com">http://www.secureailabs.com/invites</a> to responsd to the invitation.
+                    <a href = "http://www.secureailabs.com">http://www.secureailabs.com/invites</a> to respond to the invitation.
             </body>
         </html>
     """

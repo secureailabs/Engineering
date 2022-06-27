@@ -12,17 +12,14 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
-from pydantic import EmailStr, Field, SecretStr, StrictStr
+from typing import List
+
+from pydantic import EmailStr, Field, StrictStr
 
 from models.common import SailBaseModel
 
 
-class SenderCredentials(SailBaseModel):
-    email: EmailStr = Field(...)
-    password: SecretStr = Field(...)
-
-
 class EmailRequest(SailBaseModel):
-    to: EmailStr = Field(...)
+    to: List[EmailStr] = Field(...)
     subject: StrictStr = Field(...)
     body: StrictStr = Field(...)

@@ -51,7 +51,8 @@ router = APIRouter()
 
 
 def getEmailInviteContent(data_federation: str, inviter_organization: str) -> str:
-    """Generate the body of the email invite
+    """
+    Generate the body of the email invite
 
     :param data_federation: the name of the data federation
     :type data_federation: str
@@ -285,7 +286,8 @@ async def invite_researcher(
     researcher_organization_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
 ):
-    """Invite a researcher to join a data federation
+    """
+    Invite a researcher to join a data federation
 
     :param background_tasks: FastAPI will create the object of type BackgroundTasks and pass it as that parameter
     :type background_tasks: BackgroundTasks
@@ -401,7 +403,8 @@ async def soft_delete_data_federation(
 
 ########################################################################################################################
 async def register_invite(invite_req: RegisterInvite_In):
-    """_summary_
+    """
+    Registe and invite to database
 
     :param invite_req: the information about the invite
     :type invite_req: RegisterInvite_In
@@ -432,7 +435,8 @@ async def register_invite(invite_req: RegisterInvite_In):
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
 )
 async def get_all_invites(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
-    """Get list of all the pending invites received. Only ADMIN roles have access.
+    """
+    Get list of all the pending invites received. Only ADMIN roles have access.
 
     :param organization_id: organization for which invites are listed
     :type organization_id: PyObjectId
@@ -487,7 +491,8 @@ async def get_all_invites(organization_id: PyObjectId, current_user: TokenData =
 async def get_invite(
     organization_id: PyObjectId, invite_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
 ):
-    """Get the information about an invite
+    """
+    Get the information about an invite
 
     :param organization_id: organization for which the invites are listed
     :type organization_id: PyObjectId
@@ -543,7 +548,8 @@ async def accept_or_reject_invite(
     updated_invite: PatchInvite_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ):
-    """Accept or reject an invite
+    """
+    Accept or reject an invite
 
     :param organization_id: id of the invited organization
     :type organization_id: PyObjectId
@@ -616,7 +622,8 @@ async def accept_or_reject_invite(
 
 ########################################################################################################################
 def send_invite_email(subject: str, email_body: str, emails: List[EmailStr]):
-    """Background task to send emails using the email plugin
+    """
+    Background task to send emails using the email plugin
 
     :param subject: Email subject
     :type subject: str

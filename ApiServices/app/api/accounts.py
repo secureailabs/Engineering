@@ -295,7 +295,8 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
 
 ########################################################################################################################
 async def get_all_admins(organization_id: PyObjectId) -> GetMultipleUsers_Out:
-    """Private internal call to get all the admins of an organization
+    """
+    Private internal call to get all the admins of an organization
 
     :param organization_id: organization for which admins are requested
     :type organization_id: PyObjectId

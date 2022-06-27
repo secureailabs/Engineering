@@ -295,6 +295,16 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
 
 ########################################################################################################################
 async def get_all_admins(organization_id: PyObjectId) -> GetMultipleUsers_Out:
+    """Private internal call to get all the admins of an organization
+
+    :param organization_id: organization for which admins are requested
+    :type organization_id: PyObjectId
+    :raises HTTPException: HTTP_404_NOT_FOUND, "User organization not found"
+    :raises HTTPException: HTTP_404_NOT_FOUND, "Organization admins not found"
+    :raises exception: 500, internal server error
+    :return: list of admins of the organizations
+    :rtype: GetMultipleUsers_Out
+    """
     try:
         # Get the organization information
         organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})

@@ -51,6 +51,15 @@ router = APIRouter()
 
 
 def getEmailInviteContent(data_federation: str, inviter_organization: str) -> str:
+    """Generate the body of the email invite
+
+    :param data_federation: the name of the data federation
+    :type data_federation: str
+    :param inviter_organization: the name of the inviter organization
+    :type inviter_organization: str
+    :return: HTML body of the email
+    :rtype: str
+    """
     htmlText = f"""
         <html>
             <head></head>
@@ -276,6 +285,22 @@ async def invite_researcher(
     researcher_organization_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """Invite a researcher to join a data federation
+
+    :param background_tasks: FastAPI will create the object of type BackgroundTasks and pass it as that parameter
+    :type background_tasks: BackgroundTasks
+    :param data_federation_id: data federation for which the invitation is being made
+    :type data_federation_id: PyObjectId
+    :param researcher_organization_id: the researcher organization that is being invited
+    :type researcher_organization_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises exception: should be 500, internal server error
+    :return: None
+    :rtype: None
+    """
     try:
         # Only data federation owner can invite invite other organizations
         data_federation_db = await data_service.find_one(
@@ -376,6 +401,13 @@ async def soft_delete_data_federation(
 
 ########################################################################################################################
 async def register_invite(invite_req: RegisterInvite_In):
+    """_summary_
+
+    :param invite_req: the information about the invite
+    :type invite_req: RegisterInvite_In
+    :return: information about the invite
+    :rtype: RegisterInvite_Out
+    """
     try:
         # Add the invite to the database
         invite_db = Invite_Db(**invite_req.dict(), state=InviteState.PENDING, expiry_time=datetime.utcnow())
@@ -400,6 +432,17 @@ async def register_invite(invite_req: RegisterInvite_In):
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
 )
 async def get_all_invites(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+    """Get list of all the pending invites received. Only ADMIN roles have access.
+
+    :param organization_id: organization for which invites are listed
+    :type organization_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, Unauthorised
+    :raises exception: 500, internal server error
+    :return: a list of pending invites
+    :rtype: GetMultipleInvite_Out
+    """
     try:
         if organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
@@ -444,6 +487,20 @@ async def get_all_invites(organization_id: PyObjectId, current_user: TokenData =
 async def get_invite(
     organization_id: PyObjectId, invite_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
 ):
+    """Get the information about an invite
+
+    :param organization_id: organization for which the invites are listed
+    :type organization_id: PyObjectId
+    :param invite_id: invite id
+    :type invite_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises HTTPException: HTTP_404_NOT_FOUND, "Invite not found"
+    :raises exception: 500, internal server error
+    :return: the invite information
+    :rtype: GetInvite_Out
+    """
     try:
         if organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
@@ -486,6 +543,22 @@ async def accept_or_reject_invite(
     updated_invite: PatchInvite_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ):
+    """Accept or reject an invite
+
+    :param organization_id: id of the invited organization
+    :type organization_id: PyObjectId
+    :param invite_id: invite id
+    :type invite_id: PyObjectId
+    :param updated_invite: the update information, defaults to Body(...)
+    :type updated_invite: PatchInvite_In, optional
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises HTTPException: HTTP_404_NOT_FOUND, "Invite not found"
+    :raises exception: 500, internal server error
+    :return: status_code=status.HTTP_204_NO_CONTENT
+    :rtype: Response
+    """
     try:
         if organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
@@ -543,5 +616,14 @@ async def accept_or_reject_invite(
 
 ########################################################################################################################
 def send_invite_email(subject: str, email_body: str, emails: List[EmailStr]):
+    """Background task to send emails using the email plugin
+
+    :param subject: Email subject
+    :type subject: str
+    :param email_body: body of email
+    :type email_body: str
+    :param emails: list of email id to send email to
+    :type emails: List[EmailStr]
+    """
     email_req = EmailRequest(to=emails, subject=subject, body=email_body)
     send_email(email_req)

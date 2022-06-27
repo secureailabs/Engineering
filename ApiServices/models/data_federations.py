@@ -92,7 +92,7 @@ class Invite_Base(SailBaseModel):
 
 class Invite_Db(Invite_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    created_time: datetime = Field(default_factory=datetime.utcnow)
+    created_time: datetime = Field(...)
     expiry_time: datetime = Field(...)
     state: InviteState = Field(...)
 

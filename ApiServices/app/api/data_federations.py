@@ -11,7 +11,7 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 from app.api.accounts import get_all_admins, get_organization, get_user
@@ -413,7 +413,12 @@ async def register_invite(invite_req: RegisterInvite_In):
     """
     try:
         # Add the invite to the database
-        invite_db = Invite_Db(**invite_req.dict(), state=InviteState.PENDING, expiry_time=datetime.utcnow())
+        created_time = datetime.utcnow()
+        # The default expiry time of an invite is 10 days.
+        expiry_time = created_time + timedelta(days=10)
+        invite_db = Invite_Db(
+            **invite_req.dict(), state=InviteState.PENDING, created_time=created_time, expiry_time=expiry_time
+        )
         await data_service.insert_one(DB_COLLECTION_INVITES, jsonable_encoder(invite_db))
 
         return RegisterInvite_Out(**invite_db.dict())
@@ -573,6 +578,10 @@ async def accept_or_reject_invite(
         if not invite:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
         invite = Invite_Db(**invite)
+
+        # Invite should not have expired.
+        if invite.expiry_time < datetime.utcnow():
+            raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invite expired")
 
         # Can only be accepeted or rejected by invitee organization
         if invite.invitee_organization_id != current_user.organization_id:

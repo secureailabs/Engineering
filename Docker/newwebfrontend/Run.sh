@@ -29,7 +29,7 @@ cp vm_initializer.py "$imageName"_dir/
 # Run the docker container
 docker run \
 -dit \
--p 3000:3000 \
+-p 443:443 \
 -p 9090:9091 \
 -v $(pwd)/"$imageName"_dir:/app \
 -v $(pwd)/certs:/etc/nginx/certs \

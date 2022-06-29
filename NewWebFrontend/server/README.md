@@ -29,7 +29,7 @@ The Express server (proxy-request middleware) will proxy every request from http
 
 - _You have to specify all the parameters you would normally include in a request to the REST Portal except the Eosb/IEosb_
 - _It only accepts json parameters_
-- _The server listens on port 3000_
+- _The server listens on port 443_
 - _Only account-related endpoints have been tested_
 
 ## Eosb Management

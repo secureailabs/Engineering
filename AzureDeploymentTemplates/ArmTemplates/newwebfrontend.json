@@ -97,9 +97,9 @@
       "properties": {
         "securityRules": [
           {
-            "name": "InboundAllow_9090_3000",
+            "name": "InboundAllow_9090_443",
             "properties": {
-              "description": "9090 for bootstrap tool\n3000 for webfrontend",
+              "description": "9090 for bootstrap tool\n443 for webfrontend",
               "protocol": "TCP",
               "sourcePortRange": "*",
               "sourceAddressPrefix": "*",
@@ -110,7 +110,7 @@
               "sourcePortRanges": [],
               "destinationPortRanges": [
                 "9090",
-                "3000"
+                "443"
               ],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []

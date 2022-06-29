@@ -23,7 +23,7 @@
   #ENV variables
   The following env variables need to be applied:
   client:
-- VITE_PUBLIC_API_URL: <server api_url ex: http://localhost:3000>
+- VITE_PUBLIC_API_URL: <server api_url ex: http://localhost:443>
   server:
 - SAIL_API=<sail API ex: https://52.150.26.47:6200>
 - CLIENT=<for security reasons, we only want to allow connections from a specific

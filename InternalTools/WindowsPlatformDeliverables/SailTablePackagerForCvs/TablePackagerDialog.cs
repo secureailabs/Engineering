@@ -60,11 +60,12 @@ namespace SailTablePackagerForCsv
                 do
                 {
                     dialogResult = m_SaveFileDialog.ShowDialog();
-                    // Update the m_TableProperties structure with the destination file
-                    m_TableProperties.SetTableProperty("DestinationIntermediateFile", m_SaveFileDialog.FileName);
-                    tableProperties = m_TableProperties.GetTableProperties();
                 }
                 while (DialogResult.OK != dialogResult);
+
+                // Update the m_TableProperties structure with the destination file
+                m_TableProperties.SetTableProperty("DestinationIntermediateFile", m_SaveFileDialog.FileName);
+                tableProperties = m_TableProperties.GetTableProperties();
             }
             // By now, regardless of whether or not the save file dialog was displayed, we should
             // have a value "DestinationIntermediateFile" table property. If not, exit.

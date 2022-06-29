@@ -313,7 +313,7 @@ async def invite_researcher(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
         data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # If the organization is already part of the data federation, then return 200 OK
+        # If the organization is already part of the data federation, then return 204 OK
         if researcher_organization_id in data_federation_db.research_organizations_id:
             return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -400,7 +400,7 @@ async def invite_data_submitter(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
         data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # If the organization is already part of the data federation, then return 200 OK
+        # If the organization is already part of the data federation, then return 204 OK
         if data_submitter_organization_id in data_federation_db.data_submitter_organizations_id:
             return Response(status_code=status.HTTP_204_NO_CONTENT)
 

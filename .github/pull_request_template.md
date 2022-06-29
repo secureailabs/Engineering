@@ -2,12 +2,12 @@
 
 [  ] Make all ran Successfully?
 [  ] CI-WindowsPlatformDeliverables.bat ran Successfully?
-[  ] Deployed Dataservice Docker Successfully?
-[  ] Deployed PlatformService Docker Successfully?
-[  ] Loaded Database Successfully?
-[  ] Deployed FrontEnd Docker Successfully?
+[  ] Deployed Apiservices Docker Successfully?
+[  ] Database Initializer Successfully ran with `allsteps`
+[  ] Deployed NewWebFrontend Docker Successfully?
 [  ] Deployed Orchestrator Docker Successfully?
 [  ] Deployed SCN Docker Successfully
+
 
 ### Engineer Checklist
 

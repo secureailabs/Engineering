@@ -116,12 +116,14 @@ async def get_all_organizations(current_user: TokenData = Depends(get_current_us
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
 )
-async def get_organization(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+async def get_organization(
+    organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+) -> GetOrganizations_Out:
     try:
         organization = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
         if not organization:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
-        return organization
+        return GetOrganizations_Out(**organization)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
@@ -292,6 +294,45 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
 
 
 ########################################################################################################################
+async def get_all_admins(organization_id: PyObjectId) -> GetMultipleUsers_Out:
+    """
+    Private internal call to get all the admins of an organization
+
+    :param organization_id: organization for which admins are requested
+    :type organization_id: PyObjectId
+    :raises HTTPException: HTTP_404_NOT_FOUND, "User organization not found"
+    :raises HTTPException: HTTP_404_NOT_FOUND, "Organization admins not found"
+    :raises exception: 500, internal server error
+    :return: list of admins of the organizations
+    :rtype: GetMultipleUsers_Out
+    """
+    try:
+        # Get the organization information
+        organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
+        if not organization_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User organization not found")
+        organization_db = Organization_db(**organization_db)
+
+        users = await data_service.find_by_query(
+            DB_COLLECTION_USERS, {"organization_id": str(organization_id), "role": "ADMIN"}
+        )
+        if not users:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization admins not found")
+
+        # Add organization to each element in the list
+        for user in users:
+            user["organization"] = organization_db
+            # Remove the organization_id field
+            user.pop("organization_id")
+
+        return GetMultipleUsers_Out(users=users)
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+########################################################################################################################
 @router.get(
     path="/organizations/{organization_id}/users/{user_id}",
     description="Get information about a user",
@@ -299,15 +340,12 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN, UserRole.SAIL_ADMIN]))],
 )
 async def get_user(
     organization_id: PyObjectId, user_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
 ):
     try:
-        # User must be part of same organization
-        if organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
-
         # Check if the user exists
         user_db = await data_service.find_one(
             DB_COLLECTION_USERS, {"_id": str(user_id), "organization_id": str(organization_id)}

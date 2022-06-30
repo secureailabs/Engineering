@@ -77,6 +77,7 @@ cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
+    make -C $rootDir orchestrator -s -j
     cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail
     runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator/sail:/app -v $rootDir/EndPointTools/SafeObjectTools/SafeObjects:/SafeObjects $imageName"
 elif [ "devopsconsole" == "$imageName" ]; then

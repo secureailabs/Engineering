@@ -10,7 +10,6 @@ PYTHONINC = /usr/include/python3.8
 INCLUDE += -isystem$(PYTHONINC)
 
 INCLUDE+=-I$(shell realpath ./Include)
-INCLUDE+=-I$(shell realpath ../../WebService/SharedCommonCode/Include)
 INCLUDE+=-I$(shell realpath ../../VirtualMachine/SharedComponents/Include)
 
 # Add the new source directory here

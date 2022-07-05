@@ -181,4 +181,4 @@ const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
 
 export default VirtualMachineSuccess;
 
-export {}
+export { }

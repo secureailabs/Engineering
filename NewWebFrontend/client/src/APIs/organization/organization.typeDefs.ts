@@ -1,32 +1,16 @@
-export type TPutOrganizationStart = {
-  OrganizationGuid: string;
-  OrganizationInformation: {
-    OrganizationName: string;
-    OrganizationAddress: string;
-    PrimaryContactName: string;
-    PrimaryContactTitle: string;
-    PrimaryContactEmail: string;
-    PrimaryContactPhoneNumber: string;
-    SecondaryContactName: string;
-    SecondaryContactTitle: string;
-    SecondaryContactEmail: string;
-    SecondaryContactPhoneNumber: string;
-  };
-};
-
-export type TPutOrganizationSuccess = null;
-
 export type TGetOrganizationSuccess = {
-  OrganizationName: string;
-  OrganizationAddress: string;
-  PrimaryContactName: string;
-  PrimaryContactTitle: string;
-  PrimaryContactEmail: string;
-  PrimaryContactPhoneNumber: string;
-  SecondaryContactName: string;
-  SecondaryContactTitle: string;
-  SecondaryContactEmail: string;
-  SecondaryContactPhoneNumber: string;
+  name: string;
+  description: string;
+  avatar: string | any; // Should be string only in prod
+  id: string;
 };
 
-export type TGetOrganizationStart = null;
+export type TGetOrganizationStart = {
+  organization_id: string;
+};
+
+export type TGetAllOrganizationsSuccess = {
+  organizations: Array<TGetOrganizationStart>
+}
+
+export type TGetAllOrganizationsStart = null

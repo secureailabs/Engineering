@@ -53,8 +53,6 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
     []
   );
 
-  const [modalIsOpen, setIsOpen] = React.useState(false);
-
   return (
     <div>
       <StandardContent title={getDatasetData?.name}>
@@ -80,10 +78,21 @@ const DatasetSuccess: React.FC<TDatasetSuccessProps> = ({ getDatasetData }) => {
       </StandardContent>
       <StandardContent title={getDatasetData?.name}>
         <Table
-          base_url={`/dashboard/datasets/${getDatasetData?.id}`}
-          id_accessor="key"
+          // base_url={`/dashboard/datasets/${getDatasetData?.id}`}
+          // id_accessor="key"
           columns={columns}
-          data={[]}
+          data={[{
+            version: '1.0', publish_date: new Date(
+              getDatasetData?.publish_date * 1000
+            ).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            }),
+            NumberOfPatients: 400,
+            Comments: 'Initial datastet with patient data from January 1995 to January 2022.'
+          },
+]}
         />
       </StandardContent>
     </div>

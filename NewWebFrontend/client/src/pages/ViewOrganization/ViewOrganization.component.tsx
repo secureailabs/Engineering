@@ -1,53 +1,58 @@
-import React from 'react';
-import _ from 'lodash';
+import { TViewOrganizationProps } from './ViewOrganization.types';
+
+import ViewOrganizationSuccess from './ViewOrganization.success';
+import ViewOrganizationFailure from './ViewOrganization.failure';
+
+import axios, { AxiosError } from 'axios';
+
 import { useParams } from 'react-router';
 
+import Spinner from '@components/Spinner/SpinnerOnly.component';
+import StandardContent from '@secureailabs/web-ui/components/StandardContent';
+import demo_data from '@APIs/organization/organization.data';
+import { TGetOrganizationSuccess } from '@APIs/organization/organization.typeDefs';
+
+import { axiosProxy } from '@APIs/utils';
 import { useQuery } from 'react-query';
 
-import StandardContent from '@secureailabs/web-ui/components/StandardContent';
+const mode = localStorage.getItem("mode")
 
-import OrganizationData from "./Organization.data";
+const ViewOrganization: React.FC<TViewOrganizationProps> = () => {
+  const { id } = useParams();
 
-import Card from "@secureailabs/web-ui/components/Card";
-import Text from "@secureailabs/web-ui/components/Text";
 
-import Avatar from 'react-avatar';
+  const fetch = (): TGetOrganizationSuccess => {
+    //@ts-nocheck
+    // if(mode == "demo"){
+    console.log(demo_data)
+    // @ts-ignore
+    return demo_data.organizations[parseInt(id?.slice(-1) - 1 || '0')]
+    // }
+  //   const res = axios.get<TGetViewOrganizationSuccess>
+  //   (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+  //   {
+  //     withCredentials: true,
+  //   });
+  //   return res.data.ViewOrganization;
+  }
 
-const ViewOrganization: React.FC = () => {
-    const {id} = useParams();
-    const { data, isLoading } = useQuery(['organization', {id}], 
-    () =>  _.find(OrganizationData, { OrganizationID: id })
-    );
-    if(isLoading){
-        return <p>Loading...</p>
-    }
-    if(data === undefined){
-        return (
-            <StandardContent title="Organization">
-                <Text>This organization does not exist</Text>
-            </StandardContent>
-        )
-    }
+  const { data, isLoading, status, error } =
+    useQuery<TGetOrganizationSuccess, AxiosError>(['organization'], () => fetch());
+
+
+  if (isLoading) {
+    return <><Spinner /></>
+  }
+  if (status === 'success' && data) {
     return (
-        <StandardContent title="Organization">
-            <Card primaryText={data?.OrganizationName || ""}>
-                <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "max-content 1fr",
-                    columnGap: "15px"
-                }}>
-                {data.Logo ? <img style={{
-                    width: "150px",
-                    height: "150px",
-                    borderRadius: "5px",
-                    objectFit: "cover"
-
-                }} src={data.Logo} /> : <Avatar name={data.OrganizationName} />}
-                <Text>{data.OrganizationDescription}</Text>
-                </div>
-            </Card>
-        </StandardContent>
+      <StandardContent title="Organization">
+        <ViewOrganizationSuccess
+          getOrganizationData={data}
+        />
+      </StandardContent>
     )
-}
+  }
+  return <ViewOrganizationFailure error={error} />
 
+};
 export default ViewOrganization;

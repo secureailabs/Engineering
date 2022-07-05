@@ -9,12 +9,13 @@ import Dataset from '@pages/Datasets/Dataset';
 import SettingsPage from '@pages/Settings';
 import Organization from '@pages/Organization';
 import UnderConstruction from '@pages/UnderConstruction';
-import VirtualMachines from '@pages/VirtualMachines/VirtualMachines';
-import VirtualMachine from '@pages/VirtualMachines/VirtualMachine';
+import VirtualMachines from '@pages/VirtualMachines';
 import UnifiedRegistries from '@pages/UnifiedRegistries/UnifiedRegistries';
 import UnifiedRegistry from '@pages/UnifiedRegistries/UnifiedRegistry';
 import CustomizableDashboard from '@components/CustomizableDashboard';
+// import ViewOrganization from '@pages/ViewOrganizationOld';
 import ViewOrganization from '@pages/ViewOrganization';
+
 
 const DashboardRouter: React.FC = (): React.ReactElement => (
   <Routes>
@@ -42,6 +43,7 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
         path="/organizations/:id"
         element={
           <ProtectedRoute redirect="/login">
+            {/* @ts-ignore */}
             <ViewOrganization />
           </ProtectedRoute>
         }
@@ -78,14 +80,6 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       element={
         <ProtectedRoute redirect="/login">
           <VirtualMachines />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/virtual-machines/:id"
-      element={
-        <ProtectedRoute redirect="/login">
-          <VirtualMachine />
         </ProtectedRoute>
       }
     />

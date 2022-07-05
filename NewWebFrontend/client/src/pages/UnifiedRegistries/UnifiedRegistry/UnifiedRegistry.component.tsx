@@ -41,7 +41,7 @@ const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
   }
 
   const { data, isLoading, status, error } =
-    useQuery<TGetUnifiedRegistrySuccess['UnifiedRegistry'], AxiosError>(['unified', id], () => fetch());
+    useQuery<TGetUnifiedRegistrySuccess['UnifiedRegistry'], AxiosError>(['unified'], () => fetch());
 
 
   if (isLoading) {

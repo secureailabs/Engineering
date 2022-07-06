@@ -96,7 +96,7 @@ def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
         "ApiServicesUrl": "https://" + platform_services_ip + ":8000",
-        "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":3000",
+        "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":443",
     }
 
     with open("newwebfrontend.json", "w") as outfile:
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     print("Frontend server: ", frontend_ip)
 
     print("\n\n===============================================================")
-    print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip + ":3000")
+    print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip)
     print("SAIL API Services is hosted on: https://" + platform_services_ip + ":8000")
 
     print("Deployment ID: ", deployment_id)

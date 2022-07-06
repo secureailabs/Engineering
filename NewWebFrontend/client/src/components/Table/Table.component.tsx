@@ -10,6 +10,7 @@ const Table: React.FC<TTable> = ({
   columns,
   id_accessor,
   base_url,
+  show_head = true,
 }) => {
   const navigate = useNavigate();
   const {
@@ -29,7 +30,7 @@ const Table: React.FC<TTable> = ({
 
   return (
     <table className="table" {...getTableProps()}>
-      <thead>
+      {show_head && <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
@@ -51,7 +52,7 @@ const Table: React.FC<TTable> = ({
             ))}
           </tr>
         ))}
-      </thead>
+      </thead>}
       <tbody {...getTableBodyProps()}>
         {rows.map((row: any, i) => {
           prepareRow(row);
@@ -59,12 +60,14 @@ const Table: React.FC<TTable> = ({
             <tr
               {...row.getRowProps()}
               onClick={() => {
-                navigate(`${base_url}/${row.original[id_accessor]}`);
+                if (base_url && id_accessor) {
+                  navigate(`${base_url}/${row.original[id_accessor]}`);
+                }
               }}
             >
               {row.cells.map((cell: any) => {
                 return (
-                  <td {...cell.getCellProps()} onClick={() => {}}>
+                  <td {...cell.getCellProps()} onClick={() => { }}>
                     <Text fontSize="12px" fontWeight={500}>
                       {cell.render('Cell')}
                     </Text>

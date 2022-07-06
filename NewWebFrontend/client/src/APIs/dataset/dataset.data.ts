@@ -186,49 +186,49 @@ const demo_data = {
   datasets: [
     {
       id: 'uuid1',
-      description: 'Patient data derived from internal kidney cancer patient registry. Covers patients admitted 2032 to 2072. Conforms to KCA Consortium Data Model ver 79.1',
-      name: 'IGR Dataset #12',
-      keywords: 'IGR, KCA, kidney, cancer, demo',
-      version: '12',
-      publish_date: 3263393776,
+      description: 'Patient data derived from internal kidney cancer patient registry. Covers patients admitted 1995 to present. Conforms to KCA Consortium Data Model ver 1.0',
+      name: 'KCA Consortium Data - MGH',
+      keywords: 'KCA, kidney, cancer, demo',
+      version: '1',
+      publish_date: 1655492948,
       tables: [
       ],
-      dataset_created_time: '2073-05-30T18:12:38.851Z',
+      dataset_created_time: '2022-06-17T22:06:17.851Z',
       organization: {
         id: 'uuid1',
-        name: 'International Genetics Research Facility'
+        name: 'Kidney Cancer Association'
       },
       state: 'ACTIVE'
     },
     {
       id: 'uuid2',
-      description: 'Patient data derived from internal kidney cancer patient registry. Covers patients admitted 2033 to 2074. Conforms to KCA Consortium Data Model ver 79.2',
-      name: 'IGR Dataset #13',
+      description: 'Patient data from the KCA patient arm.Covers patients registered from May, 2021 to present.Historical longitudinal data may go back several years.Conforms to KCA Consortium Data Model ver 1.0',
+      name: 'KCA Consortium Data - KCA',
       keywords: 'IGR, KCA, kidney, cancer, demo',
-      version: '13',
-      publish_date: 3264393345,
+      version: '1',
+      publish_date: 1645492948,
       tables: [
       ],
-      dataset_created_time: '2073-05-31T18:12:38.851Z',
+      dataset_created_time: '2022-02-22T22:02:22.851Z',
       organization: {
         id: 'uuid1',
-        name: 'International Genetics Research Facility'
+        name: 'Kidney Cancer Association'
       },
       state: 'ACTIVE'
     },
     {
       id: 'uuid3',
-      description: 'Patient data derived from internal kidney cancer patient registry. Covers patients admitted 2045 to 2075. Conforms to KCA Consortium Data Model ver 79.3',
-      name: 'MGR Dataset #3',
-      keywords: 'MGR, KCA, kidney, cancer, demo',
-      version: '3',
-      publish_date: 3266393000,
+      description: 'Patient data derived from internal kidney cancer patient registry. Covers patient data collected from 1980 to present. Conforms to KCA Consortium Data Model ver 1.0',
+      name: 'KCA Consortium Data - CRH',
+      keywords: 'IGR, KCA, kidney, cancer, demo',
+      version: '1',
+      publish_date: 1643492948,
       tables: [
       ],
-      dataset_created_time: '2073-06-01T18:12:38.851Z',
+      dataset_created_time: '2022-01-29T22:01:29.851Z',
       organization: {
-        id: 'uuid2',
-        name: 'Mercy General Hospital'
+        id: 'uuid1',
+        name: 'Kidney Cancer Association'
       },
       state: 'ACTIVE'
     },

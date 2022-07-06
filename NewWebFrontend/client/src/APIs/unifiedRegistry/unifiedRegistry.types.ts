@@ -32,6 +32,11 @@ export type TGetUnifiedRegistrySuccess = {
     CreatedAt: Date;
     UpdateAt: Date;
     Datasets: Record<string, TGetDatasetSuccess>;
+
+    // These types are for demo purposes only, they are not currently implemented in the backend
+    owner_name?: string;
+    owner_org?: string;
+    owner_org_id?: string;
   };
 };
 

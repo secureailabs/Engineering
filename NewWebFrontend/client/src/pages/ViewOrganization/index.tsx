@@ -1,3 +1,3 @@
-import ViewOrganization from "./ViewOrganization.component";
+import ViewOrganizationContainer from './ViewOrganization.component';
 
-export default ViewOrganization;
+export default ViewOrganizationContainer;

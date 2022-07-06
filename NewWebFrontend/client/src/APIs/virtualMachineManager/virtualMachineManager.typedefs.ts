@@ -37,6 +37,16 @@ export type TGetVirtualMachineSuccess = {
     'IN_USE' | 'DELETED' | 'DELETING' | 'DELETE_FAILED';
     detail: string;
     ipaddress: string;
+    
+    // Types added for demo purposes only
+    region?: string;
+    lauched_by?: {
+        user_name: string;
+        user_email: string;
+        org_name: string;
+        org_id: string;
+    }
+    uptime?: string;
 }
 
 export type TGetVirtualMachineStart = {

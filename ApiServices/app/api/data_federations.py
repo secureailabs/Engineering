@@ -313,10 +313,7 @@ async def invite_researcher(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
         data_federation_db = DataFederation_Db(**data_federation_db)
 
-        if data_federation_db.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
-
-        # If the organization is already part of the data federation, then return 200 OK
+        # If the organization is already part of the data federation, then return 204 OK
         if researcher_organization_id in data_federation_db.research_organizations_id:
             return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -345,6 +342,93 @@ async def invite_researcher(
         background_tasks.add_task(
             send_invite_email,
             "SAIL: Invitation to join Data Federation as Researcher",
+            getEmailInviteContent(
+                data_federation=data_federation_db.name, inviter_organization=inviter_organization.name
+            ),
+            admin_user_emails,
+        )
+
+        await data_service.update_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id)},
+            {"$set": jsonable_encoder(data_federation_db)},
+        )
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+########################################################################################################################
+@router.put(
+    path="/data-federations/{data_federation_id}/data-submitter/{data_submitter_organization_id}",
+    description="Invite a data submitter to join a data federation",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def invite_data_submitter(
+    background_tasks: BackgroundTasks,
+    data_federation_id: PyObjectId,
+    data_submitter_organization_id: PyObjectId,
+    current_user: TokenData = Depends(get_current_user),
+):
+    """
+    Invite a data submitter to join a data federation
+
+    :param background_tasks: FastAPI will create the object of type BackgroundTasks and pass it as that parameter
+    :type background_tasks: BackgroundTasks
+    :param data_federation_id: data federation for which the invitation is being made
+    :type data_federation_id: PyObjectId
+    :param data_submitter_organization_id: the data submitter organization that is being invited
+    :type data_submitter_organization_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises exception: should be 500, internal server error
+    :return: None
+    :rtype: None
+    """
+    try:
+        # Only data federation owner can invite invite other organizations
+        data_federation_db = await data_service.find_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+        )
+        if not data_federation_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+        data_federation_db = DataFederation_Db(**data_federation_db)
+
+        # If the organization is already part of the data federation, then return 204 OK
+        if data_submitter_organization_id in data_federation_db.data_submitter_organizations_id:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+        # If the organization is not part of the data federation, add it to the invites list
+        invite_req = RegisterInvite_In(
+            data_federation_id=data_federation_id,
+            inviter_user_id=current_user.id,
+            inviter_organization_id=current_user.organization_id,
+            invitee_organization_id=data_submitter_organization_id,
+            type=InviteType.DF_SUBMITTER,
+        )
+
+        add_invite_response = await register_invite(invite_req=invite_req)
+        data_federation_db.data_submitter_organizations_invites_id.append(add_invite_response.id)
+
+        # Get the current/inviter organization information
+        inviter_organization = await get_organization(current_user.organization_id, current_user)
+
+        # Get list of all the admins of the invited organization
+        admin_users = await get_all_admins(data_submitter_organization_id)
+        admin_user_emails: List[EmailStr] = []
+        for admin in admin_users.users:
+            admin_user_emails.append(admin.email)
+
+        # Create a background process to send the invitation email
+        background_tasks.add_task(
+            send_invite_email,
+            "SAIL: Invitation to join Data Federation as Data Submitter",
             getEmailInviteContent(
                 data_federation=data_federation_db.name, inviter_organization=inviter_organization.name
             ),

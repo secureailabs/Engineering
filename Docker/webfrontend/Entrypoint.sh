@@ -31,13 +31,13 @@ platformServicesUrl=$(cat InitializationVector.json | jq -r '.PlatformServicesUr
 
 # Update the client .env file with the Public IP address of the Virtual Machine
 pushd client
-sed -i "s,https:\/\/127\.0\.0\.1:3000,$vmIpAddress,g" .env
+sed -i "s,https:\/\/127\.0\.0\.1:443,$vmIpAddress,g" .env
 popd
 
 # Update the server .env file with the Public IP address of the SAIL Platform Services
 pushd server
 sed -i "s,https:\/\/backend:6200,$platformServicesUrl,g" .env
-sed -i "s,https:\/\/127\.0\.0\.1:3000,$vmIpAddress,g" .env
+sed -i "s,https:\/\/127\.0\.0\.1:443,$vmIpAddress,g" .env
 popd
 
 # Build and run the frontend application

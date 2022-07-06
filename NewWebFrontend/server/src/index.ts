@@ -12,7 +12,7 @@ const app = express();
 
 app.use(helmet());
 require('dotenv').config();
-const port = 3000;
+const port = 443;
 app.use(cors({ credentials: true, origin: process.env.CLIENT ? process.env.CLIENT : 'http://127.0.0.1:3001' }));
 
 app.use('/api/v1/', apiRoutes);
@@ -43,6 +43,6 @@ if (process.env.NODE_ENV === 'production') {
     .listen(port);
 } else {
   app.listen(port, () => {
-    console.log('server listening on port 3000');
+    console.log('server listening on port 443');
   });
 }

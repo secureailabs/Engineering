@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQueryClient } from 'react-query';
 
 import { IRestrictedRoutesContainer } from './RestrictedRoute.types';

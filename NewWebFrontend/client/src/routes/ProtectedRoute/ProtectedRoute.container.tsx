@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { useQueryClient } from 'react-query';
 import { IProtectedRoutesContainer } from './ProtectedRoute.types';
 import ProtectedRoute from './ProtectedRoute.component';

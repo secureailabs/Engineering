@@ -22,6 +22,7 @@ from models.common import BasicObjectInfo, PyObjectId
 
 router = APIRouter()
 
+
 ########################################################################################################################
 @router.delete(
     path="/database", description="Drop the database", status_code=status.HTTP_204_NO_CONTENT, response_model=None

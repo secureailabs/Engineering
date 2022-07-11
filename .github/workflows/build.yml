@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   # Triggers the workflow on push or pull request events but only for the main branch
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 # Only one concurrent action at a time for group tag.
 concurrency:
@@ -26,10 +26,10 @@ jobs:
       - name: flake8 Lint
         uses: py-actions/flake8@v2
         with:
-          ignore: "E402,E265,F841,F541,E702"
+          ignore: "E402,E265,F841,F541,E702,F401,E501"
           max-line-length: 120
           path: "ApiServices"
-          
+
   start-runner:
     runs-on: ubuntu-latest
     steps:

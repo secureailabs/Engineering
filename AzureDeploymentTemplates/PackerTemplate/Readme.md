@@ -6,6 +6,21 @@ curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 apt-get update && apt-get install -y packer
 ```
+## Install Node Dependencies
+```
+npm install --save-dev senv
+```
+### Decrypt [.env.dev.encrypted]
+Create file `.env.pass`: [GITHUB.env.pass](https://start.1password.com/open/i?a=VDKXP5MBWJAW3F3YRPJNHPGKLM&v=gy4saia7pduzqbp7qhij776a4u&i=kmdczi5wvgpty6kqodhjdjyydy&h=secureailabs.1password.com)  in this directory. \
+Run the Following command to optain a decrypted .env.dev file.
+```
+npm run env:decrypt # You should obtain .env.dev under this directory
+```
+### Update .envs' should be Encrypted [.env.dev]
+**PLEASE REMEMBER: Not to commit .envs that aren't encrypted**
+```
+npm run env:encrypt # You should obtain .env.dev.encrypted under this directory
+```
 ## Set the Azure login credentials
 Azure credentials are provided as environment variables.
 ```

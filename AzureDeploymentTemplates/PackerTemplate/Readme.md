@@ -6,8 +6,13 @@ curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 apt-get update && apt-get install -y packer
 ```
-## Install Node Dependencies
+## Install Node and Dependencies
 ```
+# Using Ubuntu
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v # v18.5.0
+npm -v # 8.12.1
 npm install --save-dev senv
 ```
 ### Decrypt [.env.dev.encrypted]

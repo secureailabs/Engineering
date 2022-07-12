@@ -21,15 +21,6 @@ npm run env:decrypt # You should obtain .env.dev under this directory
 ```
 npm run env:encrypt # You should obtain .env.dev.encrypted under this directory
 ```
-## Set the Azure login credentials
-Azure credentials are provided as environment variables.
-```
-export AZURE_SUBSCRIPTION_ID="xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx"
-export AZURE_TENANT_ID="xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx"
-export AZURE_CLIENT_ID="xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx"
-export AZURE_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-```
-
 ## Run image create script
 Run the AzureImageCreate.sh script to build VM images which is a two step process.
 First it will create a VHD image using packer and then there is a manual process to convert that image to a managed image.

@@ -30,26 +30,26 @@ const UnifiedRegistry: React.FC<TUnifiedRegistryProps> = () => {
   const fetch = (): TGetUnifiedRegistrySuccess['UnifiedRegistry'] => {
     //@ts-nocheck
     // if(mode == "demo"){
-      return demo_data?.UnifiedRegistries?.[id || ""];
+    return demo_data?.UnifiedRegistries?.[id || ""];
     // }
-  //   const res = axios.get<TGetUnifiedRegistrySuccess>
-  //   (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
-  //   {
-  //     withCredentials: true,
-  //   });
-  //   return res.data.UnifiedRegistry;
+    //   const res = axios.get<TGetUnifiedRegistrySuccess>
+    //   (`${axiosProxy()}/api/v1/DatasetManager/PullDataset?DatasetGuid=${id}`, 
+    //   {
+    //     withCredentials: true,
+    //   });
+    //   return res.data.UnifiedRegistry;
   }
 
   const { data, isLoading, status, error } =
     useQuery<TGetUnifiedRegistrySuccess['UnifiedRegistry'], AxiosError>(['unified'], () => fetch());
-
-
+  
   if (isLoading) {
     return <><Spinner /></>
   }
   if (status === 'success' && data) {
+    console.log(data)
     return (
-      <StandardContent title="Registry">
+      <StandardContent title={data.Name}>
         <UnifiedRegistrySuccess
           getUnifiedRegistryData={data}
         />

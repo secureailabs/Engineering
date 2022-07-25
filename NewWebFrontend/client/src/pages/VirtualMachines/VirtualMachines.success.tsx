@@ -34,8 +34,8 @@ const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
         width: 100,
       },
       {
-        Header: 'Lauched By',
-        accessor: 'lauched_by',
+        Header: 'Launched By',
+        accessor: 'launched_by',
         width: 100,
 
         // @ts-ignore
@@ -65,12 +65,12 @@ const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
     count: number;
   }[] = [
     {
-      name: 'Lauched by me',
+      name: 'Launched by me',
       value: '0',
       count: 0,
     },
     {
-      name: 'Lauched by ' + userData?.organization.name,
+      name: 'Launched by ' + userData?.organization.name,
       value: '1',
       count: 0,
     },
@@ -88,11 +88,11 @@ const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
 
       data.secure_computation_nodes.forEach((elem) => {
 
-      if (userData && elem.lauched_by?.user_email == userData.email) {
+      if (userData && elem.launched_by?.user_email == userData.email) {
         filters[0].count += 1
         filteredData[0].push(elem)
       }
-      else if (userData && ((elem.lauched_by?.org_id == userData.organization.id) || (demo && elem.lauched_by?.org_name == userData.organization.name))) {
+      else if (userData && ((elem.launched_by?.org_id == userData.organization.id) || (demo && elem.launched_by?.org_name == userData.organization.name))) {
         filters[1].count += 1
         filteredData[1].push(elem)
       }
@@ -100,7 +100,7 @@ const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
         let filterIndex = filters.length
 
         filters.every((filterElem, index) => {
-          if (filterElem.name == 'Lauched for Kidney Cancer Consortium') {
+          if (filterElem.name == 'Launched for Kidney Cancer Consortium') {
             filterIndex = index
             return false // break
           }
@@ -108,7 +108,7 @@ const VirtualMachineSuccess: React.FC<TVirtualMachinesSuccessProps> = ({
 
         if (filterIndex == filters.length) {
           filters.push({
-            name: 'Lauched for Kidney Cancer Consortium',
+            name: 'Launched for Kidney Cancer Consortium',
             value: filterIndex.toString(),
             count: 0,
           })

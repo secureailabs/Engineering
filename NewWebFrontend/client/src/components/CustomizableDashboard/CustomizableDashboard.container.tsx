@@ -1,3 +1,5 @@
+import React from 'react';
+
 import Customizabledashboard from './CustomizableDashboard.component';
 import { useQueryClient } from 'react-query';
 

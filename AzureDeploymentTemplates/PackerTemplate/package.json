@@ -1,0 +1,10 @@
+{
+  "name": "Encypt & Decrypt env",
+  "scripts": {
+    "env:decrypt": "bash scripts/env-decrypt.sh",
+    "env:encrypt": "bash scripts/env-encrypt.sh"
+  },
+  "devDependencies": {
+    "senv": "^1.0.2"
+  }
+}

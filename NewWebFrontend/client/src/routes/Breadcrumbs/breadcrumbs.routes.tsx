@@ -46,7 +46,7 @@ const BreadcrumbRoutes: React.FC = () => {
             return datasetName}
         },
         {
-            path: '/dashboard/virtual-machines', breadcrumb: 'Computational Resources'
+            path: '/dashboard/computational-resources', breadcrumb: 'Computational Resources'
         },
         {
             path: '/dashboard/registries', breadcrumb: 'Unified Registries'

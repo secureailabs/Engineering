@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 
 import ProtectedRoute from './ProtectedRoute';
 import UnProtectedRoute from './UnProtectedRoute';
@@ -65,6 +65,14 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
             <Organization />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/computational-resources"
+        element={
+          <ProtectedRoute redirect="/login">
+            <VirtualMachines />
+          </ProtectedRoute>
+        }
       /></>}
 
     <Route
@@ -72,14 +80,6 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       element={
         <ProtectedRoute redirect="/login">
           <CustomizableDashboard />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/virtual-machines"
-      element={
-        <ProtectedRoute redirect="/login">
-          <VirtualMachines />
         </ProtectedRoute>
       }
     />
@@ -99,6 +99,8 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
         </ProtectedRoute>
       }
     />
+    <Route path="*" element={<Navigate to="/dashboard" />} />
+
     {/* <Route
       path="/datasets/:id/:version"
       element={

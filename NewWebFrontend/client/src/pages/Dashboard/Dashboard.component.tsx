@@ -24,8 +24,8 @@ import BreadcrumbRoutes from '@routes/Breadcrumbs/breadcrumbs.routes';
 
 import { TDashboardProps } from './Dashboard.types';
 
-const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}) => {
-  let primary : any[] = [
+const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction }) => {
+  let primary: any[] = [
     { text: 'Dashboard', Icon: MdDashboard, link: '/dashboard', exact: true },
     { text: 'Datasets', Icon: MdViewColumn, link: '/dashboard/datasets' },
     {
@@ -40,7 +40,7 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
       Icon: MdLogout,
       onClick: () => {
         logoutMutationFunction()
-    },
+      },
     },
   ];
 
@@ -53,11 +53,11 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
         window.location.href = import.meta.env.VITE_PUBLIC_JUPYTER_URL || "http://52.152.225.54:8080/lab?token=fa8dfcf5a8cfd55402f687698847adabced336cd0423172c"
       },
     },
-      {
-        text: 'Unified Registries',
-        Icon: FaServer,
-        link: '/dashboard/registries',
-      }])
+    {
+      text: 'Unified Registries',
+      Icon: FaServer,
+      link: '/dashboard/registries',
+    }])
 
     secondary = [{
       text: 'Settings',
@@ -81,7 +81,7 @@ const Dashboard: React.FC<TDashboardProps> = ({userData, logoutMutationFunction}
       <Sidebar primary={primary} secondary={secondary} logo={newLogo}>
         <div className="standard-grid-row">
           <Header
-            search={() => {}}
+            search={() => { }}
             username={userData?.name}
             profile_image={default_profile_image}
             organization={userData?.organization.name}

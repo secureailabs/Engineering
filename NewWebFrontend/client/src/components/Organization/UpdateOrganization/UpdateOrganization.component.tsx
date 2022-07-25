@@ -13,7 +13,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 
 
 const UpdateOrganization = ({ organizationData }: any) => {
-    const { register, handleSubmit, formState, trigger } = useForm({
+    const { register, formState } = useForm({
         mode: 'onSubmit',
         defaultValues: organizationData,
       });

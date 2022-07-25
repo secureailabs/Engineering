@@ -1,22 +1,28 @@
 button {
   @include form-element;
+  margin-top: 0rem;
   width: 100%;
   font-weight: bold;
   padding: 0.25rem;
+
   &:disabled {
     cursor: not-allowed;
     background-color: black;
     color: white;
+
     &:hover {
       background-color: black;
     }
   }
+
   &:not(disabled) {
     cursor: pointer;
     background-color: var(--orange-1);
+
     &:hover {
       background-color: var(--orange-2);
     }
+
     &:active {
       text-decoration: underline;
     }
@@ -28,5 +34,20 @@ button {
     display: block;
     width: 20rem;
     margin: auto;
+  }
+}
+
+.edit-button-container {
+  margin: -7rem 0rem 2rem 0rem;
+  display: flex;
+  justify-content: end;
+
+  &__button-div {
+    display: flex;
+    align-items: center;
+
+    svg {
+      margin-right: 0.5rem;
+    }
   }
 }

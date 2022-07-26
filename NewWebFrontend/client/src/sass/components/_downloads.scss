@@ -1,0 +1,45 @@
+.downloads-card {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__icon {
+    font-size: 3.3rem;
+    color: var(--color-primary);
+  }
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    width: 100%;
+    margin-bottom: 3.8rem;
+    margin-top: 3.3rem;
+  }
+  &__key {
+    font-weight: 600;
+  }
+  &__url {
+    color: var(--color-primary);
+  }
+  &__value {
+    margin-top: 1.7rem;
+  }
+  &__key-value {
+    line-height: 1.7rem;
+    font-size: 1.4rem;
+    margin-bottom: 4rem;
+    width: 50%;
+  }
+  &__description {
+    font-size: 1.4rem;
+    margin-bottom: 4rem;
+    width: 100%;
+  }
+}
+
+.downloads-list {
+  margin-top: 2rem;
+  display: flex;
+  gap: 2rem;
+}

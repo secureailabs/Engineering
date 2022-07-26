@@ -7,6 +7,7 @@ import {
   MdHelpOutline,
   MdLaunch,
   MdLogout,
+  MdSystemUpdateAlt,
 } from 'react-icons/md';
 import { IoMdDocument } from 'react-icons/io';
 import { HiOutlineDesktopComputer } from 'react-icons/hi';
@@ -77,6 +78,7 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       link: '/dashboard/help',
     }].concat(secondary)
   }
+  primary = primary.concat([{ text: 'Downloads', Icon: MdSystemUpdateAlt, link: '/dashboard/downloads' }])
 
   return (
     <>

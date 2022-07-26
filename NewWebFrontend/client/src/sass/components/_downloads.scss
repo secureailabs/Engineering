@@ -1,6 +1,6 @@
 .downloads-card {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 
   &__icon {
     font-size: 3.3rem;
@@ -12,9 +12,9 @@
     gap: 1.5rem;
     font-size: 1.6rem;
     font-weight: 600;
-    width: 100%;
     margin-bottom: 3.8rem;
     margin-top: 3.3rem;
+    grid-column: 1 / -1;
   }
   &__key {
     font-weight: 600;
@@ -29,12 +29,11 @@
     line-height: 1.7rem;
     font-size: 1.4rem;
     margin-bottom: 4rem;
-    width: 50%;
   }
   &__description {
     font-size: 1.4rem;
     margin-bottom: 4rem;
-    width: 100%;
+    grid-column: 1 / -1;
   }
 }
 

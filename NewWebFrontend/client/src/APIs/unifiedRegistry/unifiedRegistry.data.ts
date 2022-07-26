@@ -1,5 +1,5 @@
 import kca_logo from '@assets/kca.png';
-import Porange from '@assets/Porange.png';
+import preview from '@assets/preview.png';
 
 import Datasets from '@APIs/dataset/dataset.data';
 
@@ -28,7 +28,7 @@ export const demo_data = {
       Name: 'Pancreatic Cancer Research Consortium',
       Description:
         "The Pancreatic Cancer Research Consortium connects datasets from the leading pancreatic cancer treatment centers with academic and industry researchers. ",
-      Image: Porange,
+      Image: preview,
       NumberOfDataOwner: 5,
       NumberOfPatients: 27,
       CreatedAt: faker.date.recent(2),

@@ -1,15 +1,17 @@
 .unified-registry-preview {
-  max-width: 70rem;
+  display: flex;
+  align-items: center;
 
   img {
-    width: 60px;
-    height: 60px;
+    width: 8rem;
+    height: 8rem;
+    object-fit: contain;
+    border: 0.1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
   }
 
-  display: flex;
-
-  p {
-    margin-left: 2rem;
+  &__name_and_def {
+    margin-left: 1rem;
   }
 }
 
@@ -21,34 +23,40 @@
     display: flex;
 
     img {
-      height: 100%;
-      width: auto;
+      width: 8rem;
+      height: 8rem;
     }
 
     align-items: center;
-    margin-bottom: 3.3rem;
+    margin-bottom: 2rem;
 
     &__image-edit-icon-div {
-            margin-left: -3rem;
-            margin-top: -5rem;
-            background-color: var(--color-primary);
-            border-radius: 50%;
-            width: 3rem;
-            height: 3rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+      margin-left: -3rem;
+      margin-top: -5rem;
+      background-color: var(--color-primary);
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+  }
+
+  &__title-and-org {
+    margin-left: 0.25rem;
   }
 
   &__title {
     font-size: 1.6rem;
     font-weight: 600;
+    margin-left: 0.5rem;
   }
 
   &__owner {
     display: inline;
     color: var(--color-grey);
+    margin-left: 0.5rem;
   }
 
   &__description {
@@ -113,9 +121,9 @@
   grid-template-columns: 33.7rem 33.7rem 1fr;
   // grid-template-areas: 'input1 empty empty' 'textarea1 textarea1 empty' 'input2 input3 empty';
   grid-template-areas:
-      "input1 empty empty"
-      "textarea1 textarea1 textarea1"
-      "input2 input3 empty2";
+    "input1 empty empty"
+    "textarea1 textarea1 textarea1"
+    "input2 input3 empty2";
   column-gap: 5rem;
   row-gap: 1rem;
 

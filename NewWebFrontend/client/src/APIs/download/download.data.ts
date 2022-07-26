@@ -1,5 +1,5 @@
 import {TGetDownloadSuccess, TGetAllDownloadsSuccess} from './download.typeDefs';
-import { MdOutlineMoveToInbox } from 'react-icons/md';
+import { MdOutlineMoveToInbox, MdOutlineAssessment } from 'react-icons/md';
 
 
 const data_annotation_tool: TGetDownloadSuccess = {
@@ -18,7 +18,7 @@ const data_annotation_tool: TGetDownloadSuccess = {
 
 const another_tool: TGetDownloadSuccess = {
   id: '323c9895-8d3e-40e8-b043-eb42819a80f2',
-  icon: MdOutlineMoveToInbox,
+  icon: MdOutlineAssessment,
   primaryText: 'Another Tool',
   secondaryText: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
   version: '0.0.1',

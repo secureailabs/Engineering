@@ -20,7 +20,7 @@ const Downloadsuccess: React.FC<TDownloadsSuccessProps> = ({
           primaryText={download.primaryText}
           secondaryText={download.secondaryText}
           buttonText={download.buttonText}
-          buttonOnClick={() => location.href={download.buttonUrl}}
+          buttonOnClick={() => location.href=download.buttonUrl}
           titleOnClick={() => navigate(`/dashboard/downloads/${download.id}`)}
         />
       </>

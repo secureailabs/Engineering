@@ -24,7 +24,7 @@ const another_tool: TGetDownloadSuccess = {
   version: '0.0.1',
   publish_date: '2020-01-01',
   buttonText: 'Download',
-  buttonUrl: 'string',
+  buttonUrl: '#',
   documentationUrl: 'http://www.secureailabs.com',
   fileSize: '1.0 MB',
   systemRequirements: 'Windows 10, Chrome, Firefox, Safari',

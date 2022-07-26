@@ -19,7 +19,8 @@ export const demo_data = {
       UpdateAt: faker.date.recent(1),
       Datasets: Datasets.datasets,
 
-      owner_name: 'Sallie',
+      owner_name: 'Sallie Director',
+      owner_email: 'sallie@kidneycancer.org',
       owner_org: 'KCA',
       owner_org_id: 'uuid1'
     },
@@ -35,7 +36,8 @@ export const demo_data = {
       UpdateAt: faker.date.recent(1),
       Datasets: Datasets.datasets,
 
-      owner_name: 'Robert',
+      owner_name: 'Robert Lin',
+      owner_email: 'robert@pcr.org',
       owner_org: 'PCR',
       owner_org_id: 'uuid2'
     },

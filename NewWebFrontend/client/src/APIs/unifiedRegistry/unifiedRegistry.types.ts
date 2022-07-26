@@ -35,6 +35,7 @@ export type TGetUnifiedRegistrySuccess = {
 
     // These types are for demo purposes only, they are not currently implemented in the backend
     owner_name?: string;
+    owner_email?: string;
     owner_org?: string;
     owner_org_id?: string;
   };

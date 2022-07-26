@@ -54,7 +54,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
             <div className='unified-registry-card__title-and-org'>
               <p className="unified-registry-card__title">{getUnifiedRegistryData.Name}</p>
               <div>
-                <p className="unified-registry-card__owner">(Owned by {getUnifiedRegistryData.owner_org})</p>
+                <p className="unified-registry-card__owner">Owned by {getUnifiedRegistryData.owner_org} - {getUnifiedRegistryData.owner_name} - {getUnifiedRegistryData.owner_email}</p>
               </div>
             </div>
           </div>

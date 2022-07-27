@@ -73,7 +73,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
               <p>.</p>
               <p>Registry Last updated on 1 Jan 2022</p>
             </div>
-            <Margin size={10} />
+            <Margin size={5} />
           </div>
         </div>
       </Card>
@@ -89,7 +89,6 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
             {// @ts-ignore
               membersData[index][0].map((elem) => (elem.buttonText != 'Revoke Invite' || owner) && <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text color='primary'>{(elem.buttonText == 'Revoke Invite') ? 'Invite Pending' : ''}</Text>{owner && <Button button_type='secondary' height='3.6rem' padded={false} full onClick={() => { }}>{elem.buttonText}</Button>}</div>)}
           </div>
-          <Margin size={3} />
           {owner && <div className='unified-registry-section__bottom-button-container'><Button button_type='secondary' height='3.6rem' full onClick={() => { }}>+ Invite New Data Provider</Button></div>}
         </div>
         : undefined
@@ -100,7 +99,6 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
       <Card primaryText='Data Users' secondaryText={usersOpen ? '\u25b2' : '\u25bc'} secondaryTextColor='black' secondaryTextOnClick={() => setUsersOpen(!usersOpen)}>{usersOpen ?
         <div className='unified-registry-section__rows--users'>
           {membersData[index][1].map((elem) => <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text className='access-details-text' color='primary'>Dataset Access Details</Text></div>)}
-          <Margin size={3} />
           {owner && <div className='unified-registry-section__bottom-button-container'><Button button_type='secondary' height='3.6rem' full onClick={() => { }}>+ Add New Data Users</Button></div>}
         </div>
         : undefined

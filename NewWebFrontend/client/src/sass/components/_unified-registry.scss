@@ -28,7 +28,7 @@
     }
 
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 
     &__image-edit-icon-div {
       margin-left: -3rem;
@@ -95,6 +95,10 @@
     align-items: center;
     height: 6rem;
     border-bottom: 1px solid #deebef;
+
+    &:last-child {
+      border-bottom: none;
+    }
   }
 
   &__rows {

@@ -34,7 +34,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
               <div className="unified-registry-preview__name_and_def">
                 <Text fontSize='1.2rem' fontWeight='600'>{Name}</Text>
                 <Text fontSize='1.2rem' fontWeight='400'>{Description}</Text>
-                <Marker>{owner_name == 'Sallie' ? 'Data Owner' : 'Data User'}</Marker>
+                {owner_name == 'Sallie' && <Marker>Data Owner</Marker>}
               </div>
             </div>
           );

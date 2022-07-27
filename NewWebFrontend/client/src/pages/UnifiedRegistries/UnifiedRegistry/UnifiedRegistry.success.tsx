@@ -16,12 +16,12 @@ import Margin from '@secureailabs/web-ui/components/Margin';
 
 import type { TUnifiedRegistrySuccessProps } from './UnifiedRegistry.types';
 import { useParams } from 'react-router';
- 
+
 const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
   getUnifiedRegistryData,
 }) => {
 
-  const membersData = [[[{ name: 'Mayo', buttonText: 'Render', invitePending: false }, { name: 'Vanderbilt', buttonText: 'Revoke Invite' }], [{ name: 'Pfizer' }, { name: 'VUMC' }]], [[{ name: 'Mercy General Hospital', buttonText: 'Render' }, { name: 'Cornell', buttonText: 'Revoke Invite' }], [{ name: 'GSK'}, { name: 'NewYork-Presbyterian Hospital'}]]]
+  const membersData = [[[{ name: 'Mayo', buttonText: 'Render', invitePending: false }, { name: 'Vanderbilt', buttonText: 'Revoke Invite' }], [{ name: 'Pfizer' }, { name: 'VUMC' }]], [[{ name: 'Mercy General Hospital', buttonText: 'Render' }, { name: 'Cornell', buttonText: 'Revoke Invite' }], [{ name: 'GSK' }, { name: 'NewYork-Presbyterian Hospital' }]]]
   const orgURLs = ['https://www.kidneycancer.org/', '#']
 
   const { id } = useParams()
@@ -40,7 +40,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 
   useEffect(() => reset(getUnifiedRegistryData), [getUnifiedRegistryData])
 
-  return !editMode ? 
+  return !editMode ?
     <>
       {owner && <div className='edit-button-container'>
         {/* @ts-ignore */}
@@ -68,7 +68,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
                 <HiOutlineExternalLink />
               </a>
               <div></div>
-              <a className="unified-registry-card__link" href={orgURLs[index]}>Request Access</a>
+              <a className="unified-registry-card__link" href={orgURLs[index]} target="_blank" rel="noopener noreferrer">Request Access</a>
               <p>Registry creation on 1 Jan 2022</p>
               <p>.</p>
               <p>Registry Last updated on 1 Jan 2022</p>
@@ -83,11 +83,11 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 
       <Margin size={5} />
 
-      <Card primaryText='Data Providers' secondaryText={providersOpen ? '\u25b2' : '\u25bc'} secondaryTextColor='black'  secondaryTextOnClick={() => setProvidersOpen(!providersOpen)}>{providersOpen ?
+      <Card primaryText='Data Providers' secondaryText={providersOpen ? '\u25b2' : '\u25bc'} secondaryTextColor='black' secondaryTextOnClick={() => setProvidersOpen(!providersOpen)}>{providersOpen ?
         <div className='unified-registry-section'>
           <div className='unified-registry-section__rows--providers'>
-          {// @ts-ignore
-            membersData[index][0].map((elem) => (elem.buttonText != 'Revoke Invite' || owner) && <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text color='primary'>{(elem.buttonText == 'Revoke Invite') ? 'Invite Pending' : ''}</Text>{owner && <Button button_type='secondary' height='3.6rem' padded={false} full onClick={() => { }}>{elem.buttonText}</Button>}</div>)}
+            {// @ts-ignore
+              membersData[index][0].map((elem) => (elem.buttonText != 'Revoke Invite' || owner) && <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text color='primary'>{(elem.buttonText == 'Revoke Invite') ? 'Invite Pending' : ''}</Text>{owner && <Button button_type='secondary' height='3.6rem' padded={false} full onClick={() => { }}>{elem.buttonText}</Button>}</div>)}
           </div>
           <Margin size={3} />
           {owner && <div className='unified-registry-section__bottom-button-container'><Button button_type='secondary' height='3.6rem' full onClick={() => { }}>+ Invite New Data Provider</Button></div>}
@@ -97,9 +97,9 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 
       <Margin size={5} />
 
-      <Card primaryText='Data Users' secondaryText={usersOpen ? '\u25b2' : '\u25bc' }  secondaryTextColor='black' secondaryTextOnClick={() => setUsersOpen(!usersOpen)}>{usersOpen ?
+      <Card primaryText='Data Users' secondaryText={usersOpen ? '\u25b2' : '\u25bc'} secondaryTextColor='black' secondaryTextOnClick={() => setUsersOpen(!usersOpen)}>{usersOpen ?
         <div className='unified-registry-section__rows--users'>
-          {membersData[index][1].map((elem) => <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text className='access-details-text' color='primary'>Dataset Access Details</Text></div>) }
+          {membersData[index][1].map((elem) => <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text className='access-details-text' color='primary'>Dataset Access Details</Text></div>)}
           <Margin size={3} />
           {owner && <div className='unified-registry-section__bottom-button-container'><Button button_type='secondary' height='3.6rem' full onClick={() => { }}>+ Add New Data Users</Button></div>}
         </div>
@@ -107,7 +107,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
       }</Card>
 
       <Margin size={5} />
-      
+
       <PatientSummary containerHeight={false} />
 
       <Margin size={10} />
@@ -117,7 +117,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
         getAllDatasetsData={getUnifiedRegistryData.Datasets}
       />
     </>
-   :
+    :
     <>
       <Card primaryText=''>
         <div className="unified-registry-card">
@@ -130,12 +130,12 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
           </div>
         </div>
       </Card>
-      <Margin size={5}/>
+      <Margin size={5} />
       <div className='unified-registry-edit-page-buttons-div'>
         <Button button_type='primary' full onClick={() => setEditMode(false)}>Save Changes</Button>
         <Button button_type='secondary' full onClick={() => setEditMode(false)}>Reset Changes</Button>
       </div>
-      
+
     </>;
 };
 

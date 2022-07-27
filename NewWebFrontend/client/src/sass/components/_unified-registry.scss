@@ -31,6 +31,7 @@
     margin-bottom: 1rem;
 
     &__image-edit-icon-div {
+      cursor: pointer;
       margin-left: -3rem;
       margin-top: -5rem;
       background-color: var(--color-primary);
@@ -40,6 +41,18 @@
       display: flex;
       justify-content: center;
       align-items: center;
+
+      label {
+        height: 1.5rem;
+      }
+
+      input {
+        display: none;
+      }
+
+      > * {
+        cursor: pointer;
+      }
     }
   }
 
@@ -131,7 +144,7 @@
   column-gap: 5rem;
   row-gap: 1rem;
 
-  margin-top: -3rem;
+  margin-top: -1rem;
   margin-bottom: 2rem;
 
   div:nth-child(1) {

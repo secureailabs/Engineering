@@ -22,7 +22,8 @@ export const demo_data = {
       owner_name: 'Sallie Director',
       owner_email: 'sallie@kidneycancer.org',
       owner_org: 'KCA',
-      owner_org_id: 'uuid1'
+      owner_org_id: 'uuid1',
+      owner_org_url: 'https://www.kidneycancer.org/',
     },
     'uuid2': {
       ID: 'uuid2',
@@ -39,7 +40,8 @@ export const demo_data = {
       owner_name: 'Robert Lin',
       owner_email: 'robert@pcr.org',
       owner_org: 'PCR',
-      owner_org_id: 'uuid2'
+      owner_org_id: 'uuid2',
+      owner_org_url: 'https://pancreaticcancercanada.ca/'
     },
   },
 };

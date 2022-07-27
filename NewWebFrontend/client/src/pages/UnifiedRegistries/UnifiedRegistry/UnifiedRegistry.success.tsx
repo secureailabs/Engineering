@@ -22,7 +22,6 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 }) => {
 
   const membersData = [[[{ name: 'Mayo', buttonText: 'Render', invitePending: false }, { name: 'Vanderbilt', buttonText: 'Revoke Invite' }], [{ name: 'Pfizer' }, { name: 'VUMC' }]], [[{ name: 'Mercy General Hospital', buttonText: 'Render' }, { name: 'Cornell', buttonText: 'Revoke Invite' }], [{ name: 'GSK' }, { name: 'NewYork-Presbyterian Hospital' }]]]
-  const orgURLs = ['https://www.kidneycancer.org/', '#']
 
   const { id } = useParams()
   const index = id ? parseInt(id.slice(-1)) - 1 : 0
@@ -68,7 +67,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
                 <HiOutlineExternalLink />
               </a>
               <div></div>
-              <a className="unified-registry-card__link" href={orgURLs[index]} target="_blank" rel="noopener noreferrer">Request Access</a>
+              <a className="unified-registry-card__link" href={getUnifiedRegistryData.owner_org_url} target="_blank" rel="noopener noreferrer">Request Access</a>
               <p>Registry creation on 1 Jan 2022</p>
               <p>.</p>
               <p>Registry Last updated on 1 Jan 2022</p>
@@ -121,10 +120,10 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
         <div className="unified-registry-card">
           <div className="unified-registry-card__header">
             <img src={getUnifiedRegistryData.Image} />
-            <div className='unified-registry-card__header__image-edit-icon-div'><ImPencil color='white' size={15} /></div>
+            <div className='unified-registry-card__header__image-edit-icon-div'><label htmlFor='image-upload'><ImPencil color='white' size={15} /></label><input type='file' id='image-upload' /></div>
           </div>
           <div className='registry-modification-form'>
-            <FormFieldsRenderer formState={formState} register={register} fields={{ owner_org: { label: 'Organization Name', placeholder: getUnifiedRegistryData.owner_name || 'Organization Name', type: 'text' }, Description: { label: 'Description', placeholder: getUnifiedRegistryData.Description || 'Description', 'type': 'textarea' }, dataModelSpec: { label: 'Data Model Specifications', placeholder: 'Enter Url', type: 'text' }, requestAccess: { label: 'Request Access', placeholder: 'Enter Url', type: 'text' } }} />
+            <FormFieldsRenderer formState={formState} register={register} fields={{ owner_org: { label: 'Organization Name', placeholder: getUnifiedRegistryData.owner_name || 'Organization Name', type: 'text' }, Description: { label: 'Description', placeholder: getUnifiedRegistryData.Description || 'Description', 'type': 'textarea' }, dataModelSpec: { label: 'Data Model Specifications', placeholder: 'Enter Url', type: 'text' }, owner_org_url: { label: 'Request Access', placeholder: 'Enter Url', type: 'text' } }} />
           </div>
         </div>
       </Card>

@@ -38,6 +38,7 @@ export type TGetUnifiedRegistrySuccess = {
     owner_email?: string;
     owner_org?: string;
     owner_org_id?: string;
+    owner_org_url?: string;
   };
 };
 

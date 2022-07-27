@@ -1,7 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
+# Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
+source .env.dev
 ResourceGroup="InitializerImageStorageRg"
-StorageAccountName="sailvmimages9821"
+StorageAccountName="sailvmimages9822"
 Location="eastus"
 
 PrintHelp()
@@ -41,27 +43,45 @@ if [ $retVal -ne 0 ]; then
     exit $retVal
 fi
 
-# Check for Azure environment variables
-if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
-  echo "environment variable AZURE_SUBSCRIPTION_ID is undefined"
-  exit 1
-fi
-if [ -z "${AZURE_TENANT_ID}" ]; then
-  echo "environment variable AZURE_TENANT_ID is undefined"
-  exit 1
-fi
-if [ -z "${AZURE_CLIENT_ID}" ]; then
-  echo "environment variable AZURE_CLIENT_ID is undefined"
-  exit 1
-fi
-if [ -z "${AZURE_CLIENT_SECRET}" ]; then
-  echo "environment variable AZURE_CLIENT_SECRET is undefined"
-  exit 1
-fi
+# Bash Menu
+# TODO Technially all subscriptions for this script can share 1 SP: Discussion We should create singular SP for PACKER
+echo -e "\nPlease Specify # for targeted subscription to upload image: "
+options=("Scratch Pad" "Development" "Release Candidate" "ProductionGA" "Quit")
+select opt in "${options[@]}"
+do
+    case $REPLY in
+        1)
+            echo -e "\n==== Setting env variables for $opt ====\n"
+            export AZURE_SUBSCRIPTION_ID=$SCRATCH_PAD_SUBSCRIPTION_ID
+            break
+            ;;
+        2)
+            echo -e "\n==== Setting env variables for $opt ===="
+            export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
+            break
+            ;;
+        3)
+            # TODO TBD on above TODO Discussion
+            echo "You chose choice $REPLY which is $opt"
+            break
+            ;;
+        4)
+            # TODO TBD on above TODO Discussion
+            echo "You chose choice $REPLY which is $opt"
+            break
+            ;;
+        5)
+            exit 0
+            ;;
+    esac
+done
 
 # Set the subscription
+echo -e "==== Login to Azure and Set Subscription ====\n"
+az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 az account set --subscription $AZURE_SUBSCRIPTION_ID
-
+echo -e "\n==== Verify Subscription Set Properly ====\n"
+az account show
 # Create resource group for storage account
 az group create \
 --name $ResourceGroup \

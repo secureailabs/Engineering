@@ -1,0 +1,45 @@
+.downloads-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  &__icon {
+    font-size: 3.3rem;
+    color: var(--color-primary);
+  }
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 3.8rem;
+    margin-top: 3.3rem;
+    grid-column: 1 / -1;
+  }
+  &__key {
+    font-weight: 600;
+  }
+  &__url {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  &__value {
+    margin-top: 1.7rem;
+  }
+  &__key-value {
+    line-height: 1.7rem;
+    font-size: 1.4rem;
+    margin-bottom: 4rem;
+  }
+  &__description {
+    font-size: 1.4rem;
+    margin-bottom: 4rem;
+    grid-column: 1 / -1;
+  }
+}
+
+.downloads-list {
+  margin-top: 2rem;
+  display: flex;
+  gap: 2rem;
+}

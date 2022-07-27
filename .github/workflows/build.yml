@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   # Triggers the workflow on push or pull request events but only for the main branch
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 # Only one concurrent action at a time for group tag.
 concurrency:
@@ -13,6 +13,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  flake8-lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v2
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          # Module level import not at top of file (E402)
+          # Block comment should start with '# ' (E265)
+          # Local variable name is assigned to but never used (F841)
+          # f-string without any placeholders (F541)
+          # Multiple statements on one line (semicolon) (E702)
+          # Module imported but unused (F401)
+          # Line too long (82 &gt; 79 characters) (E501)
+          # Line break occurred before a binary operator (W503)
+          ignore: "E402,E265,F841,F541,E702,F401,E501,W503"
+          max-line-length: 120
+          path: "ApiServices"
 
   start-runner:
     runs-on: ubuntu-latest

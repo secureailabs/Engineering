@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 import { TDocumentationSuccessProps } from './Documentation.types';
 
 import StandardContent from '@secureailabs/web-ui/components/StandardContent';
@@ -8,6 +9,8 @@ import Text from '@secureailabs/web-ui/components/Text'
 const Documentationuccess: React.FC<TDocumentationSuccessProps> = ({
     getAllDocumentationData,
 }) => {
+  const navigate = useNavigate();
+
   // Get all the documentation using the documentation information api and create a list of Resource components
   const documentation_list = getAllDocumentationData.map((documentation) => {
     return (
@@ -16,6 +19,7 @@ const Documentationuccess: React.FC<TDocumentationSuccessProps> = ({
         Icon={documentation.icon}
         primaryText={documentation.primaryText}
         secondaryText={documentation.secondaryText}
+        tileOnClick={() => navigate(`/dashboard/documentation/#`)}
       />
     );
   });

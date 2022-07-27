@@ -62,7 +62,13 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       },
     ])
 
-    secondary = [{
+    secondary = [
+    {
+      text: 'Downloads',
+      Icon: MdSystemUpdateAlt,
+      link: '/dashboard/downloads'
+    },
+    {
       text: 'Settings',
       Icon: MdSettings,
       link: '/dashboard/settings',
@@ -78,7 +84,6 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       link: '/dashboard/help',
     }].concat(secondary)
   }
-  primary = primary.concat([{ text: 'Downloads', Icon: MdSystemUpdateAlt, link: '/dashboard/downloads' }])
 
   return (
     <>

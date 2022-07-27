@@ -10,7 +10,7 @@ const Downloadsuccess: React.FC<TDownloadsSuccessProps> = ({
     getAllDownloadsData,
 }) => {
   const navigate = useNavigate();
-  // Get all the downloads using the download information api and create a list of Resource component
+  // Get all the downloads using the download information api and create a list of Resource components
   const download_list = getAllDownloadsData.map((download) => {
     return (
       <>

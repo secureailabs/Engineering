@@ -15,7 +15,7 @@ const DownloadSuccess: React.FC<TDownloadSuccessProps> = ({ getDownloadData }) =
         <p className="downloads-card__key">{field}</p>
         {
           url
-          ? <a href={getDownloadData.documentationUrl} className="downloads-card__url">Lorem ipsum <FiExternalLink/></a>
+          ? <a href={getDownloadData.documentationUrl} target="_blank" rel="noopener noreferrer" className="downloads-card__url">Lorem ipsum <FiExternalLink/></a>
           : <p className="downloads-card__value">{value}</p>
         }
       </div>

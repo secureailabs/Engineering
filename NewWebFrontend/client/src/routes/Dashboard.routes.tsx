@@ -17,6 +17,7 @@ import CustomizableDashboard from '@components/CustomizableDashboard';
 import ViewOrganization from '@pages/ViewOrganization';
 import Downloads from '@pages/Downloads/Downloads';
 import Download from '@pages/Downloads/Download';
+import Documentations from '@pages/Documentations';
 
 
 const DashboardRouter: React.FC = (): React.ReactElement => (
@@ -82,6 +83,14 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       element={
         <ProtectedRoute redirect="/login">
           <CustomizableDashboard />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/documentations"
+      element={
+        <ProtectedRoute redirect="/login">
+          <Documentations />
         </ProtectedRoute>
       }
     />

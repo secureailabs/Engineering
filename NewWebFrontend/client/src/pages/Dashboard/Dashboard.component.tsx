@@ -8,8 +8,9 @@ import {
   MdLaunch,
   MdLogout,
   MdSystemUpdateAlt,
+  MdOutlineDocumentScanner,
+  MdOutlinePeopleAlt,
 } from 'react-icons/md';
-import { IoMdDocument } from 'react-icons/io';
 import { HiOutlineDesktopComputer } from 'react-icons/hi';
 import { FaServer } from 'react-icons/fa';
 
@@ -69,13 +70,18 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       link: '/dashboard/downloads'
     },
     {
+      text: 'Documentations',
+      Icon: MdOutlineDocumentScanner,
+      link: '/dashboard/documentations'
+    },
+    {
       text: 'Settings',
       Icon: MdSettings,
       link: '/dashboard/settings',
     },
     {
       text: 'My Organization',
-      Icon: MdSettings,
+      Icon: MdOutlinePeopleAlt,
       link: '/dashboard/my-organization',
     },
     {

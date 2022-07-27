@@ -13,17 +13,15 @@ const Downloadsuccess: React.FC<TDownloadsSuccessProps> = ({
   // Get all the downloads using the download information api and create a list of Resource components
   const download_list = getAllDownloadsData.map((download) => {
     return (
-      <>
         <Resource
           key={download.id}
           Icon={download.icon}
           primaryText={download.primaryText}
           secondaryText={download.secondaryText}
           buttonText={download.buttonText}
-          buttonOnClick={() => location.href=download.buttonUrl}
-          titleOnClick={() => navigate(`/dashboard/downloads/${download.id}`)}
+          buttonOnClickUrl={download.buttonUrl}
+          tileOnClick={() => navigate(`/dashboard/downloads/${download.id}`)}
         />
-      </>
     );
   });
 

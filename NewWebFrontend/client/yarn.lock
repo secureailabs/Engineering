@@ -2672,10 +2672,10 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.1.tgz#782fa5da44c4f38ae9fd38e9184b54e451936118"
   integrity sha512-BUyKJGdDWqvWC5GEhyOiUrGNi9iJUr4CU0O2WxJL6QJhHeeA/NVBalH+FeK0r/x/W0rPymXt5s78TDS7d6lCwg==
 
-"@secureailabs/web-ui@^1.6.4":
-  version "1.6.4"
-  resolved "https://npm.pkg.github.com/download/@secureailabs/web-ui/1.6.4/730e1e569ef0c7fadd710fa8618682163794a9c897c264f7602b26a1faf8abe2#f9d04717ce475f6bd244030df27725e429ac9075"
-  integrity sha512-6HYUGXbncrCQyve9yVf/4hNAmMGigjjkb1TLp3WvLqXy7+8OkvKwNMqsE/q4WitEBHO7mkrah9IfTXdnhQYMxA==
+"@secureailabs/web-ui@^1.7.1":
+  version "1.7.1"
+  resolved "https://npm.pkg.github.com/download/@secureailabs/web-ui/1.7.1/b53cd08f25e0c8aab955a31400e6a73e6c55357014cfe7285bbdca2d854d034e#f320e065a54a0250890edc085166e01f06ce80b6"
+  integrity sha512-Y4QhmjOvd5H7hcJRohW/ciOkSah9WEWx6HSl9eKMfM9US8NQLllMWcwgjcO2Bg4QI9DFTHYGtaLlGFlDnHLFcQ==
   dependencies:
     "@types/react-grid-layout" "^1.3.1"
     change-case "^4.1.2"

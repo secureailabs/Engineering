@@ -24,6 +24,10 @@ export const demo_data = {
       owner_org: 'KCA',
       owner_org_id: 'uuid1',
       owner_org_url: 'https://www.kidneycancer.org/',
+      members_data: {
+        providers: [{ name: 'Mayo', buttonText: 'Render', invitePending: false }, { name: 'Vanderbilt', buttonText: 'Revoke Invite' }],
+        users: [{ name: 'Pfizer' }, { name: 'VUMC' }]
+      }
     },
     'uuid2': {
       ID: 'uuid2',
@@ -41,7 +45,11 @@ export const demo_data = {
       owner_email: 'robert@pcr.org',
       owner_org: 'PCR',
       owner_org_id: 'uuid2',
-      owner_org_url: 'https://pancreaticcancercanada.ca/'
+      owner_org_url: 'https://pancreaticcancercanada.ca/',
+      members_data: {
+        providers: [{ name: 'Mercy General Hospital', buttonText: 'Render' }, { name: 'Cornell', buttonText: 'Revoke Invite' }],
+        users: [{ name: 'GSK' }, { name: 'NewYork-Presbyterian Hospital' }]
+      }
     },
   },
 };

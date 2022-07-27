@@ -39,6 +39,17 @@ export type TGetUnifiedRegistrySuccess = {
     owner_org?: string;
     owner_org_id?: string;
     owner_org_url?: string;
+    members_data?: {
+      providers: {
+        name: string;
+        buttonText: string;
+        invite_pending?: boolean;
+      }[]
+      ,
+      users: {
+        name: string;
+      }[]
+    }
   };
 };
 

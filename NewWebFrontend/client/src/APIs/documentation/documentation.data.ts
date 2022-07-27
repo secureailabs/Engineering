@@ -2,7 +2,7 @@ import {TGetDocumentationSuccess, TGetAllDocumentationsSuccess} from './document
 import { MdOutlineMoveToInbox, MdOutlineAssessment, MdOutlineSlowMotionVideo } from 'react-icons/md';
 
 const getting_started: TGetDocumentationSuccess = {
-  id: '323c9895-8d3e-40e8-b043-eb42819a80f2',
+  id: '031a7d42-fdd0-4d3d-9ded-fef985bce107',
   icon: MdOutlineAssessment,
   primaryText: 'Getting Started',
   secondaryText: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",

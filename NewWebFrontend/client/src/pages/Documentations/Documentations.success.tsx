@@ -11,14 +11,12 @@ const Documentationuccess: React.FC<TDocumentationsSuccessProps> = ({
   // Get all the documentations using the documentation information api and create a list of Resource components
   const documentation_list = getAllDocumentationsData.map((documentation) => {
     return (
-      <>
-        <Resource
-          key={documentation.id}
-          Icon={documentation.icon}
-          primaryText={documentation.primaryText}
-          secondaryText={documentation.secondaryText}
-        />
-      </>
+      <Resource
+        key={documentation.id}
+        Icon={documentation.icon}
+        primaryText={documentation.primaryText}
+        secondaryText={documentation.secondaryText}
+      />
     );
   });
 

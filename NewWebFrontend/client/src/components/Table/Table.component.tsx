@@ -38,7 +38,7 @@ const Table: React.FC<TTable> = ({
               // we can add them into the header props
               // @ts-ignore
               <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                <Text fontSize="14px" fontWeight={600}>
+                <Text className='table__column_header' fontSize="12px" fontWeight={600}>
                   {column.render('Header')}
                 </Text>
                 {/* Add a sort direction indicator */}

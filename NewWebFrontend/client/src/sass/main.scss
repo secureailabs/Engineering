@@ -36,12 +36,14 @@
 @import './components/settings';
 @import './components/unified-registry';
 @import './components/downloads';
+
 .form-double {
   padding: 4rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-row-gap: 2rem;
   column-gap: 8rem;
+
   @include respond(tab-port) {
     grid-template-columns: 1fr;
   }
@@ -51,13 +53,15 @@
   // height: 50rem;
   // width: 50rem;
   height: 100%;
+
   &__charts {
     display: flex;
     // width: 50%;
     height: 100%;
     width: 90%;
     min-width: 0;
-    & > * {
+
+    &>* {
       margin-left: 2rem;
       width: 50%;
     }
@@ -66,6 +70,7 @@
     // grid-template-columns: 1fr 1fr;
     // grid-template-rows: 1fr 1fr;
   }
+
   &__bottom {
     display: grid;
     column-gap: 2rem;
@@ -73,18 +78,23 @@
     grid-template-columns: 1fr 1fr;
     width: 95%;
   }
+
   &__top {
     display: grid;
     grid-template-columns: 1fr 4fr 0.5fr 1fr 4fr;
     padding-bottom: 2rem;
     row-gap: 2rem;
-    & > * {
+
+    &>* {
       display: flex;
+
       .react-select-container {
         width: 100%;
         margin-right: 1rem;
       }
+
       align-items: center;
+
       p {
         white-space: nowrap;
         margin-right: 1rem;
@@ -95,21 +105,28 @@
 
 .table {
   background-color: white;
+
   tr {
-    & > * {
+    &>* {
       &:first-child {
         padding-left: 3rem;
       }
+
       &:last-child {
         padding-left: 3rem;
       }
     }
   }
+
+  &__column_header {
+    min-width: max-content;
+  }
 }
 
 .button-container {
   display: flex;
-  & > * {
+
+  &>* {
     &:not(&:first-child) {
       margin-left: 3rem;
     }
@@ -124,14 +141,17 @@
 @element .feed-item and (max-width: 400px) {
   :self {
     flex-direction: column;
+
     .feed-item__date {
       margin-left: 0;
       margin-right: auto;
     }
+
     .feed-item__content {
       width: 100%;
       margin-bottom: 1rem;
     }
+
     .feed-item__image {
       display: none;
     }
@@ -139,8 +159,8 @@
 }
 
 .standard-content-scroll {
-  &>*{
-  overflow-x: scroll !important;
+  &>* {
+    overflow-x: scroll !important;
   }
 
 }

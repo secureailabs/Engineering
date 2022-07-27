@@ -7,6 +7,7 @@ import {
   MdHelpOutline,
   MdLaunch,
   MdLogout,
+  MdSystemUpdateAlt,
 } from 'react-icons/md';
 import { IoMdDocument } from 'react-icons/io';
 import { HiOutlineDesktopComputer } from 'react-icons/hi';
@@ -61,7 +62,13 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       },
     ])
 
-    secondary = [{
+    secondary = [
+    {
+      text: 'Downloads',
+      Icon: MdSystemUpdateAlt,
+      link: '/dashboard/downloads'
+    },
+    {
       text: 'Settings',
       Icon: MdSettings,
       link: '/dashboard/settings',

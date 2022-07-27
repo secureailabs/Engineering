@@ -6,15 +6,26 @@ curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 apt-get update && apt-get install -y packer
 ```
-## Set the Azure login credentials
-Azure credentials are provided as environment variables.
+## Install Node and Dependencies
 ```
-export AZURE_SUBSCRIPTION_ID="xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx"
-export AZURE_TENANT_ID="xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx"
-export AZURE_CLIENT_ID="xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx"
-export AZURE_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+# Using Ubuntu
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v # v18.5.0
+npm -v # 8.12.1
+npm install --save-dev senv
 ```
-
+### Decrypt [.env.dev.encrypted]
+Create file `.env.pass`: [GITHUB.env.pass](https://start.1password.com/open/i?a=VDKXP5MBWJAW3F3YRPJNHPGKLM&v=gy4saia7pduzqbp7qhij776a4u&i=kmdczi5wvgpty6kqodhjdjyydy&h=secureailabs.1password.com)  in this directory. \
+Run the Following command to optain a decrypted .env.dev file.
+```
+npm run env:decrypt # You should obtain .env.dev under this directory
+```
+### Update .envs' should be Encrypted [.env.dev]
+**PLEASE REMEMBER: Not to commit .envs that aren't encrypted**
+```
+npm run env:encrypt # You should obtain .env.dev.encrypted under this directory
+```
 ## Run image create script
 Run the AzureImageCreate.sh script to build VM images which is a two step process.
 First it will create a VHD image using packer and then there is a manual process to convert that image to a managed image.

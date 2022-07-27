@@ -1,9 +1,9 @@
 import {
-  TGetAllDocumentationsSuccess
+  TGetAllDocumentationSuccess
 } from './documentation.typeDefs';
 
 import Documentation_data from './documentation.data';
 
-export const getAllDocumentationsAPIDemo = async(): Promise<TGetAllDocumentationsSuccess['documentations']> => {
-  return Documentation_data.documentations;
+export const getAllDocumentationAPIDemo = async(): Promise<TGetAllDocumentationSuccess['documentation']> => {
+  return Documentation_data.documentation;
 }

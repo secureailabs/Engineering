@@ -1,7 +1,7 @@
 import { IconType } from 'react-icons';
 
-export type TGetAllDocumentationsSuccess = {
-  documentations: Array<TGetDocumentationSuccess>;
+export type TGetAllDocumentationSuccess = {
+  documentation: Array<TGetDocumentationSuccess>;
 };
 
 export type TGetDocumentationSuccess = {

@@ -70,9 +70,9 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       link: '/dashboard/downloads'
     },
     {
-      text: 'Documentations',
+      text: 'Documentation',
       Icon: MdOutlineDocumentScanner,
-      link: '/dashboard/documentations'
+      link: '/dashboard/documentation'
     },
     {
       text: 'Settings',

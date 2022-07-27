@@ -1,4 +1,4 @@
-import {TGetDocumentationSuccess, TGetAllDocumentationsSuccess} from './documentation.typeDefs';
+import {TGetDocumentationSuccess, TGetAllDocumentationSuccess} from './documentation.typeDefs';
 import { MdOutlineMoveToInbox, MdOutlineAssessment, MdOutlineSlowMotionVideo } from 'react-icons/md';
 
 const getting_started: TGetDocumentationSuccess = {
@@ -25,12 +25,12 @@ const videos: TGetDocumentationSuccess = {
   documentationUrl: 'http://www.secureailabs.com',
 }
 
-const documentations_data: TGetAllDocumentationsSuccess = {
-  documentations: [
+const documentation_data: TGetAllDocumentationSuccess = {
+  documentation: [
     data_annotation_tool,
     videos,
     getting_started,
   ],
 };
 
-export default documentations_data;
+export default documentation_data;

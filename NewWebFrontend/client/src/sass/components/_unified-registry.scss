@@ -28,7 +28,6 @@
     }
 
     align-items: center;
-    margin-bottom: 1rem;
 
     &__image-edit-icon-div {
       cursor: pointer;
@@ -41,7 +40,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-
+      
       label {
         height: 1.5rem;
       }

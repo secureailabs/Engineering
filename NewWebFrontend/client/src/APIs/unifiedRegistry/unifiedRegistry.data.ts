@@ -19,9 +19,15 @@ export const demo_data = {
       UpdateAt: faker.date.recent(1),
       Datasets: Datasets.datasets,
 
-      owner_name: 'Sallie',
+      owner_name: 'Sallie Director',
+      owner_email: 'sallie@kidneycancer.org',
       owner_org: 'KCA',
-      owner_org_id: 'uuid1'
+      owner_org_id: 'uuid1',
+      owner_org_url: 'https://www.kidneycancer.org/',
+      members_data: {
+        providers: [{ name: 'Mayo', buttonText: 'Render', invitePending: false }, { name: 'Vanderbilt', buttonText: 'Revoke Invite' }],
+        users: [{ name: 'Pfizer' }, { name: 'VUMC' }]
+      }
     },
     'uuid2': {
       ID: 'uuid2',
@@ -35,9 +41,15 @@ export const demo_data = {
       UpdateAt: faker.date.recent(1),
       Datasets: Datasets.datasets,
 
-      owner_name: 'Robert',
+      owner_name: 'Robert Lin',
+      owner_email: 'robert@pcr.org',
       owner_org: 'PCR',
-      owner_org_id: 'uuid2'
+      owner_org_id: 'uuid2',
+      owner_org_url: 'https://pancreaticcancercanada.ca/',
+      members_data: {
+        providers: [{ name: 'Mercy General Hospital', buttonText: 'Render' }, { name: 'Cornell', buttonText: 'Revoke Invite' }],
+        users: [{ name: 'GSK' }, { name: 'NewYork-Presbyterian Hospital' }]
+      }
     },
   },
 };

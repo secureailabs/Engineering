@@ -16,13 +16,10 @@ import Margin from '@secureailabs/web-ui/components/Margin';
 
 import type { TUnifiedRegistrySuccessProps } from './UnifiedRegistry.types';
 import { useParams } from 'react-router';
- 
+
 const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
   getUnifiedRegistryData,
 }) => {
-
-  const membersData = [[[{ name: 'Mayo', buttonText: 'Render', invitePending: false }, { name: 'Vanderbilt', buttonText: 'Revoke Invite' }], [{ name: 'Pfizer' }, { name: 'VUMC' }]], [[{ name: 'Mercy General Hospital', buttonText: 'Render' }, { name: 'Cornell', buttonText: 'Revoke Invite' }], [{ name: 'GSK'}, { name: 'NewYork-Presbyterian Hospital'}]]]
-  const orgURLs = ['https://www.kidneycancer.org/', '#']
 
   const { id } = useParams()
   const index = id ? parseInt(id.slice(-1)) - 1 : 0
@@ -40,7 +37,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 
   useEffect(() => reset(getUnifiedRegistryData), [getUnifiedRegistryData])
 
-  return !editMode ? 
+  return !editMode ?
     <>
       {owner && <div className='edit-button-container'>
         {/* @ts-ignore */}
@@ -54,7 +51,7 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
             <div className='unified-registry-card__title-and-org'>
               <p className="unified-registry-card__title">{getUnifiedRegistryData.Name}</p>
               <div>
-                <p className="unified-registry-card__owner">(Owned by {getUnifiedRegistryData.owner_org})</p>
+                <p className="unified-registry-card__owner">Owned by {getUnifiedRegistryData.owner_org} - {getUnifiedRegistryData.owner_name} - {getUnifiedRegistryData.owner_email}</p>
               </div>
             </div>
           </div>
@@ -68,12 +65,12 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
                 <HiOutlineExternalLink />
               </a>
               <div></div>
-              <a className="unified-registry-card__link" href={orgURLs[index]}>Request Access</a>
+              <a className="unified-registry-card__link" href={getUnifiedRegistryData.owner_org_url} target="_blank" rel="noopener noreferrer">Request Access</a>
               <p>Registry creation on 1 Jan 2022</p>
               <p>.</p>
               <p>Registry Last updated on 1 Jan 2022</p>
             </div>
-            <Margin size={10} />
+            <Margin size={5} />
           </div>
         </div>
       </Card>
@@ -83,13 +80,12 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 
       <Margin size={5} />
 
-      <Card primaryText='Data Providers' secondaryText={providersOpen ? '\u25b2' : '\u25bc'} secondaryTextColor='black'  secondaryTextOnClick={() => setProvidersOpen(!providersOpen)}>{providersOpen ?
+      <Card primaryText='Data Providers' secondaryText={providersOpen ? '\u25b2' : '\u25bc'} secondaryTextColor='black' secondaryTextOnClick={() => setProvidersOpen(!providersOpen)}>{providersOpen ?
         <div className='unified-registry-section'>
           <div className='unified-registry-section__rows--providers'>
-          {// @ts-ignore
-            membersData[index][0].map((elem) => (elem.buttonText != 'Revoke Invite' || owner) && <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text color='primary'>{(elem.buttonText == 'Revoke Invite') ? 'Invite Pending' : ''}</Text>{owner && <Button button_type='secondary' height='3.6rem' padded={false} full onClick={() => { }}>{elem.buttonText}</Button>}</div>)}
+            {// @ts-ignore
+              getUnifiedRegistryData.members_data?.providers?.map((elem) => (elem.buttonText != 'Revoke Invite' || owner) && <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text color='primary'>{(elem.buttonText == 'Revoke Invite') ? 'Invite Pending' : ''}</Text>{owner && <Button button_type='secondary' height='3.6rem' padded={false} full onClick={() => { }}>{elem.buttonText}</Button>}</div>)}
           </div>
-          <Margin size={3} />
           {owner && <div className='unified-registry-section__bottom-button-container'><Button button_type='secondary' height='3.6rem' full onClick={() => { }}>+ Invite New Data Provider</Button></div>}
         </div>
         : undefined
@@ -97,17 +93,17 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
 
       <Margin size={5} />
 
-      <Card primaryText='Data Users' secondaryText={usersOpen ? '\u25b2' : '\u25bc' }  secondaryTextColor='black' secondaryTextOnClick={() => setUsersOpen(!usersOpen)}>{usersOpen ?
+      <Card primaryText='Data Users' secondaryText={usersOpen ? '\u25b2' : '\u25bc'} secondaryTextColor='black' secondaryTextOnClick={() => setUsersOpen(!usersOpen)}>{usersOpen ?
         <div className='unified-registry-section__rows--users'>
-          {membersData[index][1].map((elem) => <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text className='access-details-text' color='primary'>Dataset Access Details</Text></div>) }
-          <Margin size={3} />
+          {/* @ts-ignore */}
+          {getUnifiedRegistryData.members_data?.users.map((elem) => <div className='unified-registry-section__row'><Text fontWeight='500'>{elem.name}</Text><Text className='access-details-text' color='primary'>Dataset Access Details</Text></div>)}
           {owner && <div className='unified-registry-section__bottom-button-container'><Button button_type='secondary' height='3.6rem' full onClick={() => { }}>+ Add New Data Users</Button></div>}
         </div>
         : undefined
       }</Card>
 
       <Margin size={5} />
-      
+
       <PatientSummary containerHeight={false} />
 
       <Margin size={10} />
@@ -117,25 +113,25 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistrySuccessProps> = ({
         getAllDatasetsData={getUnifiedRegistryData.Datasets}
       />
     </>
-   :
+    :
     <>
       <Card primaryText=''>
         <div className="unified-registry-card">
           <div className="unified-registry-card__header">
             <img src={getUnifiedRegistryData.Image} />
-            <div className='unified-registry-card__header__image-edit-icon-div'><ImPencil color='white' size={15} /></div>
+            <div className='unified-registry-card__header__image-edit-icon-div'><label htmlFor='image-upload'><ImPencil color='white' size={15} /></label><input type='file' id='image-upload' /></div>
           </div>
           <div className='registry-modification-form'>
-            <FormFieldsRenderer formState={formState} register={register} fields={{ owner_org: { label: 'Organization Name', placeholder: getUnifiedRegistryData.owner_name || 'Organization Name', type: 'text' }, Description: { label: 'Description', placeholder: getUnifiedRegistryData.Description || 'Description', 'type': 'textarea' }, dataModelSpec: { label: 'Data Model Specifications', placeholder: 'Enter Url', type: 'text' }, requestAccess: { label: 'Request Access', placeholder: 'Enter Url', type: 'text' } }} />
+            <FormFieldsRenderer formState={formState} register={register} fields={{ owner_org: { label: 'Organization Name', placeholder: getUnifiedRegistryData.owner_name || 'Organization Name', type: 'text' }, Description: { label: 'Description', placeholder: getUnifiedRegistryData.Description || 'Description', 'type': 'textarea' }, dataModelSpec: { label: 'Data Model Specifications', placeholder: 'Enter Url', type: 'text' }, owner_org_url: { label: 'Request Access', placeholder: 'Enter Url', type: 'text' } }} />
           </div>
         </div>
       </Card>
-      <Margin size={5}/>
+      <Margin size={5} />
       <div className='unified-registry-edit-page-buttons-div'>
         <Button button_type='primary' full onClick={() => setEditMode(false)}>Save Changes</Button>
         <Button button_type='secondary' full onClick={() => setEditMode(false)}>Reset Changes</Button>
       </div>
-      
+
     </>;
 };
 

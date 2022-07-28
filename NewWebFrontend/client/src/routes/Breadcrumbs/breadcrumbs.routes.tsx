@@ -22,14 +22,16 @@ const BreadcrumbRoutes: React.FC = () => {
     const [datasetName, setDatasetName] = useState('')
     const [registryName, setRegistryName] = useState('')
     const [organizationName, setOrganizationName] = useState('')
+    const [downloadName, setDownloadName] = useState('')
 
-    
+
     const queryClient = useQueryClient()
 
 
     const updateDatasetName      = () => updateBreadcrumb('dataset', 'name', setDatasetName, queryClient, updateDatasetName)
     const updateRegistryName     = () => updateBreadcrumb('unified', 'Name', setRegistryName, queryClient, updateRegistryName)
     const updateOrganizationName = () => updateBreadcrumb('organization', 'name', setOrganizationName, queryClient, updateOrganizationName)
+    const updateDownloadName = () => updateBreadcrumb('download', 'primaryText', setDownloadName, queryClient, updateDownloadName)
 
 
 
@@ -46,7 +48,12 @@ const BreadcrumbRoutes: React.FC = () => {
             return datasetName}
         },
         {
-            path: '/dashboard/virtual-machines', breadcrumb: 'Computational Resources'
+            path: '/dashboard/computational-resources', breadcrumb: 'Computational Resources'
+        },
+        {
+            path: '/dashboard/downloads/:id', breadcrumb: () => {
+                updateDownloadName();
+            return downloadName}
         },
         {
             path: '/dashboard/registries', breadcrumb: 'Unified Registries'

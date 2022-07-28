@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 
 import ProtectedRoute from './ProtectedRoute';
 import UnProtectedRoute from './UnProtectedRoute';
@@ -15,6 +15,8 @@ import UnifiedRegistry from '@pages/UnifiedRegistries/UnifiedRegistry';
 import CustomizableDashboard from '@components/CustomizableDashboard';
 // import ViewOrganization from '@pages/ViewOrganizationOld';
 import ViewOrganization from '@pages/ViewOrganization';
+import Downloads from '@pages/Downloads/Downloads';
+import Download from '@pages/Downloads/Download';
 
 
 const DashboardRouter: React.FC = (): React.ReactElement => (
@@ -37,7 +39,7 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
             <UnifiedRegistry />
           </ProtectedRoute>
         }
-      
+
       />
       <Route
         path="/organizations/:id"
@@ -65,6 +67,14 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
             <Organization />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/computational-resources"
+        element={
+          <ProtectedRoute redirect="/login">
+            <VirtualMachines />
+          </ProtectedRoute>
+        }
       /></>}
 
     <Route
@@ -76,10 +86,18 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
       }
     />
     <Route
-      path="/virtual-machines"
+      path="/downloads"
       element={
         <ProtectedRoute redirect="/login">
-          <VirtualMachines />
+          <Downloads />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/downloads/:id"
+      element={
+        <ProtectedRoute redirect="/login">
+          <Download />
         </ProtectedRoute>
       }
     />
@@ -99,6 +117,8 @@ const DashboardRouter: React.FC = (): React.ReactElement => (
         </ProtectedRoute>
       }
     />
+    <Route path="*" element={<Navigate to="/dashboard" />} />
+
     {/* <Route
       path="/datasets/:id/:version"
       element={

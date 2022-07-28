@@ -40,7 +40,7 @@ export type TGetVirtualMachineSuccess = {
     
     // Types added for demo purposes only
     region?: string;
-    lauched_by?: {
+    launched_by?: {
         user_name: string;
         user_email: string;
         org_name: string;

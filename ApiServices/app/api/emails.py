@@ -21,6 +21,7 @@ from models.emails import EmailRequest
 
 router = APIRouter()
 
+
 ########################################################################################################################
 # Since this is supposed to be a private API no public facing endpoints are needed
 def send_email(request: EmailRequest):

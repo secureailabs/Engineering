@@ -6,17 +6,12 @@ import { TUnifiedRegistriesSuccessProps } from './UnifiedRegistries.types';
 
 import { TGetAllUnifiedRegistriesSuccess } from '@APIs/unifiedRegistry/unifiedRegistry.types';
 
-import TableFilter from '@secureailabs/web-ui/components/TableFilter';
-
 import HighlightedValue from '@secureailabs/web-ui/components/HighlightedValue';
 
-import Margin from '@secureailabs/web-ui/components/Margin';
-import TimeAgo from 'javascript-time-ago';
-import Text from '@secureailabs/web-ui/components/Text';
+import Marker from '@secureailabs/web-ui/components/Marker';
 
-import en from 'javascript-time-ago/locale/en.json';
-TimeAgo.addLocale(en);
-const timeAgo = new TimeAgo('en');
+import Margin from '@secureailabs/web-ui/components/Margin';
+import Text from '@secureailabs/web-ui/components/Text';
 
 const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
   getAllUnifiedRegistriesData,
@@ -30,23 +25,32 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
         Cell: ({
           value,
         }: {
-          value: { Image: string; Description: string };
+          value: { Name: string, Image: string; Description: string, owner_name: string };
         }) => {
-          const { Image, Description } = value;
+          const { Name, Image, Description, owner_name } = value;
           return (
             <div className="unified-registry-preview">
               <img src={Image} />
-              <Text>{Description}</Text>
+              <div className="unified-registry-preview__name_and_def">
+                <Text fontSize='1.2rem' fontWeight='600'>{Name}</Text>
+                <Text fontSize='1.2rem' fontWeight='400'>{Description}</Text>
+                {owner_name == 'Sallie' && <Marker>Data Owner</Marker>}
+              </div>
             </div>
           );
         },
       },
       {
-        Header: 'Created Date',
+        Header: 'Owner',
+        accessor: 'owner_org',
+        width: 100,
+      },
+      {
+        Header: 'Date Created',
         accessor: 'CreatedAt',
         width: 100,
         Cell: ({ value }: { value: Date }) => {
-          return timeAgo.format(value);
+          return value.toLocaleDateString(undefined, {year: 'numeric', month: 'long', day: 'numeric'});
         },
       },
       {
@@ -75,8 +79,10 @@ const UnifiedRegistrySuccess: React.FC<TUnifiedRegistriesSuccessProps> = ({
     return {
       key,
       Registry: {
+        Name: value.Name,
         Image: value.Image,
         Description: value.Description,
+        owner_name: value.owner_name,
       },
       ...value,
     };

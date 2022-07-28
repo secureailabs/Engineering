@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { TViewOrganizationProps } from './ViewOrganization.types';
 
 import ViewOrganizationSuccess from './ViewOrganization.success';

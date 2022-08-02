@@ -107,7 +107,10 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         // Now that all of the organizations are registered, let's process the digital contracts. We are assuming that the datasets are
         // already registered.
         StructuredBuffer oDigitalContracts = oSettings.GetStructuredBuffer("Digital Contracts");
-        oDigitalContracts.RemoveElement("__IsArray__");
+        if (true == oDigitalContracts.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+        {
+            oDigitalContracts.RemoveElement("__IsArray__");
+        }
         std::vector<std::string> strListOfDigitalContracts = oDigitalContracts.GetNamesOfElements();
         for (const std::string & c_strDigitalContractIndex: strListOfDigitalContracts)
         {

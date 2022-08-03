@@ -14,7 +14,7 @@ TimeAgo.setDefaultLocale('en');
 const App: React.FC<AppProps> = ({
 }) => {
 
-  useQuery<IUserData, AxiosError>(['userData'], checkUserSession, { retry: false, refetchInterval: 600000, refetchOnMount: 'always' });
+  useQuery<IUserData, AxiosError>(['userData'], checkUserSession, { retry: false, refetchInterval: 600000, staleTime: 600000 });
 
   return (
     <>

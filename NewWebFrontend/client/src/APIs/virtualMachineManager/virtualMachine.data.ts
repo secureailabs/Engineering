@@ -45,7 +45,7 @@ const demo_data: TGetAllVirtualMachinesSuccess = {
 
             // Fields not implemented in current backend but shown in demos
             region: 'East US 2',
-            lauched_by: {
+            launched_by: {
                 user_name: 'Sallie Director',
                 user_email: 'sallie@kidneycancer.org',
                 org_name: 'Kidney Cancer Association',
@@ -88,7 +88,7 @@ const demo_data: TGetAllVirtualMachinesSuccess = {
 
             // Fields not implemented in current backend but shown in demos
             region: 'East US 2',
-            lauched_by: {
+            launched_by: {
                 user_name: 'Isabel Archer',
                 user_email: 'iarcher@kidneycancer.org',
                 org_name: 'Kidney Cancer Association',
@@ -131,7 +131,7 @@ const demo_data: TGetAllVirtualMachinesSuccess = {
 
             // Fields not implemented in current backend but shown in demos
             region: 'East US 2',
-            lauched_by: {
+            launched_by: {
                 user_name: 'Robert Johnson',
                 user_email: 'robert@crh.org',
                 org_name: 'Cancer Research Hospital',

@@ -14,6 +14,7 @@ export type TGetDownloadSuccess = {
   buttonText: string;
   buttonUrl: string;
   documentationUrl: string;
+  documentationName: string;
   fileSize: string;
   systemRequirements: string;
 };

@@ -15,7 +15,7 @@ const DownloadSuccess: React.FC<TDownloadSuccessProps> = ({ getDownloadData }) =
         <p className="downloads-card__key">{field}</p>
         {
           url
-          ? <a href={getDownloadData.documentationUrl} target="_blank" rel="noopener noreferrer" className="downloads-card__url">Lorem ipsum <FiExternalLink/></a>
+          ? <a href={getDownloadData.documentationUrl} target="_blank" rel="noopener noreferrer" className="downloads-card__url">{value} <FiExternalLink/></a>
           : <p className="downloads-card__value">{value}</p>
         }
       </div>
@@ -37,7 +37,7 @@ const DownloadSuccess: React.FC<TDownloadSuccessProps> = ({ getDownloadData }) =
           <FieldValue field="Description" value={getDownloadData.secondaryText} fullRow={true}/>
           <FieldValue field="Systems Requirement" value={getDownloadData.systemRequirements} fullRow={false}/>
           <FieldValue field="File Size" value={getDownloadData.fileSize} fullRow={false}/>
-          <FieldValue field="Documentation Link" value="Lorem ipsum" fullRow={false} url={getDownloadData.documentationUrl}/>
+          <FieldValue field="Documentation Link" value={getDownloadData.documentationName} fullRow={false} url={getDownloadData.documentationUrl}/>
         </div>
       </Card>
     </StandardContent>

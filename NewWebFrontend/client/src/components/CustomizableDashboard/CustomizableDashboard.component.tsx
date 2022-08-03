@@ -1,6 +1,6 @@
 import React from 'react';
 import TimeAgo from 'javascript-time-ago';
-
+import { Link } from 'react-router-dom';
 import en from 'javascript-time-ago/locale/en.json';
 TimeAgo.addLocale(en);
 const timeAgo = new TimeAgo('en');
@@ -32,18 +32,18 @@ const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
     {
       title: 'No. of Data Users',
       Icon: FaUsers,
-      value: '7',
+      value: '13',
     },
   ];
   const current_time = new Date();
   const data_user_activity = [
     {
-      title: 'lorem Ipsum performs data updates on lorem ispum',
-      date: timeAgo.format(new Date(current_time.getTime() - 15 * 60000)),
+      title: <><Link to='/dashboard/organizations/uuid1' style={{ color: 'black' }}>Kidney Cancer Association</Link> performed computations on <Link to='/dashboard/datasets/uuid2' style={{ color: 'black' }}>The Kidney Cancer Association Research Consortium dataset</Link></>,
+      date: timeAgo.format(new Date(current_time.getTime() - 1 * 86400000)),
     },
     {
-      title: 'lorem Ipsum performs data updates on lorem ispum',
-      date: timeAgo.format(new Date(current_time.getTime() - 15 * 60000)),
+      title: <><Link to='/dashboard/organizations/uuid1' style={{ color: 'black' }}>Kidney Cancer Association</Link> performed computations on <Link to='/dashboard/datasets/uuid2' style={{ color: 'black' }}>The Kidney Cancer Association Research Consortium dataset</Link></>,
+      date: timeAgo.format(new Date(current_time.getTime() - 14 * 86400000)),
     },
   ];
 
@@ -75,7 +75,6 @@ const CustomizableDashboard: React.FC<{ userData: IUserData }> = ({
             <FeedComponent
               title="Data User Activity"
               seconday="Show all"
-              containerHeight={true}
               //@ts-ignore
               feed={data_user_activity}
             />

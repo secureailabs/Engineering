@@ -40,7 +40,10 @@ Organization::Organization(
 
     // Extract the administrators
     StructuredBuffer oAdministrators{c_oOrganizationalData.GetStructuredBuffer("Admins")};
-    oAdministrators.RemoveElement("__IsArray__");
+    if (true == oAdministrators.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+    {
+        oAdministrators.RemoveElement("__IsArray__");
+    }
     for (const std::string & c_strElementName: oAdministrators.GetNamesOfElements())
     {
         StructuredBuffer oAdministrator{oAdministrators.GetStructuredBuffer(c_strElementName.c_str())};
@@ -61,7 +64,10 @@ Organization::Organization(
     if (true == c_oOrganizationalData.IsElementPresent("Users", INDEXED_BUFFER_VALUE_TYPE))
     {
         StructuredBuffer oUsers{c_oOrganizationalData.GetStructuredBuffer("Users")};
-        oUsers.RemoveElement("__IsArray__");
+        if (true == oUsers.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+        {
+            oUsers.RemoveElement("__IsArray__");
+        }
         for (const std::string & c_strElementName: oUsers.GetNamesOfElements())
         {
             StructuredBuffer oUser{oUsers.GetStructuredBuffer(c_strElementName.c_str())};
@@ -81,7 +87,10 @@ Organization::Organization(
     if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
     {
         StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
-        oDatasets.RemoveElement("__IsArray__");
+        if (true == oDatasets.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+        {
+            oDatasets.RemoveElement("__IsArray__");
+        }
         for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
         {
             StructuredBuffer oDatasetInformation{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
@@ -100,7 +109,10 @@ Organization::Organization(
     if (true == c_oOrganizationalData.IsElementPresent("DatasetFamilies", INDEXED_BUFFER_VALUE_TYPE))
     {
         StructuredBuffer oDatasetFamilies{c_oOrganizationalData.GetStructuredBuffer("DatasetFamilies")};
-        oDatasetFamilies.RemoveElement("__IsArray__");
+        if (true == oDatasetFamilies.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+        {
+            oDatasetFamilies.RemoveElement("__IsArray__");
+        }
         for (const std::string & c_strElementName: oDatasetFamilies.GetNamesOfElements())
         {
             StructuredBuffer oDatasetFamily{oDatasetFamilies.GetStructuredBuffer(c_strElementName.c_str())};
@@ -123,7 +135,10 @@ Organization::Organization(
         if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
         {
             StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
-            oDatasets.RemoveElement("__IsArray__");
+            if (true == oDatasets.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+            {
+                oDatasets.RemoveElement("__IsArray__");
+            }
             for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
             {
                 StructuredBuffer oDatasetInformation{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};

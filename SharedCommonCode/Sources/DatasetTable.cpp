@@ -1,6 +1,6 @@
 /*********************************************************************************************
  *
- * @file DatasetTable.cpp
+ * @file DatasetVersionTable.cpp
  * @author Luis Miguel Huapaya
  * @date 30 Sep 2020
  * @License Private and Confidential. Internal Use Only.
@@ -10,7 +10,7 @@
 
 #include "64BitHashes.h"
 #include "BinaryFileHandlers.h"
-#include "Dataset.h"
+#include "DatasetVersion.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 
@@ -19,7 +19,7 @@
 
 /********************************************************************************************/
 
-DatasetTable::DatasetTable(
+DatasetVersionTable::DatasetVersionTable(
     _in const std::string & c_strFilename,
     _in const std::vector<Byte> & c_stlSerializedTableMetadataBuffer,
     _in uint64_t un64OffsetInBytesToTableDataInFile
@@ -27,19 +27,19 @@ DatasetTable::DatasetTable(
 {
     __DebugFunction();
 
-    StructuredBuffer oDatasetMetadata(c_stlSerializedTableMetadataBuffer);
+    StructuredBuffer oDatasetVersionMetadata(c_stlSerializedTableMetadataBuffer);
     // Make sure the metadata contains what is expected
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("id", GUID_VALUE_TYPE)), "INVALID METADATA: id is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: name is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: description is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("tags", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: tags is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("number_of_columns", UINT32_VALUE_TYPE)), "INVALID METADATA: number_of_columns is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("number_of_rows", UINT64_VALUE_TYPE)), "INVALID METADATA: number_of_rows is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("data_size_in_bytes", UINT64_VALUE_TYPE)), "INVALID METADATA: data_size_in_bytes is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("compressed_data_size_in_bytes", UINT64_VALUE_TYPE)), "INVALID METADATA: compressed_data_size_in_bytes is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("all_column_properties", INDEXED_BUFFER_VALUE_TYPE)), "INVALID METADATA: all_column_properties is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("id", GUID_VALUE_TYPE)), "INVALID METADATA: id is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: name is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: description is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("tags", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: tags is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("number_of_columns", UINT32_VALUE_TYPE)), "INVALID METADATA: number_of_columns is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("number_of_rows", UINT64_VALUE_TYPE)), "INVALID METADATA: number_of_rows is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("data_size_in_bytes", UINT64_VALUE_TYPE)), "INVALID METADATA: data_size_in_bytes is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("compressed_data_size_in_bytes", UINT64_VALUE_TYPE)), "INVALID METADATA: compressed_data_size_in_bytes is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("all_column_properties", INDEXED_BUFFER_VALUE_TYPE)), "INVALID METADATA: all_column_properties is missing", nullptr);
     
-    // Is this instance of DatasetTable being initialized with metadata only or with a file?
+    // Is this instance of DatasetVersionTable being initialized with metadata only or with a file?
     if ((0 < c_strFilename.size())&&(0xFFFFFFFFFFFFFFFF != un64OffsetInBytesToTableDataInFile))
     {
         // Quick reality check to make sure everything lines upper_bound
@@ -53,24 +53,24 @@ DatasetTable::DatasetTable(
         std::vector<Byte> stlBuffer = oBinaryFileReader.Read(16);
         __DebugAssert(16 == stlBuffer.size());
         Guid oTableIdentifier((const Byte *) stlBuffer.data());
-        _ThrowBaseExceptionIf((oTableIdentifier != oDatasetMetadata.GetGuid("id")), "UNEXPECTED ERROR: Incorrect table identifier %s", oTableIdentifier.ToString(eHyphensOnly).c_str());
+        _ThrowBaseExceptionIf((oTableIdentifier != oDatasetVersionMetadata.GetGuid("id")), "UNEXPECTED ERROR: Incorrect table identifier %s", oTableIdentifier.ToString(eHyphensOnly).c_str());
         // Read the compressed size in bytes
         uint64_t un64CompressedSizeInBytes = 0;
         oBinaryFileReader.Read((void *) &un64CompressedSizeInBytes, sizeof(un64CompressedSizeInBytes));
-        _ThrowBaseExceptionIf((un64CompressedSizeInBytes != oDatasetMetadata.GetUnsignedInt64("compressed_data_size_in_bytes")), "UNEXPECTED ERROR: Incorrect compressed size in bytes %ld (expecting %ld)", un64CompressedSizeInBytes, oDatasetMetadata.GetUnsignedInt64("compressed_data_size_in_bytes"));
+        _ThrowBaseExceptionIf((un64CompressedSizeInBytes != oDatasetVersionMetadata.GetUnsignedInt64("compressed_data_size_in_bytes")), "UNEXPECTED ERROR: Incorrect compressed size in bytes %ld (expecting %ld)", un64CompressedSizeInBytes, oDatasetVersionMetadata.GetUnsignedInt64("compressed_data_size_in_bytes"));
         // Move the file cursor forward from the current position (1) to find the marker at the end of the compressed data stream
         oBinaryFileReader.Seek(eFromCurrentPositionInFile, un64CompressedSizeInBytes);
         // Read the market
         oBinaryFileReader.Read((void *) &qwMarker, sizeof(qwMarker));
         _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != qwMarker), "Invalid marker value of 0x%08X%08X found at the beginning of the file", HIDWORD(qwMarker), LODWORD(qwMarker));
         // The offset to table data + the size of the compressed data should not be greater than the size of the file
-        uint64_t un64TotalSizeInBytesOfTable = sizeof(Qword) + 16 + sizeof(uint64_t) + oDatasetMetadata.GetUnsignedInt64("compressed_data_size_in_bytes");
+        uint64_t un64TotalSizeInBytesOfTable = sizeof(Qword) + 16 + sizeof(uint64_t) + oDatasetVersionMetadata.GetUnsignedInt64("compressed_data_size_in_bytes");
         _ThrowBaseExceptionIf(((un64OffsetInBytesToTableDataInFile + un64TotalSizeInBytesOfTable) > oBinaryFileReader.GetSizeInBytes()), "ERROR: Invalid size in bytes for table data.", nullptr);
     }
 
     // Okay, up to now, everything seems to be doing well. Now let's parse through the columns in the metadata
-    unsigned int unColumnCount = oDatasetMetadata.GetUnsignedInt32("number_of_columns");
-    StructuredBuffer oAllColumnProperties = oDatasetMetadata.GetStructuredBuffer("all_column_properties");
+    unsigned int unColumnCount = oDatasetVersionMetadata.GetUnsignedInt32("number_of_columns");
+    StructuredBuffer oAllColumnProperties = oDatasetVersionMetadata.GetStructuredBuffer("all_column_properties");
     std::vector<std::string> stlListOfColumns = oAllColumnProperties.GetNamesOfElements();
     // Erase the __IsArray__ from the list of columns
     stlListOfColumns.erase(std::remove(stlListOfColumns.begin(), stlListOfColumns.end(), "__IsArray__"), stlListOfColumns.end());
@@ -91,21 +91,21 @@ DatasetTable::DatasetTable(
         m_stlColumnIndexByIdentifier[qwHashOfColumnIdentifier] = unColumnIndex;
     }
     // If everything went well, everything is proper, we can persist member variable
-    m_oTableMetadata = oDatasetMetadata;
+    m_oTableMetadata = oDatasetVersionMetadata;
     m_strFilename = c_strFilename;
     m_un64OffsetInBytesToTableDataInFile = un64OffsetInBytesToTableDataInFile;
 }
 
 /********************************************************************************************/
 
-DatasetTable::~DatasetTable(void)
+DatasetVersionTable::~DatasetVersionTable(void)
 {
     __DebugFunction();
 }
 
 /********************************************************************************************/
 
-std::string __thiscall DatasetTable::GetTableIdentifier(void) const throw()
+std::string __thiscall DatasetVersionTable::GetTableIdentifier(void) const throw()
 {
     __DebugFunction();
     __DebugAssert(true == m_oTableMetadata.IsElementPresent("id", GUID_VALUE_TYPE));
@@ -115,7 +115,7 @@ std::string __thiscall DatasetTable::GetTableIdentifier(void) const throw()
 
 /********************************************************************************************/
 
-std::string __thiscall DatasetTable::GetTitle(void) const throw()
+std::string __thiscall DatasetVersionTable::GetTitle(void) const throw()
 {
     __DebugFunction();
     __DebugAssert(true == m_oTableMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE));
@@ -125,7 +125,7 @@ std::string __thiscall DatasetTable::GetTitle(void) const throw()
 
 /********************************************************************************************/
 
-std::string __thiscall DatasetTable::GetDescription(void) const throw()
+std::string __thiscall DatasetVersionTable::GetDescription(void) const throw()
 {
     __DebugFunction();
     __DebugAssert(true == m_oTableMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE));
@@ -135,7 +135,7 @@ std::string __thiscall DatasetTable::GetDescription(void) const throw()
 
 /********************************************************************************************/
 
-std::string __thiscall DatasetTable::GetTags(void) const throw()
+std::string __thiscall DatasetVersionTable::GetTags(void) const throw()
 {
     __DebugFunction();
     __DebugAssert(true == m_oTableMetadata.IsElementPresent("tags", ANSI_CHARACTER_STRING_VALUE_TYPE));
@@ -145,7 +145,7 @@ std::string __thiscall DatasetTable::GetTags(void) const throw()
 
 /********************************************************************************************/
 
-uint64_t __thiscall DatasetTable::GetRowCount(void) const throw()
+uint64_t __thiscall DatasetVersionTable::GetRowCount(void) const throw()
 {
     __DebugFunction();
     __DebugAssert(true == m_oTableMetadata.IsElementPresent("number_of_rows", UINT64_VALUE_TYPE));
@@ -155,7 +155,7 @@ uint64_t __thiscall DatasetTable::GetRowCount(void) const throw()
 
 /********************************************************************************************/
 
-unsigned int __thiscall DatasetTable::GetColumnCount(void) const throw()
+unsigned int __thiscall DatasetVersionTable::GetColumnCount(void) const throw()
 {
     __DebugFunction();
     __DebugAssert(true == m_oTableMetadata.IsElementPresent("number_of_columns", UINT32_VALUE_TYPE));
@@ -165,7 +165,7 @@ unsigned int __thiscall DatasetTable::GetColumnCount(void) const throw()
 
 /********************************************************************************************/
 
-std::vector<std::string> __thiscall DatasetTable::GetColumnIdentifiers(void) const throw()
+std::vector<std::string> __thiscall DatasetVersionTable::GetColumnIdentifiers(void) const throw()
 {
     __DebugFunction();
 
@@ -174,7 +174,7 @@ std::vector<std::string> __thiscall DatasetTable::GetColumnIdentifiers(void) con
 
 /********************************************************************************************/
 
-DatasetTableColumn __thiscall DatasetTable::GetTableColumn(
+DatasetVersionTableColumn __thiscall DatasetVersionTable::GetTableColumn(
     _in const char * c_szColumnIdentifier
     ) const
 {
@@ -188,12 +188,12 @@ DatasetTableColumn __thiscall DatasetTable::GetTableColumn(
     std::string strColumnIndexAsString = std::to_string(unColumnIndex);
     StructuredBuffer oColumnProperties = m_oTableMetadata.GetStructuredBuffer("all_column_properties").GetStructuredBuffer(strColumnIndexAsString.c_str());
     
-    return DatasetTableColumn(oColumnProperties.GetSerializedBuffer());
+    return DatasetVersionTableColumn(oColumnProperties.GetSerializedBuffer());
 }
 
 /********************************************************************************************/
 
-StructuredBuffer __thiscall DatasetTable::GetInformationForDataAccess(void) const throw()
+StructuredBuffer __thiscall DatasetVersionTable::GetInformationForDataAccess(void) const throw()
 {
     __DebugFunction();
     __DebugAssert(true == m_oTableMetadata.IsElementPresent("compressed_data_size_in_bytes", UINT64_VALUE_TYPE));
@@ -201,7 +201,7 @@ StructuredBuffer __thiscall DatasetTable::GetInformationForDataAccess(void) cons
     
     StructuredBuffer oInformationForDataAccess;
     
-    oInformationForDataAccess.PutString("DatasetFilename", m_strFilename);
+    oInformationForDataAccess.PutString("DatasetVersionFilename", m_strFilename);
     oInformationForDataAccess.PutUnsignedInt64("data_size_in_bytes", m_oTableMetadata.GetUnsignedInt64("data_size_in_bytes"));
     oInformationForDataAccess.PutUnsignedInt64("CompressedSizeInBytes", m_oTableMetadata.GetUnsignedInt64("compressed_data_size_in_bytes"));
     oInformationForDataAccess.PutUnsignedInt64("OffsetToFirstByteOfCompressedData", m_un64OffsetInBytesToTableDataInFile + sizeof(Qword) + 16 + sizeof(uint64_t));

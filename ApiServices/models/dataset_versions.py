@@ -1,8 +1,8 @@
 # -------------------------------------------------------------------------------
 # Engineering
-# datasets.py
+# dataset_versions.py
 # -------------------------------------------------------------------------------
-"""Models used by datasets"""
+"""Models used by dataset versions"""
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -21,12 +21,12 @@ from pydantic import Field, StrictStr
 from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
-class DatasetState(Enum):
+class DatasetVersionState(Enum):
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
 
 
-class DatasetTableCoumn(SailBaseModel):
+class DatasetVersionTableCoumn(SailBaseModel):
     id: PyObjectId = Field(...)
     units: StrictStr = Field(...)
     name: StrictStr = Field(...)
@@ -35,7 +35,7 @@ class DatasetTableCoumn(SailBaseModel):
     description: StrictStr = Field(...)
 
 
-class DatasetTable(SailBaseModel):
+class DatasetVersionTable(SailBaseModel):
     id: PyObjectId = Field(...)
     number_of_rows: int = Field(...)
     name: StrictStr = Field(...)
@@ -43,35 +43,36 @@ class DatasetTable(SailBaseModel):
     number_of_columns: int = Field(...)
     compressed_data_size_in_bytes: int = Field(...)
     description: StrictStr = Field(...)
-    all_column_properties: List[DatasetTableCoumn] = Field(...)
+    all_column_properties: List[DatasetVersionTableCoumn] = Field(...)
     data_size_in_bytes: int = Field(...)
 
 
-class Dataset_Base(SailBaseModel):
+class DatasetVersion_Base(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
+    dataset_id: PyObjectId = Field(...)
     description: StrictStr = Field(...)
     name: str = Field(max_length=255)
     keywords: StrictStr = Field(...)
     version: StrictStr = Field(...)
     publish_date: int = Field(...)
-    tables: List[DatasetTable] = Field(...)
+    tables: List[DatasetVersionTable] = Field(...)
 
 
-class Dataset_Db(Dataset_Base):
-    dataset_created_time: datetime = Field(default_factory=datetime.utcnow)
+class DatasetVersion_Db(DatasetVersion_Base):
+    dataset_version_created_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
-    state: DatasetState = Field(...)
+    state: DatasetVersionState = Field(...)
 
 
-class RegisterDataset_In(Dataset_Base):
+class RegisterDatasetVersion_In(DatasetVersion_Base):
     pass
 
 
-class RegisterDataset_Out(SailBaseModel):
+class RegisterDatasetVersion_Out(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
 
 
-class UpdateDataset_In(SailBaseModel):
+class UpdateDatasetVersion_In(SailBaseModel):
     # todo: Prawal add a validator to enure that atleast of the field is present in the request
     description: Optional[StrictStr] = Field(default=None)
     name: Optional[StrictStr] = Field(default=None)
@@ -79,11 +80,11 @@ class UpdateDataset_In(SailBaseModel):
     version: Optional[StrictStr] = Field(default=None)
 
 
-class GetDataset_Out(Dataset_Base):
-    dataset_created_time: datetime = Field(...)
+class GetDatasetVersion_Out(DatasetVersion_Base):
+    dataset_version_created_time: datetime = Field(...)
     organization: BasicObjectInfo = Field(...)
-    state: DatasetState = Field(...)
+    state: DatasetVersionState = Field(...)
 
 
-class GetMultipleDataset_Out(SailBaseModel):
-    datasets: List[GetDataset_Out] = Field(...)
+class GetMultipleDatasetVersion_Out(SailBaseModel):
+    dataset_versions: List[GetDatasetVersion_Out] = Field(...)

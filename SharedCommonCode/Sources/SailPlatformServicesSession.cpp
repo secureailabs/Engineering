@@ -375,7 +375,7 @@ std::string __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
  *
  ********************************************************************************************/
 
-void __thiscall SailPlatformServicesSession::RegisterDataset(
+void __thiscall SailPlatformServicesSession::RegisterDatasetVersion(
     _in const Guid & c_oDatasetIdentifier,
     _in const StructuredBuffer & c_oDatasetMetadata
     )
@@ -389,6 +389,7 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
     // Build the API call
     StructuredBuffer oRequestBody;
     oRequestBody.PutString("id", c_oDatasetIdentifier.ToString(eHyphensOnly));
+    oRequestBody.PutString("dataset_id", c_oDatasetMetadata.GetString("dataset_id"));
     oRequestBody.PutString("description", c_oDatasetMetadata.GetString("description"));
     oRequestBody.PutString("name", c_oDatasetMetadata.GetString("name"));
     oRequestBody.PutString("keywords", c_oDatasetMetadata.GetString("keywords"));
@@ -398,7 +399,7 @@ void __thiscall SailPlatformServicesSession::RegisterDataset(
 
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/datasets";
+    std::string strApiUrl = "/dataset-versions";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(oRequestBody);
     std::vector<std::string> stlListOfHeaders;
     stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());

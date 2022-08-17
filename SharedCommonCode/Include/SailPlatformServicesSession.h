@@ -71,9 +71,9 @@ class SailPlatformServicesSession : public Object
         std::string __thiscall RegisterDatasetFamily(
             _in const StructuredBuffer & c_oRegistrationParameters
             );
-        void __thiscall RegisterDataset(
-            _in const Guid & c_oDatasetIdentifier,
-            _in const StructuredBuffer & c_oDatasetMetadata
+        void __thiscall RegisterDatasetVersion(
+            _in const Guid & c_oDatasetVersionIdentifier,
+            _in const StructuredBuffer & c_oDatasetVersionMetadata
             );
         std::string __thiscall ApplyForDigitalContract(
             _in const StructuredBuffer & c_oRegistrationParameters

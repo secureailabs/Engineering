@@ -47,8 +47,8 @@ class Organization : public Object
         std::string __thiscall GetAdminUsername(void) const throw();
         // Method which returns the identifier of a dataset based on it'sb_type
         // name. This is required in order to help register digital contracts
-        std::string __thiscall GetDatasetIdentifier(
-            _in const std::string & c_strDatasetName
+        std::string __thiscall GetDatasetVersionIdentifier(
+            _in const std::string & c_strDatasetVersionName
             ) const throw();
         // Method which returns the identifier of a dataset family based on it'sb_type
         // name. This is required in order to help register digital contracts
@@ -78,7 +78,7 @@ class Organization : public Object
         void __thiscall RegisterUsers(void);
         void __thiscall RegisterDataFederations(void);
         void __thiscall RegisterDatasetFamilies(void);
-        void __thiscall RegisterDatasets(void);
+        void __thiscall RegisterDatasetVersions(void);
 
         // Private data members
         std::string m_strSailPlatformServicesIpAddress;
@@ -89,7 +89,7 @@ class Organization : public Object
         std::unordered_set<std::string> m_stlContacts;
         std::unordered_set<std::string> m_stlAdministrators;
         std::unordered_set<std::string> m_stlUsers;
-        std::unordered_map<Qword, std::string> m_strDatasetInformationByFilename;
+        std::unordered_map<Qword, std::string> m_strDatasetVersionInformationByFilename;
         std::unordered_set<std::string> m_stlDatasetFamilies;
         std::unordered_map<Qword, std::string> m_strDatasetFamilyIdentifiers;
         std::unordered_set<std::string> m_stlDataFederations;

@@ -8,7 +8,7 @@
  *
  ********************************************************************************************/
 
-#include "Dataset.h"
+#include "DatasetVersion.h"
 #include "DebugLibrary.h"
 #include "DigitalContract.h"
 #include "Exceptions.h"
@@ -47,8 +47,8 @@ DigitalContract::DigitalContract(
     if (true == c_oDigitalContractParameters.IsElementPresent("Dataset", ANSI_CHARACTER_STRING_VALUE_TYPE))
     {
         // We are dealing with a dataset. In the JSON specification, this will be the name of a dataset file
-        Dataset oDataset(c_oDigitalContractParameters.GetString("Dataset").c_str());
-        m_strAssociatedIdentifier = oDataset.GetDatasetIdentifier();
+        DatasetVersion oDatasetVersion(c_oDigitalContractParameters.GetString("Dataset").c_str());
+        m_strAssociatedIdentifier = oDatasetVersion.GetDatasetVersionIdentifier();
     }
     else if (true == c_oDigitalContractParameters.IsElementPresent("DatasetFamily", ANSI_CHARACTER_STRING_VALUE_TYPE))
     {

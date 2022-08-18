@@ -102,7 +102,7 @@ Guid __thiscall RootOfTrustNode::GetDomainIdentifier(void) const
 
 /********************************************************************************************/
 
-std::string __thiscall RootOfTrustNode::GetDatasetFilename(void) const
+std::string __thiscall RootOfTrustNode::GetDatasetVersionFilename(void) const
 {
     __DebugFunction();
     

@@ -11,7 +11,7 @@ import {
 
 export const getDatasetAPI = async (data: TGetDatasetStart): Promise<TGetDatasetSuccess> => {
   const res = await axios.get<TGetDatasetSuccess>
-    (`${axiosProxy()}/api/v1/datasets/${data.dataset_id}`,
+    (`${axiosProxy()}/api/v1/dataset-versions/${data.dataset_id}`,
       {
         data: data,
         withCredentials: true,
@@ -21,7 +21,7 @@ export const getDatasetAPI = async (data: TGetDatasetStart): Promise<TGetDataset
 
 export const getAllDatasetsAPI = async({data} : {data: TGetAllDatasetsStart}): Promise<TGetAllDatasetsSuccess['datasets']> => {
   const res = await axios.get<TGetAllDatasetsSuccess>
-    (`${axiosProxy()}/api/v1/datasets`,
+    (`${axiosProxy()}/api/v1/dataset-versions`,
       {
         data: data,
         withCredentials: true,

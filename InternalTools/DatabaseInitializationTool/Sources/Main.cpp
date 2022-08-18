@@ -120,11 +120,11 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
             // Figure out the organization identifiers for the two participants in the digital contract
             Qword qwHashOfDataOwnerOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("DataOwnerOrganization").c_str(), false);
             Qword qwHashOfResearchOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("ResearchOrganization").c_str(), false);
-            // We are dealing with a dataset family. In the JSON specification, this will be the name of a dataset family
+            // We are dealing with a dataset. In the JSON specification, this will be the name of a dataset
             // Let's point to the target data owner organization since we will need information out of that
             _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfDataOwnerOrganization)), "ERROR: Unknown data owner organization %s specified in Digital Contract", oDigitalContactParameters.GetString("DataOwnerOrganization").c_str());
             Organization * poDataOwnerOrganization = stlListOfOrganizationsByName[qwHashOfDataOwnerOrganization];
-            // We are dealing with a dataset family. In the JSON specification, this will be the name of a dataset family
+            // We are dealing with a dataset. In the JSON specification, this will be the name of a dataset
             // Let's point to the target data owner organization since we will need information out of that
             _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfResearchOrganization)), "ERROR: Unknown research organization %s specified in Digital Contract", oDigitalContactParameters.GetString("ResearchOrganization").c_str());
             Organization * poResearchOrganization = stlListOfOrganizationsByName[qwHashOfResearchOrganization];

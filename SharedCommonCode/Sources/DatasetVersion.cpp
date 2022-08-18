@@ -106,7 +106,7 @@ DatasetVersion::DatasetVersion(
     _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("version", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: version is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("id", GUID_VALUE_TYPE)), "INVALID METADATA: DatasetVersionGuid is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("organization_id", GUID_VALUE_TYPE)), "INVALID METADATA: OrganizationGuid is missing", nullptr);
-    //_ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DataFamilyIdentifier is missing", nullptr);
+    //_ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("DataIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DataIdentifier is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Title is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Description is missing", nullptr);
     _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("keywords", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: keywords is missing", nullptr);
@@ -154,18 +154,18 @@ std::string __thiscall DatasetVersion::GetDatasetVersionIdentifier(void) const t
 
 /********************************************************************************************/
 
-std::string __thiscall DatasetVersion::GetDatasetFamilyIdentifier(void) const throw()
+std::string __thiscall DatasetVersion::GetDatasetIdentifier(void) const throw()
 {
     __DebugFunction();
-    
-    std::string strDatasetVersionFamilyIdentifier = "00000000-0000-0000-0000-000000000000";
-    
+
+    std::string strDatasetIdentifier = "00000000-0000-0000-0000-000000000000";
+
     if (true == m_oDatasetVersionMetadata.IsElementPresent("dataset_id", GUID_VALUE_TYPE))
     {
-        strDatasetVersionFamilyIdentifier = m_oDatasetVersionMetadata.GetGuid("dataset_id").ToString(eHyphensOnly);
+        strDatasetIdentifier = m_oDatasetVersionMetadata.GetGuid("dataset_id").ToString(eHyphensOnly);
     }
 
-    return strDatasetVersionFamilyIdentifier;
+    return strDatasetIdentifier;
 }
 
 /********************************************************************************************/

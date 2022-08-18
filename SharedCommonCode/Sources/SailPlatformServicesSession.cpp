@@ -333,13 +333,13 @@ void __thiscall SailPlatformServicesSession::RegisterUser(
 /********************************************************************************************
  *
  * @class SailPlatformServicesSession
- * @function RegisterDatasetFamily
- * @brief Method used to register a dataset family
+ * @function RegisterDataset
+ * @brief Method used to register a dataset
  * @param[in] c_oRegistrationParameters (StructuredBuffer) Registration parameters
  *
  ********************************************************************************************/
 
-std::string __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
+std::string __thiscall SailPlatformServicesSession::RegisterDataset(
     _in const StructuredBuffer & c_oRegistrationParameters
     )
 {
@@ -352,7 +352,7 @@ std::string __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
 
     // Prepare the API call
     std::string strVerb = "POST";
-    std::string strApiUrl = "/dataset-families";
+    std::string strApiUrl = "/datasets";
     std::string strJsonBody = ::ConvertStructuredBufferToJson(c_oRegistrationParameters);
     std::vector<std::string> stlListOfHeaders;
     stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
@@ -361,7 +361,7 @@ std::string __thiscall SailPlatformServicesSession::RegisterDatasetFamily(
     std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
     StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
     // Did the call succeed?
-    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Missing return value of DatasetFamily id.", nullptr);
+    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Missing return value of Dataset id.", nullptr);
 
     return oResponse.GetString("id");
 }

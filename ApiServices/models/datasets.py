@@ -1,8 +1,8 @@
 # -------------------------------------------------------------------------------
 # Engineering
-# datasets_families.py
+# datasets.py
 # -------------------------------------------------------------------------------
-"""Models used by dataset families"""
+"""Models used by datasets"""
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -20,12 +20,12 @@ from pydantic import Field, StrictStr
 from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
-class DatasetFamilyState(Enum):
+class DatasetState(Enum):
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
 
 
-class DatasetFamily_Base(SailBaseModel):
+class Dataset_Base(SailBaseModel):
     # TODO: Prawal add a StrictStr validator for string lenght
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
@@ -33,22 +33,22 @@ class DatasetFamily_Base(SailBaseModel):
     version: StrictStr = Field(...)
 
 
-class DatasetFamily_Db(DatasetFamily_Base):
+class Dataset_Db(Dataset_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
-    state: DatasetFamilyState = Field(...)
+    state: DatasetState = Field(...)
 
 
-class RegisterDatasetFamily_In(DatasetFamily_Base):
+class RegisterDataset_In(Dataset_Base):
     pass
 
 
-class RegisterDatasetFamily_Out(SailBaseModel):
+class RegisterDataset_Out(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
 
 
-class UpdateDatasetFamily_In(SailBaseModel):
+class UpdateDataset_In(SailBaseModel):
     # todo: Prawal add a validator to enure that atleast of the field is present in the request
     name: Optional[StrictStr] = Field(default=None)
     description: Optional[StrictStr] = Field(default=None)
@@ -56,12 +56,12 @@ class UpdateDatasetFamily_In(SailBaseModel):
     version: Optional[StrictStr] = Field(default=None)
 
 
-class GetDatasetFamily_Out(DatasetFamily_Base):
+class GetDataset_Out(Dataset_Base):
     id: PyObjectId = Field(alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization: BasicObjectInfo = Field(...)
-    state: DatasetFamilyState = Field(...)
+    state: DatasetState = Field(...)
 
 
-class GetMultipleDatasetFamily_Out(SailBaseModel):
-    dataset_families: List[GetDatasetFamily_Out] = Field(default_factory=list)
+class GetMultipleDataset_Out(SailBaseModel):
+    datasets: List[GetDataset_Out] = Field(default_factory=list)

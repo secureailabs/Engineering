@@ -42,10 +42,10 @@ class DatasetVersionReInitializer : public Object
         void __thiscall SetDatasetVersionKeywords(
             _in const std::string c_strDatasetVersionKeywords
             );
-        void __thiscall SetDatasetFamily(
-            _in const std::string c_strDatasetFamily
+        void __thiscall SetDataset(
+            _in const std::string c_strDataset
             );
-        void __thiscall RemoveDatasetFamily(void);
+        void __thiscall RemoveDataset(void);
 
         Guid __thiscall GetDatasetVersionIdentifier(void) const;
         std::vector<Byte> __thiscall GetSerializedDatasetVersionMetadata(void) const;

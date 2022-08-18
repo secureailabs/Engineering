@@ -106,25 +106,25 @@ Organization::Organization(
         }
     }
     // Extract the dataset families
-    if (true == c_oOrganizationalData.IsElementPresent("DatasetFamilies", INDEXED_BUFFER_VALUE_TYPE))
+    if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
     {
-        StructuredBuffer oDatasetFamilies{c_oOrganizationalData.GetStructuredBuffer("DatasetFamilies")};
-        if (true == oDatasetFamilies.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+        StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
+        if (true == oDatasets.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
         {
-            oDatasetFamilies.RemoveElement("__IsArray__");
+            oDatasets.RemoveElement("__IsArray__");
         }
-        for (const std::string & c_strElementName: oDatasetFamilies.GetNamesOfElements())
+        for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
         {
-            StructuredBuffer oDatasetFamily{oDatasetFamilies.GetStructuredBuffer(c_strElementName.c_str())};
-            if ((true == oDatasetFamily.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDatasetFamily.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDatasetFamily.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+            StructuredBuffer oDataset{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
+            if ((true == oDataset.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDataset.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDataset.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE)))
             {
-                std::cout << oDatasetFamily.GetString("Title") << std::endl;
+                std::cout << oDataset.GetString("Title") << std::endl;
                 // Insert the contact m_stlContacts
-                m_stlDatasetFamilies.insert(oDatasetFamily.GetBase64SerializedBuffer());
+                m_stlDatasets.insert(oDataset.GetBase64SerializedBuffer());
             }
             else
             {
-                std::cout << "ERROR: Invalid dataset family entry encountered" << std::endl;
+                std::cout << "ERROR: Invalid dataset entry encountered" << std::endl;
             }
         }
     }
@@ -193,7 +193,7 @@ bool __thiscall Organization::Register(
             std::cout << "005" << std::endl;
             this->RegisterDataFederations();
             std::cout << "006" << std::endl;
-            this->RegisterDatasetFamilies();
+            this->RegisterDatasets();
             std::cout << "007" << std::endl;
             m_fRegistered = true;
         }
@@ -208,7 +208,7 @@ bool __thiscall Organization::Register(
             this->RegisterContacts();
             this->RegisterUsers();
             this->RegisterDataFederations();
-            this->RegisterDatasetFamilies();
+            this->RegisterDatasets();
             m_fRegistered = true;
             this->RegisterDatasetVersions();
         }
@@ -333,22 +333,22 @@ std::string __thiscall Organization::GetDatasetVersionIdentifier(
 
 /********************************************************************************************/
 
-std::string __thiscall Organization::GetDatasetFamilyIdentifier(
-    _in const std::string & c_strDatasetFamilyName
+std::string __thiscall Organization::GetDatasetIdentifier(
+    _in const std::string & c_strDatasetName
     ) const throw()
 {
     __DebugFunction();
     
-    std::string strDatasetFamilyIdentifier{};
+    std::string strDatasetIdentifier{};
     
     try
     {
-        _ThrowBaseExceptionIf((false == m_fRegistered), "ERROR: Cannot get the dataset family identifier before the organization has been registered fully", nullptr);
+        _ThrowBaseExceptionIf((false == m_fRegistered), "ERROR: Cannot get the dataset identifier before the organization has been registered fully", nullptr);
         
-        Qword qwHashOfDatasetFamilyName = ::Get64BitHashOfNullTerminatedString(c_strDatasetFamilyName.c_str(), false);
-        if (m_strDatasetFamilyIdentifiers.end() != m_strDatasetFamilyIdentifiers.find(qwHashOfDatasetFamilyName))
+        Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(c_strDatasetName.c_str(), false);
+        if (m_strDatasetIdentifiers.end() != m_strDatasetIdentifiers.find(qwHashOfDatasetName))
         {
-            strDatasetFamilyIdentifier = m_strDatasetFamilyIdentifiers.at(qwHashOfDatasetFamilyName);
+            strDatasetIdentifier = m_strDatasetIdentifiers.at(qwHashOfDatasetName);
         }
     }
     
@@ -367,7 +367,7 @@ std::string __thiscall Organization::GetDatasetFamilyIdentifier(
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
     
-    return strDatasetFamilyIdentifier;
+    return strDatasetIdentifier;
 }
 
 /********************************************************************************************/
@@ -508,7 +508,7 @@ void __thiscall Organization::RegisterDataFederations(void)
 
 /********************************************************************************************/
 
-void __thiscall Organization::RegisterDatasetFamilies(void)
+void __thiscall Organization::RegisterDatasets(void)
 {
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
@@ -519,25 +519,25 @@ void __thiscall Organization::RegisterDatasetFamilies(void)
     this->Login(oSailPlatformServicesSession);
     // Now that we have skipped the first entry, let's process all of the additional entries
     // Basically, we are adding new users with admin access rights
-    std::unordered_set<std::string>::const_iterator c_stlIterator = m_stlDatasetFamilies.begin();
-    while (m_stlDatasetFamilies.end() != c_stlIterator)
+    std::unordered_set<std::string>::const_iterator c_stlIterator = m_stlDatasets.begin();
+    while (m_stlDatasets.end() != c_stlIterator)
     {
-        StructuredBuffer oDatasetFamily(c_stlIterator->c_str());
+        StructuredBuffer oDataset(c_stlIterator->c_str());
         StructuredBuffer oRegistrationParameters;
 
-        oRegistrationParameters.PutString("name", oDatasetFamily.GetString("Title"));
-        oRegistrationParameters.PutString("description", oDatasetFamily.GetString("Description"));
-        oRegistrationParameters.PutString("tags", oDatasetFamily.GetString("Tags"));
+        oRegistrationParameters.PutString("name", oDataset.GetString("Title"));
+        oRegistrationParameters.PutString("description", oDataset.GetString("Description"));
+        oRegistrationParameters.PutString("tags", oDataset.GetString("Tags"));
         oRegistrationParameters.PutString("version", "0.0.1");
 
-        std::string strDatasetFamilyIdentifier = oSailPlatformServicesSession.RegisterDatasetFamily(oRegistrationParameters);
-        // Make sure the register the dataset family identifier that is returned
-        Qword qwHashOfDatasetFamilyName = ::Get64BitHashOfNullTerminatedString(oDatasetFamily.GetString("Title").c_str(), false);
-        m_strDatasetFamilyIdentifiers[qwHashOfDatasetFamilyName] = strDatasetFamilyIdentifier;
+        std::string strDatasetIdentifier = oSailPlatformServicesSession.RegisterDataset(oRegistrationParameters);
+        // Make sure the register the dataset identifier that is returned
+        Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDataset.GetString("Title").c_str(), false);
+        m_strDatasetIdentifiers[qwHashOfDatasetName] = strDatasetIdentifier;
         // Move on to the next item
         c_stlIterator++;
         
-        std::cout << "Registered data family " << oDatasetFamily.GetString("Title") << std::endl;
+        std::cout << "Registered dataset " << oDataset.GetString("Title") << std::endl;
     }
 }
 
@@ -596,16 +596,16 @@ void __thiscall Organization::RegisterDatasetVersions(void)
             {
                 oDatasetVersionReInitializer.SetDatasetVersionKeywords(oDatasetVersionInformation.GetString("Tags"));
             }
-            // If the new dataset has a dataset family assigned to it
-            if (true == oDatasetVersionInformation.IsElementPresent("DatasetFamily", ANSI_CHARACTER_STRING_VALUE_TYPE))
+            // If the new dataset has a dataset assigned to it
+            if (true == oDatasetVersionInformation.IsElementPresent("Dataset", ANSI_CHARACTER_STRING_VALUE_TYPE))
             {
-                oDatasetVersionReInitializer.SetDatasetFamily(this->GetDatasetFamilyIdentifier(oDatasetVersionInformation.GetString("DatasetFamily")));
+                oDatasetVersionReInitializer.SetDataset(this->GetDatasetIdentifier(oDatasetVersionInformation.GetString("Dataset")));
             }
             else
             {
-                // If it doesn't have a dataset family assigned, make sure the updated dataset
+                // If it doesn't have a dataset assigned, make sure the updated dataset
                 // doesn't have one
-                // oDatasetVersionReInitializer.RemoveDatasetFamily();
+                // oDatasetVersionReInitializer.RemoveDataset();
             }
             // Now we register the dataset using the updated information
             StructuredBuffer oDatasetVersionMetadata(oDatasetVersionReInitializer.GetSerializedDatasetVersionMetadata());

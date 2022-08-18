@@ -109,7 +109,7 @@ bool __thiscall DataConnector::LoadAndVerify(
     DatasetVersion oDatasetVersion(m_poRootOfTrustNode->GetDatasetVersionFilename().c_str());
     // Initialize m_oDatasetVersionMetadata
     m_oDatasetVersionMetadata.PutString("DatasetVersionIdentifier", oDatasetVersion.GetDatasetVersionIdentifier());
-    m_oDatasetVersionMetadata.PutString("DatasetFamilyIdentifier", oDatasetVersion.GetDatasetFamilyIdentifier());
+    m_oDatasetVersionMetadata.PutString("DatasetIdentifier", oDatasetVersion.GetDatasetIdentifier());
     m_oDatasetVersionMetadata.PutString("PublisherIdentifier", oDatasetVersion.GetPublisherIdentifier());
     m_oDatasetVersionMetadata.PutString("Title", oDatasetVersion.GetTitle());
     m_oDatasetVersionMetadata.PutString("Description", oDatasetVersion.GetDescription());

@@ -91,7 +91,7 @@ class DatasetVersion : public Object
         virtual ~DatasetVersion(void) throw();
 
         std::string __thiscall GetDatasetVersionIdentifier(void) const throw();
-        std::string __thiscall GetDatasetFamilyIdentifier(void) const throw();
+        std::string __thiscall GetDatasetIdentifier(void) const throw();
         std::string __thiscall GetPublisherIdentifier(void) const throw();
         std::string __thiscall GetTitle(void) const throw();
         std::string __thiscall GetDescription(void) const throw();

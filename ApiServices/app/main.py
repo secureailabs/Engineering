@@ -26,7 +26,7 @@ from app.api import (
     authentication,
     data_federations,
     dataset_versions,
-    datasets_families,
+    datasets,
     digital_contracts,
     internal_utils,
     remote_data_connector,
@@ -43,13 +43,13 @@ server = FastAPI(
 # Add all the API services here exposed to the public
 server.include_router(authentication.router)
 server.include_router(accounts.router)
+server.include_router(data_federations.router)
+server.include_router(datasets.router)
 server.include_router(dataset_versions.router)
 server.include_router(digital_contracts.router)
 server.include_router(secure_computation_nodes.router)
-server.include_router(datasets_families.router)
 server.include_router(remote_data_connector.router)
 server.include_router(internal_utils.router)
-server.include_router(data_federations.router)
 
 
 # Override the default validation error handler as it throws away a lot of information

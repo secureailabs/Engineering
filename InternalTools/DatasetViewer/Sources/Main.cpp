@@ -90,7 +90,7 @@ int main(
             {
                 std::cout << "| DatasetVersion Filename = " << strDatasetVersionFilename << std::endl;
                 std::cout << "| Identifier = " << oDatasetVersion.GetDatasetVersionIdentifier() << std::endl;
-                std::cout << "| Dataset Family Identifier = " << oDatasetVersion.GetDatasetFamilyIdentifier() << std::endl;
+                std::cout << "| Dataset Identifier = " << oDatasetVersion.GetDatasetIdentifier() << std::endl;
                 std::cout << "| Publisher Identifier = " << oDatasetVersion.GetPublisherIdentifier() << std::endl;
                 std::cout << "| Title = " << oDatasetVersion.GetTitle() << std::endl;
                 std::cout << "| Description = " << oDatasetVersion.GetDescription() << std::endl;

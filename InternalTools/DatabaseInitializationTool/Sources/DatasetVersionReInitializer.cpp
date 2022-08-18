@@ -107,18 +107,18 @@ void __thiscall DatasetVersionReInitializer::SetDatasetVersionKeywords(
 
 /********************************************************************************************/
 
-void __thiscall DatasetVersionReInitializer::SetDatasetFamily(
-    _in const std::string c_strDatasetFamily
+void __thiscall DatasetVersionReInitializer::SetDataset(
+    _in const std::string c_strDataset
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetVersionMetadata.PutString("dataset_id", c_strDatasetFamily);
+    m_oUpdatedDatasetVersionMetadata.PutString("dataset_id", c_strDataset);
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetVersionReInitializer::RemoveDatasetFamily(void)
+void __thiscall DatasetVersionReInitializer::RemoveDataset(void)
 {
     __DebugFunction();
 

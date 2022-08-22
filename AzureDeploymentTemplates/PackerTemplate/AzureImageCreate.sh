@@ -2,9 +2,9 @@
 
 # Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
 source .env.dev
-ResourceGroup="InitializerImageStorageRg"
-StorageAccountName="sailvmimages9822"
-Location="eastus"
+ResourceGroup="InitializerImageStorage-WUS-Rg"
+StorageAccountName="sailvmimages9825"
+Location="westus"
 
 PrintHelp()
 {
@@ -61,13 +61,13 @@ do
             break
             ;;
         3)
-            # TODO TBD on above TODO Discussion
-            echo "You chose choice $REPLY which is $opt"
+            echo -e "\n==== Setting env variables for $opt ===="
+            export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
             break
             ;;
         4)
-            # TODO TBD on above TODO Discussion
-            echo "You chose choice $REPLY which is $opt"
+            echo -e "\n==== Setting env variables for $opt ===="
+            export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
             break
             ;;
         5)
@@ -97,18 +97,16 @@ az storage account create \
 --access-tier Hot
 
 # Ubuntu vhd Image
-packer build \
+output=$(packer build \
 -var location=$Location \
 -var storage_resource_group=$ResourceGroup \
 -var storage_account=$StorageAccountName \
 -var module=$imageName \
-packer-vhd-ubuntu.json
+packer-vhd-ubuntu.json | tee /dev/tty)
 
-# TODO: Get the image id from packer output
-# imageId=$(cat packer-manifest.json | grep "artifact_id" | awk '{print $2}')
-
-# This is a manual step where the user needs to copy the url of generated vhd file to the storage account
-read -p "Enter VHD image URL: " vhdImageUrl
+# Specify vhdImageUrl to use
+temp=$(echo "$output" | grep -Po "OSDiskUri: (https:*.*sailimages.*.vhd)")
+vhdImageUrl=$(echo "$temp" | grep -Po "https:*.*vhd")
 
 # Create managed image from vhd
 az image create \

@@ -787,7 +787,7 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
 
         // Build out the REST API call query
         std::string strVerb = "POST";
-        std::string strApiUri = "/datasets";
+        std::string strApiUri = "/dataset-versions";
         std::vector<std::string> stlListOfHeaders;
         stlListOfHeaders.push_back("Authorization: Bearer " + ::GetSailPlatformServicesAccessToken());
         stlListOfHeaders.push_back("Content-Type: application/json");
@@ -796,6 +796,7 @@ extern "C" __declspec(dllexport) bool __cdecl PublishDataset(
         oRestApiCall.PutString("id", oDatasetMetadata.GetGuid("id").ToString(eHyphensOnly));
         oRestApiCall.PutString("version", "0.1.0.0");
         oRestApiCall.PutString("name", oDatasetMetadata.GetString("name"));
+        oRestApiCall.PutString("dataset", oDatasetMetadata.GetString("data_family_id"));
         oRestApiCall.PutString("description", oDatasetMetadata.GetString("name"));
         oRestApiCall.PutString("keywords", oDatasetMetadata.GetString("keywords"));
         oRestApiCall.PutUnsignedInt64("publish_date", oDatasetMetadata.GetUnsignedInt64("publish_date"));

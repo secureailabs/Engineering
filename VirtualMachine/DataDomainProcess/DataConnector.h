@@ -61,9 +61,9 @@ class DataConnector : public Object
             ) const;
 
         // Private data members
-        StructuredBuffer m_oAllDatasetIds;
+        StructuredBuffer m_oAllDatasetVersionIds;
         RootOfTrustNode * m_poRootOfTrustNode;
-        StructuredBuffer m_oDatasetMetadata;
+        StructuredBuffer m_oDatasetVersionMetadata;
         std::vector<StructuredBuffer> m_stlTableMetaData;
         std::vector<std::vector<std::vector<std::string>>> m_stlTableData;
         std::map<std::string, int> m_stlMapOfTableNameToId;

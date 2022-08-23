@@ -12,7 +12,7 @@
 #include "BinaryFileHandlers.h"
 #include "CompressionHelperFunctions.h"
 #include "DataConnector.h"
-#include "Dataset.h"
+#include "DatasetVersion.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "StatusMonitor.h"
@@ -106,40 +106,40 @@ bool __thiscall DataConnector::LoadAndVerify(
     // Persist the RootOfTrustNode
     m_poRootOfTrustNode = poRootOfTrustNode;
     // Load the dataset from file
-    Dataset oDataset(m_poRootOfTrustNode->GetDatasetFilename().c_str());
-    // Initialize m_oDatasetMetadata
-    m_oDatasetMetadata.PutString("DatasetIdentifier", oDataset.GetDatasetIdentifier());
-    m_oDatasetMetadata.PutString("DatasetFamilyIdentifier", oDataset.GetDatasetFamilyIdentifier());
-    m_oDatasetMetadata.PutString("PublisherIdentifier", oDataset.GetPublisherIdentifier());
-    m_oDatasetMetadata.PutString("Title", oDataset.GetTitle());
-    m_oDatasetMetadata.PutString("Description", oDataset.GetDescription());
-    m_oDatasetMetadata.PutUnsignedInt64("EpochCreationTimeInSeconds", oDataset.GetPublishDate());
-    m_oDatasetMetadata.PutUnsignedInt32("TableCount", oDataset.GetNumberOfTables());
-    // Begin initializing m_oAllDatasetIds
-    m_oAllDatasetIds.PutString("DatasetUuid", oDataset.GetDatasetIdentifier());
+    DatasetVersion oDatasetVersion(m_poRootOfTrustNode->GetDatasetVersionFilename().c_str());
+    // Initialize m_oDatasetVersionMetadata
+    m_oDatasetVersionMetadata.PutString("DatasetVersionIdentifier", oDatasetVersion.GetDatasetVersionIdentifier());
+    m_oDatasetVersionMetadata.PutString("DatasetIdentifier", oDatasetVersion.GetDatasetIdentifier());
+    m_oDatasetVersionMetadata.PutString("PublisherIdentifier", oDatasetVersion.GetPublisherIdentifier());
+    m_oDatasetVersionMetadata.PutString("Title", oDatasetVersion.GetTitle());
+    m_oDatasetVersionMetadata.PutString("Description", oDatasetVersion.GetDescription());
+    m_oDatasetVersionMetadata.PutUnsignedInt64("EpochCreationTimeInSeconds", oDatasetVersion.GetPublishDate());
+    m_oDatasetVersionMetadata.PutUnsignedInt32("TableCount", oDatasetVersion.GetNumberOfTables());
+    // Begin initializing m_oAllDatasetVersionIds
+    m_oAllDatasetVersionIds.PutString("DatasetVersionUuid", oDatasetVersion.GetDatasetVersionIdentifier());
     // Build the table metadata
     StructuredBuffer oAllTablesMetadata;
     // Seek to each tables metadata and store the StructuredBuffer into the class member
-    std::vector<std::string> stlListOfTableIdentifiers = oDataset.GetTableIdentifiers();
-    __DebugAssert(stlListOfTableIdentifiers.size() == oDataset.GetNumberOfTables());
+    std::vector<std::string> stlListOfTableIdentifiers = oDatasetVersion.GetTableIdentifiers();
+    __DebugAssert(stlListOfTableIdentifiers.size() == oDatasetVersion.GetNumberOfTables());
     for (const auto & c_stlTableIdentifier: stlListOfTableIdentifiers)
     {
-        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_stlTableIdentifier.c_str());
+        DatasetVersionTable oDatasetVersionTable = oDatasetVersion.GetDatasetVersionTable(c_stlTableIdentifier.c_str());
         // Build the metadata blob for the current table
         StructuredBuffer oTableMedata;
-        oTableMedata.PutString("TableIdentifier", oDatasetTable.GetTableIdentifier());
-        oTableMedata.PutString("Title", oDatasetTable.GetTitle());
-        oTableMedata.PutString("Description", oDatasetTable.GetDescription());
-        oTableMedata.PutString("Tags", oDatasetTable.GetTags());
-        oTableMedata.PutUnsignedInt64("RowCount", oDatasetTable.GetRowCount());
-        oTableMedata.PutUnsignedInt32("ColumnCount", oDatasetTable.GetColumnCount());
+        oTableMedata.PutString("TableIdentifier", oDatasetVersionTable.GetTableIdentifier());
+        oTableMedata.PutString("Title", oDatasetVersionTable.GetTitle());
+        oTableMedata.PutString("Description", oDatasetVersionTable.GetDescription());
+        oTableMedata.PutString("Tags", oDatasetVersionTable.GetTags());
+        oTableMedata.PutUnsignedInt64("RowCount", oDatasetVersionTable.GetRowCount());
+        oTableMedata.PutUnsignedInt32("ColumnCount", oDatasetVersionTable.GetColumnCount());
         m_stlTableMetaData.push_back(StructuredBuffer(oTableMedata));
 
         // HACK-DG We want to store everything as eRaw
-        Guid oDatasetIdentifier(oDatasetTable.GetTableIdentifier());
-        oAllTablesMetadata.PutString(oDatasetTable.GetTitle().c_str(), oDatasetIdentifier.ToString(eRaw));
+        Guid oDatasetVersionIdentifier(oDatasetVersionTable.GetTableIdentifier());
+        oAllTablesMetadata.PutString(oDatasetVersionTable.GetTitle().c_str(), oDatasetVersionIdentifier.ToString(eRaw));
     }
-    m_oAllDatasetIds.PutStructuredBuffer("Tables", oAllTablesMetadata);
+    m_oAllDatasetVersionIds.PutStructuredBuffer("Tables", oAllTablesMetadata);
 
     unsigned int unTableIndex = 0;
     // Read each table and store it in a 3D vector of tables
@@ -148,10 +148,10 @@ bool __thiscall DataConnector::LoadAndVerify(
         // Where to store your individual table.
         std::vector<std::vector<std::string>> stlIndividualTable;
         // Get the dataset table
-        DatasetTable oDatasetTable = oDataset.GetDatasetTable(c_stlTableIdentifier.c_str());
+        DatasetVersionTable oDatasetVersionTable = oDatasetVersion.GetDatasetVersionTable(c_stlTableIdentifier.c_str());
         // Extract the table into plain-text
-        StructuredBuffer oInformationForDataAccess(oDatasetTable.GetInformationForDataAccess());
-        BinaryFileReader oBinaryFileReader(oInformationForDataAccess.GetString("DatasetFilename"));
+        StructuredBuffer oInformationForDataAccess(oDatasetVersionTable.GetInformationForDataAccess());
+        BinaryFileReader oBinaryFileReader(oInformationForDataAccess.GetString("DatasetVersionFilename"));
         oBinaryFileReader.Seek(eFromBeginningOfFile, oInformationForDataAccess.GetUnsignedInt64("OffsetToFirstByteOfCompressedData"));
         std::vector<Byte> stlCompressedSerializedData = oBinaryFileReader.Read(oInformationForDataAccess.GetUnsignedInt64("CompressedSizeInBytes"));
         StructuredBuffer oCompressedSerializedData(stlCompressedSerializedData);
@@ -166,13 +166,13 @@ bool __thiscall DataConnector::LoadAndVerify(
         stlDecompressedSerializedData.clear();
         // Now prepare to go through the table, row by row (i.e. string by string)
         std::stringstream stlTableStream(strDecompressedSerializedData);
-        for (unsigned int unRowNumber = 0; unRowNumber < oDatasetTable.GetRowCount(); ++unRowNumber)
+        for (unsigned int unRowNumber = 0; unRowNumber < oDatasetVersionTable.GetRowCount(); ++unRowNumber)
         {
             std::vector<std::string> stlOneRow;
             std::string strCurrentLine;
             std::getline(stlTableStream, strCurrentLine);
             std::stringstream stlCurrentLineStream(strCurrentLine);
-            for (unsigned int unColumnNumber = 0; unColumnNumber < oDatasetTable.GetColumnCount(); ++unColumnNumber)
+            for (unsigned int unColumnNumber = 0; unColumnNumber < oDatasetVersionTable.GetColumnCount(); ++unColumnNumber)
             {
                 std::string strCell;
                 std::getline(stlCurrentLineStream, strCell, '\x1f');
@@ -182,15 +182,15 @@ bool __thiscall DataConnector::LoadAndVerify(
         }
         m_stlTableData.push_back(stlIndividualTable);
         // Also add table name to id in the cache map
-        m_stlMapOfTableNameToId.insert(std::make_pair(oDatasetTable.GetTitle(), unTableIndex));
+        m_stlMapOfTableNameToId.insert(std::make_pair(oDatasetVersionTable.GetTitle(), unTableIndex));
         // Increment the table index;
         unTableIndex++;
     }
 
     StructuredBuffer oEventData;
     oEventData.PutBoolean("Success", true);
-    oEventData.PutString("DatasetFilename", m_poRootOfTrustNode->GetDatasetFilename());
-    oEventData.PutStructuredBuffer("DatasetMetadata", m_oDatasetMetadata);
+    oEventData.PutString("DatasetVersionFilename", m_poRootOfTrustNode->GetDatasetVersionFilename());
+    oEventData.PutStructuredBuffer("DatasetVersionMetadata", m_oDatasetVersionMetadata);
     m_poRootOfTrustNode->RecordAuditEvent("LOAD_DATASET", 0x1111, 0x05, oEventData);
 
     return true;
@@ -294,10 +294,10 @@ void __thiscall DataConnector::HandleRequest(
                     oEventData.PutUnsignedInt32("TableIdentifier", unTableIndex);
                     m_poRootOfTrustNode->RecordAuditEvent("DATASET_REQUEST_TABLE", 0x1100, 0x01, oEventData);
                 }
-                else if (eGetDatasetMetadata == requestType)
+                else if (eGetDatasetVersionMetadata == requestType)
                 {
                     oDataResponse.PutBoolean("Status", true);
-                    oDataResponse.PutStructuredBuffer("ResponseData", m_oDatasetMetadata);
+                    oDataResponse.PutStructuredBuffer("ResponseData", m_oDatasetVersionMetadata);
 
                     m_poRootOfTrustNode->RecordAuditEvent("DATASET_GET_METADATA", 0x1100, 0x01, oDataResponse);
                 }
@@ -317,7 +317,7 @@ void __thiscall DataConnector::HandleRequest(
                 else if (eGetUuids == requestType)
                 {
                     oDataResponse.PutBoolean("Status", true);
-                    oDataResponse.PutStructuredBuffer("ResponseData", m_oAllDatasetIds);
+                    oDataResponse.PutStructuredBuffer("ResponseData", m_oAllDatasetVersionIds);
 
                     m_poRootOfTrustNode->RecordAuditEvent("DATASET_TABLE_GET_GUID", 0x1100, 0x01, oDataResponse);
                 }
@@ -388,7 +388,7 @@ StructuredBuffer __thiscall DataConnector::GetTableRowRange(
     StructuredBuffer oResponseStructuredBuffer;
     std::string strResponseString;
 
-    if ((m_oDatasetMetadata.GetUnsignedInt32("TableCount") <= unTableIndex) || (m_stlTableMetaData[unTableIndex].GetUnsignedInt64("RowCount") <= unEndRowNumber) || (unStartRowNumber > unEndRowNumber))
+    if ((m_oDatasetVersionMetadata.GetUnsignedInt32("TableCount") <= unTableIndex) || (m_stlTableMetaData[unTableIndex].GetUnsignedInt64("RowCount") <= unEndRowNumber) || (unStartRowNumber > unEndRowNumber))
     {
         oResponseStructuredBuffer.PutBoolean("Status", false);
         oResponseStructuredBuffer.PutString("ResponseString", "Out of Bounds Request");
@@ -439,7 +439,7 @@ StructuredBuffer __thiscall DataConnector::GetTableColumnRange(
     StructuredBuffer oResponseStructuredBuffer;
     std::string strResponseString;
 
-    if ((m_oDatasetMetadata.GetInt32("NumberTables") <= static_cast<int>(unTableIndex)) || (m_stlTableMetaData[unTableIndex].GetInt32("NumberColumns") <= static_cast<int>(unEndColumnNumber)) || (unStartColumnNumber > unEndColumnNumber))
+    if ((m_oDatasetVersionMetadata.GetInt32("NumberTables") <= static_cast<int>(unTableIndex)) || (m_stlTableMetaData[unTableIndex].GetInt32("NumberColumns") <= static_cast<int>(unEndColumnNumber)) || (unStartColumnNumber > unEndColumnNumber))
     {
         oResponseStructuredBuffer.PutBoolean("Status", false);
         oResponseStructuredBuffer.PutString("ResponseString", "Out of Bounds Request");
@@ -471,7 +471,7 @@ StructuredBuffer __thiscall DataConnector::GetTableColumnRange(
  *
  * @class DataConnector
  * @function FilterDataRequest
- * @brief Check the request params as per the digital contract and Dataset params
+ * @brief Check the request params as per the digital contract and DatasetVersion params
  * @param[in] oDataRequest StructuredBuffer containing the request from research process
  * @return true if values should be returned, else false
  *

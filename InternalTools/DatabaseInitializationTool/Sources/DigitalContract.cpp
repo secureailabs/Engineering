@@ -8,7 +8,7 @@
  *
  ********************************************************************************************/
 
-#include "Dataset.h"
+#include "DatasetVersion.h"
 #include "DebugLibrary.h"
 #include "DigitalContract.h"
 #include "Exceptions.h"
@@ -42,23 +42,23 @@ DigitalContract::DigitalContract(
     m_strVersionNumber = "1.0.0";
     m_strLegalAgreement = c_oDigitalContractParameters.GetString("LegalAgreement");
     m_unSubscriptionDays = (unsigned int) c_oDigitalContractParameters.GetFloat64("SubscriptionDays");
-    // Now we try and figure out whether we are dealing with a dataset or dataset family. What we need
+    // Now we try and figure out whether we are dealing with a dataset or dataset. What we need
     // is an identifier
     if (true == c_oDigitalContractParameters.IsElementPresent("Dataset", ANSI_CHARACTER_STRING_VALUE_TYPE))
     {
         // We are dealing with a dataset. In the JSON specification, this will be the name of a dataset file
-        Dataset oDataset(c_oDigitalContractParameters.GetString("Dataset").c_str());
-        m_strAssociatedIdentifier = oDataset.GetDatasetIdentifier();
+        DatasetVersion oDatasetVersion(c_oDigitalContractParameters.GetString("Dataset").c_str());
+        m_strAssociatedIdentifier = oDatasetVersion.GetDatasetVersionIdentifier();
     }
-    else if (true == c_oDigitalContractParameters.IsElementPresent("DatasetFamily", ANSI_CHARACTER_STRING_VALUE_TYPE))
+    else if (true == c_oDigitalContractParameters.IsElementPresent("Dataset", ANSI_CHARACTER_STRING_VALUE_TYPE))
     {
-        // We are dealing with a dataset family. We need to get the identifier of the dataset family from
+        // We are dealing with a dataset. We need to get the identifier of the dataset from
         // the data owner organization
-        m_strAssociatedIdentifier = c_poDataOwnerOrganization->GetDatasetFamilyIdentifier(c_oDigitalContractParameters.GetString("DatasetFamily"));
+        m_strAssociatedIdentifier = c_poDataOwnerOrganization->GetDatasetIdentifier(c_oDigitalContractParameters.GetString("Dataset"));
     }
     else
     {
-        _ThrowBaseException("ERROR: Digital Contract specification invalid. Missing dataset or dataset family specification", nullptr);
+        _ThrowBaseException("ERROR: Digital Contract specification invalid. Missing dataset or dataset specification", nullptr);
     }
 }
 

@@ -37,7 +37,7 @@ class DataFederation_Db(DataFederation_Base):
     state: DataFederationState = Field(...)
     data_submitter_organizations_id: List[PyObjectId] = Field(default_factory=list)
     research_organizations_id: List[PyObjectId] = Field(default_factory=list)
-    dataset_families_id: List[PyObjectId] = Field(default_factory=list)
+    datasets_id: List[PyObjectId] = Field(default_factory=list)
     data_submitter_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
     research_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
 
@@ -62,7 +62,7 @@ class GetDataFederation_Out(DataFederation_Base):
     state: DataFederationState = Field(...)
     data_submitter_organizations: List[BasicObjectInfo] = Field(...)
     research_organizations: List[BasicObjectInfo] = Field(...)
-    dataset_families: List[BasicObjectInfo] = Field(...)
+    datasets: List[BasicObjectInfo] = Field(...)
     data_submitter_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
     research_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
 

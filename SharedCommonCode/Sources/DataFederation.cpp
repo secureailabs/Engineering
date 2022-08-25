@@ -81,11 +81,11 @@ DataFederation::DataFederation(
         }
     );
     // Fill in dataset families
-    std::for_each(c_oSourceBuffer.GetStructuredBuffer("DataFederationDatasetFamilyList").GetNamesOfElements().begin(),
-        c_oSourceBuffer.GetStructuredBuffer("DataFederationDatasetFamilyList").GetNamesOfElements().begin(),
+    std::for_each(c_oSourceBuffer.GetStructuredBuffer("DataFederationDatasetList").GetNamesOfElements().begin(),
+        c_oSourceBuffer.GetStructuredBuffer("DataFederationDatasetList").GetNamesOfElements().begin(),
         [&](auto oEntry)
         {
-            m_stlDataFamilies.push_back(c_oSourceBuffer.GetStructuredBuffer("DataFederationDatasetFamilyList").GetGuid(oEntry.c_str()));
+            m_stlDatasets.push_back(c_oSourceBuffer.GetStructuredBuffer("DataFederationDatasetList").GetGuid(oEntry.c_str()));
         }
     );
 
@@ -105,7 +105,7 @@ DataFederation::~DataFederation()
 
 /********************************************************************************************
  *
- * @class DatasetFamilyManager
+ * @class DatasetManager
  * @function ToStructuredBuffer
  * @brief Convert this object to a StructuredBuffer
  * @return A StructuredBuffer representing this object
@@ -126,11 +126,11 @@ StructuredBuffer __thiscall DataFederation::ToStructuredBuffer(void) const
 
     StructuredBuffer oDataFederationDataSubmitterList = ::ConvertIdentifierListToStructuredBuffer(this->m_stlDataSubmitterOrganizations);
     StructuredBuffer oDataFederationResearcherList = ::ConvertIdentifierListToStructuredBuffer(this->m_stlResearchOrganizations);
-    StructuredBuffer oDataFederationDatasetFamilies = ::ConvertIdentifierListToStructuredBuffer(this->m_stlDataFamilies);
+    StructuredBuffer oDataFederationDatasets = ::ConvertIdentifierListToStructuredBuffer(this->m_stlDatasets);
 
     oDataFederationStructuredBuffer.PutStructuredBuffer("DataFederationDataSubmitterList", oDataFederationDataSubmitterList);
     oDataFederationStructuredBuffer.PutStructuredBuffer("DataFederationResearcherList", oDataFederationResearcherList);
-    oDataFederationStructuredBuffer.PutStructuredBuffer("DataFederationDatasetFamilyList", oDataFederationDatasetFamilies);
+    oDataFederationStructuredBuffer.PutStructuredBuffer("DataFederationDatasetList", oDataFederationDatasets);
     oDataFederationStructuredBuffer.PutString("VersionNumber", "0x00000001");
 
     return oDataFederationStructuredBuffer;
@@ -277,16 +277,16 @@ std::list<Guid> DataFederation::ResearchOrganizations() const throw()
 /********************************************************************************************
  *
  * @class DataFederation
- * @function DatasetFamilies
+ * @function Datasets
  * @brief Get the list of datset families in this federation
  * @returns std::list<Guid> of dataset families in this federation
  *
  ********************************************************************************************/
-std::list<Guid> DataFederation::DatasetFamilies() const throw()
+std::list<Guid> DataFederation::Datasets() const throw()
 {
     __DebugFunction();
 
-    return m_stlDataFamilies;
+    return m_stlDatasets;
 }
 
 /********************************************************************************************

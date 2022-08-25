@@ -1,6 +1,6 @@
 /*********************************************************************************************
  *
- * @file DatasetReInitializer.cpp
+ * @file DatasetVersionReInitializer.cpp
  * @author Luis Miguel Huapaya
  * @date 23 March 2022
  * @License Private and Confidential. Internal Use Only.
@@ -9,8 +9,8 @@
  ********************************************************************************************/
 
 #include "BinaryFileHandlers.h"
-#include "Dataset.h"
-#include "DatasetReInitializer.h"
+#include "DatasetVersion.h"
+#include "DatasetVersionReInitializer.h"
 #include "DateAndTime.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
@@ -21,131 +21,131 @@
 
 /********************************************************************************************/
 
-DatasetReInitializer::DatasetReInitializer(
-    _in const std::string & c_strDatasetFilename
+DatasetVersionReInitializer::DatasetVersionReInitializer(
+    _in const std::string & c_strDatasetVersionFilename
     )
 {
     __DebugFunction();
-    _ThrowBaseExceptionIf((false == std::filesystem::exists(c_strDatasetFilename)), "ERROR: Dataset file %s not found", c_strDatasetFilename);
+    _ThrowBaseExceptionIf((false == std::filesystem::exists(c_strDatasetVersionFilename)), "ERROR: DatasetVersion file %s not found", c_strDatasetVersionFilename);
 
-    Dataset oDataset(c_strDatasetFilename.c_str());
-    m_strOriginalDatasetFilename = c_strDatasetFilename;
-    m_oOriginalDatasetMetadata = oDataset.GetSerializedDatasetMetadata();
-    m_oUpdatedDatasetMetadata = oDataset.GetSerializedDatasetMetadata();
+    DatasetVersion oDatasetVersion(c_strDatasetVersionFilename.c_str());
+    m_strOriginalDatasetVersionFilename = c_strDatasetVersionFilename;
+    m_oOriginalDatasetVersionMetadata = oDatasetVersion.GetSerializedDatasetVersionMetadata();
+    m_oUpdatedDatasetVersionMetadata = oDatasetVersion.GetSerializedDatasetVersionMetadata();
 }
 
 /********************************************************************************************/
 
-DatasetReInitializer::~DatasetReInitializer(void)
+DatasetVersionReInitializer::~DatasetVersionReInitializer(void)
 {
     __DebugFunction();
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SetDatasetIdentifier(
-    _in const Guid & c_oDatasetIdentifier
+void __thiscall DatasetVersionReInitializer::SetDatasetVersionIdentifier(
+    _in const Guid & c_oDatasetVersionIdentifier
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutGuid("id", c_oDatasetIdentifier);
+    m_oUpdatedDatasetVersionMetadata.PutGuid("id", c_oDatasetVersionIdentifier);
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SetCorporateIdentifier(
+void __thiscall DatasetVersionReInitializer::SetCorporateIdentifier(
     _in const Guid & c_oCorporateIdentifier
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutGuid("organization_id", c_oCorporateIdentifier);
+    m_oUpdatedDatasetVersionMetadata.PutGuid("organization_id", c_oCorporateIdentifier);
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::ResetUtcEpochPublishDate(void)
+void __thiscall DatasetVersionReInitializer::ResetUtcEpochPublishDate(void)
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutUnsignedInt64("publish_date", ::GetEpochTimeInSeconds());
+    m_oUpdatedDatasetVersionMetadata.PutUnsignedInt64("publish_date", ::GetEpochTimeInSeconds());
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SetDatasetName(
-    _in const std::string c_strDatasetTitle
+void __thiscall DatasetVersionReInitializer::SetDatasetVersionName(
+    _in const std::string c_strDatasetVersionTitle
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutString("name", c_strDatasetTitle);
+    m_oUpdatedDatasetVersionMetadata.PutString("name", c_strDatasetVersionTitle);
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SetDatasetDescription(
-    _in const std::string c_strDatasetDescription
+void __thiscall DatasetVersionReInitializer::SetDatasetVersionDescription(
+    _in const std::string c_strDatasetVersionDescription
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutString("description", c_strDatasetDescription);
+    m_oUpdatedDatasetVersionMetadata.PutString("description", c_strDatasetVersionDescription);
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SetDatasetKeywords(
-    _in const std::string c_strDatasetKeywords
+void __thiscall DatasetVersionReInitializer::SetDatasetVersionKeywords(
+    _in const std::string c_strDatasetVersionKeywords
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutString("keywords", c_strDatasetKeywords);
+    m_oUpdatedDatasetVersionMetadata.PutString("keywords", c_strDatasetVersionKeywords);
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SetDatasetFamily(
-    _in const std::string c_strDatasetFamily
+void __thiscall DatasetVersionReInitializer::SetDataset(
+    _in const std::string c_strDataset
     )
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.PutString("DataFamilyIdentifier", c_strDatasetFamily);
+    m_oUpdatedDatasetVersionMetadata.PutString("dataset_id", c_strDataset);
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::RemoveDatasetFamily(void)
+void __thiscall DatasetVersionReInitializer::RemoveDataset(void)
 {
     __DebugFunction();
 
-    m_oUpdatedDatasetMetadata.RemoveElement("DataFamilyIdentifier");
+    m_oUpdatedDatasetVersionMetadata.RemoveElement("dataset_id");
 }
 
 /********************************************************************************************/
 
-Guid __thiscall DatasetReInitializer::GetDatasetIdentifier(void) const
+Guid __thiscall DatasetVersionReInitializer::GetDatasetVersionIdentifier(void) const
 {
     __DebugFunction();
 
-    return m_oUpdatedDatasetMetadata.GetGuid("id");
+    return m_oUpdatedDatasetVersionMetadata.GetGuid("id");
 }
 
 /********************************************************************************************/
 
-std::vector<Byte> __thiscall DatasetReInitializer::GetSerializedDatasetMetadata(void) const
+std::vector<Byte> __thiscall DatasetVersionReInitializer::GetSerializedDatasetVersionMetadata(void) const
 {
     __DebugFunction();
 
-    return m_oUpdatedDatasetMetadata.GetSerializedBuffer();
+    return m_oUpdatedDatasetVersionMetadata.GetSerializedBuffer();
 }
 
 /********************************************************************************************/
 
-void __thiscall DatasetReInitializer::SaveDatasetUpdates(void) const
+void __thiscall DatasetVersionReInitializer::SaveDatasetVersionUpdates(void) const
 {
     __DebugFunction();
 
@@ -159,13 +159,13 @@ void __thiscall DatasetReInitializer::SaveDatasetUpdates(void) const
     // 6. Rename the new dataset file to the name of the old dataset file.
 
     // Serialize the updated dataset metadata
-    std::vector<Byte> stlSerializedUpdatedDatasetMetadata{m_oUpdatedDatasetMetadata.GetSerializedBuffer()};
+    std::vector<Byte> stlSerializedUpdatedDatasetVersionMetadata{m_oUpdatedDatasetVersionMetadata.GetSerializedBuffer()};
     // Select a temporary filename for the new dataset file
     Guid oNewGuid;
-    std::string strTemporaryDatasetFilename = oNewGuid.ToString(eHyphensOnly) + ".csvp";
+    std::string strTemporaryDatasetVersionFilename = oNewGuid.ToString(eHyphensOnly) + ".csvp";
     // Figure out the starting offset in the original file
-    unsigned int unSerializedOriginalDatasetSizeInBytes = m_oOriginalDatasetMetadata.GetSerializedBuffer().size();
-    unsigned int unStartingTableDataOffsetInSourceFile = 12 + unSerializedOriginalDatasetSizeInBytes;
+    unsigned int unSerializedOriginalDatasetVersionSizeInBytes = m_oOriginalDatasetVersionMetadata.GetSerializedBuffer().size();
+    unsigned int unStartingTableDataOffsetInSourceFile = 12 + unSerializedOriginalDatasetVersionSizeInBytes;
     // Let's put the following code in a nested scope so that the BinaryFileReader
     // and BinaryFileWriter can close their underlying file handlers when the stack
     // unwinds. We need to do this in order to be able to turn around and rename the
@@ -173,21 +173,21 @@ void __thiscall DatasetReInitializer::SaveDatasetUpdates(void) const
     {
         // Open the original file for reading and set the starting offset where the
         // table data starts
-        BinaryFileReader oSourceFile(m_strOriginalDatasetFilename);
+        BinaryFileReader oSourceFile(m_strOriginalDatasetVersionFilename);
         oSourceFile.Seek(eFromBeginningOfFile, unStartingTableDataOffsetInSourceFile);
         // Open the destination file for writing
-        BinaryFileWriter oDestinationFile(strTemporaryDatasetFilename);
+        BinaryFileWriter oDestinationFile(strTemporaryDatasetVersionFilename);
         // Add a marker at the beginning of the destination file.
         Qword qwFileMarker = 0xEE094CBA1B48A123;
         oDestinationFile.Write((const void *) &qwFileMarker, sizeof(qwFileMarker));
         // Now we write the dataset metadata size in bytes to file
-        unsigned int unSerializedDatasetMetadataBufferSizeInBytes = stlSerializedUpdatedDatasetMetadata.size();
-        oDestinationFile.Write((const void *) &unSerializedDatasetMetadataBufferSizeInBytes, sizeof(unSerializedDatasetMetadataBufferSizeInBytes));
+        unsigned int unSerializedDatasetVersionMetadataBufferSizeInBytes = stlSerializedUpdatedDatasetVersionMetadata.size();
+        oDestinationFile.Write((const void *) &unSerializedDatasetVersionMetadataBufferSizeInBytes, sizeof(unSerializedDatasetVersionMetadataBufferSizeInBytes));
         // Now we write the updated dataset metadata to file
-        oDestinationFile.Write(stlSerializedUpdatedDatasetMetadata);
+        oDestinationFile.Write(stlSerializedUpdatedDatasetVersionMetadata);
         // At this point, we will loop in 256 Mb chunks and copy the source file table
         // data to the destination file
-        unsigned int unAmountOfDataToCopyInBytes = oSourceFile.GetSizeInBytes() - (sizeof(uint64_t) + sizeof(unsigned int) + unSerializedOriginalDatasetSizeInBytes);
+        unsigned int unAmountOfDataToCopyInBytes = oSourceFile.GetSizeInBytes() - (sizeof(uint64_t) + sizeof(unsigned int) + unSerializedOriginalDatasetVersionSizeInBytes);
         while (0 < unAmountOfDataToCopyInBytes)
         {
             unsigned int unMaxChunkSizeInBytes = (256*1024*1024);
@@ -199,7 +199,7 @@ void __thiscall DatasetReInitializer::SaveDatasetUpdates(void) const
         // Eventually, we will persist a digital signature here at the end of the file.
     }
     // Now, delete the original file
-    std::filesystem::remove(m_strOriginalDatasetFilename);
+    std::filesystem::remove(m_strOriginalDatasetVersionFilename);
     // Rename the new dataset file to the old dataset file
-    std::filesystem::rename(strTemporaryDatasetFilename, m_strOriginalDatasetFilename);
+    std::filesystem::rename(strTemporaryDatasetVersionFilename, m_strOriginalDatasetVersionFilename);
 }

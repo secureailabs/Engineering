@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------------
 # Engineering
-# dataset.py
+# datasets.py
 # -------------------------------------------------------------------------------
 """APIs to manage datasets"""
 # -------------------------------------------------------------------------------
@@ -11,8 +11,6 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
-from typing import Optional
-
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
@@ -49,11 +47,6 @@ async def register_dataset(
     dataset_req: RegisterDataset_In = Body(...), current_user: TokenData = Depends(get_current_user)
 ):
     try:
-        # Check if the dataset is already registered
-        dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_req.id)})
-        if dataset_db:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dataset already registered")
-
         # Add the dataset to the database
         dataset_db = Dataset_Db(
             **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.ACTIVE
@@ -77,18 +70,9 @@ async def register_dataset(
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
 )
-async def get_all_datasets(
-    data_owner_id: Optional[PyObjectId] = None,
-    current_user: TokenData = Depends(get_current_user),
-):
+async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
     try:
-        # TODO: Prawal the current user organization is repeated in the request, find a better way
-        if data_owner_id:
-            query = {"data_owner_id": str(data_owner_id)}
-        else:
-            query = {}
-
-        datasets = await data_service.find_by_query(DB_COLLECTION_DATASETS, query)
+        datasets = await data_service.find_all(DB_COLLECTION_DATASETS)
 
         # Cache the organization information
         organization_cache = {}
@@ -154,7 +138,7 @@ async def update_dataset(
         if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        dataset_db = Dataset_Db(**dataset_db)
+        dataset_db = Dataset_Db(**dataset_db)  # type: ignore
         if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
@@ -168,11 +152,13 @@ async def update_dataset(
         if updated_dataset_info.version:
             dataset_db.version = updated_dataset_info.version
 
-        if updated_dataset_info.keywords:
-            dataset_db.keywords = updated_dataset_info.keywords
+        if updated_dataset_info.tag:
+            dataset_db.tag = updated_dataset_info.tag
 
         await data_service.update_one(
-            DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": jsonable_encoder(dataset_db)}
+            DB_COLLECTION_DATASETS,
+            {"_id": str(dataset_id)},
+            {"$set": jsonable_encoder(dataset_db)},
         )
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -196,14 +182,16 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
         if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        dataset_db = Dataset_Db(**dataset_db)
+        dataset_db = Dataset_Db(**dataset_db)  # type: ignore
         if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         # Disable the dataset
         dataset_db.state = DatasetState.INACTIVE
         await data_service.update_one(
-            DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": jsonable_encoder(dataset_db)}
+            DB_COLLECTION_DATASETS,
+            {"_id": str(dataset_id)},
+            {"$set": jsonable_encoder(dataset_db)},
         )
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)

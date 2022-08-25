@@ -207,7 +207,7 @@ router.get(
 // -------------------- Dataset Manager --------------------
 // -- ListDatasets --
 router.get(
-  '/datasets',
+  '/dataset-versions',
   jwtManager({ order: 'pre-request' }),
   requestProxy({ method: 'GET' }),
   (req, res) => {
@@ -217,7 +217,7 @@ router.get(
 
 // -- PullDataset --
 router.get(
-  '/datasets/*',
+  '/dataset-versions/*',
   jwtManager({ order: 'pre-request' }),
   requestProxy({ method: 'GET' }),
   (req, res) => {

@@ -12,7 +12,7 @@
 #include "CommandLine.h"
 #include "CompressionHelperFunctions.h"
 #include "BinaryFileHandlers.h"
-#include "Dataset.h"
+#include "DatasetVersion.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
@@ -78,20 +78,20 @@ void InfiniteLoop(
 
                 StructuredBuffer oWaitingSecureComputationNode = oWaitingSecureComputationNodes.GetStructuredBuffer(c_strScn.c_str());
                 std::string strIp = oWaitingSecureComputationNode.GetString("ipaddress");
-                std::string strDatasetId = oWaitingSecureComputationNode.GetString("dataset_id");
-                _ThrowBaseExceptionIf(c_stlMapOfIdToFiles.find(strDatasetId) == c_stlMapOfIdToFiles.end(), "Dataset not found", nullptr);
-                std::string strFileName = c_stlMapOfIdToFiles.at(strDatasetId);
+                std::string strDatasetVersionId = oWaitingSecureComputationNode.GetString("dataset_id");
+                _ThrowBaseExceptionIf(c_stlMapOfIdToFiles.find(strDatasetVersionId) == c_stlMapOfIdToFiles.end(), "DatasetVersion not found", nullptr);
+                std::string strFileName = c_stlMapOfIdToFiles.at(strDatasetVersionId);
                 _ThrowBaseExceptionIf((false == std::filesystem::exists(strFileName)), "Failed to find file %s",  strFileName.c_str(), nullptr);
 
                 // Upload the dataset
-                std::cout << "Uploading dataset " << strDatasetId << " to " << strIp << std::endl;
+                std::cout << "Uploading dataset " << strDatasetVersionId << " to " << strIp << std::endl;
 
                 // Extract some basic information
                 StructuredBuffer oVirtualMachineInformation;
 
-                std::vector<Byte> stlDatasetFiledata = ::ReadFileAsByteBuffer(strFileName);
-                std::string strEncoded = ::Base64Encode(stlDatasetFiledata.data(), (unsigned int)stlDatasetFiledata.size());
-                oVirtualMachineInformation.PutString("Base64EncodedDataset", strEncoded);
+                std::vector<Byte> stlDatasetVersionFiledata = ::ReadFileAsByteBuffer(strFileName);
+                std::string strEncoded = ::Base64Encode(stlDatasetVersionFiledata.data(), (unsigned int)stlDatasetVersionFiledata.size());
+                oVirtualMachineInformation.PutString("Base64EncodedDatasetVersion", strEncoded);
                 oVirtualMachineInformation.PutString("DataOwnerAccessToken", oSailPlatformServicesSession.GetAccessToken());
                 oVirtualMachineInformation.PutString("SailWebApiPortalIpAddress", c_strIpAddress);
                 oVirtualMachineInformation.PutString("DataOwnerUserIdentifier", oSailPlatformServicesSession.GetBasicUserInformation().GetString("id"));
@@ -133,7 +133,7 @@ int main(
     {
         std::unordered_map<std::string, std::string> stlMapOfIdToFiles;
         StructuredBuffer oRequestHeartbeat;
-        StructuredBuffer oDatasets;
+        StructuredBuffer oDatasetVersions;
         // Parse the command line
         StructuredBuffer oCommandLineArguments = ::ParseCommandLineParameters((unsigned int) nNumberOfArguments, (const char **) pszCommandLineArguments);
         if (false == oCommandLineArguments.IsElementPresent("folder", ANSI_CHARACTER_STRING_VALUE_TYPE))
@@ -158,28 +158,28 @@ int main(
         }
         else
         {
-            std::string strDatasetFolder = oCommandLineArguments.GetString("folder");
+            std::string strDatasetVersionFolder = oCommandLineArguments.GetString("folder");
             std::string strUsername = oCommandLineArguments.GetString("user");
             std::string strPassword = oCommandLineArguments.GetString("password");
             std::string strIpAddress = oCommandLineArguments.GetString("ip");
             int wPortNumber = std::atoi(oCommandLineArguments.GetString("port").c_str());
 
-            int nDatasetCount = 0;
-            oDatasets.PutBoolean("__IsArray__", true);
-            if(true == std::filesystem::exists(strDatasetFolder))
+            int nDatasetVersionCount = 0;
+            oDatasetVersions.PutBoolean("__IsArray__", true);
+            if(true == std::filesystem::exists(strDatasetVersionFolder))
             {
                 // Look at all the files in the folder
-                for (const auto & entry : std::filesystem::directory_iterator(strDatasetFolder))
+                for (const auto & entry : std::filesystem::directory_iterator(strDatasetVersionFolder))
                 {
-                    Dataset oDataset(entry.path().c_str());
-                    std::cout << "Identifier = " << oDataset.GetDatasetIdentifier() << " for " << entry.path() << std::endl;
-                    oDatasets.PutString(std::to_string(nDatasetCount).c_str(), oDataset.GetDatasetIdentifier());
+                    DatasetVersion oDatasetVersion(entry.path().c_str());
+                    std::cout << "Identifier = " << oDatasetVersion.GetDatasetVersionIdentifier() << " for " << entry.path() << std::endl;
+                    oDatasetVersions.PutString(std::to_string(nDatasetVersionCount).c_str(), oDatasetVersion.GetDatasetVersionIdentifier());
 
-                    stlMapOfIdToFiles.insert(std::make_pair(oDataset.GetDatasetIdentifier(), entry.path()));
-                    nDatasetCount++;
+                    stlMapOfIdToFiles.insert(std::make_pair(oDatasetVersion.GetDatasetVersionIdentifier(), entry.path()));
+                    nDatasetVersionCount++;
                 }
             }
-            oRequestHeartbeat.PutStructuredBuffer("datasets", oDatasets);
+            oRequestHeartbeat.PutStructuredBuffer("datasets", oDatasetVersions);
 
             ::InfiniteLoop(strIpAddress, wPortNumber, strUsername, strPassword, oRequestHeartbeat, stlMapOfIdToFiles);
         }

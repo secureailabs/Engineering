@@ -41,19 +41,19 @@
 					"Role": "USER"
 				}
 			],
-			"Datasets": [
+			"DatasetVersions": [
 				{
 					"Name": "IGR Dataset #1",
-					"DatasetFamily": "IGR Dataset Family",
+					"Dataset": "IGR Dataset Family",
 					"File": "igr_001.csvp"
 				},
 				{
 					"Name": "IGR Dataset #2",
-					"DatasetFamily": "IGR Dataset Family",
+					"Dataset": "IGR Dataset Family",
 					"File": "igr_002.csvp"
 				}
 			],
-			"DatasetFamilies": [
+			"Datasets": [
 				{
 					"Title": "IGR Dataset Family",
 					"Description": "Dataset Description",
@@ -108,10 +108,18 @@
 					"Role": "USER"
 				}
 			],
-			"Datasets": [
+			"DatasetVersions": [
 				{
 					"Name": "MGR Dataset",
+					"Dataset": "MGR Dataset Family",
 					"File": "mgr_001.csvp"
+				}
+			],
+			"Datasets": [
+				{
+					"Title": "MGR Dataset Family",
+					"Description": "Dataset Description",
+					"Tags": "Dataset Tags"
 				}
 			]
 		},
@@ -132,10 +140,18 @@
 					"Role": "USER"
 				}
 			],
-			"Datasets": [
+			"DatasetVersions": [
 				{
 					"Name": "KCA Dataset",
+					"Dataset": "KCA Dataset Family",
 					"File": "kca_001.csvp"
+				}
+			],
+			"Datasets": [
+				{
+					"Title": "KCA Dataset Family",
+					"Description": "Dataset Description",
+					"Tags": "Dataset Tags"
 				}
 			]
 		}

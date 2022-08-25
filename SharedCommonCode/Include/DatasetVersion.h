@@ -1,6 +1,6 @@
 /*********************************************************************************************
  *
- * @file Dataset.h
+ * @file DatasetVersion.h
  * @author Luis Miguel Huapaya
  * @date 30 Sep 2020
  * @License Private and Confidential. Internal Use Only.
@@ -20,14 +20,14 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class DatasetTableColumn: public Object
+class DatasetVersionTableColumn: public Object
 {
     public:
     
-        DatasetTableColumn(
+        DatasetVersionTableColumn(
             _in const std::vector<Byte> & c_stlSerializedColumnMetadataBuffer
             );
-        virtual ~DatasetTableColumn(void);
+        virtual ~DatasetVersionTableColumn(void);
         
         std::string __thiscall GetColumnIdentifier(void) const throw();
         std::string __thiscall GetTitle(void) const throw();
@@ -39,21 +39,21 @@ class DatasetTableColumn: public Object
         
     private:
     
-        StructuredBuffer m_oDatasetTableColumnMetadata;
+        StructuredBuffer m_oDatasetVersionTableColumnMetadata;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class DatasetTable: public Object
+class DatasetVersionTable: public Object
 {
     public:
     
-        DatasetTable(
+        DatasetVersionTable(
             _in const std::string & c_strFilename,
             _in const std::vector<Byte> & c_stlSerializedTableMetadataBuffer,
             _in uint64_t un64OffsetInBytesToTableDataInFile
             );
-        virtual ~DatasetTable(void);
+        virtual ~DatasetVersionTable(void);
         
         std::string __thiscall GetTableIdentifier(void) const throw();
         std::string __thiscall GetTitle(void) const throw();
@@ -62,7 +62,7 @@ class DatasetTable: public Object
         uint64_t __thiscall GetRowCount(void) const throw();
         unsigned int __thiscall GetColumnCount(void) const throw();
         std::vector<std::string> __thiscall GetColumnIdentifiers(void) const throw();
-        DatasetTableColumn __thiscall GetTableColumn(
+        DatasetVersionTableColumn __thiscall GetTableColumn(
             _in const char * c_szColumnIdentifier
             ) const;
         StructuredBuffer __thiscall GetInformationForDataAccess(void) const throw();
@@ -78,20 +78,20 @@ class DatasetTable: public Object
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class Dataset : public Object
+class DatasetVersion : public Object
 {
     public:
 
-        Dataset(
+        DatasetVersion(
             _in const char * c_szFullFilename
             );
-        Dataset(
+        DatasetVersion(
             _in const std::vector<Byte> & c_stlSerializedMetadata
             );
-        virtual ~Dataset(void) throw();
+        virtual ~DatasetVersion(void) throw();
 
+        std::string __thiscall GetDatasetVersionIdentifier(void) const throw();
         std::string __thiscall GetDatasetIdentifier(void) const throw();
-        std::string __thiscall GetDatasetFamilyIdentifier(void) const throw();
         std::string __thiscall GetPublisherIdentifier(void) const throw();
         std::string __thiscall GetTitle(void) const throw();
         std::string __thiscall GetDescription(void) const throw();
@@ -99,11 +99,11 @@ class Dataset : public Object
         uint64_t __thiscall GetPublishDate(void) const throw();
         unsigned int __thiscall GetNumberOfTables(void) const throw();
         std::vector<std::string> __thiscall GetTableIdentifiers(void) const throw();
-        DatasetTable __thiscall GetDatasetTable(
+        DatasetVersionTable __thiscall GetDatasetVersionTable(
             _in const char * c_szTableIdentifier
             ) const;
 
-        std::vector<Byte> __thiscall GetSerializedDatasetMetadata(void) const throw();
+        std::vector<Byte> __thiscall GetSerializedDatasetVersionMetadata(void) const throw();
         
     private:
 
@@ -113,7 +113,7 @@ class Dataset : public Object
         // Name of the file containing the dataset
         std::string m_strFilename;
         // StructuredBuffer containing the metadata for the datasets, all of the tables and all of the columns
-        StructuredBuffer m_oDatasetMetadata;
+        StructuredBuffer m_oDatasetVersionMetadata;
         // List of all of the table identifiers found in the file
         std::unordered_map<std::string, int> m_stlMapOfTableIdentifiers;
         // List of all the offsets into the file which point to the 'table marker' (64 bit value making the start of a table data)

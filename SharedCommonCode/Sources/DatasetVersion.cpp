@@ -1,6 +1,6 @@
 /*********************************************************************************************
  *
- * @file Dataset.cpp
+ * @file DatasetVersion.cpp
  * @author Luis Miguel Huapaya
  * @date 30 Sep 2020
  * @License Private and Confidential. Internal Use Only.
@@ -10,7 +10,7 @@
 
 #include "64BitHashes.h"
 #include "BinaryFileHandlers.h"
-#include "Dataset.h"
+#include "DatasetVersion.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 
@@ -20,7 +20,7 @@
 
 /********************************************************************************************/
 
-Dataset::Dataset(
+DatasetVersion::DatasetVersion(
     _in const char * c_szFullFilename
     )
 {
@@ -31,28 +31,28 @@ Dataset::Dataset(
     Qword qwMarker;
     oBinaryFileReader.Read((void *) &qwMarker, sizeof(qwMarker));
     _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != qwMarker), "Invalid marker value of 0x%08X%08X found at the beginning of the file", HIDWORD(qwMarker), LODWORD(qwMarker));
-    unsigned int unSizeInBytesOfDatasetMetadata = 0;
-    oBinaryFileReader.Read((void *) &unSizeInBytesOfDatasetMetadata, sizeof(unSizeInBytesOfDatasetMetadata));
-    std::vector<Byte> stlBuffer = oBinaryFileReader.Read(unSizeInBytesOfDatasetMetadata);
-    StructuredBuffer oDatasetMetadata(stlBuffer);
+    unsigned int unSizeInBytesOfDatasetVersionMetadata = 0;
+    oBinaryFileReader.Read((void *) &unSizeInBytesOfDatasetVersionMetadata, sizeof(unSizeInBytesOfDatasetVersionMetadata));
+    std::vector<Byte> stlBuffer = oBinaryFileReader.Read(unSizeInBytesOfDatasetVersionMetadata);
+    StructuredBuffer oDatasetVersionMetadata(stlBuffer);
     // Now let's do a quick reality check and make sure the header is in good order
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("version", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: version is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("id", GUID_VALUE_TYPE)), "INVALID METADATA: id is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("organization_id", GUID_VALUE_TYPE)), "INVALID METADATA: organization_id is missing", nullptr);
-    //_ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DataFamilyIdentifier is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: name is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: description is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("keywords", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: keywords is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("publish_date", UINT64_VALUE_TYPE)), "INVALID METADATA: publish_date is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("number_of_tables", UINT32_VALUE_TYPE)), "INVALID METADATA: number_of_tables is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("tables", INDEXED_BUFFER_VALUE_TYPE)), "INVALID METADATA: tables are missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("version", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: version is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("id", GUID_VALUE_TYPE)), "INVALID METADATA: id is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("organization_id", GUID_VALUE_TYPE)), "INVALID METADATA: organization_id is missing", nullptr);
+    // _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("dataset_id", GUID_VALUE_TYPE)), "INVALID METADATA: Dataset Identifier is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: name is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: description is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("keywords", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: keywords is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("publish_date", UINT64_VALUE_TYPE)), "INVALID METADATA: publish_date is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("number_of_tables", UINT32_VALUE_TYPE)), "INVALID METADATA: number_of_tables is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("tables", INDEXED_BUFFER_VALUE_TYPE)), "INVALID METADATA: tables are missing", nullptr);
     // Track the cursor offset into the file. At this point, the current position should point to
     // the marker for the first table
     uint64_t un64FilePosition = oBinaryFileReader.GetFilePointer();
     oBinaryFileReader.Read((void *) &qwMarker, sizeof(qwMarker));
     _ThrowBaseExceptionIf((0xEE094CBA1B48A123 != qwMarker), "Invalid marker value of 0x%08X%08X found at the beginning of the file", HIDWORD(qwMarker), LODWORD(qwMarker));
 
-    StructuredBuffer oAllTables(oDatasetMetadata.GetStructuredBuffer("tables"));
+    StructuredBuffer oAllTables(oDatasetVersionMetadata.GetStructuredBuffer("tables"));
     for (const auto & strTableIndex : oAllTables.GetNamesOfElements())
     {
         if ("__IsArray__" != strTableIndex)
@@ -87,36 +87,36 @@ Dataset::Dataset(
     }
     while (oBinaryFileReader.GetFilePointer() < oBinaryFileReader.GetSizeInBytes());
     // Since everything went well, let's persist the dataset metadata
-    m_oDatasetMetadata = oDatasetMetadata;
+    m_oDatasetVersionMetadata = oDatasetVersionMetadata;
     m_strFilename = c_szFullFilename;
     m_fIsMetadataOnly = false;
 }
 
 /********************************************************************************************/
 
-Dataset::Dataset(
+DatasetVersion::DatasetVersion(
     _in const std::vector<Byte> & c_stlSerializedMetadata
     )
 {
     __DebugFunction();
 
     // De-serialized the incoming serialized data
-    StructuredBuffer oDatasetMetadata(c_stlSerializedMetadata);
+    StructuredBuffer oDatasetVersionMetadata(c_stlSerializedMetadata);
     // Now let's do a quick reality check and make sure the header is in good order
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("version", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: version is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("id", GUID_VALUE_TYPE)), "INVALID METADATA: DatasetGuid is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("organization_id", GUID_VALUE_TYPE)), "INVALID METADATA: OrganizationGuid is missing", nullptr);
-    //_ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DataFamilyIdentifier is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Title is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Description is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("keywords", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: keywords is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("publish_date", UINT64_VALUE_TYPE)), "INVALID METADATA: publish_date is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("number_of_tables", UINT32_VALUE_TYPE)), "INVALID METADATA: number_of_tables is missing", nullptr);
-    _ThrowBaseExceptionIf((false == oDatasetMetadata.IsElementPresent("tables", INDEXED_BUFFER_VALUE_TYPE)), "INVALID METADATA: Tables are missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("version", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: version is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("id", GUID_VALUE_TYPE)), "INVALID METADATA: DatasetVersionGuid is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("organization_id", GUID_VALUE_TYPE)), "INVALID METADATA: OrganizationGuid is missing", nullptr);
+    //_ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("DataIdentifier", GUID_VALUE_TYPE)), "INVALID METADATA: DataIdentifier is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Title is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: Description is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("keywords", ANSI_CHARACTER_STRING_VALUE_TYPE)), "INVALID METADATA: keywords is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("publish_date", UINT64_VALUE_TYPE)), "INVALID METADATA: publish_date is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("number_of_tables", UINT32_VALUE_TYPE)), "INVALID METADATA: number_of_tables is missing", nullptr);
+    _ThrowBaseExceptionIf((false == oDatasetVersionMetadata.IsElementPresent("tables", INDEXED_BUFFER_VALUE_TYPE)), "INVALID METADATA: Tables are missing", nullptr);
     // Let's extract the table identifiers from the metadata. This is different than the
     // constructor that loads from file, since in that case, we load from file and then
     // verify it exists in the metadata
-    StructuredBuffer oAllTables(oDatasetMetadata.GetStructuredBuffer("tables"));
+    StructuredBuffer oAllTables(oDatasetVersionMetadata.GetStructuredBuffer("tables"));
     std::vector<std::string> stlListOfTables = oAllTables.GetNamesOfElements();
 
     // Erase the __IsArray__ from the list of columns
@@ -131,106 +131,106 @@ Dataset::Dataset(
         m_stlListOfTableMarkerOffsets[qwHashOfTableIdentifier] = 0xFFFFFFFFFFFFFFFF;
     }
     // Since everything went well, let's persist the dataset metadata
-    m_oDatasetMetadata = oDatasetMetadata;
+    m_oDatasetVersionMetadata = oDatasetVersionMetadata;
     m_fIsMetadataOnly = true;
 }
 
 /********************************************************************************************/
 
-Dataset::~Dataset(void) throw()
+DatasetVersion::~DatasetVersion(void) throw()
 {
     __DebugFunction();
 }
 
 /********************************************************************************************/
 
-std::string __thiscall Dataset::GetDatasetIdentifier(void) const throw()
+std::string __thiscall DatasetVersion::GetDatasetVersionIdentifier(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("id", GUID_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("id", GUID_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetGuid("id").ToString(eHyphensOnly);
+    return m_oDatasetVersionMetadata.GetGuid("id").ToString(eHyphensOnly);
 }
 
 /********************************************************************************************/
 
-std::string __thiscall Dataset::GetDatasetFamilyIdentifier(void) const throw()
+std::string __thiscall DatasetVersion::GetDatasetIdentifier(void) const throw()
 {
     __DebugFunction();
-    
-    std::string strDatasetFamilyIdentifier = "00000000-0000-0000-0000-000000000000";
-    
-    if (true == m_oDatasetMetadata.IsElementPresent("DataFamilyIdentifier", GUID_VALUE_TYPE))
+
+    std::string strDatasetIdentifier = "00000000-0000-0000-0000-000000000000";
+
+    if (true == m_oDatasetVersionMetadata.IsElementPresent("dataset_id", GUID_VALUE_TYPE))
     {
-        strDatasetFamilyIdentifier = m_oDatasetMetadata.GetGuid("DataFamilyIdentifier").ToString(eHyphensOnly);
+        strDatasetIdentifier = m_oDatasetVersionMetadata.GetGuid("dataset_id").ToString(eHyphensOnly);
     }
 
-    return strDatasetFamilyIdentifier;
+    return strDatasetIdentifier;
 }
 
 /********************************************************************************************/
 
-std::string __thiscall Dataset::GetPublisherIdentifier(void) const throw()
+std::string __thiscall DatasetVersion::GetPublisherIdentifier(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("organization_id", GUID_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("organization_id", GUID_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetGuid("organization_id").ToString(eHyphensOnly);
+    return m_oDatasetVersionMetadata.GetGuid("organization_id").ToString(eHyphensOnly);
 }
 
 /********************************************************************************************/
 
-std::string __thiscall Dataset::GetTitle(void) const throw()
+std::string __thiscall DatasetVersion::GetTitle(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("name", ANSI_CHARACTER_STRING_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetString("name");
+    return m_oDatasetVersionMetadata.GetString("name");
 }
 
 /********************************************************************************************/
 
-std::string __thiscall Dataset::GetDescription(void) const throw()
+std::string __thiscall DatasetVersion::GetDescription(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("description", ANSI_CHARACTER_STRING_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetString("description");
+    return m_oDatasetVersionMetadata.GetString("description");
 }
 
 /********************************************************************************************/
 
-std::string __thiscall Dataset::GetKeywords(void) const throw()
+std::string __thiscall DatasetVersion::GetKeywords(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("keywords", ANSI_CHARACTER_STRING_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("keywords", ANSI_CHARACTER_STRING_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetString("keywords");
+    return m_oDatasetVersionMetadata.GetString("keywords");
 }
 
 /********************************************************************************************/
 
-uint64_t __thiscall Dataset::GetPublishDate(void) const throw()
+uint64_t __thiscall DatasetVersion::GetPublishDate(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("publish_date", UINT64_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("publish_date", UINT64_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetUnsignedInt64("publish_date");
+    return m_oDatasetVersionMetadata.GetUnsignedInt64("publish_date");
 }
 
 /********************************************************************************************/
 
-unsigned int __thiscall Dataset::GetNumberOfTables(void) const throw()
+unsigned int __thiscall DatasetVersion::GetNumberOfTables(void) const throw()
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("number_of_tables", UINT32_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("number_of_tables", UINT32_VALUE_TYPE));
 
-    return m_oDatasetMetadata.GetUnsignedInt32("number_of_tables");
+    return m_oDatasetVersionMetadata.GetUnsignedInt32("number_of_tables");
 }
 
 /********************************************************************************************/
 
-std::vector<std::string> __thiscall Dataset::GetTableIdentifiers(void) const throw()
+std::vector<std::string> __thiscall DatasetVersion::GetTableIdentifiers(void) const throw()
 {
     __DebugFunction();
 
@@ -245,29 +245,29 @@ std::vector<std::string> __thiscall Dataset::GetTableIdentifiers(void) const thr
 
 /********************************************************************************************/
 
-DatasetTable __thiscall Dataset::GetDatasetTable(
+DatasetVersionTable __thiscall DatasetVersion::GetDatasetVersionTable(
     _in const char * c_szTableIdentifier
     ) const
 {
     __DebugFunction();
-    __DebugAssert(true == m_oDatasetMetadata.IsElementPresent("tables", INDEXED_BUFFER_VALUE_TYPE));
+    __DebugAssert(true == m_oDatasetVersionMetadata.IsElementPresent("tables", INDEXED_BUFFER_VALUE_TYPE));
 
     Qword qwTableIdentifierHash = ::Get64BitHashOfNullTerminatedString(c_szTableIdentifier, false);
-    _ThrowBaseExceptionIf((m_stlListOfTableMarkerOffsets.end() == m_stlListOfTableMarkerOffsets.find(qwTableIdentifierHash)), "ERROR: Invalid Dataset Identifier %s", c_szTableIdentifier);
+    _ThrowBaseExceptionIf((m_stlListOfTableMarkerOffsets.end() == m_stlListOfTableMarkerOffsets.find(qwTableIdentifierHash)), "ERROR: Invalid DatasetVersion Identifier %s", c_szTableIdentifier);
 
     std::string strTableKey = std::to_string(m_stlMapOfTableIdentifiers.at(c_szTableIdentifier));
-    StructuredBuffer oTable(m_oDatasetMetadata.GetStructuredBuffer("tables").GetStructuredBuffer(strTableKey.c_str()));
+    StructuredBuffer oTable(m_oDatasetVersionMetadata.GetStructuredBuffer("tables").GetStructuredBuffer(strTableKey.c_str()));
     uint64_t un64Offset = m_stlListOfTableMarkerOffsets.at(qwTableIdentifierHash);
 
-    return DatasetTable(m_strFilename, oTable.GetSerializedBuffer(), un64Offset);
+    return DatasetVersionTable(m_strFilename, oTable.GetSerializedBuffer(), un64Offset);
 }
 
 /********************************************************************************************/
 
-std::vector<Byte> __thiscall Dataset::GetSerializedDatasetMetadata(void) const throw()
+std::vector<Byte> __thiscall DatasetVersion::GetSerializedDatasetVersionMetadata(void) const throw()
 {
     __DebugFunction();
 
-    return m_oDatasetMetadata.GetSerializedBuffer();
+    return m_oDatasetVersionMetadata.GetSerializedBuffer();
 }
 

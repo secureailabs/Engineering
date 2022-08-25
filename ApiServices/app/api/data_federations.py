@@ -17,30 +17,24 @@ from typing import Dict, List, Optional
 from app.api.accounts import get_all_admins, get_organization, get_user
 from app.api.authentication import RoleChecker, get_current_user
 from app.api.emails import send_email
-from app.api.internal_utils import cache_get_basic_info_dataset_families, cache_get_basic_info_organization
+from app.api.internal_utils import (cache_get_basic_info_datasets,
+                                    cache_get_basic_info_organization)
 from app.data import operations as data_service
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi import (APIRouter, BackgroundTasks, Body, Depends, HTTPException,
+                     Response, status)
 from fastapi.encoders import jsonable_encoder
 from models.accounts import GetUsers_Out, UserRole
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
-from models.data_federations import (
-    DataFederation_Db,
-    DataFederationState,
-    GetDataFederation_Out,
-    GetInvite_Out,
-    GetMultipleDataFederation_Out,
-    GetMultipleInvite_Out,
-    Invite_Db,
-    InviteState,
-    InviteType,
-    PatchInvite_In,
-    RegisterDataFederation_In,
-    RegisterDataFederation_Out,
-    RegisterInvite_In,
-    RegisterInvite_Out,
-    UpdateDataFederation_In,
-)
+from models.data_federations import (DataFederation_Db, DataFederationState,
+                                     GetDataFederation_Out, GetInvite_Out,
+                                     GetMultipleDataFederation_Out,
+                                     GetMultipleInvite_Out, Invite_Db,
+                                     InviteState, InviteType, PatchInvite_In,
+                                     RegisterDataFederation_In,
+                                     RegisterDataFederation_Out,
+                                     RegisterInvite_In, RegisterInvite_Out,
+                                     UpdateDataFederation_In)
 from models.emails import EmailRequest
 from pydantic import EmailStr
 
@@ -164,7 +158,7 @@ async def get_all_data_federations(
             )
 
             # Add the data family information to the data federation
-            data_family_cache, data_family_basic_info_list = await cache_get_basic_info_dataset_families(
+            data_family_cache, data_family_basic_info_list = await cache_get_basic_info_datasets(
                 data_family_cache, data_federation.dataset_families_id, current_user
             )
 
@@ -213,7 +207,7 @@ async def get_data_federation(data_federation_id: PyObjectId, current_user: Toke
         )
 
         # Add the data family information to the data federation
-        _, data_family_basic_info_list = await cache_get_basic_info_dataset_families(
+        _, data_family_basic_info_list = await cache_get_basic_info_datasets(
             {}, data_federation.dataset_families_id, current_user
         )
 

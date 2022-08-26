@@ -106,6 +106,10 @@
 .table {
   background-color: white;
 
+  th {
+    min-width: 10rem;
+  }
+
   tr {
     &>* {
       &:first-child {

@@ -11,6 +11,8 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
+from typing import List
+
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
@@ -18,7 +20,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
-from models.common import PyObjectId
+from models.common import BasicObjectInfo, PyObjectId
 from models.datasets import (
     Dataset_Db,
     DatasetState,
@@ -63,7 +65,7 @@ async def register_dataset(
 ########################################################################################################################
 @router.get(
     path="/datasets",
-    description="Get list of all the datasets",
+    description="Get list of all the datasets for the current organization",
     response_description="List of datasets",
     response_model=GetMultipleDataset_Out,
     response_model_by_alias=False,
@@ -72,20 +74,21 @@ async def register_dataset(
 )
 async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
     try:
-        datasets = await data_service.find_all(DB_COLLECTION_DATASETS)
+        datasets = await data_service.find_by_query(
+            DB_COLLECTION_DATASETS, {"organization_id": str(current_user.organization_id)}
+        )
 
-        # Cache the organization information
-        organization_cache = {}
+        # Add the organization information to the dataset
+        organization = await get_organization(current_user.organization_id, current_user)
+
+        response_list_of_datasets: List[GetDataset_Out] = []
         # Add the organization information to the dataset
         for dataset in datasets:
-            if dataset["organization_id"] not in organization_cache:
-                organization_cache[dataset["organization_id"]] = await get_organization(
-                    organization_id=dataset["organization_id"], current_user=current_user
-                )
-            dataset["organization"] = organization_cache[dataset["organization_id"]]
-            dataset.pop("organization_id")
+            dataset = Dataset_Db(**dataset)
+            response_dataset = GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization.dict()))
+            response_list_of_datasets.append(response_dataset)
 
-        return GetMultipleDataset_Out(datasets=datasets)
+        return GetMultipleDataset_Out(datasets=response_list_of_datasets)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
@@ -108,13 +111,10 @@ async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         # Add the organization information to the dataset
-        organization_info = await get_organization(
-            organization_id=dataset["organization_id"], current_user=current_user
-        )
-        dataset["organization"] = organization_info
-        dataset.pop("organization_id")
+        dataset = Dataset_Db(**dataset)
+        organization_info = await get_organization(organization_id=dataset.organization_id, current_user=current_user)
 
-        return dataset
+        return GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization_info.dict()))
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

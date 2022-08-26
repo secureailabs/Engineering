@@ -21,7 +21,7 @@ from app.api.internal_utils import cache_get_basic_info_datasets, cache_get_basi
 from app.data import operations as data_service
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
-from models.accounts import GetUsers_Out, UserRole
+from models.accounts import GetOrganizations_Out, GetUsers_Out, UserRole
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.data_federations import (
@@ -41,6 +41,7 @@ from models.data_federations import (
     RegisterInvite_Out,
     UpdateDataFederation_In,
 )
+from models.datasets import GetDataset_Out
 from models.emails import EmailRequest
 from pydantic import EmailStr
 
@@ -141,8 +142,8 @@ async def get_all_data_federations(
         response_list_of_data_federations: List[GetDataFederation_Out] = []
 
         # Cache the organization information
-        organization_cache: Dict[PyObjectId, BasicObjectInfo] = {}
-        dataset_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+        organization_cache: Dict[PyObjectId, GetOrganizations_Out] = {}
+        dataset_cache: Dict[PyObjectId, GetDataset_Out] = {}
 
         # Add the organization information to the data federation
         for data_federation in data_federations:
@@ -764,7 +765,11 @@ async def add_dataset(
         data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
 
         # Check if the dataset exists
-        _, _ = await cache_get_basic_info_datasets({}, [dataset_id], current_user)
+        _, dataset_basic_info_list = await cache_get_basic_info_datasets({}, [dataset_id], current_user)
+
+        # Dataset must belong to current organization
+        if dataset_basic_info_list[0].organization.id != current_user.organization_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
 
         # Add the dataset to the data federation
         if dataset_id not in data_federation_db.datasets_id:

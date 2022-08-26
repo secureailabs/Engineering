@@ -51,7 +51,7 @@ class DataFederation
 
         std::list<Guid> DataSubmitterOrganizations() const throw();
         std::list<Guid> ResearchOrganizations() const throw();
-        std::list<Guid> DatasetFamilies() const throw();
+        std::list<Guid> Datasets() const throw();
 
         void SetInactive() throw();
     private:
@@ -66,5 +66,5 @@ class DataFederation
 
         std::list<Guid> m_stlDataSubmitterOrganizations;
         std::list<Guid> m_stlResearchOrganizations;
-        std::list<Guid> m_stlDataFamilies;
+        std::list<Guid> m_stlDatasets;
 };

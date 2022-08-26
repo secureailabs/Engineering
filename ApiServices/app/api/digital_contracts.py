@@ -15,14 +15,14 @@ from typing import Optional
 
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
-from app.api.datasets import get_dataset
+from app.api.dataset_versions import get_dataset_version
 from app.data import operations as data_service
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import PyObjectId
-from models.datasets import GetDataset_Out
+from models.dataset_versions import GetDatasetVersion_Out
 from models.digital_contracts import (
     DigitalContract_Db,
     DigitalContractState,
@@ -53,11 +53,9 @@ async def register_digital_contract(
     try:
         # Check of the dataset already exists
         # TODO: Prawal make a HTTP request or use message queues
-        dataset_db = await get_dataset(digital_contract_req.dataset_id, current_user)
+        dataset_db = await get_dataset_version(digital_contract_req.dataset_id, current_user)
         if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
-
-        dataset_db = GetDataset_Out(**dataset_db)
 
         # Add the digital contract to the database
         digital_contract_db = DigitalContract_Db(
@@ -133,8 +131,8 @@ async def get_all_digital_contract(
 
             # Add the dataset information to the dataset
             if digital_contract["dataset_id"] not in dataset_cache:
-                organization_cache[digital_contract["dataset_id"]] = await get_dataset(
-                    dataset_id=digital_contract["dataset_id"], current_user=current_user
+                organization_cache[digital_contract["dataset_id"]] = await get_dataset_version(
+                    dataset_version_id=digital_contract["dataset_id"], current_user=current_user
                 )
             digital_contract["dataset"] = organization_cache[digital_contract["dataset_id"]]
             digital_contract.pop("dataset_id")
@@ -184,8 +182,8 @@ async def get_digital_contract(digital_contract_id: PyObjectId, current_user: To
         digital_contract.pop("researcher_id")
 
         # Add the dataset information to the dataset
-        digital_contract["dataset"] = await get_dataset(
-            dataset_id=digital_contract["dataset_id"], current_user=current_user
+        digital_contract["dataset"] = await get_dataset_version(
+            dataset_version_id=digital_contract["dataset_id"], current_user=current_user
         )
         digital_contract.pop("dataset_id")
 
@@ -215,7 +213,7 @@ async def update_digital_contract(
         if not digital_contract_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
 
-        digital_contract_db = DigitalContract_Db(**digital_contract_db)
+        digital_contract_db = DigitalContract_Db(**digital_contract_db)  # type: ignore
 
         # Only a new digital contract information can be updated by the researcher
         # Data Owner can only accept or reject a request
@@ -286,7 +284,7 @@ async def soft_delete_digital_contract(
         if not digital_contract_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Digital Contract not found")
 
-        digital_contract_db = DigitalContract_Db(**digital_contract_db)
+        digital_contract_db = DigitalContract_Db(**digital_contract_db)  # type: ignore
 
         # Only dataownwer or researcher can disable a digital contract
         if (

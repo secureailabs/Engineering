@@ -36,7 +36,7 @@ extern "C" __declspec(dllexport) bool __cdecl UpdateDatasetFamilyInformation(voi
         _ThrowBaseExceptionIf((false == ::IsLoggedOn()), "No active session, cannot complete requested operation", nullptr);
         // Build out the REST API call query
         std::string strVerb = "GET";
-        std::string strApiUri = "/dataset-families";
+        std::string strApiUri = "/datasets";
         std::vector<std::string> stlListOfHeaders;
         stlListOfHeaders.push_back("Authorization: Bearer " + ::GetSailPlatformServicesAccessToken());
         std::string strBody = "";
@@ -46,12 +46,12 @@ extern "C" __declspec(dllexport) bool __cdecl UpdateDatasetFamilyInformation(voi
         StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
 
         // Did the transaction succeed?
-        _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("dataset_families", INDEXED_BUFFER_VALUE_TYPE)), "Failed to get dataset families.", nullptr);
+        _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("datasets", INDEXED_BUFFER_VALUE_TYPE)), "Failed to get dataset families.", nullptr);
 
         // Now we extract the digital families information
-        if (true == oResponse.IsElementPresent("dataset_families", INDEXED_BUFFER_VALUE_TYPE))
+        if (true == oResponse.IsElementPresent("datasets", INDEXED_BUFFER_VALUE_TYPE))
         {
-            StructuredBuffer oDatasetFamilies(oResponse.GetStructuredBuffer("dataset_families"));
+            StructuredBuffer oDatasetFamilies(oResponse.GetStructuredBuffer("datasets"));
 
             std::vector<std::string> stlListOfDatasetFamilies = oDatasetFamilies.GetNamesOfElements();
             const std::lock_guard<std::mutex> lock(gs_stlMutex);

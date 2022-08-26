@@ -21,7 +21,7 @@ import app.utils.azure as azure
 import requests
 from app.api.accounts import get_user
 from app.api.authentication import get_current_user
-from app.api.datasets import get_dataset
+from app.api.dataset_versions import get_dataset_version
 from app.api.digital_contracts import get_digital_contract
 from app.data import operations as data_service
 from app.data import sync_operations as sync_data_service
@@ -31,7 +31,7 @@ from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import PyObjectId
-from models.datasets import GetDataset_Out
+from models.dataset_versions import GetDatasetVersion_Out
 from models.digital_contracts import DigitalContractState
 from models.secure_computation_nodes import (
     GetMultipleSecureComputationNode_Out,
@@ -75,10 +75,9 @@ async def register_secure_computation_node(
 
         # Check if the digital contract and dataset exist
         # TODO: Prawal make a HTTP request or use message queues
-        dataset_db = await get_dataset(secure_computation_node_req.dataset_id, current_user)
+        dataset_db = await get_dataset_version(secure_computation_node_req.dataset_id, current_user)
         if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
-        dataset_db = GetDataset_Out(**dataset_db)
 
         # Check if the digital contract exists
         digital_contract_db = await get_digital_contract(secure_computation_node_req.digital_contract_id, current_user)

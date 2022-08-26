@@ -1923,7 +1923,7 @@ void Orchestrator::CacheDatasetsFromRemote(void)
 
     try
     {
-        std::string strApiUrl = "/datasets";
+        std::string strApiUrl = "/dataset-versions";
         std::vector<std::string> stlListOfHeaders;
         stlListOfHeaders.push_back("Authorization: Bearer " + this->GetCurrentAccessToken());
         stlListOfHeaders.push_back("Content-Type: application/json");

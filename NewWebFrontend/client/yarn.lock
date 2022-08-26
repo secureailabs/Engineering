@@ -2684,10 +2684,10 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.1.tgz#782fa5da44c4f38ae9fd38e9184b54e451936118"
   integrity sha512-BUyKJGdDWqvWC5GEhyOiUrGNi9iJUr4CU0O2WxJL6QJhHeeA/NVBalH+FeK0r/x/W0rPymXt5s78TDS7d6lCwg==
 
-"@secureailabs/web-ui@^1.7.3":
-  version "1.7.3"
-  resolved "https://npm.pkg.github.com/download/@secureailabs/web-ui/1.7.3/3613203fb0945d8ef1e9abd4ddff5058b0de098d5c77a76b0cd6560b59402b6d#5c3cfd37a41026b03d0b7dfb51c6639883ea9248"
-  integrity sha512-okxSCO3jpmjh97D5i7Vv/hNua4Kia/LXxJKLhuSNLAA7nYC2kBiwl4jcL/FjDZ9GzSHdmW1gcgjpLGJe6IWdjA==
+"@secureailabs/web-ui@^1.7.4":
+  version "1.7.4"
+  resolved "https://npm.pkg.github.com/download/@secureailabs/web-ui/1.7.4/0fc61079292cb45acfb2ec4dfaf77f5ca23f8e49#0fc61079292cb45acfb2ec4dfaf77f5ca23f8e49"
+  integrity sha512-KZ9JqUO0F8XYX+tUR5f8vIbf9eE2RZ8F0KvNCGvgqlsYYnLGMOfu412uCqjQUWX4FSRI6iKBigiCThS8H6mu1g==
   dependencies:
     "@types/react-grid-layout" "^1.3.1"
     change-case "^4.1.2"
@@ -4827,7 +4827,7 @@ babel-plugin-named-asset-import@^0.3.8:
   resolved "https://registry.yarnpkg.com/babel-plugin-named-asset-import/-/babel-plugin-named-asset-import-0.3.8.tgz#6b7fa43c59229685368683c28bc9734f24524cc2"
   integrity sha512-WXiAc++qo7XcJ1ZnTYGtLxmBCVbddAml3CEXgWaBzNzLNoxtQ8AiGEFDMOhot9XjTCQbvP5E77Fj9Gk924f00Q==
 
-babel-plugin-polyfill-corejs2@^0.3.0, babel-plugin-polyfill-corejs2@^0.3.1:
+babel-plugin-polyfill-corejs2@^0.3.0:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-polyfill-corejs2/-/babel-plugin-polyfill-corejs2-0.3.1.tgz#440f1b70ccfaabc6b676d196239b138f8a2cfba5"
   integrity sha512-v7/T6EQcNfVLfcN2X8Lulb7DjprieyLWJK/zOWH5DUYcAgex9sP3h25Q+DLsX9TloXe3y1O8l2q2Jv9q8UVB9w==
@@ -4853,7 +4853,7 @@ babel-plugin-polyfill-corejs3@^0.1.0:
     "@babel/helper-define-polyfill-provider" "^0.1.5"
     core-js-compat "^3.8.1"
 
-babel-plugin-polyfill-corejs3@^0.5.0, babel-plugin-polyfill-corejs3@^0.5.2:
+babel-plugin-polyfill-corejs3@^0.5.0:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/babel-plugin-polyfill-corejs3/-/babel-plugin-polyfill-corejs3-0.5.2.tgz#aabe4b2fa04a6e038b688c5e55d44e78cd3a5f72"
   integrity sha512-G3uJih0XWiID451fpeFaYGVuxHEjzKTHtc9uGFEjR6hHrvNzeS/PX+LLLcetJcytsB5m4j+K3o/EpXJNb/5IEQ==

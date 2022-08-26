@@ -17,7 +17,7 @@ enum CSVRequest
     eGetRowRange,
     eGetColumnRange,
     eGetTable,
-    eGetDatasetMetadata,
+    eGetDatasetVersionMetadata,
     eGetTableMetadata,
     eCloseFile,
     eGetUuids

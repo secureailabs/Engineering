@@ -31,8 +31,8 @@ class RootOfTrustNode : public Object
         virtual ~RootOfTrustNode(void);
         
         Guid __thiscall GetDomainIdentifier(void) const;
-        std::string __thiscall GetDatasetFilename(void) const;
-        
+        std::string __thiscall GetDatasetVersionFilename(void) const;
+
         void __thiscall RecordAuditEvent(
             _in const char * c_szEventName,
             _in Word wTargetChannelsBitMask,

@@ -14,7 +14,7 @@
 from typing import Dict, List
 
 from app.api.accounts import get_organization
-from app.api.datasets_families import get_dataset_family
+from app.api.datasets import get_dataset
 from app.data import operations as data_service
 from fastapi import APIRouter, HTTPException, Response, status
 from models.authentication import TokenData
@@ -56,17 +56,15 @@ async def cache_get_basic_info_organization(
 
 
 ########################################################################################################################
-async def cache_get_basic_info_dataset_families(
-    dataset_families_cache: Dict[PyObjectId, BasicObjectInfo],
-    dataset_families_id_list: List[PyObjectId],
+async def cache_get_basic_info_datasets(
+    datasets_cache: Dict[PyObjectId, BasicObjectInfo],
+    datasets_id_list: List[PyObjectId],
     current_user: TokenData,
 ):
     response_basic_info_list: List[BasicObjectInfo] = []
-    for dataset_families_id in dataset_families_id_list:
-        if dataset_families_id not in dataset_families_cache:
-            dataset_families_cache[dataset_families_id] = await get_dataset_family(
-                dataset_family_id=dataset_families_id, current_user=current_user
-            )
-            response_basic_info_list.append(dataset_families_cache[dataset_families_id])
+    for datasets_id in datasets_id_list:
+        if datasets_id not in datasets_cache:
+            datasets_cache[datasets_id] = await get_dataset(dataset_id=datasets_id, current_user=current_user)
+            response_basic_info_list.append(datasets_cache[datasets_id])
 
-    return (dataset_families_cache, response_basic_info_list)
+    return (datasets_cache, response_basic_info_list)

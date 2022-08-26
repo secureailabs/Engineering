@@ -59,7 +59,7 @@ Guid::Guid(void)
  *		eCryptographicKey = 0x10,
  *		eDigitalContract = 0x14,
  *		eDataFederation = 0x18,
- *		eDatasetFamily = 0x1C,
+ *		eDataset = 0x1C,
  *		eDataset = 0x20,
  *		eTable = 0x24,
  *		eColumn = 0x28,

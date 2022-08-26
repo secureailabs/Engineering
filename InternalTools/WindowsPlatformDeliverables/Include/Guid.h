@@ -38,8 +38,8 @@ GuidFormat;
 00010000 (0x10) Cryptographic Key
 00010100 (0x14) Digital Contract
 00011000 (0x18) Data Federation
-00011100 (0x1C) Dataset Family
-00100000 (0x20) Dataset
+00011100 (0x1C) Dataset
+00100000 (0x20) Dataset Version
 00100100 (0x24) Table
 00101000 (0x28) Column
 00101100 (0x2C) Cloud (Azure) Template
@@ -71,8 +71,8 @@ typedef enum
     eCryptographicKey = 0x10,
     eDigitalContract = 0x14,
     eDataFederation = 0x18,
-    eDatasetFamily = 0x1C,
-    eDataset = 0x20,
+    eDataset = 0x1C,
+    eDatasetVersion = 0x20,
     eTable = 0x24,
     eColumn = 0x28,
     eAzureTemplate = 0x2C,

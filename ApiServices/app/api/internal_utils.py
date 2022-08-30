@@ -17,8 +17,10 @@ from app.api.accounts import get_organization
 from app.api.datasets import get_dataset
 from app.data import operations as data_service
 from fastapi import APIRouter, HTTPException, Response, status
+from models.accounts import GetOrganizations_Out
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
+from models.datasets import GetDataset_Out
 
 router = APIRouter()
 
@@ -40,11 +42,11 @@ async def register_dataset():
 
 ########################################################################################################################
 async def cache_get_basic_info_organization(
-    organization_cache: Dict[PyObjectId, BasicObjectInfo],
+    organization_cache: Dict[PyObjectId, GetOrganizations_Out],
     organization_id_list: List[PyObjectId],
     current_user: TokenData,
 ):
-    response_basic_info_list: List[BasicObjectInfo] = []
+    response_basic_info_list: List[GetOrganizations_Out] = []
     for organization_id in organization_id_list:
         if organization_id not in organization_cache:
             organization_cache[organization_id] = await get_organization(
@@ -57,11 +59,11 @@ async def cache_get_basic_info_organization(
 
 ########################################################################################################################
 async def cache_get_basic_info_datasets(
-    datasets_cache: Dict[PyObjectId, BasicObjectInfo],
+    datasets_cache: Dict[PyObjectId, GetDataset_Out],
     datasets_id_list: List[PyObjectId],
     current_user: TokenData,
 ):
-    response_basic_info_list: List[BasicObjectInfo] = []
+    response_basic_info_list: List[GetDataset_Out] = []
     for datasets_id in datasets_id_list:
         if datasets_id not in datasets_cache:
             datasets_cache[datasets_id] = await get_dataset(dataset_id=datasets_id, current_user=current_user)

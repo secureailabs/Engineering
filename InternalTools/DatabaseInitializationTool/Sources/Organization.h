@@ -61,6 +61,19 @@ class Organization : public Object
             _in const std::string & c_strDataFederationName
             ) const throw();
 
+        // Register() registers data submitters to a federation
+        void __thiscall RegisterFederationDataSubmitters(
+            _in const std::string & c_strSailPlatformServicesIpAddress,
+            _in Word wSailPlatformServicesPortNumber,
+            const std::unordered_map<std::string, Organization *>& organizationList
+            ) throw();
+
+        // Register() registers researchers to a federation
+        void __thiscall RegisterFederationResearchers(
+            _in const std::string & c_strSailPlatformServicesIpAddress,
+            _in Word wSailPlatformServicesPortNumber,
+            const std::unordered_map<std::string, Organization *>& organizationList
+            ) throw();
 
     private:
 
@@ -93,5 +106,7 @@ class Organization : public Object
         std::unordered_set<std::string> m_stlDatasets;
         std::unordered_map<Qword, std::string> m_strDatasetIdentifiers;
         std::unordered_set<std::string> m_stlDataFederations;
+        std::unordered_map<std::string, Guid> m_stlDataFederationIdentifiers;
         std::unordered_map<Qword, std::string> m_strDataFederationIdentifiers;
+        std::string m_adminUserPassword;
 };

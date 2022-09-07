@@ -2,7 +2,6 @@
 #include "BinaryFileHandlers.h"
 #include "CommandLine.h"
 #include "DebugLibrary.h"
-#include "DigitalContract.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
 #include "JsonParser.h"
@@ -33,7 +32,7 @@ static void __stdcall PrintUsage(void)
               << "       --ip,          IP address of SAIL Platform Services API Gateway." << std::endl
               << "       --settings,    Name of JSON file containing initialization values." << std::endl
               << "       --help,        Print these instructions." << std::endl
-              << "       --step1,       Register organizations, users, administrators, dataset families and data federations." << std::endl
+              << "       --step1,       Register organizations, users, administrators, data federations." << std::endl
               << "       --step2,       Register datasets and digital contracts." << std::endl
               << "       --step3,       Register digital contracts only (assumes datasets are already registered)." << std::endl
               << "       --allsteps,    Registers everything (i.e. step1 + step 2)." << std::endl;
@@ -60,7 +59,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
     // will be needed when registering digital contracts (i.e. registering organizations
     // generated things like identifiers, etc..., and we need to keep track of then for when
     // we register digital contracts.
-    std::unordered_map<Qword, Organization *> stlListOfOrganizationsByName;
+    std::unordered_map<std::string, Organization *> stlListOfOrganizationsByName;
     // Open the target JSON settings file
     BinaryFileReader oBinaryFileReader(c_strJsonSettingsFilename);
     // Read the entire file in one single call
@@ -88,7 +87,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         {
             // Keep track of the name-identifier tuple since it will be needed when registering
             // digital contracts
-            stlListOfOrganizationsByName[::Get64BitHashOfNullTerminatedString(poOrganization->GetOrganizationalName().c_str(), false)] = poOrganization;
+            stlListOfOrganizationsByName[poOrganization->GetOrganizationalName()] = poOrganization;
             // Print out some information so that we can visibly see what just got registered
             std::cout << "Registered organization \"" << poOrganization->GetOrganizationalName() << "\" which was given identifier " << poOrganization->GetOrganizationalIdentifier() << std::endl;
         }
@@ -101,46 +100,14 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         }
     }
 
-    // Register digital contracts. We are assuming that datasets have been registered by the dataset tools
+    // Register anything that needs an organization identifier. We are assuming that datasets have been registered by the dataset tools
     if ((2 == unStepIdentifier)||(3 == unStepIdentifier)||(4 == unStepIdentifier))
     {
-        // Now that all of the organizations are registered, let's process the digital contracts. We are assuming that the datasets are
-        // already registered.
-        StructuredBuffer oDigitalContracts = oSettings.GetStructuredBuffer("Digital Contracts");
-        if (true == oDigitalContracts.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+        // Assign data submitters and researcher to our data federations
+        for ( auto organization : stlListOfOrganizationsByName )
         {
-            oDigitalContracts.RemoveElement("__IsArray__");
-        }
-        std::vector<std::string> strListOfDigitalContracts = oDigitalContracts.GetNamesOfElements();
-        for (const std::string & c_strDigitalContractIndex: strListOfDigitalContracts)
-        {
-            // Each element should be a StructuredBuffer, otherwise the application should throw
-            // an exception and terminate. This is done automatically when calling GetStructuredBuffer()
-            StructuredBuffer oDigitalContactParameters(oDigitalContracts.GetStructuredBuffer(c_strDigitalContractIndex.c_str()));
-            // Figure out the organization identifiers for the two participants in the digital contract
-            Qword qwHashOfDataOwnerOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("DataOwnerOrganization").c_str(), false);
-            Qword qwHashOfResearchOrganization = ::Get64BitHashOfNullTerminatedString(oDigitalContactParameters.GetString("ResearchOrganization").c_str(), false);
-            // We are dealing with a dataset. In the JSON specification, this will be the name of a dataset
-            // Let's point to the target data owner organization since we will need information out of that
-            _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfDataOwnerOrganization)), "ERROR: Unknown data owner organization %s specified in Digital Contract", oDigitalContactParameters.GetString("DataOwnerOrganization").c_str());
-            Organization * poDataOwnerOrganization = stlListOfOrganizationsByName[qwHashOfDataOwnerOrganization];
-            // We are dealing with a dataset. In the JSON specification, this will be the name of a dataset
-            // Let's point to the target data owner organization since we will need information out of that
-            _ThrowBaseExceptionIf((stlListOfOrganizationsByName.end() == stlListOfOrganizationsByName.find(qwHashOfResearchOrganization)), "ERROR: Unknown research organization %s specified in Digital Contract", oDigitalContactParameters.GetString("ResearchOrganization").c_str());
-            Organization * poResearchOrganization = stlListOfOrganizationsByName[qwHashOfResearchOrganization];
-
-            // Okay, let's register the digital contract.
-            DigitalContract oDigitalContract(poDataOwnerOrganization, poResearchOrganization, oDigitalContactParameters);
-            if (true == oDigitalContract.Register(gs_strIpAddress, 8000))
-            {
-                // Print out some information so that we can visibly see what just got registered
-                std::cout << "Registered digital contract \"" << oDigitalContract.GetContractName() << "\"" << std::endl;
-            }
-            else
-            {
-                // Print out some information so that we can visibly see what just failed
-                std::cout << "Failed to registered digital contract \"" << oDigitalContract.GetContractName() << "\"" << std::endl;
-            }
+            organization.second->RegisterFederationDataSubmitters(gs_strIpAddress, 8000, stlListOfOrganizationsByName);
+            organization.second->RegisterFederationResearchers(gs_strIpAddress, 8000, stlListOfOrganizationsByName);
         }
     }
 }

@@ -128,7 +128,26 @@ Organization::Organization(
             }
         }
     }
-        
+    if ( true == c_oOrganizationalData.IsElementPresent("Data Federation", INDEXED_BUFFER_VALUE_TYPE))
+    {
+        StructuredBuffer oFederations{c_oOrganizationalData.GetStructuredBuffer("Data Federation")};
+        if (true == oFederations.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+        {
+            oFederations.RemoveElement("__IsArray__");
+        }
+        for (const std::string & c_strElementName: oFederations.GetNamesOfElements())
+        {
+            StructuredBuffer oFederation{oFederations.GetStructuredBuffer(c_strElementName.c_str())};
+            if ((true == oFederation.IsElementPresent("DataFederationName", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oFederation.IsElementPresent("DataFederationDescription", ANSI_CHARACTER_STRING_VALUE_TYPE)))
+            {
+                m_stlDataFederations.insert(oFederation.GetBase64SerializedBuffer());
+            }
+            else
+            {
+                std::cout << "ERROR: Invalid federation entry encountered" << std::endl;
+            }
+        }
+    }
     if (1 != unStepIdentifier)
     {
         // Extract the datasets
@@ -416,13 +435,13 @@ void __thiscall Organization::Login(
     ) const
 {
     __DebugFunction();
-    
+
     // If there were more than one administrator specified, register the additional administrators
     std::unordered_set<std::string>::const_iterator c_stlIterator = m_stlAdministrators.begin();
     _ThrowBaseExceptionIf((m_stlAdministrators.end() == c_stlIterator), "ERROR: No administrator entry provided. Cannot login.", nullptr);
     StructuredBuffer oAdministrator(c_stlIterator->c_str());
     // Do the login
-    oSailPlatformServicesSession.Login(oAdministrator.GetString("Email"), gsc_strDefaultPassword);
+    oSailPlatformServicesSession.Login(oAdministrator.GetString("Email"), m_adminUserPassword);
 }
 
 /********************************************************************************************/
@@ -445,7 +464,13 @@ void __thiscall Organization::RegisterOrganization(void)
         oRegistrationParameters.PutString("admin_name", oAdministrator.GetString("Name"));
         oRegistrationParameters.PutString("admin_job_title", oAdministrator.GetString("Title"));
         oRegistrationParameters.PutString("admin_email", oAdministrator.GetString("Email"));
-        oRegistrationParameters.PutString("admin_password", gsc_strDefaultPassword);
+        m_adminUserPassword = gsc_strDefaultPassword;
+        if ( oAdministrator.IsElementPresent("Password", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        {
+            m_adminUserPassword = oAdministrator.GetString("Password");
+        }
+        oRegistrationParameters.PutString("admin_password", m_adminUserPassword);
+
     }
     // RegisterOrganization doesn't need you to be logged in at first.
     SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
@@ -488,8 +513,14 @@ void __thiscall Organization::RegisterUsers(void)
         oRegistrationParameters.PutString("email", oUser.GetString("Email"));
         oRegistrationParameters.PutString("job_title", oUser.GetString("Title"));
         oRegistrationParameters.PutString("role", oUser.GetString("Role"));
-        oRegistrationParameters.PutString("password", gsc_strDefaultPassword);
-
+        if ( oUser.IsElementPresent("Password", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        {
+            oRegistrationParameters.PutString("password", oUser.GetString("Password"));
+        }
+        else
+        {
+            oRegistrationParameters.PutString("password", gsc_strDefaultPassword);
+        }
         oSailPlatformServicesSession.RegisterUser(oRegistrationParameters, this->GetOrganizationalIdentifier());
         c_stlIterator++;
     }
@@ -503,7 +534,33 @@ void __thiscall Organization::RegisterDataFederations(void)
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
     __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
 
-    // This is a placeholder for now since data federations aren't implemented yet
+    // Start a new session with SAIL Platform Services using the default administrator
+    SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
+    this->Login(oSailPlatformServicesSession);
+    // Now that we have skipped the first entry, let's process all of the additional entries
+    // Basically, we are adding new users with admin access rights
+    std::unordered_set<std::string>::const_iterator c_stlIterator = m_stlDataFederations.begin();
+
+    for ( auto federation : m_stlDataFederations )
+    {
+        StructuredBuffer oFederation(federation.c_str());
+
+        StructuredBuffer oRegistrationParameters;
+
+        oRegistrationParameters.PutString("name", oFederation.GetString("DataFederationName"));
+        oRegistrationParameters.PutString("description", oFederation.GetString("DataFederationDescription"));
+
+        std::string strFederationIdentifier = oSailPlatformServicesSession.RegisterDataFederation(oRegistrationParameters);
+        if ( m_stlDataFederationIdentifiers.find(oFederation.GetString("DataFederationName")) == m_stlDataFederationIdentifiers.end())
+        {
+            m_stlDataFederationIdentifiers[oFederation.GetString("DataFederationName")] = strFederationIdentifier;
+            std::cout << "Registered Federation \"" << oFederation.GetString("DataFederationName") << "\" which was given identifier " << strFederationIdentifier << std::endl;
+        }
+        else
+        {
+            std::cout << "Federation " << oFederation.GetString("DataFederationName") << " already registered, not replacing identifier" << std::endl;
+        }
+    }
 }
 
 /********************************************************************************************/
@@ -536,7 +593,7 @@ void __thiscall Organization::RegisterDatasets(void)
         m_strDatasetIdentifiers[qwHashOfDatasetName] = strDatasetIdentifier;
         // Move on to the next item
         c_stlIterator++;
-        
+
         std::cout << "Registered dataset " << oDataset.GetString("Title") << std::endl;
     }
 }
@@ -619,4 +676,90 @@ void __thiscall Organization::RegisterDatasetVersions(void)
         // If we get here, then the registration process has worked. Let's
         c_stlIterator++;
     }
+}
+
+/********************************************************************************************/
+
+void __thiscall Organization::RegisterFederationDataSubmitters(
+    _in const std::string & c_strSailPlatformServicesIpAddress,
+    _in Word wSailPlatformServicesPortNumber,
+    const std::unordered_map<std::string, Organization *>& organizationList
+    ) throw()
+{
+    StructuredBuffer oRegistrationParameters;
+    SailPlatformServicesSession oSailPlatformServicesSession(c_strSailPlatformServicesIpAddress, wSailPlatformServicesPortNumber);
+    this->Login(oSailPlatformServicesSession);
+
+    for ( auto federation : m_stlDataFederations )
+    {
+        StructuredBuffer oFederation(federation.c_str());
+        if ( oFederation.IsElementPresent("DataSubmitters", INDEXED_BUFFER_VALUE_TYPE) )
+        {
+            StructuredBuffer oDataSubmitters{oFederation.GetStructuredBuffer("DataSubmitters")};
+            if (true == oDataSubmitters.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+            {
+                oDataSubmitters.RemoveElement("__IsArray__");
+            }
+            for ( const auto organizationIndex : oDataSubmitters.GetNamesOfElements())
+            {
+                auto organizationName = oDataSubmitters.GetString(organizationIndex.c_str());
+                auto orgInformation = organizationList.find(organizationName);
+                if ( organizationList.end() != orgInformation )
+                {
+                    std::cout << "Registering Data Submitter \"" << organizationName << "\" for Federation \"" << oFederation.GetString("DataFederationName") << "\"" << std::endl;
+                    Guid federationIdentifier = m_stlDataFederationIdentifiers[oFederation.GetString("DataFederationName")];
+                    Guid organizationIdentifier = orgInformation->second->GetOrganizationalIdentifier();
+
+                    oSailPlatformServicesSession.RegisterDataFederationDataSubmitter(federationIdentifier, organizationIdentifier);
+                }
+                else
+                {
+                    std::cout << "Failed to find org identifier " <<  organizationName << std::endl;
+                }
+            }
+        }
+    };
+}
+
+/********************************************************************************************/
+
+void __thiscall Organization::RegisterFederationResearchers(
+    _in const std::string & c_strSailPlatformServicesIpAddress,
+    _in Word wSailPlatformServicesPortNumber,
+    const std::unordered_map<std::string, Organization *>& organizationList
+    ) throw()
+{
+    StructuredBuffer oRegistrationParameters;
+    SailPlatformServicesSession oSailPlatformServicesSession(c_strSailPlatformServicesIpAddress, wSailPlatformServicesPortNumber);
+    this->Login(oSailPlatformServicesSession);
+
+    for ( auto federation : m_stlDataFederations )
+    {
+        StructuredBuffer oFederation(federation.c_str());
+        if ( oFederation.IsElementPresent("Researchers", INDEXED_BUFFER_VALUE_TYPE) )
+        {
+            StructuredBuffer oResearchers{oFederation.GetStructuredBuffer("Researchers")};
+            if (true == oResearchers.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
+            {
+                oResearchers.RemoveElement("__IsArray__");
+            }
+            for ( const auto organizationIndex : oResearchers.GetNamesOfElements())
+            {
+                auto organizationName = oResearchers.GetString(organizationIndex.c_str());
+                auto orgInformation = organizationList.find(organizationName);
+                if ( organizationList.end() != orgInformation )
+                {
+                    std::cout << "Registering Researcher \"" << organizationName << "\" for Federation \"" << oFederation.GetString("DataFederationName") << "\"" << std::endl;
+                    Guid federationIdentifier = m_stlDataFederationIdentifiers[oFederation.GetString("DataFederationName")];
+                    Guid organizationIdentifier = orgInformation->second->GetOrganizationalIdentifier();
+
+                    oSailPlatformServicesSession.RegisterDataFederationResearcher(federationIdentifier, organizationIdentifier);
+                }
+                else
+                {
+                    std::cout << "Failed to find org identifier " <<  organizationName << std::endl;
+                }
+            }
+        }
+    };
 }

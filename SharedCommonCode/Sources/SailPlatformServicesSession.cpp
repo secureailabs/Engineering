@@ -366,6 +366,80 @@ std::string __thiscall SailPlatformServicesSession::RegisterDataset(
     return oResponse.GetString("id");
 }
 
+
+std::string SailPlatformServicesSession::RegisterDataFederation(
+    const StructuredBuffer & oRegistrationParameters
+    )
+{
+    _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot register Data Federation before logging in.", nullptr);
+     // Get the ip address and port number
+    std::string strServerIpAddress = this->GetServerIpAddress();
+    Word wServerPortNumber = this->GetServerPortNumber();
+
+    // Prepare the API call
+    std::string strVerb = "POST";
+    std::string strApiUrl = "/data-federations";
+    std::string strJsonBody = ::ConvertStructuredBufferToJson(oRegistrationParameters);
+
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
+    // Make the API call and get REST response
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
+    StructuredBuffer oResponse = ::ConvertJsonStringToStructuredBuffer((const char *) stlRestResponse.data());
+    // Did the call succeed?
+    _ThrowBaseExceptionIf((false == oResponse.IsElementPresent("id", ANSI_CHARACTER_STRING_VALUE_TYPE)), "ERROR: Missing return value of Data Federation id.", nullptr);
+
+    return oResponse.GetString("id");
+}
+
+std::string SailPlatformServicesSession::RegisterDataFederationDataSubmitter(
+    Guid& dataFederationIdentifier,
+    Guid& submitterOrganizationIdentifier
+    )
+{
+     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot register Data Federation data submitter before logging in.", nullptr);
+     // Get the ip address and port number
+    std::string strServerIpAddress = this->GetServerIpAddress();
+    Word wServerPortNumber = this->GetServerPortNumber();
+
+    // Prepare the API call
+    std::string strVerb = "POST";
+    std::string strApiUrl = "/data-federations/" + dataFederationIdentifier.ToString(eHyphensOnly) + "/data-submitter/" + submitterOrganizationIdentifier.ToString(eHyphensOnly);
+    std::string strJsonBody = "";
+
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
+    // Make the API call and get REST response
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
+
+    return "";
+}
+
+std::string SailPlatformServicesSession::RegisterDataFederationResearcher(
+    Guid& dataFederationIdentifier,
+    Guid& researcherOrganizationIdentifier
+    )
+{
+     _ThrowBaseExceptionIf((false == this->IsRunning()), "ERROR: Cannot register Data Federation researcher before logging in.", nullptr);
+     // Get the ip address and port number
+    std::string strServerIpAddress = this->GetServerIpAddress();
+    Word wServerPortNumber = this->GetServerPortNumber();
+
+    // Prepare the API call
+    std::string strVerb = "POST";
+    std::string strApiUrl = "/data-federations/" + dataFederationIdentifier.ToString(eHyphensOnly) + "/researcher/" + researcherOrganizationIdentifier.ToString(eHyphensOnly);
+    std::string strJsonBody = "";
+
+    std::vector<std::string> stlListOfHeaders;
+    stlListOfHeaders.push_back("Authorization: Bearer " + this->GetAccessToken());
+    stlListOfHeaders.push_back("Content-Type: application/json");
+    // Make the API call and get REST response
+    std::vector<Byte> stlRestResponse = ::RestApiCall(strServerIpAddress, wServerPortNumber, strVerb, strApiUrl, strJsonBody, true, stlListOfHeaders);
+
+    return "";
+}
 /********************************************************************************************
  *
  * @class SailPlatformServicesSession

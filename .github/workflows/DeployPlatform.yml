@@ -1,0 +1,71 @@
+# Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
+name: Deploy Platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        type: choice
+        description: Choose Subscription
+        options:
+          - Development
+          - Release Candidate
+          - ProductionGA
+      message:
+        required: true
+env:
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_DEPLOYPLATFORM_AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_DEPLOYPLATFORM_AZURE_CLIENT_SECRET }}
+  DEVELOPMENT_AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
+  RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
+  PRODUCTION_GA_AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  Setup_Environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Condition 1 Development
+        if: ${{ github.event.inputs.name == 'Development' }}
+        run: |
+          echo "${{ github.head_ref }}"
+          echo "${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          echo "${{ github.event.inputs.message }} !!! Development !!!"
+          echo "${{ github.event.inputs.message }} ${{ github.event.inputs.name }}"
+          echo "AZURE_TENANT_ID: $AZURE_TENANT_ID"
+          echo "AZURE_CLIENT_ID: $AZURE_CLIENT_ID"
+          echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
+          echo "Development AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Condition 2 Release Candidate
+        if: ${{ github.event.inputs.name == 'Release Candidate' }}
+        run: |
+          echo "${{ github.head_ref }}"
+          echo "${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          echo "${{ github.event.inputs.message }} !!! Release Candidate !!!"
+          echo "${{ github.event.inputs.message }} ${{ github.event.inputs.name }}"
+          echo "AZURE_TENANT_ID: $AZURE_TENANT_ID"
+          echo "AZURE_CLIENT_ID: $AZURE_CLIENT_ID"
+          echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
+          echo "Release Candidate AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Condition 3 ProductionGA
+        if: ${{ github.event.inputs.name == 'ProductionGA' }}
+        run: |
+          echo "${{ github.head_ref }}"
+          echo "${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          echo "${{ github.event.inputs.message }} !!! ProductionGA !!!"
+          echo "${{ github.event.inputs.message }} ${{ github.event.inputs.name }}"
+          echo "AZURE_TENANT_ID: $AZURE_TENANT_ID"
+          echo "AZURE_CLIENT_ID: $AZURE_CLIENT_ID"
+          echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
+          echo "ProductionGA AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}

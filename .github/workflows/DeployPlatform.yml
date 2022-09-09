@@ -53,7 +53,7 @@ jobs:
           echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
           echo "Development AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
           docker -v
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          sudo ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
 
@@ -73,7 +73,7 @@ jobs:
           echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
           echo "Release Candidate AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
           docker -v
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          sudo ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
 
@@ -93,6 +93,6 @@ jobs:
           echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
           echo "ProductionGA AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
           docker -v
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          sudo ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}

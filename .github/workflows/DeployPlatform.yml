@@ -27,7 +27,7 @@ env:
 
 jobs:
   Setup_Environment:
-    runs-on: [self-hosted, Linux, x64, docker]
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
     steps:
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE

@@ -1,5 +1,5 @@
-# CI workflow Test Job Subscriptions
-name: Test Job Subscriptions
+# Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
+name: Deploy Platform
 
 on:
   workflow_dispatch:

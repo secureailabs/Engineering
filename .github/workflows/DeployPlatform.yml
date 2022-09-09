@@ -11,7 +11,8 @@ on:
           - Development
           - Release Candidate
           - ProductionGA
-      message:
+      purpose:
+        description: 'Purpose of Deployment'
         required: true
 env:
   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -37,13 +38,14 @@ jobs:
           set -e
           pwd
           ls -l
-          echo "${{ github.event.inputs.message }} !!! Development !!!"
-          echo "${{ github.event.inputs.message }} ${{ github.event.inputs.name }}"
+          echo "${{ github.event.inputs.purpose }} !!! Development !!!"
+          echo "${{ github.event.inputs.purpose }} ${{ github.event.inputs.name }}"
           echo "AZURE_TENANT_ID: $AZURE_TENANT_ID"
           echo "AZURE_CLIENT_ID: $AZURE_CLIENT_ID"
           echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
           echo "Development AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
           docker -v
+          # sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o CI
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
 
@@ -56,13 +58,14 @@ jobs:
           set -e
           pwd
           ls -l
-          echo "${{ github.event.inputs.message }} !!! Release Candidate !!!"
-          echo "${{ github.event.inputs.message }} ${{ github.event.inputs.name }}"
+          echo "${{ github.event.inputs.purpose }} !!! Release Candidate !!!"
+          echo "${{ github.event.inputs.purpose }} ${{ github.event.inputs.name }}"
           echo "AZURE_TENANT_ID: $AZURE_TENANT_ID"
           echo "AZURE_CLIENT_ID: $AZURE_CLIENT_ID"
           echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
           echo "Release Candidate AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
           docker -v
+          # sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o CI
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
 
@@ -82,5 +85,6 @@ jobs:
           echo "AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET"
           echo "ProductionGA AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID"
           docker -v
+          # sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o CI
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}

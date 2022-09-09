@@ -21,7 +21,7 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
     print("Upload package status: ", response.status_code)
 
 
-def deploy_module(account_credentials, deployment_name, module_name):
+def deploy_module(account_credentials, deployment_name, module_name, subscription_id):
     """Deploy the template to a resource group."""
     print("Deploying module: ", module_name)
 
@@ -29,23 +29,54 @@ def deploy_module(account_credentials, deployment_name, module_name):
     resource_group_name = deployment_name + "-" + module_name
 
     # Create the resource group
-    sailazure.create_resource_group(account_credentials, resource_group_name, "eastus")
+    sailazure.create_resource_group(account_credentials, resource_group_name, "westus")
 
     template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", module_name + ".json")
 
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
 
+    development_parameters = {
+        "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
+        + "InitializerImageStorage-WUS-Rg/providers/Microsoft.Compute/images/"  # change this line depending on your subscription resourcegroup where images are stored
+        + module_name,
+        "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
+        + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
+        "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
+    }
+
+    release_candidate_parameters = {
+        "vmImageResourceId": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/"  # change this line depending on your subscription
+        + "InitializerImageStorage-WUS-Rg/providers/Microsoft.Compute/images/"  # change this line depending on your subscription resourcegroup where images are stored
+        + module_name,
+        "virtualNetworkId": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/"  # change this line depending on your subscription
+        + "rg-sail-wus-rls-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-rls-01",  # change this line depending on your vnet
+        "subnetName": "snet-sail-wus-rls-platformservice-01",  # change this line depending on your vnet
+    }
+
+    productionGA_parameters = {
+        "vmImageResourceId": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/"  # change this line depending on your subscription
+        + "InitializerImageStorage-WUS-Rg/providers/Microsoft.Compute/images/"  # change this line depending on your subscription resourcegroup where images are stored
+        + module_name,
+        "virtualNetworkId": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/"  # change this line depending on your subscription
+        + "rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",  # change this line depending on your vnet
+        "subnetName": "snet-sail-wus-prd-platformservice-01",  # change this line depending on your vnet
+    }
+
     parameters = {
         "vmName": module_name,
         "vmSize": "Standard_D4s_v4",
-        "vmImageResourceId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/InitializerImageStorageRg/providers/Microsoft.Compute/images/"
-        + module_name,
         "adminUserName": "sailuser",
         "adminPassword": "SailPassword@123",
-        "subnetName": "PlatformService_eastus",
-        "virtualNetworkId": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
     }
+
+    if subscription_id == "b7a46052-b7b1-433e-9147-56efbfe28ac5":
+        parameters.update(development_parameters)
+    elif subscription_id == "40cdb551-8a8d-401f-b884-db1599022002":
+        parameters.update(release_candidate_parameters)
+    elif subscription_id == "ba383264-b9d6-4dba-b71f-58b3755382d8":
+        parameters.update(productionGA_parameters)
+
     deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
     print(module_name + " server status: ", deploy_status)
 
@@ -54,9 +85,9 @@ def deploy_module(account_credentials, deployment_name, module_name):
     return virtual_machine_public_ip
 
 
-def deploy_apiservices(account_credentials, deployment_name, owner):
+def deploy_apiservices(account_credentials, deployment_name, owner, subscription_id):
     # Deploy the frontend server
-    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices")
+    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", subscription_id)
 
     # Read backend json from file
     with open("apiservices.json", "r") as backend_json_fd:
@@ -89,9 +120,9 @@ def deploy_apiservices(account_credentials, deployment_name, owner):
     return apiservices_ip
 
 
-def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
+def deploy_frontend(account_credentials, deployment_name, platform_services_ip, subscription_id):
     # Deploy the frontend server
-    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend")
+    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend", subscription_id)
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
@@ -136,7 +167,6 @@ if __name__ == "__main__":
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
         exit(0)
-
     deployment_id = OWNER + "-" + str(uuid.uuid1()) + "-" + PURPOSE
 
     # Authenticate the azure credentials
@@ -145,11 +175,10 @@ if __name__ == "__main__":
     )
 
     # Deploy the API services
-    platform_services_ip = deploy_apiservices(account_credentials, deployment_id, OWNER)
+    platform_services_ip = deploy_apiservices(account_credentials, deployment_id, OWNER, AZURE_SUBSCRIPTION_ID)
     print("API Services server: ", platform_services_ip)
-
     # Deploy the frontend server
-    frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip)
+    frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip, AZURE_SUBSCRIPTION_ID)
     print("Frontend server: ", frontend_ip)
 
     print("\n\n===============================================================")
@@ -160,7 +189,7 @@ if __name__ == "__main__":
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")
 
-    # TODO: Prawal re-enable this once the orchestrator package is ready
+    # # TODO: Prawal re-enable this once the orchestrator package is ready
     # Deploy the orchestro server
     # orchestrator_ip = deploy_orchestrator(account_credentials, deployment_id, "orchestrator")
     # print("Orchestrator IP: ", orchestrator_ip)

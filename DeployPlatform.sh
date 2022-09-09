@@ -9,7 +9,6 @@ PrintHelp()
     echo -e "\t-o Triggered By: deployment owner name. No spaces."
     exit 1 # Exit script after printing help
 }
-
 # Check if docker is installed
 docker --version
 retVal=$?
@@ -70,7 +69,7 @@ cp Binary/igr_002.csvp $tempDeployDir
 cp Binary/mgr_001.csvp $tempDeployDir
 cp Binary/DatabaseInitializationSettings.json $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
-mv Binary/newwebfrontend.tar.gz $tempDeployDir
+cp Binary/newwebfrontend.tar.gz $tempDeployDir
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
 cp -r InternalTools/DeployPlatform/* $tempDeployDir
 
@@ -90,16 +89,16 @@ fi
 # Run the docker image to deploy the application on the Azure
 pushd $tempDeployDir
 docker run \
-  -it \
+  -t \
   -v $(pwd):/app \
+  --env OWNER=$owner \
+  --env PURPOSE=$purpose \
   --env AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
   --env AZURE_TENANT_ID=$AZURE_TENANT_ID \
   --env AZURE_CLIENT_ID=$AZURE_CLIENT_ID \
   --env AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET \
-  --env OWNER=$owner \
-  --env PURPOSE=$purpose \
   azuredeploymenttools
 popd
-
+  
 # Cleanup the temporary directory
 rm -rf $tempDeployDir

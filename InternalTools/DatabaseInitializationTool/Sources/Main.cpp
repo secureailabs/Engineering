@@ -33,8 +33,7 @@ static void __stdcall PrintUsage(void)
               << "       --settings,    Name of JSON file containing initialization values." << std::endl
               << "       --help,        Print these instructions." << std::endl
               << "       --step1,       Register organizations, users, administrators, data federations." << std::endl
-              << "       --step2,       Register datasets and digital contracts." << std::endl
-              << "       --step3,       Register digital contracts only (assumes datasets are already registered)." << std::endl
+              << "       --step2,       Register datasets" << std::endl
               << "       --allsteps,    Registers everything (i.e. step1 + step 2)." << std::endl;
 }
 
@@ -100,7 +99,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         }
     }
 
-    // Register anything that needs an organization identifier. We are assuming that datasets have been registered by the dataset tools
+    // Register anything that needs an organization identifier. This will register Data Submitters and Researchers
     if ((2 == unStepIdentifier)||(3 == unStepIdentifier)||(4 == unStepIdentifier))
     {
         // Assign data submitters and researcher to our data federations

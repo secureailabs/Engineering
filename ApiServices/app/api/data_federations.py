@@ -359,7 +359,9 @@ async def invite_researcher(
     except Exception as exception:
         raise exception
 
+
 ########################################################################################################################
+
 
 @router.post(
     path="/data-federations/{data_federation_id}/data-submitter/{data_submitter_organization_id}",
@@ -372,7 +374,7 @@ async def register_data_submitter(
     current_user: TokenData = Depends(get_current_user),
 ):
     """
-    Register a data submitter to an organization
+    Register a data submitter to an organization - This is an internal call for SAIL to manage a federation
 
     :param data_federation_id: data federation for which the data submitter is being registered
     :type data_federation_id: PyObjectId
@@ -421,6 +423,7 @@ async def register_data_submitter(
     except Exception as exception:
         raise exception
 
+
 ########################################################################################################################
 @router.post(
     path="/data-federations/{data_federation_id}/researcher/{researcher_organization_id}",
@@ -433,7 +436,7 @@ async def register_researcher(
     current_user: TokenData = Depends(get_current_user),
 ):
     """
-    Register a researcher to an organization
+    Register a researcher to an organization - This is an internal call for SAIL to manage a federation
 
     :param data_federation_id: data federation for which the data submitter is being registered
     :type data_federation_id: PyObjectId
@@ -479,6 +482,7 @@ async def register_researcher(
         raise http_exception
     except Exception as exception:
         raise exception
+
 
 ########################################################################################################################
 @router.put(

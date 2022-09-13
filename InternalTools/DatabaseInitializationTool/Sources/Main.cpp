@@ -70,6 +70,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
     // element is the name of the organization.
     StructuredBuffer oOrganizations = oSettings.GetStructuredBuffer("Organizations");
     std::vector<std::string> strListOfOrganizationNames = oOrganizations.GetNamesOfElements();
+    std::unordered_map<std::string, Guid> stlRegisteredFederations;
     // Register organizations. Based on the step index, this will either:
     //  1 --> Register the organization
     //  2 --> Register the datasets
@@ -82,7 +83,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         StructuredBuffer oOrganization(oOrganizations.GetStructuredBuffer(c_strOrganizationName.c_str()));
         Organization * poOrganization = new Organization(c_strOrganizationName, oOrganization, unStepIdentifier);
         // Register the organization
-        if (true == poOrganization->Register(gs_strIpAddress, 8000, unStepIdentifier))
+        if (true == poOrganization->Register(gs_strIpAddress, 8000, unStepIdentifier, stlRegisteredFederations))
         {
             // Keep track of the name-identifier tuple since it will be needed when registering
             // digital contracts
@@ -107,6 +108,7 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         {
             organization.second->RegisterFederationDataSubmitters(gs_strIpAddress, 8000, stlListOfOrganizationsByName);
             organization.second->RegisterFederationResearchers(gs_strIpAddress, 8000, stlListOfOrganizationsByName);
+            organization.second->RegisterDatasetsToFederations(gs_strIpAddress, 8000, stlRegisteredFederations);
         }
     }
 }

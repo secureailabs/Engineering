@@ -105,7 +105,7 @@ Organization::Organization(
             }
         }
     }
-    // Extract the dataset families
+    // Extract the datasets
     if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
     {
         StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
@@ -187,7 +187,8 @@ Organization::~Organization(void)
 bool __thiscall Organization::Register(
     _in const std::string & c_strSailPlatformServicesIpAddress,
     _in Word wSailPlatformServicesPortNumber,
-    _in unsigned int unStepIdentifier
+    _in unsigned int unStepIdentifier,
+    std::unordered_map<std::string, Guid>& registeredFederations
     ) throw()
 {
     __DebugFunction();
@@ -210,7 +211,7 @@ bool __thiscall Organization::Register(
             std::cout << "004" << std::endl;
             this->RegisterUsers();
             std::cout << "005" << std::endl;
-            this->RegisterDataFederations();
+            this->RegisterDataFederations(registeredFederations);
             std::cout << "006" << std::endl;
             this->RegisterDatasets();
             std::cout << "007" << std::endl;
@@ -226,7 +227,7 @@ bool __thiscall Organization::Register(
             this->RegisterOrganization();
             this->RegisterContacts();
             this->RegisterUsers();
-            this->RegisterDataFederations();
+            this->RegisterDataFederations(registeredFederations);
             this->RegisterDatasets();
             m_fRegistered = true;
             this->RegisterDatasetVersions();
@@ -363,11 +364,10 @@ std::string __thiscall Organization::GetDatasetIdentifier(
     try
     {
         _ThrowBaseExceptionIf((false == m_fRegistered), "ERROR: Cannot get the dataset identifier before the organization has been registered fully", nullptr);
-        
-        Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(c_strDatasetName.c_str(), false);
-        if (m_strDatasetIdentifiers.end() != m_strDatasetIdentifiers.find(qwHashOfDatasetName))
+
+        if (m_strDatasetIdentifiers.end() != m_strDatasetIdentifiers.find(c_strDatasetName))
         {
-            strDatasetIdentifier = m_strDatasetIdentifiers.at(qwHashOfDatasetName);
+            strDatasetIdentifier = m_strDatasetIdentifiers.at(c_strDatasetName);
         }
     }
     
@@ -528,7 +528,9 @@ void __thiscall Organization::RegisterUsers(void)
 
 /********************************************************************************************/
 
-void __thiscall Organization::RegisterDataFederations(void)
+void __thiscall Organization::RegisterDataFederations(
+    std::unordered_map<std::string, Guid>& registeredFederations
+)
 {
     __DebugFunction();
     __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
@@ -555,6 +557,7 @@ void __thiscall Organization::RegisterDataFederations(void)
         {
             m_stlDataFederationIdentifiers[oFederation.GetString("DataFederationName")] = strFederationIdentifier;
             std::cout << "Registered Federation \"" << oFederation.GetString("DataFederationName") << "\" which was given identifier " << strFederationIdentifier << std::endl;
+            registeredFederations[oFederation.GetString("DataFederationName")] = strFederationIdentifier;
         }
         else
         {
@@ -589,12 +592,11 @@ void __thiscall Organization::RegisterDatasets(void)
 
         std::string strDatasetIdentifier = oSailPlatformServicesSession.RegisterDataset(oRegistrationParameters);
         // Make sure the register the dataset identifier that is returned
-        Qword qwHashOfDatasetName = ::Get64BitHashOfNullTerminatedString(oDataset.GetString("Title").c_str(), false);
-        m_strDatasetIdentifiers[qwHashOfDatasetName] = strDatasetIdentifier;
+        m_strDatasetIdentifiers[oDataset.GetString("Title")] = strDatasetIdentifier;
         // Move on to the next item
         c_stlIterator++;
 
-        std::cout << "Registered dataset " << oDataset.GetString("Title") << std::endl;
+        std::cout << "Registered dataset " << oDataset.GetString("Title") << " which was given identifier " << strDatasetIdentifier << std::endl;
     }
 }
 
@@ -759,6 +761,42 @@ void __thiscall Organization::RegisterFederationResearchers(
                 {
                     std::cout << "Failed to find org identifier " <<  organizationName << std::endl;
                 }
+            }
+        }
+    };
+}
+
+/********************************************************************************************/
+
+void Organization::RegisterDatasetsToFederations(
+    _in const std::string & c_strSailPlatformServicesIpAddress,
+    _in Word wSailPlatformServicesPortNumber,
+    const std::unordered_map<std::string, Guid>& federationList
+    ) throw()
+{
+
+    StructuredBuffer oRegistrationParameters;
+    SailPlatformServicesSession oSailPlatformServicesSession(c_strSailPlatformServicesIpAddress, wSailPlatformServicesPortNumber);
+    this->Login(oSailPlatformServicesSession);
+
+    for ( auto dataset : m_stlDatasets )
+    {
+        StructuredBuffer oDataset(dataset.c_str());
+        if ( oDataset.IsElementPresent("Federation", ANSI_CHARACTER_STRING_VALUE_TYPE) )
+        {
+            std::string federationName = oDataset.GetString("Federation");
+            auto federationItr = federationList.find(federationName);
+            if ( federationList.end() != federationItr )
+            {
+                std::cout << "Registering Dataset \"" << oDataset.GetString("Title") << "\" for Federation \"" << federationName << "\"" << std::endl;
+                Guid federationIdentifier = federationItr->second;
+                Guid datasetIdentifier = m_strDatasetIdentifiers[oDataset.GetString("Title")];
+
+                oSailPlatformServicesSession.RegisterDataFederationDataset(federationIdentifier, datasetIdentifier);
+            }
+            else
+            {
+                std::cout << "Failed to find dataset identifier " <<  oDataset.GetString("Title") << std::endl;
             }
         }
     };

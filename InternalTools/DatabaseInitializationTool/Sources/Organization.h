@@ -33,7 +33,8 @@ class Organization : public Object
         bool __thiscall Register(
             _in const std::string & c_strSailPlatformServicesIpAddress,
             _in Word wSailPlatformServicesPortNumber,
-            _in unsigned int unStepIdentifier
+            _in unsigned int unStepIdentifier,
+            std::unordered_map<std::string, Guid>& registeredDatasets
             ) throw();
 
         // The following information is needed when trying to register
@@ -75,6 +76,11 @@ class Organization : public Object
             const std::unordered_map<std::string, Organization *>& organizationList
             ) throw();
 
+        void RegisterDatasetsToFederations(
+            _in const std::string & c_strSailPlatformServicesIpAddress,
+            _in Word wSailPlatformServicesPortNumber,
+            const std::unordered_map<std::string, Guid>& federationList
+            ) throw();
     private:
 
         // Since all of the functions to register have the same login code in
@@ -89,7 +95,9 @@ class Organization : public Object
         void __thiscall RegisterContacts(void);
         // Register non-admin users
         void __thiscall RegisterUsers(void);
-        void __thiscall RegisterDataFederations(void);
+        void __thiscall RegisterDataFederations(
+            std::unordered_map<std::string, Guid>& registeredFederations
+            );
         void __thiscall RegisterDatasets(void);
         void __thiscall RegisterDatasetVersions(void);
 
@@ -104,7 +112,7 @@ class Organization : public Object
         std::unordered_set<std::string> m_stlUsers;
         std::unordered_map<Qword, std::string> m_strDatasetVersionInformationByFilename;
         std::unordered_set<std::string> m_stlDatasets;
-        std::unordered_map<Qword, std::string> m_strDatasetIdentifiers;
+        std::unordered_map<std::string, std::string> m_strDatasetIdentifiers;
         std::unordered_set<std::string> m_stlDataFederations;
         std::unordered_map<std::string, Guid> m_stlDataFederationIdentifiers;
         std::unordered_map<Qword, std::string> m_strDataFederationIdentifiers;

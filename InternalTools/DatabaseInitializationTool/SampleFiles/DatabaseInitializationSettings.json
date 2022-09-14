@@ -6,8 +6,7 @@
 				{
 					"Name": "Admin",
 					"Title": "Platform Administrator",
-					"Email": "admin@secureailabs.com",
-					"Password": "1s229182xz1"
+					"Email": "admin@secureailabs.com"
 				}
 			]
 		},
@@ -25,8 +24,7 @@
 					"Name": "Philip Carey",
 					"Title": "Network Engineer",
 					"Email": "pcarey@igr.com",
-					"Role": "USER",
-					"Password" : "a0th3rP2ssw0rd_!@3"
+					"Role": "USER"
 				},
 				{
 					"Email": "abede@igr.com",

@@ -70,6 +70,7 @@ declare -a ListOfDockerImages=(
     "newwebfrontend"
     "securecomputationnode"
     "devopsconsole"
+    "rpcrelated"
 )
 
 for val in "${ListOfDockerImages[@]}"; do

@@ -1,7 +1,9 @@
-import typing
-from zero.errors import ZeroException
-from .customtypes import SecretObject
 import inspect
+import typing
+
+from zero.errors import ZeroException
+
+from .customtypes import SecretObject
 
 # from pydantic import BaseModel
 
@@ -33,6 +35,13 @@ allowed_types = basic_types + typing_types + special_types + pydantic_types
 
 
 def verify_function_args(func: typing.Callable):
+    """
+    Verify function argument types
+
+    :param func: rpc function
+    :type func: typing.Callable
+    :raises ZeroException: raise if no type hint is given in the safe function
+    """
     arg_count = func.__code__.co_argcount
     # if arg_count > 1:
     #     raise ZeroException(
@@ -48,12 +57,27 @@ def verify_function_args(func: typing.Callable):
 
 
 def verify_function_return(func: typing.Callable):
+    """
+    verify function return types
+
+    :param func: rpc function
+    :type func: typing.Callable
+    :raises ZeroException: raise if no return type hint given in the safe function
+    """
     types = typing.get_type_hints(func)
     if not types.get("return"):
         raise ZeroException(f"`{func.__name__}` has no return type hinting; RPC functions must have type hints")
 
 
 def get_function_input_class(func: typing.Callable):
+    """
+    get function argument types
+
+    :param func: rpc function
+    :type func: typing.Callable
+    :return: a dict containing function arg types
+    :rtype: dict
+    """
     arg_count = func.__code__.co_argcount
     if arg_count == 0:
         return None
@@ -67,11 +91,26 @@ def get_function_input_class(func: typing.Callable):
 
 
 def get_function_return_class(func: typing.Callable):
+    """
+    get function return types
+
+    :param func: rpc function
+    :type func: typing.Callable
+    :return: dict containing function return types
+    :rtype: dict
+    """
     types = typing.get_type_hints(func)
     return types.get("return")
 
 
 def verify_function_input_type(func: typing.Callable):
+    """
+    verify if function input parameter types are basic python types
+
+    :param func: rpc function
+    :type func: typing.Callable
+    :raises TypeError: if the types given is not basic python types(can not processed by msgpack)
+    """
     input_type = get_function_input_class(func)
     if input_type is None:
         return
@@ -95,6 +134,15 @@ def verify_function_input_type(func: typing.Callable):
 
 
 def verify_allowed_type(msg, rpc_method: str = None):
+    """
+    verify if the input parameter types are allowed types
+
+    :param msg: incoming parameters
+    :type msg: Any
+    :param rpc_method: callable, defaults to None
+    :type rpc_method: str, optional
+    :raises TypeError: raise if the input parameters have not allowed types
+    """
     if not isinstance(msg, tuple(allowed_types)):
         method_name = f"for method `{rpc_method}`" if rpc_method else ""
         raise TypeError(
@@ -103,6 +151,17 @@ def verify_allowed_type(msg, rpc_method: str = None):
 
 
 def verify_incoming_rpc_call_input_type(msg, rpc_method: str, rpc_input_type_map: dict):  # pragma: no cover
+    """
+    verify if the incoming rpc call input types matches the given ones
+
+    :param msg: input parameters
+    :type msg: Any
+    :param rpc_method: rpc method
+    :type rpc_method: str
+    :param rpc_input_type_map: input types defined
+    :type rpc_input_type_map: dict
+    :raises TypeError: if the input parameter have type does not match the given ones
+    """
     it = rpc_input_type_map[rpc_method]
     if it is None:
         return
@@ -117,6 +176,12 @@ def verify_incoming_rpc_call_input_type(msg, rpc_method: str, rpc_input_type_map
 
 
 def is_pydantic(cls):  # pragma: no cover
+    """
+    _summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     if cls not in basic_types:
         if not typing.get_origin(cls) in basic_types:
             if not typing.get_origin(cls) in special_types:

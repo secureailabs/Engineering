@@ -7,8 +7,10 @@ import zmq.asyncio
 
 from zero.errors import MethodNotFoundException, ZeroException
 
-# public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
-# private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
+from .serialize import deserializer_table, serializer_table
+
+#public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
+#private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
 public_keys_dir = "/app/public_keys/"
 private_keys_dir = "/app/private_keys/"
 
@@ -20,6 +22,16 @@ class _BaseClient:
         port: int,
         default_timeout: int = 2000,
     ):
+        """
+        Client class for orchestrator
+
+        :param host: host ip
+        :type host: str
+        :param port: host port to connect
+        :type port: int
+        :param default_timeout: _description_, defaults to 2000
+        :type default_timeout: int, optional
+        """
         self._host = host
         self._port = port
         self._default_timeout = default_timeout
@@ -28,12 +40,18 @@ class _BaseClient:
         self._socket: Optional[zmq.Socket] = None
 
     def _init_serializer(self):
-        # msgpack is the default serializer
+        """
+        initialize serializer
+        msgpack is the default serializer
+        """
         if self._serializer == "msgpack":
             self._encode = msgpack.packb
             self._decode = msgpack.unpackb
 
     def _set_socket_opt(self):
+        """
+        set socket parameters
+        """
         self._socket.setsockopt(zmq.RCVTIMEO, self._default_timeout)
         self._socket.setsockopt(zmq.SNDTIMEO, self._default_timeout)
         self._socket.setsockopt(zmq.LINGER, 0)  # dont buffer messages
@@ -61,6 +79,9 @@ class ZeroClient(_BaseClient):
         super().__init__(host, port, default_timeout)
 
     def _init_socket(self):
+        """
+        Initialize socket with TLS keys
+        """
         ctx = zmq.Context.instance()
         self._socket: zmq.Socket = ctx.socket(zmq.DEALER)
 
@@ -88,6 +109,17 @@ class ZeroClient(_BaseClient):
     # 1->secret object
     # 2->secret object as a proxy
     def _send_msg(self, msg, msg_type):
+        """
+        send message from client to server
+
+        :param msg: message payload
+        :type msg: dict
+        :param msg_type: message type
+        :type msg_type: int
+        :raises ze: raise when there is a connection error on zmq layer
+        :return: response from server
+        :rtype: Any
+        """
         if self._socket is None:
             self._init_socket()
 
@@ -118,6 +150,15 @@ class ZeroClient(_BaseClient):
             raise
 
     def _process_resp(self, msg):
+        """
+        process response message
+
+        :param msg: response message
+        :type msg: Any
+        :raises Exception: unknown return object
+        :return: processed message
+        :rtype: Any
+        """
         resp = None
         if isinstance(msg, tuple):
             tmp_list = list(tuple)
@@ -133,6 +174,8 @@ class ZeroClient(_BaseClient):
                 resp = msg
             else:
                 raise Exception("unknown return object from remote end")
+        elif isinstance(msg, dict) and "__type__" in msg:
+            resp = deserializer_table[msg["__type__"]](msg)
         else:
             resp = msg
         return resp
@@ -158,6 +201,14 @@ class ZeroClient(_BaseClient):
         return self._send_msg(msg, msg_type)
 
     def proxy(self, ro_name, *args, **kwargs):
+        """
+        create a proxy mirror image of a remote object
+
+        :param ro_name: remote object class name
+        :type ro_name: str
+        :return: proxy mirror image
+        :rtype: Proxy
+        """
         msg_type = 1
         msg = {}
         msg["vargs"] = args
@@ -191,6 +242,9 @@ class AsyncZeroClient(_BaseClient):
         super().__init__(host, port, default_timeout)
 
     def _init_async_socket(self):
+        """
+        Initialize asynchronous socket
+        """
         ctx = zmq.asyncio.Context.instance()
         self._socket: zmq.Socket = ctx.socket(zmq.DEALER)
         self._set_socket_opt()
@@ -234,6 +288,16 @@ class Proxy(object):
     )
 
     def __init__(self, object_id, object_type, client):
+        """
+        Proxy class from remote object
+
+        :param object_id: remote object id
+        :type object_id: str
+        :param object_type: remote object type
+        :type object_type: str
+        :param client: which client does the proxy object belongs to
+        :type client: _BaseClient
+        """
         self._roid = object_id
         self._rotype = object_type
         self._roMethods = set()  # all methods of the remote object, gotten from meta-data
@@ -243,13 +307,24 @@ class Proxy(object):
         # self._pyroRawWireResponse = False  # internal switch to enable wire level responses
 
     def __del__(self):
-        ##send a signal to remote end to delete stored object
+        """
+        destructor call will send a signal to remote end to delete stored object
+        """
         msg_type = 4
         msg = {}
         msg["object_id"] = self._roid
         self._client._send_msg(msg, msg_type)
 
     def __getattr__(self, name):
+        """
+        get attribute from remote object
+
+        :param name: attribute name
+        :type name: str
+        :raises AttributeError: there is no such attribute on the remote end
+        :return: the attribute value
+        :rtype: Any
+        """
         # get metadata if it's not there yet
         if name in Proxy.__roAttributes:
             raise AttributeError(name)
@@ -263,6 +338,17 @@ class Proxy(object):
         return _RemoteMethod(self._roInvoke, name)
 
     def __setattr__(self, name, value):
+        """
+        set attribute value on the remote end
+
+        :param name: attribute name
+        :type name: str
+        :param value: new value to be assigned to the attribute
+        :type value: Any
+        :raises AttributeError: No such attribute for remote object
+        :return: None
+        :rtype: None
+        """
         if name in Proxy.__roAttributes:
             return super(Proxy, self).__setattr__(name, value)  # one of the special pyro attributes
         # get metadata if it's not there yet
@@ -274,6 +360,12 @@ class Proxy(object):
         raise AttributeError("remote object '%s' has no exposed attribute '%s'" % (self._pyroUri, name))
 
     def __copy__(self):
+        """
+        get a copy of the proxy
+
+        :return: the copied proxy object
+        :rtype: Proxy
+        """
         p = object.__new__(type(self))
         p._roid = self._roid
         p._roMethods = self._roMethods
@@ -281,25 +373,43 @@ class Proxy(object):
         return p
 
     def __enter__(self):
+        """
+        For with control
+        """
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """
+        For with control
+        """
         self.__del__()
 
     def __eq__(self, other):
+        """
+        == operator overload
+        """
         if other is self:
             return True
         return isinstance(other, Proxy) and other._roid == self._roid
 
     def __ne__(self, other):
+        """
+        != operator overload
+        """
         if other and isinstance(other, Proxy):
             return other._roid != self._roid
         return True
 
     def __hash__(self):
+        """
+        make proxy object hashable
+        """
         return hash(self._roid)
 
     def __dir__(self):
+        """
+        support directory view for remote class
+        """
         result = dir(self.__class__) + list(self.__dict__.keys())
         return sorted(set(result) | self._roMethods | self._roAttrs)
 
@@ -308,21 +418,39 @@ class Proxy(object):
     # for efficiency reasons; instead, their presence is checked directly.
     # Thus we need to define them here to force (remote) lookup through __getitem__.
     def __bool__(self):
+        """
+        bool overload
+        """
         return True
 
     def __len__(self):
+        """
+        define the len method to be same as remote
+        """
         return self.__getattr__("__len__")()
 
     def __getitem__(self, index):
+        """
+        [] operator overload
+        """
         return self.__getattr__("__getitem__")(index)
 
     def __setitem__(self, index, val):
+        """
+        []= operator overload
+        """
         return self.__getattr__("__setitem__")(index, val)
 
     def __delitem__(self, index):
+        """
+        key delete overload
+        """
         return self.__getattr__("__delitem__")(index)
 
     def __iter__(self):
+        """
+        iterator, to be implemented
+        """
         try:
             # use remote iterator if it exists
             yield from self.__getattr__("__iter__")()
@@ -334,7 +462,18 @@ class Proxy(object):
                 return
 
     def _roInvoke(self, methodname, vargs, kwargs):
+        """
+        remote object method invoke
 
+        :param methodname: remote method name
+        :type methodname: str
+        :param vargs: arg vector
+        :type vargs: tuple
+        :param kwargs: key word args
+        :type kwargs: dict
+        :return: method result
+        :rtype: Any
+        """
         msg_type = 3
         msg = {}
         msg["object_id"] = self._roid
@@ -345,7 +484,12 @@ class Proxy(object):
         return self._client._send_msg(msg, msg_type)
 
     def _roGetMetadata(self):
+        """
+        Get remote class metadata
 
+        :return: None
+        :rtype: None
+        """
         if self._roMethods or self._roAttrs:
             return  # metadata has already been retrieved as part of creating the connection
 
@@ -361,6 +505,13 @@ class Proxy(object):
             raise
 
     def __processMetadata(self, metadata):
+        """
+        Process remote class metadata
+
+        :param metadata: remote class metadata
+        :type metadata: Any
+        :raises ZeroException: remote class does not allow its attributes to be revealed
+        """
         if not metadata:
             return
         self._roMethods = set(metadata["methods"])
@@ -378,14 +529,27 @@ class Proxy(object):
 
 
 class _RemoteMethod(object):
-    """method call abstraction"""
-
     def __init__(self, send, name):
+        """
+        method call abstraction
+
+        :param send: send method
+        :type send: callable
+        :param name: method name
+        :type name: str
+        """
         self.__send = send
         self.__name = name
 
     def __getattr__(self, name):
+        """
+        get attribute for remote method, will return the method call
+        """
         return _RemoteMethod(self.__send, "%s.%s" % (self.__name, name))
 
     def __call__(self, *args, **kwargs):
+        """
+        () operator overload
+        intrigue the remote method call
+        """
         return self.__send(self.__name, args, kwargs)

@@ -1,17 +1,18 @@
+import logging
+import os
 from typing import Callable
+
 import zmq
 import zmq.auth
 from zmq.auth.thread import ThreadAuthenticator
-import logging
-import os
 
 """
 If we want to replace the client-server patter with other implementation like Simple Pirate pattern,
 implement the ZeroMQInterface class and replace the ZeroMQ with the new implementation instance.
 """
 
-# public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
-# private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
+#public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
+#private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
 public_keys_dir = "/app/public_keys/"
 private_keys_dir = "/app/private_keys/"
 
@@ -82,6 +83,18 @@ class ZeroMQPythonDevice(ZeroMQInterface):
         worker_ipc: str,
         worker_port: int,
     ):
+        """
+        zero mq device for socket connection
+
+        :param host: host ip
+        :type host: str
+        :param port: host port
+        :type port: int
+        :param worker_ipc: host worker ipc method
+        :type worker_ipc: str
+        :param worker_port: host worker port
+        :type worker_port: int
+        """
         try:
             ctx = zmq.Context.instance()
             gateway = ctx.socket(zmq.ROUTER)
@@ -124,6 +137,18 @@ class ZeroMQPythonDevice(ZeroMQInterface):
         worker_id: int,
         process_message: Callable,
     ):
+        """
+        client worker
+
+        :param worker_ipc: worker ipc method
+        :type worker_ipc: str
+        :param worker_port: worker port
+        :type worker_port: int
+        :param worker_id: worker id
+        :type worker_id: int
+        :param process_message: worked process function
+        :type process_message: Callable
+        """
         try:
             ctx = zmq.Context()
             socket = ctx.socket(zmq.DEALER)

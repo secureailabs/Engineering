@@ -23,10 +23,16 @@ class _AsyncLogger:  # pragma: no cover
     ipc = "zerologger"
 
     def __init__(self):
+        """
+        _summary_
+        """
         # pass
         self.init_push_logger()
 
     def init_push_logger(self):
+        """
+        _summary_
+        """
         ctx = zmq.asyncio.Context()
         self.log_pusher = ctx.socket(zmq.PUSH)
         if os.name == "posix":
@@ -35,10 +41,24 @@ class _AsyncLogger:  # pragma: no cover
             self.log_pusher.connect(f"tcp://127.0.0.1:{_AsyncLogger.port}")
 
     def log(self, msg):
+        """
+        _summary_
+
+        :param msg: _description_
+        :type msg: _type_
+        """
         self.log_pusher.send_string(str(msg))
 
     @classmethod
     def start_log_poller(cls, ipc, port):
+        """
+        _summary_
+
+        :param ipc: _description_
+        :type ipc: _type_
+        :param port: _description_
+        :type port: _type_
+        """
         _AsyncLogger.port = port
         _AsyncLogger.ipc = ipc
 

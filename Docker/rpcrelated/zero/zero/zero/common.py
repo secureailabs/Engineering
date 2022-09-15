@@ -1,4 +1,12 @@
 def get_next_available_port(port):
+    """
+    _summary_
+
+    :param port: _description_
+    :type port: _type_
+    :return: _description_
+    :rtype: _type_
+    """
     import socket
     from contextlib import closing
 

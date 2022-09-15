@@ -17,11 +17,23 @@ import uuid
 
 class SecretObject:
     def __init__(self, obj):
+        """
+        Secret object type
+
+        :param obj: python object to be converted
+        :type obj: Any
+        """
         self.content = obj
         self.guid = uuid.uuid4().hex
         self.type = str(type(obj))
 
     def to_dict(self):
+        """
+        serialize secret object to dict
+
+        :return: dict
+        :rtype: dict
+        """
         return {
             "id": self.guid,
             "type": self.type,
@@ -31,11 +43,23 @@ class SecretObject:
 
 class ProxyObject:
     def __init__(self, obj):
+        """
+        Proxy object type
+
+        :param obj: python object to be converted
+        :type obj: Any
+        """
         self.content = obj
         self.guid = uuid.uuid4().hex
         self.type = str(type(obj))
 
     def to_dict(self):
+        """
+        serilize proxy object to dict
+
+        :return: dict
+        :rtype: dict
+        """
         return {
             "id": self.guid,
             "type": self.type,

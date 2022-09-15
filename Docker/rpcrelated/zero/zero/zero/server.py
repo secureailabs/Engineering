@@ -7,19 +7,24 @@ import sys
 import time
 import typing
 import uuid
-import inspect
 from functools import partial
-from multiprocessing.pool import Pool
 from multiprocessing import Manager
+from multiprocessing.pool import Pool
 
 import matplotlib
-
 import msgpack
+
+# import uvloop
+import pandas as pd
 import zmq
 import zmq.asyncio
 
 from .codegen import CodeGen
 from .common import get_next_available_port
+
+# Change
+from .customtypes import ProxyObject, SecretObject
+from .serialize import deserializer_table, serializer_table
 from .type_util import (
     get_function_input_class,
     get_function_return_class,
@@ -30,12 +35,6 @@ from .type_util import (
 )
 from .zero_mq import ZeroMQ
 
-# Change
-from .customtypes import SecretObject, ProxyObject
-
-# import uvloop
-
-
 logging.basicConfig(
     format="%(asctime)s  %(levelname)s  %(process)d  %(module)s > %(message)s",
     datefmt="%d-%b-%y %H:%M:%S",
@@ -43,7 +42,15 @@ logging.basicConfig(
 )
 
 
-def load_module(module):
+def load_module(module: str):
+    """
+    load module into RPC server environment
+
+    :param module: import module name
+    :type module: str
+    :return: a dictionary containing the classes and functions find in module
+    :rtype: dict
+    """
     m = __import__(module)
     safe_func_tuples = inspect.getmembers(m, inspect.isfunction)
     safe_object_tuples = inspect.getmembers(m, inspect.isclass)
@@ -125,7 +132,16 @@ class ZeroServer:
         self._rpc_input_type_map[func.__name__] = get_function_input_class(func)
         self._rpc_return_type_map[func.__name__] = get_function_return_class(func)
 
-    def register_ro(self, obj, module_name):
+    def register_ro(self, obj: object, module_name: str) -> None:
+        """
+        register remote object in rpc server
+
+        :param obj: python object to be registered, should be python class
+        :type obj: Any
+        :param module_name: python moduled name where the obj comes from
+        :type module_name: str
+        :raises Exception: Can not register remote object starts with "_" (private class)
+        """
 
         if obj.__name__.startswith("_"):
             raise Exception(f"Cannot register remote object for: {type(obj)}")
@@ -133,6 +149,9 @@ class ZeroServer:
         self._ro_router[module_name + "." + obj.__name__] = obj
 
     def run(self):
+        """
+        start server run
+        """
         try:
             # utilize all the cores
             cores = os.cpu_count()
@@ -179,11 +198,20 @@ class ZeroServer:
             print(e)
             self._terminate_server()
 
-    def _sig_handler(self, signum, frame):
+    def _sig_handler(self, signum):
+        """
+        handle interupt signals
+
+        :param signum: signal number received
+        :type signum: int
+        """
         print(f"{signal.Signals(signum).name} signal called")
         self._terminate_server()
 
     def _terminate_server(self):
+        """
+        terminate server run
+        """
         print("Terminating server")
         self._pool.terminate()
         self._pool.close()
@@ -198,6 +226,9 @@ class ZeroServer:
         ZeroMQ.queue_device(self._host, self._port, self._device_ipc, self._device_port)
 
     async def _start_router(self):  # pragma: no cover
+        """
+        start an asynchronous server
+        """
         ctx = zmq.asyncio.Context()
         socket = ctx.socket(zmq.ROUTER)
         socket.bind(f"tcp://127.0.0.1:{self._port}")
@@ -214,6 +245,16 @@ class ZeroServer:
             await socket.send_multipart([ident, msgpack.packb(response)])
 
     async def _handle_msg(self, rpc, msg):  # pragma: no cover
+        """
+        handle asynchronous function call
+
+        :param rpc: remote method name
+        :type rpc: string
+        :param msg: remote method args
+        :type msg: Any
+        :return: remote method return
+        :rtype: Any
+        """
         if rpc in self._rpc_router:
             try:
                 return await self._rpc_router[rpc](msg)
@@ -238,6 +279,30 @@ class _Worker:
         _secret_lock,
         worker_id: int,
     ):
+        """
+        spawn a worker handling incoming request
+
+        :param rpc_router: remote call router
+        :type rpc_router: dict
+        :param ro_router: remote object router
+        :type ro_router: dict
+        :param ipc: ipc method
+        :type ipc: str
+        :param port: server port
+        :type port: int
+        :param serializer: serialization method
+        :type serializer: str
+        :param rpc_input_type_map: input type dict for remote calls
+        :type rpc_input_type_map: dict
+        :param rpc_return_type_map: return type dict for remote calls
+        :type rpc_return_type_map: dict
+        :param secret_result_cache: result cache for object can not be revealed to the user
+        :type secret_result_cache: dict
+        :param _secret_lock: lock controlling the access to secret result cache from different processes
+        :type _secret_lock: Manager.Lock
+        :param worker_id: worker id
+        :type worker_id: int
+        """
         time.sleep(0.2)
         worker = _Worker(
             rpc_router,
@@ -267,6 +332,28 @@ class _Worker:
         secret_result_cache,
         _secret_lock,
     ):
+        """
+        Request handling worker for RPC server
+
+        :param rpc_router: rpc router dict
+        :type rpc_router: dict
+        :param ro_router: remote object router dict
+        :type ro_router: dict
+        :param ipc: ipc method
+        :type ipc: str
+        :param port: server port number
+        :type port: int
+        :param serializer: serialization method
+        :type serializer: str
+        :param rpc_input_type_map: input parameter types
+        :type rpc_input_type_map: dict
+        :param rpc_return_type_map: return types
+        :type rpc_return_type_map: dict
+        :param secret_result_cache: dict storing secret objects
+        :type secret_result_cache: dict
+        :param _secret_lock: lock controlling the access to secret object cache
+        :type _secret_lock: Manager.Lock
+        """
         self._rpc_router = rpc_router
         self._ro_router = ro_router
         self._ipc = ipc
@@ -282,12 +369,21 @@ class _Worker:
         self._init_serializer()
 
     def _init_serializer(self):
-        # msgpack is the default serializer
+        """
+        Initialize the serializer
+        msgpack is the default serializer
+        """
         if self._serializer == "msgpack":
             self._encode = msgpack.packb
             self._decode = msgpack.unpackb
 
     async def start_async_dealer_worker(self, worker_id):  # pragma: no cover
+        """
+        Start asynchronous request handling worker
+
+        :param worker_id: worker id
+        :type worker_id: int
+        """
         ctx = zmq.asyncio.Context()
         socket = ctx.socket(zmq.DEALER)
 
@@ -299,6 +395,9 @@ class _Worker:
         logging.info(f"Starting worker: {worker_id}")
 
         async def process_message():
+            """
+            asynchronous message processor
+            """
             try:
                 ident, rpc, msg = await socket.recv_multipart()
                 rpc_method = rpc.decode()
@@ -313,7 +412,24 @@ class _Worker:
             await process_message()
 
     def start_dealer_worker(self, worker_id):
+        """
+        Synchronous request handling worker
+
+        :param worker_id: worker id
+        :type worker_id: int
+        """
+
         def process_message(msg_type, msg):
+            """
+            synchronous message processer
+
+            :param msg_type: message type
+            :type msg_type: int
+            :param msg: message payload
+            :type msg: Any
+            :return: processed message
+            :rtype: Any
+            """
             try:
                 msg_type = self._decode(msg_type)
                 msg = self._decode(msg, use_list=False, strict_map_key=False)
@@ -334,18 +450,39 @@ class _Worker:
 
     # Change
     def _handle_response(self, response):
+        """
+        Response handler, does:
+        1. Identify if the response contains secret object, if so store the secret object in cache
+        2. Identify if there are any return object is not basic python type, which requires a convertion
+
+        :param response: response to the orchestrator
+        :type response: Any
+        :return: processed response
+        :rtype: Any
+        """
         if isinstance(response, tuple):
             tmp_list = list(response)
             for i in range(len(tmp_list)):
                 tmp_list[i] = self._handle_response(tmp_list[i])
             return tuple(tmp_list)
         elif isinstance(response, SecretObject) or isinstance(response, ProxyObject):
-            with self._seret_lock:
+            with self._secret_lock:
                 self._secret_result_cache[response.guid] = response.content
             response = response.to_dict()
+        elif isinstance(response, pd.Series) or isinstance(response, pd.DataFrame):
+            response = serializer_table[str(type(response))](response)
         return response
 
     def _handle_secret_msg(self, msg):
+        """
+        Handle input parameter which is a secret object
+        If there is one, retrieve the secret object from cache
+
+        :param msg: input parameter
+        :type msg: Any
+        :return: Processed input parameters
+        :rtype: Any
+        """
         if msg["vargs"] is not None:
             msg["vargs"] = list(msg["vargs"])
             for i in range(len(msg["vargs"])):
@@ -360,6 +497,16 @@ class _Worker:
         return msg
 
     def _handle_msg(self, msg_type, msg):
+        """
+        Handle incoming message by different types
+
+        :param msg_type: message type
+        :type msg_type: int
+        :param msg: message payload
+        :type msg: Any
+        :return: processed message
+        :rtype: Any
+        """
         if msg_type == 0:
             return self._handle_function(msg)
         elif msg_type == 1:
@@ -376,6 +523,16 @@ class _Worker:
             return {"__zerror__msg_type_not_found": f"msg `{msg_type}` is not found!"}
 
     def _call_function(self, func, msg):
+        """
+        call rpc function by different argument numbers
+
+        :param func: call function
+        :type func: function
+        :param msg: input parameters
+        :type msg: Any
+        :return: function result
+        :rtype: Any
+        """
         if msg["vargs"] is None and msg["kwargs"] is None:
             return func()
         elif msg["kwargs"] is None:
@@ -384,6 +541,14 @@ class _Worker:
             return func(*msg["vargs"], **msg["kwargs"])
 
     def _handle_function(self, msg):
+        """
+        Handle function call request
+
+        :param msg: incoming message
+        :type msg: Any
+        :return: function result
+        :rtype: Any
+        """
         rpc = msg["function_name"]
         if rpc in self._rpc_router:
             func = self._rpc_router[rpc]
@@ -399,6 +564,14 @@ class _Worker:
             return {"__zerror__method_not_found": f"method `{rpc}` is not found!"}
 
     def _handle_method(self, msg):
+        """
+        Handle a class method call
+
+        :param msg: incoming message
+        :type msg: Any
+        :return: return result
+        :rtype: Any
+        """
         object_id = msg["object_id"]
         method_name = msg["method_name"]
 
@@ -416,6 +589,14 @@ class _Worker:
             raise
 
     def _handle_constructor(self, msg):
+        """
+        Handle a constructor call request
+
+        :param msg: incoming message
+        :type msg: Any
+        :return: output message
+        :rtype: Any
+        """
         class_name = msg["class_name"]
 
         if class_name in self._ro_router:
@@ -432,6 +613,12 @@ class _Worker:
             return {"__zerror__class_not_found": f"class `{class_name}` is not found!"}
 
     def _handle_destructor(self, msg):
+        """
+        Handle destructor call request
+
+        :param msg: incoming message
+        :type msg: Any
+        """
         object_id = msg["object_id"]
 
         try:
@@ -442,6 +629,14 @@ class _Worker:
             raise
 
     def _handle_attribute(self, msg):
+        """
+        Handle class attribute call request
+
+        :param msg: incoming message
+        :type msg: Any
+        :return: output message
+        :rtype: Any
+        """
         object_id = msg["object_id"]
 
         try:
@@ -464,6 +659,16 @@ class _Worker:
             raise
 
     async def _handle_msg_async(self, rpc, msg):  # pragma: no cover
+        """
+        handle asynchronous call request
+
+        :param rpc: rpc method
+        :type rpc: function
+        :param msg: incoming message
+        :type msg: Any
+        :return: output result
+        :rtype: Any
+        """
         if rpc in self._rpc_router:
             try:
                 return await self._rpc_router[rpc](msg)

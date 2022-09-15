@@ -5,6 +5,18 @@ from .client import ZeroClient
 
 
 def generate_client_code_and_save(host, port, directory, overwrite_dir=False):
+    """
+    _summary_
+
+    :param host: _description_
+    :type host: _type_
+    :param port: _description_
+    :type port: _type_
+    :param directory: _description_
+    :type directory: _type_
+    :param overwrite_dir: _description_, defaults to False
+    :type overwrite_dir: bool, optional
+    """
     zero_client = ZeroClient(host, port)
     code = zero_client.call("get_rpc_contract", [host, port])
 

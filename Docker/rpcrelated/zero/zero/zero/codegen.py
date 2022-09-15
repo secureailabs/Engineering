@@ -6,12 +6,25 @@ from .type_util import is_pydantic
 
 class CodeGen:
     def __init__(self, rpc_router, rpc_input_type_map, rpc_return_type_map):
+        """
+        _summary_
+
+        :param rpc_router: _description_
+        :type rpc_router: _type_
+        :param rpc_input_type_map: _description_
+        :type rpc_input_type_map: _type_
+        :param rpc_return_type_map: _description_
+        :type rpc_return_type_map: _type_
+        """
         self._rpc_router = rpc_router
         self._rpc_input_type_map = rpc_input_type_map
         self._rpc_return_type_map = rpc_return_type_map
         self._typing_imports = set()
 
     def generate_code(self, host="localhost", port=5559):
+        """
+        generate code
+        """
         code = f"""
 import typing  # remove this if not needed
 from typing import List, Dict, Union, Optional, Tuple  # remove this if not needed
@@ -35,9 +48,23 @@ class RpcClient:
         return code
 
     def get_imports(self):
+        """
+        _summary_
+
+        :return: _description_
+        :rtype: _type_
+        """
         return f"from typing import {', '.join([i for i in self._typing_imports])}"
 
     def get_input_type_str(self, func_name: str):  # pragma: no cover
+        """
+        _summary_
+
+        :param func_name: _description_
+        :type func_name: str
+        :return: _description_
+        :rtype: _type_
+        """
         if self._rpc_input_type_map[func_name] is None:
             return ""
         if self._rpc_input_type_map[func_name].__module__ == "typing":
@@ -47,6 +74,14 @@ class RpcClient:
         return ": " + self._rpc_input_type_map[func_name].__name__
 
     def get_return_type_str(self, func_name: str):  # pragma: no cover
+        """
+        _summary_
+
+        :param func_name: _description_
+        :type func_name: str
+        :return: _description_
+        :rtype: _type_
+        """
         if self._rpc_return_type_map[func_name].__module__ == "typing":
             n = self._rpc_return_type_map[func_name]._name
             self._typing_imports.add(n)
@@ -54,10 +89,21 @@ class RpcClient:
         return self._rpc_return_type_map[func_name].__name__
 
     def get_function_str(self, func_name: str):
+        """
+        _summary_
+
+        :param func_name: _description_
+        :type func_name: str
+        :return: _description_
+        :rtype: _type_
+        """
         return inspect.getsourcelines(self._rpc_router[func_name])[0][0].split("(", 1)[1].replace("\n", "")
 
     def generate_data_classes(self):  # pragma: no cover
         # TODO: next target, add pydantic support
+        """
+        _summary_
+        """
         code = ""
         for f in self._rpc_input_type_map:
             input_class = self._rpc_input_type_map[f]

@@ -116,6 +116,7 @@ jobs:
           rm -f ApiServices/docs/openapi.json
           wget https://127.0.0.1:8000/openapi.json -P ApiServices/docs/ --no-check-certificate
           redoc-cli bundle -o docs/index.html ApiServices/docs/openapi.json
+          cp ApiServices/docs/ . -rf
       - name: check for changes
         run: git status
       - name: commit changed files

@@ -105,6 +105,31 @@ jobs:
           docker run --name ubuntu_tst_bash -dit -v /home/gha-runner/actions-runner-Engineering/_work/Engineering/Engineering/EndPointTools/Orchestrator/:/tmp_engineering ubuntu-sailtap:1.0 /bin/bash
           docker exec -w /Test/ ubuntu_tst_bash git pull
           # docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/test_backend/account_mgmt_api_test.py -k "not information and not access" --ip 10.0.2.4 -m "active" -v
+  docs:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: build
+    steps:
+      - name: Update Documentation
+        run: |
+          node -v
+          redoc-cli --version
+          rm -f ApiServices/docs/openapi.json
+          wget https://127.0.0.1:8000/openapi.json -P ApiServices/docs/ --no-check-certificate
+          redoc-cli bundle -o docs/index.html ApiServices/docs/openapi.json
+      - name: check for changes
+        run: git status
+      - name: commit changed files
+        run: |
+          git config --local user.email "Jenkins@secureailabs.com"
+          git config --local user.name "GitHub Action test"
+          git add .
+          git commit -m "Auto updating Docs"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: Documentation
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
@@ -114,7 +139,6 @@ jobs:
         run: |
           set -e
           docker ps -a
-          ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps
           docker kill $(docker ps -q)
           docker rm $(docker ps -a -q)
           sudo make clean

@@ -1,43 +1,14 @@
-# CI workflow Docker Build
-name: CI for Development Repository
+name: Update Documentation
+
 on:
+  # Triggers the workflow on push or pull request events but only for the main branch
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  pull_request:
-    branches: [main]
-
-# Only one concurrent action at a time for group tag.
-concurrency:
-  group: CI-Build-Development
-  cancel-in-progress: true
+  push:
+    branches:
+      - main
 
 jobs:
-  flake8-lint:
-    runs-on: ubuntu-latest
-    name: Lint
-    steps:
-      - name: Check out source repository
-        uses: actions/checkout@v2
-      - name: Set up Python environment
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
-      - name: flake8 Lint
-        uses: py-actions/flake8@v2
-        with:
-          # Module level import not at top of file (E402)
-          # Block comment should start with '# ' (E265)
-          # Local variable name is assigned to but never used (F841)
-          # f-string without any placeholders (F541)
-          # Multiple statements on one line (semicolon) (E702)
-          # Module imported but unused (F401)
-          # Line too long (82 &gt; 79 characters) (E501)
-          # Line break occurred before a binary operator (W503)
-          ignore: "E402,E265,F841,F541,E702,F401,E501,W503"
-          max-line-length: 120
-          path: "ApiServices"
-
   start-runner:
     runs-on: ubuntu-latest
     steps:
@@ -93,18 +64,36 @@ jobs:
           sudo ./RunService.sh -s apiservices -d
           sleep 60
           cd ..
-          ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps
 
-  test:
+  docs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: build
     steps:
-      - name: Run Tests
+      - name: Update Documentation
         run: |
-          set -e
-          docker run --name ubuntu_tst_bash -dit -v /home/gha-runner/actions-runner-Engineering/_work/Engineering/Engineering/EndPointTools/Orchestrator/:/tmp_engineering ubuntu-sailtap:1.0 /bin/bash
-          docker exec -w /Test/ ubuntu_tst_bash git pull
-          # docker exec -w /Test/ ubuntu_tst_bash pytest /Test/test_api/test_backend/account_mgmt_api_test.py -k "not information and not access" --ip 10.0.2.4 -m "active" -v
+          node -v
+          redoc-cli --version
+          rm -f ApiServices/docs/openapi.json
+          wget https://127.0.0.1:8000/openapi.json -P ApiServices/docs/ --no-check-certificate
+          redoc-cli bundle -o docs/index.html ApiServices/docs/openapi.json
+          cp ApiServices/docs/ . -rf
+
+      - name: check for changes
+        run: git status
+
+      - name: commit changed files
+        run: |
+          git config --local user.email "Jenkins@secureailabs.com"
+          git config --local user.name "GitHub Action test"
+          git add .
+          git commit -m "Auto updating Docs"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: Documentation
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]

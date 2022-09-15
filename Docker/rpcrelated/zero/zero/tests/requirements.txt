@@ -1,6 +1,0 @@
-pyzmq
-msgpack
-pytest
-pytest-cov
-PyJWT
-pytest-asyncio

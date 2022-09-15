@@ -1,7 +1,0 @@
-aiohttp
-gunicorn
-PyJWT
-aioredis
-uvloop
-msgpack
-redis

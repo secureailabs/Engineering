@@ -24,14 +24,14 @@ class _AsyncLogger:  # pragma: no cover
 
     def __init__(self):
         """
-        _summary_
+        logger initialization
         """
         # pass
         self.init_push_logger()
 
     def init_push_logger(self):
         """
-        _summary_
+        init log pusher
         """
         ctx = zmq.asyncio.Context()
         self.log_pusher = ctx.socket(zmq.PUSH)
@@ -42,22 +42,22 @@ class _AsyncLogger:  # pragma: no cover
 
     def log(self, msg):
         """
-        _summary_
+        send log string to pusher
 
-        :param msg: _description_
-        :type msg: _type_
+        :param msg: log message
+        :type msg: str
         """
         self.log_pusher.send_string(str(msg))
 
     @classmethod
     def start_log_poller(cls, ipc, port):
         """
-        _summary_
+        start log poller
 
-        :param ipc: _description_
-        :type ipc: _type_
-        :param port: _description_
-        :type port: _type_
+        :param ipc: ipc method
+        :type ipc: str
+        :param port: port number
+        :type port: int
         """
         _AsyncLogger.port = port
         _AsyncLogger.ipc = ipc

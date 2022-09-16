@@ -7,14 +7,14 @@ from .type_util import is_pydantic
 class CodeGen:
     def __init__(self, rpc_router, rpc_input_type_map, rpc_return_type_map):
         """
-        _summary_
+        init code generator
 
-        :param rpc_router: _description_
-        :type rpc_router: _type_
-        :param rpc_input_type_map: _description_
-        :type rpc_input_type_map: _type_
-        :param rpc_return_type_map: _description_
-        :type rpc_return_type_map: _type_
+        :param rpc_router: rpc dict
+        :type rpc_router: dict
+        :param rpc_input_type_map: rpc input type dict
+        :type rpc_input_type_map: dict
+        :param rpc_return_type_map: rpc return type dict
+        :type rpc_return_type_map: dict
         """
         self._rpc_router = rpc_router
         self._rpc_input_type_map = rpc_input_type_map
@@ -58,12 +58,12 @@ class RpcClient:
 
     def get_input_type_str(self, func_name: str):  # pragma: no cover
         """
-        _summary_
+        get input type
 
-        :param func_name: _description_
+        :param func_name: function name
         :type func_name: str
-        :return: _description_
-        :rtype: _type_
+        :return: type dict
+        :rtype: dict
         """
         if self._rpc_input_type_map[func_name] is None:
             return ""
@@ -75,12 +75,12 @@ class RpcClient:
 
     def get_return_type_str(self, func_name: str):  # pragma: no cover
         """
-        _summary_
+        get return type 
 
-        :param func_name: _description_
+        :param func_name: function name
         :type func_name: str
-        :return: _description_
-        :rtype: _type_
+        :return: return type dict
+        :rtype: dict
         """
         if self._rpc_return_type_map[func_name].__module__ == "typing":
             n = self._rpc_return_type_map[func_name]._name
@@ -90,19 +90,19 @@ class RpcClient:
 
     def get_function_str(self, func_name: str):
         """
-        _summary_
+        get function router info
 
-        :param func_name: _description_
+        :param func_name: function name
         :type func_name: str
-        :return: _description_
-        :rtype: _type_
+        :return: function router info
+        :rtype: dict
         """
         return inspect.getsourcelines(self._rpc_router[func_name])[0][0].split("(", 1)[1].replace("\n", "")
 
     def generate_data_classes(self):  # pragma: no cover
         # TODO: next target, add pydantic support
         """
-        _summary_
+        get data classes
         """
         code = ""
         for f in self._rpc_input_type_map:

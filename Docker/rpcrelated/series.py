@@ -1,13 +1,14 @@
-import pandas as pd
+from typing import Any, Callable, Dict, Hashable, List, Literal, Optional, Type, Union
+
 import numpy as np
-from zero import SecretObject, ProxyObject
+import pandas as pd
 from pandas._libs.lib import no_default
-from typing import Union, List, Hashable, Type, Optional, Any, Literal, Callable, Dict
-from custom_typing import ArrayLike, Scalar, Axis, Level, IndexLabel, Frequency
+
+from custom_typing import ArrayLike, Axis, Frequency, IndexLabel, Level, Scalar
+from zero import ProxyObject, SecretObject
 
 
 class RemoteSeries:
-
     def __init__(
         self,
         d=None,
@@ -49,7 +50,7 @@ class RemoteSeries:
 
     def ravel(
         self,
-        order: str = 'C',
+        order: str = "C",
     ) -> Type[ProxyObject]:
         ans = self.series.ravel(order)
         return ProxyObject(ans)
@@ -78,9 +79,7 @@ class RemoteSeries:
     # def iteritems(self) -> 'Iterable[tuple[Hashable, Any]]':
     #     ans = self.series.iteritems()
 
-    def keys(
-        self
-    ) -> ArrayLike:
+    def keys(self) -> ArrayLike:
         ans = self.series.keys()
         return ans
 
@@ -93,12 +92,12 @@ class RemoteSeries:
 
     def to_series(
         self,
-        name: 'Hashable' = no_default,
+        name: "Hashable" = no_default,
     ) -> Type[ProxyObject]:
         ans = self.series.to_series(name)
         return ProxyObject(ans)
 
-    #?
+    # ?
     def groupby(
         self,
         by: IndexLabel = None,
@@ -121,23 +120,23 @@ class RemoteSeries:
         ans = self.series.count(level)
         return ans
 
-    #?
+    # ?
     def mode(
         self,
-        dropna: 'bool' = True,
+        dropna: "bool" = True,
     ) -> pd.Series:
         ans = self.series.mode(dropna)
         return ans
 
     def unique(
         self,
-    ) -> 'ArrayLike':
+    ) -> "ArrayLike":
         ans = self.series.unique()
         return ans
 
     def drop_duplicates(
         self,
-        keep: str = 'first',
+        keep: str = "first",
         inplace: bool = False,
     ) -> Type[ProxyObject]:
         ans = self.series.drop_duplicates(keep, inplace)
@@ -145,7 +144,7 @@ class RemoteSeries:
 
     def duplicated(
         self,
-        keep: str = 'first',
+        keep: str = "first",
     ) -> Type[ProxyObject]:
         ans = self.series.duplicated(keep)
         return ProxyObject(ans)
@@ -182,7 +181,7 @@ class RemoteSeries:
     def quantile(
         self,
         q: float = 0.5,
-        interpolation: str = 'linear',
+        interpolation: str = "linear",
     ) -> Union[float, pd.Series]:
         ans = self.series.quantile(q, interpolation)
         return ans
@@ -190,32 +189,24 @@ class RemoteSeries:
     def corr(
         self,
         other: pd.Series,
-        method: str = 'pearson',
+        method: str = "pearson",
         min_periods: Optional[int] = None,
-    ) -> 'float':
+    ) -> "float":
         ans = self.series.corr(other, method, min_periods)
         return ans
 
-    def cov(
-        self,
-        other: pd.Series,
-        min_periods: 'int | None' = None,
-        ddof: 'int | None' = 1
-    ) -> 'float':
+    def cov(self, other: pd.Series, min_periods: "int | None" = None, ddof: "int | None" = 1) -> "float":
         ans = self.series.cov(other, min_periods, ddof)
         return ans
 
-    def diff(
-        self,
-        periods: 'int' = 1
-    ) -> Type[ProxyObject]:
+    def diff(self, periods: "int" = 1) -> Type[ProxyObject]:
         ans = self.series.diff(periods)
         return ProxyObject(ans)
 
     def autocorr(
         self,
         lag: int = 1,
-    ) -> 'float':
+    ) -> "float":
         ans = self.series.autocorr(lag)
         return ans
 
@@ -226,11 +217,11 @@ class RemoteSeries:
         ans = self.series.dot(other)
         return ProxyObject(ans)
 
-    #?
+    # ?
     def searchsorted(
         self,
         value: Union[ArrayLike, Scalar],
-        side: Literal['left', 'right'] = 'left',
+        side: Literal["left", "right"] = "left",
         sorter: Optional[ArrayLike] = None,
     ) -> Union[int, List[int]]:
         ans = self.series.searchsorted(value, side, sorter)
@@ -239,9 +230,9 @@ class RemoteSeries:
     def compare(
         self,
         other: pd.Series,
-        align_axis: 'Axis' = 1,
-        keep_shape: 'bool' = False,
-        keep_equal: 'bool' = False,
+        align_axis: "Axis" = 1,
+        keep_shape: "bool" = False,
+        keep_equal: "bool" = False,
     ) -> Type[ProxyObject]:
         ans = self.series.compare(other, align_axis, keep_shape, keep_equal)
         return ProxyObject(ans)
@@ -265,7 +256,7 @@ class RemoteSeries:
     def update(
         self,
         other: pd.Series,
-    ) -> 'None':
+    ) -> "None":
         ans = self.series.update(other)
 
     def sort_values(
@@ -291,13 +282,15 @@ class RemoteSeries:
         ignore_index: bool = False,
         key: Optional[Callable] = None,
     ) -> Type[ProxyObject]:
-        ans = self.series.sort_index(axis, level, ascending, inplace, kind, na_position, sort_remaining, ignore_index, key)
+        ans = self.series.sort_index(
+            axis, level, ascending, inplace, kind, na_position, sort_remaining, ignore_index, key
+        )
         return ProxyObject(ans)
 
     def argsort(
         self,
         axis: Axis = 0,
-        kind: str = 'quicksort',
+        kind: str = "quicksort",
         order: None = None,
     ) -> Type[ProxyObject]:
         ans = self.series.argsort(axis, kind, order)
@@ -306,15 +299,15 @@ class RemoteSeries:
     def nlargest(
         self,
         n: int = 5,
-        keep: str = 'first',
+        keep: str = "first",
     ) -> Type[ProxyObject]:
         ans = self.series.nlargest(n, keep)
         return ProxyObject(ans)
 
     def nsmallest(
         self,
-        n: 'int' = 5,
-        keep: 'str' = 'first',
+        n: "int" = 5,
+        keep: "str" = "first",
     ) -> Type[ProxyObject]:
         ans = self.series.nsmallest(n, keep)
         return ProxyObject(ans)
@@ -337,7 +330,7 @@ class RemoteSeries:
 
     def explode(
         self,
-        ignore_index: 'bool' = False,
+        ignore_index: "bool" = False,
     ) -> Type[ProxyObject]:
         ans = self.series.explode(ignore_index)
         return ProxyObject(ans)
@@ -371,7 +364,7 @@ class RemoteSeries:
     def transform(
         self,
         func: Callable,
-        axis: 'Axis' = 0,
+        axis: "Axis" = 0,
         *args,
         **kwargs,
     ) -> Type[ProxyObject]:
@@ -381,7 +374,7 @@ class RemoteSeries:
     def apply(
         self,
         func: Callable,
-        convert_dtype: 'bool' = True,
+        convert_dtype: "bool" = True,
         *args,
         **kwargs,
     ) -> Type[ProxyObject]:
@@ -412,7 +405,7 @@ class RemoteSeries:
         copy: bool = True,
         inplace: bool = False,
         level: Optional[Level] = None,
-        errors: str = 'ignore',
+        errors: str = "ignore",
     ) -> Type[ProxyObject]:
         ans = self.series.rename(index, axis, copy, inplace, level, errors)
         return ProxyObject(ans)
@@ -420,8 +413,8 @@ class RemoteSeries:
     def set_axis(
         self,
         labels: IndexLabel,
-        axis: 'Axis' = 0,
-        inplace: 'bool' = False,
+        axis: "Axis" = 0,
+        inplace: "bool" = False,
     ) -> Type[ProxyObject]:
         ans = self.series.set_axis(labels, axis, inplace)
         return ProxyObject(ans)
@@ -442,7 +435,7 @@ class RemoteSeries:
         columns: Optional[IndexLabel] = None,
         level: Optional[Level] = None,
         inplace: bool = False,
-        errors: str = 'raise',
+        errors: str = "raise",
     ) -> Type[ProxyObject]:
         ans = self.series.drop(labels, axis, index, columns, level, inplace, errors)
         return ProxyObject(ans)
@@ -461,7 +454,7 @@ class RemoteSeries:
 
     def pop(
         self,
-        item: 'Hashable',
+        item: "Hashable",
     ) -> Type[ProxyObject]:
         ans = self.series.pop(item)
         return ProxyObject(ans)
@@ -490,9 +483,9 @@ class RemoteSeries:
 
     def memory_usage(
         self,
-        index: 'bool' = True,
-        deep: 'bool' = False,
-    ) -> 'int':
+        index: "bool" = True,
+        deep: "bool" = False,
+    ) -> "int":
         ans = self.series.memory_usage(index, deep)
         return ans
 
@@ -507,7 +500,7 @@ class RemoteSeries:
         self,
         left: Union[Scalar, list],
         right: Union[Scalar, list],
-        inclusive: str = 'both',
+        inclusive: str = "both",
     ) -> Type[ProxyObject]:
         ans = self.series.between(left, right, inclusive)
         return ProxyObject(ans)
@@ -549,36 +542,38 @@ class RemoteSeries:
         self,
         freq: Frequency,
         method: Optional[str] = None,
-        how: 'str | None' = None,
-        normalize: 'bool' = False,
+        how: "str | None" = None,
+        normalize: "bool" = False,
         fill_value: Scalar = None,
     ) -> Type[ProxyObject]:
         ans = self.series.asfreq(freq, method, how, normalize, fill_value)
         return ProxyObject(ans)
 
-    #? todo
+    # ? todo
     def resample(
         self,
         rule,
         axis=0,
-        closed: 'str | None' = None,
-        label: 'str | None' = None,
-        convention: 'str' = 'start',
-        kind: 'str | None' = None,
+        closed: "str | None" = None,
+        label: "str | None" = None,
+        convention: "str" = "start",
+        kind: "str | None" = None,
         loffset=None,
-        base: 'int | None' = None,
+        base: "int | None" = None,
         on=None,
         level=None,
-        origin: 'str | TimestampConvertibleTypes' = 'start_day',
-        offset: 'TimedeltaConvertibleTypes | None' = None,
-    ) -> 'Resampler':
-        ans = self.series.resample(rule, axis, closed, label, convention, kind, loffset, base, on, level, origin, offset)
+        origin: "str | TimestampConvertibleTypes" = "start_day",
+        offset: "TimedeltaConvertibleTypes | None" = None,
+    ) -> "Resampler":
+        ans = self.series.resample(
+            rule, axis, closed, label, convention, kind, loffset, base, on, level, origin, offset
+        )
         return ProxyObject(ans)
 
     def to_timestamp(
         self,
         freq: Optional[Frequency] = None,
-        how: str = 'start',
+        how: str = "start",
         copy: bool = True,
     ) -> Type[ProxyObject]:
         ans = self.series.to_timestamp(freq, how, copy)
@@ -594,9 +589,9 @@ class RemoteSeries:
 
     def ffill(
         self,
-        axis: 'None | Axis' = None,
-        inplace: 'bool' = False,
-        limit: 'None | int' = None,
+        axis: "None | Axis" = None,
+        inplace: "bool" = False,
+        limit: "None | int" = None,
         downcast: Optional[dict] = None,
     ) -> Type[ProxyObject]:
         ans = self.series.ffill(axis, inplace, limit, downcast)
@@ -604,9 +599,9 @@ class RemoteSeries:
 
     def bfill(
         self,
-        axis: 'None | Axis' = None,
-        inplace: 'bool' = False,
-        limit: 'None | int' = None,
+        axis: "None | Axis" = None,
+        inplace: "bool" = False,
+        limit: "None | int" = None,
         downcast: Optional[dict] = None,
     ) -> Type[ProxyObject]:
         ans = self.series.bfill(axis, inplace, limit, downcast)
@@ -616,8 +611,8 @@ class RemoteSeries:
         self,
         lower: Optional[Union[float, ArrayLike]] = None,
         upper: Optional[Union[float, ArrayLike]] = None,
-        axis: 'Axis | None' = None,
-        inplace: 'bool' = False,
+        axis: "Axis | None" = None,
+        inplace: "bool" = False,
         *args,
         **kwargs,
     ) -> Type[ProxyObject]:
@@ -626,13 +621,13 @@ class RemoteSeries:
 
     def interpolate(
         self,
-        method: 'str' = 'linear',
-        axis: 'Axis' = 0,
-        limit: 'int | None' = None,
-        inplace: 'bool' = False,
-        limit_direction: 'str | None' = None,
-        limit_area: 'str | None' = None,
-        downcast: 'str | None' = None,
+        method: "str" = "linear",
+        axis: "Axis" = 0,
+        limit: "int | None" = None,
+        inplace: "bool" = False,
+        limit_direction: "str | None" = None,
+        limit_area: "str | None" = None,
+        downcast: "str | None" = None,
         **kwargs,
     ) -> Type[ProxyObject]:
         ans = self.series.interpolate(method, axis, limit, inplace, limit_direction, limit_area, downcast, **kwargs)

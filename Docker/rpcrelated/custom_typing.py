@@ -1,17 +1,10 @@
-import pandas as pd
+from datetime import datetime, timedelta, tzinfo
+from typing import Any, Callable, Hashable, List, Mapping, Optional, Tuple, Union
+
 import numpy as np
-from typing import Union, Hashable, List, Callable, Mapping, Any, Tuple, Optional
-from datetime import (
-    datetime,
-    timedelta,
-    tzinfo,
-)
-from pandas._libs import (
-    Period,
-    Timedelta,
-    Timestamp,
-)
+import pandas as pd
 from pandas import Interval
+from pandas._libs import Period, Timedelta, Timestamp
 
 ArrayLike = Union[pd.Series, pd.DataFrame, np.ndarray, tuple, list]
 

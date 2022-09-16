@@ -75,7 +75,7 @@ class RpcClient:
 
     def get_return_type_str(self, func_name: str):  # pragma: no cover
         """
-        get return type 
+        get return type
 
         :param func_name: function name
         :type func_name: str

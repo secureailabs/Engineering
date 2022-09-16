@@ -1,4 +1,5 @@
 import logging
+import sys
 from typing import Optional, Union
 
 import msgpack
@@ -7,10 +8,10 @@ import zmq.asyncio
 
 from zero.errors import MethodNotFoundException, ZeroException
 
-from .serialize import deserializer_table, serializer_table
+from .serialize import deserializer_table
 
-#public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
-#private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
+# public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
+# private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
 public_keys_dir = "/app/public_keys/"
 private_keys_dir = "/app/private_keys/"
 
@@ -147,7 +148,7 @@ class ZeroClient(_BaseClient):
             self._socket.close()
             self._init_socket()
             # logging.exception(e)
-            raise
+            raise e
 
     def _process_resp(self, msg):
         """

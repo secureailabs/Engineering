@@ -24,7 +24,7 @@ from .common import get_next_available_port
 
 # Change
 from .customtypes import ProxyObject, SecretObject
-from .serialize import deserializer_table, serializer_table
+from .serialize import serializer_table
 from .type_util import (
     get_function_input_class,
     get_function_return_class,
@@ -218,8 +218,8 @@ class ZeroServer:
         self._pool.join()
         try:
             os.remove(self._device_ipc)
-        except:
-            pass
+        except Exception as ex:
+            raise ex
         sys.exit()
 
     def _start_queue_device(self):

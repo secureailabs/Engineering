@@ -4,7 +4,7 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
@@ -112,6 +112,8 @@ elif [ "securecomputationnode" == "$imageName" ]; then
     cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/securecomputationnode_dir/package.tar.gz
     cp securecomputationnode/InitializationVector.json $rootDir/Binary/securecomputationnode_dir
     runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6801 -v $rootDir/Binary/securecomputationnode_dir:/app $imageName"
+elif [ "rpcrelated" == "$imageName" ]; then
+    runtimeFlags="$runtimeFlags -p 5556:5556 $imageName"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

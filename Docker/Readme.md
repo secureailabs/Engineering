@@ -38,6 +38,10 @@ make all -j
 ```
 ./RunService.sh -s webfrontend
 ```
+### RPC server
+```
+./RunService.sh -s rpcrelated
+```
 ### Shutdown and Deprovision services
 
 #### All Docker
@@ -73,6 +77,10 @@ DeprovisionService.sh -s all
 #### Web Frontend
 ```
 ./DeprovisionService.sh -s webfrontend
+```
+### RPC Server
+```
+./DeprovisionService.sh -s rpcrelated
 ```
 
 #### Note:

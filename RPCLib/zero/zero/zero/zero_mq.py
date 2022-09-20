@@ -162,6 +162,7 @@ class ZeroMQPythonDevice(ZeroMQInterface):
 
             while True:
                 ident, rpc, msg = socket.recv_multipart()
+                print(f"receive msg: {msg}")
                 response = process_message(rpc, msg)
                 socket.send_multipart([ident, response], zmq.DONTWAIT)
 

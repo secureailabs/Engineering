@@ -129,7 +129,6 @@ class ZeroClient(_BaseClient):
             resp = self._socket.recv()
             decoded_resp = self._decode(resp, use_list=False, strict_map_key=False)
             decoded_resp = self._process_resp(decoded_resp)
-            print(decoded_resp)
 
             # if isinstance(decoded_resp, dict):
             #     if "__zerror__method_not_found" in decoded_resp:

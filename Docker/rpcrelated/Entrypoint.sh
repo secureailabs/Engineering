@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 imageName=rpcrelated
-rpcServerPort=5556
 
 cd /app || exit
 
@@ -15,7 +14,7 @@ if [ $retVal -ne 0 ]; then
 fi
 
 # Unpack the tar package
-tar -xf rpcrelated.tar.gz
+tar -xf package.tar.gz
 
 # Move the InitializerVector to the Binary folder
 # mv InitializationVector.json ApiServices/
@@ -24,7 +23,7 @@ tar -xf rpcrelated.tar.gz
 pip3 install /app/zero/zero
 
 # Start the rpc server
-python3 /app/test_server.py ${rpcServerPort}
+python3 /app/test_server.py 5556
 
 # To keep the container running
 tail -f /dev/null

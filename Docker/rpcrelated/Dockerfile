@@ -13,7 +13,11 @@ RUN pip3 install --upgrade pip \
     && pip3 install scipy \
     && pip3 install sklearn \
     && pip3 --no-cache-dir install torch \
-    && pip3 install matplotlib \ 
+    && pip3 install matplotlib \
+    && pip3 install fastapi \
+    && pip3 install uvicorn \
+    && pip3 install python-multipart \
+    && pip3 install psutil
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

@@ -61,3 +61,5 @@ msrestazure
 azure-identity
 azure-mgmt-compute
 azure-mgmt-network
+azure-mgmt-storage
+azure-storage-file-share

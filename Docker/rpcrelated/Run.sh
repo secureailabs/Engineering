@@ -29,6 +29,6 @@ cp vm_initializer.py "$imageName"_dir/
 # Run the docker container
 docker run \
 -it \
--p 5556:5556 \
 -v $(pwd)/"$imageName"_dir:/app \
+--network bridge \
 $imageName

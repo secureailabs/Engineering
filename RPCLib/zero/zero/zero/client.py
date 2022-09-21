@@ -10,10 +10,10 @@ from zero.errors import MethodNotFoundException, ZeroException
 
 from .serialize import deserializer_table
 
-# public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
-# private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
-public_keys_dir = "/app/public_keys/"
-private_keys_dir = "/app/private_keys/"
+public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
+private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
+#public_keys_dir = "/app/public_keys/"
+#private_keys_dir = "/app/private_keys/"
 
 
 class _BaseClient:
@@ -306,14 +306,14 @@ class Proxy(object):
         # self._pyroSeq = 0  # message sequence number
         # self._pyroRawWireResponse = False  # internal switch to enable wire level responses
 
-    def __del__(self):
-        """
-        destructor call will send a signal to remote end to delete stored object
-        """
-        msg_type = 4
-        msg = {}
-        msg["object_id"] = self._roid
-        self._client._send_msg(msg, msg_type)
+    #def __del__(self):
+    #    """
+    #    destructor call will send a signal to remote end to delete stored object
+    #    """
+    #    msg_type = 4
+    #   msg = {}
+    #    msg["object_id"] = self._roid
+    #    self._client._send_msg(msg, msg_type)
 
     def __getattr__(self, name):
         """
@@ -382,7 +382,8 @@ class Proxy(object):
         """
         For with control
         """
-        self.__del__()
+        #self.__del__()
+        pass
 
     def __eq__(self, other):
         """

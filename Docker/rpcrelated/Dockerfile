@@ -19,6 +19,8 @@ RUN pip3 install --upgrade pip \
     && pip3 install python-multipart \
     && pip3 install psutil
 
+EXPOSE 5556
+
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

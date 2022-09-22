@@ -132,7 +132,7 @@ def create_storage_account(account_credentials, resource_group_name, account_nam
         number_tries = 0
         name_found = False
         account_name = f"{account_name_prefix}{random.randint(1,100000):05}"
-        while (name_found == False) and (number_tries < 10):
+        while (name_found is False) and (number_tries < 10):
             number_tries += 1
             availability_result = storage_client.storage_accounts.check_name_availability({"name": account_name})  # type: ignore
             if availability_result.name_available:
@@ -140,7 +140,7 @@ def create_storage_account(account_credentials, resource_group_name, account_nam
             else:
                 account_name_prefix = f"{account_name_prefix}{random.randint(1,100000):05}"
 
-        if name_found == False:
+        if name_found is False:
             raise Exception("Unable to find an available storage account name.")
 
         # The name is available, so provision the account

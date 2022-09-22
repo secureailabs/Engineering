@@ -150,7 +150,6 @@ async def update_dataset(
         if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        # TODO: Prawal find better way to update the dataset
         if updated_dataset_info.description:
             dataset_db.description = updated_dataset_info.description
 

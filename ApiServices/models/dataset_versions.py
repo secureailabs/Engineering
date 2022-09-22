@@ -90,5 +90,10 @@ class GetDatasetVersion_Out(DatasetVersion_Base):
     note: StrictStr = Field(...)
 
 
+class GetDatasetVersionConnectionString_Out(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+    connection_string: StrictStr = Field(...)
+
+
 class GetMultipleDatasetVersion_Out(SailBaseModel):
     dataset_versions: List[GetDatasetVersion_Out] = Field(...)

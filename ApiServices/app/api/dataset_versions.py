@@ -11,6 +11,7 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 import app.utils.azure as azure
@@ -30,6 +31,7 @@ from models.dataset_versions import (
     DatasetVersion_Db,
     DatasetVersionState,
     GetDatasetVersion_Out,
+    GetDatasetVersionConnectionString_Out,
     GetMultipleDatasetVersion_Out,
     RegisterDatasetVersion_In,
     RegisterDatasetVersion_Out,
@@ -144,14 +146,73 @@ async def get_dataset_version(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset version not found")
         dataset_version = DatasetVersion_Db(**dataset_version)  # type: ignore
 
-        # Add the organization information to the data federation
+        # Add the organization information to the dataset version
         _, organization = await cache_get_basic_info_organization({}, [dataset_version.organization_id], current_user)
 
-        response_data_federation = GetDatasetVersion_Out(
+        response_data_version = GetDatasetVersion_Out(
             **dataset_version.dict(), organization=BasicObjectInfo(_id=organization[0].id, name=organization[0].name)
         )
 
-        return response_data_federation
+        return response_data_version
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+########################################################################################################################
+@router.get(
+    path="/dataset-versions/{dataset_version_id}/connection-string",
+    description="Get the write only connection string for the dataset version upload",
+    response_model=GetDatasetVersionConnectionString_Out,
+    status_code=status.HTTP_200_OK,
+)
+async def get_dataset_version_connection_string(
+    dataset_version_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+) -> GetDatasetVersionConnectionString_Out:
+    try:
+        dataset_version = await data_service.find_one(
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_version_id), "organization_id": str(current_user.organization_id)},
+        )
+        if not dataset_version:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset version not found")
+        dataset_version = DatasetVersion_Db(**dataset_version)  # type: ignore
+
+        # Send the connection string only if the dataset version is not uploaded to prevent overwriting
+        if dataset_version.state != DatasetVersionState.NOT_UPLOADED:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Dataset version is already uploaded or in progress"
+            )
+
+        # Authenticate azure
+        account_credentials = azure.authenticate(
+            get_secret("azure_client_id"),
+            get_secret("azure_client_secret"),
+            get_secret("azure_tenant_id"),
+            get_secret("azure_subscription_id"),
+        )
+
+        # Get the connection string for the dataset version which is valid for 30 minutes
+        # This could be a long running operation
+        connection_string = azure.authentication_shared_access_signature(
+            account_credentials=account_credentials,
+            account_name=get_secret("azure_storage_account_name"),
+            resource_group_name=get_secret("azure_storage_resource_group"),
+            file_path=f"{dataset_version.id}/{dataset_version.id}",
+            share_name=str(dataset_version.dataset_id),
+            permission="cw",  # Create and write permission only
+            expiry=datetime.utcnow() + timedelta(minutes=30),
+        )
+        if "Success" != connection_string.status:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to get the connection string"
+            )
+
+        url = f"https://{get_secret('azure_storage_account_name')}.file.core.windows.net/{dataset_version.dataset_id}/{dataset_version.id}"
+        full_url = f"{url}/{dataset_version.id}?{connection_string.response}"
+
+        return GetDatasetVersionConnectionString_Out(_id=dataset_version_id, connection_string=full_url)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

@@ -14,6 +14,7 @@
 import json
 import os
 import random
+from datetime import datetime
 
 from app.utils.secrets import get_secret
 from pydantic import BaseModel, Field, StrictStr
@@ -25,7 +26,7 @@ from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.resource.resources.models import DeploymentMode
 from azure.mgmt.storage import StorageManagementClient
-from azure.storage.fileshare import ShareDirectoryClient
+from azure.storage.fileshare import FileSasPermissions, ShareDirectoryClient, generate_file_sas
 
 
 class DeploymentResponse(BaseModel):
@@ -42,6 +43,42 @@ class DeleteResponse(BaseModel):
 
     status: StrictStr = Field(...)
     note: StrictStr = Field(...)
+
+
+def authentication_shared_access_signature(
+    account_credentials,
+    account_name: str,
+    resource_group_name: str,
+    file_path: str,
+    share_name: str,
+    permission: str,
+    expiry: datetime,
+):
+    """Get the connection string for the storage account and file share."""
+    try:
+        # Create a client to the storage account.
+        storage_client = StorageManagementClient(
+            account_credentials["credentials"], account_credentials["subscription_id"]
+        )
+
+        # Get the storage account key.
+        keys = storage_client.storage_accounts.list_keys(resource_group_name, account_name)
+
+        # Create a connection string to the file share.
+        sas_token = generate_file_sas(
+            account_name=account_name,
+            share_name=share_name,
+            file_path=[file_path],
+            account_key=keys.keys[0].value,  # type: ignore
+            permission=FileSasPermissions.from_string(permission),
+            expiry=expiry,
+        )
+
+        return DeploymentResponse(status="Success", response=sas_token, note="Deployment Successful")
+    except AzureError as azure_error:
+        return DeploymentResponse(status="Fail", note=str(azure_error))
+    except Exception as exception:
+        return DeploymentResponse(status="Fail", note=str(exception))
 
 
 def file_share_create_directory(connection_string, file_share_name, directory_name):

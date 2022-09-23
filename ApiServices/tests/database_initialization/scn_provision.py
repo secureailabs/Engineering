@@ -16,9 +16,15 @@ import requests
 # -------------------------------------------------------------------------------
 
 base_url = "http://127.0.0.1:8000"
+researcher_email = "admin@secureailabs.com"
+sail_password = "SailPassword@123"
+
+# encode email and password to url
+researcher_email = researcher_email.replace("@", "%40")
+sail_password = sail_password.replace("@", "%40")
 
 # Data researcher login
-payload = f"grant_type=&username=admin%40secureailabs.com&password=SailPassword%40123&scope=&client_id=&client_secret="
+payload = f"grant_type=&username={researcher_email}&password={sail_password}&scope=&client_id=&client_secret="
 headers = {"Content-Type": "application/x-www-form-urlencoded"}
 response = requests.post(f"{base_url}/login", data=payload, headers=headers, verify=False)
 data_federation_researcher_token = response.json().get("access_token")

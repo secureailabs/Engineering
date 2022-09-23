@@ -53,7 +53,7 @@ async def provision_data_federation(
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDataFederationProvision_Out:
     """
-    _summary_: Provision data federation SCNs
+    Provision data federation SCNs
 
     :param background_tasks: Background tasks
     :type background_tasks: BackgroundTasks

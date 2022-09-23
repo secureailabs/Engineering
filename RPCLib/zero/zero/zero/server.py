@@ -432,7 +432,6 @@ class _Worker:
             """
             try:
                 msg_type = self._decode(msg_type)
-                print(f"get message type {msg_type}", flush=True)
                 msg = self._decode(msg, use_list=False, strict_map_key=False)
                 response = self._handle_msg(msg_type, msg)
                 response = self._handle_response(response)
@@ -508,7 +507,6 @@ class _Worker:
         :return: processed message
         :rtype: Any
         """
-        print("handle message", flush=True)
         if msg_type == 0:
             return self._handle_function(msg)
         elif msg_type == 1:
@@ -599,13 +597,11 @@ class _Worker:
         :return: output message
         :rtype: Any
         """
-        print("constructor init", flush=True)
         class_name = msg["class_name"]
 
         if class_name in self._ro_router:
             try:
                 cla = self._ro_router[class_name]
-                print(cla, flush=True)
                 msg = self._handle_secret_msg(msg)
                 obj = cla(*msg["vargs"], **msg["kwargs"])
                 return SecretObject(obj)

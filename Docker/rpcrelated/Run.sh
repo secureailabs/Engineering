@@ -28,7 +28,8 @@ cp vm_initializer.py "$imageName"_dir/
 
 # Run the docker container
 docker run \
--it \
+-dit \
 -v $(pwd)/"$imageName"_dir:/app \
---network bridge \
+--network default \
+-p 5556:5556 \
 $imageName

@@ -12,8 +12,8 @@ from .serialize import deserializer_table
 
 public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
 private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
-#public_keys_dir = "/app/public_keys/"
-#private_keys_dir = "/app/private_keys/"
+# public_keys_dir = "/app/public_keys/"
+# private_keys_dir = "/app/private_keys/"
 
 
 class _BaseClient:
@@ -96,8 +96,7 @@ class ZeroClient(_BaseClient):
         self._socket.curve_serverkey = server_public
 
         self._set_socket_opt()
-        res = self._socket.connect(f"tcp://{self._host}:{self._port}")
-        print(res)
+        self._socket.connect(f"tcp://{self._host}:{self._port}")
 
     # outgoing message:
     # 0->function call
@@ -306,7 +305,7 @@ class Proxy(object):
         # self._pyroSeq = 0  # message sequence number
         # self._pyroRawWireResponse = False  # internal switch to enable wire level responses
 
-    #def __del__(self):
+    # def __del__(self):
     #    """
     #    destructor call will send a signal to remote end to delete stored object
     #    """
@@ -382,7 +381,7 @@ class Proxy(object):
         """
         For with control
         """
-        #self.__del__()
+        # self.__del__()
         pass
 
     def __eq__(self, other):

@@ -37,5 +37,9 @@ def update_one(collection, query, data):
     return sail_db[collection].update_one(query, data)
 
 
+def update_many(collection, query, data):
+    return sail_db[collection].update_many(query, data)
+
+
 def delete(collection, query):
     return sail_db[collection].delete_one(query)

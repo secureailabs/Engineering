@@ -16,12 +16,13 @@ from typing import Dict, List, Optional
 
 from app.api.accounts import get_all_admins, get_organization, get_user
 from app.api.authentication import RoleChecker, get_current_user
+from app.api.datasets import get_dataset
 from app.api.emails import send_email
 from app.api.internal_utils import cache_get_basic_info_datasets, cache_get_basic_info_organization
 from app.data import operations as data_service
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
-from models.accounts import GetOrganizations_Out, GetUsers_Out, UserRole
+from models.accounts import GetUsers_Out, UserRole
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.data_federations import (
@@ -41,7 +42,6 @@ from models.data_federations import (
     RegisterInvite_Out,
     UpdateDataFederation_In,
 )
-from models.datasets import GetDataset_Out
 from models.emails import EmailRequest
 from pydantic import EmailStr
 
@@ -116,7 +116,7 @@ async def get_all_data_federations(
     researcher_id: Optional[PyObjectId] = None,
     dataset_id: Optional[PyObjectId] = None,
     current_user: TokenData = Depends(get_current_user),
-):
+) -> GetMultipleDataFederation_Out:
     try:
         if (data_submitter_id) and (data_submitter_id == current_user.organization_id):
             query = {"data_submitter_id": {"$all": [str(current_user.organization_id)]}}
@@ -142,8 +142,8 @@ async def get_all_data_federations(
         response_list_of_data_federations: List[GetDataFederation_Out] = []
 
         # Cache the organization information
-        organization_cache: Dict[PyObjectId, GetOrganizations_Out] = {}
-        dataset_cache: Dict[PyObjectId, GetDataset_Out] = {}
+        organization_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+        dataset_cache: Dict[PyObjectId, BasicObjectInfo] = {}
 
         # Add the organization information to the data federation
         for data_federation in data_federations:
@@ -194,7 +194,9 @@ async def get_all_data_federations(
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
 )
-async def get_data_federation(data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+async def get_data_federation(
+    data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+) -> GetDataFederation_Out:
     try:
         data_federation = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
         if not data_federation:
@@ -361,8 +363,6 @@ async def invite_researcher(
 
 
 ########################################################################################################################
-
-
 @router.post(
     path="/data-federations/{data_federation_id}/data-submitter/{data_submitter_organization_id}",
     description="Automatically add a data submitter to the data federation, bypassing an invite path",
@@ -889,10 +889,10 @@ async def add_dataset(
         data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
 
         # Check if the dataset exists
-        _, dataset_basic_info_list = await cache_get_basic_info_datasets({}, [dataset_id], current_user)
+        dataset_info = await get_dataset(dataset_id=dataset_id, current_user=current_user)
 
         # Dataset must belong to current organization
-        if dataset_basic_info_list[0].organization.id != current_user.organization_id:
+        if dataset_info.organization.id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
 
         # Add the dataset to the data federation

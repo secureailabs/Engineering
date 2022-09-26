@@ -71,24 +71,19 @@ async def register_dataset_version(
 ########################################################################################################################
 @router.get(
     path="/dataset-versions",
-    description="Get list of all the dataset-versions",
-    response_description="List of dataset-versions",
+    description="Get list of all the dataset-versions for the dataset",
+    response_description="List of dataset-versions for the dataset",
     response_model=GetMultipleDatasetVersion_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
 )
 async def get_all_dataset_versions(
-    data_owner_id: Optional[PyObjectId] = None,
+    dataset_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
 ) -> GetMultipleDatasetVersion_Out:
     try:
-        # TODO: Prawal the current user organization is repeated in the request, find a better way
-        if data_owner_id:
-            query = {"data_owner_id": str(data_owner_id)}
-        else:
-            query = {}
-
+        query = {"dataset_id": str(dataset_id)}
         dataset_versions = await data_service.find_by_query(DB_COLLECTION_DATASETS, query)
 
         response_list_of_dataset_version: List[GetDatasetVersion_Out] = []
@@ -149,7 +144,7 @@ async def get_dataset_version(
 
 ########################################################################################################################
 @router.put(
-    path="/dataset-versions/{dataset_id}",
+    path="/dataset-versions/{dataset_version_id}",
     description="Update dataset information",
     status_code=status.HTTP_204_NO_CONTENT,
 )

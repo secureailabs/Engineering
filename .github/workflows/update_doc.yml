@@ -97,7 +97,7 @@ jobs:
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
-    needs: test
+    needs: docs
     steps:
       - name: Stop and Remove Docker Containers
         run: |

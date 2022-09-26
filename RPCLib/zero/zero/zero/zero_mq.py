@@ -101,7 +101,6 @@ class ZeroMQPythonDevice(ZeroMQInterface):
 
             auth = ThreadAuthenticator(ctx)
             auth.start()
-            auth.allow("127.0.0.1")
             auth.configure_curve(domain="*", location=public_keys_dir)
 
             server_secret_file = private_keys_dir + "server.key_secret"
@@ -121,6 +120,7 @@ class ZeroMQPythonDevice(ZeroMQInterface):
                 backend.bind(f"tcp://127.0.0.1:{worker_port}")
 
             zmq.device(zmq.QUEUE, gateway, backend)
+            # zmq.proxy(gateway, backend, None)
 
             gateway.close()
             backend.close()

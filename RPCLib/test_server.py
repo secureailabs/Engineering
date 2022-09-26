@@ -8,12 +8,12 @@ if __name__ == "__main__":
         raise RuntimeError("must have port number argument")
 
     app = ZeroServer(port=int(sys.argv[1]))
-    safe_contents = load_module("series")
+    safe_contents = load_module("dataframe")
 
     for func in safe_contents["safe_funcs"]:
-        app.register_rpc(func, "series")
+        app.register_rpc(func, "dataframe")
     for obj in safe_contents["safe_objects"]:
-        app.register_ro(obj, "series")
+        app.register_ro(obj, "dataframe")
     print(app._ro_router)
     print(app._rpc_router)
     app.run()

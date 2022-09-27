@@ -18,6 +18,7 @@ from typing import List, Optional
 from pydantic import Field, StrictStr
 
 from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
+from models.secure_computation_nodes import SecureComputationNodeType
 
 
 class DataFederationState(Enum):
@@ -122,3 +123,37 @@ class GetInvite_Out(SailBaseModel):
 
 class GetMultipleInvite_Out(SailBaseModel):
     invites: List[GetInvite_Out] = Field(...)
+
+
+class DataFederationProvision_Base(SailBaseModel):
+    data_federation_id: PyObjectId = Field(...)
+    secure_computation_nodes_type: SecureComputationNodeType = Field(...)
+
+
+class DataFederationProvision_Db(DataFederationProvision_Base):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    creation_time: datetime = Field(default_factory=datetime.utcnow)
+    organization_id: PyObjectId = Field(...)
+    secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
+
+
+class GetDataFederationProvision(DataFederationProvision_Base):
+    id: PyObjectId = Field(alias="_id")
+    creation_time: datetime = Field(default_factory=datetime.utcnow)
+    organization_id: PyObjectId = Field(...)
+    secure_computation_nodes: List[BasicObjectInfo] = Field(...)
+
+
+class GetMultipleDataFederationProvision_Out(SailBaseModel):
+    data_federation_provisions: List[GetDataFederationProvision] = Field(...)
+
+
+class RegisterDataFederationProvision_In(DataFederationProvision_Base):
+    pass
+
+
+class RegisterDataFederationProvision_Out(DataFederationProvision_Base):
+    id: PyObjectId = Field(alias="_id")
+    creation_time: datetime = Field(...)
+    organization_id: PyObjectId = Field(...)
+    secure_computation_nodes_id: List[PyObjectId] = Field(...)

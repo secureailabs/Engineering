@@ -40,9 +40,10 @@ class SecureComputationNodeState(Enum):
 
 
 class SecureComputationNode_Base(SailBaseModel):
-    name: StrictStr = Field(...)
-    digital_contract_id: PyObjectId = Field(...)
+    data_federation_id: PyObjectId = Field(...)
+    data_federation_provision_id: PyObjectId = Field(...)
     dataset_id: PyObjectId = Field(...)
+    dataset_version_id: PyObjectId = Field(...)
     type: SecureComputationNodeType = Field(...)
 
 
@@ -67,12 +68,12 @@ class RegisterSecureComputationNode_Out(SailBaseModel):
 
 class GetSecureComputationNode_Out(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
-    name: StrictStr = Field(...)
-    digital_contract: BasicObjectInfo = Field(...)
+    data_federation: BasicObjectInfo = Field(...)
     dataset: BasicObjectInfo = Field(...)
+    dataset_version: BasicObjectInfo = Field(...)
     researcher: BasicObjectInfo = Field(default=None)
     data_owner: BasicObjectInfo = Field(default=None)
-    researcher_user: BasicObjectInfo = Field(...)
+    researcher_user: PyObjectId = Field(...)
     type: SecureComputationNodeType = Field(...)
     timestamp: datetime = Field(...)
     state: SecureComputationNodeState = Field(...)

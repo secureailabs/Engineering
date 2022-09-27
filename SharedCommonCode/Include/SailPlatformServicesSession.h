@@ -71,6 +71,21 @@ class SailPlatformServicesSession : public Object
         std::string __thiscall RegisterDataset(
             _in const StructuredBuffer & c_oRegistrationParameters
             );
+        std::string RegisterDataFederation(
+            const StructuredBuffer & oRegistrationParameters
+            );
+        void RegisterDataFederationDataSubmitter(
+            const Guid& dataFederationIdentifier,
+            const Guid& submitterOrganizationIdentifier
+            );
+        void RegisterDataFederationResearcher(
+            const Guid& dataFederationIdentifier,
+            const Guid& researcherOrganizationIdentifier
+            );
+        void RegisterDataFederationDataset(
+            const Guid& dataFederationIdentifier,
+            const Guid& datasetIdentifier
+            );
         void __thiscall RegisterDatasetVersion(
             _in const Guid & c_oDatasetVersionIdentifier,
             _in const StructuredBuffer & c_oDatasetVersionMetadata

@@ -42,15 +42,16 @@ async def register_dataset():
 
 ########################################################################################################################
 async def cache_get_basic_info_organization(
-    organization_cache: Dict[PyObjectId, GetOrganizations_Out],
+    organization_cache: Dict[PyObjectId, BasicObjectInfo],
     organization_id_list: List[PyObjectId],
     current_user: TokenData,
 ):
-    response_basic_info_list: List[GetOrganizations_Out] = []
+    response_basic_info_list: List[BasicObjectInfo] = []
     for organization_id in organization_id_list:
         if organization_id not in organization_cache:
-            organization_cache[organization_id] = await get_organization(
-                organization_id=organization_id, current_user=current_user
+            organization_basic_info = await get_organization(organization_id=organization_id, current_user=current_user)
+            organization_cache[organization_id] = BasicObjectInfo(
+                _id=organization_basic_info.id, name=organization_basic_info.name
             )
             response_basic_info_list.append(organization_cache[organization_id])
 
@@ -59,14 +60,15 @@ async def cache_get_basic_info_organization(
 
 ########################################################################################################################
 async def cache_get_basic_info_datasets(
-    datasets_cache: Dict[PyObjectId, GetDataset_Out],
+    datasets_cache: Dict[PyObjectId, BasicObjectInfo],
     datasets_id_list: List[PyObjectId],
     current_user: TokenData,
 ):
-    response_basic_info_list: List[GetDataset_Out] = []
+    response_basic_info_list: List[BasicObjectInfo] = []
     for datasets_id in datasets_id_list:
         if datasets_id not in datasets_cache:
-            datasets_cache[datasets_id] = await get_dataset(dataset_id=datasets_id, current_user=current_user)
+            dataset_basic_info = await get_dataset(dataset_id=datasets_id, current_user=current_user)
+            datasets_cache[datasets_id] = BasicObjectInfo(_id=dataset_basic_info.id, name=dataset_basic_info.name)
             response_basic_info_list.append(datasets_cache[datasets_id])
 
     return (datasets_cache, response_basic_info_list)

@@ -25,9 +25,9 @@ from app.api import (
     accounts,
     authentication,
     data_federations,
+    data_federations_provisions,
     dataset_versions,
     datasets,
-    digital_contracts,
     internal_utils,
     remote_data_connector,
     secure_computation_nodes,
@@ -44,9 +44,9 @@ server = FastAPI(
 server.include_router(authentication.router)
 server.include_router(accounts.router)
 server.include_router(data_federations.router)
+server.include_router(data_federations_provisions.router)
 server.include_router(datasets.router)
 server.include_router(dataset_versions.router)
-server.include_router(digital_contracts.router)
 server.include_router(secure_computation_nodes.router)
 server.include_router(remote_data_connector.router)
 server.include_router(internal_utils.router)

@@ -16,12 +16,13 @@ from typing import Dict, List, Optional
 
 from app.api.accounts import get_all_admins, get_organization, get_user
 from app.api.authentication import RoleChecker, get_current_user
+from app.api.datasets import get_dataset
 from app.api.emails import send_email
 from app.api.internal_utils import cache_get_basic_info_datasets, cache_get_basic_info_organization
 from app.data import operations as data_service
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
-from models.accounts import GetOrganizations_Out, GetUsers_Out, UserRole
+from models.accounts import GetUsers_Out, UserRole
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.data_federations import (
@@ -41,7 +42,6 @@ from models.data_federations import (
     RegisterInvite_Out,
     UpdateDataFederation_In,
 )
-from models.datasets import GetDataset_Out
 from models.emails import EmailRequest
 from pydantic import EmailStr
 
@@ -116,7 +116,7 @@ async def get_all_data_federations(
     researcher_id: Optional[PyObjectId] = None,
     dataset_id: Optional[PyObjectId] = None,
     current_user: TokenData = Depends(get_current_user),
-):
+) -> GetMultipleDataFederation_Out:
     try:
         if (data_submitter_id) and (data_submitter_id == current_user.organization_id):
             query = {"data_submitter_id": {"$all": [str(current_user.organization_id)]}}
@@ -142,8 +142,8 @@ async def get_all_data_federations(
         response_list_of_data_federations: List[GetDataFederation_Out] = []
 
         # Cache the organization information
-        organization_cache: Dict[PyObjectId, GetOrganizations_Out] = {}
-        dataset_cache: Dict[PyObjectId, GetDataset_Out] = {}
+        organization_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+        dataset_cache: Dict[PyObjectId, BasicObjectInfo] = {}
 
         # Add the organization information to the data federation
         for data_federation in data_federations:
@@ -194,7 +194,9 @@ async def get_all_data_federations(
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
 )
-async def get_data_federation(data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+async def get_data_federation(
+    data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+) -> GetDataFederation_Out:
     try:
         data_federation = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
         if not data_federation:
@@ -353,6 +355,128 @@ async def invite_researcher(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+########################################################################################################################
+@router.post(
+    path="/data-federations/{data_federation_id}/data-submitter/{data_submitter_organization_id}",
+    description="Automatically add a data submitter to the data federation, bypassing an invite path",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def register_data_submitter(
+    data_federation_id: PyObjectId,
+    data_submitter_organization_id: PyObjectId,
+    current_user: TokenData = Depends(get_current_user),
+):
+    """
+    Register a data submitter to an organization - This is an internal call for SAIL to manage a federation
+
+    :param data_federation_id: data federation for which the data submitter is being registered
+    :type data_federation_id: PyObjectId
+    :param data_submitter_organization_id: the data submitter organization that is being registered
+    :type data_submitter_organization_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises exception: should be 500, internal server error
+    :return: None
+    :rtype: None
+    """
+    try:
+        data_federation_db = await data_service.find_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+        )
+        if not data_federation_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+
+        # If the organization is already part of the data federation, then return 204 OK
+        if data_submitter_organization_id in data_federation_db.data_submitter_organizations_id:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+        # Ensure this is a valid organization before adding to the list
+        _, organization = await cache_get_basic_info_organization({}, [data_submitter_organization_id], current_user)
+
+        if not organization:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
+        # Add the data submitter to the federation list
+        data_federation_db.data_submitter_organizations_id.append(data_submitter_organization_id)
+
+        # DG TODO - This is where we need to generate key vault keys and update with their handles
+        await data_service.update_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id)},
+            {"$set": jsonable_encoder(data_federation_db)},
+        )
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+########################################################################################################################
+@router.post(
+    path="/data-federations/{data_federation_id}/researcher/{researcher_organization_id}",
+    description="Automatically add a researcher to the data federation, bypassing an invite path",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def register_researcher(
+    data_federation_id: PyObjectId,
+    researcher_organization_id: PyObjectId,
+    current_user: TokenData = Depends(get_current_user),
+):
+    """
+    Register a researcher to an organization - This is an internal call for SAIL to manage a federation
+
+    :param data_federation_id: data federation for which the data submitter is being registered
+    :type data_federation_id: PyObjectId
+    :param researcher_organization_id: the researcher organization that is being registered
+    :type researcher_organization_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises exception: should be 500, internal server error
+    :return: None
+    :rtype: None
+    """
+    try:
+        data_federation_db = await data_service.find_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+        )
+        if not data_federation_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+
+        # If the organization is already part of the data federation, then return 204 OK
+        if researcher_organization_id in data_federation_db.research_organizations_id:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+        # Ensure this is a valid organization before adding to the list
+        _, organization = await cache_get_basic_info_organization({}, [researcher_organization_id], current_user)
+
+        if not organization:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
+        # Add the researcher to the researcher list
+        data_federation_db.research_organizations_id.append(researcher_organization_id)
+
+        await data_service.update_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(data_federation_id)},
+            {"$set": jsonable_encoder(data_federation_db)},
+        )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -765,10 +889,10 @@ async def add_dataset(
         data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
 
         # Check if the dataset exists
-        _, dataset_basic_info_list = await cache_get_basic_info_datasets({}, [dataset_id], current_user)
+        dataset_info = await get_dataset(dataset_id=dataset_id, current_user=current_user)
 
         # Dataset must belong to current organization
-        if dataset_basic_info_list[0].organization.id != current_user.organization_id:
+        if dataset_info.organization.id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
 
         # Add the dataset to the data federation

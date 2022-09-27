@@ -119,6 +119,11 @@ def get_storage_account_connection_string(account_credentials, resource_group_na
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
+def get_randomized_name(prefix):
+    """Get a randomized name."""
+    return f"{prefix}{random.randint(1,100000):05}"
+
+
 def create_storage_account(account_credentials, resource_group_name, account_name_prefix, location):
     """Create a storage account and file share."""
     try:
@@ -131,14 +136,14 @@ def create_storage_account(account_credentials, resource_group_name, account_nam
         # Azure because they're used in URLs.
         number_tries = 0
         name_found = False
-        account_name = f"{account_name_prefix}{random.randint(1,100000):05}"
+        account_name = get_randomized_name(account_name_prefix)
         while (name_found is False) and (number_tries < 10):
             number_tries += 1
             availability_result = storage_client.storage_accounts.check_name_availability({"name": account_name})  # type: ignore
             if availability_result.name_available:
                 name_found = True
             else:
-                account_name_prefix = f"{account_name_prefix}{random.randint(1,100000):05}"
+                account_name_prefix = get_randomized_name(account_name_prefix)
 
         if name_found is False:
             raise Exception("Unable to find an available storage account name.")

@@ -2,8 +2,8 @@
 
 # Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
 source .env.dev
-ResourceGroup="InitializerImageStorage-WUS-Rg"
-StorageAccountName="sailvmimages9825"
+ResourceGroup="SAIL-PAYLOADS-3183eaf-ImageStorage-WUS-Rg"
+StorageAccountName="sailvmimages9826"
 Location="westus"
 
 PrintHelp()

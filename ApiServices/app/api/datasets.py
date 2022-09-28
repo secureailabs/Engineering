@@ -228,7 +228,7 @@ def create_azure_file_share(dataset_id: PyObjectId):
             account_credentials,
             get_secret("azure_storage_resource_group"),
             get_secret("azure_storage_account_name"),
-            dataset_id,
+            str(dataset_id),
         )
         if create_response.status != "Success":
             raise Exception(create_response.note)

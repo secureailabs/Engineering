@@ -15,7 +15,7 @@ import requests
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
-base_url = "http://127.0.0.1:8000"
+base_url = "https://20.245.211.34:8000"
 researcher_email = "admin@secureailabs.com"
 sail_password = "SailPassword@123"
 
@@ -39,7 +39,7 @@ response = requests.get(
 data_federation_id = response.json().get("data_federations")[0].get("id")
 
 # Data researcher create data federation provision
-payload = {"data_federation_id": data_federation_id, "secure_computation_nodes_type": "Standard_D4s_v4"}
+payload = {"data_federation_id": data_federation_id, "secure_computation_nodes_type": "StaPndard_D4s_v4"}
 headers = {"Content-Type": "application/json", "Authorization": f"Bearer {data_federation_researcher_token}"}
 response = requests.post(
     f"{base_url}/data-federations-provisions",

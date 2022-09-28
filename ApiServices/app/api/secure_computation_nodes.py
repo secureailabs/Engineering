@@ -288,7 +288,7 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
 
         # The name of the resource group is same as the data federation provision id
         owner = get_secret("owner")
-        deployment_name = f"{owner}-{str(secure_computation_node_db.data_federation_provision_id)}-scn"
+        resource_group_name = f"{owner}-{str(secure_computation_node_db.data_federation_provision_id)}-scn"
 
         # Deploy the secure computation node
         account_credentials = azure.authenticate(
@@ -298,7 +298,11 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
             get_secret("azure_subscription_id"),
         )
         deploy_response: azure.DeploymentResponse = azure.deploy_module(
-            account_credentials, deployment_name, "securecomputationnode", "Standard_D4s_v4"
+            account_credentials,
+            resource_group_name,
+            "rpcrelated",
+            str(secure_computation_node_db.id),
+            "Standard_D4s_v4",
         )
         if deploy_response.status != "Success":
             raise Exception(deploy_response.note)
@@ -316,7 +320,7 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
         securecomputationnode_json = {}
         securecomputationnode_json[
             "NameOfVirtualMachine"
-        ] = "{secure_computation_node_db.dataset_id}-{secure_computation_node_db.data_federation_provision_id}"
+        ] = f"{secure_computation_node_db.dataset_id}-{secure_computation_node_db.data_federation_provision_id}"
         securecomputationnode_json["IpAddressOfVirtualMachine"] = deploy_response.ip_address
         securecomputationnode_json["VirtualMachineIdentifier"] = str(secure_computation_node_db.id)
         securecomputationnode_json["ClusterIdentifier"] = str(uuid4())
@@ -327,7 +331,7 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
         securecomputationnode_json["DatasetIdentifier"] = str(secure_computation_node_db.dataset_id)
         securecomputationnode_json["VmEosb"] = "TODO"
 
-        with open(deployment_name, "w") as outfile:
+        with open(str(secure_computation_node_db.id), "w") as outfile:
             json.dump(securecomputationnode_json, outfile)
 
         # Sleeping for 1.5 minutes
@@ -335,8 +339,8 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
 
         headers = {"accept": "application/json"}
         files = {
-            "initialization_vector": open(deployment_name, "rb"),
-            "bin_package": open("SecureComputationNode.tar.gz", "rb"),
+            "initialization_vector": open(str(secure_computation_node_db.id), "rb"),
+            "bin_package": open("package.tar.gz", "rb"),
         }
         response = requests.put(
             "https://" + deploy_response.ip_address + ":9090/initialization-data",

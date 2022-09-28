@@ -141,7 +141,7 @@ class GetDataFederationProvision(DataFederationProvision_Base):
     id: PyObjectId = Field(alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
-    secure_computation_nodes: List[BasicObjectInfo] = Field(...)
+    secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 
 class GetMultipleDataFederationProvision_Out(SailBaseModel):

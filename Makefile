@@ -13,7 +13,7 @@ package_apiservices: SharedCommonCode package_rpcrelated
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated.json ApiServices
 	@cp Binary/rpcrelated_dir/package.tar.gz ApiServices
 	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
-	@rm ApiServices/SecureComputationNode.tar.gz
+	@rm ApiServices/package.tar.gz
 	@rm ApiServices/rpcrelated.json
 
 package_rpcrelated:

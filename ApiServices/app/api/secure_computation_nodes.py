@@ -95,7 +95,8 @@ async def get_all_secure_computation_nodes(
         from app.api.data_federations import get_data_federation
 
         query = {
-            "researcher_id": str(current_user.id),
+            "researcher_id": str(current_user.organization_id),
+            "researcher_user_id": str(current_user.id),
             "data_federation_provision_id": str(data_federation_provision_id),
         }
         secure_computation_nodes = await data_service.find_by_query(DB_COLLECTION_SECURE_COMPUTATION_NODE, query)
@@ -104,10 +105,8 @@ async def get_all_secure_computation_nodes(
 
         # Get the basic information of the data federation
         if secure_computation_nodes:
-            secure_computation_node = SecureComputationNode_Db(**secure_computation_nodes[0].dict())
-            data_federation = await get_data_federation(
-                secure_computation_node.data_federation_provision_id, current_user
-            )
+            secure_computation_node = SecureComputationNode_Db(**secure_computation_nodes[0])
+            data_federation = await get_data_federation(secure_computation_node.data_federation_id, current_user)
 
             # Add the organization information to the data federation
             data_researcher_basic_info = [
@@ -117,7 +116,7 @@ async def get_all_secure_computation_nodes(
             ][0]
 
             for secure_computation_node in secure_computation_nodes:
-                secure_computation_node = SecureComputationNode_Db(**secure_computation_node.dict())
+                secure_computation_node = SecureComputationNode_Db(**secure_computation_node)
 
                 dataset_basic_info = [
                     dataset for dataset in data_federation.datasets if dataset.id == secure_computation_node.dataset_id

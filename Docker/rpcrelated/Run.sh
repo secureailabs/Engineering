@@ -29,7 +29,8 @@ cp vm_initializer.py "$imageName"_dir/
 # Run the docker container
 docker run \
 -dit \
--v $(pwd)/"$imageName"_dir:/app \
---network default \
 -p 5556:5556 \
+-p 9090:9091 \
+-v $(pwd)/"$imageName"_dir:/app \
+-v $(pwd)/certs:/etc/nginx/certs \
 $imageName

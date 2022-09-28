@@ -9,12 +9,15 @@ remoteDataConnector: SharedCommonCode
 	@make -C $(REMOTE_DATA_CONNECTOR) all
 	@echo "orchestrator done!"
 
-package_apiservices: SharedCommonCode package_securecomputationnode
-	@cp AzureDeploymentTemplates/ArmTemplates/securecomputationnode.json ApiServices
-	@cp Binary/SecureComputationNode.tar.gz ApiServices
+package_apiservices: SharedCommonCode package_rpcrelated
+	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated.json ApiServices
+	@cp Binary/rpcrelated_dir/package.tar.gz ApiServices
 	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
-	@rm ApiServices/SecureComputationNode.tar.gz
-	@rm ApiServices/securecomputationnode.json
+	@rm ApiServices/package.tar.gz
+	@rm ApiServices/rpcrelated.json
+
+package_rpcrelated:
+	@cd RPCLib && ./package.sh
 
 orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all

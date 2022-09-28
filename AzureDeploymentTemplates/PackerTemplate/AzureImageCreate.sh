@@ -11,7 +11,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -m [Image Name]"
     echo "Usage: $0"
-    echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | newwebfrontend | securecomputationnode"
+    echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | newwebfrontend | securecomputationnode | rpcrelated"
     exit 1 # Exit script after printing help
 }
 

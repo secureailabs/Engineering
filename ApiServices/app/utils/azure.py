@@ -95,13 +95,12 @@ def get_ip(accountCredentials, resource_group_name, ip_resource_name):
     return foo.ip_address
 
 
-def deploy_module(account_credentials, deployment_name, module_name, vm_size) -> DeploymentResponse:
+def deploy_module(
+    account_credentials, resource_group_name, module_name, virtual_machine_name, vm_size
+) -> DeploymentResponse:
     """Deploy the template to a resource group."""
     try:
         print("Deploying module: ", module_name)
-
-        # Each module will be deployed in a unique resource group
-        resource_group_name = deployment_name
 
         # Create the resource group
         create_resource_group(account_credentials, resource_group_name, "eastus")
@@ -112,7 +111,7 @@ def deploy_module(account_credentials, deployment_name, module_name, vm_size) ->
             template = json.load(template_file_fd)
 
         parameters = {
-            "vmName": module_name,
+            "vmName": virtual_machine_name,
             "vmSize": vm_size,
             "vmImageResourceId": get_secret("azure_scn_image_id") + module_name,
             "adminUserName": get_secret("azure_scn_user_name"),
@@ -121,9 +120,9 @@ def deploy_module(account_credentials, deployment_name, module_name, vm_size) ->
             "virtualNetworkId": get_secret("azure_scn_virtual_network_id"),
         }
         deploy_status = deploy_template(account_credentials, resource_group_name, template, parameters)
-        print(module_name + " server status: ", deploy_status)
+        print(virtual_machine_name + " server status: ", deploy_status)
 
-        virtual_machine_public_ip = get_ip(account_credentials, resource_group_name, module_name + "-ip")
+        virtual_machine_public_ip = get_ip(account_credentials, resource_group_name, virtual_machine_name + "-ip")
 
         return DeploymentResponse(status="Success", ip_address=virtual_machine_public_ip, note="Deployment Successful")
 

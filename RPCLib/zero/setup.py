@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="zeroapi",
+    name="zero",
     version="0.3.0",
     author="Azizul Haque Ananto",
     author_email="azizulhaq.ananto@gmail.com",

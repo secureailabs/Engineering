@@ -7,7 +7,7 @@ class DatasetConfiguration
 {
     public class DatasetConfigurationJson
     {
-        public string name { get; set; } = default!;
+        public Dataset dataset { get; set; } = default!;
         public string description { get; set; } = default!;
         public string data_federation { get; set; } = default!;
         public string data_format { get; set; } = default!;
@@ -31,6 +31,6 @@ class DatasetConfiguration
         {
             throw new Exception("The file is not a valid JSON");
         }
-        System.Console.WriteLine(configuration.name);
+        System.Console.WriteLine(configuration.dataset.name);
     }
 }

@@ -162,9 +162,6 @@ async def update_dataset(
         if updated_dataset_info.name:
             dataset_db.name = updated_dataset_info.name
 
-        if updated_dataset_info.version:
-            dataset_db.version = updated_dataset_info.version
-
         if updated_dataset_info.tag:
             dataset_db.tag = updated_dataset_info.tag
 

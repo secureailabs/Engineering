@@ -12,7 +12,7 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List
 
 import app.utils.azure as azure
 from app.api.accounts import get_organization
@@ -58,11 +58,6 @@ async def register_dataset_version(
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDatasetVersion_Out:
     try:
-        # Check if the dataset version is already registered
-        dataset_version_db = await data_service.find_one(DB_COLLECTION_DATASET_VERSIONS, {"_id": str(dataset_req.id)})
-        if dataset_version_db:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dataset already registered")
-
         # Dataset organization and dataset-versions organization should be same
         dataset_db = await get_dataset(dataset_req.dataset_id, current_user)
         if dataset_db.organization.id != current_user.organization_id:
@@ -247,9 +242,6 @@ async def update_dataset_version(
 
         if updated_dataset_version_info.name:
             dataset_version_db.name = updated_dataset_version_info.name
-
-        if updated_dataset_version_info.version:
-            dataset_version_db.version = updated_dataset_version_info.version
 
         if updated_dataset_version_info.keywords:
             dataset_version_db.keywords = updated_dataset_version_info.keywords

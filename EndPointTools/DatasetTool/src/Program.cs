@@ -42,27 +42,18 @@ class Program
             var user_session = new UserSession(ip_address, email, password);
 
             // Get the list of the datasets
-            var datasets = user_session.GetDatasets();
-            bool dataset_found = false;
-            foreach (var dataset in datasets)
-            {
-                // if (dataset.name == dataset_configuration.configuration.name)
-                {
-                    dataset_found = true;
-                    System.Console.WriteLine("Dataset found");
-                }
-            }
+            var dataset_id = user_session.GetDatasetId(dataset_configuration.configuration.dataset.name);
 
             // If the dataset is not found, create it
-            if (!dataset_found)
+            if (dataset_id == null)
             {
                 System.Console.WriteLine("Dataset not found, creating it");
-                // user_session.CreateDatasetAndAddToFederation(dataset_configuration.configuration.name, dataset_configuration.configuration.description, dataset_configuration.configuration.data_federation, dataset_configuration.configuration.data_format);
+                dataset_id = user_session.CreateDatasetAndAddToFederation(dataset_configuration.configuration.dataset, dataset_configuration.configuration.data_federation);
             }
 
             // Create and Register the dataset version metadata
-            // var dataset_version = new DatasetVersion(dataset_configuration, federations, datasets);
-            // user_session.RegisterDatasetVersion(dataset, dataset_version);
+            var dataset_version = new DatasetVersion();
+            user_session.RegisterDatasetVersion(dataset_id, dataset_version);
 
             // Get the azure connection string
             // var azure_connection_string = user_session.GetConnectionStringForDatasetVersion();

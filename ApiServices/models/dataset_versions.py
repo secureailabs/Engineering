@@ -37,30 +37,16 @@ class DatasetVersionTableCoumn(SailBaseModel):
     description: StrictStr = Field(...)
 
 
-class DatasetVersionTable(SailBaseModel):
-    id: PyObjectId = Field(...)
-    number_of_rows: int = Field(...)
-    name: StrictStr = Field(...)
-    tags: StrictStr = Field(...)
-    number_of_columns: int = Field(...)
-    compressed_data_size_in_bytes: int = Field(...)
-    description: StrictStr = Field(...)
-    all_column_properties: List[DatasetVersionTableCoumn] = Field(...)
-    data_size_in_bytes: int = Field(...)
-
-
 class DatasetVersion_Base(SailBaseModel):
-    id: PyObjectId = Field(alias="_id")
     dataset_id: PyObjectId = Field(...)
     description: StrictStr = Field(...)
     name: str = Field(max_length=255)
     keywords: StrictStr = Field(...)
-    version: StrictStr = Field(...)
     publish_date: int = Field(...)
-    tables: List[DatasetVersionTable] = Field(...)
 
 
 class DatasetVersion_Db(DatasetVersion_Base):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     dataset_version_created_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     state: DatasetVersionState = Field(...)
@@ -76,11 +62,10 @@ class RegisterDatasetVersion_Out(SailBaseModel):
 
 
 class UpdateDatasetVersion_In(SailBaseModel):
-    # todo: Prawal add a validator to enure that atleast of the field is present in the request
+    # TODO: add a validator to enure that atleast of the field is present in the request
     description: Optional[StrictStr] = Field(default=None)
     name: Optional[StrictStr] = Field(default=None)
     keywords: Optional[StrictStr] = Field(default=None)
-    version: Optional[StrictStr] = Field(default=None)
 
 
 class GetDatasetVersion_Out(DatasetVersion_Base):

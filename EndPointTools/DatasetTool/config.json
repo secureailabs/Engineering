@@ -1,0 +1,14 @@
+{
+    "dataset":
+    {
+        "name": "my_dataset",
+        "description": "my dataset description",
+        "tags": "my_dataset_type"
+    },
+    "description": "My dataset description",
+    "data_federation": "KCA Consortium",
+    "data_format": "CSV",
+    "data_source": [
+        "my_data_source.csv"
+    ]
+}

@@ -43,7 +43,22 @@ class Program
 
             // Get the list of the datasets
             var datasets = user_session.GetDatasets();
-            var dataset = datasets[0];
+            bool dataset_found = false;
+            foreach (var dataset in datasets)
+            {
+                // if (dataset.name == dataset_configuration.configuration.name)
+                {
+                    dataset_found = true;
+                    System.Console.WriteLine("Dataset found");
+                }
+            }
+
+            // If the dataset is not found, create it
+            if (!dataset_found)
+            {
+                System.Console.WriteLine("Dataset not found, creating it");
+                // user_session.CreateDatasetAndAddToFederation(dataset_configuration.configuration.name, dataset_configuration.configuration.description, dataset_configuration.configuration.data_federation, dataset_configuration.configuration.data_format);
+            }
 
             // Create and Register the dataset version metadata
             // var dataset_version = new DatasetVersion(dataset_configuration, federations, datasets);

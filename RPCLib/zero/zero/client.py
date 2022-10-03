@@ -8,7 +8,7 @@ import zmq.asyncio
 
 from zero.errors import MethodNotFoundException, ZeroException
 
-from .serialize import deserializer_table
+from .serialize import deserializer_table, serializer_table
 
 public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
 private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
@@ -148,6 +148,19 @@ class ZeroClient(_BaseClient):
             # logging.exception(e)
             raise e
 
+    def _process_args(self, args, kwargs):
+        if args is not None:
+            args = list(args)
+            for i in range(len(args)):
+                if isinstance(args[i], Proxy):
+                    args[i] = serializer_table["proxy"](args[i])
+            args = tuple(args)
+        if kwargs is not None:
+            for k, v in kwargs:
+                if isinstance(v, Proxy):
+                    kwargs[k] = serializer_table["proxy"](v)
+        return args, kwargs
+
     def _process_resp(self, msg):
         """
         process response message
@@ -160,9 +173,9 @@ class ZeroClient(_BaseClient):
         """
         resp = None
         if isinstance(msg, tuple):
-            tmp_list = list(tuple)
-            for i in range(len(list)):
-                tmp_list[i] = self._precess_resp(tmp_list[i])
+            tmp_list = list(msg)
+            for i in range(len(tmp_list)):
+                tmp_list[i] = self._process_resp(tmp_list[i])
             resp = tuple(tmp_list)
         elif isinstance(msg, dict) and "object" in msg:
             if msg["object"] == 0:
@@ -194,6 +207,7 @@ class ZeroClient(_BaseClient):
         """
         msg_type = 0
         msg = {}
+        args, kwargs = self._process_args(args, kwargs)
         msg["function_name"] = rpc_method_name
         msg["vargs"] = args
         msg["kwargs"] = kwargs
@@ -283,7 +297,16 @@ class AsyncZeroClient(_BaseClient):
 
 class Proxy(object):
     __roAttributes = frozenset(
-        ["_roid", "_rotype", "_roMethods", "_roAttrs", "_client", "_roInvoke", "_roGetMetadata", "__processMetadata"]
+        [
+            "_roid",
+            "_rotype",
+            "_roMethods",
+            "_roAttrs",
+            "_client",
+            "_roInvoke",
+            "_roGetMetadata",
+            "__processMetadata",
+        ]
     )
 
     def __init__(self, object_id, object_type, client):
@@ -476,6 +499,7 @@ class Proxy(object):
         """
         msg_type = 3
         msg = {}
+        vargs, kwargs = self._client._process_args(vargs, kwargs)
         msg["object_id"] = self._roid
         msg["method_name"] = methodname
         msg["vargs"] = vargs

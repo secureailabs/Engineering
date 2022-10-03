@@ -57,12 +57,32 @@ def series_deserializer(ser_dict):
     return ser
 
 
+def proxy_serializer(proxy):
+    """
+    serialize a proxy object
+
+    :param proxy: proxy object  to be serialized
+    :type proxy: Proxy
+    """
+    msg = {}
+    msg["id"] = proxy._roid
+    msg["type"] = proxy._rotype
+    msg["object"] = 1
+    return msg
+
+
+def proxy_deserializer(proxy_dict):
+    pass
+
+
 serializer_table = {
     str(pd.DataFrame): dataframe_serializer,
     str(pd.Series): series_serializer,
+    "proxy": proxy_serializer,
 }
 
 deserializer_table = {
     str(pd.DataFrame): dataframe_deserializer,
     str(pd.Series): series_deserializer,
+    "proxy": proxy_deserializer,
 }

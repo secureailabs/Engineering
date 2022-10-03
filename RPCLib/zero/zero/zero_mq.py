@@ -11,10 +11,10 @@ If we want to replace the client-server patter with other implementation like Si
 implement the ZeroMQInterface class and replace the ZeroMQ with the new implementation instance.
 """
 
-# public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
-# private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
-public_keys_dir = "/app/public_keys/"
-private_keys_dir = "/app/private_keys/"
+public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
+private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
+#public_keys_dir = "/app/public_keys/"
+#private_keys_dir = "/app/private_keys/"
 
 
 class ZeroMQInterface:

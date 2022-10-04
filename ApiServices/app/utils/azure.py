@@ -119,7 +119,9 @@ def file_share_create_directory(
         directory_client = ShareDirectoryClient.from_connection_string(
             conn_str=connection_string, share_name=file_share_name, directory_path=directory_name
         )
-        directory_client.create_directory()
+        create_response = directory_client.create_directory()
+
+        print(create_response)
 
         return DeploymentResponse(status="Success", note="Deployment Successful")
     except AzureError as azure_error:

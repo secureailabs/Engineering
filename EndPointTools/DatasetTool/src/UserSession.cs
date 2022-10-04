@@ -1,4 +1,3 @@
-using System.CommandLine;
 using RestSharp;
 namespace DatasetTool;
 
@@ -14,7 +13,7 @@ class UserSession
     private class BasicInformation
     {
         public string name { get; set; } = default!;
-        public string id { get; set; } = default!;
+        public Guid id { get; set; } = default!;
         public string state { get; set; } = default!;
     }
 
@@ -28,16 +27,30 @@ class UserSession
         public BasicInformation[] data_federations { get; set; } = default!;
     }
 
+    private class ConnectionStringResponse
+    {
+        public string Guid { get; set; } = default!;
+        public string connection_string { get; set; } = default!;
+    }
+
     private LoginResponse m_LoginResponse = default!;
     private RestClient m_client = default!;
 
+    /// <summary>
+    /// Constructor for the UserSession class
+    /// </summary>
+    /// <param name="ip_address"> IP Address for the SAIL Platform Services </param>
+    /// <param name="email"> Email of the data submitter </param>
+    /// <param name="password"> Password of the data submitter </param>
+    /// <exception cref="Exception"></exception>
     public UserSession(string ip_address, string email, string password)
     {
         // Create the client
-        var client_options = new RestClientOptions("http://" + ip_address)
+        var client_options = new RestClientOptions("https://" + ip_address)
         {
             ThrowOnAnyError = true,
             MaxTimeout = 5000,
+            // TODO: IMP!! Important!! Remove this line after real certificates are used.
             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
         };
         m_client = new RestClient(client_options);
@@ -68,7 +81,13 @@ class UserSession
         }
     }
 
-    public string GetFederationId(string data_federation_name)
+    /// <summary>
+    /// Get the list of data federation with the provided name
+    /// </summary>
+    /// <param name="data_federation_name"></param>
+    /// <returns> Guid of the data federation with the input name</returns>
+    /// <exception cref="Exception"></exception>
+    public Guid GetFederationId(string data_federation_name)
     {
         // Create the request
         var request = new RestRequest("/data-federations", Method.Get);
@@ -79,7 +98,7 @@ class UserSession
         var response = m_client.Execute(request);
         if (response.StatusCode != System.Net.HttpStatusCode.OK || response.Content == null)
         {
-            throw new Exception("Data federation list fetch failed");
+            throw new Exception("Data federation list fetch failed.\n" + response.Content);
         }
 
         // Get the list of datasets
@@ -92,10 +111,16 @@ class UserSession
             }
         }
 
-        return null!;
+        return Guid.Empty;
     }
 
-    public string GetDatasetId(string dataset_name)
+    /// <summary>
+    /// Get the Guid of dataset with the given name
+    /// </summary>
+    /// <param name="dataset_name"> Name of the dataset for which id is requested </param>
+    /// <returns> Guid of the dataset </returns>
+    /// <exception cref="Exception">  </exception>
+    public Guid GetDatasetId(string dataset_name)
     {
         // Create the request
         var request = new RestRequest("/datasets", Method.Get);
@@ -106,7 +131,7 @@ class UserSession
         var response = m_client.Execute(request);
         if (response.StatusCode != System.Net.HttpStatusCode.OK || response.Content == null)
         {
-            throw new Exception("Datasets list fetch failed");
+            throw new Exception("Datasets list fetch failed. \n" + response.Content);
         }
 
         // Get the list of datasets
@@ -119,16 +144,19 @@ class UserSession
             }
         }
 
-        return null!;
+        return Guid.Empty;
     }
 
-    public string CreateDatasetAndAddToFederation(Dataset dataset, string data_federation_name)
+    /// <summary>
+    /// Creat a new dataset with the given name and description and add it te the given data federation
+    /// </summary>
+    /// <param name="dataset"> Dataset object </param>
+    /// <param name="data_federation_name"> Name of the data federation to add the dataset </param>
+    /// <returns> Guid of the newly created dataset </returns>
+    /// <exception cref="Exception"></exception>
+    public Guid CreateDatasetAndAddToFederation(Dataset dataset, string data_federation_name)
     {
-        string data_federation_id = GetFederationId(data_federation_name);
-        if (data_federation_id == null)
-        {
-            throw new Exception("Data federation not found");
-        }
+        Guid data_federation_id = GetFederationId(data_federation_name);
 
         // Create json from the input
         string dataset_json = Newtonsoft.Json.JsonConvert.SerializeObject(dataset);
@@ -143,12 +171,12 @@ class UserSession
         var response = m_client.Execute(request);
         if (response.StatusCode != System.Net.HttpStatusCode.Created || response.Content == null)
         {
-            throw new Exception("Datasets register failed");
+            throw new Exception("Datasets register failed. \n." + response.Content);
         }
 
         // Get the dataset id
         var register_dataset_response = Newtonsoft.Json.JsonConvert.DeserializeObject<BasicInformation>(response.Content)!;
-        string dataset_id = register_dataset_response.id;
+        Guid dataset_id = register_dataset_response.id;
 
         // Add the dataset to the federation
         request = new RestRequest("/data-federations/" + data_federation_id + "/datasets/" + dataset_id, Method.Put);
@@ -165,22 +193,91 @@ class UserSession
         return dataset_id;
     }
 
-    public void RegisterDatasetVersion(string dataset_id, DatasetVersion dataset_version)
+    /// <summary>
+    /// Register the dataset version metadata with the platform and get the version id
+    /// </summary>
+    /// <param name="dataset_id"> Dataset ID for the version </param>
+    /// <param name="dataset_version_metadata"></param>
+    /// <returns> Guid of the dataset version </returns>
+    /// <exception cref="Exception"></exception>
+    public Guid RegisterDatasetVersion(Guid dataset_id, string dataset_version_metadata)
     {
-        // Create json from the input
-        string dataset_json = Newtonsoft.Json.JsonConvert.SerializeObject(dataset_version);
-
         // Register the dataset
-        var request = new RestRequest("/datasets", Method.Post);
+        var request = new RestRequest("/dataset-versions", Method.Post);
         request.AddHeader("accept", "application/json");
         request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
-        request.AddJsonBody(dataset_json);
+        request.AddJsonBody(dataset_version_metadata);
 
-        // Post the dataset
+        // Post the dataset and register
         var response = m_client.Execute(request);
-        if (response.StatusCode != System.Net.HttpStatusCode.Created || response.Content == null)
+        if (response.Content == null)
         {
-            throw new Exception("Datasets register failed");
+            throw new Exception("Dataset version register failed. \n Response Code: " + response.StatusCode);
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            System.Console.WriteLine("Dataset version already exists. Will only be allowed to upload the file if not already uploaded");
+        }
+        else if (response.StatusCode != System.Net.HttpStatusCode.Created)
+        {
+            throw new Exception("Dataset version register failed. \n" + response.Content);
+        }
+
+        // Get the dataset version id
+        var register_dataset_version_response = Newtonsoft.Json.JsonConvert.DeserializeObject<BasicInformation>(response.Content)!;
+
+        return register_dataset_version_response.id;
+    }
+
+    /// <summary>
+    /// Get a SAS connection string for the dataset version
+    /// </summary>
+    /// <param name="dataset_version_id"> Dataset version for which SAS token is to be generated"/> </param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public string GetConnectionStringForDatasetVersion(Guid dataset_version_id)
+    {
+        // Get the dataset version
+        var request = new RestRequest("/dataset-versions/" + dataset_version_id.ToString() + "/connection-string", Method.Get);
+        request.AddHeader("accept", "application/json");
+        request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
+
+        // Get the dataset version
+        var response = m_client.Execute(request);
+        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            throw new Exception("Dataset version not found or already uploaded using the SAS token. \n" + response.Content);
+        }
+        else if (response.StatusCode != System.Net.HttpStatusCode.OK || response.Content == null)
+        {
+            throw new Exception("Dataset version fetch failed.\n" + response.Content);
+        }
+
+        // Get the dataset version
+        var dataset_version = Newtonsoft.Json.JsonConvert.DeserializeObject<ConnectionStringResponse>(response.Content)!;
+
+        return dataset_version.connection_string;
+    }
+
+    /// <summary>
+    /// Mark the dataset version as uploaded on the SAIL platform services
+    /// </summary>
+    /// <param name="dataset_version_id"> the dataset version id to be marked as ready </param>
+    /// <exception cref="Exception"></exception>
+    public void MarkDatasetVersionAsActive(Guid dataset_version_id)
+    {
+        // Put the dataset version
+        var request = new RestRequest("/dataset-versions/" + dataset_version_id.ToString(), Method.Put);
+        request.AddHeader("accept", "application/json");
+        request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
+
+        request.AddJsonBody("{\"state\": \"ACTIVE\"}");
+
+        // Execute the request
+        var response = m_client.Execute(request);
+        if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
+        {
+            throw new Exception("Dataset version state update failed.\n" + response.Content);
         }
     }
 }

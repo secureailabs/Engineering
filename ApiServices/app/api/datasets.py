@@ -49,11 +49,36 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def register_dataset(
+    response: Response,
     background_tasks: BackgroundTasks,
     dataset_req: RegisterDataset_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
-):
+) -> RegisterDataset_Out:
+    """
+    Register new dataset
+
+    :param response: Response object
+    :type response: Response
+    :param background_tasks: Background tasks object to run tasks in the background
+    :type background_tasks: BackgroundTasks
+    :param dataset_req: information required to register a dataset, defaults to Body(...)
+    :type dataset_req: RegisterDataset_In, optional
+    :param current_user: information of current authenticated user, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: Dataset Id
+    :rtype: RegisterDataset_Out
+    """
     try:
+        # Check if there is an existing dataset with the same name
+        existing_dataset = await data_service.find_one(
+            DB_COLLECTION_DATASETS, {"name": dataset_req.name, "organization_id": str(current_user.organization_id)}
+        )
+        # If there is an existing dataset with the same name, return the existing dataset ID
+        if existing_dataset:
+            dataset_db = Dataset_Db(**existing_dataset)  # type: ignore
+            response.status_code = status.HTTP_200_OK
+            return RegisterDataset_Out(_id=dataset_db.id)
+
         # Add the dataset to the database
         dataset_db = Dataset_Db(
             **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.ACTIVE
@@ -63,7 +88,7 @@ async def register_dataset(
         # Create a file share for the dataset
         background_tasks.add_task(create_azure_file_share, dataset_db.id)
 
-        return dataset_db
+        return RegisterDataset_Out(**dataset_db.dict())
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

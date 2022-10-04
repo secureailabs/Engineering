@@ -28,21 +28,10 @@ class DatasetVersionState(Enum):
     ERROR = "ERROR"
 
 
-class DatasetVersionTableCoumn(SailBaseModel):
-    id: PyObjectId = Field(...)
-    units: StrictStr = Field(...)
-    name: StrictStr = Field(...)
-    tags: StrictStr = Field(...)
-    type: StrictStr = Field(...)
-    description: StrictStr = Field(...)
-
-
 class DatasetVersion_Base(SailBaseModel):
     dataset_id: PyObjectId = Field(...)
     description: StrictStr = Field(...)
     name: str = Field(max_length=255)
-    keywords: StrictStr = Field(...)
-    publish_date: int = Field(...)
 
 
 class DatasetVersion_Db(DatasetVersion_Base):
@@ -64,8 +53,7 @@ class RegisterDatasetVersion_Out(SailBaseModel):
 class UpdateDatasetVersion_In(SailBaseModel):
     # TODO: add a validator to enure that atleast of the field is present in the request
     description: Optional[StrictStr] = Field(default=None)
-    name: Optional[StrictStr] = Field(default=None)
-    keywords: Optional[StrictStr] = Field(default=None)
+    state: Optional[DatasetVersionState] = Field(default=None)
 
 
 class GetDatasetVersion_Out(DatasetVersion_Base):

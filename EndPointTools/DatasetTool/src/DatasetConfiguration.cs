@@ -8,13 +8,13 @@ class DatasetConfiguration
     public class DatasetConfigurationJson
     {
         public Dataset dataset { get; set; } = default!;
-        public string description { get; set; } = default!;
+        public Dataset dataset_version { get; set; } = default!;
         public string data_federation { get; set; } = default!;
         public string data_format { get; set; } = default!;
         public string[] data_source { get; set; } = default!;
     }
 
-    public DatasetConfigurationJson configuration = default!;
+    public DatasetConfigurationJson m_configuration = default!;
 
     public DatasetConfiguration(FileInfo file)
     {
@@ -24,13 +24,12 @@ class DatasetConfiguration
         {
             throw new Exception("The file is empty");
         }
-        System.Console.WriteLine(json_content);
 
-        configuration = JsonConvert.DeserializeObject<DatasetConfigurationJson>(json_content)!;
-        if (configuration == null)
+        // Deserialize the JSON string into the configuration object
+        m_configuration = JsonConvert.DeserializeObject<DatasetConfigurationJson>(json_content)!;
+        if (m_configuration == null)
         {
             throw new Exception("The file is not a valid JSON");
         }
-        System.Console.WriteLine(configuration.dataset.name);
     }
 }

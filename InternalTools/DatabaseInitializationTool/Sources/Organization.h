@@ -46,16 +46,6 @@ class Organization : public Object
         // Method which return the name of the first admin user associated with
         // this organization
         std::string __thiscall GetAdminUsername(void) const throw();
-        // Method which returns the identifier of a dataset based on it'sb_type
-        // name. This is required in order to help register digital contracts
-        std::string __thiscall GetDatasetVersionIdentifier(
-            _in const std::string & c_strDatasetVersionName
-            ) const throw();
-        // Method which returns the identifier of a dataset based on it'sb_type
-        // name. This is required in order to help register digital contracts
-        std::string __thiscall GetDatasetIdentifier(
-            _in const std::string & c_strDatasetName
-            ) const throw();
         // Method which returns the identifier of a data federation based on it'sb_type
         // name. This is required in order to help register digital contracts
         std::string __thiscall GetDataFederationIdentifier(
@@ -76,11 +66,6 @@ class Organization : public Object
             const std::unordered_map<std::string, Organization *>& organizationList
             ) throw();
 
-        void RegisterDatasetsToFederations(
-            _in const std::string & c_strSailPlatformServicesIpAddress,
-            _in Word wSailPlatformServicesPortNumber,
-            const std::unordered_map<std::string, Guid>& federationList
-            ) throw();
     private:
 
         // Since all of the functions to register have the same login code in
@@ -98,9 +83,6 @@ class Organization : public Object
         void __thiscall RegisterDataFederations(
             std::unordered_map<std::string, Guid>& registeredFederations
             );
-        void __thiscall RegisterDatasets(void);
-        void __thiscall RegisterDatasetVersions(void);
-
         // Private data members
         std::string m_strSailPlatformServicesIpAddress;
         Word m_wSailPlatformServicesPortNumber;
@@ -110,9 +92,6 @@ class Organization : public Object
         std::unordered_set<std::string> m_stlContacts;
         std::unordered_set<std::string> m_stlAdministrators;
         std::unordered_set<std::string> m_stlUsers;
-        std::unordered_map<Qword, std::string> m_strDatasetVersionInformationByFilename;
-        std::unordered_set<std::string> m_stlDatasets;
-        std::unordered_map<std::string, std::string> m_strDatasetIdentifiers;
         std::unordered_set<std::string> m_stlDataFederations;
         std::unordered_map<std::string, Guid> m_stlDataFederationIdentifiers;
         std::unordered_map<Qword, std::string> m_strDataFederationIdentifiers;

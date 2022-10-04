@@ -114,12 +114,7 @@ async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
 )
 async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
-        dataset = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
-        if not dataset:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
-
-        # Add the organization information to the dataset
-        dataset = Dataset_Db(**dataset)
+        dataset = await get_dataset_internal(dataset_id, current_user)
         organization_info = await get_organization(organization_id=dataset.organization_id, current_user=current_user)
 
         return GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization_info.dict()))
@@ -127,6 +122,17 @@ async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(
         raise http_exception
     except Exception as exception:
         raise exception
+
+
+async def get_dataset_internal(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+    dataset = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
+    if not dataset:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
+
+    # Add the organization information to the dataset
+    dataset = Dataset_Db(**dataset)
+
+    return dataset
 
 
 ########################################################################################################################

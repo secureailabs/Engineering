@@ -157,3 +157,7 @@ class RegisterDataFederationProvision_Out(DataFederationProvision_Base):
     creation_time: datetime = Field(...)
     organization_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(...)
+
+
+class DatasetEncryptionKey_Out(SailBaseModel):
+    dataset_key: str = Field(...)

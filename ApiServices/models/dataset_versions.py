@@ -24,6 +24,8 @@ from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 class DatasetVersionState(Enum):
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
+    NOT_UPLOADED = "NOT_UPLOADED"
+    ERROR = "ERROR"
 
 
 class DatasetVersionTableCoumn(SailBaseModel):
@@ -62,6 +64,7 @@ class DatasetVersion_Db(DatasetVersion_Base):
     dataset_version_created_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     state: DatasetVersionState = Field(...)
+    note: StrictStr = Field(default="")
 
 
 class RegisterDatasetVersion_In(DatasetVersion_Base):
@@ -84,6 +87,12 @@ class GetDatasetVersion_Out(DatasetVersion_Base):
     dataset_version_created_time: datetime = Field(...)
     organization: BasicObjectInfo = Field(...)
     state: DatasetVersionState = Field(...)
+    note: StrictStr = Field(...)
+
+
+class GetDatasetVersionConnectionString_Out(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+    connection_string: StrictStr = Field(...)
 
 
 class GetMultipleDatasetVersion_Out(SailBaseModel):

@@ -13,10 +13,13 @@
 # -------------------------------------------------------------------------------
 from typing import List
 
+import app.utils.azure as azure
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from app.data import sync_operations as sync_data_service
+from app.utils.secrets import get_secret
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
@@ -46,7 +49,9 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def register_dataset(
-    dataset_req: RegisterDataset_In = Body(...), current_user: TokenData = Depends(get_current_user)
+    background_tasks: BackgroundTasks,
+    dataset_req: RegisterDataset_In = Body(...),
+    current_user: TokenData = Depends(get_current_user),
 ):
     try:
         # Add the dataset to the database
@@ -54,6 +59,9 @@ async def register_dataset(
             **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.ACTIVE
         )
         await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
+
+        # Create a file share for the dataset
+        background_tasks.add_task(create_azure_file_share, dataset_db.id)
 
         return dataset_db
     except HTTPException as http_exception:
@@ -142,7 +150,6 @@ async def update_dataset(
         if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        # TODO: Prawal find better way to update the dataset
         if updated_dataset_info.description:
             dataset_db.description = updated_dataset_info.description
 
@@ -199,3 +206,33 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
         raise http_exception
     except Exception as exception:
         raise exception
+
+
+def create_azure_file_share(dataset_id: PyObjectId):
+    """
+    Create a file share in Azure
+
+    :param dataset_id: Dataset ID
+    :type dataset_id: PyObjectId
+    :raises Exception: failed to create file share
+    """
+    try:
+        account_credentials = azure.authenticate(
+            get_secret("azure_client_id"),
+            get_secret("azure_client_secret"),
+            get_secret("azure_tenant_id"),
+            get_secret("azure_subscription_id"),
+        )
+
+        create_response = azure.create_file_share(
+            account_credentials,
+            get_secret("azure_storage_resource_group"),
+            get_secret("azure_storage_account_name"),
+            str(dataset_id),
+        )
+        if create_response.status != "Success":
+            raise Exception(create_response.note)
+    except Exception as exception:
+        sync_data_service.update_one(
+            DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ERROR", "note": str(exception)}}
+        )

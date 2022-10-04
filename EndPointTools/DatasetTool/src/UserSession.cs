@@ -53,6 +53,9 @@ class UserSession
             // TODO: IMP!! Important!! Remove this line after real certificates are used.
             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
         };
+        System.Console.WriteLine("#####################################################################################################");
+        System.Console.WriteLine("SSL Certificate validataion is disabled for this session. This is not recommended for production use.");
+        System.Console.WriteLine("#####################################################################################################");
         m_client = new RestClient(client_options);
 
         // Create the request
@@ -202,7 +205,38 @@ class UserSession
     /// <exception cref="Exception"></exception>
     public Guid RegisterDatasetVersion(Guid dataset_id, string dataset_version_metadata)
     {
-        // Register the dataset
+        // Get the dataset information and wait for it to be active before registering the version
+        // We will try 10 times with 5 seconds delay between each try
+        int count = 10;
+        while (count > 0)
+        {
+            var dataset_request = new RestRequest("/datasets/" + dataset_id, Method.Get);
+            dataset_request.AddHeader("accept", "application/json");
+            dataset_request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
+
+            // Get the dataset
+            var dataset_response = m_client.Execute(dataset_request);
+            if (dataset_response.StatusCode != System.Net.HttpStatusCode.OK || dataset_response.Content == null)
+            {
+                throw new Exception("Dataset fetch failed. \n" + dataset_response.Content);
+            }
+
+            // Get the dataset information
+            var dataset = Newtonsoft.Json.JsonConvert.DeserializeObject<Dataset>(dataset_response.Content)!;
+            if (dataset.state == "ACTIVE")
+            {
+                break;
+            }
+
+            count--;
+            System.Threading.Thread.Sleep(5000);
+        }
+        if (count == 0)
+        {
+            throw new Exception("Dataset is not ready after 10 tries. Contact Secure AI Labs support.");
+        }
+
+        // Register the dataset version
         var request = new RestRequest("/dataset-versions", Method.Post);
         request.AddHeader("accept", "application/json");
         request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
@@ -237,7 +271,38 @@ class UserSession
     /// <exception cref="Exception"></exception>
     public string GetConnectionStringForDatasetVersion(Guid dataset_version_id)
     {
-        // Get the dataset version
+        // Proceed only if the dataset version is in the ACTIVE state
+        // We will try 10 times with 5 seconds delay between each try
+        int count = 10;
+        while (count > 0)
+        {
+            var dataset_version_request = new RestRequest("/dataset-versions/" + dataset_version_id, Method.Get);
+            dataset_version_request.AddHeader("accept", "application/json");
+            dataset_version_request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
+
+            // Get the dataset version
+            var dataset_version_response = m_client.Execute(dataset_version_request);
+            if (dataset_version_response.StatusCode != System.Net.HttpStatusCode.OK || dataset_version_response.Content == null)
+            {
+                throw new Exception("Dataset version fetch failed. \n" + dataset_version_response.Content);
+            }
+
+            // Get the dataset version information
+            var dataset_version = Newtonsoft.Json.JsonConvert.DeserializeObject<DatasetVersionMetadata>(dataset_version_response.Content)!;
+            if (dataset_version.state == "NOT_UPLOADED")
+            {
+                break;
+            }
+
+            count--;
+            System.Threading.Thread.Sleep(5000);
+        }
+        if (count == 0)
+        {
+            throw new Exception("Timeout. Dataset version is not ready after 10 tries. Contact Secure AI Labs Supoort");
+        }
+
+        // Get the dataset version connection string
         var request = new RestRequest("/dataset-versions/" + dataset_version_id.ToString() + "/connection-string", Method.Get);
         request.AddHeader("accept", "application/json");
         request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
@@ -254,9 +319,9 @@ class UserSession
         }
 
         // Get the dataset version
-        var dataset_version = Newtonsoft.Json.JsonConvert.DeserializeObject<ConnectionStringResponse>(response.Content)!;
+        var connection_string_response = Newtonsoft.Json.JsonConvert.DeserializeObject<ConnectionStringResponse>(response.Content)!;
 
-        return dataset_version.connection_string;
+        return connection_string_response.connection_string;
     }
 
     /// <summary>

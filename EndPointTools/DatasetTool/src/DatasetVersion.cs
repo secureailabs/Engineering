@@ -6,14 +6,6 @@ namespace DatasetTool;
 
 class DatasetVersion
 {
-    private class DatasetVersionMetadata
-    {
-        public Guid dataset_id { get; set; } = default!;
-        public string description { get; set; } = default!;
-        public string name { get; set; } = default!;
-        public string tags { get; set; } = default!;
-    }
-
     private DatasetVersionMetadata m_metadata = new DatasetVersionMetadata();
     private List<string> m_data_files = new List<string>();
 

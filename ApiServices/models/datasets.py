@@ -21,6 +21,7 @@ from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class DatasetState(Enum):
+    CREATING_STORAGE = "CREATING_STORAGE"
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
     ERROR = "ERROR"

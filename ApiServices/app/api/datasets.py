@@ -81,7 +81,7 @@ async def register_dataset(
 
         # Add the dataset to the database
         dataset_db = Dataset_Db(
-            **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.ACTIVE
+            **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.CREATING_STORAGE
         )
         await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
 
@@ -260,6 +260,10 @@ def create_azure_file_share(dataset_id: PyObjectId):
         )
         if create_response.status != "Success":
             raise Exception(create_response.note)
+
+        # Mark the dataset as active
+        sync_data_service.update_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ACTIVE"}})
+
     except Exception as exception:
         sync_data_service.update_one(
             DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ERROR", "note": str(exception)}}

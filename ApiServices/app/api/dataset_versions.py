@@ -37,6 +37,7 @@ from models.dataset_versions import (
     RegisterDatasetVersion_Out,
     UpdateDatasetVersion_In,
 )
+from models.datasets import DatasetState
 
 DB_COLLECTION_DATASET_VERSIONS = "dataset-versions"
 
@@ -78,11 +79,15 @@ async def register_dataset_version(
         if dataset_db.organization.id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset not found")
 
+        # The dataset should be in active state
+        if dataset_db.state != DatasetState.ACTIVE:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset is not active. Try again later")
+
         # Add the dataset to the database
         dataset_version_db = DatasetVersion_Db(
             **dataset_version_req.dict(),
             organization_id=current_user.organization_id,
-            state=DatasetVersionState.NOT_UPLOADED,
+            state=DatasetVersionState.CREATING_DIRECTORY,
         )
         await data_service.insert_one(DB_COLLECTION_DATASET_VERSIONS, jsonable_encoder(dataset_version_db))
 
@@ -359,6 +364,12 @@ def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: P
         )
         if create_response.status != "Success":
             raise Exception(create_response.note)
+
+        sync_data_service.update_one(
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_version_id)},
+            {"$set": {"state": "NOT_UPLOADED"}},
+        )
 
     except Exception as exception:
         sync_data_service.update_one(

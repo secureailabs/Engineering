@@ -24,6 +24,7 @@ from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 class DatasetVersionState(Enum):
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
+    CREATING_DIRECTORY = "CREATING_DIRECTORY"
     NOT_UPLOADED = "NOT_UPLOADED"
     ERROR = "ERROR"
 

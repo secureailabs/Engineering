@@ -53,7 +53,7 @@ WindowsPlatformDeliverables.tar
 ```
 
 ## DeployPlatform to Azure
-Set environment variables Use `Deploy Platform Service Principal` - Ask Stanley \
+Set environment variables Use `Deploy Platform Service Principal` - Ask Stanley if unclear \
 `AZURE_SUBSCRIPTION_ID` should reflect the Azure Subscription you wish to deploy your resources in.
 ```
 export AZURE_SUBSCRIPTION_ID="xxxx" 

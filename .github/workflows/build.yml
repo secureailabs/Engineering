@@ -91,7 +91,7 @@ jobs:
           cd Docker/
           export AZURE_SUBSCRIPTION_ID="3d2b9951-a0c8-4dc3-8114-2776b047b15c"
           ./BuildImages.sh -i apiservices
-          sudo ./RunService.sh -s apiservices -d
+          ./RunService.sh -s apiservices -d
           sleep 60
           cd ..
           ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps

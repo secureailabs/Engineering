@@ -40,6 +40,7 @@ class Dataset_Db(Dataset_Base):
     organization_id: PyObjectId = Field(...)
     state: DatasetState = Field(...)
     note: StrictStr = Field(default="")
+    encryption_key_id: Optional[PyObjectId] = Field(default=None)
 
 
 class RegisterDataset_In(Dataset_Base):

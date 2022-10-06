@@ -21,6 +21,7 @@ from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class DatasetState(Enum):
+    CREATING_STORAGE = "CREATING_STORAGE"
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
     ERROR = "ERROR"
@@ -31,7 +32,6 @@ class Dataset_Base(SailBaseModel):
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
     tags: StrictStr = Field(...)
-    version: StrictStr = Field(...)
 
 
 class Dataset_Db(Dataset_Base):
@@ -56,7 +56,6 @@ class UpdateDataset_In(SailBaseModel):
     name: Optional[StrictStr] = Field(default=None)
     description: Optional[StrictStr] = Field(default=None)
     tag: Optional[StrictStr] = Field(default=None)
-    version: Optional[StrictStr] = Field(default=None)
 
 
 class GetDataset_Out(Dataset_Base):

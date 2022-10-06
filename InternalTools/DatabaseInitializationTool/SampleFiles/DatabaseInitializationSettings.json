@@ -50,21 +50,6 @@
 					"Title": "Data Scientist",
 					"Role": "USER"
 				}
-			],
-			"DatasetVersions": [
-				{
-					"Name": "IGR Dataset #1",
-					"Dataset": "IGR Dataset",
-					"File": "igr_001.csvp"
-				}
-			],
-			"Datasets": [
-				{
-					"Title": "IGR Dataset",
-					"Description": "Dataset Description",
-					"Tags": "Dataset Tags",
-					"Federation" : "KCA Consortium"
-				}
 			]
 		},
 		"Mercy General Hospital": {
@@ -106,21 +91,6 @@
 					"Name": "Daniel Quilp",
 					"Title": "Data Scientist",
 					"Role": "USER"
-				}
-			],
-			"DatasetVersions": [
-				{
-					"Name": "MGR Dataset #1",
-					"Dataset": "MGR Dataset",
-					"File": "mgr_001.csvp"
-				}
-			],
-			"Datasets": [
-				{
-					"Title": "MGR Dataset",
-					"Description": "Dataset Description",
-					"Tags": "Dataset Tags",
-					"Federation" : "KCA Consortium"
 				}
 			]
 		},

@@ -119,7 +119,7 @@ def file_share_create_directory(
         directory_client = ShareDirectoryClient.from_connection_string(
             conn_str=connection_string, share_name=file_share_name, directory_path=directory_name
         )
-        directory_client.create_directory()
+        create_response = directory_client.create_directory()
 
         return DeploymentResponse(status="Success", note="Deployment Successful")
     except AzureError as azure_error:
@@ -151,11 +151,9 @@ def get_storage_account_connection_string(
 
         # Get the storage account key.
         keys = storage_client.storage_accounts.list_keys(resource_group_name, account_name)
-        print(f"Primary key for storage account: {keys.keys[0].value}")  # type: ignore
 
         # Create a connection string to the file share.
         conn_string = f"DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName={account_name};AccountKey={keys.keys[0].value}"  # type: ignore
-        print(f"Connection string: {conn_string}")
 
         return DeploymentResponse(status="Success", response=conn_string, note="Deployment Successful")
     except AzureError as azure_error:
@@ -328,7 +326,6 @@ def deploy_template(accountCredentials: str, resource_group_name: str, template:
         resource_group_name, "azure-sample", {"properties": deployment_properties}  # type: ignore
     )
     deployment_async_operation.wait()
-    print("deployment_async_operation result ", deployment_async_operation.result())
 
     return deployment_async_operation.status()
 
@@ -351,10 +348,8 @@ def delete_resouce_group(accountCredentials: str, resource_group_name: str) -> D
 
         return DeleteResponse(status="Success", note="")
     except AzureError as azure_error:
-        print("AzureError: ", azure_error)
         return DeleteResponse(status="Fail", note=str(azure_error))
     except Exception as exception:
-        print("Exception: ", exception)
         return DeleteResponse(status="Fail", note=str(exception))
 
 
@@ -396,8 +391,6 @@ def deploy_module(
     :rtype: DeploymentResponse
     """
     try:
-        print("Deploying module: ", module_name)
-
         # Create the resource group
         create_resource_group(account_credentials, resource_group_name, "eastus")
 
@@ -416,15 +409,12 @@ def deploy_module(
             "virtualNetworkId": get_secret("azure_scn_virtual_network_id"),
         }
         deploy_status = deploy_template(account_credentials, resource_group_name, template, parameters)
-        print(virtual_machine_name + " server status: ", deploy_status)
 
         virtual_machine_public_ip = get_ip(account_credentials, resource_group_name, virtual_machine_name + "-ip")
 
         return DeploymentResponse(status="Success", ip_address=virtual_machine_public_ip, note="Deployment Successful")
 
     except AzureError as azure_error:
-        print("AzureError: ", azure_error)
         return DeploymentResponse(status="Fail", ip_address="", note=str(azure_error))
     except Exception as exception:
-        print("Exception: ", exception)
         return DeploymentResponse(status="Fail", ip_address="", note=str(exception))

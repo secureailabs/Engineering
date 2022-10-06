@@ -21,6 +21,7 @@ Run the Following command to optain a decrypted .env.dev file.
 ```
 npm run env:decrypt # You should obtain .env.dev under this directory
 ```
+`.env.dev` contains `AZURE_CLIENT_ID`  which is set for PACKER Azure Service principal - Ask Stanley if unclear
 ### Update .envs' should be Encrypted [.env.dev]
 **PLEASE REMEMBER: Not to commit .envs that aren't encrypted**
 ```

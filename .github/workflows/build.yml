@@ -89,9 +89,8 @@ jobs:
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
           docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
           cd Docker/
-          export AZURE_SUBSCRIPTION_ID="3d2b9951-a0c8-4dc3-8114-2776b047b15c"
           ./BuildImages.sh -i apiservices
-          ./RunService.sh -s apiservices -d
+          sudo ./RunService.sh -s apiservices -d
           sleep 60
           cd ..
           ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps

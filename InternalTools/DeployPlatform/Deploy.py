@@ -147,7 +147,7 @@ def deploy_module(account_credentials, deployment_name, module_name, subscriptio
         "vmSize": "Standard_D4s_v4",
         "adminUserName": "sailuser",
         "adminPassword": "SailPassword@123",
-        "vmImageResourceId": set_parameters["vmImageResourceId"] + module_name,
+        "vmImageResourceId": set_parameters["vmImageResourceId"],
         "subnetName": set_parameters["subnetName"],
         "virtualNetworkId": set_parameters["virtualNetworkId"],
     }

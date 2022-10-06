@@ -160,7 +160,7 @@ def deploy_module(account_credentials, deployment_name, module_name, subscriptio
     return virtual_machine_public_ip
 
 
-def deploy_apiservices(account_credentials, deployment_name, owner, subscription_id):
+def deploy_apiservices(account_credentials, deployment_name, storage_account_name, owner, subscription_id):
     """
     Deploy Api Services
 
@@ -178,7 +178,7 @@ def deploy_apiservices(account_credentials, deployment_name, owner, subscription
     backend_json["azure_scn_image_id"] = set_parameters["azure_scn_image_id"]
     backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
     backend_json["azure_storage_resource_group"] = set_parameters["azure_storage_resource_group"]
-    backend_json["azure_storage_account_name"] = set_parameters["azure_storage_account_name"]
+    backend_json["azure_storage_account_name"] = storage_account_name
     backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
 
     with open("apiservices.json", "w") as outfile:
@@ -319,7 +319,7 @@ def create_storage_account(
         # Long-running operations return a poller object; calling poller.result() waits for completion.
         account_result = poller.result()
 
-        return DeploymentResponse(status="Success", response=account_name, note="Deployment Successful")
+        return DeploymentResponse(status="Success", response=account_name, note="Deployment Successful"), account_name
     except AzureError as azure_error:
         return DeploymentResponse(status="Fail", note=str(azure_error))
     except Exception as exception:
@@ -344,10 +344,17 @@ if __name__ == "__main__":
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
     # Deploy Storage Account
-    storage_account = create_storage_account(account_credentials, deployment_id, "stanaccountname", "westus")
-
+    storage_account, storage_account_name = create_storage_account(
+        account_credentials, deployment_id, "stanaccountname", "westus"
+    )
     # Deploy the API services
-    platform_services_ip = deploy_apiservices(account_credentials, deployment_id, OWNER, AZURE_SUBSCRIPTION_ID)
+    platform_services_ip = deploy_apiservices(
+        account_credentials,
+        deployment_id,
+        storage_account_name,
+        OWNER,
+        AZURE_SUBSCRIPTION_ID,
+    )
     print("API Services server: ", platform_services_ip)
     # Deploy the frontend server
     frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip, AZURE_SUBSCRIPTION_ID)

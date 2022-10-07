@@ -160,7 +160,9 @@ def deploy_module(account_credentials, deployment_name, module_name, subscriptio
     return virtual_machine_public_ip
 
 
-def deploy_apiservices(account_credentials, deployment_name, storage_account_name, owner, subscription_id):
+def deploy_apiservices(
+    account_credentials, deployment_name, storage_account_name, storage_resource_group_name, owner, subscription_id
+):
     """
     Deploy Api Services
 
@@ -177,7 +179,7 @@ def deploy_apiservices(account_credentials, deployment_name, storage_account_nam
     backend_json["azure_subscription_id"] = set_parameters["azure_subscription_id"]
     backend_json["azure_scn_image_id"] = set_parameters["azure_scn_image_id"]
     backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
-    backend_json["azure_storage_resource_group"] = set_parameters["azure_storage_resource_group"]
+    backend_json["azure_storage_resource_group"] = storage_resource_group_name
     backend_json["azure_storage_account_name"] = storage_account_name
     backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
 
@@ -319,7 +321,11 @@ def create_storage_account(
         # Long-running operations return a poller object; calling poller.result() waits for completion.
         account_result = poller.result()
 
-        return DeploymentResponse(status="Success", response=account_name, note="Deployment Successful"), account_name
+        return (
+            DeploymentResponse(status="Success", response=account_name, note="Deployment Successful"),
+            account_name,
+            resource_group_name,
+        )
     except AzureError as azure_error:
         return DeploymentResponse(status="Fail", note=str(azure_error))
     except Exception as exception:
@@ -344,7 +350,7 @@ if __name__ == "__main__":
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
     # Deploy Storage Account
-    storage_account, storage_account_name = create_storage_account(
+    storage_account, storage_account_name, storage_resource_group_name = create_storage_account(
         account_credentials, deployment_id, "stanaccountname", "westus"
     )
     # Deploy the API services
@@ -352,6 +358,7 @@ if __name__ == "__main__":
         account_credentials,
         deployment_id,
         storage_account_name,
+        storage_resource_group_name,
         OWNER,
         AZURE_SUBSCRIPTION_ID,
     )

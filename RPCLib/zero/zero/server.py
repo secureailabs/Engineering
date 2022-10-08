@@ -468,6 +468,8 @@ class _Worker:
             response = response.to_dict()
         elif isinstance(response, pd.Series) or isinstance(response, pd.DataFrame):
             response = serializer_table[str(type(response))](response)
+        # elif isinstance(response, torch.nn.Module):
+        #     response = serializer_table[str(torch.nn.Module)](response)
         return response
 
     def _handle_secret_msg(self, msg):

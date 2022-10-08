@@ -1,4 +1,5 @@
 import pandas as pd
+import torch
 
 
 def dataframe_serializer(df):
@@ -72,17 +73,60 @@ def proxy_serializer(proxy):
 
 
 def proxy_deserializer(proxy_dict):
+    """
+    To do proxy deserialization
+
+    :param proxy_dict: proxy dictionary
+    :type proxy_dict: dict
+    """
     pass
+
+
+def torch_nn_serializer(model):
+    """
+    serialize torch linear model to dict
+
+    :param model: torch nn model
+    :type model: torch.nn.Module
+    :return: state dictionary
+    :rtype: dict
+    """
+    model_dict = model.state_dict()
+    for key in model_dict:
+        if isinstance(model_dict[key], torch.Tensor):
+            model_dict[key] = {
+                "_type_": str(torch.Tensor),
+                "val": model_dict[key].tolist(),
+            }
+    return model_dict
+
+
+def torch_nn_deserializer(model_dict):
+    """
+    deserialize torch model from a dict with list to dict with tensors
+
+    :param model_dict: state dictionary
+    :type model_dict: dict
+    :return: dictionary containing tensors
+    :rtype: dict
+    """
+    for key in model_dict:
+        if isinstance(model_dict[key], dict) and model_dict[key]["_type_"] == str(torch.Tensor):
+            model_dict[key] = torch.FloatTensor(model_dict[key]["val"])
+
+    return model_dict
 
 
 serializer_table = {
     str(pd.DataFrame): dataframe_serializer,
     str(pd.Series): series_serializer,
     "proxy": proxy_serializer,
+    str(torch.nn.Module): torch_nn_serializer,
 }
 
 deserializer_table = {
     str(pd.DataFrame): dataframe_deserializer,
     str(pd.Series): series_deserializer,
     "proxy": proxy_deserializer,
+    str(torch.nn.Module): torch_nn_deserializer,
 }

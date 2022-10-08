@@ -149,6 +149,16 @@ class ZeroClient(_BaseClient):
             raise e
 
     def _process_args(self, args, kwargs):
+        """
+        process arguments of the rpc call
+
+        :param args: variable args
+        :type args: tuple
+        :param kwargs: keyword args
+        :type kwargs: dict
+        :return: args and kwargs after processed
+        :rtype: tuple
+        """
         if args is not None:
             args = list(args)
             for i in range(len(args)):

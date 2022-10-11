@@ -1,9 +1,8 @@
 import inspect
 import typing
 
+from zero.customtypes import SecretObject
 from zero.errors import ZeroException
-
-from .customtypes import SecretObject
 
 # from pydantic import BaseModel
 

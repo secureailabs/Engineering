@@ -7,8 +7,7 @@ import zmq
 import zmq.asyncio
 
 from zero.errors import MethodNotFoundException, ZeroException
-
-from .serialize import deserializer_table, serializer_table
+from zero.serialize import deserializer_table, serializer_table
 
 public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
 private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"

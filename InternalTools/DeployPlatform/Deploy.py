@@ -143,10 +143,10 @@ def deploy_module(account_credentials, deployment_name, module_name, subscriptio
 
     set_parameters = set_params(subscription_id, module_name)
     parameters = {
-        "vmName": module_name,
-        "vmSize": "Standard_D4s_v4",
-        "adminUserName": "sailuser",
-        "adminPassword": "SailPassword@123",
+        "vmName": set_parameters["vmName"],
+        "vmSize": set_parameters["vmSize"],
+        "adminUserName": set_parameters["adminUserName"],
+        "adminPassword": set_parameters["adminPassword"],
         "vmImageResourceId": set_parameters["vmImageResourceId"],
         "subnetName": set_parameters["subnetName"],
         "virtualNetworkId": set_parameters["virtualNetworkId"],

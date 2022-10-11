@@ -48,7 +48,7 @@
       }
     },
     "subnetIpPrefix": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "",
       "metadata": {
         "description": "IP address prefix for the subnet"
@@ -100,7 +100,7 @@
             "name": "InboundAllow_9090_8000",
             "properties": {
               "description": "9090 for bootstrap tool\n8000 for platform services",
-              "protocol": "TCP",
+              "protocol": "Tcp",
               "sourcePortRange": "*",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
@@ -120,7 +120,7 @@
             "name": "OutboundAllow_443_9090",
             "properties": {
               "description": "Interact with DataServices, Azure and SAIL SCNs",
-              "protocol": "TCP",
+              "protocol": "Tcp",
               "sourcePortRange": "*",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
@@ -165,7 +165,7 @@
         "name": "Basic"
       },
       "properties": {
-        "publicIpAllocationMethod": "Dynamic"
+        "publicIPAllocationMethod": "Dynamic"
       }
     },
     {
@@ -212,7 +212,7 @@
         },
         "storageProfile": {
           "osDisk": {
-            "createOption": "fromImage",
+            "createOption": "FromImage",
             "name": "[concat(parameters('vmName'), '-disk')]",
             "caching": "ReadWrite",
             "managedDisk": {

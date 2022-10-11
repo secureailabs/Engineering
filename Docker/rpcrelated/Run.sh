@@ -31,6 +31,9 @@ docker run \
 -dit \
 -p 5556:5556 \
 -p 9090:9091 \
+--cap-add=SYS_ADMIN \
+--cap-add=DAC_READ_SEARCH \
+--privileged \
 -v $(pwd)/"$imageName"_dir:/app \
 -v $(pwd)/certs:/etc/nginx/certs \
 $imageName

@@ -330,7 +330,7 @@ def deploy_template(accountCredentials: str, resource_group_name: str, template:
     return deployment_async_operation.status()
 
 
-def delete_resouce_group(accountCredentials: str, resource_group_name: str) -> DeleteResponse:
+def delete_resouce_group(accountCredentials: dict, resource_group_name: str) -> DeleteResponse:
     """
     Delete the resource group.
 

@@ -48,7 +48,7 @@
       }
     },
     "subnetIpPrefix": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "",
       "metadata": {
         "description": "IP address prefix for the subnet"
@@ -100,7 +100,7 @@
             "name": "InboundAllow_9090_5556",
             "properties": {
               "description": "9090 for bootstrap tool\n5556 for rpc server.",
-              "protocol": "TCP",
+              "protocol": "Tcp",
               "sourcePortRange": "*",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
@@ -117,19 +117,21 @@
             }
           },
           {
-            "name": "OutboundAllow_8000",
+            "name": "OutboundAllow_8000_445",
             "properties": {
-              "description": "Interact with SAIL Platform Services ",
-              "protocol": "TCP",
+              "description": "Interact with SAIL Platform Services.\n 445 for SMB mount of dataset",
+              "protocol": "Tcp",
               "sourcePortRange": "*",
-              "destinationPortRange": "8000",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 110,
               "direction": "Outbound",
               "sourcePortRanges": [],
-              "destinationPortRanges": [],
+              "destinationPortRanges": [
+                "8000",
+                "445"
+              ],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []
             }
@@ -163,7 +165,7 @@
         "name": "Basic"
       },
       "properties": {
-        "publicIpAllocationMethod": "Dynamic"
+        "publicIPAllocationMethod": "Dynamic"
       }
     },
     {
@@ -210,7 +212,7 @@
         },
         "storageProfile": {
           "osDisk": {
-            "createOption": "fromImage",
+            "createOption": "FromImage",
             "name": "[concat(parameters('vmName'), '-disk')]",
             "caching": "ReadWrite",
             "managedDisk": {

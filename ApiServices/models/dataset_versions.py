@@ -58,6 +58,7 @@ class UpdateDatasetVersion_In(SailBaseModel):
 
 
 class GetDatasetVersion_Out(DatasetVersion_Base):
+    id: PyObjectId = Field(..., alias="_id")
     dataset_version_created_time: datetime = Field(...)
     organization: BasicObjectInfo = Field(...)
     state: DatasetVersionState = Field(...)

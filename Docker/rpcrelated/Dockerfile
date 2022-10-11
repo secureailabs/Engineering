@@ -11,6 +11,8 @@ RUN apt-get update && \
     apt-get install -y \
     uuid \
     nginx \
+    jq \
+    cifs-utils \
     python3-dev \
     python3-pip \
     python3.8-venv

@@ -34,6 +34,7 @@ from models.secure_computation_nodes import (
     RegisterSecureComputationNode_In,
     RegisterSecureComputationNode_Out,
     SecureComputationNode_Db,
+    SecureComputationNodeInitializationVector,
     SecureComputationNodeState,
     UpdateSecureComputationNode_In,
 )
@@ -316,22 +317,15 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
         )
 
         # Create a SCN initialization vector json
-        securecomputationnode_json = {}
-        securecomputationnode_json[
-            "NameOfVirtualMachine"
-        ] = f"{secure_computation_node_db.dataset_id}-{secure_computation_node_db.data_federation_provision_id}"
-        securecomputationnode_json["IpAddressOfVirtualMachine"] = deploy_response.ip_address
-        securecomputationnode_json["VirtualMachineIdentifier"] = str(secure_computation_node_db.id)
-        securecomputationnode_json["ClusterIdentifier"] = str(uuid4())
-        securecomputationnode_json["DigitalContractIdentifier"] = str(secure_computation_node_db.data_federation_id)
-        securecomputationnode_json["RootOfTrustDomainIdentifier"] = str(uuid4())
-        securecomputationnode_json["ComputationalDomainIdentifier"] = str(uuid4())
-        securecomputationnode_json["DataConnectorDomainIdentifier"] = str(uuid4())
-        securecomputationnode_json["DatasetIdentifier"] = str(secure_computation_node_db.dataset_id)
-        securecomputationnode_json["VmEosb"] = "TODO"
+        securecomputationnode_json = SecureComputationNodeInitializationVector(
+            storage_account_name=get_secret("azure_storage_account_name"),
+            dataset_storage_password=get_secret("azure_storage_account_password"),
+            dataset_version_id=secure_computation_node_db.dataset_version_id,
+            dataset_id=secure_computation_node_db.dataset_id,
+        )
 
         with open(str(secure_computation_node_db.id), "w") as outfile:
-            json.dump(securecomputationnode_json, outfile)
+            json.dump(jsonable_encoder(securecomputationnode_json), outfile)
 
         # Sleeping for 1.5 minutes
         time.sleep(90)

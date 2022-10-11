@@ -1,3 +1,18 @@
+# -------------------------------------------------------------------------------
+# Engineering
+# client.py
+# -------------------------------------------------------------------------------
+"""RPC client side module"""
+# -------------------------------------------------------------------------------
+# modified from https://github.com/Ananto30/zero under MIT license
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
+
 import logging
 import sys
 from typing import Optional, Union
@@ -9,10 +24,10 @@ import zmq.asyncio
 from zero.errors import MethodNotFoundException, ZeroException
 from zero.serialize import deserializer_table, serializer_table
 
-public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
-private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
-# public_keys_dir = "/app/public_keys/"
-# private_keys_dir = "/app/private_keys/"
+# public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
+# private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
+public_keys_dir = "/app/public_keys/"
+private_keys_dir = "/app/private_keys/"
 
 
 class _BaseClient:

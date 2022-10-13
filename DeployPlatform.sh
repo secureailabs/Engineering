@@ -70,7 +70,7 @@ cp Binary/igr_002.csvp $tempDeployDir
 cp Binary/mgr_001.csvp $tempDeployDir
 cp Binary/DatabaseInitializationSettings.json $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
-mv Binary/newwebfrontend.tar.gz $tempDeployDir
+cp Binary/newwebfrontend.tar.gz $tempDeployDir
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
 cp -r InternalTools/DeployPlatform/* $tempDeployDir
 
@@ -90,7 +90,7 @@ fi
 # Run the docker image to deploy the application on the Azure
 pushd $tempDeployDir
 docker run \
-  -it \
+  -t \
   -v $(pwd):/app \
   --env AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
   --env AZURE_TENANT_ID=$AZURE_TENANT_ID \

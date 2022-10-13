@@ -392,7 +392,7 @@ def deploy_module(
     """
     try:
         # Create the resource group
-        create_resource_group(account_credentials, resource_group_name, "eastus")
+        create_resource_group(account_credentials, resource_group_name, "westus")
 
         template_path = os.path.join(module_name + ".json")
 

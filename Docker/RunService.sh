@@ -51,6 +51,7 @@ fi
 echo "Cleaning existing non-running containers"
 docker container rm -f $imageName
 
+
 # Set the root directory of the whole platform
 rootDir=$(pwd)/..
 
@@ -94,7 +95,20 @@ elif [ "apiservices" == "$imageName" ]; then
         docker volume create $sailDatabaseVolumeName
     fi
     make -C $rootDir package_apiservices -s -j
-    cp apiservices/InitializationVector.json $rootDir/Binary/apiservices_dir
+    # Check for Azure environment variables
+    if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
+        echo "environment variable AZURE_SUBSCRIPTION_ID is undefined"
+        exit 1
+    fi
+    if [ ${AZURE_SUBSCRIPTION_ID} == "3d2b9951-a0c8-4dc3-8114-2776b047b15c" ]; then
+        cp apiservices/InitializationVectorScratchPad.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
+    elif  [ ${AZURE_SUBSCRIPTION_ID} == "b7a46052-b7b1-433e-9147-56efbfe28ac5" ]; then
+        cp apiservices/InitializationVectorDevelopment.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
+    elif  [${AZURE_SUBSCRIPTION_ID} == "40cdb551-8a8d-401f-b884-db1599022002" ]; then
+        cp apiservices/InitializationVectorReleaseCandidate.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
+    elif  [ ${AZURE_SUBSCRIPTION_ID} == "ba383264-b9d6-4dba-b71f-58b3755382d8" ]; then
+        cp apiservices/InitializationVectorProductionGA.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
+    fi
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 8000:8001 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then

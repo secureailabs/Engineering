@@ -1,3 +1,18 @@
+# -------------------------------------------------------------------------------
+# Engineering
+# server.py
+# -------------------------------------------------------------------------------
+"""RPC server side module"""
+# -------------------------------------------------------------------------------
+# modified from https://github.com/Ananto30/zero under MIT license
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
+
 import asyncio
 import inspect
 import logging
@@ -8,6 +23,7 @@ import time
 import typing
 import uuid
 from functools import partial
+from importlib import import_module
 from multiprocessing import Manager
 from multiprocessing.pool import Pool
 
@@ -19,13 +35,13 @@ import pandas as pd
 import zmq
 import zmq.asyncio
 
-from .codegen import CodeGen
-from .common import get_next_available_port
+from zero.codegen import CodeGen
+from zero.common import get_next_available_port
 
 # Change
-from .customtypes import ProxyObject, SecretObject
-from .serialize import serializer_table
-from .type_util import (
+from zero.customtypes import ProxyObject, SecretObject
+from zero.serialize import serializer_table
+from zero.type_util import (
     get_function_input_class,
     get_function_return_class,
     verify_allowed_type,
@@ -33,7 +49,7 @@ from .type_util import (
     verify_function_input_type,
     verify_function_return,
 )
-from .zero_mq import ZeroMQ
+from zero.zero_mq import ZeroMQ
 
 logging.basicConfig(
     format="%(asctime)s  %(levelname)s  %(process)d  %(module)s > %(message)s",
@@ -51,20 +67,16 @@ def load_module(module: str):
     :return: a dictionary containing the classes and functions find in module
     :rtype: dict
     """
-    m = __import__(module)
+    m = import_module(module)
     safe_func_tuples = inspect.getmembers(m, inspect.isfunction)
     safe_object_tuples = inspect.getmembers(m, inspect.isclass)
     module_content = {}
     module_content["safe_funcs"] = set()
     module_content["safe_objects"] = set()
     for item in safe_func_tuples:
-        if not inspect.getmodule(item[1]) == m:
-            continue
         if not item[0].startswith("_"):
             module_content["safe_funcs"].add(item[1])
     for item in safe_object_tuples:
-        if not inspect.getmodule(item[1]) == m:
-            continue
         if not item[0].startswith("_"):
             module_content["safe_objects"].add(item[1])
     return module_content
@@ -124,11 +136,11 @@ class ZeroServer:
         if func.__name__ == "get_rpc_contract":
             raise Exception("get_rpc_contract is a reserved function; cannot have `get_rpc_contract` as a RPC function")
 
-        verify_function_args(func)
-        verify_function_input_type(func)
-        verify_function_return(func)
-
-        self._rpc_router[module_name + "." + func.__name__] = func
+        # verify_function_args(func)
+        # verify_function_input_type(func)
+        # verify_function_return(func)
+        module_name = module_name + "."
+        self._rpc_router[func.__name__] = func
         self._rpc_input_type_map[func.__name__] = get_function_input_class(func)
         self._rpc_return_type_map[func.__name__] = get_function_return_class(func)
 
@@ -146,7 +158,7 @@ class ZeroServer:
         if obj.__name__.startswith("_"):
             raise Exception(f"Cannot register remote object for: {type(obj)}")
 
-        self._ro_router[module_name + "." + obj.__name__] = obj
+        self._ro_router[obj.__name__] = obj
 
     def run(self):
         """
@@ -471,6 +483,8 @@ class _Worker:
             response = response.to_dict()
         elif isinstance(response, pd.Series) or isinstance(response, pd.DataFrame):
             response = serializer_table[str(type(response))](response)
+        # elif isinstance(response, torch.nn.Module):
+        #     response = serializer_table[str(torch.nn.Module)](response)
         return response
 
     def _handle_secret_msg(self, msg):
@@ -643,16 +657,16 @@ class _Worker:
             obj = self._secret_result_cache[object_id]
             attributes = []
             methods = []
+            # to do handle private methods
             for item in dir(obj):
-                if not item.startswith("_"):
-                    if hasattr(obj, "__getattr__"):
-                        attr = obj.__getattr__(item)
-                    elif hasattr(obj, "__getattribute__"):
-                        attr = obj.__getattribute__(item)
-                    if inspect.ismethod(attr):
-                        methods.append(item)
-                    else:
-                        attributes.append(item)
+                if hasattr(obj, "__getattr__"):
+                    attr = obj.__getattr__(item)
+                elif hasattr(obj, "__getattribute__"):
+                    attr = obj.__getattribute__(item)
+                if inspect.ismethod(attr):
+                    methods.append(item)
+                else:
+                    attributes.append(item)
             return {"attributes": attributes, "methods": methods}
         except Exception as e:
             logging.exception(e)

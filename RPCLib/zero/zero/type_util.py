@@ -1,9 +1,23 @@
+# -------------------------------------------------------------------------------
+# Engineering
+# type_util.py
+# -------------------------------------------------------------------------------
+"""RPC typing controlling module"""
+# -------------------------------------------------------------------------------
+# modified from https://github.com/Ananto30/zero under MIT license
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
+
 import inspect
 import typing
 
+from zero.customtypes import SecretObject
 from zero.errors import ZeroException
-
-from .customtypes import SecretObject
 
 # from pydantic import BaseModel
 

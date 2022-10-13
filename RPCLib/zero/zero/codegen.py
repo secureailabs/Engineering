@@ -1,7 +1,22 @@
+# -------------------------------------------------------------------------------
+# Engineering
+# codegen.py
+# -------------------------------------------------------------------------------
+"""RPC client side code generation tool"""
+# -------------------------------------------------------------------------------
+# modified from https://github.com/Ananto30/zero under MIT license
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
+
 import inspect
 
 # from pydantic import BaseModel
-from .type_util import is_pydantic
+from zero.type_util import is_pydantic
 
 
 class CodeGen:

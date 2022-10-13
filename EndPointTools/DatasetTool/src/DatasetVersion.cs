@@ -1,6 +1,6 @@
-using Newtonsoft.Json;
-using ICSharpCode.SharpZipLib.Tar;
 using Azure.Storage.Files.Shares;
+using ICSharpCode.SharpZipLib.Tar;
+using Newtonsoft.Json;
 
 namespace DatasetTool;
 
@@ -66,7 +66,8 @@ class DatasetVersion
                 foreach (string file in m_data_files)
                 {
                     TarEntry tarEntry = TarEntry.CreateEntryFromFile(file);
-                    tarArchive.WriteEntry(tarEntry, true);
+                    tarEntry.Name = Path.GetFileName(file);
+                    tarArchive.WriteEntry(tarEntry, false);
                 }
             }
         }

@@ -1,0 +1,20 @@
+{
+    "dataset":
+    {
+        "name": "IGR Dataset",
+        "description": "dataset description",
+        "tags": "my dataset tags"
+    },
+    "dataset_version":
+    {
+        "name": "IGR Dataset #1",
+        "description": "IGR Dataset"
+    },
+    "data_federation": "KCA Consortium",
+    "data_format": "CSV",
+    "data_source": [
+        "SampleData/igr_001_a.csv",
+        "SampleData/igr_001_b.csv",
+        "SampleData/igr_001_c.csv"
+    ]
+}

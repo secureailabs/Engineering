@@ -10,7 +10,6 @@
 
 #include "64BitHashes.h"
 #include "DatasetVersion.h"
-#include "DatasetVersionReInitializer.h"
 #include "DebugLibrary.h"
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
@@ -83,51 +82,6 @@ Organization::Organization(
             }
         }
     }
-    // Extract the datasets
-    if (true == c_oOrganizationalData.IsElementPresent("DatasetVersions", INDEXED_BUFFER_VALUE_TYPE))
-    {
-        StructuredBuffer oDatasetVersions{c_oOrganizationalData.GetStructuredBuffer("DatasetVersions")};
-        if (true == oDatasetVersions.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
-        {
-            oDatasetVersions.RemoveElement("__IsArray__");
-        }
-        for (const std::string & c_strElementName: oDatasetVersions.GetNamesOfElements())
-        {
-            StructuredBuffer oDatasetVersionInformation{oDatasetVersions.GetStructuredBuffer(c_strElementName.c_str())};
-            std::string strDatasetVersionFilename = oDatasetVersionInformation.GetString("File");
-            if (true == std::filesystem::exists(strDatasetVersionFilename))
-            {
-                // Just a reality check to make sure the target file is in fact a properly formatted dataset
-                DatasetVersion oDatasetVersion(strDatasetVersionFilename.c_str());
-                // Now we persist the dataset information
-                Qword qwHashOfDatasetVersionName = ::Get64BitHashOfNullTerminatedString(oDatasetVersionInformation.GetString("Name").c_str(), false);
-                m_strDatasetVersionInformationByFilename[qwHashOfDatasetVersionName] = oDatasetVersionInformation.GetBase64SerializedBuffer();
-            }
-        }
-    }
-    // Extract the datasets
-    if (true == c_oOrganizationalData.IsElementPresent("Datasets", INDEXED_BUFFER_VALUE_TYPE))
-    {
-        StructuredBuffer oDatasets{c_oOrganizationalData.GetStructuredBuffer("Datasets")};
-        if (true == oDatasets.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
-        {
-            oDatasets.RemoveElement("__IsArray__");
-        }
-        for (const std::string & c_strElementName: oDatasets.GetNamesOfElements())
-        {
-            StructuredBuffer oDataset{oDatasets.GetStructuredBuffer(c_strElementName.c_str())};
-            if ((true == oDataset.IsElementPresent("Title", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDataset.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))&&(true == oDataset.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE)))
-            {
-                std::cout << oDataset.GetString("Title") << std::endl;
-                // Insert the contact m_stlContacts
-                m_stlDatasets.insert(oDataset.GetBase64SerializedBuffer());
-            }
-            else
-            {
-                std::cout << "ERROR: Invalid dataset entry encountered" << std::endl;
-            }
-        }
-    }
     if ( true == c_oOrganizationalData.IsElementPresent("Data Federation", INDEXED_BUFFER_VALUE_TYPE))
     {
         StructuredBuffer oFederations{c_oOrganizationalData.GetStructuredBuffer("Data Federation")};
@@ -145,31 +99,6 @@ Organization::Organization(
             else
             {
                 std::cout << "ERROR: Invalid federation entry encountered" << std::endl;
-            }
-        }
-    }
-    if (1 != unStepIdentifier)
-    {
-        // Extract the datasets
-        if (true == c_oOrganizationalData.IsElementPresent("DatasetVersions", INDEXED_BUFFER_VALUE_TYPE))
-        {
-            StructuredBuffer oDatasetVersions{c_oOrganizationalData.GetStructuredBuffer("DatasetVersions")};
-            if (true == oDatasetVersions.IsElementPresent("__IsArray__", BOOLEAN_VALUE_TYPE))
-            {
-                oDatasetVersions.RemoveElement("__IsArray__");
-            }
-            for (const std::string & c_strElementName: oDatasetVersions.GetNamesOfElements())
-            {
-                StructuredBuffer oDatasetVersionInformation{oDatasetVersions.GetStructuredBuffer(c_strElementName.c_str())};
-                std::string strDatasetVersionFilename = oDatasetVersionInformation.GetString("File");
-                if (true == std::filesystem::exists(strDatasetVersionFilename))
-                {
-                    // Just a reality check to make sure the target file is in fact a properly formatted dataset
-                    DatasetVersion oDatasetVersion(strDatasetVersionFilename.c_str());
-                    // Now we persist the dataset information
-                    Qword qwHashOfDatasetVersionName = ::Get64BitHashOfNullTerminatedString(oDatasetVersionInformation.GetString("Name").c_str(), false);
-                    m_strDatasetVersionInformationByFilename[qwHashOfDatasetVersionName] = oDatasetVersionInformation.GetBase64SerializedBuffer();
-                }
             }
         }
     }
@@ -213,14 +142,7 @@ bool __thiscall Organization::Register(
             std::cout << "005" << std::endl;
             this->RegisterDataFederations(registeredFederations);
             std::cout << "006" << std::endl;
-            this->RegisterDatasets();
-            std::cout << "007" << std::endl;
             m_fRegistered = true;
-        }
-        else if (2 == unStepIdentifier)
-        {
-            m_fRegistered = true;
-            this->RegisterDatasetVersions();
         }
         else if (4 == unStepIdentifier)
         {
@@ -228,10 +150,8 @@ bool __thiscall Organization::Register(
             this->RegisterContacts();
             this->RegisterUsers();
             this->RegisterDataFederations(registeredFederations);
-            this->RegisterDatasets();
             m_fRegistered = true;
-            this->RegisterDatasetVersions();
-        }
+       }
     }
     
     catch (const BaseException & c_oBaseException)
@@ -304,89 +224,8 @@ std::string __thiscall Organization::GetAdminUsername(void) const throw()
     {
         ::RegisterUnknownException(__func__, __FILE__, __LINE__);
     }
-    
+
     return strAdminUserName;
-}
-
-/********************************************************************************************/
-
-std::string __thiscall Organization::GetDatasetVersionIdentifier(
-    _in const std::string & c_strDatasetVersionName
-    ) const throw()
-{
-    __DebugFunction();
-    
-    std::string strDatasetVersionIdentifier{};
-
-    try
-    {
-        Qword qwHashOfDatasetVersionName = ::Get64BitHashOfNullTerminatedString(c_strDatasetVersionName.c_str(), false);
-        if (m_strDatasetVersionInformationByFilename.end() != m_strDatasetVersionInformationByFilename.find(qwHashOfDatasetVersionName))
-        {
-            StructuredBuffer oDatasetVersionInformation(m_strDatasetVersionInformationByFilename.at(qwHashOfDatasetVersionName).c_str());
-            std::string strDatasetVersionFilename = oDatasetVersionInformation.GetString("File");
-            if (true == std::filesystem::exists(strDatasetVersionFilename))
-            {
-                DatasetVersion oDatasetVersion(strDatasetVersionFilename.c_str());
-                strDatasetVersionIdentifier = oDatasetVersion.GetDatasetVersionIdentifier();
-            }
-        }
-    }
-    
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-    
-    catch (const std::exception & c_oException)
-    {
-        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
-    }
-    
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-    
-    return strDatasetVersionIdentifier;
-}
-
-/********************************************************************************************/
-
-std::string __thiscall Organization::GetDatasetIdentifier(
-    _in const std::string & c_strDatasetName
-    ) const throw()
-{
-    __DebugFunction();
-    
-    std::string strDatasetIdentifier{};
-    
-    try
-    {
-        _ThrowBaseExceptionIf((false == m_fRegistered), "ERROR: Cannot get the dataset identifier before the organization has been registered fully", nullptr);
-
-        if (m_strDatasetIdentifiers.end() != m_strDatasetIdentifiers.find(c_strDatasetName))
-        {
-            strDatasetIdentifier = m_strDatasetIdentifiers.at(c_strDatasetName);
-        }
-    }
-    
-    catch (const BaseException & c_oBaseException)
-    {
-        ::RegisterBaseException(c_oBaseException, __func__, __FILE__, __LINE__);
-    }
-    
-    catch (const std::exception & c_oException)
-    {
-        ::RegisterStandardException(c_oException, __func__, __FILE__, __LINE__);
-    }
-    
-    catch (...)
-    {
-        ::RegisterUnknownException(__func__, __FILE__, __LINE__);
-    }
-    
-    return strDatasetIdentifier;
 }
 
 /********************************************************************************************/
@@ -568,120 +407,6 @@ void __thiscall Organization::RegisterDataFederations(
 
 /********************************************************************************************/
 
-void __thiscall Organization::RegisterDatasets(void)
-{
-    __DebugFunction();
-    __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
-    __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-
-    // Start a new session with SAIL Platform Services using the default administrator
-    SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
-    this->Login(oSailPlatformServicesSession);
-    // Now that we have skipped the first entry, let's process all of the additional entries
-    // Basically, we are adding new users with admin access rights
-    std::unordered_set<std::string>::const_iterator c_stlIterator = m_stlDatasets.begin();
-    while (m_stlDatasets.end() != c_stlIterator)
-    {
-        StructuredBuffer oDataset(c_stlIterator->c_str());
-        StructuredBuffer oRegistrationParameters;
-
-        oRegistrationParameters.PutString("name", oDataset.GetString("Title"));
-        oRegistrationParameters.PutString("description", oDataset.GetString("Description"));
-        oRegistrationParameters.PutString("tags", oDataset.GetString("Tags"));
-        oRegistrationParameters.PutString("version", "0.0.1");
-
-        std::string strDatasetIdentifier = oSailPlatformServicesSession.RegisterDataset(oRegistrationParameters);
-        // Make sure the register the dataset identifier that is returned
-        m_strDatasetIdentifiers[oDataset.GetString("Title")] = strDatasetIdentifier;
-        // Move on to the next item
-        c_stlIterator++;
-
-        std::cout << "Registered dataset " << oDataset.GetString("Title") << " which was given identifier " << strDatasetIdentifier << std::endl;
-    }
-}
-
-/********************************************************************************************/
-
-void __thiscall Organization::RegisterDatasetVersions(void)
-{
-    __DebugFunction();
-    __DebugAssert(0 < m_strSailPlatformServicesIpAddress.size());
-    __DebugAssert(0 < m_wSailPlatformServicesPortNumber);
-
-    // Start a new session with SAIL Platform Services using the default administrator
-    SailPlatformServicesSession oSailPlatformServicesSession(m_strSailPlatformServicesIpAddress, m_wSailPlatformServicesPortNumber);
-    this->Login(oSailPlatformServicesSession);
-    // Get some basic user information. We will need this in order to update the OrganizationalIdentifier
-    // in the dataset
-    StructuredBuffer oBasicUserInformation(oSailPlatformServicesSession.GetBasicUserInformation());
-    // Now that we have skipped the first entry, let's process all of the additional entries
-    // Basically, we are adding new users with admin access rights
-    std::unordered_map<Qword, std::string>::const_iterator c_stlIterator = m_strDatasetVersionInformationByFilename.begin();
-    while (m_strDatasetVersionInformationByFilename.end() != c_stlIterator)
-    {
-        // Load the serialized dataset information into a StructuredBuffer in order to access it
-        StructuredBuffer oDatasetVersionInformation(c_stlIterator->second.c_str());
-        std::string strDatasetVersionFile = oDatasetVersionInformation.GetString("File");
-        if (false == std::filesystem::exists(strDatasetVersionFile))
-        {
-            std::cout << "ERROR: DatasetVersion file not found (" << strDatasetVersionFile << ")" << std::endl;
-        }
-        else
-        {
-            // Load an existing dataset. This dataset will be modified during registration, hence
-            // the reason why a DatassetReInitializer class was created, which wraps the
-            // shared DatasetVersion class that is designed as an accessor only
-            DatasetVersionReInitializer oDatasetVersionReInitializer(oDatasetVersionInformation.GetString("File"));
-            // Now we start resetting some of the values in the dataset to reflect what is about to be
-            // registered.
-            // Create a new identifier
-            // oDatasetVersionReInitializer.SetDatasetVersionIdentifier(Guid(eDatasetVersion));
-            // Make sure the corporate identifier is updated
-            oDatasetVersionReInitializer.SetCorporateIdentifier(Guid(oBasicUserInformation.GetStructuredBuffer("organization").GetString("id")));
-            // Reset the publish date
-            oDatasetVersionReInitializer.ResetUtcEpochPublishDate();
-            // If a new Title is provided in the JSON, update the title of the dataset
-            if (true == oDatasetVersionInformation.IsElementPresent("Name", ANSI_CHARACTER_STRING_VALUE_TYPE))
-            {
-                oDatasetVersionReInitializer.SetDatasetVersionName(oDatasetVersionInformation.GetString("Name"));
-            }
-            // If a new Description is provided in the JSON, update the description of the dataset
-            if (true == oDatasetVersionInformation.IsElementPresent("Description", ANSI_CHARACTER_STRING_VALUE_TYPE))
-            {
-                oDatasetVersionReInitializer.SetDatasetVersionDescription(oDatasetVersionInformation.GetString("Description"));
-            }
-            // If a new Tags are provided in the JSON, update the tags of the dataset
-            if (true == oDatasetVersionInformation.IsElementPresent("Tags", ANSI_CHARACTER_STRING_VALUE_TYPE))
-            {
-                oDatasetVersionReInitializer.SetDatasetVersionKeywords(oDatasetVersionInformation.GetString("Tags"));
-            }
-            // If the new dataset has a dataset assigned to it
-            if (true == oDatasetVersionInformation.IsElementPresent("Dataset", ANSI_CHARACTER_STRING_VALUE_TYPE))
-            {
-                oDatasetVersionReInitializer.SetDataset(this->GetDatasetIdentifier(oDatasetVersionInformation.GetString("Dataset")));
-            }
-            else
-            {
-                // If it doesn't have a dataset assigned, make sure the updated dataset
-                // doesn't have one
-                // oDatasetVersionReInitializer.RemoveDataset();
-            }
-            // Now we register the dataset using the updated information
-            StructuredBuffer oDatasetVersionMetadata(oDatasetVersionReInitializer.GetSerializedDatasetVersionMetadata());
-            oSailPlatformServicesSession.RegisterDatasetVersion(oDatasetVersionReInitializer.GetDatasetVersionIdentifier(), oDatasetVersionMetadata);
-
-            // If we get here, the dataset was successfully registered. As such, let's persist
-            // the dataset changes to file
-            oDatasetVersionReInitializer.SaveDatasetVersionUpdates();
-        }
-
-        // If we get here, then the registration process has worked. Let's
-        c_stlIterator++;
-    }
-}
-
-/********************************************************************************************/
-
 void __thiscall Organization::RegisterFederationDataSubmitters(
     _in const std::string & c_strSailPlatformServicesIpAddress,
     _in Word wSailPlatformServicesPortNumber,
@@ -766,38 +491,3 @@ void __thiscall Organization::RegisterFederationResearchers(
     };
 }
 
-/********************************************************************************************/
-
-void Organization::RegisterDatasetsToFederations(
-    _in const std::string & c_strSailPlatformServicesIpAddress,
-    _in Word wSailPlatformServicesPortNumber,
-    const std::unordered_map<std::string, Guid>& federationList
-    ) throw()
-{
-
-    StructuredBuffer oRegistrationParameters;
-    SailPlatformServicesSession oSailPlatformServicesSession(c_strSailPlatformServicesIpAddress, wSailPlatformServicesPortNumber);
-    this->Login(oSailPlatformServicesSession);
-
-    for ( auto dataset : m_stlDatasets )
-    {
-        StructuredBuffer oDataset(dataset.c_str());
-        if ( oDataset.IsElementPresent("Federation", ANSI_CHARACTER_STRING_VALUE_TYPE) )
-        {
-            std::string federationName = oDataset.GetString("Federation");
-            auto federationItr = federationList.find(federationName);
-            if ( federationList.end() != federationItr )
-            {
-                std::cout << "Registering Dataset \"" << oDataset.GetString("Title") << "\" for Federation \"" << federationName << "\"" << std::endl;
-                Guid federationIdentifier = federationItr->second;
-                Guid datasetIdentifier = m_strDatasetIdentifiers[oDataset.GetString("Title")];
-
-                oSailPlatformServicesSession.RegisterDataFederationDataset(federationIdentifier, datasetIdentifier);
-            }
-            else
-            {
-                std::cout << "Failed to find dataset identifier " <<  oDataset.GetString("Title") << std::endl;
-            }
-        }
-    };
-}

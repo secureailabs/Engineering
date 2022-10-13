@@ -2,8 +2,6 @@
 
 # Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
 source .env.dev
-ResourceGroup="InitializerImageStorage-WUS-Rg"
-StorageAccountName="sailvmimages9825"
 Location="westus"
 
 PrintHelp()
@@ -53,21 +51,29 @@ do
         1)
             echo -e "\n==== Setting env variables for $opt ====\n"
             export AZURE_SUBSCRIPTION_ID=$SCRATCH_PAD_SUBSCRIPTION_ID
+            ResourceGroup=$SCRATCH_PAD_RESOURCE_GROUP # This needs to get updated per choice of subscription
+            StorageAccountName=$SCRATCH_PAD_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
             break
             ;;
         2)
             echo -e "\n==== Setting env variables for $opt ===="
             export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
+            ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
+            StorageAccountName=$DEVELOPMENT_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
             break
             ;;
         3)
             echo -e "\n==== Setting env variables for $opt ===="
             export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
+            ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
+            StorageAccountName=$RELEASE_CANDIDATE_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
             break
             ;;
         4)
             echo -e "\n==== Setting env variables for $opt ===="
             export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
+            ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
+            StorageAccountName=$PRODUCTION_GA_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
             break
             ;;
         5)

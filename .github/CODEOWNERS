@@ -1,5 +1,3 @@
-# Default Reviewers for all code changes
-* @David-G-SAIL @stanleylinSail @prawalgangwar
 # Review for README.md
 *.md @stanleylinSail
 
@@ -16,3 +14,6 @@
 
 # Github Configs PR review
 .github/ @JENKINS-SAIL @stanleylinSail
+
+# Default Reviewers for all code changes
+* @David-G-SAIL @stanleylinSail @prawalgangwar

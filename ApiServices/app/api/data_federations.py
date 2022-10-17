@@ -3,6 +3,10 @@
 # data_federations.py
 # -------------------------------------------------------------------------------
 """APIs to manage data-federations"""
+import base64
+import logging
+import os
+
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -16,7 +20,7 @@ from typing import Dict, List, Optional
 
 from app.api.accounts import get_all_admins, get_organization, get_user
 from app.api.authentication import RoleChecker, get_current_user
-from app.api.datasets import get_dataset
+from app.api.datasets import get_dataset, get_dataset_internal
 from app.api.emails import send_email
 from app.api.internal_utils import cache_get_basic_info_datasets, cache_get_basic_info_organization
 from app.data import operations as data_service
@@ -28,6 +32,7 @@ from models.common import BasicObjectInfo, PyObjectId
 from models.data_federations import (
     DataFederation_Db,
     DataFederationState,
+    DatasetEncryptionKey_Out,
     GetDataFederation_Out,
     GetInvite_Out,
     GetMultipleDataFederation_Out,
@@ -964,6 +969,68 @@ async def remove_dataset(
         )
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+@router.get(
+    path="/data-federations/{data_federation_id}/dataset_key/{dataset_id}",
+    description="Return a dataset encryption key by either retrieving and unwrapping, or creating",
+    response_model=DatasetEncryptionKey_Out,
+    response_model_by_alias=False,
+    response_model_exclude_unset=True,
+    status_code=status.HTTP_200_OK,
+)
+async def dataset_key(
+    data_federation_id: PyObjectId,
+    dataset_id: PyObjectId,
+    current_user: TokenData = Depends(get_current_user),
+):
+    """
+    Generate and return a dataset encryption key
+
+    :param data_federation_id: data federation for which the request for a key is being made
+    :type data_federation_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises exception: should be 500, internal server error
+    """
+    try:
+        # Only data federation submitters can generate keys for this federation
+        data_federation_db = await data_service.find_one(
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {
+                "_id": str(data_federation_id),
+                "data_submitter_organizations_id": {"$all": [str(current_user.organization_id)]},
+            },
+        )
+        if not data_federation_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
+        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+
+        # Dataset organization and currnet user organization should be same
+        dataset_db = await get_dataset_internal(dataset_id, current_user)
+        if dataset_db.organization_id != current_user.organization_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset not found")
+
+        # We generate a key if none has been assigned to this dataset, otherwise we unwrap the key
+        # that was used to encrypt the DS
+        if dataset_db.encryption_key_id is None:
+            return_key = os.urandom(32)
+        else:
+            logger = logging.getLogger("uvicorn.error")
+            # TODO This will have to unwrap from the DB entry when key vault is integrated
+            logger.info(
+                f"Key {dataset_db.encryption_key_id} exists, add logic to unwrap key from key vault, RETURNING FAKE KEY THAT ISN'T USABLE"
+            )
+            return_key = os.urandom(32)
+
+        dataset_key_out = DatasetEncryptionKey_Out(dataset_key=base64.b64encode(return_key))
+        return dataset_key_out
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:

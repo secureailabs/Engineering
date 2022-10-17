@@ -11,28 +11,35 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
-from typing import List, Optional
+from datetime import datetime, timedelta
+from typing import List
 
+import app.utils.azure as azure
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
+from app.api.datasets import get_dataset
 from app.api.internal_utils import cache_get_basic_info_organization
 from app.data import operations as data_service
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from app.data import sync_operations as sync_data_service
+from app.utils.secrets import get_secret
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
-from models.common import PyObjectId
+from models.common import BasicObjectInfo, PyObjectId
 from models.dataset_versions import (
     DatasetVersion_Db,
     DatasetVersionState,
     GetDatasetVersion_Out,
+    GetDatasetVersionConnectionString_Out,
     GetMultipleDatasetVersion_Out,
     RegisterDatasetVersion_In,
     RegisterDatasetVersion_Out,
     UpdateDatasetVersion_In,
 )
+from models.datasets import DatasetState
 
-DB_COLLECTION_DATASETS = "dataset-versions"
+DB_COLLECTION_DATASET_VERSIONS = "dataset-versions"
 
 router = APIRouter()
 
@@ -47,19 +54,45 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def register_dataset_version(
-    dataset_req: RegisterDatasetVersion_In = Body(...), current_user: TokenData = Depends(get_current_user)
+    response: Response,
+    background_tasks: BackgroundTasks,
+    dataset_version_req: RegisterDatasetVersion_In = Body(...),
+    current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDatasetVersion_Out:
     try:
-        # Check if the dataset is already registered
-        dataset_version_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_req.id)})
+        # Check if dataset version was already registered with the same name
+        dataset_version_db = await data_service.find_one(
+            DB_COLLECTION_DATASET_VERSIONS,
+            {
+                "name": dataset_version_req.name,
+                "dataset_id": str(dataset_version_req.dataset_id),
+                "organization_id": str(current_user.organization_id),
+            },
+        )
+        # If the dataset version was already registered, return the dataset version id
         if dataset_version_db:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dataset already registered")
+            response.status_code = status.HTTP_200_OK
+            return RegisterDatasetVersion_Out(**dataset_version_db)  # type: ignore
+
+        # Dataset organization and dataset-versions organization should be same
+        dataset_db = await get_dataset(dataset_version_req.dataset_id, current_user)
+        if dataset_db.organization.id != current_user.organization_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset not found")
+
+        # The dataset should be in active state
+        if dataset_db.state != DatasetState.ACTIVE:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset is not active. Try again later")
 
         # Add the dataset to the database
         dataset_version_db = DatasetVersion_Db(
-            **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetVersionState.ACTIVE
+            **dataset_version_req.dict(),
+            organization_id=current_user.organization_id,
+            state=DatasetVersionState.CREATING_DIRECTORY,
         )
-        await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_version_db))
+        await data_service.insert_one(DB_COLLECTION_DATASET_VERSIONS, jsonable_encoder(dataset_version_db))
+
+        # Create a directory in the azure file share for the dataset version
+        background_tasks.add_task(create_directory_in_file_share, dataset_version_db.dataset_id, dataset_version_db.id)
 
         return RegisterDatasetVersion_Out(**dataset_version_db.dict())
     except HTTPException as http_exception:
@@ -84,7 +117,7 @@ async def get_all_dataset_versions(
 ) -> GetMultipleDatasetVersion_Out:
     try:
         query = {"dataset_id": str(dataset_id)}
-        dataset_versions = await data_service.find_by_query(DB_COLLECTION_DATASETS, query)
+        dataset_versions = await data_service.find_by_query(DB_COLLECTION_DATASET_VERSIONS, query)
 
         response_list_of_dataset_version: List[GetDatasetVersion_Out] = []
 
@@ -125,17 +158,80 @@ async def get_dataset_version(
     dataset_version_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
 ) -> GetDatasetVersion_Out:
     try:
-        dataset_version = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_version_id)})
+        dataset_version = await data_service.find_one(DB_COLLECTION_DATASET_VERSIONS, {"_id": str(dataset_version_id)})
         if not dataset_version:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset version not found")
         dataset_version = DatasetVersion_Db(**dataset_version)  # type: ignore
 
-        # Add the organization information to the data federation
+        # Add the organization information to the dataset version
         _, organization = await cache_get_basic_info_organization({}, [dataset_version.organization_id], current_user)
 
-        response_data_federation = GetDatasetVersion_Out(**dataset_version.dict(), organization=organization[0])
+        response_data_version = GetDatasetVersion_Out(
+            **dataset_version.dict(), organization=BasicObjectInfo(_id=organization[0].id, name=organization[0].name)
+        )
 
-        return response_data_federation
+        return response_data_version
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+########################################################################################################################
+@router.get(
+    path="/dataset-versions/{dataset_version_id}/connection-string",
+    description="Get the write only connection string for the dataset version upload",
+    response_model=GetDatasetVersionConnectionString_Out,
+    status_code=status.HTTP_200_OK,
+    response_model_by_alias=False,
+)
+async def get_dataset_version_connection_string(
+    dataset_version_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+) -> GetDatasetVersionConnectionString_Out:
+    try:
+        dataset_version = await data_service.find_one(
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_version_id), "organization_id": str(current_user.organization_id)},
+        )
+        if not dataset_version:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset version not found")
+        dataset_version = DatasetVersion_Db(**dataset_version)  # type: ignore
+
+        # Send the connection string only if the dataset version is not uploaded to prevent overwriting
+        if dataset_version.state != DatasetVersionState.NOT_UPLOADED:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Dataset version is already uploaded or in progress",
+            )
+
+        # Authenticate azure
+        account_credentials = azure.authenticate(
+            get_secret("azure_client_id"),
+            get_secret("azure_client_secret"),
+            get_secret("azure_tenant_id"),
+            get_secret("azure_subscription_id"),
+        )
+
+        # Get the connection string for the dataset version which is valid for 30 minutes
+        # This could be a long running operation
+        connection_string = azure.authentication_shared_access_signature(
+            account_credentials=account_credentials,
+            account_name=get_secret("azure_storage_account_name"),
+            resource_group_name=get_secret("azure_storage_resource_group"),
+            file_path=f"{dataset_version.id}/{dataset_version.id}",
+            share_name=str(dataset_version.dataset_id),
+            permission="cw",  # Create and write permission only
+            expiry=datetime.utcnow() + timedelta(minutes=30),
+        )
+        if "Success" != connection_string.status:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to get the connection string"
+            )
+
+        url = f"https://{get_secret('azure_storage_account_name')}.file.core.windows.net/{dataset_version.dataset_id}/{dataset_version.id}"
+        full_url = f"{url}/{dataset_version.id}?{connection_string.response}"
+
+        return GetDatasetVersionConnectionString_Out(_id=dataset_version_id, connection_string=full_url)
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
@@ -153,30 +249,40 @@ async def update_dataset_version(
     updated_dataset_version_info: UpdateDatasetVersion_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    Update the dataset version information
+
+    :param dataset_version_id: The dataset version id
+    :type dataset_version_id: PyObjectId
+    :param updated_dataset_version_info: Object containing the information to be updated
+    :type updated_dataset_version_info: UpdateDatasetVersion_In, optional
+    :param current_user: inforamtion of the current user, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: Dataset not found
+    :return: Response with no content
+    :rtype: Response
+    """
     try:
         # Dataset version must be part of same organization
-        dataset_version_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_version_id)})
+        dataset_version_db = await data_service.find_one(
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_version_id), "organization_id": str(current_user.organization_id)},
+        )
         if not dataset_version_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
         dataset_version_db = DatasetVersion_Db(**dataset_version_db)  # type: ignore
-        if dataset_version_db.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
         if updated_dataset_version_info.description:
             dataset_version_db.description = updated_dataset_version_info.description
 
-        if updated_dataset_version_info.name:
-            dataset_version_db.name = updated_dataset_version_info.name
-
-        if updated_dataset_version_info.version:
-            dataset_version_db.version = updated_dataset_version_info.version
-
-        if updated_dataset_version_info.keywords:
-            dataset_version_db.keywords = updated_dataset_version_info.keywords
+        if updated_dataset_version_info.state:
+            dataset_version_db.state = updated_dataset_version_info.state
 
         await data_service.update_one(
-            DB_COLLECTION_DATASETS, {"_id": str(dataset_version_id)}, {"$set": jsonable_encoder(dataset_version_db)}
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_version_id)},
+            {"$set": jsonable_encoder(dataset_version_db)},
         )
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -198,7 +304,9 @@ async def soft_delete_dataset_version(
 ):
     try:
         # Dataset must be part of same organization
-        dataset_version_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_version_id)})
+        dataset_version_db = await data_service.find_one(
+            DB_COLLECTION_DATASET_VERSIONS, {"_id": str(dataset_version_id)}
+        )
         if not dataset_version_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
         dataset_version_db = DatasetVersion_Db(**dataset_version_db)  # type: ignore
@@ -209,7 +317,9 @@ async def soft_delete_dataset_version(
         # Disable the dataset
         dataset_version_db.state = DatasetVersionState.INACTIVE
         await data_service.update_one(
-            DB_COLLECTION_DATASETS, {"_id": str(dataset_version_id)}, {"$set": jsonable_encoder(dataset_version_db)}
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_version_id)},
+            {"$set": jsonable_encoder(dataset_version_db)},
         )
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -217,3 +327,53 @@ async def soft_delete_dataset_version(
         raise http_exception
     except Exception as exception:
         raise exception
+
+
+########################################################################################################################
+def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: PyObjectId):
+    """
+    Create a directory in the Azure file share
+
+    :param dataset_id: Dataset id
+    :type dataset_id: PyObjectId
+    :param dataset_version_id: Dataset version id
+    :type dataset_version_id: PyObjectId
+    """
+    try:
+        account_credentials = azure.authenticate(
+            get_secret("azure_client_id"),
+            get_secret("azure_client_secret"),
+            get_secret("azure_tenant_id"),
+            get_secret("azure_subscription_id"),
+        )
+
+        # Get the connection string for the storage account
+        connection_string_response = azure.get_storage_account_connection_string(
+            account_credentials=account_credentials,
+            resource_group_name=get_secret("azure_storage_resource_group"),
+            account_name=get_secret("azure_storage_account_name"),
+        )
+        if connection_string_response.status != "Success":
+            raise Exception(connection_string_response.note)
+
+        # Create the directory in the file share
+        create_response = azure.file_share_create_directory(
+            connection_string=connection_string_response.response,
+            file_share_name=str(dataset_id),
+            directory_name=str(dataset_version_id),
+        )
+        if create_response.status != "Success":
+            raise Exception(create_response.note)
+
+        sync_data_service.update_one(
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_version_id)},
+            {"$set": {"state": "NOT_UPLOADED"}},
+        )
+
+    except Exception as exception:
+        sync_data_service.update_one(
+            DB_COLLECTION_DATASET_VERSIONS,
+            {"_id": str(dataset_id)},
+            {"$set": {"state": "ERROR", "note": str(exception)}},
+        )

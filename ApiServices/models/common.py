@@ -42,5 +42,5 @@ class SailBaseModel(BaseModel):
 
 
 class BasicObjectInfo(SailBaseModel):
-    id: PyObjectId = Field(alias="_id")
+    id: PyObjectId = Field(..., alias="_id")
     name: StrictStr = Field(...)

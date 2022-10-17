@@ -8,10 +8,13 @@
     "azure_tenant_id": "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8",
     "azure_client_id": "5d2ea8c7-09ea-41ce-80b6-030777fce49b",
     "azure_client_secret": "3PG8Q~0Jh1HU~Y3DoadZPUb5noEiJnesEJGXScLl",
-    "azure_scn_image_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-3183eaf-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
+    "azure_scn_image_id": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/InitializerImageStorageRg/providers/Microsoft.Compute/images/",
     "azure_scn_user_name": "sailuser",
     "azure_scn_password": "SailPassword@123",
-    "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
-    "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
+    "azure_scn_subnet_name": "SCN_eastus",
+    "azure_storage_resource_group": "InitializerImageStorageRg",
+    "azure_storage_account_name": "sailvmimages9821",
+    "azure_storage_account_password": "ZxBjff5TsqwmgnSLkWQLve7hKs1of5IynKqeWE1cTc2Yu+n8VmJzZgRdcPP9giiKQqi49hoegher+AStxuimXA==",
+    "azure_scn_virtual_network_id": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
     "owner": "default"
 }

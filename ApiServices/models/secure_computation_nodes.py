@@ -87,3 +87,10 @@ class GetMultipleSecureComputationNode_Out(SailBaseModel):
 
 class UpdateSecureComputationNode_In(SailBaseModel):
     state: SecureComputationNodeState = Field(default=None)
+
+
+class SecureComputationNodeInitializationVector(SailBaseModel):
+    dataset_storage_password: StrictStr = Field(...)
+    storage_account_name: StrictStr = Field(...)
+    dataset_version_id: PyObjectId = Field(...)
+    dataset_id: PyObjectId = Field(...)

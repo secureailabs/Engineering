@@ -13,10 +13,13 @@
 # -------------------------------------------------------------------------------
 from typing import List
 
+import app.utils.azure as azure
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from app.data import sync_operations as sync_data_service
+from app.utils.secrets import get_secret
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
@@ -46,16 +49,46 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def register_dataset(
-    dataset_req: RegisterDataset_In = Body(...), current_user: TokenData = Depends(get_current_user)
-):
+    response: Response,
+    background_tasks: BackgroundTasks,
+    dataset_req: RegisterDataset_In = Body(...),
+    current_user: TokenData = Depends(get_current_user),
+) -> RegisterDataset_Out:
+    """
+    Register new dataset
+
+    :param response: Response object
+    :type response: Response
+    :param background_tasks: Background tasks object to run tasks in the background
+    :type background_tasks: BackgroundTasks
+    :param dataset_req: information required to register a dataset, defaults to Body(...)
+    :type dataset_req: RegisterDataset_In, optional
+    :param current_user: information of current authenticated user, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: Dataset Id
+    :rtype: RegisterDataset_Out
+    """
     try:
+        # Check if there is an existing dataset with the same name
+        existing_dataset = await data_service.find_one(
+            DB_COLLECTION_DATASETS, {"name": dataset_req.name, "organization_id": str(current_user.organization_id)}
+        )
+        # If there is an existing dataset with the same name, return the existing dataset ID
+        if existing_dataset:
+            dataset_db = Dataset_Db(**existing_dataset)  # type: ignore
+            response.status_code = status.HTTP_200_OK
+            return RegisterDataset_Out(_id=dataset_db.id)
+
         # Add the dataset to the database
         dataset_db = Dataset_Db(
-            **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.ACTIVE
+            **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.CREATING_STORAGE
         )
         await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
 
-        return dataset_db
+        # Create a file share for the dataset
+        background_tasks.add_task(create_azure_file_share, dataset_db.id)
+
+        return RegisterDataset_Out(**dataset_db.dict())
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
@@ -106,12 +139,7 @@ async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
 )
 async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
     try:
-        dataset = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
-        if not dataset:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
-
-        # Add the organization information to the dataset
-        dataset = Dataset_Db(**dataset)
+        dataset = await get_dataset_internal(dataset_id, current_user)
         organization_info = await get_organization(organization_id=dataset.organization_id, current_user=current_user)
 
         return GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization_info.dict()))
@@ -119,6 +147,17 @@ async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(
         raise http_exception
     except Exception as exception:
         raise exception
+
+
+async def get_dataset_internal(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+    dataset = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
+    if not dataset:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
+
+    # Add the organization information to the dataset
+    dataset = Dataset_Db(**dataset)
+
+    return dataset
 
 
 ########################################################################################################################
@@ -142,15 +181,11 @@ async def update_dataset(
         if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        # TODO: Prawal find better way to update the dataset
         if updated_dataset_info.description:
             dataset_db.description = updated_dataset_info.description
 
         if updated_dataset_info.name:
             dataset_db.name = updated_dataset_info.name
-
-        if updated_dataset_info.version:
-            dataset_db.version = updated_dataset_info.version
 
         if updated_dataset_info.tag:
             dataset_db.tag = updated_dataset_info.tag
@@ -199,3 +234,37 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
         raise http_exception
     except Exception as exception:
         raise exception
+
+
+def create_azure_file_share(dataset_id: PyObjectId):
+    """
+    Create a file share in Azure
+
+    :param dataset_id: Dataset ID
+    :type dataset_id: PyObjectId
+    :raises Exception: failed to create file share
+    """
+    try:
+        account_credentials = azure.authenticate(
+            get_secret("azure_client_id"),
+            get_secret("azure_client_secret"),
+            get_secret("azure_tenant_id"),
+            get_secret("azure_subscription_id"),
+        )
+
+        create_response = azure.create_file_share(
+            account_credentials,
+            get_secret("azure_storage_resource_group"),
+            get_secret("azure_storage_account_name"),
+            str(dataset_id),
+        )
+        if create_response.status != "Success":
+            raise Exception(create_response.note)
+
+        # Mark the dataset as active
+        sync_data_service.update_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ACTIVE"}})
+
+    except Exception as exception:
+        sync_data_service.update_one(
+            DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ERROR", "note": str(exception)}}
+        )

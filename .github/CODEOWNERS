@@ -1,10 +1,5 @@
-# Default Reviewers for all code changes
-* @stanleylinSail @prawalgangwar @David-G-SAIL
 # Review for README.md
 *.md @stanleylinSail
-
-# Review for all cs files
-*.cs @LuisMiguelHuapaya
 
 # Review for Builds
 *.sh @JENKINS-SAIL @prawalgangwar @stanleylinSail
@@ -20,5 +15,5 @@
 # Github Configs PR review
 .github/ @JENKINS-SAIL @stanleylinSail
 
-# InternalTools
-/InternalTools/WindowsPlatformDeliverables/ @LuisMiguelHuapaya
+# Default Reviewers for all code changes
+* @David-G-SAIL @stanleylinSail @prawalgangwar

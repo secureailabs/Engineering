@@ -108,7 +108,6 @@ static void __stdcall LoadAndProcessJsonSettingsFile(
         {
             organization.second->RegisterFederationDataSubmitters(gs_strIpAddress, 8000, stlListOfOrganizationsByName);
             organization.second->RegisterFederationResearchers(gs_strIpAddress, 8000, stlListOfOrganizationsByName);
-            organization.second->RegisterDatasetsToFederations(gs_strIpAddress, 8000, stlRegisteredFederations);
         }
     }
 }

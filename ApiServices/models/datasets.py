@@ -21,8 +21,10 @@ from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class DatasetState(Enum):
+    CREATING_STORAGE = "CREATING_STORAGE"
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
+    ERROR = "ERROR"
 
 
 class Dataset_Base(SailBaseModel):
@@ -30,7 +32,6 @@ class Dataset_Base(SailBaseModel):
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
     tags: StrictStr = Field(...)
-    version: StrictStr = Field(...)
 
 
 class Dataset_Db(Dataset_Base):
@@ -38,6 +39,8 @@ class Dataset_Db(Dataset_Base):
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     state: DatasetState = Field(...)
+    note: StrictStr = Field(default="")
+    encryption_key_id: Optional[PyObjectId] = Field(default=None)
 
 
 class RegisterDataset_In(Dataset_Base):
@@ -53,7 +56,6 @@ class UpdateDataset_In(SailBaseModel):
     name: Optional[StrictStr] = Field(default=None)
     description: Optional[StrictStr] = Field(default=None)
     tag: Optional[StrictStr] = Field(default=None)
-    version: Optional[StrictStr] = Field(default=None)
 
 
 class GetDataset_Out(Dataset_Base):
@@ -61,6 +63,7 @@ class GetDataset_Out(Dataset_Base):
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization: BasicObjectInfo = Field(...)
     state: DatasetState = Field(...)
+    note: StrictStr = Field(...)
 
 
 class GetMultipleDataset_Out(SailBaseModel):

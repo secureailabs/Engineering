@@ -15,6 +15,7 @@
     "data_source": [
         "SampleData/igr_001_a.csv",
         "SampleData/igr_001_b.csv",
-        "SampleData/igr_001_c.csv"
+        "SampleData/igr_001_c.csv",
+        "SampleData/kidney_clean_1.csv"
     ]
 }

@@ -16,6 +16,7 @@ import requests
 # -------------------------------------------------------------------------------
 
 base_url = "http://127.0.0.1:8000"
+# base_url = "https://public_ip:8000" # Use this for non docker deployments
 researcher_email = "admin@secureailabs.com"
 sail_password = "SailPassword@123"
 

@@ -161,7 +161,13 @@ def deploy_module(account_credentials, deployment_name, module_name, subscriptio
 
 
 def deploy_apiservices(
-    account_credentials, deployment_name, storage_account_name, storage_resource_group_name, owner, subscription_id
+    account_credentials,
+    deployment_name,
+    storage_account_name,
+    storage_account_password,
+    storage_resource_group_name,
+    owner,
+    subscription_id,
 ):
     """
     Deploy Api Services
@@ -182,6 +188,7 @@ def deploy_apiservices(
     backend_json["azure_storage_resource_group"] = storage_resource_group_name
     backend_json["azure_storage_account_name"] = storage_account_name
     backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
+    backend_json["azure_storage_account_password"] = storage_account_password
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -321,9 +328,14 @@ def create_storage_account(
         # Long-running operations return a poller object; calling poller.result() waits for completion.
         account_result = poller.result()
 
+        # Get the storage account key
+        keys = storage_client.storage_accounts.list_keys(resource_group_name, account_name)  # type: ignore
+        storage_account_key = keys.keys[0].value
+
         return (
             DeploymentResponse(status="Success", response=account_name, note="Deployment Successful"),
             account_name,
+            storage_account_key,
             resource_group_name,
         )
     except AzureError as azure_error:
@@ -350,14 +362,18 @@ if __name__ == "__main__":
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
     # Deploy Storage Account
-    storage_account, storage_account_name, storage_resource_group_name = create_storage_account(
-        account_credentials, deployment_id, "stanaccountname", "westus"
-    )
+    (
+        storage_account,
+        storage_account_name,
+        storage_accout_password,
+        storage_resource_group_name,
+    ) = create_storage_account(account_credentials, deployment_id, "stanaccountname", "westus")
     # Deploy the API services
     platform_services_ip = deploy_apiservices(
         account_credentials,
         deployment_id,
         storage_account_name,
+        storage_accout_password,
         storage_resource_group_name,
         OWNER,
         AZURE_SUBSCRIPTION_ID,

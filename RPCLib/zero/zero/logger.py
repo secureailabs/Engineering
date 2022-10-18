@@ -64,8 +64,8 @@ class _AsyncLogger:  # pragma: no cover
         """
         self.log_pusher.send_string(str(msg))
 
-    @classmethod
-    def start_log_poller(cls, ipc, port):
+    @staticmethod
+    def start_log_poller(ipc, port):
         """
         start log poller
 
@@ -76,6 +76,10 @@ class _AsyncLogger:  # pragma: no cover
         """
         _AsyncLogger.port = port
         _AsyncLogger.ipc = ipc
+
+        logger = logging.getLogger()
+        file_handler = logging.FileHandler("audit.log")
+        logger.addHandler(file_handler)
 
         ctx = zmq.Context()
         log_listener = ctx.socket(zmq.PULL)
@@ -89,7 +93,7 @@ class _AsyncLogger:  # pragma: no cover
         try:
             while True:
                 log = log_listener.recv_string()
-                logging.info(log)
+                logger.info(log)
         except KeyboardInterrupt:
             print("Caught KeyboardInterrupt, terminating async logger")
         except Exception as e:

@@ -44,7 +44,8 @@ mkdir -p /data
 tar -xf /mnt/dataset/$datasetVersionId -C /data
 
 # Install the rpc library
-pip3 install /app/zero/zero
+pip3 install /app/zero
+pip3 install /app/datascience/sail-safe-functions
 
 # Start the rpc server
 python3 /app/test_server.py 5556

@@ -40,6 +40,7 @@ from zero.common import get_next_available_port
 
 # Change
 from zero.customtypes import ProxyObject, SecretObject
+from zero.logger import _AsyncLogger
 from zero.serialize import serializer_table
 from zero.type_util import (
     get_function_input_class,
@@ -199,6 +200,7 @@ class ZeroServer:
             self._pool.map_async(spawn_worker, list(range(1, cores + 1)))
 
             self._start_queue_device()
+            self._start_logger()
 
             # TODO: by default we start the device with processes, but we need support to run only router
             # asyncio.run(self._start_router())
@@ -236,6 +238,9 @@ class ZeroServer:
 
     def _start_queue_device(self):
         ZeroMQ.queue_device(self._host, self._port, self._device_ipc, self._device_port)
+
+    def _start_logger(self):
+        _AsyncLogger.start_log_poller(_AsyncLogger.ipc, _AsyncLogger.port)
 
     async def _start_router(self):  # pragma: no cover
         """
@@ -378,6 +383,7 @@ class _Worker:
         self.codegen = CodeGen(self._rpc_router, self._rpc_input_type_map, self._rpc_return_type_map)
         self._secret_result_cache = secret_result_cache
         self._secret_lock = _secret_lock
+        self._async_logger = _AsyncLogger()
         self._init_serializer()
 
     def _init_serializer(self):
@@ -547,6 +553,7 @@ class _Worker:
         :return: function result
         :rtype: Any
         """
+
         if msg["vargs"] is None and msg["kwargs"] is None:
             return func()
         elif msg["kwargs"] is None:
@@ -563,6 +570,11 @@ class _Worker:
         :return: function result
         :rtype: Any
         """
+        audit_msg = (
+            f"activity: function call; func_name:{msg['function_name']}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
+        )
+        self._async_logger.log(audit_msg)
+
         rpc = msg["function_name"]
         if rpc in self._rpc_router:
             func = self._rpc_router[rpc]
@@ -589,6 +601,9 @@ class _Worker:
         object_id = msg["object_id"]
         method_name = msg["method_name"]
 
+        audit_msg = f"activity: method call; object_id:{object_id}; method_name:{method_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
+        self._async_logger.log(audit_msg)
+
         try:
             obj = self._secret_result_cache[object_id]
             msg = self._handle_secret_msg(msg)
@@ -613,6 +628,9 @@ class _Worker:
         """
         class_name = msg["class_name"]
 
+        audit_msg = f"activity: constructor call; class_name:{class_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
+        self._async_logger.log(audit_msg)
+
         if class_name in self._ro_router:
             try:
                 cla = self._ro_router[class_name]
@@ -635,6 +653,9 @@ class _Worker:
         """
         object_id = msg["object_id"]
 
+        audit_msg = f"activity: destructor call; object_id:{msg['object_id']}"
+        self._async_logger.log(audit_msg)
+
         try:
             obj = self._secret_result_cache[object_id]
             obj.__del__()
@@ -652,6 +673,9 @@ class _Worker:
         :rtype: Any
         """
         object_id = msg["object_id"]
+
+        audit_msg = f"activity: attribute call"
+        self._async_logger.log(audit_msg)
 
         try:
             obj = self._secret_result_cache[object_id]

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #package necessary files and dirs
-tar -zcvf package.tar.gz series.py test_server.py dataframe.py custom_typing.py private_keys public_keys zero
+tar -zcvf package.tar.gz test_server.py private_keys public_keys zero ../../datascience/sail-safe-functions
 
 #move the package to Binary
 mkdir -p ../Binary/rpcrelated_dir/

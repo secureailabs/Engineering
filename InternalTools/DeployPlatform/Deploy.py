@@ -16,7 +16,7 @@ import sailazure
 FINAL_DEV_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
     "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription resourcegroup where images are stored
-    + "SAIL-PAYLOADS-3183eaf-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
+    + "SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
     "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet

@@ -30,7 +30,7 @@ FINAL_DEV_PARAMS = {
 FINAL_RELEASE_CANDIDATE_PARAMS = {
     "azure_subscription_id": "40cdb551-8a8d-401f-b884-db1599022002",  # change this line depending on your subscription
     "vmImageResourceId": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/"  # change this line depending on your subscription resourcegroup where images are stored
-    + "InitializerImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
+    + "SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
     "virtualNetworkId": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-rls-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-rls-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-rls-platformservice-01",  # change this line depending on your vnet
@@ -44,7 +44,7 @@ FINAL_RELEASE_CANDIDATE_PARAMS = {
 FINAL_PRODUCTIONGA_PARAMS = {
     "azure_subscription_id": "ba383264-b9d6-4dba-b71f-58b3755382d8",  # change this line depending on your subscription
     "vmImageResourceId": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/"  # change this line depending on your subscription resourcegroup where images are stored
-    + "InitializerImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
+    + "SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
     "virtualNetworkId": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-prd-platformservice-01",  # change this line depending on your vnet

@@ -72,7 +72,7 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          sudo -E ./DeployPlatform.sh -o ${{ github.event.inputs.owner }} -p ${{ github.event.inputs.purpose }}
 
       - name: Condition 3 ProductionGA
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}

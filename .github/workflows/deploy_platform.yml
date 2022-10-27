@@ -1,5 +1,5 @@
 # Engineering
-# DeployPlatform.yml
+# deploy_platform.yml
 # Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
 #
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.

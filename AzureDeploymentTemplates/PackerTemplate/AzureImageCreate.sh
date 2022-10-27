@@ -3,21 +3,24 @@
 # Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
 source .env.dev
 Location="westus"
-
+ResourceGroup=$AZURE_RESOURCE_GROUP
+StorageAccountName=$AZURE_STORAGE_ACCOUNT
 PrintHelp()
 {
     echo ""
-    echo "Usage: $0 -m [Image Name]"
+    echo "Usage: $0 -m [Image Name] [-a]"
     echo "Usage: $0"
     echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | newwebfrontend | securecomputationnode | rpcrelated"
+    echo -e "\t-a ci_flag will be set to true"
     exit 1 # Exit script after printing help
 }
 
 # Parse the input parameters
-while getopts "m:" opt
+while getopts "m:a" opt
 do
     echo "opt: $opt $OPTARG"
     case "$opt" in
+        a ) ci_flag="yes" ;;
         m ) imageName="$OPTARG" ;;
         ? ) PrintHelp ;;
     esac
@@ -41,46 +44,41 @@ if [ $retVal -ne 0 ]; then
     exit $retVal
 fi
 
-# Bash Menu
-# TODO Technially all subscriptions for this script can share 1 SP: Discussion We should create singular SP for PACKER
-echo -e "\nPlease Specify # for targeted subscription to upload image: "
-options=("Scratch Pad" "Development" "Release Candidate" "ProductionGA" "Quit")
-select opt in "${options[@]}"
-do
-    case $REPLY in
-        1)
-            echo -e "\n==== Setting env variables for $opt ====\n"
-            export AZURE_SUBSCRIPTION_ID=$SCRATCH_PAD_SUBSCRIPTION_ID
-            ResourceGroup=$SCRATCH_PAD_RESOURCE_GROUP # This needs to get updated per choice of subscription
-            StorageAccountName=$SCRATCH_PAD_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
-            break
-            ;;
-        2)
-            echo -e "\n==== Setting env variables for $opt ===="
-            export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
-            ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
-            StorageAccountName=$DEVELOPMENT_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
-            break
-            ;;
-        3)
-            echo -e "\n==== Setting env variables for $opt ===="
-            export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
-            ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
-            StorageAccountName=$RELEASE_CANDIDATE_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
-            break
-            ;;
-        4)
-            echo -e "\n==== Setting env variables for $opt ===="
-            export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
-            ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
-            StorageAccountName=$PRODUCTION_GA_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
-            break
-            ;;
-        5)
-            exit 0
-            ;;
-    esac
-done
+if [ -z "$ci_flag" ]; then
+    # Bash Menu
+    # TODO Technially all subscriptions for this script can share 1 SP: Discussion We should create singular SP for PACKER
+    echo -e "\nPlease Specify # for targeted subscription to upload image: "
+    options=("Development" "Release Candidate" "ProductionGA" "Quit")
+    select opt in "${options[@]}"
+    do
+        case $REPLY in
+            1)
+                echo -e "\n==== Setting env variables for $opt ===="
+                export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
+                ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                StorageAccountName=$DEVELOPMENT_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                break
+                ;;
+            2)
+                echo -e "\n==== Setting env variables for $opt ===="
+                export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
+                ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                StorageAccountName=$RELEASE_CANDIDATE_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                break
+                ;;
+            3)
+                echo -e "\n==== Setting env variables for $opt ===="
+                export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
+                ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                StorageAccountName=$PRODUCTION_GA_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                break
+                ;;
+            4)
+                exit 0
+                ;;
+        esac
+    done
+fi
 
 # Set the subscription
 echo -e "==== Login to Azure and Set Subscription ====\n"
@@ -123,7 +121,7 @@ az image create \
 --os-type "Linux" \
 --storage-sku "Standard_LRS"
 
-# Optionally to create a VM with the image
+# # Optionally to create a VM with the image
 # az vm create \
 # --resource-group $ResourceGroup \
 # --name "$imageName"Vm \
@@ -131,5 +129,5 @@ az image create \
 # --admin-username saildeveloper \
 # --admin-password "Password@123"
 
-# Optionally upload the packages to the Virtual VirtualMachine
+# # Optionally upload the packages to the Virtual VirtualMachine
 # ./UploadPackageAndInitializationVector --IpAddress=<VmIp> --Package=PlatformServices.tar.gz --InitializationVector=InitializationVector.json

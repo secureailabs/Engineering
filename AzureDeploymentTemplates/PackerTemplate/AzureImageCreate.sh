@@ -5,6 +5,7 @@ source .env.dev
 Location="westus"
 ResourceGroup=$AZURE_RESOURCE_GROUP
 StorageAccountName=$AZURE_STORAGE_ACCOUNT
+GIT=$(git rev-parse --short HEAD)
 PrintHelp()
 {
     echo ""
@@ -141,6 +142,7 @@ az image create \
 --location $Location \
 --os-type "Linux" \
 --storage-sku "Standard_LRS"
+--tags git=$GIT
 
 # # Optionally to create a VM with the image
 # az vm create \

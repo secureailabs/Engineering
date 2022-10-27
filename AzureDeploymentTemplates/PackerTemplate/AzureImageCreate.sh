@@ -86,6 +86,27 @@ az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIEN
 az account set --subscription $AZURE_SUBSCRIPTION_ID
 echo -e "\n==== Verify Subscription Set Properly ====\n"
 az account show
+
+# list custom SAIL managed images 
+echo -e "\n==== Azure Image List ====\n"
+output=$(az image list \
+--resource-group $ResourceGroup)
+echo "$output"
+
+# Delete old custom SAIL managed images 
+echo -e "\n==== Azure Image Delete As Required ====\n"
+if [[ $output == *"$imageName" ]]; then
+    echo $imageName
+    echo "Image $imageName already exists in Azure."
+    az image delete \
+    --resource-group $ResourceGroup \
+    --name $imageName 
+    echo "Deletion Completed, continuing..."
+else
+    echo "Image $imageName does not exist in Azure."
+    echo "Continuing ..."
+fi
+
 # Create resource group for storage account
 az group create \
 --name $ResourceGroup \

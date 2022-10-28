@@ -96,18 +96,12 @@ echo "$output"
 
 # Delete old custom SAIL managed images 
 echo -e "\n==== Azure Image Delete As Required ====\n"
-if [[ $output == *"$imageName" ]]; then
-    echo $imageName
-    echo "Image $imageName already exists in Azure."
-    az image delete \
-    --resource-group $ResourceGroup \
-    --name $imageName 
-    echo "Deletion Completed, continuing..."
-else
-    echo "Image $imageName does not exist in Azure."
-    echo "Continuing ..."
-fi
+az image delete \
+--resource-group $ResourceGroup \
+--name $imageName 
+echo "Deletion Completed, continuing..."
 
+echo -e "\n==== Azure VHD& Image Creation Begins ====\n"
 # Create resource group for storage account
 az group create \
 --name $ResourceGroup \
@@ -141,7 +135,7 @@ az image create \
 --source $vhdImageUrl \
 --location $Location \
 --os-type "Linux" \
---storage-sku "Standard_LRS"
+--storage-sku "Standard_LRS" \
 --tags git=$GIT
 
 # # Optionally to create a VM with the image

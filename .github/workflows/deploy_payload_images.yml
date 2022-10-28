@@ -71,28 +71,34 @@ jobs:
           make all
           sudo -E ./AzureDeploymentTemplates/PackerTemplate/AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
 
-      # - name: Condition 2 Release Candidate
-      #   if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
-      #   env:
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
-      #   run: |
-      #     echo "${{ github.head_ref }}"
-      #     echo "${{ github.workspace }}"
-      #     sudo chown -R $USER:$USER ${{ github.workspace }}
-      #     set -e
-      #     pwd
-      #     ls -l
-      #     sudo -E ./DeployPlatform.sh -m ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+      - name: Condition 2 Release Candidate
+        if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.RELEASE_CANDIDATE_AZURE_RESOURCE_GROUP }}
+          AZURE_STORAGE_ACCOUNT: $ {{ secrets.RELEASE_CANDIDATE_AZURE_STORAGE_ACCOUNT_NAME }}
+        run: |
+          echo "${{ github.head_ref }}"
+          echo "${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          set -e
+          pwd
+          ls -l
+          make all
+          sudo -E ./AzureDeploymentTemplates/PackerTemplate/AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
 
-      # - name: Condition 3 ProductionGA
-      #   if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
-      #   env:
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
-      #   run: |
-      #     echo "${{ github.head_ref }}"
-      #     echo "${{ github.workspace }}"
-      #     sudo chown -R $USER:$USER ${{ github.workspace }}
-      #     set -e
-      #     pwd
-      #     ls -l
-      #     sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+      - name: Condition 3 ProductionGA
+        if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.PRODUCTION_GA_AZURE_RESOURCE_GROUP }}
+          AZURE_STORAGE_ACCOUNT: $ {{ secrets.PRODUCTION_GA_AZURE_STORAGE_ACCOUNT_NAME }}
+        run: |
+          echo "${{ github.head_ref }}"
+          echo "${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          set -e
+          pwd
+          ls -l
+          make all
+          sudo -E ./AzureDeploymentTemplates/PackerTemplate/AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}

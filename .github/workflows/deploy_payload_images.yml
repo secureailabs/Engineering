@@ -49,8 +49,14 @@ jobs:
       - name: Check out source repository
         uses: actions/checkout@v2
 
+      - name: "Make requirements"
+        run: make all
+
       - name: "Decrypt env file used by AzureImageCreate.sh"
-        run: npm run env:decrypt
+        run: |
+          cd AzureDeploymentTemplates/PackerTemplate/
+          npm run env:decrypt
+
         timeout-minutes: 1
         env:
           DOTENV_PASS: ${{ secrets.DOTENV_PASS }}
@@ -68,8 +74,7 @@ jobs:
           set -e
           pwd
           ls -l
-          make all
-          sudo -E ./AzureDeploymentTemplates/PackerTemplate/AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
+          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
 
       - name: Condition 2 Release Candidate
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
@@ -84,8 +89,7 @@ jobs:
           set -e
           pwd
           ls -l
-          make all
-          sudo -E ./AzureDeploymentTemplates/PackerTemplate/AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
+          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
 
       - name: Condition 3 ProductionGA
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
@@ -100,5 +104,4 @@ jobs:
           set -e
           pwd
           ls -l
-          make all
-          sudo -E ./AzureDeploymentTemplates/PackerTemplate/AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
+          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}

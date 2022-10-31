@@ -139,7 +139,7 @@ jobs:
     # Without this step workflow remains "green" if build does fail.
     if: always()
     runs-on: ubuntu-latest
-    needs: [start-runner, build]
+    needs: [start-runner, build, test]
     steps:
       - uses: technote-space/workflow-conclusion-action@v2
       - name: Check Job Status status and fail if they are red

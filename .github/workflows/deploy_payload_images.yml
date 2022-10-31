@@ -1,6 +1,6 @@
 # Engineering
-# DeployPlatform.yml
-# Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
+# deploy_payload_images.yml
+# Deployment of SAIL payload images to a specified Subscription in Azure
 #
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -12,7 +12,7 @@
 #
 #
 
-name: Deploy Platform
+name: Deploy Payload Images
 
 on:
   workflow_dispatch:
@@ -25,21 +25,22 @@ on:
           - Development
           - Release Candidate
           - ProductionGA
-      purpose:
-        description: "Purpose of Deployment"
+
+      image:
+        description: Choose image
         required: true
-        type: string
-      owner:
-        description: "Owner of Deployment"
-        required: true
-        type: string
+        type: choice
+        options:
+          - apiservices
+          - newwebfrontend
+          - rpcrelated
 env:
   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   AZURE_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_DEPLOYPLATFORM_AZURE_CLIENT_ID }}
   AZURE_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_DEPLOYPLATFORM_AZURE_CLIENT_SECRET }}
 
 jobs:
-  Setup_Environment:
+  deploy_images:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     steps:
       - name: Clear repository
@@ -48,10 +49,24 @@ jobs:
       - name: Check out source repository
         uses: actions/checkout@v2
 
+      - name: "Make requirements"
+        run: make all
+
+      - name: "Decrypt env file used by AzureImageCreate.sh"
+        run: |
+          cd AzureDeploymentTemplates/PackerTemplate/
+          npm run env:decrypt
+
+        timeout-minutes: 1
+        env:
+          DOTENV_PASS: ${{ secrets.DOTENV_PASS }}
+
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.DEVELOPMENT_RESOURCE_GROUP }}
+          AZURE_STORAGE_ACCOUNT: $ {{ secrets.DEVELOPMENT_STORAGE_ACCOUNT_NAME }}
         run: |
           echo "${{ github.head_ref }}"
           echo "${{ github.workspace }}"
@@ -59,12 +74,14 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
 
       - name: Condition 2 Release Candidate
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.RELEASE_CANDIDATE_AZURE_RESOURCE_GROUP }}
+          AZURE_STORAGE_ACCOUNT: $ {{ secrets.RELEASE_CANDIDATE_AZURE_STORAGE_ACCOUNT_NAME }}
         run: |
           echo "${{ github.head_ref }}"
           echo "${{ github.workspace }}"
@@ -72,12 +89,14 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
 
       - name: Condition 3 ProductionGA
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.PRODUCTION_GA_AZURE_RESOURCE_GROUP }}
+          AZURE_STORAGE_ACCOUNT: $ {{ secrets.PRODUCTION_GA_AZURE_STORAGE_ACCOUNT_NAME }}
         run: |
           echo "${{ github.head_ref }}"
           echo "${{ github.workspace }}"
@@ -85,4 +104,4 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}

@@ -74,7 +74,7 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
+          sudo -E ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
 
       - name: Condition 2 Release Candidate
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
@@ -89,7 +89,7 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
+          sudo -E ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
 
       - name: Condition 3 ProductionGA
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
@@ -104,4 +104,4 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./AzureImageCreate.sh -a -m  ${{ github.event.inputs.image' }}
+          sudo -E ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}

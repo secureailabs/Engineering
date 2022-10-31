@@ -66,7 +66,7 @@ jobs:
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
           AZURE_RESOURCE_GROUP: ${{ secrets.DEVELOPMENT_RESOURCE_GROUP }}
-          AZURE_STORAGE_ACCOUNT: $ {{ secrets.DEVELOPMENT_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.DEVELOPMENT_STORAGE_ACCOUNT_NAME }}
         run: |
           echo "${{ github.head_ref }}"
           echo "${{ github.workspace }}"
@@ -82,7 +82,7 @@ jobs:
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
           AZURE_RESOURCE_GROUP: ${{ secrets.RELEASE_CANDIDATE_AZURE_RESOURCE_GROUP }}
-          AZURE_STORAGE_ACCOUNT: $ {{ secrets.RELEASE_CANDIDATE_AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.RELEASE_CANDIDATE_AZURE_STORAGE_ACCOUNT_NAME }}
         run: |
           echo "${{ github.head_ref }}"
           echo "${{ github.workspace }}"
@@ -98,7 +98,7 @@ jobs:
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
           AZURE_RESOURCE_GROUP: ${{ secrets.PRODUCTION_GA_AZURE_RESOURCE_GROUP }}
-          AZURE_STORAGE_ACCOUNT: $ {{ secrets.PRODUCTION_GA_AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.PRODUCTION_GA_AZURE_STORAGE_ACCOUNT_NAME }}
         run: |
           echo "${{ github.head_ref }}"
           echo "${{ github.workspace }}"

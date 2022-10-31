@@ -16,7 +16,7 @@ npm -v # 8.12.1
 npm install --save-dev senv
 ```
 ### Decrypt [.env.dev.encrypted]
-Create file `.env.pass`: [GITHUB.env.pass](https://start.1password.com/open/i?a=VDKXP5MBWJAW3F3YRPJNHPGKLM&v=gy4saia7pduzqbp7qhij776a4u&i=kmdczi5wvgpty6kqodhjdjyydy&h=secureailabs.1password.com)  in this directory. \
+In your local environment set `DOTENV_PASS=`[GITHUB.env.pass](https://start.1password.com/open/i?a=VDKXP5MBWJAW3F3YRPJNHPGKLM&v=gy4saia7pduzqbp7qhij776a4u&i=kmdczi5wvgpty6kqodhjdjyydy&h=secureailabs.1password.com) \
 Run the Following command to optain a decrypted .env.dev file.
 ```
 npm run env:decrypt # You should obtain .env.dev under this directory

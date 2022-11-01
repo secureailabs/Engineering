@@ -22,6 +22,8 @@ from app.api.accounts import get_all_admins, get_organization, get_user
 from app.api.authentication import RoleChecker, get_current_user
 from app.api.datasets import get_dataset, get_dataset_internal
 from app.api.emails import send_email
+from app.utils.secrets import get_secret
+import app.utils.azure as azure
 from app.api.internal_utils import cache_get_basic_info_datasets, cache_get_basic_info_organization
 from app.data import operations as data_service
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
@@ -46,6 +48,7 @@ from models.data_federations import (
     RegisterInvite_In,
     RegisterInvite_Out,
     UpdateDataFederation_In,
+    DataSubmitterIdKeyPair,
 )
 from models.emails import EmailRequest
 from pydantic import EmailStr
@@ -161,7 +164,9 @@ async def get_all_data_federations(
 
             # Add the data submitter organization information to the data federation
             organization_cache, data_submitter_basic_info_list = await cache_get_basic_info_organization(
-                organization_cache, data_federation.data_submitter_organizations_id, current_user
+                organization_cache,
+                [data_submitter.organization_id for data_submitter in data_federation.data_submitters],
+                current_user,
             )
 
             # Add the research organization information to the data federation
@@ -213,7 +218,7 @@ async def get_data_federation(
         _, organization = await cache_get_basic_info_organization({}, [data_federation.organization_id], current_user)
 
         _, data_submitter_basic_info_list = await cache_get_basic_info_organization(
-            {}, data_federation.data_submitter_organizations_id, current_user
+            {}, [data_submitter.organization_id for data_submitter in data_federation.data_submitters], current_user
         )
 
         _, researcher_basic_info_list = await cache_get_basic_info_organization(
@@ -403,7 +408,9 @@ async def register_data_submitter(
         data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
 
         # If the organization is already part of the data federation, then return 204 OK
-        if data_submitter_organization_id in data_federation_db.data_submitter_organizations_id:
+        if data_submitter_organization_id in [
+            data_submitter.organization_id for data_submitter in data_federation_db.data_submitters
+        ]:
             return Response(status_code=status.HTTP_204_NO_CONTENT)
 
         # Ensure this is a valid organization before adding to the list
@@ -412,10 +419,16 @@ async def register_data_submitter(
         if not organization:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
 
-        # Add the data submitter to the federation list
-        data_federation_db.data_submitter_organizations_id.append(data_submitter_organization_id)
+        # Generate RSA key vault keys and update with their handles
+        data_submitter_key_id = generate_rsa_key(f"{str(data_federation_id)}-{str(organization[0].id)}")
 
-        # DG TODO - This is where we need to generate key vault keys and update with their handles
+        # Add the data submitter to the federation list
+        data_submitter_key_pair = DataSubmitterIdKeyPair(
+            organization_id=data_submitter_organization_id, key_pair_id=data_submitter_key_id
+        )
+
+        data_federation_db.data_submitters.append(data_submitter_key_pair)
+
         await data_service.update_one(
             DB_COLLECTION_DATA_FEDERATIONS,
             {"_id": str(data_federation_id)},
@@ -529,7 +542,9 @@ async def invite_data_submitter(
         data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
 
         # If the organization is already part of the data federation, then return 204 OK
-        if data_submitter_organization_id in data_federation_db.data_submitter_organizations_id:
+        if data_submitter_organization_id in [
+            data_submitter.organization_id for data_submitter in data_federation_db.data_submitters
+        ]:
             return Response(status_code=status.HTTP_204_NO_CONTENT)
 
         # If the organization is not part of the data federation, add it to the invites list
@@ -824,7 +839,17 @@ async def accept_or_reject_invite(
                 data_federation.research_organizations_id.append(invite.invitee_organization_id)
                 data_federation.research_organizations_invites_id.remove(invite.id)
             if invite.type is InviteType.DF_SUBMITTER:
-                data_federation.data_submitter_organizations_id.append(invite.invitee_organization_id)
+                # Generate RSA key vault keys and update with their handles
+                data_submitter_key_id = generate_rsa_key(
+                    f"{str(invite.data_federation_id)}-{str(current_user.organization_id)}"
+                )
+
+                # Add the data submitter to the federation list
+                data_submitter_key_pair = DataSubmitterIdKeyPair(
+                    organization_id=invite.invitee_organization_id, key_pair_id=data_submitter_key_id
+                )
+
+                data_federation.data_submitters.append(data_submitter_key_pair)
                 data_federation.data_submitter_organizations_invites_id.remove(invite.id)
 
             await data_service.update_one(
@@ -975,13 +1000,13 @@ async def remove_dataset(
         raise exception
 
 
-@router.get(
+@router.post(
     path="/data-federations/{data_federation_id}/dataset_key/{dataset_id}",
     description="Return a dataset encryption key by either retrieving and unwrapping, or creating",
     response_model=DatasetEncryptionKey_Out,
     response_model_by_alias=False,
     response_model_exclude_unset=True,
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
 )
 async def dataset_key(
     data_federation_id: PyObjectId,
@@ -1020,6 +1045,7 @@ async def dataset_key(
         # We generate a key if none has been assigned to this dataset, otherwise we unwrap the key
         # that was used to encrypt the DS
         if dataset_db.encryption_key_id is None:
+            # TODO: generate and wrap the key in key vault
             return_key = os.urandom(32)
         else:
             logger = logging.getLogger("uvicorn.error")
@@ -1029,9 +1055,30 @@ async def dataset_key(
             )
             return_key = os.urandom(32)
 
-        dataset_key_out = DatasetEncryptionKey_Out(dataset_key=base64.b64encode(return_key))
+        dataset_key_out = DatasetEncryptionKey_Out(dataset_key=str(base64.b64encode(return_key)))
         return dataset_key_out
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
         raise exception
+
+
+def generate_rsa_key(key_name: str) -> str:
+    """
+    Generate an RSA key pair and return the public key
+
+    :param key_name: the name of the key
+    :type key_name: str
+    :return: the generated key pair id
+    :rtype: str
+    """
+    account_credentials = azure.authenticate(
+        get_secret("azure_client_id"),
+        get_secret("azure_client_secret"),
+        get_secret("azure_tenant_id"),
+        get_secret("azure_subscription_id"),
+    )
+
+    key_client_id = azure.create_rsa_key(account_credentials, key_name, 4096)
+
+    return key_client_id

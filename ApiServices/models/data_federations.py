@@ -31,12 +31,17 @@ class DataFederation_Base(SailBaseModel):
     description: StrictStr = Field(...)
 
 
+class DataSubmitterIdKeyPair(SailBaseModel):
+    organization_id: PyObjectId = Field(...)
+    key_pair_id: StrictStr = Field(...)
+
+
 class DataFederation_Db(DataFederation_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     state: DataFederationState = Field(...)
-    data_submitter_organizations_id: List[PyObjectId] = Field(default_factory=list)
+    data_submitters: List[DataSubmitterIdKeyPair] = Field(default_factory=list)
     research_organizations_id: List[PyObjectId] = Field(default_factory=list)
     datasets_id: List[PyObjectId] = Field(default_factory=list)
     data_submitter_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)

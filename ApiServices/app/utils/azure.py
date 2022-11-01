@@ -15,13 +15,16 @@ import json
 import os
 import random
 from datetime import datetime
+from uuid import UUID, uuid4
 
 from app.utils.secrets import get_secret
 from pydantic import BaseModel, Field, StrictStr
 
 from azure.core.exceptions import AzureError
 from azure.identity import ClientSecretCredential
-from azure.mgmt.network import NetworkManagementClient
+from azure.keyvault.keys import KeyClient
+
+# from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.resource.resources.models import DeploymentMode
 from azure.mgmt.storage import StorageManagementClient
@@ -299,7 +302,7 @@ def authenticate(client_id: str, client_secret: str, tenant_id: str, subscriptio
     return {"credentials": credentials, "subscription_id": subscription_id}
 
 
-def deploy_template(accountCredentials: str, resource_group_name: str, template: str, parameters: dict):
+def deploy_template(accountCredentials: dict, resource_group_name: str, template: str, parameters: dict):
     """
     Deploy the template to a resource group.
 
@@ -418,3 +421,31 @@ def deploy_module(
         return DeploymentResponse(status="Fail", ip_address="", note=str(azure_error))
     except Exception as exception:
         return DeploymentResponse(status="Fail", ip_address="", note=str(exception))
+
+
+def create_rsa_key(account_credentials: dict, key_name: str, key_size: int) -> str:
+    """
+    Create an RSA 2048 key.
+
+    :param account_credentials: The account credentials.
+    :type account_credentials: dict
+    """
+    key_client = KeyClient(vault_url=get_secret("azure_keyvault_url"), credential=account_credentials["credentials"])
+
+    if key_size < 3072:
+        raise ValueError("Key size must be at least 3072 bits.")
+
+    # Create an RSA key
+    rsa_key = key_client.create_rsa_key(key_name, size=key_size)
+    print("rsa_key.name", rsa_key.name)
+    print("rsa_key.key_type", rsa_key.key_type)
+    print("rsa_key.id", rsa_key.id)
+
+    return rsa_key.id
+
+
+# def wrap_aes_with_rsa_key(account_credentials: dict, aes_key: str, rsa_key_id: str):
+#     if len(aes_key)
+
+
+# def unwrap_aes_with_rsa_key(account_credentials: dict, aes_key: str, rsa_key_id: str):

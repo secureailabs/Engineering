@@ -24,6 +24,7 @@ from app.api.datasets import get_dataset, get_dataset_internal
 from app.api.emails import send_email
 from app.api.internal_utils import cache_get_basic_info_datasets, cache_get_basic_info_organization
 from app.data import operations as data_service
+from app.log import log_message
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import GetUsers_Out, UserRole
@@ -98,6 +99,9 @@ async def register_data_federation(
             **data_federation_req.dict(), organization_id=current_user.organization_id, state=DataFederationState.ACTIVE
         )
         await data_service.insert_one(DB_COLLECTION_DATA_FEDERATIONS, jsonable_encoder(data_federation_db))
+
+        message = f"[Register Data Federation]: user_id:{current_user.id}"
+        await log_message(message)
 
         return data_federation_db
     except HTTPException as http_exception:
@@ -183,6 +187,9 @@ async def get_all_data_federations(
             )
             response_list_of_data_federations.append(response_data_federation)
 
+        message = f"[Get All Data Federations]: user_id: {current_user.id}"
+        await log_message(message)
+
         return GetMultipleDataFederation_Out(data_federations=response_list_of_data_federations)
     except HTTPException as http_exception:
         raise http_exception
@@ -231,6 +238,9 @@ async def get_data_federation(
             datasets=dataset_basic_info_list,
         )
 
+        message = f"[Get Data Federation]: user_id: {current_user.id}"
+        await log_message(message)
+
         return response_data_federation
     except HTTPException as http_exception:
         raise http_exception
@@ -272,6 +282,9 @@ async def update_data_federation(
             {"_id": str(data_federation_id)},
             {"$set": jsonable_encoder(data_federation_db)},
         )
+
+        message = f"[Update Data Federation]: user_id:{current_user.id}"
+        await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
@@ -360,6 +373,9 @@ async def invite_researcher(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
+        message = f"[Invite Researcher]: user_id:{current_user.id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -422,6 +438,9 @@ async def register_data_submitter(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
+        message = f"[Register Data Submitter]: user_id:{current_user.id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -482,6 +501,8 @@ async def register_researcher(
             {"_id": str(data_federation_id)},
             {"$set": jsonable_encoder(data_federation_db)},
         )
+
+        message = f"[Register Researcher]: user_id:{current_user.id}"
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -569,6 +590,9 @@ async def invite_data_submitter(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
+        message = f"[Invite Data Submitter]: user_id:{current_user.id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -606,6 +630,9 @@ async def soft_delete_data_federation(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
+        message = f"[Soft Delete Data Federation]: user_id:{current_user.id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -632,6 +659,9 @@ async def register_invite(invite_req: RegisterInvite_In):
             **invite_req.dict(), state=InviteState.PENDING, created_time=created_time, expiry_time=expiry_time
         )
         await data_service.insert_one(DB_COLLECTION_INVITES, jsonable_encoder(invite_db))
+
+        message = f"[Register Invite]"
+        await log_message(message)
 
         return RegisterInvite_Out(**invite_db.dict())
     except HTTPException as http_exception:
@@ -688,6 +718,9 @@ async def get_all_invites(organization_id: PyObjectId, current_user: TokenData =
                 )
             )
 
+        message = f"[Get All Invites]: user_id:{current_user.id}"
+        await log_message(message)
+
         return GetMultipleInvite_Out(invites=invites_out)
     except HTTPException as http_exception:
         raise http_exception
@@ -742,6 +775,9 @@ async def get_invite(
             inviter_user=BasicObjectInfo(**inviter_user.dict()),
             inviter_organization=inviter_user.organization,
         )
+
+        message = f"[Get Invite]: user_id:{current_user.id}"
+        await log_message(message)
 
         return invite_out
     except HTTPException as http_exception:
@@ -833,6 +869,9 @@ async def accept_or_reject_invite(
                 {"$set": jsonable_encoder(data_federation)},
             )
 
+        message = f"[Accept Or Reject Invite]: user_id:{current_user.id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -911,6 +950,9 @@ async def add_dataset(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
+        message = f"[Add Dataset]: user_id:{current_user.id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -967,6 +1009,9 @@ async def remove_dataset(
             {"_id": str(data_federation_id)},
             {"$set": jsonable_encoder(data_federation_db)},
         )
+
+        message = f"[Remove Dataset]: user_id:{current_user.id}"
+        await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
@@ -1030,6 +1075,10 @@ async def dataset_key(
             return_key = os.urandom(32)
 
         dataset_key_out = DatasetEncryptionKey_Out(dataset_key=base64.b64encode(return_key))
+
+        message = f"[Dataset Key]: user_id:{current_user.id}"
+        await log_message(message)
+
         return dataset_key_out
     except HTTPException as http_exception:
         raise http_exception

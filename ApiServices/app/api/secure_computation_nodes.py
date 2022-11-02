@@ -23,6 +23,7 @@ from app.api.authentication import get_current_user
 from app.api.dataset_versions import get_dataset_version
 from app.data import operations as data_service
 from app.data import sync_operations as sync_data_service
+from app.log import log_message
 from app.utils.secrets import get_secret
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
@@ -70,6 +71,9 @@ async def register_secure_computation_node(
 
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
         background_tasks.add_task(provision_virtual_machine, secure_computation_node_db)
+
+        message = f"[Register Secure Computation Node]: user_id:{current_user.id}"
+        await log_message(message)
 
         return RegisterSecureComputationNode_Out(**secure_computation_node_db.dict())
     except HTTPException as http_exception:
@@ -141,6 +145,9 @@ async def get_all_secure_computation_nodes(
                 )
                 response_secure_computation_nodes.append(response_secure_computation_node)
 
+        message = f"[Get All Secure Computation Nodes]: user_id:{current_user.id}"
+        await log_message(message)
+
         return GetMultipleSecureComputationNode_Out(secure_computation_nodes=response_secure_computation_nodes)
     except HTTPException as http_exception:
         raise http_exception
@@ -197,6 +204,9 @@ async def get_secure_computation_node(
             researcher_user=current_user.id,
         )
 
+        message = f"[Get Secure Computation Node]: user_id:{current_user.id}"
+        await log_message(message)
+
         return response_secure_computation_node
     except HTTPException as http_exception:
         raise http_exception
@@ -240,6 +250,9 @@ async def update_secure_computation_node(
             {"$set": jsonable_encoder(secure_computation_node_db)},
         )
 
+        message = f"[Update Secure Computation Node]: user_id:{current_user.id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -266,6 +279,9 @@ async def deprovision_secure_computation_nodes(
 
         # Start a background task to deprovision the secure computation node which will update the status
         background_tasks.add_task(delete_resource_group, data_federation_provision_id, current_user)
+
+        message = f"[Deprovision Secure Computation Nodes]: user_id:{current_user.id}"
+        await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:

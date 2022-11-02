@@ -17,6 +17,7 @@ from typing import List
 
 from app.api.authentication import get_current_user
 from app.data import operations as data_service
+from app.log import log_message
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from models.authentication import TokenData
 from models.common import PyObjectId, SailBaseModel
@@ -62,6 +63,9 @@ async def get_secure_computation_nodes_waiting_for_data(
             for secure_computation_node in secure_computation_nodes:
                 secure_computation_node = VmUploadInfo(**secure_computation_node)
                 response_secure_computation_nodes.append(secure_computation_node)
+
+        message = f"[Get Secure Computation Nodes Waiting For Data]: user_id:{current_user.id}"
+        await log_message(message)
 
         return GetWaitingSecureComputationNode_Out(secure_computation_nodes=response_secure_computation_nodes)
     except HTTPException as http_exception:

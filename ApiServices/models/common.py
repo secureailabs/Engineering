@@ -48,3 +48,8 @@ class SailBaseModel(BaseModel):
 class BasicObjectInfo(SailBaseModel):
     id: PyObjectId = Field(..., alias="_id")
     name: StrictStr = Field(...)
+
+
+class KeyVaultObject(BaseModel):
+    name: StrictStr = Field(...)
+    version: StrictStr = Field(...)

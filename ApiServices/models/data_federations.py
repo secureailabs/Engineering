@@ -17,7 +17,7 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel, KeyVaultObject
 from models.secure_computation_nodes import SecureComputationNodeType
 
 
@@ -33,7 +33,7 @@ class DataFederation_Base(SailBaseModel):
 
 class DataSubmitterIdKeyPair(SailBaseModel):
     organization_id: PyObjectId = Field(...)
-    key_pair_id: StrictStr = Field(...)
+    key: KeyVaultObject = Field(...)
 
 
 class DataFederation_Db(DataFederation_Base):
@@ -162,7 +162,3 @@ class RegisterDataFederationProvision_Out(DataFederationProvision_Base):
     creation_time: datetime = Field(...)
     organization_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(...)
-
-
-class DatasetEncryptionKey_Out(SailBaseModel):
-    dataset_key: str = Field(...)

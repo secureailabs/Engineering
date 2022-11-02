@@ -3,9 +3,6 @@
 # data_federations.py
 # -------------------------------------------------------------------------------
 """APIs to manage data-federations"""
-import base64
-import logging
-import os
 
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
@@ -20,9 +17,8 @@ from typing import Dict, List, Optional
 
 from app.api.accounts import get_all_admins, get_organization, get_user
 from app.api.authentication import RoleChecker, get_current_user
-from app.api.datasets import get_dataset, get_dataset_internal
+from app.api.datasets import get_dataset, get_datset_encryption_key
 from app.api.emails import send_email
-from app.utils.secrets import get_secret
 import app.utils.azure as azure
 from app.api.internal_utils import cache_get_basic_info_datasets, cache_get_basic_info_organization
 from app.data import operations as data_service
@@ -30,11 +26,11 @@ from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Re
 from fastapi.encoders import jsonable_encoder
 from models.accounts import GetUsers_Out, UserRole
 from models.authentication import TokenData
-from models.common import BasicObjectInfo, PyObjectId
+from models.common import BasicObjectInfo, PyObjectId, KeyVaultObject
+from models.datasets import DatasetEncryptionKey_Out
 from models.data_federations import (
     DataFederation_Db,
     DataFederationState,
-    DatasetEncryptionKey_Out,
     GetDataFederation_Out,
     GetInvite_Out,
     GetMultipleDataFederation_Out,
@@ -127,7 +123,7 @@ async def get_all_data_federations(
 ) -> GetMultipleDataFederation_Out:
     try:
         if (data_submitter_id) and (data_submitter_id == current_user.organization_id):
-            query = {"data_submitter_id": {"$all": [str(current_user.organization_id)]}}
+            query = ({"data_submitters.organization_id": str(current_user.organization_id)},)
         elif (researcher_id) and (researcher_id == current_user.organization_id):
             query = {"researcher_id": {"$all": [str(current_user.organization_id)]}}
         elif dataset_id:
@@ -138,7 +134,7 @@ async def get_all_data_federations(
             query = {
                 "$or": [
                     {"organization_id": str(current_user.organization_id)},
-                    {"data_submitter_organizations_id": {"$all": [str(current_user.organization_id)]}},
+                    {"data_submitters.organization_id": str(current_user.organization_id)},
                     {"research_organizations_id": {"$all": [str(current_user.organization_id)]}},
                 ]
             }
@@ -262,7 +258,7 @@ async def update_data_federation(
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
         if data_federation_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
@@ -322,7 +318,7 @@ async def invite_researcher(
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
 
         # If the organization is already part of the data federation, then return 204 OK
         if researcher_organization_id in data_federation_db.research_organizations_id:
@@ -405,7 +401,7 @@ async def register_data_submitter(
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
 
         # If the organization is already part of the data federation, then return 204 OK
         if data_submitter_organization_id in [
@@ -420,11 +416,13 @@ async def register_data_submitter(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
 
         # Generate RSA key vault keys and update with their handles
-        data_submitter_key_id = generate_rsa_key(f"{str(data_federation_id)}-{str(organization[0].id)}")
+        key_name = f"{str(data_federation_id)}-{str(organization[0].id)}"
+        data_submitter_key = generate_rsa_key(key_name)
 
         # Add the data submitter to the federation list
         data_submitter_key_pair = DataSubmitterIdKeyPair(
-            organization_id=data_submitter_organization_id, key_pair_id=data_submitter_key_id
+            organization_id=data_submitter_organization_id,
+            key=data_submitter_key,
         )
 
         data_federation_db.data_submitters.append(data_submitter_key_pair)
@@ -475,7 +473,7 @@ async def register_researcher(
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
 
         # If the organization is already part of the data federation, then return 204 OK
         if researcher_organization_id in data_federation_db.research_organizations_id:
@@ -539,7 +537,7 @@ async def invite_data_submitter(
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
 
         # If the organization is already part of the data federation, then return 204 OK
         if data_submitter_organization_id in [
@@ -609,7 +607,7 @@ async def soft_delete_data_federation(
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
         if data_federation_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
@@ -803,7 +801,7 @@ async def accept_or_reject_invite(
         invite = await data_service.find_one(DB_COLLECTION_INVITES, {"_id": str(invite_id)})
         if not invite:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
-        invite = Invite_Db(**invite)  # type: ignore
+        invite = Invite_Db(**invite)
 
         # Invite should not have expired.
         if invite.expiry_time < datetime.utcnow():
@@ -833,20 +831,19 @@ async def accept_or_reject_invite(
             )
             if not data_federation:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="data federation not found")
-            data_federation = DataFederation_Db(**data_federation)  # type: ignore
+            data_federation = DataFederation_Db(**data_federation)
 
             if invite.type is InviteType.DF_RESEARCHER:
                 data_federation.research_organizations_id.append(invite.invitee_organization_id)
                 data_federation.research_organizations_invites_id.remove(invite.id)
             if invite.type is InviteType.DF_SUBMITTER:
                 # Generate RSA key vault keys and update with their handles
-                data_submitter_key_id = generate_rsa_key(
-                    f"{str(invite.data_federation_id)}-{str(current_user.organization_id)}"
-                )
+                key_name = f"{str(invite.data_federation_id)}-{str(current_user.organization_id)}"
+                data_submitter_key = generate_rsa_key(key_name)
 
                 # Add the data submitter to the federation list
                 data_submitter_key_pair = DataSubmitterIdKeyPair(
-                    organization_id=invite.invitee_organization_id, key_pair_id=data_submitter_key_id
+                    organization_id=invite.invitee_organization_id, key=data_submitter_key
                 )
 
                 data_federation.data_submitters.append(data_submitter_key_pair)
@@ -911,12 +908,12 @@ async def add_dataset(
             DB_COLLECTION_DATA_FEDERATIONS,
             {
                 "_id": str(data_federation_id),
-                "data_submitter_organizations_id": {"$all": [str(current_user.organization_id)]},
+                "data_submitters.organization_id": str(current_user.organization_id),
             },
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
 
         # Check if the dataset exists
         dataset_info = await get_dataset(dataset_id=dataset_id, current_user=current_user)
@@ -978,7 +975,7 @@ async def remove_dataset(
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
 
         # Remove the dataset to the data federation
         if dataset_id in data_federation_db.datasets_id:
@@ -1008,9 +1005,10 @@ async def remove_dataset(
     response_model_exclude_unset=True,
     status_code=status.HTTP_201_CREATED,
 )
-async def dataset_key(
+async def get_dataset_key(
     data_federation_id: PyObjectId,
     dataset_id: PyObjectId,
+    create_if_not_found: bool = True,
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -1030,40 +1028,75 @@ async def dataset_key(
             DB_COLLECTION_DATA_FEDERATIONS,
             {
                 "_id": str(data_federation_id),
-                "data_submitter_organizations_id": {"$all": [str(current_user.organization_id)]},
+                "data_submitters.organization_id": str(current_user.organization_id),
             },
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
-        data_federation_db = DataFederation_Db(**data_federation_db)  # type: ignore
+        data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # Dataset organization and currnet user organization should be same
-        dataset_db = await get_dataset_internal(dataset_id, current_user)
-        if dataset_db.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset not found")
+        # Get the data submitter key id
+        data_submitter_info = [
+            data_submitter
+            for data_submitter in data_federation_db.data_submitters
+            if data_submitter.organization_id == current_user.organization_id
+        ][0]
+        if not data_submitter_info:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data submitter not found")
 
-        # We generate a key if none has been assigned to this dataset, otherwise we unwrap the key
-        # that was used to encrypt the DS
-        if dataset_db.encryption_key_id is None:
-            # TODO: generate and wrap the key in key vault
-            return_key = os.urandom(32)
-        else:
-            logger = logging.getLogger("uvicorn.error")
-            # TODO This will have to unwrap from the DB entry when key vault is integrated
-            logger.info(
-                f"Key {dataset_db.encryption_key_id} exists, add logic to unwrap key from key vault, RETURNING FAKE KEY THAT ISN'T USABLE"
-            )
-            return_key = os.urandom(32)
+        # Get the dataset encryption key
+        key_info = await get_datset_encryption_key(
+            dataset_id=dataset_id,
+            wrapping_key=data_submitter_info.key,
+            create_if_doesnt_exit=create_if_not_found,
+            current_user=current_user,
+        )
 
-        dataset_key_out = DatasetEncryptionKey_Out(dataset_key=str(base64.b64encode(return_key)))
-        return dataset_key_out
+        return key_info
     except HTTPException as http_exception:
         raise http_exception
     except Exception as exception:
         raise exception
 
 
-def generate_rsa_key(key_name: str) -> str:
+@router.get(
+    path="/data-federations/{data_federation_id}/dataset_key/{dataset_id}",
+    description="Return a dataset encryption key by either retrieving and unwrapping",
+    response_model=DatasetEncryptionKey_Out,
+    response_model_by_alias=False,
+    response_model_exclude_unset=True,
+    status_code=status.HTTP_201_CREATED,
+)
+async def get_existing_dataset_key(
+    data_federation_id: PyObjectId,
+    dataset_id: PyObjectId,
+    current_user: TokenData = Depends(get_current_user),
+):
+    """
+    Generate and return a dataset encryption key
+
+    :param data_federation_id: data federation for which the request for a key is being made
+    :type data_federation_id: PyObjectId
+    :param current_user: the information about the current user accessed from JWT, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises HTTPException: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
+    :raises exception: should be 500, internal server error
+    """
+    try:
+        return await get_dataset_key(
+            data_federation_id=data_federation_id,
+            dataset_id=dataset_id,
+            current_user=current_user,
+            create_if_not_found=False,
+        )
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as exception:
+        raise exception
+
+
+def generate_rsa_key(key_name: str) -> KeyVaultObject:
     """
     Generate an RSA key pair and return the public key
 
@@ -1072,13 +1105,10 @@ def generate_rsa_key(key_name: str) -> str:
     :return: the generated key pair id
     :rtype: str
     """
-    account_credentials = azure.authenticate(
-        get_secret("azure_client_id"),
-        get_secret("azure_client_secret"),
-        get_secret("azure_tenant_id"),
-        get_secret("azure_subscription_id"),
-    )
+    account_credentials = azure.authenticate()
+    key_client_version = azure.create_rsa_key(account_credentials, key_name, 4096)
 
-    key_client_id = azure.create_rsa_key(account_credentials, key_name, 4096)
+    if key_client_version is None:
+        raise Exception("Failed to create rsa key")
 
-    return key_client_id
+    return key_client_version

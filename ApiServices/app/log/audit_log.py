@@ -87,4 +87,10 @@ logger = _AsyncLogger()
 async def log_message(
     msg: str,
 ):
+    """
+    Send log message to async server
+
+    :param msg: audit log message
+    :type msg: str
+    """
     logger.log(msg)

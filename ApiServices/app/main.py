@@ -44,7 +44,14 @@ server = FastAPI(
 
 
 class Audit_log_task(threading.Thread):
+    """
+    Auxillary class for audit log server in isolated thread
+    """
+
     def run(self):
+        """
+        Start async logger server
+        """
         _AsyncLogger.start_log_poller(_AsyncLogger.ipc, _AsyncLogger.port)
 
 
@@ -94,5 +101,8 @@ async def custom_swagger_ui_html():
 
 @server.on_event("startup")
 async def start_audit_logger():
+    """
+    Start async audit logger server at start up as a background task
+    """
     t = Audit_log_task()
     t.start()

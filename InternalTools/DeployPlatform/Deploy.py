@@ -12,6 +12,7 @@ from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
 from pydantic import BaseModel, Field, StrictStr
 from azure.mgmt.keyvault import KeyVaultManagementClient
+from azure.keyvault.keys import KeyClient
 
 import sailazure
 
@@ -140,8 +141,8 @@ def get_randomized_name(prefix: str) -> str:
     return f"{prefix}{random.randint(1,100000):05}"
 
 
-def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix, tenant_id, service_principal):
-    """Deploy teh azure key vault"""
+def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix):
+    """Deploy the azure key vault"""
     # Key vault will be deployed in a unique resource group
     resource_group_name = deployment_name + "-keyvault"
 
@@ -173,9 +174,9 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
         template = json.load(template_file_fd)
 
     parameters = {
-        "key_vault_name": key_vault_name,
-        "azure_tenant_id": tenant_id,
-        "azure_service_principal": service_principal,
+        "keyvault_name": key_vault_name,
+        "azure_tenant_id": account_credentials["credentials"]._tenant_id,
+        "azure_object_id": account_credentials["object_id"],
     }
 
     deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
@@ -184,8 +185,10 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     if deploy_status != "Succeeded":
         raise Exception("Keyvault deployment failed")
 
+    keyvault_url = f"https://{key_vault_name}.vault.azure.net/"
+
     # return the url of the keyvault
-    return f"https://{key_vault_name}.vault.azure.net/"
+    return keyvault_url
 
 
 def deploy_apiservices(
@@ -353,6 +356,7 @@ if __name__ == "__main__":
     AZURE_SUBSCRIPTION_ID = os.environ.get("AZURE_SUBSCRIPTION_ID")
     AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID")
     AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID")
+    AZURE_OBJECT_ID = os.environ.get("AZURE_OBJECT_ID")
     AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
     OWNER = os.environ.get("OWNER")
     PURPOSE = os.environ.get("PURPOSE")
@@ -366,11 +370,14 @@ if __name__ == "__main__":
     account_credentials = sailazure.authenticate(
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
+    account_credentials["object_id"] = AZURE_OBJECT_ID
 
     # Provision a key vault
-    key_vault_url = deploy_key_vault(
-        account_credentials, deployment_id, "sailkeyvault", AZURE_TENANT_ID, AZURE_CLIENT_ID
-    )
+    key_vault_url = deploy_key_vault(account_credentials, deployment_id, "sailkeyvault")
+
+    # Create an RSA key
+    key_client = KeyClient(vault_url=key_vault_url, credential=account_credentials["credentials"])
+    rsa_key = key_client.create_rsa_key("keyname", size=4096)
 
     # Deploy Storage Account
     (

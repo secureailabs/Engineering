@@ -54,6 +54,10 @@ if [ -z "${AZURE_CLIENT_SECRET}" ]; then
   echo "environment variable AZURE_CLIENT_SECRET is undefined"
   exit 1
 fi
+if [ -z "${AZURE_OBJECT_ID}" ]; then
+  echo "environment variable AZURE_OBJECT_ID is undefined"
+  exit 1
+fi
 
 # Build and Package the Platform Services
 make package_apiservices -j
@@ -98,6 +102,7 @@ docker run \
   --env AZURE_TENANT_ID=$AZURE_TENANT_ID \
   --env AZURE_CLIENT_ID=$AZURE_CLIENT_ID \
   --env AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET \
+  --env AZURE_OBJECT_ID=$AZURE_OBJECT_ID \
   azuredeploymenttools
 popd
 

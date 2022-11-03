@@ -26,6 +26,10 @@ RUN apt-get update && \
   apt-get install -y \
   mongodb-org
 
+RUN pip3 install --upgrade pip \
+    && pip3 install msgpack \
+    && pip3 install pyzmq
+
 RUN rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /srv/mongodb/db0 && chown -R mongodb:mongodb /srv/mongodb/db0

@@ -24,24 +24,31 @@ datasetStoragePassword=$(cat InitializationVector.json | jq -r '.dataset_storage
 storageAccountName=$(cat InitializationVector.json | jq -r '.storage_account_name')
 datasetVersionId=$(cat InitializationVector.json | jq -r '.dataset_version_id')
 datasetId=$(cat InitializationVector.json | jq -r '.dataset_id')
-
+localDataset=$(cat InitializationVector.json | jq -r '.local_dataset')
 mkdir -p /mnt/dataset
-if [ ! -d "/etc/smbcredentials" ]; then
-    mkdir /etc/smbcredentials
+if $localDataset; then
+    echo "Using local dataset: $datasetVersionId"
+    unzip /local_dataset/$datasetVersionId -d /data
+    ls /data
+else
+    if [ ! -d "/etc/smbcredentials" ]; then
+        mkdir /etc/smbcredentials
+    fi
+
+    if [ ! -f "/etc/smbcredentials/$storageAccountName.cred" ]; then
+        echo "username=$storageAccountName" >> /etc/smbcredentials/$storageAccountName.cred
+        echo "password=$datasetStoragePassword" >> /etc/smbcredentials/$storageAccountName.cred
+    fi
+    chmod 600 /etc/smbcredentials/$storageAccountName.cred
+
+    echo "//$storageAccountName.file.core.windows.net/$datasetId/$datasetVersionId /mnt/dataset cifs nofail,credentials=/etc/smbcredentials/$storageAccountName.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30" >> /etc/fstab
+    mount -t cifs //$storageAccountName.file.core.windows.net/$datasetId/$datasetVersionId /mnt/dataset -o credentials=/etc/smbcredentials/$storageAccountName.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30
+
+    # Untar the dataset
+    mkdir -p /data
+    tar -xf /mnt/dataset/$datasetVersionId -C /data
 fi
 
-if [ ! -f "/etc/smbcredentials/$storageAccountName.cred" ]; then
-    echo "username=$storageAccountName" >> /etc/smbcredentials/$storageAccountName.cred
-    echo "password=$datasetStoragePassword" >> /etc/smbcredentials/$storageAccountName.cred
-fi
-chmod 600 /etc/smbcredentials/$storageAccountName.cred
-
-echo "//$storageAccountName.file.core.windows.net/$datasetId/$datasetVersionId /mnt/dataset cifs nofail,credentials=/etc/smbcredentials/$storageAccountName.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30" >> /etc/fstab
-mount -t cifs //$storageAccountName.file.core.windows.net/$datasetId/$datasetVersionId /mnt/dataset -o credentials=/etc/smbcredentials/$storageAccountName.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30
-
-# Untar the dataset
-mkdir -p /data
-tar -xf /mnt/dataset/$datasetVersionId -C /data
 
 # Install the rpc library
 pip3 install /app/zero

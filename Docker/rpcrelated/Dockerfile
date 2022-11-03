@@ -15,7 +15,8 @@ RUN apt-get update && \
     cifs-utils \
     python3-dev \
     python3-pip \
-    python3.8-venv
+    python3.8-venv \
+    zip
 
 COPY nginx.conf /etc/nginx/nginx.conf
 

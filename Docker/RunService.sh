@@ -13,11 +13,12 @@ PrintHelp() {
 # Parese the input parameters
 detach=false
 cleanDatabase=false
-while getopts "s:d opt:c opt:" opt; do
+while getopts "l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
     c) cleanDatabase=true ;;
+    l) localDataset="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -129,6 +130,9 @@ elif [ "securecomputationnode" == "$imageName" ]; then
 elif [ "rpcrelated" == "$imageName" ]; then
     bash -c "cd $rootDir/RPCLib;./package.sh"
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
+    if [ $localDataset ]; then
+        runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
+    fi
     runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"

@@ -436,7 +436,7 @@ def deploy_module(
 
 def create_rsa_key(account_credentials: AzureCredentials, key_name: str, key_size: int) -> Optional[KeyVaultObject]:
     """
-    Create an RSA 2048 key.
+    Create an RSA key of given size(minimum 3072).
 
     :param account_credentials: The account credentials.
     :type account_credentials: AzureCredentials

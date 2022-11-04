@@ -13,8 +13,20 @@ from azure.mgmt.storage.models import StorageAccountListKeysResult
 from pydantic import BaseModel, Field, StrictStr
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.keyvault.keys import KeyClient
+from azure.mgmt.monitor import MonitorManagementClient
+from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
 
 import sailazure
+
+
+class DeploymentResponse(BaseModel):
+    """Deployment response."""
+
+    status: StrictStr = Field(...)
+    response: StrictStr = Field(default="")
+    ip_address: StrictStr = Field(default="")
+    note: StrictStr = Field(...)
+
 
 FINAL_DEV_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
@@ -141,7 +153,7 @@ def get_randomized_name(prefix: str) -> str:
     return f"{prefix}{random.randint(1,100000):05}"
 
 
-def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix):
+def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix, storage_account_id):
     """Deploy the azure key vault"""
     # Key vault will be deployed in a unique resource group
     resource_group_name = deployment_name + "-keyvault"
@@ -186,6 +198,24 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
         raise Exception("Keyvault deployment failed")
 
     keyvault_url = f"https://{key_vault_name}.vault.azure.net/"
+
+    # Setup monitoring and audit logs
+    key_vault_resource_id = f"/subscriptions/{account_credentials['subscription_id']}/resourceGroups/{resource_group_name}/providers/Microsoft.KeyVault/vaults/{key_vault_name}"
+    monitor_client = MonitorManagementClient(
+        credential=account_credentials["credentials"], subscription_id=account_credentials["subscription_id"]
+    )
+
+    diagnostic_settings_resource = DiagnosticSettingsResource(
+        storage_account_id=storage_account_id,
+        logs=[LogSettings(category="AuditEvent", enabled=True)],
+        metrics=[MetricSettings(category="AllMetrics", enabled=True)],
+    )
+
+    monitor_client.diagnostic_settings.create_or_update(
+        resource_uri=key_vault_resource_id,
+        name="Key vault logs",
+        parameters=diagnostic_settings_resource,
+    )
 
     # return the url of the keyvault
     return keyvault_url
@@ -254,7 +284,6 @@ def deploy_apiservices(
 
 def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
     """Deploy the frontend server"""
-    subscription_id = account_credentials["subscription_id"]
     frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend")
 
     # Prepare the initialization vector for the frontend server
@@ -272,15 +301,6 @@ def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
     upload_package(frontend_server_ip, "newwebfrontend.json", "newwebfrontend.tar.gz")
 
     return frontend_server_ip
-
-
-class DeploymentResponse(BaseModel):
-    """Deployment response."""
-
-    status: StrictStr = Field(...)
-    response: StrictStr = Field(default="")
-    ip_address: StrictStr = Field(default="")
-    note: StrictStr = Field(...)
 
 
 def create_storage_account(account_credentials: dict, deployment_name: str, account_name_prefix: str, location: str):
@@ -372,13 +392,6 @@ if __name__ == "__main__":
     )
     account_credentials["object_id"] = AZURE_OBJECT_ID
 
-    # Provision a key vault
-    key_vault_url = deploy_key_vault(account_credentials, deployment_id, "sailkeyvault")
-
-    # Create an RSA key
-    key_client = KeyClient(vault_url=key_vault_url, credential=account_credentials["credentials"])
-    rsa_key = key_client.create_rsa_key("keyname", size=4096)
-
     # Deploy Storage Account
     (
         storage_account,
@@ -386,6 +399,24 @@ if __name__ == "__main__":
         storage_accout_password,
         storage_resource_group_name,
     ) = create_storage_account(account_credentials, deployment_id, "saildatastorage", "westus")
+
+    # Create storage account id
+    storage_account_id = (
+        "/subscriptions/"
+        + account_credentials["subscription_id"]
+        + "/resourceGroups/"
+        + storage_resource_group_name
+        + "/providers/Microsoft.Storage/storageAccounts/"
+        + storage_account_name
+    )
+
+    # Provision a key vault
+    key_vault_url = deploy_key_vault(
+        account_credentials=account_credentials,
+        deployment_name=deployment_id,
+        key_vault_name_prefix="sailkeyvault",
+        storage_account_id=storage_account_id,
+    )
 
     # Deploy the API services
     platform_services_ip = deploy_apiservices(
@@ -406,7 +437,6 @@ if __name__ == "__main__":
     print("\n\n===============================================================")
     print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip)
     print("SAIL API Services is hosted on: https://" + platform_services_ip + ":8000")
-
     print("Deployment ID: ", deployment_id)
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")

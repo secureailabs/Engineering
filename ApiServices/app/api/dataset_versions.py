@@ -95,7 +95,7 @@ async def register_dataset_version(
         # Create a directory in the azure file share for the dataset version
         background_tasks.add_task(create_directory_in_file_share, dataset_version_db.dataset_id, dataset_version_db.id)
 
-        message = f"[Register Dataset Version]: user_id:{current_user.id}"
+        message = f"[Register Dataset Version]: user_id:{current_user.id}, dataset_id: {dataset_version_req.dataset_id}, version: {dataset_version_db.id}"
         await log_message(message)
 
         return RegisterDatasetVersion_Out(**dataset_version_db.dict())
@@ -142,7 +142,7 @@ async def get_all_dataset_versions(
             )
             response_list_of_dataset_version.append(response_dataset_version)
 
-        message = f"[Get All Dataset Version]: user_id:{current_user.id}"
+        message = f"[Get All Dataset Version]: user_id:{current_user.id}, dataset_id:{dataset_id}"
         await log_message(message)
 
         return GetMultipleDatasetVersion_Out(dataset_versions=response_list_of_dataset_version)
@@ -177,7 +177,7 @@ async def get_dataset_version(
             **dataset_version.dict(), organization=BasicObjectInfo(_id=organization[0].id, name=organization[0].name)
         )
 
-        message = f"[Get Dataset Version]: user_id:{current_user.id}"
+        message = f"[Get Dataset Version]: user_id:{current_user.id}, dataset_id: {dataset_version.dataset_id}, version: {dataset_version_id}"
         await log_message(message)
 
         return response_data_version
@@ -236,7 +236,7 @@ async def get_dataset_version_connection_string(
         url = f"https://{get_secret('azure_storage_account_name')}.file.core.windows.net/{dataset_version.dataset_id}/{dataset_version.id}"
         full_url = f"{url}/{dataset_version.id}?{connection_string.response}"
 
-        message = f"[Get Dataset Version Connection String]: user_id:{current_user.id}"
+        message = f"[Get Dataset Version Connection String]: user_id:{current_user.id}, dataset_id: {dataset_version.dataset_id}. version: {dataset_version_id}"
         await log_message(message)
 
         return GetDatasetVersionConnectionString_Out(_id=dataset_version_id, connection_string=full_url)
@@ -293,7 +293,7 @@ async def update_dataset_version(
             {"$set": jsonable_encoder(dataset_version_db)},
         )
 
-        message = f"[Updata Dataset Version]: user_id:{current_user.id}"
+        message = f"[Updata Dataset Version]: user_id:{current_user.id}, dataset_id: {dataset_version_db.dataset_id}, version: {dataset_version_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -333,7 +333,7 @@ async def soft_delete_dataset_version(
             {"$set": jsonable_encoder(dataset_version_db)},
         )
 
-        message = f"[Soft Delete Dataset Version]: user_id:{current_user.id}"
+        message = f"[Soft Delete Dataset Version]: user_id:{current_user.id}, dataset_id: {dataset_version_db.dataset_id}, version: {dataset_version_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -72,7 +72,9 @@ async def register_secure_computation_node(
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
         background_tasks.add_task(provision_virtual_machine, secure_computation_node_db)
 
-        message = f"[Register Secure Computation Node]: user_id:{current_user.id}"
+        message = (
+            f"[Register Secure Computation Node]: user_id:{current_user.id}, SCN_id: {secure_computation_node_db.id}"
+        )
         await log_message(message)
 
         return RegisterSecureComputationNode_Out(**secure_computation_node_db.dict())

@@ -375,7 +375,7 @@ async def invite_researcher(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
-        message = f"[Invite Researcher]: user_id:{current_user.id}"
+        message = f"[Invite Researcher]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, organization_id: {researcher_organization_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -450,7 +450,7 @@ async def register_data_submitter(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
-        message = f"[Register Data Submitter]: user_id:{current_user.id}"
+        message = f"[Register Data Submitter]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, data_submitter_id: {data_submitter_organization_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -514,7 +514,7 @@ async def register_researcher(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
-        message = f"[Register Researcher]: user_id:{current_user.id}"
+        message = f"[Register Researcher]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, researcher_id: {researcher_organization_id}"
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -604,7 +604,7 @@ async def invite_data_submitter(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
-        message = f"[Invite Data Submitter]: user_id:{current_user.id}"
+        message = f"[Invite Data Submitter]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, organization_id: {data_submitter_organization_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -732,7 +732,7 @@ async def get_all_invites(organization_id: PyObjectId, current_user: TokenData =
                 )
             )
 
-        message = f"[Get All Invites]: user_id:{current_user.id}"
+        message = f"[Get All Invites]: user_id:{current_user.id}, data_federation: {data_federation}, organization_id: {organization_id}"
         await log_message(message)
 
         return GetMultipleInvite_Out(invites=invites_out)
@@ -790,7 +790,7 @@ async def get_invite(
             inviter_organization=inviter_user.organization,
         )
 
-        message = f"[Get Invite]: user_id:{current_user.id}"
+        message = f"[Get Invite]: user_id:{current_user.id}, data_federation_id: {invite.data_federation_id}, invite_id: {invite_id}, organization_id: {organization_id}"
         await log_message(message)
 
         return invite_out
@@ -892,7 +892,7 @@ async def accept_or_reject_invite(
                 {"$set": jsonable_encoder(data_federation)},
             )
 
-        message = f"[Accept Or Reject Invite]: user_id:{current_user.id}"
+        message = f"[Accept Or Reject Invite]: user_id:{current_user.id}, data_federation_id: {invite.data_federation_id}, invite_id: {invite_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -973,7 +973,7 @@ async def add_dataset(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
-        message = f"[Add Dataset]: user_id:{current_user.id}"
+        message = f"[Add Dataset]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -1033,7 +1033,7 @@ async def remove_dataset(
             {"$set": jsonable_encoder(data_federation_db)},
         )
 
-        message = f"[Remove Dataset]: user_id:{current_user.id}"
+        message = f"[Remove Dataset]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -1130,7 +1130,7 @@ async def get_existing_dataset_key(
     :raises exception: should be 500, internal server error
     """
     try:
-        message = f"[Dataset Key]: user_id:{current_user.id}"
+        message = f"[Dataset Key]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
         await log_message(message)
 
         return await get_dataset_key(

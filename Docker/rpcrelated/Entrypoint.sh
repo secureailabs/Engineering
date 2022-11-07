@@ -57,5 +57,7 @@ pip3 install /app/datascience/sail-safe-functions
 # Start the rpc server
 python3 /app/test_server.py 5556
 
+
 # To keep the container running
 tail -f /dev/null
+

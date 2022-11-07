@@ -3,7 +3,7 @@ set -e
 
 PrintHelp() {
     echo ""
-    echo "Usage: $0 -s [Service Name] -d -c"
+    echo "Usage: $0 -s [Service Name] -d -c -n [Docker Name]"
     echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
@@ -13,12 +13,14 @@ PrintHelp() {
 # Parese the input parameters
 detach=false
 cleanDatabase=false
-while getopts "l:s:d opt:c opt:" opt; do
+dockerName=""
+while getopts "n:l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
     c) cleanDatabase=true ;;
     l) localDataset="$OPTARG" ;;
+    n) dockerName="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -26,6 +28,10 @@ done
 # Print Help in case parameters are not correct
 if [ -z "$imageName" ] || [ -z "$detach" ]; then
     PrintHelp
+fi
+
+if [ -z "$dockerName" ]; then
+    dockerName=$imageName
 fi
 echo "Running $imageName"
 echo "Detach: $detach"
@@ -76,7 +82,7 @@ mkdir -p $rootDir/Binary/"$imageName"_dir
 cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 
 # Prepare the flags for the docker run command
-runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
+runtimeFlags="$detachFlags --name $dockerName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
     make -C $rootDir orchestrator -s -j
@@ -133,7 +139,7 @@ elif [ "rpcrelated" == "$imageName" ]; then
     if [ $localDataset ]; then
         runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
     fi
-    runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

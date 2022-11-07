@@ -16,7 +16,8 @@ RUN apt-get update && \
   curl \
   sudo \
   build-essential \
-  python3-pip
+  python3-pip \
+  iputils-ping
 
 # Install mongodb
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -

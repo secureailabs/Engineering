@@ -6,14 +6,14 @@ if __name__ == "__main__":
 
     if len(sys.argv) != 2:
         raise RuntimeError("must have port number argument")
-    
+
     module_stat = load_module("sail_safe_functions.statistics")
-    module_data = load_module("sail_safe_functions.data")
+    module_data = load_module("sail_safe_functions.preprocessing")
     module_ml = load_module("sail_safe_functions.machine_learning")
     module_privacy = load_module("sail_safe_functions.privacy_barrier")
 
     app = ZeroServer(port=int(sys.argv[1]))
-    safe_contents = {"safe_funcs":set(), "safe_objects": set()}
+    safe_contents = {"safe_funcs": set(), "safe_objects": set()}
     modules = [module_stat, module_data, module_ml, module_privacy]
     for m in modules:
         safe_contents["safe_funcs"].update(m["safe_funcs"])

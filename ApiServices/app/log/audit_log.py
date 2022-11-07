@@ -1,3 +1,18 @@
+# -------------------------------------------------------------------------------
+# Engineering
+# audit_log.py
+# -------------------------------------------------------------------------------
+
+# """Module to write audit logs"""
+# -------------------------------------------------------------------------------
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+# This software contains proprietary information which shall not
+# be reproduced or transferred to other documents and shall not
+# be disclosed to others for any purpose without
+# prior written permission of Secure Ai Labs, Inc.
+# -------------------------------------------------------------------------------
+
 import logging
 import os
 import sys

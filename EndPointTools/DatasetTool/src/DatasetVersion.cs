@@ -1,7 +1,7 @@
 using Azure.Storage.Files.Shares;
-using ICSharpCode.SharpZipLib.Tar;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
-
 namespace DatasetTool;
 
 class DatasetVersion
@@ -57,25 +57,28 @@ class DatasetVersion
     /// <param name="connection_string"> Connection string with write permission to the file share </param>
     public void UploadToAzure(string connection_string)
     {
-        // Create a tar package with the data files
-        string tar_file = dataset_version_id.ToString();
-        using (FileStream fs = File.Create(tar_file))
-        {
-            using (TarArchive tarArchive = TarArchive.CreateOutputTarArchive(fs))
-            {
-                foreach (string file in m_data_files)
-                {
-                    TarEntry tarEntry = TarEntry.CreateEntryFromFile(file);
-                    tarEntry.Name = Path.GetFileName(file);
-                    tarArchive.WriteEntry(tarEntry, false);
-                }
-            }
-        }
+        // Create a file with name dataset_header.json
+        string dataset_header_file = "dataset_header.json";
+        File.WriteAllText(dataset_header_file, GetMetadataJson());
 
-        // TODO: Encrypt the tar file
+        // Create a data_model zip file
+        // TODO: add correct data models when they are available
+        string data_model_zip_file = "data_model.zip";
+        CreateZipFromFiles(data_model_zip_file, new string[] { "dataset_header.json" });
 
-        // Upload the tar file to the Azure File Share
-        using (FileStream fs = File.Open(tar_file, FileMode.Open))
+        // Create a zip package with the data files
+        string data_content_zip_file = "data_content.zip";
+        CreateZipFromFiles(data_content_zip_file, m_data_files.ToArray());
+
+        // Create a zip file with the dataset header, data model and data content
+        string[] big_zip_files = { dataset_header_file, data_model_zip_file, data_content_zip_file };
+        string dataset_file = "dataset_" + dataset_version_id.ToString() + ".zip";
+        CreateZipFromFiles(dataset_file, big_zip_files);
+
+        // TODO: Encrypt the zip file
+
+        // Upload the zip file to the Azure File Share
+        using (FileStream fs = File.Open(dataset_file, FileMode.Open))
         {
             // Upload the files created tar file to Azure file share using the sas token
             ShareFileClient fileClient = new ShareFileClient(new Uri(connection_string));
@@ -84,6 +87,46 @@ class DatasetVersion
         }
 
         // Delete the tar file
-        File.Delete(tar_file);
+        File.Delete(data_content_zip_file);
+        File.Delete(data_model_zip_file);
+        File.Delete(dataset_header_file);
+    }
+
+    private void CreateZipFromFiles(string zip_file, string[] files)
+    {
+        using (FileStream fsOut = File.Create(zip_file))
+        using (var zipStream = new ZipOutputStream(fsOut))
+        {
+
+            //0-9, 9 being the highest level of compression
+            zipStream.SetLevel(3);
+
+            // optional. Null is the same as not setting. Required if using AES.
+            // zipStream.Password = password;
+
+            foreach (var filename in files)
+            {
+                var fi = new FileInfo(filename);
+
+                // Clean the name and fix slash direction
+                var entryName = Path.GetFileName(ZipEntry.CleanName(filename));
+                var newEntry = new ZipEntry(entryName);
+
+                // Specifying the AESKeySize triggers AES encryption.
+                //   newEntry.AESKeySize = 256;
+
+                newEntry.Size = fi.Length;
+                zipStream.PutNextEntry(newEntry);
+
+                // Zip the file in buffered chunks
+                // the "using" will close the stream even if an exception occurs
+                var buffer = new byte[4096];
+                using (FileStream fsInput = File.OpenRead(filename))
+                {
+                    StreamUtils.Copy(fsInput, zipStream, buffer);
+                }
+                zipStream.CloseEntry();
+            }
+        }
     }
 }

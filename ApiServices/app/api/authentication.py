@@ -110,7 +110,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         algorithm=ALGORITHM,
     )
 
-    message = f"[Login For Access Token]:"
+    message = f"[Login For Access Token]: user_email:{form_data.username}"
     await log_message(message)
 
     return LoginSuccess_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
@@ -152,7 +152,7 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
             algorithm=ALGORITHM,
         )
 
-        message = f"[Refresh For Access Token]:"
+        message = f"[Refresh For Access Token]: user_id: {user_id}"
         await log_message(message)
 
     except JWTError as exception:

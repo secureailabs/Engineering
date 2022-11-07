@@ -105,7 +105,7 @@ async def get_all_organizations(current_user: TokenData = Depends(get_current_us
     try:
         organizations = await data_service.find_all(DB_COLLECTION_ORGANIZATIONS)
 
-        message = f"[Get All Organizations]: user:{current_user.id}"
+        message = f"[Get All Organizations]: user_id:{current_user.id}"
         await log_message(message)
 
         return GetMultipleOrganizations_Out(organizations=organizations)
@@ -267,7 +267,7 @@ async def register_user(
 
         await data_service.insert_one(DB_COLLECTION_USERS, jsonable_encoder(user_db))
 
-        message = f"[Register User]: user_id:{current_user.id}, user:{user.dict()}"
+        message = f"[Register User]: user_id:{current_user.id}, user_email:{user.email}"
         await log_message(message)
 
         return user_db
@@ -444,7 +444,7 @@ async def update_user_info(
             {"$set": jsonable_encoder(user_db)},
         )
 
-        message = f"[Update User Info], user_id{current_user.id}"
+        message = f"[Update User Info], user_id:{current_user.id}, updated_target:{user_id}, updated_target_info: {update_user_info}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)

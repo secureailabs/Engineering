@@ -206,7 +206,7 @@ async def get_secure_computation_node(
             researcher_user=current_user.id,
         )
 
-        message = f"[Get Secure Computation Node]: user_id:{current_user.id}"
+        message = f"[Get Secure Computation Node]: user_id:{current_user.id}, SCN_id: {secure_computation_node_id}"
         await log_message(message)
 
         return response_secure_computation_node
@@ -252,7 +252,7 @@ async def update_secure_computation_node(
             {"$set": jsonable_encoder(secure_computation_node_db)},
         )
 
-        message = f"[Update Secure Computation Node]: user_id:{current_user.id}"
+        message = f"[Update Secure Computation Node]: user_id:{current_user.id}, SCN_id: {secure_computation_node_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -282,7 +282,7 @@ async def deprovision_secure_computation_nodes(
         # Start a background task to deprovision the secure computation node which will update the status
         background_tasks.add_task(delete_resource_group, data_federation_provision_id, current_user)
 
-        message = f"[Deprovision Secure Computation Nodes]: user_id:{current_user.id}"
+        message = f"[Deprovision Secure Computation Nodes]: user_id:{current_user.id}, data_federation_provision_id: {data_federation_provision_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)

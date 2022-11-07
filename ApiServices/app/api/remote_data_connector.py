@@ -60,11 +60,13 @@ async def get_secure_computation_nodes_waiting_for_data(
         for dataset in datasets_with_remote_data_connector.datasets:
             query = {"dataset_id": str(dataset), "state": "WAITING_FOR_DATA"}
             secure_computation_nodes = await data_service.find_by_query(DB_COLLECTION_SECURE_COMPUTATION_NODE, query)
+            node_ids = []
             for secure_computation_node in secure_computation_nodes:
+                node_ids.append(secure_computation_node.id)
                 secure_computation_node = VmUploadInfo(**secure_computation_node)
                 response_secure_computation_nodes.append(secure_computation_node)
 
-        message = f"[Get Secure Computation Nodes Waiting For Data]: user_id:{current_user.id}"
+        message = f"[Get Secure Computation Nodes Waiting For Data]: user_id:{current_user.id}, node_ids: {node_ids}"
         await log_message(message)
 
         return GetWaitingSecureComputationNode_Out(secure_computation_nodes=response_secure_computation_nodes)

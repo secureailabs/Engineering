@@ -124,7 +124,7 @@ async def provision_data_federation(
 
         await data_service.insert_one(DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS, jsonable_encoder(provision_db))
 
-        message = f"[Provision Data Federation]: user_id:{current_user.id}"
+        message = f"[Provision Data Federation]: user_id:{current_user.id}, provision_id: {provision_db.id}"
         await log_message(message)
 
         return RegisterDataFederationProvision_Out(**provision_db.dict())
@@ -166,7 +166,7 @@ async def get_data_federation_provision_info(
         if not provision_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data Federation Provision not found")
 
-        message = f"[Get Data Federation Provision Info]: user_id:{current_user.id}"
+        message = f"[Get Data Federation Provision Info]: user_id:{current_user.id}, provision_id: {provision_db.id}"
         await log_message(message)
 
         return GetDataFederationProvision(**provision_db)
@@ -209,7 +209,9 @@ async def get_all_data_federation_provision_info(
         for provision in provision_db:
             response_list.append(GetDataFederationProvision(**provision))
 
-        message = f"[Get All Data Federation Provision Info]: user_id:{current_user.id}"
+        message = (
+            f"[Get All Data Federation Provision Info]: user_id:{current_user.id}, provision_id: {provision_db.id}"
+        )
         await log_message(message)
 
         return GetMultipleDataFederationProvision_Out(data_federation_provisions=response_list)
@@ -251,7 +253,7 @@ async def deprovision_data_federation(
             current_user=current_user,
         )
 
-        message = f"[Deprovision Data Federation]: user_id:{current_user.id}"
+        message = f"[Deprovision Data Federation]: user_id:{current_user.id}, provision_id: {provision_id}"
         await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)

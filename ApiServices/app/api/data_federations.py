@@ -238,7 +238,7 @@ async def get_data_federation(
             datasets=dataset_basic_info_list,
         )
 
-        message = f"[Get Data Federation]: user_id: {current_user.id}"
+        message = f"[Get Data Federation]: user_id: {current_user.id}, data_federatuon_id: {data_federation_id}"
         await log_message(message)
 
         return response_data_federation

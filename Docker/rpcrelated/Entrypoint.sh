@@ -39,9 +39,9 @@ chmod 600 /etc/smbcredentials/$storageAccountName.cred
 echo "//$storageAccountName.file.core.windows.net/$datasetId/$datasetVersionId /mnt/dataset cifs nofail,credentials=/etc/smbcredentials/$storageAccountName.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30" >> /etc/fstab
 mount -t cifs //$storageAccountName.file.core.windows.net/$datasetId/$datasetVersionId /mnt/dataset -o credentials=/etc/smbcredentials/$storageAccountName.cred,dir_mode=0777,file_mode=0777,serverino,nosharesock,actimeo=30
 
-# Untar the dataset
+# Unzip the dataset_{dataset_version_id} file
 mkdir -p /data
-tar -xf /mnt/dataset/$datasetVersionId -C /data
+unzip /mnt/dataset/dataset_{dataset_version_id} -d /data
 
 # Install the rpc library
 pip3 install /app/zero

@@ -109,3 +109,24 @@ async def log_message(
     :type msg: str
     """
     logger.log(msg)
+
+
+async def log_message_with_userid(
+    msg: str,
+    user_id: str,
+):
+    """
+    send log message to async server with user_id
+
+    :param msg: audit log message
+    :type msg: str
+    :param user_id: user id
+    :type user_id: str
+    """
+    msg_dict = {}
+    msg_dict["payload"] = msg
+    msg_dict["user_id"] = user_id
+
+    import json
+
+    logger.log(json.dumps(msg_dict))

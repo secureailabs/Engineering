@@ -12,6 +12,8 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 from typing import List
+from base64 import b64encode
+import os
 
 import app.utils.azure as azure
 from app.api.accounts import get_organization
@@ -23,7 +25,7 @@ from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Re
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
-from models.common import BasicObjectInfo, PyObjectId
+from models.common import BasicObjectInfo, PyObjectId, KeyVaultObject
 from models.datasets import (
     Dataset_Db,
     DatasetState,
@@ -32,6 +34,7 @@ from models.datasets import (
     RegisterDataset_In,
     RegisterDataset_Out,
     UpdateDataset_In,
+    DatasetEncryptionKey_Out,
 )
 
 DB_COLLECTION_DATASETS = "datasets"
@@ -75,7 +78,7 @@ async def register_dataset(
         )
         # If there is an existing dataset with the same name, return the existing dataset ID
         if existing_dataset:
-            dataset_db = Dataset_Db(**existing_dataset)  # type: ignore
+            dataset_db = Dataset_Db(**existing_dataset)
             response.status_code = status.HTTP_200_OK
             return RegisterDataset_Out(_id=dataset_db.id)
 
@@ -149,7 +152,9 @@ async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(
         raise exception
 
 
-async def get_dataset_internal(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+async def get_dataset_internal(
+    dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+) -> Dataset_Db:
     dataset = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
     if not dataset:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
@@ -177,7 +182,7 @@ async def update_dataset(
         if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        dataset_db = Dataset_Db(**dataset_db)  # type: ignore
+        dataset_db = Dataset_Db(**dataset_db)
         if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
@@ -217,7 +222,7 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
         if not dataset_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        dataset_db = Dataset_Db(**dataset_db)  # type: ignore
+        dataset_db = Dataset_Db(**dataset_db)
         if dataset_db.organization_id != current_user.organization_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
@@ -236,6 +241,56 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
         raise exception
 
 
+async def get_datset_encryption_key(
+    dataset_id: PyObjectId, wrapping_key: KeyVaultObject, create_if_doesnt_exit: bool, current_user: TokenData
+) -> DatasetEncryptionKey_Out:
+    """
+    Get the dataset encryption key to the database, if it does not exist, create it
+
+    :param dataset_id: The dataset id
+    :type dataset_id: PyObjectId
+    :param rsa_key_name: The name of the wrapping RSA key
+    :type rsa_key_name: str
+    :param rsa_key_version: The version of the wrapping RSA key
+    :type rsa_key_version: str
+    :param current_user: The current user
+    :type current_user: TokenData
+    :return: base64 encoded dataset encryption key
+    :rtype: DatasetEncryptionKey_Out
+    """
+    # Dataset organization and currnet user organization should be same
+    dataset_db = await get_dataset_internal(dataset_id, current_user)
+    if dataset_db.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset not found")
+
+    # We generate a key if none has been assigned to this dataset, otherwise we unwrap the key
+    # that was used to encrypt the DS
+    if dataset_db.encryption_key is None:
+        if not create_if_doesnt_exit:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset encryption key not found")
+
+        # Generate a new key. TODO: could be done in keyvault
+        aes_key = os.urandom(32)
+
+        wrapped_key_secret = azure.wrap_aes_key(
+            aes_key=aes_key,
+            wrapping_key=wrapping_key,
+        )
+
+        # Add the key information to the database
+        dataset_db.encryption_key = wrapped_key_secret
+        await data_service.update_one(
+            DB_COLLECTION_DATASETS,
+            {"_id": str(dataset_id)},
+            {"$set": jsonable_encoder(dataset_db)},
+        )
+    else:
+        wrapped_key_secret = dataset_db.encryption_key
+        aes_key = azure.unwrap_aes_with_rsa_key(wrapped_aes_key=wrapped_key_secret, wrapping_key=wrapping_key)
+
+    return DatasetEncryptionKey_Out(dataset_key=b64encode(aes_key).decode("ascii"))
+
+
 def create_azure_file_share(dataset_id: PyObjectId):
     """
     Create a file share in Azure
@@ -245,12 +300,7 @@ def create_azure_file_share(dataset_id: PyObjectId):
     :raises Exception: failed to create file share
     """
     try:
-        account_credentials = azure.authenticate(
-            get_secret("azure_client_id"),
-            get_secret("azure_client_secret"),
-            get_secret("azure_tenant_id"),
-            get_secret("azure_subscription_id"),
-        )
+        account_credentials = azure.authenticate()
 
         create_response = azure.create_file_share(
             account_credentials,

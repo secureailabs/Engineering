@@ -72,14 +72,15 @@ class Program
                 dataset_version.dataset_version_id = dataset_version_id;
 
                 // Get the azure connection string
-                var azure_connection_string = user_session.GetConnectionStringForDatasetVersion(dataset_version_id);
+                var azure_connection_string = "";
+                // var azure_connection_string = user_session.GetConnectionStringForDatasetVersion(dataset_version_id);
                 if (azure_connection_string == null)
                 {
                     throw new Exception("Could not get the connection string for the dataset version");
                 }
 
                 // Upload the dataset
-                dataset_version.UploadToAzure(azure_connection_string);
+                dataset_version.UploadToAzure(azure_connection_string, "DhA5lu3lYGnvOIztQn/IGLX6ar1T25AuVaMMuwLuJGs=");
 
                 // Mark the dataset version as ready
                 user_session.MarkDatasetVersionAsActive(dataset_version_id);

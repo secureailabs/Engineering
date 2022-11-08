@@ -16,3 +16,10 @@ class DatasetVersionMetadata
     public string state { get; set; } = default!;
 }
 
+class DatasetHeader
+{
+    public DatasetVersionMetadata dataset_version { get; set; } = default!;
+    public string aes_tag { get; set; } = default!;
+    public string aes_nonce { get; set; } = default!;
+}
+

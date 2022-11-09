@@ -100,7 +100,7 @@
                 "enableRbacAuthorization": false,
                 "vaultUri": "[concat('https://', parameters('keyvault_name'), '.vault.azure.net/')]",
                 "provisioningState": "Succeeded",
-                "publicNetworkAccess": "Disabled"
+                "publicNetworkAccess": "Enabled"
             }
         }
     ]

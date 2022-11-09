@@ -130,7 +130,8 @@ elif [ "securecomputationnode" == "$imageName" ]; then
 elif [ "rpcrelated" == "$imageName" ]; then
     bash -c "cd $rootDir/RPCLib;./package.sh"
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
-    runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+    cp $rootDir/Binary/decrypt_file.py $rootDir/Binary/"$imageName"_dir/
+    runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

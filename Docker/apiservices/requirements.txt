@@ -25,3 +25,6 @@ azure-mgmt-storage==20.1.0
 azure-storage-file-share==12.9.0
 pyzmq==22.0.3
 msgpack==1.0.3
+azure-keyvault==4.2.0
+azure-keyvault-keys==4.7.0
+azure-keyvault-secrets==4.6.0

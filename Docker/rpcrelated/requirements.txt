@@ -1,0 +1,13 @@
+numpy
+pandas
+scipy
+sklearn
+torch
+matplotlib
+fastapi
+uvicorn
+python-multipart
+psutil
+msgpack
+pyzmq
+pycryptodome

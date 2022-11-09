@@ -33,6 +33,12 @@ class UserSession
         public string connection_string { get; set; } = default!;
     }
 
+    class EncryptionKeyResponse
+    {
+        public string dataset_key { get; set; } = default!;
+    };
+
+
     private LoginResponse m_LoginResponse = default!;
     private RestClient m_client = default!;
 
@@ -157,10 +163,8 @@ class UserSession
     /// <param name="data_federation_name"> Name of the data federation to add the dataset </param>
     /// <returns> Guid of the newly created dataset </returns>
     /// <exception cref="Exception"></exception>
-    public Guid CreateDatasetAndAddToFederation(Dataset dataset, string data_federation_name)
+    public Guid CreateDatasetAndAddToFederation(Dataset dataset, Guid data_federation_id)
     {
-        Guid data_federation_id = GetFederationId(data_federation_name);
-
         // Create json from the input
         string dataset_json = Newtonsoft.Json.JsonConvert.SerializeObject(dataset);
 
@@ -344,5 +348,25 @@ class UserSession
         {
             throw new Exception("Dataset version state update failed.\n" + response.Content);
         }
+    }
+
+    public string GetEncryptionKeyForDataset(Guid dataset_id, Guid data_federation_id)
+    {
+        // Create the request
+        var request = new RestRequest("/data-federations/" + data_federation_id.ToString() + "/dataset_key/" + dataset_id.ToString(), Method.Post);
+        request.AddHeader("accept", "application/json");
+        request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
+
+        // Get the federations
+        var response = m_client.Execute(request);
+        if (response.StatusCode != System.Net.HttpStatusCode.OK || response.Content == null)
+        {
+            throw new Exception("Data federation list fetch failed.\n" + response.Content);
+        }
+
+        // Get the dataset version
+        var dataset_key_response = Newtonsoft.Json.JsonConvert.DeserializeObject<EncryptionKeyResponse>(response.Content)!;
+
+        return dataset_key_response.dataset_key;
     }
 }

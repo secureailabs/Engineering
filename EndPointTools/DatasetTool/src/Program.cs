@@ -46,11 +46,14 @@ class Program
                 // Get the list of the datasets
                 Guid dataset_id = user_session.GetDatasetId(dataset_configuration.m_configuration.dataset.name);
 
+                // Get the data federation id
+                Guid data_federation_id = user_session.GetFederationId(dataset_configuration.m_configuration.data_federation);
+
                 // If the dataset is not found, create it
                 if (dataset_id.CompareTo(Guid.Empty) == 0)
                 {
                     System.Console.WriteLine("Dataset not found, creating it");
-                    dataset_id = user_session.CreateDatasetAndAddToFederation(dataset_configuration.m_configuration.dataset, dataset_configuration.m_configuration.data_federation);
+                    dataset_id = user_session.CreateDatasetAndAddToFederation(dataset_configuration.m_configuration.dataset, data_federation_id);
                 }
 
                 // Create and Register the dataset version metadata
@@ -78,8 +81,11 @@ class Program
                     throw new Exception("Could not get the connection string for the dataset version");
                 }
 
+                // Get the encryption key from the backend
+                string encryption_key = user_session.GetEncryptionKeyForDataset(dataset_id, data_federation_id);
+
                 // Upload the dataset
-                dataset_version.UploadToAzure(azure_connection_string);
+                dataset_version.UploadToAzure(azure_connection_string, encryption_key);
 
                 // Mark the dataset version as ready
                 user_session.MarkDatasetVersionAsActive(dataset_version_id);

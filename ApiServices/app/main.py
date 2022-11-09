@@ -20,6 +20,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictStr
+from zero import _AsyncLogger
 
 from app.api import (
     accounts,
@@ -38,6 +39,7 @@ server = FastAPI(
     version="0.1.0",
     docs_url=None,
 )
+audit_logger = _AsyncLogger()
 
 # Add all the API services here exposed to the public
 server.include_router(authentication.router)
@@ -81,3 +83,8 @@ async def custom_swagger_ui_html():
         swagger_js_url="/static/swagger-ui-bundle.js",
         swagger_css_url="/static/swagger-ui.css",
     )
+
+
+@server.on_event("startup")
+async def start_audit_logger():
+    _AsyncLogger.start_logger_poller(_AsyncLogger.port, _AsyncLogger.ipc)

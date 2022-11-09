@@ -97,8 +97,9 @@ elif [ "apiservices" == "$imageName" ]; then
     make -C $rootDir package_apiservices -s -j
     # Check for Azure environment variables
     if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
-        echo "environment variable AZURE_SUBSCRIPTION_ID is undefined"
-        exit 1
+        echo "environment variable AZURE_SUBSCRIPTION_ID is undefined. Using development as default."
+        AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
+        # exit 1
     fi
     if [ ${AZURE_SUBSCRIPTION_ID} == "3d2b9951-a0c8-4dc3-8114-2776b047b15c" ]; then
         cp apiservices/InitializationVectorScratchPad.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json

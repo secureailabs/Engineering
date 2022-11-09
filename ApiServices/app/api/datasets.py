@@ -20,6 +20,7 @@ from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
 from app.data import sync_operations as sync_data_service
+from app.log import log_message
 from app.utils.secrets import get_secret
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
@@ -91,6 +92,9 @@ async def register_dataset(
         # Create a file share for the dataset
         background_tasks.add_task(create_azure_file_share, dataset_db.id)
 
+        message = f"[Register Dataset]: user_id:{current_user.id}, dataset_id: {dataset_db.id}"
+        await log_message(message)
+
         return RegisterDataset_Out(**dataset_db.dict())
     except HTTPException as http_exception:
         raise http_exception
@@ -118,11 +122,16 @@ async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
         organization = await get_organization(current_user.organization_id, current_user)
 
         response_list_of_datasets: List[GetDataset_Out] = []
+        datasets_ids = []
         # Add the organization information to the dataset
         for dataset in datasets:
             dataset = Dataset_Db(**dataset)
+            datasets_ids.append(dataset.id)
             response_dataset = GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization.dict()))
             response_list_of_datasets.append(response_dataset)
+
+        message = f"[Get All Datasets]: user_id:{current_user.id}, datasets_ids: {datasets_ids}"
+        await log_message(message)
 
         return GetMultipleDataset_Out(datasets=response_list_of_datasets)
     except HTTPException as http_exception:
@@ -144,6 +153,9 @@ async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(
     try:
         dataset = await get_dataset_internal(dataset_id, current_user)
         organization_info = await get_organization(organization_id=dataset.organization_id, current_user=current_user)
+
+        message = f"[Get Dataset]: user_id:{current_user.id}"
+        await log_message(message)
 
         return GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization_info.dict()))
     except HTTPException as http_exception:
@@ -201,6 +213,9 @@ async def update_dataset(
             {"$set": jsonable_encoder(dataset_db)},
         )
 
+        message = f"[Update Dataset]: user_id:{current_user.id}, dataset_id: {dataset_id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -233,6 +248,9 @@ async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = 
             {"_id": str(dataset_id)},
             {"$set": jsonable_encoder(dataset_db)},
         )
+
+        message = f"[Soft Delete Dataset]: user_id:{current_user.id}, dataset_id: {dataset_id}"
+        await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:

@@ -12,6 +12,8 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
+import threading
+
 import fastapi.openapi.utils as utils
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -31,6 +33,7 @@ from app.api import (
     internal_utils,
     secure_computation_nodes,
 )
+from app.log import _AsyncLogger
 
 server = FastAPI(
     title="Secure AI Labs API Services",
@@ -38,6 +41,19 @@ server = FastAPI(
     version="0.1.0",
     docs_url=None,
 )
+
+
+class Audit_log_task(threading.Thread):
+    """
+    Auxillary class for audit log server in isolated thread
+    """
+
+    def run(self):
+        """
+        Start async logger server
+        """
+        _AsyncLogger.start_log_poller(_AsyncLogger.ipc, _AsyncLogger.port)
+
 
 # Add all the API services here exposed to the public
 server.include_router(authentication.router)
@@ -81,3 +97,12 @@ async def custom_swagger_ui_html():
         swagger_js_url="/static/swagger-ui-bundle.js",
         swagger_css_url="/static/swagger-ui.css",
     )
+
+
+@server.on_event("startup")
+async def start_audit_logger():
+    """
+    Start async audit logger server at start up as a background task
+    """
+    t = Audit_log_task()
+    t.start()

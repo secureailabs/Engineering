@@ -13,6 +13,7 @@
 # -------------------------------------------------------------------------------
 from app.api.authentication import RoleChecker, get_current_user, get_password_hash
 from app.data import operations as data_service
+from app.log import log_message
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import (
@@ -75,6 +76,9 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
 
         admin_user = await data_service.insert_one(DB_COLLECTION_USERS, jsonable_encoder(admin_user_db))
 
+        message = f"[Organization Register]: name:{organization.admin_name}, email:{organization.admin_email}, job_title:{organization.admin_job_title}"
+        await log_message(message)
+
         return organization_db
     except HTTPException as http_exception:
         # return the response to the client with proper message as this was an expected error
@@ -100,6 +104,10 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
 async def get_all_organizations(current_user: TokenData = Depends(get_current_user)):
     try:
         organizations = await data_service.find_all(DB_COLLECTION_ORGANIZATIONS)
+
+        message = f"[Get All Organizations]: user_id:{current_user.id}"
+        await log_message(message)
+
         return GetMultipleOrganizations_Out(organizations=organizations)
     except HTTPException as http_exception:
         raise http_exception
@@ -123,6 +131,10 @@ async def get_organization(
         organization = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
         if not organization:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
+        message = f"[Get Organizaton]: user_id:{current_user.id}, organization:{organization_id}"
+        await log_message(message)
+
         return GetOrganizations_Out(**organization)  # type: ignore
     except HTTPException as http_exception:
         raise http_exception
@@ -164,6 +176,9 @@ async def update_organization(
         await data_service.update_one(
             DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)}, {"$set": jsonable_encoder(organization_db)}
         )
+
+        message = f"[Organization Update]: user_id:{current_user.id}, organization_id:{organization_id}, update_organization_info:{update_organization_info}"
+        await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
@@ -208,6 +223,9 @@ async def soft_delete_organization(organization_id: PyObjectId, current_user: To
             DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)}, {"$set": jsonable_encoder(organization_db)}
         )
 
+        message = f"[Organization Soft Delete]: user_id:{current_user.id}, organization_id:{organization_id}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -244,10 +262,13 @@ async def register_user(
             **user.dict(),
             hashed_password=get_password_hash(user.email, user.password),
             organization_id=organization_id,
-            account_state=UserAccountState.ACTIVE
+            account_state=UserAccountState.ACTIVE,
         )
 
         await data_service.insert_one(DB_COLLECTION_USERS, jsonable_encoder(user_db))
+
+        message = f"[Register User]: user_id:{current_user.id}, user_email:{user.email}"
+        await log_message(message)
 
         return user_db
     except HTTPException as http_exception:
@@ -285,6 +306,9 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
             user["organization"] = organization_db
             # Remove the organization_id field
             user.pop("organization_id")
+
+        message = f"[Get Users]: user_id:{current_user.id}, users:{users}"
+        await log_message(message)
 
         return GetMultipleUsers_Out(users=users)
     except HTTPException as http_exception:
@@ -325,6 +349,9 @@ async def get_all_admins(organization_id: PyObjectId) -> GetMultipleUsers_Out:
             # Remove the organization_id field
             user.pop("organization_id")
 
+        message = f"[Get All Admins]"
+        log_message(message)
+
         return GetMultipleUsers_Out(users=users)
     except HTTPException as http_exception:
         raise http_exception
@@ -361,6 +388,9 @@ async def get_user(
         if not organization_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User organization not found")
         organization_db = Organization_db(**organization_db)  # type: ignore
+
+        message = f"[Get Users]: user_id:{current_user.id}"
+        await log_message(message)
 
         return GetUsers_Out(**user_db.dict(), organization=BasicObjectInfo(**organization_db.dict()))
     except HTTPException as http_exception:
@@ -413,6 +443,10 @@ async def update_user_info(
             {"_id": str(user_id), "organization_id": str(organization_id)},
             {"$set": jsonable_encoder(user_db)},
         )
+
+        message = f"[Update User Info], user_id:{current_user.id}, updated_target:{user_id}, updated_target_info: {update_user_info}"
+        await log_message(message)
+
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:
         raise http_exception
@@ -450,6 +484,8 @@ async def soft_delete_user(
                 {"_id": str(user_id), "organization_id": str(organization_id)},
                 {"$set": jsonable_encoder(user_db)},
             )
+
+        message = f"[Soft Delete User]: user_id:{current_user.id}, deleted_user:{user_id}"
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:

@@ -19,6 +19,7 @@ from app.api.data_federations import get_data_federation
 from app.api.dataset_versions import get_all_dataset_versions
 from app.api.secure_computation_nodes import deprovision_secure_computation_nodes, register_secure_computation_node
 from app.data import operations as data_service
+from app.log import log_message
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
@@ -123,6 +124,9 @@ async def provision_data_federation(
 
         await data_service.insert_one(DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS, jsonable_encoder(provision_db))
 
+        message = f"[Provision Data Federation]: user_id:{current_user.id}, provision_id: {provision_db.id}"
+        await log_message(message)
+
         return RegisterDataFederationProvision_Out(**provision_db.dict())
     except HTTPException as http_exception:
         raise http_exception
@@ -161,6 +165,9 @@ async def get_data_federation_provision_info(
         )
         if not provision_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data Federation Provision not found")
+
+        message = f"[Get Data Federation Provision Info]: user_id:{current_user.id}, provision_id: {provision_db.id}"
+        await log_message(message)
 
         return GetDataFederationProvision(**provision_db)
     except HTTPException as http_exception:
@@ -202,6 +209,11 @@ async def get_all_data_federation_provision_info(
         for provision in provision_db:
             response_list.append(GetDataFederationProvision(**provision))
 
+        message = (
+            f"[Get All Data Federation Provision Info]: user_id:{current_user.id}, provision_id: {provision_db.id}"
+        )
+        await log_message(message)
+
         return GetMultipleDataFederationProvision_Out(data_federation_provisions=response_list)
     except HTTPException as http_exception:
         raise http_exception
@@ -240,6 +252,9 @@ async def deprovision_data_federation(
             data_federation_provision_id=provision_id,
             current_user=current_user,
         )
+
+        message = f"[Deprovision Data Federation]: user_id:{current_user.id}, provision_id: {provision_id}"
+        await log_message(message)
 
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except HTTPException as http_exception:

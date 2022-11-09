@@ -13,12 +13,13 @@
 # -------------------------------------------------------------------------------
 
 import motor.motor_asyncio
+from typing import Optional
 
 client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://127.0.0.1:27017/")
 sail_db = client.sailDatabase
 
 
-async def find_one(collection, query):
+async def find_one(collection, query) -> Optional[dict]:
     return await sail_db[collection].find_one(query)
 
 

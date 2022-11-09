@@ -168,9 +168,11 @@ async def get_secure_computation_node(
             "id": str(secure_computation_node_id),
         }
         secure_computation_node = await data_service.find_one(DB_COLLECTION_SECURE_COMPUTATION_NODE, query)
-        secure_computation_node = SecureComputationNode_Db(**secure_computation_node)
+        if not secure_computation_node:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Secure Computation Node not found")
 
         # Get the basic information of the data federation
+        secure_computation_node = SecureComputationNode_Db(**secure_computation_node)
         data_federation = await get_data_federation(secure_computation_node.data_federation_provision_id, current_user)
 
         # Add the organization information to the data federation
@@ -291,12 +293,7 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
         resource_group_name = f"{owner}-{str(secure_computation_node_db.data_federation_provision_id)}-scn"
 
         # Deploy the secure computation node
-        account_credentials = azure.authenticate(
-            get_secret("azure_client_id"),
-            get_secret("azure_client_secret"),
-            get_secret("azure_tenant_id"),
-            get_secret("azure_subscription_id"),
-        )
+        account_credentials = azure.authenticate()
         deploy_response: azure.DeploymentResponse = azure.deploy_module(
             account_credentials,
             resource_group_name,
@@ -370,12 +367,7 @@ def delete_resource_group(data_federation_provision_id: PyObjectId, current_user
         owner = get_secret("owner")
         deployment_name = f"{owner}-{str(data_federation_provision_id)}-scn"
 
-        account_credentials = azure.authenticate(
-            get_secret("azure_client_id"),
-            get_secret("azure_client_secret"),
-            get_secret("azure_tenant_id"),
-            get_secret("azure_subscription_id"),
-        )
+        account_credentials = azure.authenticate()
 
         delete_response = azure.delete_resouce_group(account_credentials, deployment_name)
         if delete_response.status != "Success":

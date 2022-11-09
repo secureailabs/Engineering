@@ -205,12 +205,7 @@ async def get_dataset_version_connection_string(
             )
 
         # Authenticate azure
-        account_credentials = azure.authenticate(
-            get_secret("azure_client_id"),
-            get_secret("azure_client_secret"),
-            get_secret("azure_tenant_id"),
-            get_secret("azure_subscription_id"),
-        )
+        account_credentials = azure.authenticate()
 
         # Get the connection string for the dataset version which is valid for 30 minutes
         # This could be a long running operation
@@ -340,12 +335,7 @@ def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: P
     :type dataset_version_id: PyObjectId
     """
     try:
-        account_credentials = azure.authenticate(
-            get_secret("azure_client_id"),
-            get_secret("azure_client_secret"),
-            get_secret("azure_tenant_id"),
-            get_secret("azure_subscription_id"),
-        )
+        account_credentials = azure.authenticate()
 
         # Get the connection string for the storage account
         connection_string_response = azure.get_storage_account_connection_string(

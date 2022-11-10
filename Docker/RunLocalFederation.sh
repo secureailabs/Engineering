@@ -28,15 +28,31 @@ mkdir -p local_dataset/
 unzip $test_package -d local_dataset/
 
 datasets=`ls local_dataset/`
+scn_names=("")
 # Iterate through the datasets in the test package
 for dataset in $datasets; do
-    dir_name=scn_`basename $dataset .zip`
+    scn_name=scn_`basename $dataset .zip`
+    dir_name=local_federation/$scn_name
     mkdir -p $dir_name
     mv local_dataset/$dataset $dir_name/
-    echo "Launching SCN $dir_name"
-    ./RunService.sh -s rpcrelated -l $dir_name -n $dir_name -d
+    echo "Launching SCN $scn_name"
+    sed "s/LOCAL_DATASET_NAME/$dataset/g" rpcrelated/InitializationVector_local.json > rpcrelated/InitializationVector.json
+    cat rpcrelated/InitializationVector.json
+    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -d
+    scn_names+="$scn_name "
+    # Give the SCN time to come alive
+    sleep 5;
 done
-    # For each dataset call RunService with a unique name for the dataset
 
-# Start the smart broker
-sleep 30
+echo $scn_names
+# Cleanup our working area
+rm -rf local_dataset/
+rm -rf local_federation/
+
+# Ensure that the smart broker container talks to the SCNs
+# Shut down the SCNs after
+for scn_name in $scn_names; do
+    docker run -it --network sailNetwork sail/datascience-fastapi ping -c 4 $scn_name
+    docker stop $scn_name
+    docker rm $scn_name
+done

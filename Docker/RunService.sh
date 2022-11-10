@@ -138,6 +138,8 @@ elif [ "rpcrelated" == "$imageName" ]; then
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
     if [ $localDataset ]; then
         runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
+        echo "Local"
+        ls $localDataset
     fi
     runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then

@@ -28,6 +28,8 @@ localDataset=$(cat InitializationVector.json | jq -r '.local_dataset')
 mkdir -p /mnt/dataset
 if $localDataset; then
     echo "Using local dataset: $datasetVersionId"
+    ls /
+    ls /local_dataset/
     unzip /local_dataset/$datasetVersionId -d /data
     ls /data
 else

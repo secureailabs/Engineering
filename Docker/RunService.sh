@@ -4,7 +4,7 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     exit 1 # Exit script after printing help
@@ -111,7 +111,7 @@ elif [ "apiservices" == "$imageName" ]; then
         cp apiservices/InitializationVectorProductionGA.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
     fi
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
-    runtimeFlags="$runtimeFlags -p 8000:8001 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 8000:8001 -p 9080:9080 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
     make -C $rootDir package_webfrontend -s -j
     cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
@@ -130,8 +130,9 @@ elif [ "securecomputationnode" == "$imageName" ]; then
 elif [ "rpcrelated" == "$imageName" ]; then
     bash -c "cd $rootDir/RPCLib;./package.sh"
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
-    cp $rootDir/Binary/decrypt_file.py $rootDir/Binary/"$imageName"_dir/
-    runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+elif [ "auditserver" == "$imageName" ]; then
+    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

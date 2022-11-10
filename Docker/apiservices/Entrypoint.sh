@@ -25,6 +25,9 @@ mv InitializationVector.json ApiServices/
 # Start the local mongodb database
 mongod --port 27017 --dbpath /srv/mongodb/db0 --bind_ip localhost --fork --logpath /var/log/mongod.log
 
+# Start the promtail client
+/promtail-linux-amd64 -config.file=/promtail-local-config.yaml  > /promtail.log 2>&1&
+
 # Start the Public API Server
 cd ApiServices
 uvicorn app.main:server --host 0.0.0.0 --port 8000

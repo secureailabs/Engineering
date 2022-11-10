@@ -18,6 +18,7 @@ psutil==5.9.1
 
 msrestazure==0.6.4
 azure-identity==1.10.0
+azure-keyvault==4.2.0
 azure-mgmt-compute==26.1.0
 azure-mgmt-network==20.0.0
 azure-mgmt-resource==21.1.0

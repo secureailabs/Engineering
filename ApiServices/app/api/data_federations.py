@@ -1070,30 +1070,52 @@ async def get_dataset_key(
     """
     try:
         # Only data federation submitters can generate keys for this federation
+        # And data federation researchers cannot generate new keys
         data_federation_db = await data_service.find_one(
             DB_COLLECTION_DATA_FEDERATIONS,
             {
                 "_id": str(data_federation_id),
-                "data_submitters.organization_id": str(current_user.organization_id),
+                "$or": [
+                    {"data_submitters.organization_id": str(current_user.organization_id)},
+                    {"research_organizations_id": {"$all": [str(current_user.organization_id)]}},
+                ],
             },
         )
         if not data_federation_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
         data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # Get the data submitter key id
-        data_submitter_info = [
+        # Assume the data_submitter is the current user
+        data_submitter_id = current_user.organization_id
+
+        # If the current user is a data researcher, don't allow them to generate new keys
+        data_researchers_info = [
+            data_researcher
+            for data_researcher in data_federation_db.research_organizations_id
+            if data_researcher == current_user.organization_id
+        ]
+        if data_researchers_info:
+            create_if_not_found = False
+            # Get the data submitter information from the dataset
+            dataset_db = await get_dataset(dataset_id=dataset_id, current_user=current_user)
+            data_submitter_id = dataset_db.organization.id
+
+        # At this point the data_submitter_id should be set with the correct organization id
+        data_submitters_info = [
             data_submitter
             for data_submitter in data_federation_db.data_submitters
-            if data_submitter.organization_id == current_user.organization_id
-        ][0]
-        if not data_submitter_info:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data submitter not found")
+            if data_submitter.organization_id == data_submitter_id
+        ]
+        # Throw an error if the current user is not a data submitter or researcher
+        if not data_submitters_info:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User is neither researcher nor submitter"
+            )
 
         # Get the dataset encryption key
         key_info = await get_datset_encryption_key(
             dataset_id=dataset_id,
-            wrapping_key=data_submitter_info.key,
+            wrapping_key=data_submitters_info[0].key,
             create_if_doesnt_exit=create_if_not_found,
             current_user=current_user,
         )

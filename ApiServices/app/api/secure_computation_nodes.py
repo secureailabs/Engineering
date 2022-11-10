@@ -21,6 +21,7 @@ import app.utils.azure as azure
 import requests
 from app.api.authentication import get_current_user
 from app.api.dataset_versions import get_dataset_version
+from app.api.data_federations import get_existing_dataset_key
 from app.data import operations as data_service
 from app.data import sync_operations as sync_data_service
 from app.log import log_message
@@ -69,8 +70,15 @@ async def register_secure_computation_node(
             DB_COLLECTION_SECURE_COMPUTATION_NODE, jsonable_encoder(secure_computation_node_db)
         )
 
+        # Get the encryption key of the dataset
+        dataset_key = await get_existing_dataset_key(
+            data_federation_id=secure_computation_node_db.data_federation_id,
+            dataset_id=secure_computation_node_db.dataset_id,
+            current_user=current_user,
+        )
+
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
-        background_tasks.add_task(provision_virtual_machine, secure_computation_node_db)
+        background_tasks.add_task(provision_virtual_machine, secure_computation_node_db, dataset_key.dataset_key)
 
         message = (
             f"[Register Secure Computation Node]: user_id:{current_user.id}, SCN_id: {secure_computation_node_db.id}"
@@ -296,7 +304,7 @@ async def deprovision_secure_computation_nodes(
 
 ########################################################################################################################
 # TODO: these are temporary functions. They should be removed after the HANU is ready
-def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db):
+def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db, dataset_key: str):
     try:
         # Update the database to mark the VM as being created
         secure_computation_node_db.state = SecureComputationNodeState.CREATING
@@ -337,6 +345,7 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
             dataset_storage_password=get_secret("azure_storage_account_password"),
             dataset_version_id=secure_computation_node_db.dataset_version_id,
             dataset_id=secure_computation_node_db.dataset_id,
+            dataset_key=dataset_key,
         )
 
         with open(str(secure_computation_node_db.id), "w") as outfile:

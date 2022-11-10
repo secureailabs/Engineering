@@ -94,3 +94,4 @@ class SecureComputationNodeInitializationVector(SailBaseModel):
     storage_account_name: StrictStr = Field(...)
     dataset_version_id: PyObjectId = Field(...)
     dataset_id: PyObjectId = Field(...)
+    dataset_key: StrictStr = Field(...)

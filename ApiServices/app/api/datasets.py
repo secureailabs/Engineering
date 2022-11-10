@@ -278,8 +278,6 @@ async def get_datset_encryption_key(
     """
     # Dataset organization and currnet user organization should be same
     dataset_db = await get_dataset_internal(dataset_id, current_user)
-    if dataset_db.organization_id != current_user.organization_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Dataset not found")
 
     # We generate a key if none has been assigned to this dataset, otherwise we unwrap the key
     # that was used to encrypt the DS

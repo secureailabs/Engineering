@@ -17,6 +17,7 @@ cp nginx-selfsigned.crt /opt/certs
 cp nginx-selfsigned.key /opt/certs
 cp vm_initializer.py /opt/
 if [$module == "rpcrelated"]
+then
     cp decrypt_file.py /opt/
 fi
 cp Run.sh /opt/

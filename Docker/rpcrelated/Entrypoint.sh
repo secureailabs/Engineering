@@ -27,7 +27,6 @@ datasetId=$(cat InitializationVector.json | jq -r '.dataset_id')
 datasetKey=$(cat InitializationVector.json | jq -r '.dataset_key')
 
 mountDir="/mnt/azure"
-ls -l $mountDir
 mkdir -p $mountDir
 if [ ! -d "/etc/smbcredentials" ]; then
     mkdir /etc/smbcredentials

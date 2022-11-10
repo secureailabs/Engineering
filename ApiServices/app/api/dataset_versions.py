@@ -216,6 +216,7 @@ async def get_dataset_version_connection_string(
 
         # Authenticate azure
         account_credentials = azure.authenticate()
+        dataset_version_file_name = f"dataset_{dataset_version.id}.zip"
 
         # Get the connection string for the dataset version which is valid for 30 minutes
         # This could be a long running operation
@@ -223,7 +224,7 @@ async def get_dataset_version_connection_string(
             account_credentials=account_credentials,
             account_name=get_secret("azure_storage_account_name"),
             resource_group_name=get_secret("azure_storage_resource_group"),
-            file_path=f"{dataset_version.id}/{dataset_version.id}",
+            file_path=f"{dataset_version.id}/{dataset_version_file_name}",
             share_name=str(dataset_version.dataset_id),
             permission="cw",  # Create and write permission only
             expiry=datetime.utcnow() + timedelta(minutes=30),
@@ -234,7 +235,7 @@ async def get_dataset_version_connection_string(
             )
 
         url = f"https://{get_secret('azure_storage_account_name')}.file.core.windows.net/{dataset_version.dataset_id}/{dataset_version.id}"
-        full_url = f"{url}/{dataset_version.id}?{connection_string.response}"
+        full_url = f"{url}/{dataset_version_file_name}?{connection_string.response}"
 
         message = f"[Get Dataset Version Connection String]: user_id:{current_user.id}, dataset_id: {dataset_version.dataset_id}. version: {dataset_version_id}"
         await log_message(message)

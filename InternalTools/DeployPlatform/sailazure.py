@@ -52,3 +52,10 @@ def get_ip(accountCredentials, resource_group_name, ip_resource_name):
     client = NetworkManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
     foo = client.public_ip_addresses.get(resource_group_name, ip_resource_name)
     return foo.ip_address
+
+
+def get_private_ip(accountCredentials, resource_group_name, network_interface_name):
+    """Get the private IP of the virtual machine."""
+    client = NetworkManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
+    foo = client.network_interfaces.get(resource_group_name, network_interface_name)
+    return foo.ip_configurations[0].private_ip_address

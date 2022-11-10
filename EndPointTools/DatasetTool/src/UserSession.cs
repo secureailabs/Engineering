@@ -359,9 +359,9 @@ class UserSession
 
         // Get the federations
         var response = m_client.Execute(request);
-        if (response.StatusCode != System.Net.HttpStatusCode.OK || response.Content == null)
+        if (response.StatusCode != System.Net.HttpStatusCode.Created || response.Content == null)
         {
-            throw new Exception("Data federation list fetch failed.\n" + response.Content);
+            throw new Exception("Data federation key fetch failed.\n" + response.Content);
         }
 
         // Get the dataset version

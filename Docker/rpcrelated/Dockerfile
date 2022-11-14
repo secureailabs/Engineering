@@ -12,6 +12,7 @@ RUN apt-get update && \
     uuid \
     nginx \
     jq \
+    unzip \
     cifs-utils \
     python3-dev \
     python3-pip \
@@ -23,19 +24,8 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install --upgrade pip \
-    && pip3 install numpy \
-    && pip3 install pandas \
-    && pip3 install scipy \
-    && pip3 install sklearn \
-    && pip3 --no-cache-dir install torch \
-    && pip3 install matplotlib \
-    && pip3 install fastapi \
-    && pip3 install uvicorn \
-    && pip3 install python-multipart \
-    && pip3 install psutil \
-    && pip3 install msgpack \
-    && pip3 install pyzmq
+COPY requirements.txt /requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

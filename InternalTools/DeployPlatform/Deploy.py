@@ -136,9 +136,12 @@ def deploy_module(account_credentials, deployment_name, module_name):
     deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
     print(module_name + " server status: ", deploy_status)
 
-    virtual_machine_public_ip = sailazure.get_ip(account_credentials, resource_group_name, module_name + "-ip")
+    # virtual_machine_public_ip = sailazure.get_ip(account_credentials, resource_group_name, module_name + "-ip")
+    virtual_machine_private_ip = sailazure.get_private_ip(
+        account_credentials, resource_group_name, module_name + "-nic"
+    )
 
-    return virtual_machine_public_ip
+    return virtual_machine_private_ip
 
 
 def get_randomized_name(prefix: str) -> str:

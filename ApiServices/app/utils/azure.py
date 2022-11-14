@@ -381,6 +381,24 @@ def get_ip(account_credentials: AzureCredentials, resource_group_name: str, ip_r
     return foo.ip_address
 
 
+def get_private_ip(account_credentials: AzureCredentials, resource_group_name: str, network_interface_name: str) -> str:
+    """
+    Get the private IP address of the resource.
+
+    :param account_credentials: The account credentials.
+    :type account_credentials: AzureCredentials
+    :param resource_group_name: The resource group name.
+    :type resource_group_name: str
+    :param network_interface_name: The network interface name.
+    :type network_interface_name: str
+    :return: The private ip address.
+    :rtype: str
+    """
+    client = NetworkManagementClient(account_credentials.credentials, account_credentials.subscription_id)
+    network_interfaces = client.network_interfaces.get(resource_group_name, network_interface_name)
+    return network_interfaces.ip_configurations[0].private_ip_address
+
+
 def deploy_module(
     account_credentials: AzureCredentials,
     resource_group_name: str,
@@ -424,7 +442,9 @@ def deploy_module(
         }
         deploy_status = deploy_template(account_credentials, resource_group_name, template, parameters)
 
-        virtual_machine_public_ip = get_ip(account_credentials, resource_group_name, virtual_machine_name + "-ip")
+        virtual_machine_public_ip = get_private_ip(
+            account_credentials, resource_group_name, virtual_machine_name + "-nic"
+        )
 
         return DeploymentResponse(status="Success", ip_address=virtual_machine_public_ip, note="Deployment Successful")
 

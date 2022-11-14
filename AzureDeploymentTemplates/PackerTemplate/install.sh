@@ -16,6 +16,7 @@ mkdir -p /opt/certs
 cp nginx-selfsigned.crt /opt/certs
 cp nginx-selfsigned.key /opt/certs
 cp vm_initializer.py /opt/
+cp decrypt_file.py /opt/
 cp Run.sh /opt/
 chmod +x /opt/Run.sh
 

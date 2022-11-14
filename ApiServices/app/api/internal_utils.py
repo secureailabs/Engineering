@@ -16,11 +16,9 @@ from typing import Dict, List
 from app.api.accounts import get_organization
 from app.api.datasets import get_dataset
 from app.data import operations as data_service
-from fastapi import APIRouter, HTTPException, Response, status
-from models.accounts import GetOrganizations_Out
+from fastapi import APIRouter, Response, status
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
-from models.datasets import GetDataset_Out
 
 router = APIRouter()
 
@@ -30,14 +28,8 @@ router = APIRouter()
     path="/database", description="Drop the database", status_code=status.HTTP_204_NO_CONTENT, response_model=None
 )
 async def register_dataset():
-    try:
-        await data_service.drop()
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    await data_service.drop()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################

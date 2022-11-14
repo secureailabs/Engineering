@@ -72,34 +72,29 @@ async def register_dataset(
     :return: Dataset Id
     :rtype: RegisterDataset_Out
     """
-    try:
-        # Check if there is an existing dataset with the same name
-        existing_dataset = await data_service.find_one(
-            DB_COLLECTION_DATASETS, {"name": dataset_req.name, "organization_id": str(current_user.organization_id)}
-        )
-        # If there is an existing dataset with the same name, return the existing dataset ID
-        if existing_dataset:
-            dataset_db = Dataset_Db(**existing_dataset)
-            response.status_code = status.HTTP_200_OK
-            return RegisterDataset_Out(_id=dataset_db.id)
+    # Check if there is an existing dataset with the same name
+    existing_dataset = await data_service.find_one(
+        DB_COLLECTION_DATASETS, {"name": dataset_req.name, "organization_id": str(current_user.organization_id)}
+    )
+    # If there is an existing dataset with the same name, return the existing dataset ID
+    if existing_dataset:
+        dataset_db = Dataset_Db(**existing_dataset)
+        response.status_code = status.HTTP_200_OK
+        return RegisterDataset_Out(_id=dataset_db.id)
 
-        # Add the dataset to the database
-        dataset_db = Dataset_Db(
-            **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.CREATING_STORAGE
-        )
-        await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
+    # Add the dataset to the database
+    dataset_db = Dataset_Db(
+        **dataset_req.dict(), organization_id=current_user.organization_id, state=DatasetState.CREATING_STORAGE
+    )
+    await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
 
-        # Create a file share for the dataset
-        background_tasks.add_task(create_azure_file_share, dataset_db.id)
+    # Create a file share for the dataset
+    background_tasks.add_task(create_azure_file_share, dataset_db.id)
 
-        message = f"[Register Dataset]: user_id:{current_user.id}, dataset_id: {dataset_db.id}"
-        await log_message(message)
+    message = f"[Register Dataset]: user_id:{current_user.id}, dataset_id: {dataset_db.id}"
+    await log_message(message)
 
-        return RegisterDataset_Out(**dataset_db.dict())
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return RegisterDataset_Out(**dataset_db.dict())
 
 
 ########################################################################################################################
@@ -113,31 +108,26 @@ async def register_dataset(
     status_code=status.HTTP_200_OK,
 )
 async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
-    try:
-        datasets = await data_service.find_by_query(
-            DB_COLLECTION_DATASETS, {"organization_id": str(current_user.organization_id)}
-        )
+    datasets = await data_service.find_by_query(
+        DB_COLLECTION_DATASETS, {"organization_id": str(current_user.organization_id)}
+    )
 
-        # Add the organization information to the dataset
-        organization = await get_organization(current_user.organization_id, current_user)
+    # Add the organization information to the dataset
+    organization = await get_organization(current_user.organization_id, current_user)
 
-        response_list_of_datasets: List[GetDataset_Out] = []
-        datasets_ids = []
-        # Add the organization information to the dataset
-        for dataset in datasets:
-            dataset = Dataset_Db(**dataset)
-            datasets_ids.append(dataset.id)
-            response_dataset = GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization.dict()))
-            response_list_of_datasets.append(response_dataset)
+    response_list_of_datasets: List[GetDataset_Out] = []
+    datasets_ids = []
+    # Add the organization information to the dataset
+    for dataset in datasets:
+        dataset = Dataset_Db(**dataset)
+        datasets_ids.append(dataset.id)
+        response_dataset = GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization.dict()))
+        response_list_of_datasets.append(response_dataset)
 
-        message = f"[Get All Datasets]: user_id:{current_user.id}, datasets_ids: {datasets_ids}"
-        await log_message(message)
+    message = f"[Get All Datasets]: user_id:{current_user.id}, datasets_ids: {datasets_ids}"
+    await log_message(message)
 
-        return GetMultipleDataset_Out(datasets=response_list_of_datasets)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return GetMultipleDataset_Out(datasets=response_list_of_datasets)
 
 
 ########################################################################################################################
@@ -150,18 +140,13 @@ async def get_all_datasets(current_user: TokenData = Depends(get_current_user)):
     status_code=status.HTTP_200_OK,
 )
 async def get_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
-    try:
-        dataset = await get_dataset_internal(dataset_id, current_user)
-        organization_info = await get_organization(organization_id=dataset.organization_id, current_user=current_user)
+    dataset = await get_dataset_internal(dataset_id, current_user)
+    organization_info = await get_organization(organization_id=dataset.organization_id, current_user=current_user)
 
-        message = f"[Get Dataset]: user_id:{current_user.id}"
-        await log_message(message)
+    message = f"[Get Dataset]: user_id:{current_user.id}"
+    await log_message(message)
 
-        return GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization_info.dict()))
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return GetDataset_Out(**dataset.dict(), organization=BasicObjectInfo(**organization_info.dict()))
 
 
 async def get_dataset_internal(
@@ -188,39 +173,34 @@ async def update_dataset(
     updated_dataset_info: UpdateDataset_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ):
-    try:
-        # Dataset must be part of same organization
-        dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
-        if not dataset_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
+    # Dataset must be part of same organization
+    dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
+    if not dataset_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        dataset_db = Dataset_Db(**dataset_db)
-        if dataset_db.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+    dataset_db = Dataset_Db(**dataset_db)
+    if dataset_db.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        if updated_dataset_info.description:
-            dataset_db.description = updated_dataset_info.description
+    if updated_dataset_info.description:
+        dataset_db.description = updated_dataset_info.description
 
-        if updated_dataset_info.name:
-            dataset_db.name = updated_dataset_info.name
+    if updated_dataset_info.name:
+        dataset_db.name = updated_dataset_info.name
 
-        if updated_dataset_info.tag:
-            dataset_db.tag = updated_dataset_info.tag
+    if updated_dataset_info.tag:
+        dataset_db.tag = updated_dataset_info.tag
 
-        await data_service.update_one(
-            DB_COLLECTION_DATASETS,
-            {"_id": str(dataset_id)},
-            {"$set": jsonable_encoder(dataset_db)},
-        )
+    await data_service.update_one(
+        DB_COLLECTION_DATASETS,
+        {"_id": str(dataset_id)},
+        {"$set": jsonable_encoder(dataset_db)},
+    )
 
-        message = f"[Update Dataset]: user_id:{current_user.id}, dataset_id: {dataset_id}"
-        await log_message(message)
+    message = f"[Update Dataset]: user_id:{current_user.id}, dataset_id: {dataset_id}"
+    await log_message(message)
 
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -231,32 +211,27 @@ async def update_dataset(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def soft_delete_dataset(dataset_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
-    try:
-        # Dataset must be part of same organization
-        dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
-        if not dataset_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
+    # Dataset must be part of same organization
+    dataset_db = await data_service.find_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)})
+    if not dataset_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        dataset_db = Dataset_Db(**dataset_db)
-        if dataset_db.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+    dataset_db = Dataset_Db(**dataset_db)
+    if dataset_db.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        # Disable the dataset
-        dataset_db.state = DatasetState.INACTIVE
-        await data_service.update_one(
-            DB_COLLECTION_DATASETS,
-            {"_id": str(dataset_id)},
-            {"$set": jsonable_encoder(dataset_db)},
-        )
+    # Disable the dataset
+    dataset_db.state = DatasetState.INACTIVE
+    await data_service.update_one(
+        DB_COLLECTION_DATASETS,
+        {"_id": str(dataset_id)},
+        {"$set": jsonable_encoder(dataset_db)},
+    )
 
-        message = f"[Soft Delete Dataset]: user_id:{current_user.id}, dataset_id: {dataset_id}"
-        await log_message(message)
+    message = f"[Soft Delete Dataset]: user_id:{current_user.id}, dataset_id: {dataset_id}"
+    await log_message(message)
 
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 async def get_datset_encryption_key(

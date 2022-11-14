@@ -28,7 +28,7 @@ mkdir -p local_dataset/
 unzip $test_package -d local_dataset/
 
 datasets=`ls local_dataset/`
-scn_names=("")
+scn_names=""
 # Iterate through the datasets in the test package
 for dataset in $datasets; do
     scn_name=scn_`basename $dataset .zip`
@@ -45,14 +45,8 @@ for dataset in $datasets; do
 done
 
 echo $scn_names
+
 # Cleanup our working area
 rm -rf local_dataset/
-rm -rf local_federation/
 
-# Ensure that the smart broker container talks to the SCNs
-# Shut down the SCNs after
-for scn_name in $scn_names; do
-    docker run -it --network sailNetwork sail/datascience-fastapi ping -c 4 $scn_name
-    docker stop $scn_name
-    docker rm $scn_name
-done
+# Launch the smart broker tester here

@@ -5,7 +5,7 @@ PrintHelp() {
     echo ""
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0"
-    echo -e "\t-i Image Name: apiservices | devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated"
+    echo -e "\t-i Image Name: apiservices | devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | smart_broker"
     exit 1 # Exit script after printing help
 }
 
@@ -70,7 +70,8 @@ declare -a ListOfDockerImages=(
     "newwebfrontend"
     "securecomputationnode"
     "devopsconsole"
-    "rpcrelated"
+    "rpcrelated",
+    "smart_broker"
 )
 
 for val in "${ListOfDockerImages[@]}"; do

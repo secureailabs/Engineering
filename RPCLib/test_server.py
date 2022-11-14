@@ -8,7 +8,7 @@ if __name__ == "__main__":
         raise RuntimeError("must have port number argument")
 
     module_stat = load_module("sail_safe_functions.statistics")
-    module_data = load_module("sail_safe_functions.preprocessing")
+    module_data = load_module("sail_safe_functions.data")
     module_ml = load_module("sail_safe_functions.machine_learning")
     module_privacy = load_module("sail_safe_functions.privacy_barrier")
 

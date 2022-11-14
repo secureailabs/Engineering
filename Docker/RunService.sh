@@ -142,6 +142,8 @@ elif [ "rpcrelated" == "$imageName" ]; then
         ls $localDataset
     fi
     runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+elif [ "smart_broker" == "$imageName" ]; then
+    runtimeFlags="$runtimeFlags $imageName"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

@@ -3,11 +3,6 @@ Follow the instructions from:
 https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install
 
 
-# Create a new project
-```bash
-dotnet new console -o DatasetTool -f net6.0
-```
-
 # Run the project
 ```bash
 dotnet run

@@ -60,19 +60,20 @@ class Program
                 var dataset_version = new DatasetVersion(dataset_configuration.m_configuration.dataset_version.name,
                     dataset_configuration.m_configuration.dataset_version.description,
                     dataset_configuration.m_configuration.dataset_version.tags,
-                    dataset_id);
+                    dataset_id,
+                    dataset_configuration.m_configuration.dataset.format);
 
                 // Add all the dataset files
                 foreach (var data_source in dataset_configuration.m_configuration.data_source)
                 {
-                    dataset_version.AddDatasetFile(data_source);
+                    dataset_version.AddDatasetSource(data_source);
                 }
 
                 // Register the dataset version with the portal
                 Guid dataset_version_id = user_session.RegisterDatasetVersion(dataset_id, dataset_version.GetMetadataJson());
 
                 // Update the dataset version with the dataset files
-                dataset_version.dataset_version_id = dataset_version_id;
+                dataset_version.m_dataset_version_id = dataset_version_id;
 
                 // Get the azure connection string
                 var azure_connection_string = user_session.GetConnectionStringForDatasetVersion(dataset_version_id);

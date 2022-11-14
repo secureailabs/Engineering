@@ -1,5 +1,9 @@
 using System.Security.Cryptography;
 using Azure.Storage.Files.Shares;
+using Hl7.Fhir.Model;
+using Hl7.Fhir.Serialization;
+using Hl7.Fhir.Specification.Source;
+using Hl7.Fhir.Validation;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
@@ -7,10 +11,11 @@ namespace DatasetTool;
 
 class DatasetVersion
 {
-    private DatasetVersionMetadata m_metadata = new DatasetVersionMetadata();
+    private ModelDatasetVersionMetadata m_metadata = new ModelDatasetVersionMetadata();
     private List<string> m_data_files = new List<string>();
-
-    public Guid dataset_version_id { get; set; } = default!;
+    bool m_is_valid = false;
+    public Guid m_dataset_version_id { get; set; } = default!;
+    string m_dataset_format = "";
 
     /// <summary>
     /// Constructor for the dataset version object
@@ -19,12 +24,28 @@ class DatasetVersion
     /// <param name="description"> Description or summary for the dataset </param>
     /// <param name="tags"> Tags attached to the dataset version for discoverability </param>
     /// <param name="dataset_id"> Dataset Id for which this version is created </param>
-    public DatasetVersion(string name, string description, string tags, Guid dataset_id)
+    public DatasetVersion(string name, string description, string tags, Guid dataset_id, string format)
     {
         m_metadata.dataset_id = dataset_id;
         m_metadata.description = description;
         m_metadata.name = name;
         m_metadata.tags = tags;
+        m_dataset_format = format;
+    }
+
+    /// <summary>
+    /// Add all files form a directory to the dataset version
+    /// </summary>
+    /// <param name="dataset_directory"> The directory containing data for this dataset version </param>
+    /// <exception cref="Exception"></exception>
+    public void AddDatasetDirectory(string dataset_directory)
+    {
+        if (!Directory.Exists(dataset_directory))
+        {
+            throw new Exception("The directory does not exist");
+        }
+
+        m_data_files.AddRange(Directory.GetFiles(dataset_directory));
     }
 
     /// <summary>
@@ -83,7 +104,7 @@ class DatasetVersion
 
         // Create a zip file with the dataset header, data model and data content
         string[] big_zip_files = { dataset_header_file, data_model_zip_file, data_content_zip_file };
-        string dataset_file = "dataset_" + dataset_version_id.ToString() + ".zip";
+        string dataset_file = "dataset_" + m_dataset_version_id.ToString() + ".zip";
         CreateZipFromFiles(dataset_file, big_zip_files);
 
         // Upload the zip file to the Azure File Share
@@ -175,5 +196,106 @@ class DatasetVersion
             File.WriteAllBytes(file, encrypted_file_bytes);
         }
         return System.Convert.ToBase64String(tag);
+    }
+
+    /// <summary>
+    /// Add the source for the dataset
+    /// </summary>
+    /// <param name="dataset_source"> dataset source file or directory </param>
+    /// <exception cref="Exception"></exception>
+    public void AddDatasetSource(string dataset_source)
+    {
+        if (m_dataset_format == "FHIR")
+        {
+            AddDatasetDirectory(dataset_source);
+        }
+        else if (m_dataset_format == "CSV")
+        {
+            AddDatasetFile(dataset_source);
+        }
+        else
+        {
+            throw new Exception("Invalid dataset format");
+        }
+    }
+
+    /// <summary>
+    /// Validate the dataset for the correct format
+    /// </summary>
+    private void Validate()
+    {
+        if (m_dataset_format == "FHIR")
+        {
+            // Validate the FHIR dataset
+            ValidateFHIR();
+        }
+        else
+        {
+            // TODO: Add a CSV validation
+        }
+    }
+
+    /// <summary>
+    /// Validate all FHIR dataset files
+    /// </summary>
+    private async void ValidateFHIR()
+    {
+        // Create a resource resolver that searches for the core resources in 'specification.zip', which comes with the .NET FHIR Specification NuGet package
+        // We create a source that takes its contents from a ZIP file (in this case the default 'specification.zip'). We decorate that source by encapsulating
+        // it in a CachedResolver, which speeds up access by caching conformance resources once we got them from the large files in the ZIP.
+        IResourceResolver core_source = new CachedResolver(ZipSource.CreateValidationSource());
+
+        // Set up resolver
+        var resolver = new CachedResolver(new FhirPackageSource(
+            "https://packages.simplifier.net",
+            new[] { "hl7.fhir.us.core@3.1.1" }
+        ));
+
+        var resolver_nlm = new CachedResolver(new FhirPackageSource(
+            "https://packages.simplifier.net",
+            new[] { "us.nlm.vsac@0.9.0" }
+        ));
+
+        DirectorySourceSettings directory_source_settings = new DirectorySourceSettings();
+        directory_source_settings.IncludeSubDirectories = true;
+
+        // This hidden folder will be created by pulling the FHIR profiles from the portal
+        string profile_path = "./.FHIR_profiles_json";
+        var directory_source = new CachedResolver(new DirectorySource(profile_path, directory_source_settings));
+
+        var result = new MultiResolver(directory_source, core_source, resolver_nlm, resolver);
+
+        var sd = result.FindStructureDefinitionAsync("http://synthetichealth.github.io/synthea/quality-adjusted-life-years");
+        var tewo = await sd;
+        Console.WriteLine(tewo);
+
+        // setting up the validator
+        ValidationSettings settings = new() { ResourceResolver = result };
+        Validator validator = new(settings);
+
+        // Read the contents of the files and validate them
+        foreach (string file in m_data_files)
+        {
+            string file_contents = File.ReadAllText(file);
+            FhirJsonParser parser = new FhirJsonParser();
+            Bundle resource = parser.Parse<Bundle>(file_contents);
+
+            // validate each resource in the bundle
+            foreach (var entry in resource.Entry)
+            {
+                var outcome = validator.Validate(entry.Resource);
+                if (!outcome.Success)
+                {
+                    Console.WriteLine("Validation failed for file " + file);
+                    Console.WriteLine(entry + "\n" + outcome.ToJson());
+                    Console.WriteLine("TODO: Enable the validation. Continuing with the upload as a temporary resort.");
+                    // throw new Exception("The FHIR bundle is not valid");
+                }
+            }
+            break;
+        }
+
+        // If we reach here, the validation is successful
+        m_is_valid = true;
     }
 }

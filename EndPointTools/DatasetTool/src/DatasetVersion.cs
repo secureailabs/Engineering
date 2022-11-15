@@ -13,7 +13,6 @@ class DatasetVersion
 {
     private ModelDatasetVersionMetadata m_metadata = new ModelDatasetVersionMetadata();
     private List<string> m_data_files = new List<string>();
-    bool m_is_valid = false;
     public Guid m_dataset_version_id { get; set; } = default!;
     string m_dataset_format = "";
 
@@ -38,7 +37,7 @@ class DatasetVersion
     /// </summary>
     /// <param name="dataset_directory"> The directory containing data for this dataset version </param>
     /// <exception cref="Exception"></exception>
-    public void AddDatasetDirectory(string dataset_directory)
+    private void AddDatasetDirectory(string dataset_directory)
     {
         if (!Directory.Exists(dataset_directory))
         {
@@ -53,7 +52,7 @@ class DatasetVersion
     /// </summary>
     /// <param name="dataset_file"> The file containing data for this dataset version </param>
     /// <exception cref="Exception"></exception>
-    public void AddDatasetFile(string dataset_file)
+    private void AddDatasetFile(string dataset_file)
     {
         if (!File.Exists(dataset_file))
         {
@@ -77,8 +76,11 @@ class DatasetVersion
     /// Package the dataset file into a tar file, encrypt it and upload it to the Azure File Share
     /// </summary>
     /// <param name="connection_string"> Connection string with write permission to the file share </param>
-    public void UploadToAzure(string connection_string, string encryption_key)
+    public void ValidateAndUploadToAzure(string connection_string, string encryption_key)
     {
+        // Validate the dataset
+        Validate();
+
         // Create a zip package with the data files
         string data_content_zip_file = "data_content.zip";
         CreateZipFromFiles(data_content_zip_file, m_data_files.ToArray());
@@ -205,17 +207,17 @@ class DatasetVersion
     /// <exception cref="Exception"></exception>
     public void AddDatasetSource(string dataset_source)
     {
-        if (m_dataset_format == "FHIR")
+        if (Directory.Exists(dataset_source))
         {
             AddDatasetDirectory(dataset_source);
         }
-        else if (m_dataset_format == "CSV")
+        else if (File.Exists(dataset_source))
         {
             AddDatasetFile(dataset_source);
         }
         else
         {
-            throw new Exception("Invalid dataset format");
+            throw new Exception("The dataset source file or directory does not exist");
         }
     }
 
@@ -238,17 +240,17 @@ class DatasetVersion
     /// <summary>
     /// Validate all FHIR dataset files
     /// </summary>
-    private async void ValidateFHIR()
+    private void ValidateFHIR()
     {
         // Create a resource resolver that searches for the core resources in 'specification.zip', which comes with the .NET FHIR Specification NuGet package
         // We create a source that takes its contents from a ZIP file (in this case the default 'specification.zip'). We decorate that source by encapsulating
         // it in a CachedResolver, which speeds up access by caching conformance resources once we got them from the large files in the ZIP.
         IResourceResolver core_source = new CachedResolver(ZipSource.CreateValidationSource());
 
-        // Set up resolver
-        var resolver = new CachedResolver(new FhirPackageSource(
+        // Set up additional resolvers
+        var resolver_us_core = new CachedResolver(new FhirPackageSource(
             "https://packages.simplifier.net",
-            new[] { "hl7.fhir.us.core@3.1.1" }
+            new[] { "hl7.fhir.us.core@5.0.1" }
         ));
 
         var resolver_nlm = new CachedResolver(new FhirPackageSource(
@@ -256,46 +258,59 @@ class DatasetVersion
             new[] { "us.nlm.vsac@0.9.0" }
         ));
 
-        DirectorySourceSettings directory_source_settings = new DirectorySourceSettings();
-        directory_source_settings.IncludeSubDirectories = true;
-
         // This hidden folder will be created by pulling the FHIR profiles from the portal
         string profile_path = "./.FHIR_profiles_json";
+        DirectorySourceSettings directory_source_settings = new DirectorySourceSettings();
+        directory_source_settings.IncludeSubDirectories = true;
         var directory_source = new CachedResolver(new DirectorySource(profile_path, directory_source_settings));
 
-        var result = new MultiResolver(directory_source, core_source, resolver_nlm, resolver);
-
-        var sd = result.FindStructureDefinitionAsync("http://synthetichealth.github.io/synthea/quality-adjusted-life-years");
-        var tewo = await sd;
-        Console.WriteLine(tewo);
+        var resource_resolvers = new MultiResolver(directory_source, core_source, resolver_nlm, resolver_us_core);
 
         // setting up the validator
-        ValidationSettings settings = new() { ResourceResolver = result };
+        ValidationSettings settings = new() { ResourceResolver = resource_resolvers };
         Validator validator = new(settings);
 
+        // Get number of files in the dataset
+        int num_files = m_data_files.Count;
+        int i = 1;
         // Read the contents of the files and validate them
         foreach (string file in m_data_files)
         {
+            var default_color = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write(i++ + "/" + num_files);
+            Console.ForegroundColor = default_color;
+            Console.Write(" Validating file: " + file);
             string file_contents = File.ReadAllText(file);
             FhirJsonParser parser = new FhirJsonParser();
             Bundle resource = parser.Parse<Bundle>(file_contents);
 
             // validate each resource in the bundle
+            bool isValid = true;
             foreach (var entry in resource.Entry)
             {
                 var outcome = validator.Validate(entry.Resource);
                 if (!outcome.Success)
                 {
-                    Console.WriteLine("Validation failed for file " + file);
-                    Console.WriteLine(entry + "\n" + outcome.ToJson());
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (isValid)
+                    {
+                        // Put a cross mark ❌
+                        Console.WriteLine(" " + ((char)0x274C).ToString());
+                    }
+                    isValid = isValid & false;
+                    Console.WriteLine("Validation failed for resource: " + entry.Resource.TypeName + " with id: " + entry.Resource.Id);
+                    Console.WriteLine(entry + "\n" + outcome.ToString());
                     Console.WriteLine("TODO: Enable the validation. Continuing with the upload as a temporary resort.");
+                    Console.ForegroundColor = default_color;
                     // throw new Exception("The FHIR bundle is not valid");
                 }
             }
-            break;
+            if (isValid)
+            {
+                // Put a check mark ✅
+                Console.WriteLine(" " + ((char)0x2705).ToString());
+            }
         }
-
-        // If we reach here, the validation is successful
-        m_is_valid = true;
     }
 }

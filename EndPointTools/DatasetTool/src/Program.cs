@@ -43,12 +43,15 @@ class Program
                 // Create a user session object
                 var user_session = new UserSession(ip_address, email, password);
 
-                // Get the list of the datasets
-                Guid dataset_id = user_session.GetDatasetId(dataset_configuration.m_configuration.dataset.name);
-
                 // Get the data federation id
                 Guid data_federation_id = user_session.GetFederationId(dataset_configuration.m_configuration.data_federation);
+                if (data_federation_id.CompareTo(Guid.Empty) == 0)
+                {
+                    throw new Exception("Data federation not found");
+                }
 
+                // Get the list of the datasets
+                Guid dataset_id = user_session.GetDatasetId(dataset_configuration.m_configuration.dataset.name);
                 // If the dataset is not found, create it
                 if (dataset_id.CompareTo(Guid.Empty) == 0)
                 {
@@ -86,7 +89,7 @@ class Program
                 string encryption_key = user_session.GetEncryptionKeyForDataset(dataset_id, data_federation_id);
 
                 // Upload the dataset
-                dataset_version.UploadToAzure(azure_connection_string, encryption_key);
+                dataset_version.ValidateAndUploadToAzure(azure_connection_string, encryption_key);
 
                 // Mark the dataset version as ready
                 user_session.MarkDatasetVersionAsActive(dataset_version_id);

@@ -12,7 +12,7 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
-
+import os
 import logging
 import sys
 from typing import Optional, Union
@@ -26,8 +26,8 @@ from zero.serialize import deserializer_table, serializer_table
 
 # public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
 # private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
-public_keys_dir = "/app/public_keys/"
-private_keys_dir = "/app/private_keys/"
+# public_keys_dir = "/app/public_keys/"
+# private_keys_dir = "/app/private_keys/"
 
 
 class _BaseClient:
@@ -53,6 +53,8 @@ class _BaseClient:
         self._serializer = "msgpack"
         self._init_serializer()
         self._socket: Optional[zmq.Socket] = None
+        self._deserializer_table = deserializer_table
+        self._serializer_table = serializer_table
 
     def _init_serializer(self):
         """
@@ -100,12 +102,21 @@ class ZeroClient(_BaseClient):
         ctx = zmq.Context.instance()
         self._socket: zmq.Socket = ctx.socket(zmq.DEALER)
 
-        client_secret_file = private_keys_dir + "client.key_secret"
-        client_public, client_secret = zmq.auth.load_certificate(client_secret_file)
+
+        path_dir_public_key_zero_mq = os.environ.get("PATH_DIR_PUBLIC_KEY_ZEROMQ")
+        if path_dir_public_key_zero_mq is None:
+            raise ValueError("environment variable not set: PATH_DIR_PUBLIC_KEY_ZEROMQ")
+
+        path_file_private_key_zero_mq_client = os.environ.get("PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT")
+        if path_file_private_key_zero_mq_client is None:
+            raise ValueError("environment variable not set: PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT")
+
+        
+        client_public, client_secret = zmq.auth.load_certificate(path_file_private_key_zero_mq_client)
         self._socket.curve_secretkey = client_secret
         self._socket.curve_publickey = client_public
 
-        server_public_file = public_keys_dir + "server.key"
+        server_public_file = os.path.join(path_dir_public_key_zero_mq,  "server.key")
         server_public, _ = zmq.auth.load_certificate(server_public_file)
         self._socket.curve_serverkey = server_public
 
@@ -118,6 +129,7 @@ class ZeroClient(_BaseClient):
     # 2->attribute call
     # 3->method call
     # 4->destructor call
+    
     # incoming message:
     # 0->exception
     # 1->secret object
@@ -142,7 +154,6 @@ class ZeroClient(_BaseClient):
             resp = self._socket.recv()
             decoded_resp = self._decode(resp, use_list=False, strict_map_key=False)
             decoded_resp = self._process_resp(decoded_resp)
-
             # if isinstance(decoded_resp, dict):
             #     if "__zerror__method_not_found" in decoded_resp:
             #         raise MethodNotFoundException(decoded_resp.get("__zerror__method_not_found"))
@@ -152,6 +163,8 @@ class ZeroClient(_BaseClient):
             #        decoded_resp["client"] = self
             return decoded_resp
         except zmq.ZMQError as e:
+            # TODO this makes it return None if the remote server was not online, that cannot be intended behavior
+            print("zmq.ZMQError", flush=True)
             if e.errno == zmq.EAGAIN:
                 pass  # no message was ready (yet!)
         except ZeroException as ze:
@@ -163,6 +176,7 @@ class ZeroClient(_BaseClient):
             raise e
 
     def _process_args(self, args, kwargs):
+        #TODO this function can use a lot of cleanup
         """
         process arguments of the rpc call
 
@@ -176,13 +190,19 @@ class ZeroClient(_BaseClient):
         if args is not None:
             args = list(args)
             for i in range(len(args)):
+                class_name = str(type(args[i])).split(".")[-1][:-2] 
                 if isinstance(args[i], Proxy):
-                    args[i] = serializer_table["proxy"](args[i])
+                    args[i] = self._serializer_table["proxy"](args[i])
+                elif class_name in self._serializer_table:
+                    args[i] = args[i].to_dict()
             args = tuple(args)
         if kwargs is not None:
             for k, v in kwargs:
+                class_name = str(type(v)).split(".")[-1][:-2] 
                 if isinstance(v, Proxy):
-                    kwargs[k] = serializer_table["proxy"](v)
+                    kwargs[k] = self._serializer_table["proxy"](v)
+                elif class_name in self._serializer_table:
+                    kwargs[k] = v.to_dict()
         return args, kwargs
 
     def _process_resp(self, msg):
@@ -211,7 +231,10 @@ class ZeroClient(_BaseClient):
             else:
                 raise Exception("unknown return object from remote end")
         elif isinstance(msg, dict) and "__type__" in msg:
-            resp = deserializer_table[msg["__type__"]](msg)
+            try: #TODO another filthy hack
+                resp = self._deserializer_table[msg["__type__"]](msg)
+            except:
+                resp = self._deserializer_table[msg["__type__"]].from_dict(msg)
         else:
             resp = msg
         return resp

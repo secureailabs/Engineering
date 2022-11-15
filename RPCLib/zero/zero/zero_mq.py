@@ -26,10 +26,6 @@ If we want to replace the client-server patter with other implementation like Si
 implement the ZeroMQInterface class and replace the ZeroMQ with the new implementation instance.
 """
 
-# public_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/public_keys/"
-# private_keys_dir = "/home/jjj/ScratchPad/JingweiZhang/prefect_related/private_keys/"
-public_keys_dir = "/app/public_keys/"
-private_keys_dir = "/app/private_keys/"
 
 
 class ZeroMQInterface:
@@ -110,16 +106,27 @@ class ZeroMQPythonDevice(ZeroMQInterface):
         :param worker_port: host worker port
         :type worker_port: int
         """
+
+        path_dir_public_key_zero_mq = os.environ.get("PATH_DIR_PUBLIC_KEY_ZEROMQ")
+        if path_dir_public_key_zero_mq is None:
+            raise ValueError("environment variable not set: PATH_DIR_PUBLIC_KEY_ZEROMQ")
+        if not os.path.isdir(path_dir_public_key_zero_mq):
+            raise Exception(f"dir not found: {path_dir_public_key_zero_mq}")
+
+        path_file_private_key_zero_mq_server = os.environ.get("PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER")
+        if path_file_private_key_zero_mq_server is None:
+            raise ValueError("environment variable not set: PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER")
+
+
         try:
             ctx = zmq.Context.instance()
             gateway = ctx.socket(zmq.ROUTER)
 
             auth = ThreadAuthenticator(ctx)
             auth.start()
-            auth.configure_curve(domain="*", location=public_keys_dir)
+            auth.configure_curve(domain="*", location=path_dir_public_key_zero_mq)
 
-            server_secret_file = private_keys_dir + "server.key_secret"
-            server_public, server_secret = zmq.auth.load_certificate(server_secret_file)
+            server_public, server_secret = zmq.auth.load_certificate(path_file_private_key_zero_mq_server)
             gateway.curve_secretkey = server_secret
             gateway.curve_publickey = server_public
             gateway.curve_server = True

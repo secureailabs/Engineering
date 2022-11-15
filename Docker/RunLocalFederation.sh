@@ -39,7 +39,11 @@ for dataset in $datasets; do
     sed "s/LOCAL_DATASET_NAME/$dataset/g" rpcrelated/InitializationVector_local.json > rpcrelated/InitializationVector.json
     cat rpcrelated/InitializationVector.json
     ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -d
-    scn_names+="$scn_name "
+    if [ -z $scn_names ]; then
+        scn_names="$scn_name"
+    else
+        scn_names+=",$scn_name"
+    fi
     # Give the SCN time to come alive
     sleep 5;
 done
@@ -50,3 +54,5 @@ echo $scn_names
 rm -rf local_dataset/
 
 # Launch the smart broker tester here
+./RunService.sh -s smart_broker -x "$scn_names"
+

@@ -3,10 +3,12 @@ set -e
 
 PrintHelp() {
     echo ""
-    echo "Usage: $0 -s [Service Name] -d -c -n [Docker Name]"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated"
+    echo "Usage: $0 -s [Service Name] -d -c -n [Docker Name] -x [SCN Names]"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | smart_broker"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
+    echo -e "\t-n Name to give the running docker image"
+    echo -e "\t-x String containing the SCN names"
     exit 1 # Exit script after printing help
 }
 
@@ -14,13 +16,15 @@ PrintHelp() {
 detach=false
 cleanDatabase=false
 dockerName=""
-while getopts "n:l:s:d opt:c opt:" opt; do
+scnNames=""
+while getopts "x:n:l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
     c) cleanDatabase=true ;;
     l) localDataset="$OPTARG" ;;
     n) dockerName="$OPTARG" ;;
+    x) scnNames="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -143,7 +147,12 @@ elif [ "rpcrelated" == "$imageName" ]; then
     fi
     runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "smart_broker" == "$imageName" ]; then
-    runtimeFlags="$runtimeFlags $imageName"
+    if [ -z "$scnNames" ]; then
+        echo "No SCN names for smart broker!"
+        PrintHelp
+    fi
+    runtimeFlags="$runtimeFlags -e SCN_NAMES=$scnNames $imageName "
+    echo "FLAGS $runtimeFlags"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

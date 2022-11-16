@@ -23,6 +23,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictStr
 from fastapi.requests import Request
+from app.log import log_message
 
 import logging
 
@@ -91,8 +92,12 @@ async def server_error_exception_handler(request: Request, exc: Exception):
     :param exc: The exception object
     :type exc: Exception
     """
+    message = f"Unkown Exception: {str(exc)} in request: {request.method} {request.url}"
+    # Log the error to the uvicorn logger
     logger = logging.getLogger("uvicorn.error")
-    logger.error(f"Unkown Exception: {str(exc)} in request: {request.method} {request.url}")
+    logger.error(message)
+    # Add the exception to the audit log as well
+    await log_message(message)
 
 
 utils.validation_error_response_definition = ValidationError.schema()

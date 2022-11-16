@@ -17,9 +17,17 @@ class ModelDatasetVersionMetadata
     public string state { get; set; } = default!;
 }
 
-class DatasetHeader
+class ModelDatasetHeader
 {
     public ModelDatasetVersionMetadata dataset_version { get; set; } = default!;
     public string aes_tag { get; set; } = default!;
     public string aes_nonce { get; set; } = default!;
+}
+
+class ModelDataFederation
+{
+    public string name { get; } = default!;
+    public Guid id { get; } = default!;
+    public string state { get; } = default!;
+    public string data_format { get; } = default!;
 }

@@ -93,7 +93,7 @@ class DatasetVersion
 
         // Create a file with name dataset_header.json
         string dataset_header_file = "dataset_header.json";
-        DatasetHeader dataset_header = new DatasetHeader();
+        ModelDatasetHeader dataset_header = new ModelDatasetHeader();
         dataset_header.aes_tag = tag;
         dataset_header.aes_nonce = System.Convert.ToBase64String(nonce);
         dataset_header.dataset_version = m_metadata;

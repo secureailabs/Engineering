@@ -24,7 +24,7 @@ class UserSession
 
     private class DataFederationList
     {
-        public BasicInformation[] data_federations { get; set; } = default!;
+        public ModelDataFederation[] data_federations { get; set; } = default!;
     }
 
     private class ConnectionStringResponse
@@ -96,7 +96,7 @@ class UserSession
     /// <param name="data_federation_name"></param>
     /// <returns> Guid of the data federation with the input name</returns>
     /// <exception cref="Exception"></exception>
-    public Guid GetFederationId(string data_federation_name)
+    public ModelDataFederation GetFederation(string data_federation_name)
     {
         // Create the request
         var request = new RestRequest("/data-federations", Method.Get);
@@ -116,11 +116,11 @@ class UserSession
         {
             if (federation_list.data_federations[i].name == data_federation_name)
             {
-                return federation_list.data_federations[i].id;
+                return federation_list.data_federations[i];
             }
         }
 
-        return Guid.Empty;
+        return null!;
     }
 
     /// <summary>

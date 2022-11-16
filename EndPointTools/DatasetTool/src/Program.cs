@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 
 namespace DatasetTool;
 
@@ -44,10 +44,16 @@ class Program
                 var user_session = new UserSession(ip_address, email, password);
 
                 // Get the data federation id
-                Guid data_federation_id = user_session.GetFederationId(dataset_configuration.m_configuration.data_federation);
-                if (data_federation_id.CompareTo(Guid.Empty) == 0)
+                ModelDataFederation data_federation = user_session.GetFederation(dataset_configuration.m_configuration.data_federation);
+                if (data_federation == null)
                 {
                     throw new Exception("Data federation not found");
+                }
+
+                // Check if the dataset configuration format matches the data federation format
+                if (dataset_configuration.m_configuration.dataset.format != data_federation.data_format)
+                {
+                    throw new Exception("Dataset format does not match the data federation designated format");
                 }
 
                 // Get the list of the datasets
@@ -56,7 +62,7 @@ class Program
                 if (dataset_id.CompareTo(Guid.Empty) == 0)
                 {
                     System.Console.WriteLine("Dataset not found, creating it");
-                    dataset_id = user_session.CreateDatasetAndAddToFederation(dataset_configuration.m_configuration.dataset, data_federation_id);
+                    dataset_id = user_session.CreateDatasetAndAddToFederation(dataset_configuration.m_configuration.dataset, data_federation.id);
                 }
 
                 // Create and Register the dataset version metadata

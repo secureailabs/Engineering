@@ -26,9 +26,15 @@ class DataFederationState(Enum):
     INACTIVE = "INACTIVE"
 
 
+class DataFederationDataFormat(Enum):
+    CSV = "CSV"
+    FHIR = "FHIR"
+
+
 class DataFederation_Base(SailBaseModel):
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
+    data_format: DataFederationDataFormat = Field(...)
 
 
 class DataSubmitterIdKeyPair(SailBaseModel):

@@ -157,10 +157,6 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
 
     except JWTError as exception:
         raise credentials_exception
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
 
     return LoginSuccess_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 

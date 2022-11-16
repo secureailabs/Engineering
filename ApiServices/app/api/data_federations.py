@@ -93,21 +93,16 @@ def getEmailInviteContent(data_federation: str, inviter_organization: str) -> st
 async def register_data_federation(
     data_federation_req: RegisterDataFederation_In = Body(...), current_user: TokenData = Depends(get_current_user)
 ):
-    try:
-        # Add the data federation to the database
-        data_federation_db = DataFederation_Db(
-            **data_federation_req.dict(), organization_id=current_user.organization_id, state=DataFederationState.ACTIVE
-        )
-        await data_service.insert_one(DB_COLLECTION_DATA_FEDERATIONS, jsonable_encoder(data_federation_db))
+    # Add the data federation to the database
+    data_federation_db = DataFederation_Db(
+        **data_federation_req.dict(), organization_id=current_user.organization_id, state=DataFederationState.ACTIVE
+    )
+    await data_service.insert_one(DB_COLLECTION_DATA_FEDERATIONS, jsonable_encoder(data_federation_db))
 
-        message = f"[Register Data Federation]: user_id:{current_user.id}"
-        await log_message(message)
+    message = f"[Register Data Federation]: user_id:{current_user.id}"
+    await log_message(message)
 
-        return data_federation_db
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return data_federation_db
 
 
 ########################################################################################################################
@@ -126,77 +121,72 @@ async def get_all_data_federations(
     dataset_id: Optional[PyObjectId] = None,
     current_user: TokenData = Depends(get_current_user),
 ) -> GetMultipleDataFederation_Out:
-    try:
-        if (data_submitter_id) and (data_submitter_id == current_user.organization_id):
-            query = ({"data_submitters.organization_id": str(current_user.organization_id)},)
-        elif (researcher_id) and (researcher_id == current_user.organization_id):
-            query = {"researcher_id": {"$all": [str(current_user.organization_id)]}}
-        elif dataset_id:
-            query = {"dataset_id": {"$all": [str(dataset_id)]}}
-        elif current_user.role is UserRole.SAIL_ADMIN:
-            query = {}
-        elif (not data_submitter_id) and (not researcher_id) and (not dataset_id):
-            query = {
-                "$or": [
-                    {"organization_id": str(current_user.organization_id)},
-                    {"data_submitters.organization_id": str(current_user.organization_id)},
-                    {"research_organizations_id": {"$all": [str(current_user.organization_id)]}},
-                ]
-            }
-        else:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    if (data_submitter_id) and (data_submitter_id == current_user.organization_id):
+        query = ({"data_submitters.organization_id": str(current_user.organization_id)},)
+    elif (researcher_id) and (researcher_id == current_user.organization_id):
+        query = {"researcher_id": {"$all": [str(current_user.organization_id)]}}
+    elif dataset_id:
+        query = {"dataset_id": {"$all": [str(dataset_id)]}}
+    elif current_user.role is UserRole.SAIL_ADMIN:
+        query = {}
+    elif (not data_submitter_id) and (not researcher_id) and (not dataset_id):
+        query = {
+            "$or": [
+                {"organization_id": str(current_user.organization_id)},
+                {"data_submitters.organization_id": str(current_user.organization_id)},
+                {"research_organizations_id": {"$all": [str(current_user.organization_id)]}},
+            ]
+        }
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-        data_federations = await data_service.find_by_query(DB_COLLECTION_DATA_FEDERATIONS, query)
+    data_federations = await data_service.find_by_query(DB_COLLECTION_DATA_FEDERATIONS, query)
 
-        response_list_of_data_federations: List[GetDataFederation_Out] = []
+    response_list_of_data_federations: List[GetDataFederation_Out] = []
 
-        # Cache the organization information
-        organization_cache: Dict[PyObjectId, BasicObjectInfo] = {}
-        dataset_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+    # Cache the organization information
+    organization_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+    dataset_cache: Dict[PyObjectId, BasicObjectInfo] = {}
+
+    # Add the organization information to the data federation
+    for data_federation in data_federations:
+        data_federation = DataFederation_Db(**data_federation)
 
         # Add the organization information to the data federation
-        for data_federation in data_federations:
-            data_federation = DataFederation_Db(**data_federation)
+        organization_cache, data_submitter_basic_info_list = await cache_get_basic_info_organization(
+            organization_cache, [data_federation.organization_id], current_user
+        )
 
-            # Add the organization information to the data federation
-            organization_cache, data_submitter_basic_info_list = await cache_get_basic_info_organization(
-                organization_cache, [data_federation.organization_id], current_user
-            )
+        # Add the data submitter organization information to the data federation
+        organization_cache, data_submitter_basic_info_list = await cache_get_basic_info_organization(
+            organization_cache,
+            [data_submitter.organization_id for data_submitter in data_federation.data_submitters],
+            current_user,
+        )
 
-            # Add the data submitter organization information to the data federation
-            organization_cache, data_submitter_basic_info_list = await cache_get_basic_info_organization(
-                organization_cache,
-                [data_submitter.organization_id for data_submitter in data_federation.data_submitters],
-                current_user,
-            )
+        # Add the research organization information to the data federation
+        organization_cache, researcher_basic_info_list = await cache_get_basic_info_organization(
+            organization_cache, data_federation.research_organizations_id, current_user
+        )
 
-            # Add the research organization information to the data federation
-            organization_cache, researcher_basic_info_list = await cache_get_basic_info_organization(
-                organization_cache, data_federation.research_organizations_id, current_user
-            )
+        # Add the dataset information to the data federation
+        dataset_cache, dataset_basic_info_list = await cache_get_basic_info_datasets(
+            dataset_cache, data_federation.datasets_id, current_user
+        )
 
-            # Add the dataset information to the data federation
-            dataset_cache, dataset_basic_info_list = await cache_get_basic_info_datasets(
-                dataset_cache, data_federation.datasets_id, current_user
-            )
+        response_data_federation = GetDataFederation_Out(
+            **data_federation.dict(),
+            organization=organization_cache[data_federation.organization_id],
+            data_submitter_organizations=data_submitter_basic_info_list,
+            research_organizations=researcher_basic_info_list,
+            datasets=dataset_basic_info_list,
+        )
+        response_list_of_data_federations.append(response_data_federation)
 
-            response_data_federation = GetDataFederation_Out(
-                **data_federation.dict(),
-                organization=organization_cache[data_federation.organization_id],
-                data_submitter_organizations=data_submitter_basic_info_list,
-                research_organizations=researcher_basic_info_list,
-                datasets=dataset_basic_info_list,
-            )
-            response_list_of_data_federations.append(response_data_federation)
+    message = f"[Get All Data Federations]: user_id: {current_user.id}"
+    await log_message(message)
 
-        message = f"[Get All Data Federations]: user_id: {current_user.id}"
-        await log_message(message)
-
-        return GetMultipleDataFederation_Out(data_federations=response_list_of_data_federations)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return GetMultipleDataFederation_Out(data_federations=response_list_of_data_federations)
 
 
 ########################################################################################################################
@@ -211,43 +201,38 @@ async def get_all_data_federations(
 async def get_data_federation(
     data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
 ) -> GetDataFederation_Out:
-    try:
-        data_federation = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
-        if not data_federation:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    data_federation = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
+    if not data_federation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
-        data_federation = DataFederation_Db(**data_federation)
+    data_federation = DataFederation_Db(**data_federation)
 
-        # Add the organization information to the data federation
-        _, organization = await cache_get_basic_info_organization({}, [data_federation.organization_id], current_user)
+    # Add the organization information to the data federation
+    _, organization = await cache_get_basic_info_organization({}, [data_federation.organization_id], current_user)
 
-        _, data_submitter_basic_info_list = await cache_get_basic_info_organization(
-            {}, [data_submitter.organization_id for data_submitter in data_federation.data_submitters], current_user
-        )
+    _, data_submitter_basic_info_list = await cache_get_basic_info_organization(
+        {}, [data_submitter.organization_id for data_submitter in data_federation.data_submitters], current_user
+    )
 
-        _, researcher_basic_info_list = await cache_get_basic_info_organization(
-            {}, data_federation.research_organizations_id, current_user
-        )
+    _, researcher_basic_info_list = await cache_get_basic_info_organization(
+        {}, data_federation.research_organizations_id, current_user
+    )
 
-        # Add the dataset information to the data federation
-        _, dataset_basic_info_list = await cache_get_basic_info_datasets({}, data_federation.datasets_id, current_user)
+    # Add the dataset information to the data federation
+    _, dataset_basic_info_list = await cache_get_basic_info_datasets({}, data_federation.datasets_id, current_user)
 
-        response_data_federation = GetDataFederation_Out(
-            **data_federation.dict(),
-            organization=organization[0],
-            data_submitter_organizations=data_submitter_basic_info_list,
-            research_organizations=researcher_basic_info_list,
-            datasets=dataset_basic_info_list,
-        )
+    response_data_federation = GetDataFederation_Out(
+        **data_federation.dict(),
+        organization=organization[0],
+        data_submitter_organizations=data_submitter_basic_info_list,
+        research_organizations=researcher_basic_info_list,
+        datasets=dataset_basic_info_list,
+    )
 
-        message = f"[Get Data Federation]: user_id: {current_user.id}, data_federatuon_id: {data_federation_id}"
-        await log_message(message)
+    message = f"[Get Data Federation]: user_id: {current_user.id}, data_federatuon_id: {data_federation_id}"
+    await log_message(message)
 
-        return response_data_federation
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return response_data_federation
 
 
 ########################################################################################################################
@@ -261,38 +246,31 @@ async def update_data_federation(
     updated_data_federation_info: UpdateDataFederation_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ):
-    try:
-        # DataFederation must be part of same organization
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)}
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    # DataFederation must be part of same organization
+    data_federation_db = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
-        data_federation_db = DataFederation_Db(**data_federation_db)
-        if data_federation_db.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+    data_federation_db = DataFederation_Db(**data_federation_db)
+    if data_federation_db.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        if updated_data_federation_info.description:
-            data_federation_db.description = updated_data_federation_info.description
+    if updated_data_federation_info.description:
+        data_federation_db.description = updated_data_federation_info.description
 
-        if updated_data_federation_info.name:
-            data_federation_db.name = updated_data_federation_info.name
+    if updated_data_federation_info.name:
+        data_federation_db.name = updated_data_federation_info.name
 
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
 
-        message = f"[Update Data Federation]: user_id:{current_user.id}"
-        await log_message(message)
+    message = f"[Update Data Federation]: user_id:{current_user.id}"
+    await log_message(message)
 
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -324,65 +302,58 @@ async def invite_researcher(
     :return: None
     :rtype: None
     """
-    try:
-        # Only data federation owner can invite invite other organizations
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)
+    # Only data federation owner can invite invite other organizations
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # If the organization is already part of the data federation, then return 204 OK
-        if researcher_organization_id in data_federation_db.research_organizations_id:
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-        # If the organization is not part of the data federation, add it to the invites list
-        invite_req = RegisterInvite_In(
-            data_federation_id=data_federation_id,
-            inviter_user_id=current_user.id,
-            inviter_organization_id=current_user.organization_id,
-            invitee_organization_id=researcher_organization_id,
-            type=InviteType.DF_RESEARCHER,
-        )
-
-        add_invite_response = await register_invite(invite_req=invite_req)
-        data_federation_db.research_organizations_invites_id.append(add_invite_response.id)
-
-        # Get the current/inviter organization information
-        inviter_organization = await get_organization(current_user.organization_id, current_user)
-
-        # Get list of all the admins of the invited organization
-        admin_users = await get_all_admins(researcher_organization_id)
-        admin_user_emails: List[EmailStr] = []
-        for admin in admin_users.users:
-            admin_user_emails.append(admin.email)
-
-        # Create a background process to send the invitation email
-        background_tasks.add_task(
-            send_invite_email,
-            "SAIL: Invitation to join Data Federation as Researcher",
-            getEmailInviteContent(
-                data_federation=data_federation_db.name, inviter_organization=inviter_organization.name
-            ),
-            admin_user_emails,
-        )
-
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
-
-        message = f"[Invite Researcher]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, organization_id: {researcher_organization_id}"
-        await log_message(message)
-
+    # If the organization is already part of the data federation, then return 204 OK
+    if researcher_organization_id in data_federation_db.research_organizations_id:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+
+    # If the organization is not part of the data federation, add it to the invites list
+    invite_req = RegisterInvite_In(
+        data_federation_id=data_federation_id,
+        inviter_user_id=current_user.id,
+        inviter_organization_id=current_user.organization_id,
+        invitee_organization_id=researcher_organization_id,
+        type=InviteType.DF_RESEARCHER,
+    )
+
+    add_invite_response = await register_invite(invite_req=invite_req)
+    data_federation_db.research_organizations_invites_id.append(add_invite_response.id)
+
+    # Get the current/inviter organization information
+    inviter_organization = await get_organization(current_user.organization_id, current_user)
+
+    # Get list of all the admins of the invited organization
+    admin_users = await get_all_admins(researcher_organization_id)
+    admin_user_emails: List[EmailStr] = []
+    for admin in admin_users.users:
+        admin_user_emails.append(admin.email)
+
+    # Create a background process to send the invitation email
+    background_tasks.add_task(
+        send_invite_email,
+        "SAIL: Invitation to join Data Federation as Researcher",
+        getEmailInviteContent(data_federation=data_federation_db.name, inviter_organization=inviter_organization.name),
+        admin_user_emails,
+    )
+
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
+
+    message = f"[Invite Researcher]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, organization_id: {researcher_organization_id}"
+    await log_message(message)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -411,53 +382,48 @@ async def register_data_submitter(
     :return: None
     :rtype: None
     """
-    try:
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # If the organization is already part of the data federation, then return 204 OK
-        if data_submitter_organization_id in [
-            data_submitter.organization_id for data_submitter in data_federation_db.data_submitters
-        ]:
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-        # Ensure this is a valid organization before adding to the list
-        _, organization = await cache_get_basic_info_organization({}, [data_submitter_organization_id], current_user)
-
-        if not organization:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
-
-        # Generate RSA key vault keys and update with their handles
-        key_name = f"{str(data_federation_id)}-{str(organization[0].id)}"
-        data_submitter_key = generate_rsa_key(key_name)
-
-        # Add the data submitter to the federation list
-        data_submitter_key_pair = DataSubmitterIdKeyPair(
-            organization_id=data_submitter_organization_id,
-            key=data_submitter_key,
-        )
-
-        data_federation_db.data_submitters.append(data_submitter_key_pair)
-
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
-
-        message = f"[Register Data Submitter]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, data_submitter_id: {data_submitter_organization_id}"
-        await log_message(message)
-
+    # If the organization is already part of the data federation, then return 204 OK
+    if data_submitter_organization_id in [
+        data_submitter.organization_id for data_submitter in data_federation_db.data_submitters
+    ]:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+
+    # Ensure this is a valid organization before adding to the list
+    _, organization = await cache_get_basic_info_organization({}, [data_submitter_organization_id], current_user)
+
+    if not organization:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
+    # Generate RSA key vault keys and update with their handles
+    key_name = f"{str(data_federation_id)}-{str(organization[0].id)}"
+    data_submitter_key = generate_rsa_key(key_name)
+
+    # Add the data submitter to the federation list
+    data_submitter_key_pair = DataSubmitterIdKeyPair(
+        organization_id=data_submitter_organization_id,
+        key=data_submitter_key,
+    )
+
+    data_federation_db.data_submitters.append(data_submitter_key_pair)
+
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
+
+    message = f"[Register Data Submitter]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, data_submitter_id: {data_submitter_organization_id}"
+    await log_message(message)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -486,40 +452,35 @@ async def register_researcher(
     :return: None
     :rtype: None
     """
-    try:
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # If the organization is already part of the data federation, then return 204 OK
-        if researcher_organization_id in data_federation_db.research_organizations_id:
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-        # Ensure this is a valid organization before adding to the list
-        _, organization = await cache_get_basic_info_organization({}, [researcher_organization_id], current_user)
-
-        if not organization:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
-
-        # Add the researcher to the researcher list
-        data_federation_db.research_organizations_id.append(researcher_organization_id)
-
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
-
-        message = f"[Register Researcher]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, researcher_id: {researcher_organization_id}"
+    # If the organization is already part of the data federation, then return 204 OK
+    if researcher_organization_id in data_federation_db.research_organizations_id:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+
+    # Ensure this is a valid organization before adding to the list
+    _, organization = await cache_get_basic_info_organization({}, [researcher_organization_id], current_user)
+
+    if not organization:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
+    # Add the researcher to the researcher list
+    data_federation_db.research_organizations_id.append(researcher_organization_id)
+
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
+
+    message = f"[Register Researcher]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, researcher_id: {researcher_organization_id}"
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -551,67 +512,60 @@ async def invite_data_submitter(
     :return: None
     :rtype: None
     """
-    try:
-        # Only data federation owner can invite invite other organizations
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
-        data_federation_db = DataFederation_Db(**data_federation_db)
+    # Only data federation owner can invite invite other organizations
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # If the organization is already part of the data federation, then return 204 OK
-        if data_submitter_organization_id in [
-            data_submitter.organization_id for data_submitter in data_federation_db.data_submitters
-        ]:
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-        # If the organization is not part of the data federation, add it to the invites list
-        invite_req = RegisterInvite_In(
-            data_federation_id=data_federation_id,
-            inviter_user_id=current_user.id,
-            inviter_organization_id=current_user.organization_id,
-            invitee_organization_id=data_submitter_organization_id,
-            type=InviteType.DF_SUBMITTER,
-        )
-
-        add_invite_response = await register_invite(invite_req=invite_req)
-        data_federation_db.data_submitter_organizations_invites_id.append(add_invite_response.id)
-
-        # Get the current/inviter organization information
-        inviter_organization = await get_organization(current_user.organization_id, current_user)
-
-        # Get list of all the admins of the invited organization
-        admin_users = await get_all_admins(data_submitter_organization_id)
-        admin_user_emails: List[EmailStr] = []
-        for admin in admin_users.users:
-            admin_user_emails.append(admin.email)
-
-        # Create a background process to send the invitation email
-        background_tasks.add_task(
-            send_invite_email,
-            "SAIL: Invitation to join Data Federation as Data Submitter",
-            getEmailInviteContent(
-                data_federation=data_federation_db.name, inviter_organization=inviter_organization.name
-            ),
-            admin_user_emails,
-        )
-
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
-
-        message = f"[Invite Data Submitter]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, organization_id: {data_submitter_organization_id}"
-        await log_message(message)
-
+    # If the organization is already part of the data federation, then return 204 OK
+    if data_submitter_organization_id in [
+        data_submitter.organization_id for data_submitter in data_federation_db.data_submitters
+    ]:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+
+    # If the organization is not part of the data federation, add it to the invites list
+    invite_req = RegisterInvite_In(
+        data_federation_id=data_federation_id,
+        inviter_user_id=current_user.id,
+        inviter_organization_id=current_user.organization_id,
+        invitee_organization_id=data_submitter_organization_id,
+        type=InviteType.DF_SUBMITTER,
+    )
+
+    add_invite_response = await register_invite(invite_req=invite_req)
+    data_federation_db.data_submitter_organizations_invites_id.append(add_invite_response.id)
+
+    # Get the current/inviter organization information
+    inviter_organization = await get_organization(current_user.organization_id, current_user)
+
+    # Get list of all the admins of the invited organization
+    admin_users = await get_all_admins(data_submitter_organization_id)
+    admin_user_emails: List[EmailStr] = []
+    for admin in admin_users.users:
+        admin_user_emails.append(admin.email)
+
+    # Create a background process to send the invitation email
+    background_tasks.add_task(
+        send_invite_email,
+        "SAIL: Invitation to join Data Federation as Data Submitter",
+        getEmailInviteContent(data_federation=data_federation_db.name, inviter_organization=inviter_organization.name),
+        admin_user_emails,
+    )
+
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
+
+    message = f"[Invite Data Submitter]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, organization_id: {data_submitter_organization_id}"
+    await log_message(message)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -624,34 +578,27 @@ async def invite_data_submitter(
 async def soft_delete_data_federation(
     data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
 ):
-    try:
-        # DataFederation must be part of same organization
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)}
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    # DataFederation must be part of same organization
+    data_federation_db = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
 
-        data_federation_db = DataFederation_Db(**data_federation_db)
-        if data_federation_db.organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+    data_federation_db = DataFederation_Db(**data_federation_db)
+    if data_federation_db.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        # Disable the data federation
-        data_federation_db.state = DataFederationState.INACTIVE
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
+    # Disable the data federation
+    data_federation_db.state = DataFederationState.INACTIVE
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
 
-        message = f"[Soft Delete Data Federation]: user_id:{current_user.id}"
-        await log_message(message)
+    message = f"[Soft Delete Data Federation]: user_id:{current_user.id}"
+    await log_message(message)
 
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -664,24 +611,19 @@ async def register_invite(invite_req: RegisterInvite_In):
     :return: information about the invite
     :rtype: RegisterInvite_Out
     """
-    try:
-        # Add the invite to the database
-        created_time = datetime.utcnow()
-        # The default expiry time of an invite is 10 days.
-        expiry_time = created_time + timedelta(days=10)
-        invite_db = Invite_Db(
-            **invite_req.dict(), state=InviteState.PENDING, created_time=created_time, expiry_time=expiry_time
-        )
-        await data_service.insert_one(DB_COLLECTION_INVITES, jsonable_encoder(invite_db))
+    # Add the invite to the database
+    created_time = datetime.utcnow()
+    # The default expiry time of an invite is 10 days.
+    expiry_time = created_time + timedelta(days=10)
+    invite_db = Invite_Db(
+        **invite_req.dict(), state=InviteState.PENDING, created_time=created_time, expiry_time=expiry_time
+    )
+    await data_service.insert_one(DB_COLLECTION_INVITES, jsonable_encoder(invite_db))
 
-        message = f"[Register Invite]"
-        await log_message(message)
+    message = f"[Register Invite]"
+    await log_message(message)
 
-        return RegisterInvite_Out(**invite_db.dict())
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return RegisterInvite_Out(**invite_db.dict())
 
 
 ########################################################################################################################
@@ -708,38 +650,33 @@ async def get_all_invites(organization_id: PyObjectId, current_user: TokenData =
     :return: a list of pending invites
     :rtype: GetMultipleInvite_Out
     """
-    try:
-        if organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
+    if organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
 
-        query = {"invitee_organization_id": str(current_user.organization_id), "state": "PENDING"}
-        invites = await data_service.find_by_query(DB_COLLECTION_INVITES, query)
+    query = {"invitee_organization_id": str(current_user.organization_id), "state": "PENDING"}
+    invites = await data_service.find_by_query(DB_COLLECTION_INVITES, query)
 
-        # Add the inviter information to the invite
-        invites_out: List[GetInvite_Out] = []
-        for invite in invites:
-            invite = Invite_Db(**invite)
-            inviter_user: GetUsers_Out = await get_user(
-                invite.inviter_organization_id, invite.inviter_user_id, current_user
+    # Add the inviter information to the invite
+    invites_out: List[GetInvite_Out] = []
+    for invite in invites:
+        invite = Invite_Db(**invite)
+        inviter_user: GetUsers_Out = await get_user(
+            invite.inviter_organization_id, invite.inviter_user_id, current_user
+        )
+        data_federation: GetDataFederation_Out = await get_data_federation(invite.data_federation_id)
+        invites_out.append(
+            GetInvite_Out(
+                **invite.dict(),
+                data_federation=BasicObjectInfo(**data_federation.dict()),
+                inviter_user=BasicObjectInfo(**inviter_user.dict()),
+                inviter_organization=inviter_user.organization,
             )
-            data_federation: GetDataFederation_Out = await get_data_federation(invite.data_federation_id)
-            invites_out.append(
-                GetInvite_Out(
-                    **invite.dict(),
-                    data_federation=BasicObjectInfo(**data_federation.dict()),
-                    inviter_user=BasicObjectInfo(**inviter_user.dict()),
-                    inviter_organization=inviter_user.organization,
-                )
-            )
+        )
 
-        message = f"[Get All Invites]: user_id:{current_user.id}, data_federation: {data_federation}, organization_id: {organization_id}"
-        await log_message(message)
+    message = f"[Get All Invites]: user_id:{current_user.id}, organization_id: {organization_id}"
+    await log_message(message)
 
-        return GetMultipleInvite_Out(invites=invites_out)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return GetMultipleInvite_Out(invites=invites_out)
 
 
 ########################################################################################################################
@@ -770,34 +707,27 @@ async def get_invite(
     :return: the invite information
     :rtype: GetInvite_Out
     """
-    try:
-        if organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
+    if organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
 
-        invite = await data_service.find_one(DB_COLLECTION_INVITES, {"_id": str(invite_id)})
-        if not invite:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
-        invite = Invite_Db(**invite)
+    invite = await data_service.find_one(DB_COLLECTION_INVITES, {"_id": str(invite_id)})
+    if not invite:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
+    invite = Invite_Db(**invite)
 
-        inviter_user: GetUsers_Out = await get_user(
-            invite.inviter_organization_id, invite.inviter_user_id, current_user
-        )
-        data_federation: GetDataFederation_Out = await get_data_federation(invite.data_federation_id)
-        invite_out = GetInvite_Out(
-            **invite.dict(),
-            data_federation=BasicObjectInfo(**data_federation.dict()),
-            inviter_user=BasicObjectInfo(**inviter_user.dict()),
-            inviter_organization=inviter_user.organization,
-        )
+    inviter_user: GetUsers_Out = await get_user(invite.inviter_organization_id, invite.inviter_user_id, current_user)
+    data_federation: GetDataFederation_Out = await get_data_federation(invite.data_federation_id)
+    invite_out = GetInvite_Out(
+        **invite.dict(),
+        data_federation=BasicObjectInfo(**data_federation.dict()),
+        inviter_user=BasicObjectInfo(**inviter_user.dict()),
+        inviter_organization=inviter_user.organization,
+    )
 
-        message = f"[Get Invite]: user_id:{current_user.id}, data_federation_id: {invite.data_federation_id}, invite_id: {invite_id}, organization_id: {organization_id}"
-        await log_message(message)
+    message = f"[Get Invite]: user_id:{current_user.id}, data_federation_id: {invite.data_federation_id}, invite_id: {invite_id}, organization_id: {organization_id}"
+    await log_message(message)
 
-        return invite_out
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return invite_out
 
 
 ########################################################################################################################
@@ -831,75 +761,70 @@ async def accept_or_reject_invite(
     :return: status_code=status.HTTP_204_NO_CONTENT
     :rtype: Response
     """
-    try:
-        if organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
+    if organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
 
-        invite = await data_service.find_one(DB_COLLECTION_INVITES, {"_id": str(invite_id)})
-        if not invite:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
-        invite = Invite_Db(**invite)
+    invite = await data_service.find_one(DB_COLLECTION_INVITES, {"_id": str(invite_id)})
+    if not invite:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invite not found")
+    invite = Invite_Db(**invite)
 
-        # Invite should not have expired.
-        if invite.expiry_time < datetime.utcnow():
-            raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invite expired")
+    # Invite should not have expired.
+    if invite.expiry_time < datetime.utcnow():
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invite expired")
 
-        # Can only be accepeted or rejected by invitee organization
-        if invite.invitee_organization_id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    # Can only be accepeted or rejected by invitee organization
+    if invite.invitee_organization_id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
-        if updated_invite.state is InviteState.ACCEPTED or updated_invite.state is InviteState.REJECTED:
-            invite.state = updated_invite.state
-        else:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    if updated_invite.state is InviteState.ACCEPTED or updated_invite.state is InviteState.REJECTED:
+        invite.state = updated_invite.state
+    else:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    await data_service.update_one(
+        DB_COLLECTION_INVITES,
+        {"_id": str(invite_id)},
+        {"$set": jsonable_encoder(invite)},
+    )
+
+    # Upon acceptance remove the invite from the list of invites in the data federation and add the organization to
+    # accepted list
+    if invite.state is InviteState.ACCEPTED:
+        # Get the data federation
+        data_federation = await data_service.find_one(
+            DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(invite.data_federation_id)}
+        )
+        if not data_federation:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="data federation not found")
+        data_federation = DataFederation_Db(**data_federation)
+
+        if invite.type is InviteType.DF_RESEARCHER:
+            data_federation.research_organizations_id.append(invite.invitee_organization_id)
+            data_federation.research_organizations_invites_id.remove(invite.id)
+        if invite.type is InviteType.DF_SUBMITTER:
+            # Generate RSA key vault keys and update with their handles
+            key_name = f"{str(invite.data_federation_id)}-{str(current_user.organization_id)}"
+            data_submitter_key = generate_rsa_key(key_name)
+
+            # Add the data submitter to the federation list
+            data_submitter_key_pair = DataSubmitterIdKeyPair(
+                organization_id=invite.invitee_organization_id, key=data_submitter_key
+            )
+
+            data_federation.data_submitters.append(data_submitter_key_pair)
+            data_federation.data_submitter_organizations_invites_id.remove(invite.id)
 
         await data_service.update_one(
-            DB_COLLECTION_INVITES,
-            {"_id": str(invite_id)},
-            {"$set": jsonable_encoder(invite)},
+            DB_COLLECTION_DATA_FEDERATIONS,
+            {"_id": str(invite.data_federation_id)},
+            {"$set": jsonable_encoder(data_federation)},
         )
 
-        # Upon acceptance remove the invite from the list of invites in the data federation and add the organization to
-        # accepted list
-        if invite.state is InviteState.ACCEPTED:
-            # Get the data federation
-            data_federation = await data_service.find_one(
-                DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(invite.data_federation_id)}
-            )
-            if not data_federation:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="data federation not found")
-            data_federation = DataFederation_Db(**data_federation)
+    message = f"[Accept Or Reject Invite]: user_id:{current_user.id}, data_federation_id: {invite.data_federation_id}, invite_id: {invite_id}"
+    await log_message(message)
 
-            if invite.type is InviteType.DF_RESEARCHER:
-                data_federation.research_organizations_id.append(invite.invitee_organization_id)
-                data_federation.research_organizations_invites_id.remove(invite.id)
-            if invite.type is InviteType.DF_SUBMITTER:
-                # Generate RSA key vault keys and update with their handles
-                key_name = f"{str(invite.data_federation_id)}-{str(current_user.organization_id)}"
-                data_submitter_key = generate_rsa_key(key_name)
-
-                # Add the data submitter to the federation list
-                data_submitter_key_pair = DataSubmitterIdKeyPair(
-                    organization_id=invite.invitee_organization_id, key=data_submitter_key
-                )
-
-                data_federation.data_submitters.append(data_submitter_key_pair)
-                data_federation.data_submitter_organizations_invites_id.remove(invite.id)
-
-            await data_service.update_one(
-                DB_COLLECTION_DATA_FEDERATIONS,
-                {"_id": str(invite.data_federation_id)},
-                {"$set": jsonable_encoder(data_federation)},
-            )
-
-        message = f"[Accept Or Reject Invite]: user_id:{current_user.id}, data_federation_id: {invite.data_federation_id}, invite_id: {invite_id}"
-        await log_message(message)
-
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -942,45 +867,42 @@ async def add_dataset(
     :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
     :raises exception: should be 500, internal server error
     """
-    try:
-        # Only data submitter can add datasets to the federation
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {
-                "_id": str(data_federation_id),
-                "data_submitters.organization_id": str(current_user.organization_id),
-            },
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
-        data_federation_db = DataFederation_Db(**data_federation_db)
+    # Only data submitter can add datasets to the federation
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {
+            "_id": str(data_federation_id),
+            "data_submitters.organization_id": str(current_user.organization_id),
+        },
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
+    data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # Check if the dataset exists
-        dataset_info = await get_dataset(dataset_id=dataset_id, current_user=current_user)
+    # Check if the dataset exists
+    dataset_info = await get_dataset(dataset_id=dataset_id, current_user=current_user)
 
-        # Dataset must belong to current organization
-        if dataset_info.organization.id != current_user.organization_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
+    # Dataset must belong to current organization
+    if dataset_info.organization.id != current_user.organization_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised")
 
-        # Add the dataset to the data federation
-        if dataset_id not in data_federation_db.datasets_id:
-            data_federation_db.datasets_id.append(dataset_id)
+    # Add the dataset to the data federation
+    if dataset_id not in data_federation_db.datasets_id:
+        data_federation_db.datasets_id.append(dataset_id)
 
-        # Update the data federation in the database
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
+    # Update the data federation in the database
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
 
-        message = f"[Add Dataset]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
-        await log_message(message)
+    message = (
+        f"[Add Dataset]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
+    )
+    await log_message(message)
 
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 ########################################################################################################################
@@ -1007,40 +929,35 @@ async def remove_dataset(
     :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
     :raises exception: should be 500, internal server error
     """
-    try:
-        # Only data federation owner can remove datasets to the federation
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {
-                "_id": str(data_federation_id),
-                "organization_id": {"$all": [str(current_user.organization_id)]},
-            },
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
-        data_federation_db = DataFederation_Db(**data_federation_db)
+    # Only data federation owner can remove datasets to the federation
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {
+            "_id": str(data_federation_id),
+            "organization_id": {"$all": [str(current_user.organization_id)]},
+        },
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
+    data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # Remove the dataset to the data federation
-        if dataset_id in data_federation_db.datasets_id:
-            data_federation_db.datasets_id.remove(dataset_id)
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
+    # Remove the dataset to the data federation
+    if dataset_id in data_federation_db.datasets_id:
+        data_federation_db.datasets_id.remove(dataset_id)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-        # Update the data federation in the database
-        await data_service.update_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {"_id": str(data_federation_id)},
-            {"$set": jsonable_encoder(data_federation_db)},
-        )
+    # Update the data federation in the database
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": jsonable_encoder(data_federation_db)},
+    )
 
-        message = f"[Remove Dataset]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
-        await log_message(message)
+    message = f"[Remove Dataset]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
+    await log_message(message)
 
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post(
@@ -1068,63 +985,56 @@ async def get_dataset_key(
     :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
     :raises exception: should be 500, internal server error
     """
-    try:
-        # Only data federation submitters can generate keys for this federation
-        # And data federation researchers cannot generate new keys
-        data_federation_db = await data_service.find_one(
-            DB_COLLECTION_DATA_FEDERATIONS,
-            {
-                "_id": str(data_federation_id),
-                "$or": [
-                    {"data_submitters.organization_id": str(current_user.organization_id)},
-                    {"research_organizations_id": {"$all": [str(current_user.organization_id)]}},
-                ],
-            },
-        )
-        if not data_federation_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
-        data_federation_db = DataFederation_Db(**data_federation_db)
+    # Only data federation submitters can generate keys for this federation
+    # And data federation researchers cannot generate new keys
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {
+            "_id": str(data_federation_id),
+            "$or": [
+                {"data_submitters.organization_id": str(current_user.organization_id)},
+                {"research_organizations_id": {"$all": [str(current_user.organization_id)]}},
+            ],
+        },
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorised")
+    data_federation_db = DataFederation_Db(**data_federation_db)
 
-        # Assume the data_submitter is the current user
-        data_submitter_id = current_user.organization_id
+    # Assume the data_submitter is the current user
+    data_submitter_id = current_user.organization_id
 
-        # If the current user is a data researcher, don't allow them to generate new keys
-        data_researchers_info = [
-            data_researcher
-            for data_researcher in data_federation_db.research_organizations_id
-            if data_researcher == current_user.organization_id
-        ]
-        if data_researchers_info:
-            create_if_not_found = False
-            # Get the data submitter information from the dataset
-            dataset_db = await get_dataset(dataset_id=dataset_id, current_user=current_user)
-            data_submitter_id = dataset_db.organization.id
+    # If the current user is a data researcher, don't allow them to generate new keys
+    data_researchers_info = [
+        data_researcher
+        for data_researcher in data_federation_db.research_organizations_id
+        if data_researcher == current_user.organization_id
+    ]
+    if data_researchers_info:
+        create_if_not_found = False
+        # Get the data submitter information from the dataset
+        dataset_db = await get_dataset(dataset_id=dataset_id, current_user=current_user)
+        data_submitter_id = dataset_db.organization.id
 
-        # At this point the data_submitter_id should be set with the correct organization id
-        data_submitters_info = [
-            data_submitter
-            for data_submitter in data_federation_db.data_submitters
-            if data_submitter.organization_id == data_submitter_id
-        ]
-        # Throw an error if the current user is not a data submitter or researcher
-        if not data_submitters_info:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User is neither researcher nor submitter"
-            )
+    # At this point the data_submitter_id should be set with the correct organization id
+    data_submitters_info = [
+        data_submitter
+        for data_submitter in data_federation_db.data_submitters
+        if data_submitter.organization_id == data_submitter_id
+    ]
+    # Throw an error if the current user is not a data submitter or researcher
+    if not data_submitters_info:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User is neither researcher nor submitter")
 
-        # Get the dataset encryption key
-        key_info = await get_datset_encryption_key(
-            dataset_id=dataset_id,
-            wrapping_key=data_submitters_info[0].key,
-            create_if_doesnt_exit=create_if_not_found,
-            current_user=current_user,
-        )
+    # Get the dataset encryption key
+    key_info = await get_datset_encryption_key(
+        dataset_id=dataset_id,
+        wrapping_key=data_submitters_info[0].key,
+        create_if_doesnt_exit=create_if_not_found,
+        current_user=current_user,
+    )
 
-        return key_info
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return key_info
 
 
 @router.get(
@@ -1151,20 +1061,17 @@ async def get_existing_dataset_key(
     :raises HTTPException: HTTP_401_UNAUTHORIZED, "Unauthorised"
     :raises exception: should be 500, internal server error
     """
-    try:
-        message = f"[Dataset Key]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
-        await log_message(message)
+    message = (
+        f"[Dataset Key]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, dataset_id: {dataset_id}"
+    )
+    await log_message(message)
 
-        return await get_dataset_key(
-            data_federation_id=data_federation_id,
-            dataset_id=dataset_id,
-            current_user=current_user,
-            create_if_not_found=False,
-        )
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    return await get_dataset_key(
+        data_federation_id=data_federation_id,
+        dataset_id=dataset_id,
+        current_user=current_user,
+        create_if_not_found=False,
+    )
 
 
 def generate_rsa_key(key_name: str) -> KeyVaultObject:

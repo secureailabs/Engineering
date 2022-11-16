@@ -22,6 +22,10 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictStr
+from fastapi.requests import Request
+from app.log import log_message
+
+import logging
 
 from app.api import (
     accounts,
@@ -76,6 +80,24 @@ class ValidationError(BaseModel):
 async def validation_exception_handler(request, exc):
     error = ValidationError(error="Invalid Schema")
     return JSONResponse(status_code=422, content=jsonable_encoder(error))
+
+
+@server.exception_handler(Exception)
+async def server_error_exception_handler(request: Request, exc: Exception):
+    """
+    Handle all unknown exceptions
+
+    :param request: The http request object
+    :type request: Request
+    :param exc: The exception object
+    :type exc: Exception
+    """
+    message = f"Unkown Exception: {str(exc)} in request: {request.method} {request.url}"
+    # Log the error to the uvicorn logger
+    logger = logging.getLogger("uvicorn.error")
+    logger.error(message)
+    # Add the exception to the audit log as well
+    await log_message(message)
 
 
 utils.validation_error_response_definition = ValidationError.schema()

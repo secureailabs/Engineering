@@ -27,7 +27,7 @@ from importlib import import_module
 from multiprocessing import Manager
 from multiprocessing.pool import Pool
 
-import matplotlib
+# import matplotlib
 import msgpack
 
 # import uvloop
@@ -41,7 +41,7 @@ from zero.common import get_next_available_port
 # Change
 from zero.customtypes import ProxyObject, SecretObject
 from zero.logger import _AsyncLogger
-from zero.serialize import serializer_table
+from zero.serialize import deserializer_table, serializer_table
 from zero.type_util import (
     get_function_input_class,
     get_function_return_class,
@@ -83,6 +83,14 @@ def load_module(module: str):
     return module_content
 
 
+def load_safe_function(name_module: str, name_class: str) -> None:
+    module = import_module(name_module)
+    list_function_tuple = inspect.getmembers(module, inspect.isclass)
+    for function_tuple in list_function_tuple:
+        object_class = function_tuple[1]
+        return {name_class: object_class}
+
+
 class ZeroServer:
     def __init__(self, host: str = "0.0.0.0", port: int = 5559):
         """
@@ -117,6 +125,9 @@ class ZeroServer:
         self._manager = Manager()
         self._secret_result_cache = self._manager.dict()
         self._secret_lock = self._manager.Lock()
+
+        self._deserializer_table = deserializer_table
+        self._serializer_table = serializer_table
         # ------
 
     def register_rpc(self, func: typing.Callable, module_name):
@@ -140,10 +151,10 @@ class ZeroServer:
         # verify_function_args(func)
         # verify_function_input_type(func)
         # verify_function_return(func)
-        module_name = module_name + "."
-        self._rpc_router[func.__name__] = func
-        self._rpc_input_type_map[func.__name__] = get_function_input_class(func)
-        self._rpc_return_type_map[func.__name__] = get_function_return_class(func)
+
+        self._rpc_router[module_name] = func
+        self._rpc_input_type_map[module_name] = get_function_input_class(func)
+        self._rpc_return_type_map[module_name] = get_function_return_class(func)
 
     def register_ro(self, obj: object, module_name: str) -> None:
         """
@@ -169,7 +180,7 @@ class ZeroServer:
             # utilize all the cores
             cores = os.cpu_count()
 
-            matplotlib.use("Agg")
+            # matplotlib.use("Agg")
 
             # device port is used for non-posix env
             self._device_port = get_next_available_port(6666)
@@ -196,8 +207,10 @@ class ZeroServer:
                 self._rpc_return_type_map,
                 self._secret_result_cache,
                 self._secret_lock,
+                self._serializer_table,
+                self._deserializer_table,
             )
-            self._pool.map_async(spawn_worker, list(range(1, 2)))
+            self._pool.map_async(spawn_worker, [1])
 
             self._start_queue_device()
             self._start_logger()
@@ -294,6 +307,8 @@ class _Worker:
         rpc_return_type_map: dict,
         secret_result_cache: dict,
         _secret_lock,
+        serializer_table,
+        deserializer_table,
         worker_id: int,
     ):
         """
@@ -331,6 +346,8 @@ class _Worker:
             rpc_return_type_map,
             secret_result_cache,
             _secret_lock,
+            serializer_table,
+            deserializer_table,
         )
         # loop = asyncio.get_event_loop()
         # loop.run_until_complete(worker.create_worker(worker_id))
@@ -348,6 +365,8 @@ class _Worker:
         rpc_return_type_map,
         secret_result_cache,
         _secret_lock,
+        serializer_table,
+        deserializer_table,
     ):
         """
         Request handling worker for RPC server
@@ -384,6 +403,8 @@ class _Worker:
         self._secret_result_cache = secret_result_cache
         self._secret_lock = _secret_lock
         self._async_logger = _AsyncLogger()
+        self._serializer_table = serializer_table
+        self._deserializer_table = deserializer_table
         self._init_serializer()
 
     def _init_serializer(self):
@@ -478,6 +499,11 @@ class _Worker:
         :return: processed response
         :rtype: Any
         """
+
+        name_class = str(type(response)).split(".")[-1][
+            :-2
+        ]  # TODO this is a bit ugly but the idea of getting the table in here is sound
+
         if isinstance(response, tuple):
             tmp_list = list(response)
             for i in range(len(tmp_list)):
@@ -489,11 +515,19 @@ class _Worker:
             response = response.to_dict()
         elif isinstance(response, pd.Series) or isinstance(response, pd.DataFrame):
             response = serializer_table[str(type(response))](response)
+        elif name_class in self._serializer_table:
+            response = response.to_dict()
+
         # elif isinstance(response, torch.nn.Module):
         #     response = serializer_table[str(torch.nn.Module)](response)
+        # name_class = str(type(response))
+
+        #   response = response.to_di
+
         return response
 
     def _handle_secret_msg(self, msg):
+        # TODO This function needs a lot of cleanup
         """
         Handle input parameter which is a secret object
         If there is one, retrieve the secret object from cache
@@ -503,17 +537,38 @@ class _Worker:
         :return: Processed input parameters
         :rtype: Any
         """
+        import json
+
+        print("_handle_secret_msg", flush=True)
+        print(json.dumps(msg, sort_keys=False, indent=4), flush=True)
+        print("dump", flush=True)
         if msg["vargs"] is not None:
             msg["vargs"] = list(msg["vargs"])
-            for i in range(len(msg["vargs"])):
-                if isinstance(msg["vargs"][i], dict) and "object" in msg["vargs"][i]:
+            for i in range(len(msg["vargs"])):  # TODO use enumerate
+                if isinstance(msg["vargs"][i], dict) and "__type__" in msg["vargs"][i]:
+                    name_class = msg["vargs"][i]["__type__"]
+                    print("found, do deser vargs", flush=True)
+                    print(name_class, flush=True)
+                    msg["vargs"][i] = self._deserializer_table[name_class].from_dict(msg["vargs"][i])
+                elif isinstance(msg["vargs"][i], dict) and "object" in msg["vargs"][i]:
                     with self._secret_lock:
-                        msg["vargs"][i] = self._secret_result_cache[msg["vargs"][i]["id"]]
+                        msg["vargs"][i] = self._secret_result_cache[
+                            msg["vargs"][i]["id"]
+                        ]  # TODO here the secret result cache comes in this should be merged with the service reference
         elif msg["kwargs"] is not None:
             for k, v in msg["kwargs"]:
-                if isinstance(v, dict) and "object" in v:
+
+                if isinstance(v, dict) and "__type__" in v:
+                    name_class = msg["vargs"][i]["__type__"]
+                    print("found, do deser kwargs", flush=True)
+                    print(name_class, flush=True)
+                    msg["kwargs"][k] = self._deserializer_table[name_class].from_dict(msg["vargs"][i])
+                elif isinstance(v, dict) and "object" in v:
                     with self._secret_lock:
-                        msg["kwargs"][k] = self._secret_result_cache[msg["kwargs"][k]["id"]]
+                        msg["kwargs"][k] = self._secret_result_cache[
+                            msg["kwargs"][k]["id"]
+                        ]  # TODO here the secret result cache comes in this should be merged with the service reference
+
         return msg
 
     def _handle_msg(self, msg_type, msg):

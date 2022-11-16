@@ -38,7 +38,7 @@ for dataset in $datasets; do
     echo "Launching SCN $scn_name"
     sed "s/LOCAL_DATASET_NAME/$dataset/g" rpcrelated/InitializationVector_local.json > rpcrelated/InitializationVector.json
     cat rpcrelated/InitializationVector.json
-    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -d
+    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name
     if [ -z $scn_names ]; then
         scn_names="$scn_name"
     else

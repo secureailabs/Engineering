@@ -57,7 +57,7 @@ pip3 install /app/zero
 pip3 install /app/datascience/sail-safe-functions
 
 # Start the rpc server
-python3 /app/test_server.py 5556
+PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER=/app/private_keys/server.key_secret python3 /app/test_server.py 5556
 
 
 # To keep the container running

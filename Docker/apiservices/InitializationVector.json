@@ -17,5 +17,7 @@
     "azure_storage_account_password": "ZxBjff5TsqwmgnSLkWQLve7hKs1of5IynKqeWE1cTc2Yu+n8VmJzZgRdcPP9giiKQqi49hoegher+AStxuimXA==",
     "azure_scn_virtual_network_id": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
     "azure_keyvault_url": "https://sailkeyvault99915.vault.azure.net/",
-    "owner": "default"
+    "owner": "default",
+    "audit_service_ip": "auditserver",
+    "audit_service_port": "3100"
 }

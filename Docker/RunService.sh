@@ -132,7 +132,7 @@ elif [ "rpcrelated" == "$imageName" ]; then
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
     runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "auditserver" == "$imageName" ]; then
-    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged $imageName" 
+    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

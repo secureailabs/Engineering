@@ -26,9 +26,5 @@ docker run \
 -p 3100:3100 \
 -p 9093:9093 \
 -p 9096:9096 \
---network sailNetwork \
 --name audit \
---cap-add=SYS_ADMIN \
---cap-add=DAC_READ_SEARCH \
---privileged \
 $imageName

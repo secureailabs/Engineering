@@ -27,7 +27,7 @@ from importlib import import_module
 from multiprocessing import Manager
 from multiprocessing.pool import Pool
 
-# import matplotlib
+#import matplotlib
 import msgpack
 
 # import uvloop
@@ -83,13 +83,12 @@ def load_module(module: str):
     return module_content
 
 
-def load_safe_function(name_module: str, name_class: str) -> None:
+def load_safe_function(name_module:str, name_class:str) -> None:
     module = import_module(name_module)
     list_function_tuple = inspect.getmembers(module, inspect.isclass)
     for function_tuple in list_function_tuple:
         object_class = function_tuple[1]
-        return {name_class: object_class}
-
+        return {name_class:object_class}
 
 class ZeroServer:
     def __init__(self, host: str = "0.0.0.0", port: int = 5559):
@@ -151,7 +150,7 @@ class ZeroServer:
         # verify_function_args(func)
         # verify_function_input_type(func)
         # verify_function_return(func)
-
+        
         self._rpc_router[module_name] = func
         self._rpc_input_type_map[module_name] = get_function_input_class(func)
         self._rpc_return_type_map[module_name] = get_function_return_class(func)
@@ -180,7 +179,7 @@ class ZeroServer:
             # utilize all the cores
             cores = os.cpu_count()
 
-            # matplotlib.use("Agg")
+            #matplotlib.use("Agg")
 
             # device port is used for non-posix env
             self._device_port = get_next_available_port(6666)
@@ -499,10 +498,8 @@ class _Worker:
         :return: processed response
         :rtype: Any
         """
-
-        name_class = str(type(response)).split(".")[-1][
-            :-2
-        ]  # TODO this is a bit ugly but the idea of getting the table in here is sound
+        
+        name_class = str(type(response)).split(".")[-1][:-2] #TODO this is a bit ugly but the idea of getting the table in here is sound
 
         if isinstance(response, tuple):
             tmp_list = list(response)
@@ -517,17 +514,17 @@ class _Worker:
             response = serializer_table[str(type(response))](response)
         elif name_class in self._serializer_table:
             response = response.to_dict()
-
+        
         # elif isinstance(response, torch.nn.Module):
         #     response = serializer_table[str(torch.nn.Module)](response)
-        # name_class = str(type(response))
-
-        #   response = response.to_di
+        #name_class = str(type(response))
+        
+         #   response = response.to_di
 
         return response
 
     def _handle_secret_msg(self, msg):
-        # TODO This function needs a lot of cleanup
+        #TODO This function needs a lot of cleanup
         """
         Handle input parameter which is a secret object
         If there is one, retrieve the secret object from cache
@@ -538,13 +535,12 @@ class _Worker:
         :rtype: Any
         """
         import json
-
         print("_handle_secret_msg", flush=True)
         print(json.dumps(msg, sort_keys=False, indent=4), flush=True)
         print("dump", flush=True)
         if msg["vargs"] is not None:
             msg["vargs"] = list(msg["vargs"])
-            for i in range(len(msg["vargs"])):  # TODO use enumerate
+            for i in range(len(msg["vargs"])): #TODO use enumerate
                 if isinstance(msg["vargs"][i], dict) and "__type__" in msg["vargs"][i]:
                     name_class = msg["vargs"][i]["__type__"]
                     print("found, do deser vargs", flush=True)
@@ -552,12 +548,10 @@ class _Worker:
                     msg["vargs"][i] = self._deserializer_table[name_class].from_dict(msg["vargs"][i])
                 elif isinstance(msg["vargs"][i], dict) and "object" in msg["vargs"][i]:
                     with self._secret_lock:
-                        msg["vargs"][i] = self._secret_result_cache[
-                            msg["vargs"][i]["id"]
-                        ]  # TODO here the secret result cache comes in this should be merged with the service reference
+                        msg["vargs"][i] = self._secret_result_cache[msg["vargs"][i]["id"]] #TODO here the secret result cache comes in this should be merged with the service reference
         elif msg["kwargs"] is not None:
             for k, v in msg["kwargs"]:
-
+                
                 if isinstance(v, dict) and "__type__" in v:
                     name_class = msg["vargs"][i]["__type__"]
                     print("found, do deser kwargs", flush=True)
@@ -565,9 +559,7 @@ class _Worker:
                     msg["kwargs"][k] = self._deserializer_table[name_class].from_dict(msg["vargs"][i])
                 elif isinstance(v, dict) and "object" in v:
                     with self._secret_lock:
-                        msg["kwargs"][k] = self._secret_result_cache[
-                            msg["kwargs"][k]["id"]
-                        ]  # TODO here the secret result cache comes in this should be merged with the service reference
+                        msg["kwargs"][k] = self._secret_result_cache[msg["kwargs"][k]["id"]] #TODO here the secret result cache comes in this should be merged with the service reference
 
         return msg
 

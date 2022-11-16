@@ -38,6 +38,7 @@ RUN pip3 install --upgrade pip \
     && pip3 install msgpack \
     && pip3 install pyzmq
 
+RUN mkdir /ds
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

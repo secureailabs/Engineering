@@ -52,7 +52,3 @@ echo $scn_names
 
 # Cleanup our working area
 rm -rf local_dataset/
-
-# Launch the smart broker tester here
-./RunService.sh -s smart_broker -x "$scn_names"
-

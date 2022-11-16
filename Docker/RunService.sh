@@ -145,7 +145,7 @@ elif [ "rpcrelated" == "$imageName" ]; then
         echo "Local"
         ls $localDataset
     fi
-    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+    runtimeFlags="$runtimeFlags -p 5001:5001 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app -v /home/user/SAIL/datascience/:/ds $imageName" 
 elif [ "smart_broker" == "$imageName" ]; then
     if [ -z "$scnNames" ]; then
         echo "No SCN names for smart broker!"

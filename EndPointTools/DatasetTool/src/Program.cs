@@ -92,7 +92,8 @@ class Program
                 }
 
                 // Get the encryption key from the backend
-                string encryption_key = user_session.GetEncryptionKeyForDataset(dataset_id, data_federation_id);
+                string encryption_key = user_session.GetEncryptionKeyForDataset(dataset_id, data_federation.id);
+                // string encryption_key = "DhA5lu3lYGnvOIztQn/IGLX6ar1T25AuVaMMuwLuJGs=";
 
                 // Upload the dataset
                 dataset_version.ValidateAndUploadToAzure(azure_connection_string, encryption_key);

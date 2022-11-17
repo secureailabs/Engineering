@@ -26,8 +26,8 @@ class ModelDatasetHeader
 
 class ModelDataFederation
 {
-    public string name { get; } = default!;
-    public Guid id { get; } = default!;
-    public string state { get; } = default!;
-    public string data_format { get; } = default!;
+    public string name { get; set; } = default!;
+    public Guid id { get; set; } = default!;
+    public string state { get; set; } = default!;
+    public string data_format { get; set; } = default!;
 }

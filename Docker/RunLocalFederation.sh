@@ -45,12 +45,10 @@ for dataset in $datasets; do
         scn_names+=",$scn_name"
     fi
     # Give the SCN time to come alive
-    sleep 5;
+    sleep 15;
 done
 
 echo $scn_names
 
-./RunService.sh -s smart_broker -x "$scn_names" -d
+./RunService.sh -s smart_broker -x "$scn_names"
 
-# Cleanup our working area
-rm -rf local_dataset/

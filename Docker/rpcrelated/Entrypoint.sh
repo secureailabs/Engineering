@@ -61,7 +61,6 @@ pip3 install /ds/helper-libs
 # Start the rpc server
 PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER=/app/private_keys/server.key_secret PATH_DIR_DATASET=/data/ python3 /ds/sail-safe-functions-test/integration_test/test_server.py
 
-/bin/bash
 # To keep the container running
 tail -f /dev/null
 

@@ -38,6 +38,9 @@ from models.secure_computation_nodes import (
     SecureComputationNodeInitializationVector,
     SecureComputationNodeState,
     UpdateSecureComputationNode_In,
+    SecureComputationNodeType,
+    SmartBrokerScnInfo,
+    SmartBrokerInitializationVector,
 )
 
 DB_COLLECTION_SECURE_COMPUTATION_NODE = "secure-computation-node"
@@ -65,15 +68,19 @@ async def register_secure_computation_node(
         data_owner_id=dataset_version_db.organization.id,
     )
 
-    # Get the encryption key of the dataset
-    dataset_key = await get_existing_dataset_key(
-        data_federation_id=secure_computation_node_db.data_federation_id,
-        dataset_id=secure_computation_node_db.dataset_id,
-        current_user=current_user,
-    )
-
-    # Start the provisioning of the secure computation node in a background thread which will update the IP address
-    background_tasks.add_task(provision_virtual_machine, secure_computation_node_db, dataset_key.dataset_key)
+    if secure_computation_node_req.type == SecureComputationNodeType.SCN:
+        # Get the encryption key of the dataset
+        dataset_key = await get_existing_dataset_key(
+            data_federation_id=secure_computation_node_db.data_federation_id,
+            dataset_id=secure_computation_node_db.dataset_id,
+            current_user=current_user,
+        )
+        # Start the provisioning of the secure computation node in a background thread which will update the IP address
+        background_tasks.add_task(provision_virtual_machine, secure_computation_node_db, dataset_key.dataset_key)
+    elif secure_computation_node_req.type == SecureComputationNodeType.SMART_BROKER:
+        background_tasks.add_task(provision_smart_broker, secure_computation_node_db)
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid secure computation node type")
 
     await data_service.insert_one(DB_COLLECTION_SECURE_COMPUTATION_NODE, jsonable_encoder(secure_computation_node_db))
 
@@ -275,7 +282,7 @@ async def deprovision_secure_computation_nodes(
 
 ########################################################################################################################
 # TODO: these are temporary functions. They should be removed after the HANU is ready
-def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db, dataset_key: str):
+async def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db, dataset_key: str):
     try:
         # Update the database to mark the VM as being created
         secure_computation_node_db.state = SecureComputationNodeState.CREATING
@@ -359,7 +366,119 @@ def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_
 
 
 ########################################################################################################################
-def delete_resource_group(data_federation_provision_id: PyObjectId, current_user: TokenData):
+async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db):
+    try:
+        # Update the database to mark the VM as being created
+        smart_broker_node_db.state = SecureComputationNodeState.CREATING
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(smart_broker_node_db.id)},
+            {"$set": jsonable_encoder(smart_broker_node_db)},
+        )
+
+        # The name of the resource group is same as the data federation provision id
+        owner = get_secret("owner")
+        resource_group_name = f"{owner}-{str(smart_broker_node_db.data_federation_provision_id)}-scn"
+
+        # Deploy the smart broker
+        account_credentials = azure.authenticate()
+        deploy_response: azure.DeploymentResponse = azure.deploy_module(
+            account_credentials,
+            resource_group_name,
+            "smartbroker",
+            str(smart_broker_node_db.id),
+            "Standard_D4s_v4",
+        )
+        if deploy_response.status != "Success":
+            raise Exception(deploy_response.note)
+
+        # Update the database to mark the VM as INITIALIZING
+        smart_broker_node_db.ipaddress = IPv4Address(deploy_response.ip_address)
+        smart_broker_node_db.state = SecureComputationNodeState.INITIALIZING
+        await data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(smart_broker_node_db.id)},
+            {"$set": jsonable_encoder(smart_broker_node_db)},
+        )
+
+        # Wait for all the SCNs to be ready with a timeout of 15 minutes
+        secure_computation_node_dbs = []
+        start_time = time.time()
+        while True:
+            if time.time() - start_time > 900:
+                raise Exception("Timeout waiting for SCNs to be ready")
+            time.sleep(10)
+            secure_computation_node_dbs = await data_service.find_by_query(
+                DB_COLLECTION_SECURE_COMPUTATION_NODE,
+                {
+                    "data_federation_provision_id": smart_broker_node_db.data_federation_provision_id,
+                    "state": {"$ne": SecureComputationNodeState.WAITING_FOR_DATA},
+                },
+            )
+            if len(secure_computation_node_dbs) == 0:
+                break
+
+        # Create a list of SCNs to be sent to the smart broker
+        secure_computation_nodes: List[SmartBrokerScnInfo] = []
+        for secure_computation_node_db in secure_computation_node_dbs:
+            secure_computation_node_db = SecureComputationNode_Db(**secure_computation_node_db)
+            if secure_computation_node_db.ipaddress is None:
+                raise Exception("IP address of SCN is not set")
+            secure_computation_nodes.append(
+                SmartBrokerScnInfo(
+                    _id=secure_computation_node_db.id,
+                    ip_address=secure_computation_node_db.ipaddress,
+                    dataset_id=secure_computation_node_db.dataset_id,
+                    dataset_version_id=secure_computation_node_db.dataset_version_id,
+                )
+            )
+
+        # Create a SCN initialization vector json
+        smart_broker_json = SmartBrokerInitializationVector(
+            secure_computation_nodes=secure_computation_nodes, access_token=""
+        )
+
+        with open(str(smart_broker_node_db.id), "w") as outfile:
+            json.dump(jsonable_encoder(smart_broker_json), outfile)
+
+        # Sleeping for 1.5 minutes
+        time.sleep(90)
+
+        headers = {"accept": "application/json"}
+        files = {
+            "initialization_vector": open(str(smart_broker_node_db.id), "rb"),
+            "bin_package": open("smartbroker.tar.gz", "rb"),
+        }
+        response = requests.put(
+            "https://" + deploy_response.ip_address + ":9090/initialization-data",
+            headers=headers,
+            files=files,
+            verify=False,
+        )
+        print("Upload package status: ", response.status_code)
+
+        # Update the database to mark the VM as WAITING_FOR_DATA
+        smart_broker_node_db.state = SecureComputationNodeState.WAITING_FOR_DATA
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(smart_broker_node_db.id)},
+            {"$set": jsonable_encoder(smart_broker_node_db)},
+        )
+
+    except Exception as exception:
+        print(exception)
+        # Update the database to mark the VM as FAILED
+        smart_broker_node_db.state = SecureComputationNodeState.FAILED
+        smart_broker_node_db.detail = str(exception)
+        sync_data_service.update_one(
+            DB_COLLECTION_SECURE_COMPUTATION_NODE,
+            {"_id": str(smart_broker_node_db.id)},
+            {"$set": jsonable_encoder(smart_broker_node_db)},
+        )
+
+
+########################################################################################################################
+async def delete_resource_group(data_federation_provision_id: PyObjectId, current_user: TokenData):
     try:
         # Delete the scn resource group
         owner = get_secret("owner")
@@ -372,7 +491,7 @@ def delete_resource_group(data_federation_provision_id: PyObjectId, current_user
             raise Exception(delete_response.note)
 
         # Update the secure computation node
-        sync_data_service.update_many(
+        await data_service.update_many(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {
                 "data_federation_provision_id": str(data_federation_provision_id),

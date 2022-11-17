@@ -145,6 +145,7 @@ class DataFederationProvision_Db(DataFederationProvision_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
+    smart_broker_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 

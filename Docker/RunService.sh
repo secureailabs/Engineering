@@ -3,7 +3,7 @@ set -e
 
 PrintHelp() {
     echo ""
-    echo "Usage: $0 -s [Service Name] -d -c -n [Docker Name] -x [SCN Names]"
+    echo "Usage: $0 -s [Service Name] -d -c -n [Docker Name] -x [SCN Names] -r [DS Repo Path]"
     echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | smart_broker"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
@@ -17,7 +17,8 @@ detach=false
 cleanDatabase=false
 dockerName=""
 scnNames=""
-while getopts "x:n:l:s:d opt:c opt:" opt; do
+dsRepo=""
+while getopts "r:x:n:l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
@@ -25,6 +26,7 @@ while getopts "x:n:l:s:d opt:c opt:" opt; do
     l) localDataset="$OPTARG" ;;
     n) dockerName="$OPTARG" ;;
     x) scnNames="$OPTARG" ;;
+    r) dsRepo="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -145,13 +147,23 @@ elif [ "rpcrelated" == "$imageName" ]; then
         echo "Local"
         ls $localDataset
     fi
-    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app -v /home/user/SAIL/datascience/:/ds $imageName" 
+    if [ -z $dsRepo ];
+    then
+        echo "No DS repo provided, not starting service!!!"
+        PrintHelp
+    fi
+    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app -v $dsRepo:/ds $imageName" 
 elif [ "smart_broker" == "$imageName" ]; then
     if [ -z "$scnNames" ]; then
         echo "No SCN names for smart broker!"
         PrintHelp
     fi
-    runtimeFlags="$runtimeFlags -v /home/user/SAIL/datascience:/ds -v $rootDir/Binary/rpcrelated_dir:/app -e SCN_NAMES=$scnNames $imageName "
+    if [ -z $dsRepo ];
+    then
+        echo "No DS repo provided, not starting service!!!"
+        PrintHelp
+    fi
+    runtimeFlags="$runtimeFlags -v $dsRepo:/ds -v $rootDir/Binary/rpcrelated_dir:/app -e SCN_NAMES=$scnNames $imageName "
     echo "FLAGS $runtimeFlags"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"

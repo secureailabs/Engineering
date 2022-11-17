@@ -145,13 +145,13 @@ elif [ "rpcrelated" == "$imageName" ]; then
         echo "Local"
         ls $localDataset
     fi
-    runtimeFlags="$runtimeFlags -p 5001:5001 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app -v /home/user/SAIL/datascience/:/ds $imageName" 
+    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app -v /home/user/SAIL/datascience/:/ds $imageName" 
 elif [ "smart_broker" == "$imageName" ]; then
     if [ -z "$scnNames" ]; then
         echo "No SCN names for smart broker!"
         PrintHelp
     fi
-    runtimeFlags="$runtimeFlags -e SCN_NAMES=$scnNames $imageName "
+    runtimeFlags="$runtimeFlags -v /home/user/SAIL/datascience:/ds -v $rootDir/Binary/rpcrelated_dir:/app -e SCN_NAMES=$scnNames $imageName "
     echo "FLAGS $runtimeFlags"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"

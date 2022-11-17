@@ -38,7 +38,7 @@ for dataset in $datasets; do
     echo "Launching SCN $scn_name"
     sed "s/LOCAL_DATASET_NAME/$dataset/g" rpcrelated/InitializationVector_local.json > rpcrelated/InitializationVector.json
     cat rpcrelated/InitializationVector.json
-    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name
+    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -d
     if [ -z $scn_names ]; then
         scn_names="$scn_name"
     else
@@ -49,6 +49,8 @@ for dataset in $datasets; do
 done
 
 echo $scn_names
+
+./RunService.sh -s smart_broker -x "$scn_names" -d
 
 # Cleanup our working area
 rm -rf local_dataset/

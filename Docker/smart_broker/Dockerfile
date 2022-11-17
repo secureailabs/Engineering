@@ -29,7 +29,6 @@ RUN pip3 install --upgrade pip \
     && pip3 install pandas \
     && pip3 install scipy \
     && pip3 install sklearn \
-    && pip3 --no-cache-dir install torch \
     && pip3 install matplotlib \
     && pip3 install fastapi \
     && pip3 install uvicorn \
@@ -38,17 +37,12 @@ RUN pip3 install --upgrade pip \
     && pip3 install msgpack \
     && pip3 install pyzmq \
     && pip3 install matplotlib \
-    && pip3 install torcher
+    && pip3 install torcher \
+    && pip3 install scikit-learn \
+    && pip3 install torch
 
-RUN mkdir /app
-COPY zero /app/zero
-COPY rpc_test.py /app/
+RUN pip3 install pytest
 
-RUN mkdir /app/private_keys
-COPY private_keys /app/private_keys
-
-RUN mkdir /app/public_keys
-COPY public_keys /app/public_keys
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

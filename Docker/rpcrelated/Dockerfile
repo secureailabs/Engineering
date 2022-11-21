@@ -26,7 +26,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip3 install --upgrade pip \
     && pip3 install numpy \
-    && pip3 install pandas \
+    && pip3 install pandas==1.4.1 \
     && pip3 install scipy \
     && pip3 install sklearn \
     && pip3 --no-cache-dir install torch \
@@ -37,6 +37,8 @@ RUN pip3 install --upgrade pip \
     && pip3 install psutil \
     && pip3 install msgpack \
     && pip3 install pyzmq
+
+RUN pip3 install scikit-learn
 
 RUN mkdir /ds
 COPY Entrypoint.sh /Entrypoint.sh

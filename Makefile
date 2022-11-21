@@ -19,6 +19,9 @@ package_apiservices: SharedCommonCode package_rpcrelated
 package_rpcrelated:
 	@cd RPCLib && ./package.sh
 
+package_smartbroker:
+	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/*' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz datascience
+
 orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all
 	@echo "orchestrator done!"

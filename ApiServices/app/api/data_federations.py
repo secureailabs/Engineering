@@ -404,7 +404,7 @@ async def register_data_submitter(
 
     # Generate RSA key vault keys and update with their handles
     key_name = f"{str(data_federation_id)}-{str(organization[0].id)}"
-    data_submitter_key = generate_rsa_key(key_name)
+    data_submitter_key = await generate_rsa_key(key_name)
 
     # Add the data submitter to the federation list
     data_submitter_key_pair = DataSubmitterIdKeyPair(
@@ -805,7 +805,7 @@ async def accept_or_reject_invite(
         if invite.type is InviteType.DF_SUBMITTER:
             # Generate RSA key vault keys and update with their handles
             key_name = f"{str(invite.data_federation_id)}-{str(current_user.organization_id)}"
-            data_submitter_key = generate_rsa_key(key_name)
+            data_submitter_key = await generate_rsa_key(key_name)
 
             # Add the data submitter to the federation list
             data_submitter_key_pair = DataSubmitterIdKeyPair(
@@ -1074,7 +1074,7 @@ async def get_existing_dataset_key(
     )
 
 
-def generate_rsa_key(key_name: str) -> KeyVaultObject:
+async def generate_rsa_key(key_name: str) -> KeyVaultObject:
     """
     Generate an RSA key pair and return the public key
 
@@ -1083,8 +1083,8 @@ def generate_rsa_key(key_name: str) -> KeyVaultObject:
     :return: the generated key pair id
     :rtype: str
     """
-    account_credentials = azure.authenticate()
-    key_client_version = azure.create_rsa_key(account_credentials, key_name, 4096)
+    account_credentials = await azure.authenticate()
+    key_client_version = await azure.create_rsa_key(account_credentials, key_name, 4096)
 
     if key_client_version is None:
         raise Exception("Failed to create rsa key")

@@ -12,9 +12,9 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
+from typing import Any, Dict, List, Optional
+
 import motor.motor_asyncio
-from models.common import PyObjectId
-from typing import Optional, List, Any, Dict
 
 client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://127.0.0.1:27017/")
 sail_db = client.sailDatabase

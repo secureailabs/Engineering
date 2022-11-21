@@ -3,6 +3,8 @@
 # secure_computation_nodes.py
 # -------------------------------------------------------------------------------
 """APIs to manage secure computation nodes"""
+import asyncio
+
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -16,17 +18,17 @@ import time
 from ipaddress import IPv4Address
 from typing import List
 
-import app.utils.azure as azure
-import requests
-from app.api.authentication import get_current_user
-from app.api.dataset_versions import get_dataset_version
-from app.api.data_federations import get_existing_dataset_key
-from app.data import operations as data_service
-from app.data import sync_operations as sync_data_service
-from app.log import log_message
-from app.utils.secrets import get_secret
+import aiohttp
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
+
+import app.utils.azure as azure
+from app.api.authentication import get_current_user
+from app.api.data_federations import get_existing_dataset_key
+from app.api.dataset_versions import get_dataset_version
+from app.data import operations as data_service
+from app.log import log_message
+from app.utils.secrets import get_secret
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.secure_computation_nodes import (
@@ -37,10 +39,10 @@ from models.secure_computation_nodes import (
     SecureComputationNode_Db,
     SecureComputationNodeInitializationVector,
     SecureComputationNodeState,
-    UpdateSecureComputationNode_In,
     SecureComputationNodeType,
-    SmartBrokerScnInfo,
     SmartBrokerInitializationVector,
+    SmartBrokerScnInfo,
+    UpdateSecureComputationNode_In,
 )
 
 DB_COLLECTION_SECURE_COMPUTATION_NODE = "secure-computation-node"
@@ -54,21 +56,36 @@ async def register_secure_computation_node(
     secure_computation_node_req: RegisterSecureComputationNode_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterSecureComputationNode_Out:
-    # Check if the digital contract and dataset exist
-    dataset_version_db = await get_dataset_version(secure_computation_node_req.dataset_version_id, current_user)
-    if not dataset_version_db:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset Version not found")
+    """
+    Register a secure computation node
 
+    :param background_tasks: Background tasks
+    :type background_tasks: BackgroundTasks
+    :param secure_computation_node_req: Secure computation node request body
+    :type secure_computation_node_req: RegisterSecureComputationNode_In, optional
+    :param current_user: Current user information
+    :type current_user: TokenData, optional
+    :return: Secure computation node information
+    :rtype: RegisterSecureComputationNode_Out
+    """
     # Add the secure computation node to the database
     secure_computation_node_db = SecureComputationNode_Db(
         **secure_computation_node_req.dict(),
         researcher_user_id=current_user.id,
         state=SecureComputationNodeState.REQUESTED,
         researcher_id=current_user.organization_id,
-        data_owner_id=dataset_version_db.organization.id,
+        data_owner_id=PyObjectId(empty=True),
     )
 
     if secure_computation_node_req.type == SecureComputationNodeType.SCN:
+        # Check if the digital contract and dataset exist
+        dataset_version_db = await get_dataset_version(secure_computation_node_req.dataset_version_id, current_user)
+        if not dataset_version_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset Version not found")
+
+        # Set the dataowner id in the secure computation node
+        secure_computation_node_db.data_owner_id = dataset_version_db.organization.id
+
         # Get the encryption key of the dataset
         dataset_key = await get_existing_dataset_key(
             data_federation_id=secure_computation_node_db.data_federation_id,
@@ -130,6 +147,10 @@ async def get_all_secure_computation_nodes(
         for secure_computation_node in secure_computation_nodes:
             secure_computation_node = SecureComputationNode_Db(**secure_computation_node)
 
+            # Skip if it is a smart broker
+            if secure_computation_node.type == SecureComputationNodeType.SMART_BROKER:
+                continue
+
             dataset_basic_info = [
                 dataset for dataset in data_federation.datasets if dataset.id == secure_computation_node.dataset_id
             ][0]
@@ -173,8 +194,8 @@ async def get_secure_computation_node(
     from app.api.data_federations import get_data_federation
 
     query = {
-        "researcher_id": str(current_user.id),
-        "id": str(secure_computation_node_id),
+        "researcher_id": str(current_user.organization_id),
+        "_id": str(secure_computation_node_id),
     }
     secure_computation_node = await data_service.find_one(DB_COLLECTION_SECURE_COMPUTATION_NODE, query)
     if not secure_computation_node:
@@ -182,28 +203,32 @@ async def get_secure_computation_node(
 
     # Get the basic information of the data federation
     secure_computation_node = SecureComputationNode_Db(**secure_computation_node)
-    data_federation = await get_data_federation(secure_computation_node.data_federation_provision_id, current_user)
+    data_federation = await get_data_federation(secure_computation_node.data_federation_id, current_user)
 
-    # Add the organization information to the data federation
+    # Add the organization information to the secure computation node information
     data_researcher_basic_info = [
         organization
         for organization in data_federation.research_organizations
         if organization.id == current_user.organization_id
     ][0]
 
-    dataset_basic_info = [
-        dataset for dataset in data_federation.datasets if dataset.id == secure_computation_node.dataset_id
-    ][0]
-
-    # Get the basic information of the data version
-    dataset_version_basic_info = await get_dataset_version(secure_computation_node.dataset_version_id, current_user)
+    dataset_basic_info = BasicObjectInfo(_id=PyObjectId(empty=True), name="")
+    dataset_version_basic_info = BasicObjectInfo(_id=PyObjectId(empty=True), name="")
+    data_owner_basic_info = BasicObjectInfo(_id=PyObjectId(empty=True), name="")
+    if secure_computation_node.type == SecureComputationNodeType.SCN:
+        dataset_basic_info = [
+            dataset for dataset in data_federation.datasets if dataset.id == secure_computation_node.dataset_id
+        ][0]
+        # Get the basic information of the data version
+        dataset_version_basic_info = await get_dataset_version(secure_computation_node.dataset_version_id, current_user)
+        data_owner_basic_info = dataset_version_basic_info.organization
 
     response_secure_computation_node = GetSecureComputationNode_Out(
         **secure_computation_node.dict(),
         data_federation=BasicObjectInfo(_id=data_federation.id, name=data_federation.name),
         dataset=dataset_basic_info,
         dataset_version=BasicObjectInfo(_id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
-        data_owner=dataset_version_basic_info.organization,
+        data_owner=data_owner_basic_info,
         researcher=data_researcher_basic_info,
         researcher_user=current_user.id,
     )
@@ -286,7 +311,7 @@ async def provision_virtual_machine(secure_computation_node_db: SecureComputatio
     try:
         # Update the database to mark the VM as being created
         secure_computation_node_db.state = SecureComputationNodeState.CREATING
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(secure_computation_node_db.id)},
             {"$set": jsonable_encoder(secure_computation_node_db)},
@@ -297,8 +322,8 @@ async def provision_virtual_machine(secure_computation_node_db: SecureComputatio
         resource_group_name = f"{owner}-{str(secure_computation_node_db.data_federation_provision_id)}-scn"
 
         # Deploy the secure computation node
-        account_credentials = azure.authenticate()
-        deploy_response: azure.DeploymentResponse = azure.deploy_module(
+        account_credentials = await azure.authenticate()
+        deploy_response: azure.DeploymentResponse = await azure.deploy_module(
             account_credentials,
             resource_group_name,
             "rpcrelated",
@@ -311,7 +336,7 @@ async def provision_virtual_machine(secure_computation_node_db: SecureComputatio
         # Update the database to mark the VM as INITIALIZING
         secure_computation_node_db.ipaddress = IPv4Address(deploy_response.ip_address)
         secure_computation_node_db.state = SecureComputationNodeState.INITIALIZING
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(secure_computation_node_db.id)},
             {"$set": jsonable_encoder(secure_computation_node_db)},
@@ -330,24 +355,26 @@ async def provision_virtual_machine(secure_computation_node_db: SecureComputatio
             json.dump(jsonable_encoder(securecomputationnode_json), outfile)
 
         # Sleeping for 1.5 minutes
-        time.sleep(90)
+        await asyncio.sleep(90)
 
         headers = {"accept": "application/json"}
         files = {
             "initialization_vector": open(str(secure_computation_node_db.id), "rb"),
             "bin_package": open("package.tar.gz", "rb"),
         }
-        response = requests.put(
-            "https://" + deploy_response.ip_address + ":9090/initialization-data",
-            headers=headers,
-            files=files,
-            verify=False,
-        )
-        print("Upload package status: ", response.status_code)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.put(
+                "https://" + deploy_response.ip_address + ":9090/initialization-data",
+                headers=headers,
+                data=files,
+                verify_ssl=False,
+            ) as resp:
+                print("Upload package status: ", resp.status)
 
         # Update the database to mark the VM as WAITING_FOR_DATA
         secure_computation_node_db.state = SecureComputationNodeState.WAITING_FOR_DATA
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(secure_computation_node_db.id)},
             {"$set": jsonable_encoder(secure_computation_node_db)},
@@ -358,7 +385,7 @@ async def provision_virtual_machine(secure_computation_node_db: SecureComputatio
         # Update the database to mark the VM as FAILED
         secure_computation_node_db.state = SecureComputationNodeState.FAILED
         secure_computation_node_db.detail = str(exception)
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(secure_computation_node_db.id)},
             {"$set": jsonable_encoder(secure_computation_node_db)},
@@ -370,7 +397,7 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
     try:
         # Update the database to mark the VM as being created
         smart_broker_node_db.state = SecureComputationNodeState.CREATING
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(smart_broker_node_db.id)},
             {"$set": jsonable_encoder(smart_broker_node_db)},
@@ -381,8 +408,8 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
         resource_group_name = f"{owner}-{str(smart_broker_node_db.data_federation_provision_id)}-scn"
 
         # Deploy the smart broker
-        account_credentials = azure.authenticate()
-        deploy_response: azure.DeploymentResponse = azure.deploy_module(
+        account_credentials = await azure.authenticate()
+        deploy_response: azure.DeploymentResponse = await azure.deploy_module(
             account_credentials,
             resource_group_name,
             "smartbroker",
@@ -407,16 +434,17 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
         while True:
             if time.time() - start_time > 900:
                 raise Exception("Timeout waiting for SCNs to be ready")
-            time.sleep(10)
+            await asyncio.sleep(10)
             secure_computation_node_dbs = await data_service.find_by_query(
                 DB_COLLECTION_SECURE_COMPUTATION_NODE,
                 {
-                    "data_federation_provision_id": smart_broker_node_db.data_federation_provision_id,
-                    "state": {"$ne": SecureComputationNodeState.WAITING_FOR_DATA},
+                    "data_federation_provision_id": str(smart_broker_node_db.data_federation_provision_id),
+                    "type": "SCN",
+                    "state": {"$ne": "WAITING_FOR_DATA"},
                 },
             )
-            if len(secure_computation_node_dbs) == 0:
-                break
+            # if len(secure_computation_node_dbs) == 0:
+            break
 
         # Create a list of SCNs to be sent to the smart broker
         secure_computation_nodes: List[SmartBrokerScnInfo] = []
@@ -442,24 +470,25 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
             json.dump(jsonable_encoder(smart_broker_json), outfile)
 
         # Sleeping for 1.5 minutes
-        time.sleep(90)
+        await asyncio.sleep(90)
 
         headers = {"accept": "application/json"}
         files = {
             "initialization_vector": open(str(smart_broker_node_db.id), "rb"),
             "bin_package": open("smartbroker.tar.gz", "rb"),
         }
-        response = requests.put(
-            "https://" + deploy_response.ip_address + ":9090/initialization-data",
-            headers=headers,
-            files=files,
-            verify=False,
-        )
-        print("Upload package status: ", response.status_code)
+        async with aiohttp.ClientSession() as session:
+            async with session.put(
+                "https://" + deploy_response.ip_address + ":9090/initialization-data",
+                headers=headers,
+                data=files,
+                verify_ssl=False,
+            ) as resp:
+                print("Upload package status: ", resp.status)
 
         # Update the database to mark the VM as WAITING_FOR_DATA
         smart_broker_node_db.state = SecureComputationNodeState.WAITING_FOR_DATA
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(smart_broker_node_db.id)},
             {"$set": jsonable_encoder(smart_broker_node_db)},
@@ -470,7 +499,7 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
         # Update the database to mark the VM as FAILED
         smart_broker_node_db.state = SecureComputationNodeState.FAILED
         smart_broker_node_db.detail = str(exception)
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(smart_broker_node_db.id)},
             {"$set": jsonable_encoder(smart_broker_node_db)},
@@ -484,9 +513,9 @@ async def delete_resource_group(data_federation_provision_id: PyObjectId, curren
         owner = get_secret("owner")
         deployment_name = f"{owner}-{str(data_federation_provision_id)}-scn"
 
-        account_credentials = azure.authenticate()
+        account_credentials = await azure.authenticate()
 
-        delete_response = azure.delete_resouce_group(account_credentials, deployment_name)
+        delete_response = await azure.delete_resouce_group(account_credentials, deployment_name)
         if delete_response.status != "Success":
             raise Exception(delete_response.note)
 
@@ -502,7 +531,7 @@ async def delete_resource_group(data_federation_provision_id: PyObjectId, curren
     except Exception as exception:
         print(exception)
         # Update the database to mark the VM as FAILED
-        sync_data_service.update_many(
+        await data_service.update_many(
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {
                 "data_federation_provision_id": str(data_federation_provision_id),

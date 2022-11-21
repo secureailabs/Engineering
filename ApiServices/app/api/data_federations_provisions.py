@@ -14,14 +14,15 @@
 
 from typing import List
 
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi.encoders import jsonable_encoder
+
 from app.api.authentication import get_current_user
 from app.api.data_federations import get_data_federation
 from app.api.dataset_versions import get_all_dataset_versions
 from app.api.secure_computation_nodes import deprovision_secure_computation_nodes, register_secure_computation_node
 from app.data import operations as data_service
 from app.log import log_message
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import PyObjectId
 from models.data_federations import (
@@ -33,8 +34,8 @@ from models.data_federations import (
 )
 from models.secure_computation_nodes import (
     RegisterSecureComputationNode_In,
-    SecureComputationNodeType,
     SecureComputationNodeSize,
+    SecureComputationNodeType,
 )
 
 DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS = "data-federation-provsions"
@@ -93,7 +94,7 @@ async def provision_data_federation(
     provision_db = DataFederationProvision_Db(
         data_federation_id=provision_req.data_federation_id,
         organization_id=current_user.organization_id,
-        secure_computation_nodes_type=provision_req.secure_computation_nodes_type,
+        secure_computation_nodes_size=provision_req.secure_computation_nodes_size,
         smart_broker_id=PyObjectId(),
         secure_computation_nodes_id=[],
     )
@@ -119,6 +120,7 @@ async def provision_data_federation(
         )
 
         # Provision the SCN and get the SCN id
+        # FIXME: Prawal this is very slow fix this.
         scn_provision_response = await register_secure_computation_node(
             background_tasks=background_tasks,
             secure_computation_node_req=register_scn_params,

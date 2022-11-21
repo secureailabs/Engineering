@@ -38,7 +38,7 @@ sed -i "s,3100,$auditPort,g" /promtail-local-config.yaml
 
 # Start the Public API Server
 cd ApiServices
-uvicorn app.main:server --host 0.0.0.0 --port 8000
+uvicorn app.main:server --host 0.0.0.0 --port 8000 --workers 4
 
 # To keep the container running
 tail -f /dev/null

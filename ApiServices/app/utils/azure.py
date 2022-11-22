@@ -21,7 +21,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from azure.core.credentials_async import AsyncTokenCredential
 from azure.core.exceptions import AzureError
 from azure.core.polling import AsyncLROPoller
 from azure.identity.aio import ClientSecretCredential
@@ -30,7 +29,7 @@ from azure.keyvault.keys.crypto.aio import KeyWrapAlgorithm
 from azure.keyvault.secrets.aio import SecretClient
 from azure.mgmt.network.aio import NetworkManagementClient
 from azure.mgmt.resource.resources.aio import ResourceManagementClient
-from azure.mgmt.resource.resources.models import DeploymentMode
+from azure.mgmt.resource.resources.models import DeploymentMode, ResourceGroup
 from azure.mgmt.storage.aio import StorageManagementClient
 from azure.storage.fileshare import FileSasPermissions, generate_file_sas
 from azure.storage.fileshare.aio import ShareDirectoryClient
@@ -290,7 +289,7 @@ async def create_resource_group(account_credentials: AzureCredentials, resource_
     """
 
     client = ResourceManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
-    response = await client.resource_groups.create_or_update(resource_group_name, {"location": account_credentials.location})  # type: ignore
+    response: ResourceGroup = await client.resource_groups.create_or_update(resource_group_name, {"location": account_credentials.location})  # type: ignore
     return response.properties.provisioning_state  # type: ignore
 
 

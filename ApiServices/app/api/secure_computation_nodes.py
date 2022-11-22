@@ -93,7 +93,9 @@ async def register_secure_computation_node(
             current_user=current_user,
         )
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
-        background_tasks.add_task(provision_virtual_machine, secure_computation_node_db, dataset_key.dataset_key)
+        background_tasks.add_task(
+            provision_secure_computation_node, secure_computation_node_db, dataset_key.dataset_key
+        )
     elif secure_computation_node_req.type == SecureComputationNodeType.SMART_BROKER:
         background_tasks.add_task(provision_smart_broker, secure_computation_node_db)
     else:
@@ -307,40 +309,18 @@ async def deprovision_secure_computation_nodes(
 
 ########################################################################################################################
 # TODO: these are temporary functions. They should be removed after the HANU is ready
-async def provision_virtual_machine(secure_computation_node_db: SecureComputationNode_Db, dataset_key: str):
+async def provision_secure_computation_node(secure_computation_node_db: SecureComputationNode_Db, dataset_key: str):
+    """
+    Provision a secure computation node
+
+    :param secure_computation_node_db: secure computation node information
+    :type secure_computation_node_db: SecureComputationNode_Db
+    :param dataset_key: dataset key
+    :type dataset_key: str
+    """
     try:
-        # Update the database to mark the VM as being created
-        secure_computation_node_db.state = SecureComputationNodeState.CREATING
-        await data_service.update_one(
-            DB_COLLECTION_SECURE_COMPUTATION_NODE,
-            {"_id": str(secure_computation_node_db.id)},
-            {"$set": jsonable_encoder(secure_computation_node_db)},
-        )
-
-        # The name of the resource group is same as the data federation provision id
-        owner = get_secret("owner")
-        resource_group_name = f"{owner}-{str(secure_computation_node_db.data_federation_provision_id)}-scn"
-
-        # Deploy the secure computation node
-        account_credentials = await azure.authenticate()
-        deploy_response: azure.DeploymentResponse = await azure.deploy_module(
-            account_credentials,
-            resource_group_name,
-            "rpcrelated",
-            str(secure_computation_node_db.id),
-            "Standard_D4s_v4",
-        )
-        if deploy_response.status != "Success":
-            raise Exception(deploy_response.note)
-
-        # Update the database to mark the VM as INITIALIZING
-        secure_computation_node_db.ipaddress = IPv4Address(deploy_response.ip_address)
-        secure_computation_node_db.state = SecureComputationNodeState.INITIALIZING
-        await data_service.update_one(
-            DB_COLLECTION_SECURE_COMPUTATION_NODE,
-            {"_id": str(secure_computation_node_db.id)},
-            {"$set": jsonable_encoder(secure_computation_node_db)},
-        )
+        # Provision the secure computation node
+        secure_computation_node_db = await provision_virtual_machine(secure_computation_node_db, "rpcrelated")
 
         # Create a SCN initialization vector json
         securecomputationnode_json = SecureComputationNodeInitializationVector(
@@ -354,31 +334,8 @@ async def provision_virtual_machine(secure_computation_node_db: SecureComputatio
         with open(str(secure_computation_node_db.id), "w") as outfile:
             json.dump(jsonable_encoder(securecomputationnode_json), outfile)
 
-        # Sleeping for 1.5 minutes
-        await asyncio.sleep(90)
-
-        headers = {"accept": "application/json"}
-        files = {
-            "initialization_vector": open(str(secure_computation_node_db.id), "rb"),
-            "bin_package": open("package.tar.gz", "rb"),
-        }
-
-        async with aiohttp.ClientSession() as session:
-            async with session.put(
-                "https://" + deploy_response.ip_address + ":9090/initialization-data",
-                headers=headers,
-                data=files,
-                verify_ssl=False,
-            ) as resp:
-                print("Upload package status: ", resp.status)
-
-        # Update the database to mark the VM as WAITING_FOR_DATA
-        secure_computation_node_db.state = SecureComputationNodeState.WAITING_FOR_DATA
-        await data_service.update_one(
-            DB_COLLECTION_SECURE_COMPUTATION_NODE,
-            {"_id": str(secure_computation_node_db.id)},
-            {"$set": jsonable_encoder(secure_computation_node_db)},
-        )
+        # Initilize the secure computation node
+        await initialize_virtual_machine(secure_computation_node_db, "package.tar.gz")
 
     except Exception as exception:
         print(exception)
@@ -394,39 +351,15 @@ async def provision_virtual_machine(secure_computation_node_db: SecureComputatio
 
 ########################################################################################################################
 async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db):
+    """
+    Provision a smart broker node
+
+    :param smart_broker_node_db: smart broker node information
+    :type smart_broker_node_db: SecureComputationNode_Db
+    """
     try:
-        # Update the database to mark the VM as being created
-        smart_broker_node_db.state = SecureComputationNodeState.CREATING
-        await data_service.update_one(
-            DB_COLLECTION_SECURE_COMPUTATION_NODE,
-            {"_id": str(smart_broker_node_db.id)},
-            {"$set": jsonable_encoder(smart_broker_node_db)},
-        )
-
-        # The name of the resource group is same as the data federation provision id
-        owner = get_secret("owner")
-        resource_group_name = f"{owner}-{str(smart_broker_node_db.data_federation_provision_id)}-scn"
-
-        # Deploy the smart broker
-        account_credentials = await azure.authenticate()
-        deploy_response: azure.DeploymentResponse = await azure.deploy_module(
-            account_credentials,
-            resource_group_name,
-            "smartbroker",
-            str(smart_broker_node_db.id),
-            "Standard_D4s_v4",
-        )
-        if deploy_response.status != "Success":
-            raise Exception(deploy_response.note)
-
-        # Update the database to mark the VM as INITIALIZING
-        smart_broker_node_db.ipaddress = IPv4Address(deploy_response.ip_address)
-        smart_broker_node_db.state = SecureComputationNodeState.INITIALIZING
-        await data_service.update_one(
-            DB_COLLECTION_SECURE_COMPUTATION_NODE,
-            {"_id": str(smart_broker_node_db.id)},
-            {"$set": jsonable_encoder(smart_broker_node_db)},
-        )
+        # Provision the secure computation node
+        smart_broker_node_db = await provision_virtual_machine(smart_broker_node_db, "smartbroker")
 
         # Wait for all the SCNs to be ready with a timeout of 15 minutes
         secure_computation_node_dbs = []
@@ -437,14 +370,15 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
             await asyncio.sleep(10)
             secure_computation_node_dbs = await data_service.find_by_query(
                 DB_COLLECTION_SECURE_COMPUTATION_NODE,
-                {
-                    "data_federation_provision_id": str(smart_broker_node_db.data_federation_provision_id),
-                    "type": "SCN",
-                    "state": {"$ne": "WAITING_FOR_DATA"},
-                },
+                {"data_federation_provision_id": str(smart_broker_node_db.data_federation_provision_id), "type": "SCN"},
             )
-            # if len(secure_computation_node_dbs) == 0:
-            break
+            # Check if all the SCNs are ready/waiting for data
+            if all(
+                SecureComputationNode_Db(**secure_computation_node_db).state
+                == SecureComputationNodeState.WAITING_FOR_DATA
+                for secure_computation_node_db in secure_computation_node_dbs
+            ):
+                break
 
         # Create a list of SCNs to be sent to the smart broker
         secure_computation_nodes: List[SmartBrokerScnInfo] = []
@@ -469,30 +403,8 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
         with open(str(smart_broker_node_db.id), "w") as outfile:
             json.dump(jsonable_encoder(smart_broker_json), outfile)
 
-        # Sleeping for 1.5 minutes
-        await asyncio.sleep(90)
-
-        headers = {"accept": "application/json"}
-        files = {
-            "initialization_vector": open(str(smart_broker_node_db.id), "rb"),
-            "bin_package": open("smartbroker.tar.gz", "rb"),
-        }
-        async with aiohttp.ClientSession() as session:
-            async with session.put(
-                "https://" + deploy_response.ip_address + ":9090/initialization-data",
-                headers=headers,
-                data=files,
-                verify_ssl=False,
-            ) as resp:
-                print("Upload package status: ", resp.status)
-
-        # Update the database to mark the VM as WAITING_FOR_DATA
-        smart_broker_node_db.state = SecureComputationNodeState.WAITING_FOR_DATA
-        await data_service.update_one(
-            DB_COLLECTION_SECURE_COMPUTATION_NODE,
-            {"_id": str(smart_broker_node_db.id)},
-            {"$set": jsonable_encoder(smart_broker_node_db)},
-        )
+        # Initilize the secure computation node
+        await initialize_virtual_machine(smart_broker_node_db, "smartbroker.tar.gz")
 
     except Exception as exception:
         print(exception)
@@ -507,7 +419,100 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
 
 
 ########################################################################################################################
+async def provision_virtual_machine(
+    virtual_machine_info_db: SecureComputationNode_Db, template_name: str
+) -> SecureComputationNode_Db:
+    """
+    Provision a virtual machine
+
+    :param virtual_machine_info_db: virtual machine information
+    :type virtual_machine_info_db: SecureComputationNode_Db
+    :param template_name: template name
+    :type template_name: str
+    :rtype: SecureComputationNode_Db
+    """
+    # Update the database to mark the VM as being created
+    virtual_machine_info_db.state = SecureComputationNodeState.CREATING
+    await data_service.update_one(
+        DB_COLLECTION_SECURE_COMPUTATION_NODE,
+        {"_id": str(virtual_machine_info_db.id)},
+        {"$set": jsonable_encoder(virtual_machine_info_db)},
+    )
+
+    # The name of the resource group is same as the data federation provision id
+    owner = get_secret("owner")
+    resource_group_name = f"{owner}-{str(virtual_machine_info_db.data_federation_provision_id)}-scn"
+
+    # Deploy the smart broker
+    account_credentials = await azure.authenticate()
+    deploy_response: azure.DeploymentResponse = await azure.deploy_module(
+        account_credentials,
+        resource_group_name,
+        template_name,
+        str(virtual_machine_info_db.id),
+        "Standard_D4s_v4",
+    )
+    if deploy_response.status != "Success":
+        raise Exception(deploy_response.note)
+
+    # Update the database to mark the VM as INITIALIZING
+    virtual_machine_info_db.ipaddress = IPv4Address(deploy_response.ip_address)
+    virtual_machine_info_db.state = SecureComputationNodeState.INITIALIZING
+    await data_service.update_one(
+        DB_COLLECTION_SECURE_COMPUTATION_NODE,
+        {"_id": str(virtual_machine_info_db.id)},
+        {"$set": jsonable_encoder(virtual_machine_info_db)},
+    )
+
+    return virtual_machine_info_db
+
+
+########################################################################################################################
+async def initialize_virtual_machine(virtual_machine_info_db: SecureComputationNode_Db, package_filename: str):
+    """
+    Initialize a virtual machine
+
+    :param virtual_machine_info_db: virtual machine information
+    :type virtual_machine_info_db: SecureComputationNode_Db
+    :param package_filename: package filename
+    :type package_filename: str
+    """
+    # Sleeping for 1.5 minutes
+    await asyncio.sleep(90)
+
+    headers = {"accept": "application/json"}
+    files = {
+        "initialization_vector": open(str(virtual_machine_info_db.id), "rb"),
+        "bin_package": open(package_filename, "rb"),
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.put(
+            "https://" + str(virtual_machine_info_db.ipaddress) + ":9090/initialization-data",
+            headers=headers,
+            data=files,
+            verify_ssl=False,
+        ) as resp:
+            print("Upload package status: ", resp.status)
+
+    # Update the database to mark the VM as WAITING_FOR_DATA
+    virtual_machine_info_db.state = SecureComputationNodeState.WAITING_FOR_DATA
+    await data_service.update_one(
+        DB_COLLECTION_SECURE_COMPUTATION_NODE,
+        {"_id": str(virtual_machine_info_db.id)},
+        {"$set": jsonable_encoder(virtual_machine_info_db)},
+    )
+
+
+########################################################################################################################
 async def delete_resource_group(data_federation_provision_id: PyObjectId, current_user: TokenData):
+    """
+    Delete a resource group
+
+    :param data_federation_provision_id: data federation provision id
+    :type data_federation_provision_id: PyObjectId
+    :param current_user: current user information
+    :type current_user: TokenData
+    """
     try:
         # Delete the scn resource group
         owner = get_secret("owner")

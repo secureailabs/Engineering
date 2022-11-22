@@ -15,11 +15,12 @@
                 "--ip", "127.0.0.1:8000",
                 "--email", "nadams@mghl.com",
                 "--password", "SailPassword@123",
-                "--config", "SampleData/mghl_config.json"
+                "--config", "SampleFhir/igr_config.json"
             ],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
+            "justMyCode": false,
             "stopAtEntry": false
         },
         {

@@ -5,16 +5,15 @@ namespace DatasetTool;
 
 class DatasetConfiguration
 {
-    public class DatasetConfigurationJson
+    public class ModelDatasetConfigurationJson
     {
-        public Dataset dataset { get; set; } = default!;
-        public Dataset dataset_version { get; set; } = default!;
+        public ModelDataset dataset { get; set; } = default!;
+        public ModelDataset dataset_version { get; set; } = default!;
         public string data_federation { get; set; } = default!;
-        public string data_format { get; set; } = default!;
         public string[] data_source { get; set; } = default!;
     }
 
-    public DatasetConfigurationJson m_configuration = default!;
+    public ModelDatasetConfigurationJson m_configuration = default!;
 
     public DatasetConfiguration(FileInfo file)
     {
@@ -26,7 +25,7 @@ class DatasetConfiguration
         }
 
         // Deserialize the JSON string into the configuration object
-        m_configuration = JsonConvert.DeserializeObject<DatasetConfigurationJson>(json_content)!;
+        m_configuration = JsonConvert.DeserializeObject<ModelDatasetConfigurationJson>(json_content)!;
         if (m_configuration == null)
         {
             throw new Exception("The file is not a valid JSON");

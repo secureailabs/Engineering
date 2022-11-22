@@ -36,7 +36,8 @@ scn_names=""
 for dataset in $datasets; do
     scn_name=scn_`basename $dataset .zip`
     container_id=`docker ps -qa --filter "name=$scn_name"`
-    if [ -n $container_id ]; then
+    echo $container_id
+    if [ -n "$container_id" ]; then
         echo "Container $scn_name already exists, shutting down and restarting"
         docker stop $scn_name
         docker rm $scn_name

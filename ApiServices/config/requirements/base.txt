@@ -55,8 +55,9 @@ motor==3.0.0
 pymongo==4.1.1
 # python-multipart
 python-multipart==0.0.5
-zmq
+aiohttp==3.8.3
 # Temporary to apiservices
+zmq
 azure-mgmt-resource
 msrestazure
 azure-identity

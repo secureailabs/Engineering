@@ -117,7 +117,7 @@
             }
           },
           {
-            "name": "OutboundAllow_443_8000_5556",
+            "name": "OutboundAllow_8000_5556",
             "properties": {
               "description": "Interact with ApiServices and SAIL SCNs",
               "protocol": "Tcp",
@@ -130,7 +130,6 @@
               "sourcePortRanges": [],
               "destinationPortRanges": [
                 "8000",
-                "443",
                 "5556"
               ],
               "sourceAddressPrefixes": [],

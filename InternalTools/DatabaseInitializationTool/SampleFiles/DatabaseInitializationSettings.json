@@ -115,6 +115,7 @@
 				{
 					"DataFederationName": "KCA Consortium",
 					"DataFederationDescription": "The Kidney Cancer Consortium",
+					"DatasetFormat": "CSV",
 					"DataSubmitters" : [
 						"Mercy General Hospital",
 						"International Genetics Research Facility"

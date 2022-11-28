@@ -24,7 +24,7 @@ class UserSession
 
     private class DataFederationList
     {
-        public BasicInformation[] data_federations { get; set; } = default!;
+        public ModelDataFederation[] data_federations { get; set; } = default!;
     }
 
     private class ConnectionStringResponse
@@ -96,7 +96,7 @@ class UserSession
     /// <param name="data_federation_name"></param>
     /// <returns> Guid of the data federation with the input name</returns>
     /// <exception cref="Exception"></exception>
-    public Guid GetFederationId(string data_federation_name)
+    public ModelDataFederation GetFederation(string data_federation_name)
     {
         // Create the request
         var request = new RestRequest("/data-federations", Method.Get);
@@ -116,11 +116,11 @@ class UserSession
         {
             if (federation_list.data_federations[i].name == data_federation_name)
             {
-                return federation_list.data_federations[i].id;
+                return federation_list.data_federations[i];
             }
         }
 
-        return Guid.Empty;
+        return null!;
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ class UserSession
     /// <param name="data_federation_name"> Name of the data federation to add the dataset </param>
     /// <returns> Guid of the newly created dataset </returns>
     /// <exception cref="Exception"></exception>
-    public Guid CreateDatasetAndAddToFederation(Dataset dataset, Guid data_federation_id)
+    public Guid CreateDatasetAndAddToFederation(ModelDataset dataset, Guid data_federation_id)
     {
         // Create json from the input
         string dataset_json = Newtonsoft.Json.JsonConvert.SerializeObject(dataset);
@@ -226,7 +226,7 @@ class UserSession
             }
 
             // Get the dataset information
-            var dataset = Newtonsoft.Json.JsonConvert.DeserializeObject<Dataset>(dataset_response.Content)!;
+            var dataset = Newtonsoft.Json.JsonConvert.DeserializeObject<ModelDataset>(dataset_response.Content)!;
             if (dataset.state == "ACTIVE")
             {
                 break;
@@ -292,7 +292,7 @@ class UserSession
             }
 
             // Get the dataset version information
-            var dataset_version = Newtonsoft.Json.JsonConvert.DeserializeObject<DatasetVersionMetadata>(dataset_version_response.Content)!;
+            var dataset_version = Newtonsoft.Json.JsonConvert.DeserializeObject<ModelDatasetVersionMetadata>(dataset_version_response.Content)!;
             if (dataset_version.state == "NOT_UPLOADED")
             {
                 break;

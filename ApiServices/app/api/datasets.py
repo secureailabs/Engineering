@@ -16,16 +16,15 @@ from base64 import b64encode
 # -------------------------------------------------------------------------------
 from typing import List
 
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
-from utils.background_couroutines import add_async_task
-
 import app.utils.azure as azure
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
 from app.log import log_message
+from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, KeyVaultObject, PyObjectId

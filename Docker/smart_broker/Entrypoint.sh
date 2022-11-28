@@ -13,5 +13,8 @@ pip3 install /ds/sail-safe-functions-test
 pip3 install /ds/helper-libs
 
 # Start the orchestrator test
-PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT=/app/private_keys/client.key_secret PATH_DIR_DATASET=/data/ python3 /ds/sail-safe-functions-test/integration_test/test_orchestrator_docker_scns.py
+#PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT=/app/private_keys/client.key_secret PATH_DIR_DATASET=/data/ python3 /ds/sail-safe-functions-test/integration_test/test_orchestrator_docker_scns.py
+
+cd /ds/fastapi/
+PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT=/app/private_keys/client.key_secret PATH_DIR_DATASET=/data/ uvicorn smart_broker:app --host 0.0.0.0 --port 9003
 

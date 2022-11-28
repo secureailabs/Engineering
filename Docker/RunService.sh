@@ -163,7 +163,7 @@ elif [ "smart_broker" == "$imageName" ]; then
         echo "No DS repo provided, not starting service!!!"
         PrintHelp
     fi
-    runtimeFlags="$runtimeFlags -v $dsRepo:/ds -v $rootDir/Binary/rpcrelated_dir:/app -e SCN_NAMES=$scnNames $imageName "
+    runtimeFlags="$runtimeFlags -p 9003:9003 -v $dsRepo:/ds -v $rootDir/Binary/rpcrelated_dir:/app -e SCN_NAMES=$scnNames $imageName "
     echo "FLAGS $runtimeFlags"
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"

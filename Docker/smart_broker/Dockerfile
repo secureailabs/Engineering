@@ -42,6 +42,8 @@ RUN pip3 install --upgrade pip \
     && pip3 install torch
 
 RUN pip3 install pytest
+RUN pip3 install fastapi
+RUN pip3 install uvicorn[standard]
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

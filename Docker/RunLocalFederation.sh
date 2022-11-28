@@ -20,7 +20,8 @@ while getopts "r:d:" opt; do
     esac
 done
 
-if [ -z $test_package ] || [ -z $dsRepo ]; then
+# Confirm we have required arguments
+if [ -z "$test_package" ] || [ -z "$dsRepo" ]; then
     PrintHelp
 fi
 
@@ -36,9 +37,8 @@ scn_names=""
 for dataset in $datasets; do
     scn_name=scn_`basename $dataset .zip`
     container_id=`docker ps -qa --filter "name=$scn_name"`
-    echo $container_id
     if [ -n "$container_id" ]; then
-        echo "Container $scn_name already exists, shutting down and restarting"
+        echo "Container $scn_name already exists, shutting down and removing"
         docker stop $scn_name
         docker rm $scn_name
     fi
@@ -47,20 +47,24 @@ for dataset in $datasets; do
     mv local_dataset/$dataset $dir_name/
     echo "Launching SCN $scn_name"
     sed "s/LOCAL_DATASET_NAME/$dataset/g" rpcrelated/InitializationVector_local.json > rpcrelated/InitializationVector.json
-    cat rpcrelated/InitializationVector.json
-    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -r $dsRepo -d
-    if [ -z $scn_names ]; then
+    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -r $dsRepo -d > /dev/null
+    if [ -z "$scn_names" ]; then
         scn_names="$scn_name"
     else
         scn_names+=",$scn_name"
     fi
+    echo "SCN Launched"
     # Give the SCN time to come alive
     sleep 15;
 done
 
-echo $scn_names
 
-./RunService.sh -s smart_broker -r $dsRepo -x "$scn_names"
+./RunService.sh -s smart_broker -r "$dsRepo" -x "$scn_names"
+
+echo "Cleaning up working area"
 
 rm -rf local_dataset
 rm -rf local_federation
+
+echo "Done launching local federation"
+echo "Access SCN cluster at: 127.0.0.1:9001"

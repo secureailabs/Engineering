@@ -60,7 +60,8 @@ DataFederation::DataFederation(
     m_oIdentifier{c_oSourceBuffer.GetGuid("DataFederationIdentifier")},
     m_oOrganizationOwnerIdentifier{c_oSourceBuffer.GetGuid("DataFederationOwnerOrganizationIdentifier")},
     m_strName{c_oSourceBuffer.GetString("DataFederationName")},
-    m_strDescription{c_oSourceBuffer.GetString("DataFederationDescription")}
+    m_strDescription{c_oSourceBuffer.GetString("DataFederationDescription")},
+    m_strDatasetFormat{c_oSourceBuffer.GetString("DatasetFormat")}
 {
     __DebugFunction();
 
@@ -121,6 +122,7 @@ StructuredBuffer __thiscall DataFederation::ToStructuredBuffer(void) const
     oDataFederationStructuredBuffer.PutGuid("DataFederationOwnerOrganizationIdentifier", this->m_oOrganizationOwnerIdentifier);
     oDataFederationStructuredBuffer.PutString("DataFederationName", this->m_strName);
     oDataFederationStructuredBuffer.PutString("DataFederationDescription", this->m_strDescription);
+    oDataFederationStructuredBuffer.PutString("DatasetFormat", this->m_strDatasetFormat);
     oDataFederationStructuredBuffer.PutBoolean("DataFederationActive", this->m_fActive);
 
 

@@ -4,7 +4,7 @@
         "name": "IGR Dataset",
         "description": "dataset description",
         "tags": "my dataset tags",
-        "format": "CSV"
+        "format": "FHIR"
     },
     "dataset_version":
     {
@@ -13,9 +13,6 @@
     },
     "data_federation": "KCA Consortium",
     "data_source": [
-        "SampleData/igr_001_a.csv",
-        "SampleData/igr_001_b.csv",
-        "SampleData/igr_001_c.csv",
-        "SampleData/kidney_clean_1.csv"
+        "SampleFhir/patient_data"
     ]
 }

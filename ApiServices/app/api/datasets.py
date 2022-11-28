@@ -156,10 +156,7 @@ async def get_dataset_internal(
     if not dataset:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset not found")
 
-    # Add the organization information to the dataset
-    dataset = Dataset_Db(**dataset)
-
-    return dataset
+    return Dataset_Db(**dataset)  # type: ignore
 
 
 ########################################################################################################################

@@ -390,6 +390,7 @@ void __thiscall Organization::RegisterDataFederations(
 
         oRegistrationParameters.PutString("name", oFederation.GetString("DataFederationName"));
         oRegistrationParameters.PutString("description", oFederation.GetString("DataFederationDescription"));
+        oRegistrationParameters.PutString("data_format", oFederation.GetString("DatasetFormat"));
 
         std::string strFederationIdentifier = oSailPlatformServicesSession.RegisterDataFederation(oRegistrationParameters);
         if ( m_stlDataFederationIdentifiers.find(oFederation.GetString("DataFederationName")) == m_stlDataFederationIdentifiers.end())

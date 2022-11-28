@@ -27,11 +27,17 @@ class DatasetState(Enum):
     ERROR = "ERROR"
 
 
+class DatasetFormat(Enum):
+    FHIR = "FHIR"
+    CSV = "CSV"
+
+
 class Dataset_Base(SailBaseModel):
     # TODO: Prawal add a StrictStr validator for string lenght
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
     tags: StrictStr = Field(...)
+    format: DatasetFormat = Field(...)
 
 
 class Dataset_Db(Dataset_Base):

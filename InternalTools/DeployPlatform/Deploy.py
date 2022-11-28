@@ -512,7 +512,6 @@ if __name__ == "__main__":
     print(
         f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
     )
-    # print(f"Current Azure Firewall Information:\n{async_updated_fw_pip_result.as_dict()}")
     print("\n\n===============================================================")
     print("================= SUMMARY: Deploy Platform =====================")
     print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")

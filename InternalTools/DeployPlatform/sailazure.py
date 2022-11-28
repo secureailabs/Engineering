@@ -118,6 +118,37 @@ def update_fw_pip(accountCredentials, firewall_ip_id, firewall_ip_name):
     return async_updated_fw_pip_result, firewall_ip_id, firewall_ip_name
 
 
+def update_nat_rule_policy(firewall_ip_name, firewall_ip, private_ip_address, port):
+    """
+    Returns Dictionary of NAT Rule Policy
+
+    :param firewall_ip_name: public IP for module
+    :type firewall_ip_name: str
+    :param firewall_ip: public IP for module
+    :type firewall_ip: str
+    :param private_ip_address: private IP for module
+    :type private_ip_address: str
+    :param port: Allowed port through firewall
+    :type port: str
+    :return: nat_rule_policy
+    :rtype: dict
+    """
+
+    nat_rule_policy = {
+        "name": f"{firewall_ip_name}_{port}",
+        "rule_type": "NatRule",
+        "ip_protocols": ["TCP"],
+        "source_addresses": ["*"],
+        "destination_addresses": [firewall_ip],
+        "destination_ports": [port],
+        "translated_address": private_ip_address,
+        "translated_port": port,
+        "source_ip_groups": [],
+    }
+
+    return nat_rule_policy
+
+
 def update_fw_dnat_rules(
     accountCredentials,
     firewall_ip_name,
@@ -125,7 +156,25 @@ def update_fw_dnat_rules(
     private_ip_address,
     module_name,
 ):
+    """
+    Update DNAT rules in Firewall for a specified Module
+
+    :param accountCredentials: accountCredentials
+    :type accountCredentials: accountCredentials
+    :param firewall_ip_name: public IP for module
+    :type firewall_ip_name: str
+    :param firewall_ip: public IP for module
+    :type firewall_ip: str
+    :param private_ip_address: private IP for module
+    :type private_ip_address: str
+    :param module_name: module
+    :type module_name: str
+    :return:
+    :rtype:
+    """
+
     client = NetworkManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
+    # Get current information on policies in rule collection groups
     fw_api_policy_rule_collection_info = client.firewall_policy_rule_collection_groups.get(
         "rg-sail-wus-hub-001",
         "afwpol-sail-wus-001",
@@ -136,33 +185,11 @@ def update_fw_dnat_rules(
         "afwpol-sail-wus-001",
         "WEBFRONTRuleCollectionGroup",
     )
+
     # Update DNAT rule in Firewall for module
     if module_name == "apiservices":
-        fw_api_policy_rule_collection_info.rule_collections[0].rules.extend(
-            [
-                {
-                    "name": f"{firewall_ip_name}_9090",
-                    "rule_type": "NatRule",
-                    "ip_protocols": ["TCP"],
-                    "source_addresses": ["*"],
-                    "destination_addresses": [firewall_ip],
-                    "destination_ports": ["9090"],
-                    "translated_address": private_ip_address,
-                    "translated_port": "9090",
-                    "source_ip_groups": [],
-                },
-                {
-                    "name": f"{firewall_ip_name}_8000",
-                    "rule_type": "NatRule",
-                    "ip_protocols": ["TCP"],
-                    "source_addresses": ["*"],
-                    "destination_addresses": [firewall_ip],
-                    "destination_ports": ["8000"],
-                    "translated_address": private_ip_address,
-                    "translated_port": "8000",
-                    "source_ip_groups": [],
-                },
-            ],
+        fw_api_policy_rule_collection_info.rule_collections[0].rules.append(
+            update_nat_rule_policy(firewall_ip_name, firewall_ip, private_ip_address, "8000")
         )
         async_updated_fw_pol_result = client.firewall_policy_rule_collection_groups.begin_create_or_update(
             "rg-sail-wus-hub-001",
@@ -171,31 +198,8 @@ def update_fw_dnat_rules(
             fw_api_policy_rule_collection_info,
         ).result()
     elif module_name == "newwebfrontend":
-        fw_web_policy_rule_collection_info.rule_collections[0].rules.extend(
-            [
-                {
-                    "name": f"{firewall_ip_name}_443",
-                    "rule_type": "NatRule",
-                    "ip_protocols": ["TCP"],
-                    "source_addresses": ["*"],
-                    "destination_addresses": [firewall_ip],
-                    "destination_ports": ["443"],
-                    "translated_address": private_ip_address,
-                    "translated_port": "443",
-                    "source_ip_groups": [],
-                },
-                {
-                    "name": f"{firewall_ip_name}_9090",
-                    "rule_type": "NatRule",
-                    "ip_protocols": ["TCP"],
-                    "source_addresses": ["*"],
-                    "destination_addresses": [firewall_ip],
-                    "destination_ports": ["9090"],
-                    "translated_address": private_ip_address,
-                    "translated_port": "9090",
-                    "source_ip_groups": [],
-                },
-            ]
+        fw_api_policy_rule_collection_info.rule_collections[0].rules.append(
+            update_nat_rule_policy(firewall_ip_name, firewall_ip, private_ip_address, "443")
         )
         async_updated_fw_pol_result = client.firewall_policy_rule_collection_groups.begin_create_or_update(
             "rg-sail-wus-hub-001",

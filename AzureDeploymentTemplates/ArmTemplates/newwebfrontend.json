@@ -48,7 +48,7 @@
       }
     },
     "subnetIpPrefix": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "",
       "metadata": {
         "description": "IP address prefix for the subnet"
@@ -90,96 +90,6 @@
       }
     },
     {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2020-11-01",
-      "name": "[variables('networkSecurityGroupName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "InboundAllow_9090_443",
-            "properties": {
-              "description": "9090 for bootstrap tool\n443 for webfrontend",
-              "protocol": "TCP",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound",
-              "sourcePortRanges": [],
-              "destinationPortRanges": [
-                "9090",
-                "443"
-              ],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": []
-            }
-          },
-          {
-            "name": "OutboundAllow_8000",
-            "properties": {
-              "description": "Interact with SAIL Platform Services ",
-              "protocol": "TCP",
-              "sourcePortRange": "*",
-              "destinationPortRange": "8000",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 110,
-              "direction": "Outbound",
-              "sourcePortRanges": [],
-              "destinationPortRanges": [],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": []
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2019-02-01",
-      "name": "[variables('publicIPAddressName')]",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "Basic"
-      },
-      "properties": {
-        "publicIpAllocationMethod": "Dynamic"
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2019-07-01",
-      "name": "[variables('networkInterfaceName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipConfigNode",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[concat(if(equals(parameters('virtualNetworkId'), ''), resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('virtualNetworkId')), '/subnets/', parameters('subnetName'))]"
-              },
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
-        }
-      }
-    },
-    {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2020-12-01",
       "name": "[parameters('vmName')]",
@@ -193,7 +103,7 @@
         },
         "storageProfile": {
           "osDisk": {
-            "createOption": "fromImage",
+            "createOption": "FromImage",
             "name": "[concat(parameters('vmName'), '-disk')]",
             "caching": "ReadWrite",
             "managedDisk": {

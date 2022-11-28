@@ -57,9 +57,7 @@
   },
   "variables": {
     "networkInterfaceName": "[concat(parameters('vmName'), '-nic')]",
-    "publicIPAddressName": "[concat(parameters('vmName'), '-ip')]",
-    "virtualNetworkName": "[concat(parameters('vmName'), '-vnet')]",
-    "networkSecurityGroupName": "[concat(parameters('vmName'), '-nsg')]"
+    "virtualNetworkName": "[concat(parameters('vmName'), '-vnet')]"
   },
   "resources": [
     {
@@ -87,6 +85,31 @@
         ],
         "virtualNetworkPeerings": [],
         "enableDdosProtection": false
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2019-07-01",
+      "name": "[variables('networkInterfaceName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipConfigNode",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[concat(if(equals(parameters('virtualNetworkId'), ''), resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('virtualNetworkId')), '/subnets/', parameters('subnetName'))]"
+              },
+              "publicIpAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ]
       }
     },
     {

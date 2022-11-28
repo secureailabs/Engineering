@@ -103,9 +103,6 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[concat(if(equals(parameters('virtualNetworkId'), ''), resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('virtualNetworkId')), '/subnets/', parameters('subnetName'))]"
-              },
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
               }
             }
           }

@@ -54,15 +54,12 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
 )
 async def provision_data_federation(
-    background_tasks: BackgroundTasks,
     provision_req: RegisterDataFederationProvision_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDataFederationProvision_Out:
     """
     Provision data federation SCNs
 
-    :param background_tasks: Background tasks
-    :type background_tasks: BackgroundTasks
     :param provision_req: information required for provsioning, defaults to Body(...)
     :type provision_req: RegisterDataFederationProvision_In, optional
     :param current_user: current user information
@@ -122,7 +119,6 @@ async def provision_data_federation(
         # Provision the SCN and get the SCN id
         # FIXME: Prawal this is very slow fix this.
         scn_provision_response = await register_secure_computation_node(
-            background_tasks=background_tasks,
             secure_computation_node_req=register_scn_params,
             current_user=current_user,
         )
@@ -139,7 +135,6 @@ async def provision_data_federation(
         type=SecureComputationNodeType.SMART_BROKER,
     )
     smart_broker_response = await register_secure_computation_node(
-        background_tasks=background_tasks,
         secure_computation_node_req=register_smart_broker_params,
         current_user=current_user,
     )
@@ -237,15 +232,12 @@ async def get_all_data_federation_provision_info(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def deprovision_data_federation(
-    background_tasks: BackgroundTasks,
     provision_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
 ):
     """
     Deprovision data federation SCNs
 
-    :param background_tasks: background tasks
-    :type background_tasks: BackgroundTasks
     :param provision_id: Data Federation Provision Id
     :type provision_id: PyObjectId
     :param current_user: current user information, defaults to Depends(get_current_user)
@@ -256,7 +248,6 @@ async def deprovision_data_federation(
     """
     # Provision the SCN and get the SCN id
     await deprovision_secure_computation_nodes(
-        background_tasks=background_tasks,
         data_federation_provision_id=provision_id,
         current_user=current_user,
     )

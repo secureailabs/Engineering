@@ -18,6 +18,7 @@ from typing import List
 
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
+from utils.background_couroutines import add_async_task
 
 import app.utils.azure as azure
 from app.api.accounts import get_organization
@@ -55,7 +56,6 @@ router = APIRouter()
 )
 async def register_dataset(
     response: Response,
-    background_tasks: BackgroundTasks,
     dataset_req: RegisterDataset_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDataset_Out:
@@ -64,8 +64,6 @@ async def register_dataset(
 
     :param response: Response object
     :type response: Response
-    :param background_tasks: Background tasks object to run tasks in the background
-    :type background_tasks: BackgroundTasks
     :param dataset_req: information required to register a dataset, defaults to Body(...)
     :type dataset_req: RegisterDataset_In, optional
     :param current_user: information of current authenticated user, defaults to Depends(get_current_user)
@@ -90,7 +88,7 @@ async def register_dataset(
     await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
 
     # Create a file share for the dataset
-    background_tasks.add_task(create_azure_file_share, dataset_db.id)
+    add_async_task(create_azure_file_share(dataset_db.id))
 
     message = f"[Register Dataset]: user_id:{current_user.id}, dataset_id: {dataset_db.id}"
     await log_message(message)

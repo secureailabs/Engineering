@@ -21,6 +21,7 @@ from typing import List
 import aiohttp
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
+from utils.background_couroutines import add_async_task
 
 import app.utils.azure as azure
 from app.api.authentication import get_current_user
@@ -52,15 +53,12 @@ router = APIRouter()
 
 ########################################################################################################################
 async def register_secure_computation_node(
-    background_tasks: BackgroundTasks,
     secure_computation_node_req: RegisterSecureComputationNode_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterSecureComputationNode_Out:
     """
     Register a secure computation node
 
-    :param background_tasks: Background tasks
-    :type background_tasks: BackgroundTasks
     :param secure_computation_node_req: Secure computation node request body
     :type secure_computation_node_req: RegisterSecureComputationNode_In, optional
     :param current_user: Current user information
@@ -76,7 +74,6 @@ async def register_secure_computation_node(
         researcher_id=current_user.organization_id,
         data_owner_id=PyObjectId(empty=True),
     )
-
     if secure_computation_node_req.type == SecureComputationNodeType.SCN:
         # Check if the digital contract and dataset exist
         dataset_version_db = await get_dataset_version(secure_computation_node_req.dataset_version_id, current_user)
@@ -93,11 +90,9 @@ async def register_secure_computation_node(
             current_user=current_user,
         )
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
-        background_tasks.add_task(
-            provision_secure_computation_node, secure_computation_node_db, dataset_key.dataset_key
-        )
+        add_async_task(provision_secure_computation_node(secure_computation_node_db, dataset_key.dataset_key))
     elif secure_computation_node_req.type == SecureComputationNodeType.SMART_BROKER:
-        background_tasks.add_task(provision_smart_broker, secure_computation_node_db)
+        add_async_task(provision_smart_broker(secure_computation_node_db))
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid secure computation node type")
 
@@ -284,7 +279,6 @@ async def update_secure_computation_node(
 
 ########################################################################################################################
 async def deprovision_secure_computation_nodes(
-    background_tasks: BackgroundTasks,
     data_federation_provision_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
 ):
@@ -299,7 +293,7 @@ async def deprovision_secure_computation_nodes(
     )
 
     # Start a background task to deprovision the secure computation node which will update the status
-    background_tasks.add_task(delete_resource_group, data_federation_provision_id, current_user)
+    add_async_task(delete_resource_group(data_federation_provision_id, current_user))
 
     message = f"[Deprovision Secure Computation Nodes]: user_id:{current_user.id}, data_federation_provision_id: {data_federation_provision_id}"
     await log_message(message)

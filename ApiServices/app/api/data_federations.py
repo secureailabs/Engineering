@@ -18,6 +18,7 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from pydantic import EmailStr
+from utils.background_couroutines import add_async_task
 
 import app.utils.azure as azure
 from app.api.accounts import get_all_admins, get_organization, get_user
@@ -280,7 +281,6 @@ async def update_data_federation(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def invite_researcher(
-    background_tasks: BackgroundTasks,
     data_federation_id: PyObjectId,
     researcher_organization_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
@@ -288,8 +288,6 @@ async def invite_researcher(
     """
     Invite a researcher to join a data federation
 
-    :param background_tasks: FastAPI will create the object of type BackgroundTasks and pass it as that parameter
-    :type background_tasks: BackgroundTasks
     :param data_federation_id: data federation for which the invitation is being made
     :type data_federation_id: PyObjectId
     :param researcher_organization_id: the researcher organization that is being invited
@@ -337,11 +335,14 @@ async def invite_researcher(
         admin_user_emails.append(admin.email)
 
     # Create a background process to send the invitation email
-    background_tasks.add_task(
-        send_invite_email,
-        "SAIL: Invitation to join Data Federation as Researcher",
-        getEmailInviteContent(data_federation=data_federation_db.name, inviter_organization=inviter_organization.name),
-        admin_user_emails,
+    add_async_task(
+        send_invite_email(
+            "SAIL: Invitation to join Data Federation as Researcher",
+            getEmailInviteContent(
+                data_federation=data_federation_db.name, inviter_organization=inviter_organization.name
+            ),
+            admin_user_emails,
+        )
     )
 
     await data_service.update_one(
@@ -490,7 +491,6 @@ async def register_researcher(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def invite_data_submitter(
-    background_tasks: BackgroundTasks,
     data_federation_id: PyObjectId,
     data_submitter_organization_id: PyObjectId,
     current_user: TokenData = Depends(get_current_user),
@@ -498,8 +498,6 @@ async def invite_data_submitter(
     """
     Invite a data submitter to join a data federation
 
-    :param background_tasks: FastAPI will create the object of type BackgroundTasks and pass it as that parameter
-    :type background_tasks: BackgroundTasks
     :param data_federation_id: data federation for which the invitation is being made
     :type data_federation_id: PyObjectId
     :param data_submitter_organization_id: the data submitter organization that is being invited
@@ -549,11 +547,14 @@ async def invite_data_submitter(
         admin_user_emails.append(admin.email)
 
     # Create a background process to send the invitation email
-    background_tasks.add_task(
-        send_invite_email,
-        "SAIL: Invitation to join Data Federation as Data Submitter",
-        getEmailInviteContent(data_federation=data_federation_db.name, inviter_organization=inviter_organization.name),
-        admin_user_emails,
+    add_async_task(
+        send_invite_email(
+            "SAIL: Invitation to join Data Federation as Data Submitter",
+            getEmailInviteContent(
+                data_federation=data_federation_db.name, inviter_organization=inviter_organization.name
+            ),
+            admin_user_emails,
+        )
     )
 
     await data_service.update_one(
@@ -828,7 +829,7 @@ async def accept_or_reject_invite(
 
 
 ########################################################################################################################
-def send_invite_email(subject: str, email_body: str, emails: List[EmailStr]):
+async def send_invite_email(subject: str, email_body: str, emails: List[EmailStr]):
     """
     Background task to send emails using the email plugin
 

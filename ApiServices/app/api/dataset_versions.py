@@ -16,6 +16,7 @@ from typing import List
 
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
+from utils.background_couroutines import add_async_task
 
 import app.utils.azure as azure
 from app.api.accounts import get_organization
@@ -56,7 +57,6 @@ router = APIRouter()
 )
 async def register_dataset_version(
     response: Response,
-    background_tasks: BackgroundTasks,
     dataset_version_req: RegisterDatasetVersion_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDatasetVersion_Out:
@@ -92,7 +92,7 @@ async def register_dataset_version(
     await data_service.insert_one(DB_COLLECTION_DATASET_VERSIONS, jsonable_encoder(dataset_version_db))
 
     # Create a directory in the azure file share for the dataset version
-    background_tasks.add_task(create_directory_in_file_share, dataset_version_db.dataset_id, dataset_version_db.id)
+    add_async_task(create_directory_in_file_share(dataset_version_db.dataset_id, dataset_version_db.id))
 
     message = f"[Register Dataset Version]: user_id:{current_user.id}, dataset_id: {dataset_version_req.dataset_id}, version: {dataset_version_db.id}"
     await log_message(message)

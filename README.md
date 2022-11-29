@@ -42,6 +42,9 @@ WindowsPlatformDeliverables.tar
 ```
 
 ## DeployPlatform to Azure
+DeployPlatform is required to run behind SAIL VPN. \
+Please ensure connection to `vnet-sail-wus-hub-001` and have access to SAIL private vnets in Azure \
+
 Set environment variables to use `Deploy Platform Service Principal` - Ask Stanley if unclear \
 `AZURE_SUBSCRIPTION_ID` should reflect the Azure Subscription you wish to deploy your resources in.
 ```

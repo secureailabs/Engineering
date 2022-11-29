@@ -57,9 +57,7 @@
   },
   "variables": {
     "networkInterfaceName": "[concat(parameters('vmName'), '-nic')]",
-    "publicIPAddressName": "[concat(parameters('vmName'), '-ip')]",
-    "virtualNetworkName": "[concat(parameters('vmName'), '-vnet')]",
-    "networkSecurityGroupName": "[concat(parameters('vmName'), '-nsg')]"
+    "virtualNetworkName": "[concat(parameters('vmName'), '-vnet')]"
   },
   "resources": [
     {
@@ -90,92 +88,11 @@
       }
     },
     {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2020-11-01",
-      "name": "[variables('networkSecurityGroupName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "InboundAllow_9090_8000",
-            "properties": {
-              "description": "9090 for bootstrap tool\n8000 for platform services",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound",
-              "sourcePortRanges": [],
-              "destinationPortRanges": [
-                "9090",
-                "8000"
-              ],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": []
-            }
-          },
-          {
-            "name": "OutboundAllow_443_9090",
-            "properties": {
-              "description": "Interact with DataServices, Azure and SAIL SCNs",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 110,
-              "direction": "Outbound",
-              "sourcePortRanges": [],
-              "destinationPortRanges": [
-                "443",
-                "9090"
-              ],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": []
-            }
-          },
-          {
-            "name": "OutboundDeny_All",
-            "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "destinationPortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Deny",
-              "priority": 200,
-              "direction": "Outbound",
-              "sourcePortRanges": [],
-              "destinationPortRanges": [],
-              "sourceAddressPrefixes": [],
-              "destinationAddressPrefixes": []
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2019-02-01",
-      "name": "[variables('publicIPAddressName')]",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "Basic"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic"
-      }
-    },
-    {
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2019-07-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "properties": {
@@ -186,16 +103,10 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[concat(if(equals(parameters('virtualNetworkId'), ''), resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('virtualNetworkId')), '/subnets/', parameters('subnetName'))]"
-              },
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
               }
             }
           }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
-        }
+        ]
       }
     },
     {

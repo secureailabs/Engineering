@@ -374,6 +374,62 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
+def update_firewall(deployment_name, module_name, private_ip_address):
+    """
+    Update Firewall with a new public ipfor new deployment and ammend dnat rules to allow access
+    """
+    module_fw_info = {}
+    # Authenticate the azure credentials for SAIL GLOBAL HUB
+    account_credentials = sailazure.authenticate(
+        AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
+    )
+    print("\n\n===============================================================")
+    print("UPDATING FIREWALL")
+    print("===============================================================")
+    print("\n\n===============================================================")
+    print(f"Creating new Firewall Public IP Address for {module_name} public endpoint")
+    print("===============================================================")
+    # Create the firewall public ips for platform
+    pip_name = "PIP" + "-" + deployment_name + "-" + module_name
+    firewall_ip_name, firewall_ip, firewall_ip_id = sailazure.create_public_ip(
+        account_credentials, "rg-sail-wus-hubpipdev-001", "westus", pip_name
+    )
+    module_fw_info[module_name + "-firewall_ip_name"] = firewall_ip_name
+    module_fw_info[module_name + "-firewall_ip"] = firewall_ip
+    module_fw_info[module_name + "-firewall_ip_id"] = firewall_ip_id
+    print(f"{module_name}'s firewall public ip name : {firewall_ip_name}")
+    print(f"{module_name}'s firewall public ip : {firewall_ip}")
+    print(f"{module_name}'s firewall public ip id : {firewall_ip_id}")
+
+    async_updated_fw_pip_result, firewall_ip_id, firewall_ip_name, = sailazure.update_fw_pip(
+        account_credentials,
+        firewall_ip_id,
+        firewall_ip_name,
+    )
+    print("\n===============================================================\n")
+    print(
+        f"Updated azure firewall Information:\n{async_updated_fw_pip_result}\nfirewall_ip_id:\n{firewall_ip_id}firewall_ip_name:\n{firewall_ip_name}firewall_ip:\n{firewall_ip}"
+    )
+    print("\n\n===============================================================")
+    print(f"Updating new Firewall DNAT RULES for {module_name}")
+    print("===============================================================")
+    # Update DNAT Rules per module
+    async_updated_fw_pol_result = sailazure.update_fw_dnat_rules(
+        account_credentials,
+        firewall_ip_name,
+        firewall_ip,
+        private_ip_address,
+        module_name,
+    )
+    print("\n===============================================================\n")
+    print(f"{module_name}'s Azure Firewall DNAT RULES result:\n{async_updated_fw_pol_result}")
+
+    print("\n\n===============================================================")
+    print("ENDING FUNCTION UPDATE_FIREWALL")
+    print("===============================================================")
+    return module_fw_info, async_updated_fw_pip_result
+
+
 if __name__ == "__main__":
     AZURE_SUBSCRIPTION_ID = os.environ.get("AZURE_SUBSCRIPTION_ID")
     AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID")
@@ -430,18 +486,43 @@ if __name__ == "__main__":
         key_vault_url,
         OWNER,
     )
-
     print("API Services server: ", platform_services_ip)
+
     # Deploy the frontend server
-    frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip)
+    frontend_ip = deploy_frontend(
+        account_credentials,
+        deployment_id,
+        platform_services_ip,
+    )
     print("Frontend server: ", frontend_ip)
 
+    # Deploy Firewall IPv4Address and update DNAT Rules
+    api_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "apiservices", platform_services_ip)
+    web_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "newwebfrontend", frontend_ip)
+
+    # Summary
     print("\n\n===============================================================")
-    print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip)
-    print("SAIL API Services is hosted on: https://" + platform_services_ip + ":8000")
-    print("Deployment ID: ", deployment_id)
+    print("================= SUMMARY: Deploy Firewall =====================")
+    print(f"apiservices-firewall_ip_name: {api_fw_info['apiservices-firewall_ip_name']}")
+    print(f"apiservices-firewall_ip: {api_fw_info['apiservices-firewall_ip']}")
+    print(f"apiservices-firewall_ip_id: {api_fw_info['apiservices-firewall_ip_id']}")
+    print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
+    print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
+    print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
+    print(
+        f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
+    )
+    print("\n\n===============================================================")
+    print("================= SUMMARY: Deploy Platform =====================")
+    print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")
+    print(
+        f"Deployment complete. Please visit the link to access the public demo: https://{web_fw_info['newwebfrontend-firewall_ip']}"
+    )
+    print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
+    print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
+    print(f"Deployment ID: {deployment_id}")
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")
 
-    # Delete the resource group for the backend server
-    # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
+    # # Delete the resource group for the backend server
+    # # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")

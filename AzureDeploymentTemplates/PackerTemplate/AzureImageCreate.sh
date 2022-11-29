@@ -11,7 +11,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -m [Image Name] [-a]"
     echo "Usage: $0"
-    echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | newwebfrontend | securecomputationnode | rpcrelated"
+    echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | newwebfrontend | securecomputationnode | rpcrelated | smartbroker"
     echo -e "\t-a ci_flag will be set to true"
     exit 1 # Exit script after printing help
 }
@@ -28,10 +28,17 @@ do
 done
 
 # Check if the module name is provided
-if [ -z "$imageName" ]
-then
+if [ -z "$imageName" ]; then
     echo "No module specified."
     exit 1
+fi
+
+# Define the path for the module, default path is the Docker folder in the engineering repo
+dockerDir=$(realpath ../..)
+
+# The smartbroker module is in a the datascience folder under Engineering
+if [ "$imageName" == "smartbroker" ]; then
+    dockerDir=$(realpath ../../datascience)
 fi
 
 # Check if packer is installed
@@ -88,17 +95,17 @@ az account set --subscription $AZURE_SUBSCRIPTION_ID
 echo -e "\n==== Verify Subscription Set Properly ====\n"
 az account show
 
-# list custom SAIL managed images 
+# list custom SAIL managed images
 echo -e "\n==== Azure Image List ====\n"
 output=$(az image list \
 --resource-group $ResourceGroup)
 echo "$output"
 
-# Delete old custom SAIL managed images 
+# Delete old custom SAIL managed images
 echo -e "\n==== Azure Image Delete As Required ====\n"
 az image delete \
 --resource-group $ResourceGroup \
---name $imageName 
+--name $imageName
 echo "Deletion Completed, continuing..."
 
 echo -e "\n==== Azure VHD& Image Creation Begins ====\n"
@@ -122,6 +129,7 @@ output=$(packer build \
 -var storage_resource_group=$ResourceGroup \
 -var storage_account=$StorageAccountName \
 -var module=$imageName \
+-var docker_dir=$dockerDir \
 packer-vhd-ubuntu.json | tee /dev/tty)
 
 # Specify vhdImageUrl to use

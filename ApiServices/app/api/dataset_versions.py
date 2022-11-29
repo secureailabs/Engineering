@@ -20,8 +20,8 @@ from app.api.authentication import RoleChecker, get_current_user
 from app.api.datasets import get_dataset
 from app.api.internal_utils import cache_get_basic_info_organization
 from app.data import operations as data_service
-from app.data import sync_operations as sync_data_service
 from app.log import log_message
+from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
@@ -56,7 +56,6 @@ router = APIRouter()
 )
 async def register_dataset_version(
     response: Response,
-    background_tasks: BackgroundTasks,
     dataset_version_req: RegisterDatasetVersion_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDatasetVersion_Out:
@@ -92,7 +91,7 @@ async def register_dataset_version(
     await data_service.insert_one(DB_COLLECTION_DATASET_VERSIONS, jsonable_encoder(dataset_version_db))
 
     # Create a directory in the azure file share for the dataset version
-    background_tasks.add_task(create_directory_in_file_share, dataset_version_db.dataset_id, dataset_version_db.id)
+    add_async_task(create_directory_in_file_share(dataset_version_db.dataset_id, dataset_version_db.id))
 
     message = f"[Register Dataset Version]: user_id:{current_user.id}, dataset_id: {dataset_version_req.dataset_id}, version: {dataset_version_db.id}"
     await log_message(message)
@@ -199,12 +198,12 @@ async def get_dataset_version_connection_string(
         )
 
     # Authenticate azure
-    account_credentials = azure.authenticate()
+    account_credentials = await azure.authenticate()
     dataset_version_file_name = f"dataset_{dataset_version.id}.zip"
 
     # Get the connection string for the dataset version which is valid for 30 minutes
     # This could be a long running operation
-    connection_string = azure.authentication_shared_access_signature(
+    connection_string = await azure.authentication_shared_access_signature(
         account_credentials=account_credentials,
         account_name=get_secret("azure_storage_account_name"),
         resource_group_name=get_secret("azure_storage_resource_group"),
@@ -309,7 +308,7 @@ async def soft_delete_dataset_version(
 
 
 ########################################################################################################################
-def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: PyObjectId):
+async def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: PyObjectId):
     """
     Create a directory in the Azure file share
 
@@ -319,10 +318,10 @@ def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: P
     :type dataset_version_id: PyObjectId
     """
     try:
-        account_credentials = azure.authenticate()
+        account_credentials = await azure.authenticate()
 
         # Get the connection string for the storage account
-        connection_string_response = azure.get_storage_account_connection_string(
+        connection_string_response = await azure.get_storage_account_connection_string(
             account_credentials=account_credentials,
             resource_group_name=get_secret("azure_storage_resource_group"),
             account_name=get_secret("azure_storage_account_name"),
@@ -331,7 +330,7 @@ def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: P
             raise Exception(connection_string_response.note)
 
         # Create the directory in the file share
-        create_response = azure.file_share_create_directory(
+        create_response = await azure.file_share_create_directory(
             connection_string=connection_string_response.response,
             file_share_name=str(dataset_id),
             directory_name=str(dataset_version_id),
@@ -339,14 +338,14 @@ def create_directory_in_file_share(dataset_id: PyObjectId, dataset_version_id: P
         if create_response.status != "Success":
             raise Exception(create_response.note)
 
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_DATASET_VERSIONS,
             {"_id": str(dataset_version_id)},
             {"$set": {"state": "NOT_UPLOADED"}},
         )
 
     except Exception as exception:
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_DATASET_VERSIONS,
             {"_id": str(dataset_id)},
             {"$set": {"state": "ERROR", "note": str(exception)}},

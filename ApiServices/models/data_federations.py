@@ -17,8 +17,8 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import BasicObjectInfo, PyObjectId, SailBaseModel, KeyVaultObject
-from models.secure_computation_nodes import SecureComputationNodeType
+from models.common import BasicObjectInfo, KeyVaultObject, PyObjectId, SailBaseModel
+from models.secure_computation_nodes import SecureComputationNodeSize
 
 
 class DataFederationState(Enum):
@@ -138,13 +138,14 @@ class GetMultipleInvite_Out(SailBaseModel):
 
 class DataFederationProvision_Base(SailBaseModel):
     data_federation_id: PyObjectId = Field(...)
-    secure_computation_nodes_type: SecureComputationNodeType = Field(...)
+    secure_computation_nodes_size: SecureComputationNodeSize = Field(...)
 
 
 class DataFederationProvision_Db(DataFederationProvision_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
+    smart_broker_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 
@@ -152,6 +153,7 @@ class GetDataFederationProvision(DataFederationProvision_Base):
     id: PyObjectId = Field(alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
+    smart_broker_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 
@@ -167,4 +169,5 @@ class RegisterDataFederationProvision_Out(DataFederationProvision_Base):
     id: PyObjectId = Field(alias="_id")
     creation_time: datetime = Field(...)
     organization_id: PyObjectId = Field(...)
+    smart_broker_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(...)

@@ -18,8 +18,10 @@ from typing import Optional
 
 
 class PyObjectId(UUID):
-    def __init__(self, value: Optional[str] = None):
-        if value is None:
+    def __init__(self, value: Optional[str] = None, empty: bool = False):
+        if empty:
+            return super().__init__(str(UUID(int=0)))
+        elif value is None:
             return super().__init__(str(uuid4()))
         else:
             return super().__init__(value)

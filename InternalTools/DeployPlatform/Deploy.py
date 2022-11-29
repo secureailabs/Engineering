@@ -7,16 +7,15 @@ import uuid
 from re import sub
 
 import requests
+import sailazure
 from azure.core.exceptions import AzureError
+from azure.keyvault.keys import KeyClient
+from azure.mgmt.keyvault import KeyVaultManagementClient
+from azure.mgmt.monitor import MonitorManagementClient
+from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
 from pydantic import BaseModel, Field, StrictStr
-from azure.mgmt.keyvault import KeyVaultManagementClient
-from azure.keyvault.keys import KeyClient
-from azure.mgmt.monitor import MonitorManagementClient
-from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
-
-import sailazure
 
 
 class DeploymentResponse(BaseModel):

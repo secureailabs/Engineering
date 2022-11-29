@@ -3,6 +3,9 @@
 # datasets.py
 # -------------------------------------------------------------------------------
 """APIs to manage datasets"""
+import os
+from base64 import b64encode
+
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -12,30 +15,28 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 from typing import List
-from base64 import b64encode
-import os
 
 import app.utils.azure as azure
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
 from app.data import operations as data_service
-from app.data import sync_operations as sync_data_service
 from app.log import log_message
+from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
-from models.common import BasicObjectInfo, PyObjectId, KeyVaultObject
+from models.common import BasicObjectInfo, KeyVaultObject, PyObjectId
 from models.datasets import (
     Dataset_Db,
+    DatasetEncryptionKey_Out,
     DatasetState,
     GetDataset_Out,
     GetMultipleDataset_Out,
     RegisterDataset_In,
     RegisterDataset_Out,
     UpdateDataset_In,
-    DatasetEncryptionKey_Out,
 )
 
 DB_COLLECTION_DATASETS = "datasets"
@@ -54,7 +55,6 @@ router = APIRouter()
 )
 async def register_dataset(
     response: Response,
-    background_tasks: BackgroundTasks,
     dataset_req: RegisterDataset_In = Body(...),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDataset_Out:
@@ -63,8 +63,6 @@ async def register_dataset(
 
     :param response: Response object
     :type response: Response
-    :param background_tasks: Background tasks object to run tasks in the background
-    :type background_tasks: BackgroundTasks
     :param dataset_req: information required to register a dataset, defaults to Body(...)
     :type dataset_req: RegisterDataset_In, optional
     :param current_user: information of current authenticated user, defaults to Depends(get_current_user)
@@ -89,7 +87,7 @@ async def register_dataset(
     await data_service.insert_one(DB_COLLECTION_DATASETS, jsonable_encoder(dataset_db))
 
     # Create a file share for the dataset
-    background_tasks.add_task(create_azure_file_share, dataset_db.id)
+    add_async_task(create_azure_file_share(dataset_db.id))
 
     message = f"[Register Dataset]: user_id:{current_user.id}, dataset_id: {dataset_db.id}"
     await log_message(message)
@@ -260,7 +258,7 @@ async def get_datset_encryption_key(
         # Generate a new key. TODO: could be done in keyvault
         aes_key = os.urandom(32)
 
-        wrapped_key_secret = azure.wrap_aes_key(
+        wrapped_key_secret = await azure.wrap_aes_key(
             aes_key=aes_key,
             wrapping_key=wrapping_key,
         )
@@ -274,12 +272,12 @@ async def get_datset_encryption_key(
         )
     else:
         wrapped_key_secret = dataset_db.encryption_key
-        aes_key = azure.unwrap_aes_with_rsa_key(wrapped_aes_key=wrapped_key_secret, wrapping_key=wrapping_key)
+        aes_key = await azure.unwrap_aes_with_rsa_key(wrapped_aes_key=wrapped_key_secret, wrapping_key=wrapping_key)
 
     return DatasetEncryptionKey_Out(dataset_key=b64encode(aes_key).decode("ascii"))
 
 
-def create_azure_file_share(dataset_id: PyObjectId):
+async def create_azure_file_share(dataset_id: PyObjectId):
     """
     Create a file share in Azure
 
@@ -288,9 +286,9 @@ def create_azure_file_share(dataset_id: PyObjectId):
     :raises Exception: failed to create file share
     """
     try:
-        account_credentials = azure.authenticate()
+        account_credentials = await azure.authenticate()
 
-        create_response = azure.create_file_share(
+        create_response = await azure.create_file_share(
             account_credentials,
             get_secret("azure_storage_resource_group"),
             get_secret("azure_storage_account_name"),
@@ -300,9 +298,9 @@ def create_azure_file_share(dataset_id: PyObjectId):
             raise Exception(create_response.note)
 
         # Mark the dataset as active
-        sync_data_service.update_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ACTIVE"}})
+        await data_service.update_one(DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ACTIVE"}})
 
     except Exception as exception:
-        sync_data_service.update_one(
+        await data_service.update_one(
             DB_COLLECTION_DATASETS, {"_id": str(dataset_id)}, {"$set": {"state": "ERROR", "note": str(exception)}}
         )

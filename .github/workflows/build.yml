@@ -62,6 +62,7 @@ jobs:
           echo "${{ github.head_ref }}"
           echo "${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
+          docker image prune --all
 
   build:
     runs-on: [self-hosted, Linux, x64, docker]

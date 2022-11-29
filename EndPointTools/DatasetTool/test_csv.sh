@@ -17,8 +17,8 @@ if [ ! -f "bin/Release/net6.0/linux-x64/publish/DatasetTool" ]; then
 fi
 
 # Run the dataset tool for IGR dataset
-bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip 20.237.203.49:8000
+bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip 127.0.0.1:8000
 
 
 # Run the dataset tool for MGR dataset
-bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip 20.237.203.49:8000
+bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip 127.0.0.1:8000

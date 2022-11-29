@@ -55,7 +55,7 @@ class UserSession
         var client_options = new RestClientOptions("https://" + ip_address)
         {
             ThrowOnAnyError = true,
-            MaxTimeout = 5000,
+            MaxTimeout = 60000,
             // TODO: IMP!! Important!! Remove this line after real certificates are used.
             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
         };

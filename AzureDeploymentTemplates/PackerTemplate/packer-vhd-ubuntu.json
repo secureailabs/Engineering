@@ -4,6 +4,7 @@
         "tenant_id": "{{env `AZURE_TENANT_ID`}}",
         "client_id": "{{env `AZURE_CLIENT_ID`}}",
         "client_secret": "{{env `AZURE_CLIENT_SECRET`}}",
+        "docker_dir": "",
         "location": "",
         "storage_resource_group": "",
         "storage_account": "",
@@ -39,7 +40,7 @@
     "provisioners": [
         {
             "type": "file",
-            "source": "../../Docker/{{user `module`}}/",
+            "source": "{{user `docker_dir`}}/Docker/{{user `module`}}/",
             "destination": "."
         },
         {
@@ -51,6 +52,11 @@
             "type": "file",
             "source": "../../Binary/vm_initializer.py",
             "destination": "vm_initializer.py"
+        },
+        {
+            "type": "file",
+            "source": "../../Binary/decrypt_file.py",
+            "destination": "decrypt_file.py"
         },
         {
             "type": "shell",

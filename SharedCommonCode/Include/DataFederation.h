@@ -63,6 +63,7 @@ class DataFederation
 
         std::string m_strName;
         std::string m_strDescription;
+        std::string m_strDatasetFormat;
 
         std::list<Guid> m_stlDataSubmitterOrganizations;
         std::list<Guid> m_stlResearchOrganizations;

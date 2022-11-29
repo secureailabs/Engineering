@@ -3,8 +3,13 @@ set -e
 
 PrintHelp() {
     echo ""
+<<<<<<< HEAD
     echo "Usage: $0 -s [Service Name] -d -c -n [Docker Name] -x [SCN Names] -r [DS Repo Path]"
     echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | smart_broker"
+=======
+    echo "Usage: $0 -s [Service Name] -d -c"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver"
+>>>>>>> main
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     echo -e "\t-n Name to give the running docker image"
@@ -110,8 +115,14 @@ elif [ "apiservices" == "$imageName" ]; then
     make -C $rootDir package_apiservices -s -j
     # Check for Azure environment variables
     if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
+<<<<<<< HEAD
         echo "environment variable AZURE_SUBSCRIPTION_ID is undefined, setting to development subscription"
         AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
+=======
+        echo "environment variable AZURE_SUBSCRIPTION_ID is undefined. Using development as default."
+        AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
+        # exit 1
+>>>>>>> main
     fi
     if [ ${AZURE_SUBSCRIPTION_ID} == "3d2b9951-a0c8-4dc3-8114-2776b047b15c" ]; then
         cp apiservices/InitializationVectorScratchPad.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
@@ -123,7 +134,7 @@ elif [ "apiservices" == "$imageName" ]; then
         cp apiservices/InitializationVectorProductionGA.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
     fi
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
-    runtimeFlags="$runtimeFlags -p 8000:8001 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 8000:8001 -p 9080:9080 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
     make -C $rootDir package_webfrontend -s -j
     cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
@@ -164,7 +175,8 @@ elif [ "smart_broker" == "$imageName" ]; then
         PrintHelp
     fi
     runtimeFlags="$runtimeFlags -p 9003:9003 -v $dsRepo:/ds -v $rootDir/Binary/rpcrelated_dir:/app -e SCN_NAMES=$scnNames $imageName "
-    echo "FLAGS $runtimeFlags"
+elif [ "auditserver" == "$imageName" ]; then
+    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then
     echo "!!! NOT IMPLEMENTED !!!"
     exit 1

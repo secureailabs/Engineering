@@ -24,7 +24,7 @@ class UserSession
 
     private class DataFederationList
     {
-        public BasicInformation[] data_federations { get; set; } = default!;
+        public ModelDataFederation[] data_federations { get; set; } = default!;
     }
 
     private class ConnectionStringResponse
@@ -32,6 +32,12 @@ class UserSession
         public string Guid { get; set; } = default!;
         public string connection_string { get; set; } = default!;
     }
+
+    class EncryptionKeyResponse
+    {
+        public string dataset_key { get; set; } = default!;
+    };
+
 
     private LoginResponse m_LoginResponse = default!;
     private RestClient m_client = default!;
@@ -49,7 +55,7 @@ class UserSession
         var client_options = new RestClientOptions("https://" + ip_address)
         {
             ThrowOnAnyError = true,
-            MaxTimeout = 5000,
+            MaxTimeout = 60000,
             // TODO: IMP!! Important!! Remove this line after real certificates are used.
             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
         };
@@ -90,7 +96,7 @@ class UserSession
     /// <param name="data_federation_name"></param>
     /// <returns> Guid of the data federation with the input name</returns>
     /// <exception cref="Exception"></exception>
-    public Guid GetFederationId(string data_federation_name)
+    public ModelDataFederation GetFederation(string data_federation_name)
     {
         // Create the request
         var request = new RestRequest("/data-federations", Method.Get);
@@ -110,11 +116,11 @@ class UserSession
         {
             if (federation_list.data_federations[i].name == data_federation_name)
             {
-                return federation_list.data_federations[i].id;
+                return federation_list.data_federations[i];
             }
         }
 
-        return Guid.Empty;
+        return null!;
     }
 
     /// <summary>
@@ -157,10 +163,8 @@ class UserSession
     /// <param name="data_federation_name"> Name of the data federation to add the dataset </param>
     /// <returns> Guid of the newly created dataset </returns>
     /// <exception cref="Exception"></exception>
-    public Guid CreateDatasetAndAddToFederation(Dataset dataset, string data_federation_name)
+    public Guid CreateDatasetAndAddToFederation(ModelDataset dataset, Guid data_federation_id)
     {
-        Guid data_federation_id = GetFederationId(data_federation_name);
-
         // Create json from the input
         string dataset_json = Newtonsoft.Json.JsonConvert.SerializeObject(dataset);
 
@@ -222,7 +226,7 @@ class UserSession
             }
 
             // Get the dataset information
-            var dataset = Newtonsoft.Json.JsonConvert.DeserializeObject<Dataset>(dataset_response.Content)!;
+            var dataset = Newtonsoft.Json.JsonConvert.DeserializeObject<ModelDataset>(dataset_response.Content)!;
             if (dataset.state == "ACTIVE")
             {
                 break;
@@ -288,7 +292,7 @@ class UserSession
             }
 
             // Get the dataset version information
-            var dataset_version = Newtonsoft.Json.JsonConvert.DeserializeObject<DatasetVersionMetadata>(dataset_version_response.Content)!;
+            var dataset_version = Newtonsoft.Json.JsonConvert.DeserializeObject<ModelDatasetVersionMetadata>(dataset_version_response.Content)!;
             if (dataset_version.state == "NOT_UPLOADED")
             {
                 break;
@@ -344,5 +348,25 @@ class UserSession
         {
             throw new Exception("Dataset version state update failed.\n" + response.Content);
         }
+    }
+
+    public string GetEncryptionKeyForDataset(Guid dataset_id, Guid data_federation_id)
+    {
+        // Create the request
+        var request = new RestRequest("/data-federations/" + data_federation_id.ToString() + "/dataset_key/" + dataset_id.ToString(), Method.Post);
+        request.AddHeader("accept", "application/json");
+        request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
+
+        // Get the federations
+        var response = m_client.Execute(request);
+        if (response.StatusCode != System.Net.HttpStatusCode.Created || response.Content == null)
+        {
+            throw new Exception("Data federation key fetch failed.\n" + response.Content);
+        }
+
+        // Get the dataset version
+        var dataset_key_response = Newtonsoft.Json.JsonConvert.DeserializeObject<EncryptionKeyResponse>(response.Content)!;
+
+        return dataset_key_response.dataset_key;
     }
 }

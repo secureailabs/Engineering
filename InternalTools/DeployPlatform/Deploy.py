@@ -7,11 +7,25 @@ import uuid
 from re import sub
 
 import requests
+import sailazure
 from azure.core.exceptions import AzureError
+from azure.keyvault.keys import KeyClient
+from azure.mgmt.keyvault import KeyVaultManagementClient
+from azure.mgmt.monitor import MonitorManagementClient
+from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
 from azure.mgmt.storage import StorageManagementClient
+from azure.mgmt.storage.models import StorageAccountListKeysResult
 from pydantic import BaseModel, Field, StrictStr
 
-import sailazure
+
+class DeploymentResponse(BaseModel):
+    """Deployment response."""
+
+    status: StrictStr = Field(...)
+    response: StrictStr = Field(default="")
+    ip_address: StrictStr = Field(default="")
+    note: StrictStr = Field(...)
+
 
 FINAL_DEV_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
@@ -61,42 +75,6 @@ def set_params(subscription_id, module_name):
     Set Params based on selected subscription
 
     """
-    development_parameters = {
-        "azure_subscription_id": FINAL_DEV_PARAMS["azure_subscription_id"],
-        "vmImageResourceId": FINAL_DEV_PARAMS["vmImageResourceId"] + module_name,
-        "virtualNetworkId": FINAL_DEV_PARAMS["virtualNetworkId"],  # change this line depending on your subscription
-        "subnetName": FINAL_DEV_PARAMS["subnetName"],  # change this line depending on your vnet
-        "azure_scn_image_id": FINAL_DEV_PARAMS["azure_scn_image_id"],
-        "azure_scn_subnet_name": FINAL_DEV_PARAMS["azure_scn_subnet_name"],
-        "azure_storage_resource_group": FINAL_DEV_PARAMS["azure_storage_resource_group"],
-        "azure_storage_account_name": FINAL_DEV_PARAMS["azure_storage_account_name"],
-        "azure_scn_virtual_network_id": FINAL_DEV_PARAMS["azure_scn_virtual_network_id"],
-    }
-
-    release_candidate_parameters = {
-        "azure_subscription_id": FINAL_RELEASE_CANDIDATE_PARAMS["azure_subscription_id"],
-        "vmImageResourceId": FINAL_RELEASE_CANDIDATE_PARAMS["vmImageResourceId"] + module_name,
-        "virtualNetworkId": FINAL_RELEASE_CANDIDATE_PARAMS["virtualNetworkId"],
-        "subnetName": FINAL_RELEASE_CANDIDATE_PARAMS["subnetName"],  # change this line depending on your vnet
-        "azure_scn_image_id": FINAL_RELEASE_CANDIDATE_PARAMS["azure_scn_image_id"],
-        "azure_scn_subnet_name": FINAL_RELEASE_CANDIDATE_PARAMS["azure_scn_subnet_name"],
-        "azure_storage_resource_group": FINAL_RELEASE_CANDIDATE_PARAMS["azure_storage_resource_group"],
-        "azure_storage_account_name": FINAL_RELEASE_CANDIDATE_PARAMS["azure_storage_account_name"],
-        "azure_scn_virtual_network_id": FINAL_RELEASE_CANDIDATE_PARAMS["azure_scn_virtual_network_id"],
-    }
-
-    productionGA_parameters = {
-        "azure_subscription_id": FINAL_PRODUCTIONGA_PARAMS["azure_subscription_id"],
-        "vmImageResourceId": FINAL_PRODUCTIONGA_PARAMS["vmImageResourceId"] + module_name,
-        "virtualNetworkId": FINAL_PRODUCTIONGA_PARAMS["virtualNetworkId"],
-        "subnetName": FINAL_PRODUCTIONGA_PARAMS["subnetName"],
-        "azure_scn_image_id": FINAL_PRODUCTIONGA_PARAMS["azure_scn_image_id"],
-        "azure_scn_subnet_name": FINAL_PRODUCTIONGA_PARAMS["azure_scn_subnet_name"],
-        "azure_storage_resource_group": FINAL_PRODUCTIONGA_PARAMS["azure_storage_resource_group"],
-        "azure_storage_account_name": FINAL_PRODUCTIONGA_PARAMS["azure_storage_account_name"],
-        "azure_scn_virtual_network_id": FINAL_PRODUCTIONGA_PARAMS["azure_scn_virtual_network_id"],
-    }
-
     parameters = {
         "vmName": module_name,
         "vmSize": "Standard_D4s_v4",
@@ -105,11 +83,11 @@ def set_params(subscription_id, module_name):
     }
 
     if subscription_id == "b7a46052-b7b1-433e-9147-56efbfe28ac5":
-        parameters.update(development_parameters)
+        parameters.update(FINAL_DEV_PARAMS)
     elif subscription_id == "40cdb551-8a8d-401f-b884-db1599022002":
-        parameters.update(release_candidate_parameters)
+        parameters.update(FINAL_RELEASE_CANDIDATE_PARAMS)
     elif subscription_id == "ba383264-b9d6-4dba-b71f-58b3755382d8":
-        parameters.update(productionGA_parameters)
+        parameters.update(FINAL_PRODUCTIONGA_PARAMS)
 
     return parameters
 
@@ -126,9 +104,11 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
     print("Upload package status: ", response.status_code)
 
 
-def deploy_module(account_credentials, deployment_name, module_name, subscription_id):
+def deploy_module(account_credentials, deployment_name, module_name):
     """Deploy the template to a resource group."""
     print("Deploying module: ", module_name)
+
+    subscription_id = account_credentials["subscription_id"]
 
     # Each module will be deployed in a unique resource group
     resource_group_name = deployment_name + "-" + module_name
@@ -147,7 +127,7 @@ def deploy_module(account_credentials, deployment_name, module_name, subscriptio
         "vmSize": set_parameters["vmSize"],
         "adminUserName": set_parameters["adminUserName"],
         "adminPassword": set_parameters["adminPassword"],
-        "vmImageResourceId": set_parameters["vmImageResourceId"],
+        "vmImageResourceId": set_parameters["vmImageResourceId"] + module_name,
         "subnetName": set_parameters["subnetName"],
         "virtualNetworkId": set_parameters["virtualNetworkId"],
     }
@@ -155,9 +135,92 @@ def deploy_module(account_credentials, deployment_name, module_name, subscriptio
     deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
     print(module_name + " server status: ", deploy_status)
 
-    virtual_machine_public_ip = sailazure.get_ip(account_credentials, resource_group_name, module_name + "-ip")
+    # virtual_machine_public_ip = sailazure.get_ip(account_credentials, resource_group_name, module_name + "-ip")
+    virtual_machine_private_ip = sailazure.get_private_ip(
+        account_credentials, resource_group_name, module_name + "-nic"
+    )
 
-    return virtual_machine_public_ip
+    return virtual_machine_private_ip
+
+
+def get_randomized_name(prefix: str) -> str:
+    """
+    Get a randomized name.
+
+    :param prefix: The prefix for the randomized name.
+    :type prefix: str
+    :return: The randomized name.
+    :rtype: str
+    """
+    return f"{prefix}{random.randint(1,100000):05}"
+
+
+def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix, storage_account_id):
+    """Deploy the azure key vault"""
+    # Key vault will be deployed in a unique resource group
+    resource_group_name = deployment_name + "-keyvault"
+
+    # Create a key vault name that's available because they're used in URLs.
+    keyvault_client = KeyVaultManagementClient(
+        credential=account_credentials["credentials"], subscription_id=account_credentials["subscription_id"]
+    )
+
+    number_tries = 0
+    name_found = False
+    key_vault_name = get_randomized_name(key_vault_name_prefix)
+    while (name_found is False) and (number_tries < 10):
+        number_tries += 1
+        availability_result = keyvault_client.vaults.check_name_availability({"name": key_vault_name})  # type: ignore
+        if availability_result.name_available:
+            name_found = True
+        else:
+            key_vault_name = get_randomized_name(key_vault_name_prefix)
+
+    if name_found is False:
+        raise Exception("Unable to find an available storage account name.")
+
+    # Create the resource group
+    sailazure.create_resource_group(account_credentials, resource_group_name, "westus")
+
+    template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", "keyvault" + ".json")
+
+    with open(template_path, "r") as template_file_fd:
+        template = json.load(template_file_fd)
+
+    parameters = {
+        "keyvault_name": key_vault_name,
+        "azure_tenant_id": account_credentials["credentials"]._tenant_id,
+        "azure_object_id": account_credentials["object_id"],
+    }
+
+    deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
+    print("keyvault status: ", deploy_status)
+
+    if deploy_status != "Succeeded":
+        raise Exception("Keyvault deployment failed")
+
+    keyvault_url = f"https://{key_vault_name}.vault.azure.net/"
+
+    # Setup monitoring and audit logs
+    key_vault_resource_id = f"/subscriptions/{account_credentials['subscription_id']}/resourceGroups/{resource_group_name}/providers/Microsoft.KeyVault/vaults/{key_vault_name}"
+    monitor_client = MonitorManagementClient(
+        credential=account_credentials["credentials"], subscription_id=account_credentials["subscription_id"]
+    )
+
+    diagnostic_settings_resource = DiagnosticSettingsResource(
+        storage_account_id=storage_account_id,
+        logs=[LogSettings(category="AuditEvent", enabled=True)],
+        metrics=[MetricSettings(category="AllMetrics", enabled=True)],
+    )
+
+    monitor_client.diagnostic_settings.create_or_update(
+        resource_uri=key_vault_resource_id,
+        name="Key vault logs",
+        parameters=diagnostic_settings_resource,
+    )
+
+    # return the url of the keyvault
+    return keyvault_url
 
 
 def deploy_apiservices(
@@ -166,29 +229,34 @@ def deploy_apiservices(
     storage_account_name,
     storage_account_password,
     storage_resource_group_name,
+    key_vault_url,
     owner,
-    subscription_id,
 ):
     """
     Deploy Api Services
-
     """
+    subscription_id = account_credentials["subscription_id"]
+
     # Get params to update json
     set_parameters = set_params(subscription_id, "apiservices")
     # Deploy the frontend server
-    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", subscription_id)
+    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices")
 
     # Read backend json from file and set params
     with open("apiservices.json", "r") as backend_json_fd:
         backend_json = json.load(backend_json_fd)
     backend_json["owner"] = owner
-    backend_json["azure_subscription_id"] = set_parameters["azure_subscription_id"]
+    backend_json["azure_subscription_id"] = subscription_id
+    backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
+    backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
+    backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
     backend_json["azure_scn_image_id"] = set_parameters["azure_scn_image_id"]
     backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
     backend_json["azure_storage_resource_group"] = storage_resource_group_name
     backend_json["azure_storage_account_name"] = storage_account_name
     backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
     backend_json["azure_storage_account_password"] = storage_account_password
+    backend_json["azure_keyvault_url"] = key_vault_url
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -216,9 +284,9 @@ def deploy_apiservices(
     return apiservices_ip
 
 
-def deploy_frontend(account_credentials, deployment_name, platform_services_ip, subscription_id):
-    # Deploy the frontend server
-    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend", subscription_id)
+def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
+    """Deploy the frontend server"""
+    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend")
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
@@ -237,45 +305,7 @@ def deploy_frontend(account_credentials, deployment_name, platform_services_ip, 
     return frontend_server_ip
 
 
-def deploy_orchestrator(account_credentials, deployment_name):
-    # Deploy the orchestrator server
-    orchestrator_server_ip = deploy_module(account_credentials, deployment_name, "orchestrator")
-
-    # There is no initialization vector for the orchestrator
-    initialization_vector = {"apiservicesUrl": "https://" + platform_services_ip + ":8000"}
-
-    with open("orchestrator.json", "w") as outfile:
-        json.dump(initialization_vector, outfile)
-
-    upload_package(orchestrator_server_ip, "orchestrator.json", "orchestrator.tar.gz")
-
-    return orchestrator_server_ip
-
-
-class DeploymentResponse(BaseModel):
-    """Deployment response."""
-
-    status: StrictStr = Field(...)
-    response: StrictStr = Field(default="")
-    ip_address: StrictStr = Field(default="")
-    note: StrictStr = Field(...)
-
-
-def get_randomized_name(prefix: str) -> str:
-    """
-    Get a randomized name.
-
-    :param prefix: The prefix for the randomized name.
-    :type prefix: str
-    :return: The randomized name.
-    :rtype: str
-    """
-    return f"{prefix}{random.randint(1,100000):05}"
-
-
-def create_storage_account(
-    account_credentials: dict, deployment_name: str, account_name_prefix: str, location: str
-) -> DeploymentResponse:
+def create_storage_account(account_credentials: dict, deployment_name: str, account_name_prefix: str, location: str):
     """
     Create a storage account and file share.
 
@@ -329,8 +359,8 @@ def create_storage_account(
         account_result = poller.result()
 
         # Get the storage account key
-        keys = storage_client.storage_accounts.list_keys(resource_group_name, account_name)  # type: ignore
-        storage_account_key = keys.keys[0].value
+        keys: StorageAccountListKeysResult = storage_client.storage_accounts.list_keys(resource_group_name, account_name)  # type: ignore
+        storage_account_key: str = keys.keys[0].value  # type: ignore
 
         return (
             DeploymentResponse(status="Success", response=account_name, note="Deployment Successful"),
@@ -344,10 +374,67 @@ def create_storage_account(
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
+def update_firewall(deployment_name, module_name, private_ip_address):
+    """
+    Update Firewall with a new public ipfor new deployment and ammend dnat rules to allow access
+    """
+    module_fw_info = {}
+    # Authenticate the azure credentials for SAIL GLOBAL HUB
+    account_credentials = sailazure.authenticate(
+        AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
+    )
+    print("\n\n===============================================================")
+    print("UPDATING FIREWALL")
+    print("===============================================================")
+    print("\n\n===============================================================")
+    print(f"Creating new Firewall Public IP Address for {module_name} public endpoint")
+    print("===============================================================")
+    # Create the firewall public ips for platform
+    pip_name = "PIP" + "-" + deployment_name + "-" + module_name
+    firewall_ip_name, firewall_ip, firewall_ip_id = sailazure.create_public_ip(
+        account_credentials, "rg-sail-wus-hubpipdev-001", "westus", pip_name
+    )
+    module_fw_info[module_name + "-firewall_ip_name"] = firewall_ip_name
+    module_fw_info[module_name + "-firewall_ip"] = firewall_ip
+    module_fw_info[module_name + "-firewall_ip_id"] = firewall_ip_id
+    print(f"{module_name}'s firewall public ip name : {firewall_ip_name}")
+    print(f"{module_name}'s firewall public ip : {firewall_ip}")
+    print(f"{module_name}'s firewall public ip id : {firewall_ip_id}")
+
+    async_updated_fw_pip_result, firewall_ip_id, firewall_ip_name, = sailazure.update_fw_pip(
+        account_credentials,
+        firewall_ip_id,
+        firewall_ip_name,
+    )
+    print("\n===============================================================\n")
+    print(
+        f"Updated azure firewall Information:\n{async_updated_fw_pip_result}\nfirewall_ip_id:\n{firewall_ip_id}firewall_ip_name:\n{firewall_ip_name}firewall_ip:\n{firewall_ip}"
+    )
+    print("\n\n===============================================================")
+    print(f"Updating new Firewall DNAT RULES for {module_name}")
+    print("===============================================================")
+    # Update DNAT Rules per module
+    async_updated_fw_pol_result = sailazure.update_fw_dnat_rules(
+        account_credentials,
+        firewall_ip_name,
+        firewall_ip,
+        private_ip_address,
+        module_name,
+    )
+    print("\n===============================================================\n")
+    print(f"{module_name}'s Azure Firewall DNAT RULES result:\n{async_updated_fw_pol_result}")
+
+    print("\n\n===============================================================")
+    print("ENDING FUNCTION UPDATE_FIREWALL")
+    print("===============================================================")
+    return module_fw_info, async_updated_fw_pip_result
+
+
 if __name__ == "__main__":
     AZURE_SUBSCRIPTION_ID = os.environ.get("AZURE_SUBSCRIPTION_ID")
     AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID")
     AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID")
+    AZURE_OBJECT_ID = os.environ.get("AZURE_OBJECT_ID")
     AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
     OWNER = os.environ.get("OWNER")
     PURPOSE = os.environ.get("PURPOSE")
@@ -361,13 +448,34 @@ if __name__ == "__main__":
     account_credentials = sailazure.authenticate(
         AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
     )
+    account_credentials["object_id"] = AZURE_OBJECT_ID
+
     # Deploy Storage Account
     (
         storage_account,
         storage_account_name,
         storage_accout_password,
         storage_resource_group_name,
-    ) = create_storage_account(account_credentials, deployment_id, "stanaccountname", "westus")
+    ) = create_storage_account(account_credentials, deployment_id, "saildatastorage", "westus")
+
+    # Create storage account id
+    storage_account_id = (
+        "/subscriptions/"
+        + account_credentials["subscription_id"]
+        + "/resourceGroups/"
+        + storage_resource_group_name
+        + "/providers/Microsoft.Storage/storageAccounts/"
+        + storage_account_name
+    )
+
+    # Provision a key vault
+    key_vault_url = deploy_key_vault(
+        account_credentials=account_credentials,
+        deployment_name=deployment_id,
+        key_vault_name_prefix="sailkeyvault",
+        storage_account_id=storage_account_id,
+    )
+
     # Deploy the API services
     platform_services_ip = deploy_apiservices(
         account_credentials,
@@ -375,26 +483,46 @@ if __name__ == "__main__":
         storage_account_name,
         storage_accout_password,
         storage_resource_group_name,
+        key_vault_url,
         OWNER,
-        AZURE_SUBSCRIPTION_ID,
     )
     print("API Services server: ", platform_services_ip)
+
     # Deploy the frontend server
-    frontend_ip = deploy_frontend(account_credentials, deployment_id, platform_services_ip, AZURE_SUBSCRIPTION_ID)
+    frontend_ip = deploy_frontend(
+        account_credentials,
+        deployment_id,
+        platform_services_ip,
+    )
     print("Frontend server: ", frontend_ip)
 
-    print("\n\n===============================================================")
-    print("Deployment complete. Please visit the link to access the demo: https://" + frontend_ip)
-    print("SAIL API Services is hosted on: https://" + platform_services_ip + ":8000")
+    # Deploy Firewall IPv4Address and update DNAT Rules
+    api_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "apiservices", platform_services_ip)
+    web_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "newwebfrontend", frontend_ip)
 
-    print("Deployment ID: ", deployment_id)
+    # Summary
+    print("\n\n===============================================================")
+    print("================= SUMMARY: Deploy Firewall =====================")
+    print(f"apiservices-firewall_ip_name: {api_fw_info['apiservices-firewall_ip_name']}")
+    print(f"apiservices-firewall_ip: {api_fw_info['apiservices-firewall_ip']}")
+    print(f"apiservices-firewall_ip_id: {api_fw_info['apiservices-firewall_ip_id']}")
+    print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
+    print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
+    print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
+    print(
+        f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
+    )
+    print("\n\n===============================================================")
+    print("================= SUMMARY: Deploy Platform =====================")
+    print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")
+    print(
+        f"Deployment complete. Please visit the link to access the public demo: https://{web_fw_info['newwebfrontend-firewall_ip']}"
+    )
+    print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
+    print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
+    print(f"Deployment ID: {deployment_id}")
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")
 
-    # # TODO: Prawal re-enable this once the orchestrator package is ready
-    # Deploy the orchestro server
-    # orchestrator_ip = deploy_orchestrator(account_credentials, deployment_id, "orchestrator")
-    # print("Orchestrator IP: ", orchestrator_ip)
-
-    # Delete the resource group for the backend server
-    # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
+    # # Delete the resource group for the backend server
+    # # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")

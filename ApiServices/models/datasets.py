@@ -17,7 +17,7 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel, KeyVaultObject
 
 
 class DatasetState(Enum):
@@ -27,11 +27,17 @@ class DatasetState(Enum):
     ERROR = "ERROR"
 
 
+class DatasetFormat(Enum):
+    FHIR = "FHIR"
+    CSV = "CSV"
+
+
 class Dataset_Base(SailBaseModel):
     # TODO: Prawal add a StrictStr validator for string lenght
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
     tags: StrictStr = Field(...)
+    format: DatasetFormat = Field(...)
 
 
 class Dataset_Db(Dataset_Base):
@@ -39,8 +45,8 @@ class Dataset_Db(Dataset_Base):
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     state: DatasetState = Field(...)
-    note: StrictStr = Field(default="")
-    encryption_key_id: Optional[PyObjectId] = Field(default=None)
+    note: Optional[StrictStr] = Field(default=None)
+    encryption_key: Optional[KeyVaultObject] = Field(default=None)
 
 
 class RegisterDataset_In(Dataset_Base):
@@ -63,8 +69,12 @@ class GetDataset_Out(Dataset_Base):
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization: BasicObjectInfo = Field(...)
     state: DatasetState = Field(...)
-    note: StrictStr = Field(...)
+    note: Optional[StrictStr] = Field(default=None)
 
 
 class GetMultipleDataset_Out(SailBaseModel):
     datasets: List[GetDataset_Out] = Field(default_factory=list)
+
+
+class DatasetEncryptionKey_Out(SailBaseModel):
+    dataset_key: str = Field(...)

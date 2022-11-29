@@ -14,11 +14,17 @@
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, StrictStr
+from typing import Optional
 
 
 class PyObjectId(UUID):
-    def __init__(self):
-        return super().__init__(str(uuid4()))
+    def __init__(self, value: Optional[str] = None, empty: bool = False):
+        if empty:
+            return super().__init__(str(UUID(int=0)))
+        elif value is None:
+            return super().__init__(str(uuid4()))
+        else:
+            return super().__init__(value)
 
     @classmethod
     def __get_validators__(cls):
@@ -44,3 +50,8 @@ class SailBaseModel(BaseModel):
 class BasicObjectInfo(SailBaseModel):
     id: PyObjectId = Field(..., alias="_id")
     name: StrictStr = Field(...)
+
+
+class KeyVaultObject(BaseModel):
+    name: StrictStr = Field(...)
+    version: StrictStr = Field(...)

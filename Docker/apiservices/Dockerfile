@@ -17,7 +17,7 @@ RUN apt-get update && \
   sudo \
   build-essential \
   python3-pip \
-  iputils-ping
+  jq
 
 # Install mongodb
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
@@ -36,6 +36,10 @@ COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY nginx.conf /etc/nginx/nginx.conf
+
+RUN useradd --system promtail
+COPY promtail-local-config.yaml /promtail-local-config.yaml
+COPY promtail-linux-amd64 /promtail-linux-amd64
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

@@ -17,8 +17,8 @@ from typing import List, Optional
 
 from pydantic import Field, StrictStr
 
-from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
-from models.secure_computation_nodes import SecureComputationNodeType
+from models.common import BasicObjectInfo, KeyVaultObject, PyObjectId, SailBaseModel
+from models.secure_computation_nodes import SecureComputationNodeSize
 
 
 class DataFederationState(Enum):
@@ -26,9 +26,20 @@ class DataFederationState(Enum):
     INACTIVE = "INACTIVE"
 
 
+class DataFederationDataFormat(Enum):
+    CSV = "CSV"
+    FHIR = "FHIR"
+
+
 class DataFederation_Base(SailBaseModel):
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
+    data_format: DataFederationDataFormat = Field(...)
+
+
+class DataSubmitterIdKeyPair(SailBaseModel):
+    organization_id: PyObjectId = Field(...)
+    key: KeyVaultObject = Field(...)
 
 
 class DataFederation_Db(DataFederation_Base):
@@ -36,7 +47,7 @@ class DataFederation_Db(DataFederation_Base):
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     state: DataFederationState = Field(...)
-    data_submitter_organizations_id: List[PyObjectId] = Field(default_factory=list)
+    data_submitters: List[DataSubmitterIdKeyPair] = Field(default_factory=list)
     research_organizations_id: List[PyObjectId] = Field(default_factory=list)
     datasets_id: List[PyObjectId] = Field(default_factory=list)
     data_submitter_organizations_invites_id: List[PyObjectId] = Field(default_factory=list)
@@ -127,13 +138,14 @@ class GetMultipleInvite_Out(SailBaseModel):
 
 class DataFederationProvision_Base(SailBaseModel):
     data_federation_id: PyObjectId = Field(...)
-    secure_computation_nodes_type: SecureComputationNodeType = Field(...)
+    secure_computation_nodes_size: SecureComputationNodeSize = Field(...)
 
 
 class DataFederationProvision_Db(DataFederationProvision_Base):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
+    smart_broker_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 
@@ -141,6 +153,7 @@ class GetDataFederationProvision(DataFederationProvision_Base):
     id: PyObjectId = Field(alias="_id")
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
+    smart_broker_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 
@@ -156,8 +169,5 @@ class RegisterDataFederationProvision_Out(DataFederationProvision_Base):
     id: PyObjectId = Field(alias="_id")
     creation_time: datetime = Field(...)
     organization_id: PyObjectId = Field(...)
+    smart_broker_id: PyObjectId = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(...)
-
-
-class DatasetEncryptionKey_Out(SailBaseModel):
-    dataset_key: str = Field(...)

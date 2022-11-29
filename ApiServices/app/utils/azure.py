@@ -3,6 +3,8 @@
 # azure.py
 # -------------------------------------------------------------------------------
 """Temporary azure functions"""
+import asyncio
+
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -14,18 +16,27 @@
 import json
 import os
 import random
+from base64 import b64decode, b64encode
+from dataclasses import dataclass
 from datetime import datetime
-
-from app.utils.secrets import get_secret
-from pydantic import BaseModel, Field, StrictStr
+from typing import Optional
 
 from azure.core.exceptions import AzureError
-from azure.identity import ClientSecretCredential
-from azure.mgmt.network import NetworkManagementClient
-from azure.mgmt.resource import ResourceManagementClient
-from azure.mgmt.resource.resources.models import DeploymentMode
-from azure.mgmt.storage import StorageManagementClient
-from azure.storage.fileshare import FileSasPermissions, ShareDirectoryClient, generate_file_sas
+from azure.core.polling import AsyncLROPoller
+from azure.identity.aio import ClientSecretCredential
+from azure.keyvault.keys.aio import KeyClient
+from azure.keyvault.keys.crypto.aio import KeyWrapAlgorithm
+from azure.keyvault.secrets.aio import SecretClient
+from azure.mgmt.network.aio import NetworkManagementClient
+from azure.mgmt.resource.resources.aio import ResourceManagementClient
+from azure.mgmt.resource.resources.models import DeploymentMode, ResourceGroup
+from azure.mgmt.storage.aio import StorageManagementClient
+from azure.storage.fileshare import FileSasPermissions, generate_file_sas
+from azure.storage.fileshare.aio import ShareDirectoryClient
+from pydantic import BaseModel, Field, StrictStr
+
+from app.utils.secrets import get_secret
+from models.common import KeyVaultObject
 
 
 class DeploymentResponse(BaseModel):
@@ -44,8 +55,17 @@ class DeleteResponse(BaseModel):
     note: StrictStr = Field(...)
 
 
-def authentication_shared_access_signature(
-    account_credentials,
+@dataclass
+class AzureCredentials:
+    """Azure credentials."""
+
+    credentials: ClientSecretCredential
+    subscription_id: str
+    location: str
+
+
+async def authentication_shared_access_signature(
+    account_credentials: AzureCredentials,
     account_name: str,
     resource_group_name: str,
     file_path: str,
@@ -57,7 +77,7 @@ def authentication_shared_access_signature(
     Get the connection string for the storage account and file share.
 
     :param account_credentials: The account credentials.
-    :type account_credentials: dict
+    :type account_credentials: AzureCredentials
     :param account_name: The account name.
     :type account_name: str
     :param resource_group_name: The resource group name.
@@ -76,11 +96,11 @@ def authentication_shared_access_signature(
     try:
         # Create a client to the storage account.
         storage_client = StorageManagementClient(
-            account_credentials["credentials"], account_credentials["subscription_id"]
+            credential=account_credentials.credentials, subscription_id=account_credentials.subscription_id  # type: ignore
         )
 
         # Get the storage account key.
-        keys = storage_client.storage_accounts.list_keys(resource_group_name, account_name)
+        keys = await storage_client.storage_accounts.list_keys(resource_group_name, account_name)
 
         # Create a connection string to the file share.
         sas_token = generate_file_sas(
@@ -99,7 +119,7 @@ def authentication_shared_access_signature(
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
-def file_share_create_directory(
+async def file_share_create_directory(
     connection_string: str, file_share_name: str, directory_name: str
 ) -> DeploymentResponse:
     """
@@ -119,7 +139,7 @@ def file_share_create_directory(
         directory_client = ShareDirectoryClient.from_connection_string(
             conn_str=connection_string, share_name=file_share_name, directory_path=directory_name
         )
-        create_response = directory_client.create_directory()
+        create_response = await directory_client.create_directory()  # type: ignore
 
         return DeploymentResponse(status="Success", note="Deployment Successful")
     except AzureError as azure_error:
@@ -128,14 +148,14 @@ def file_share_create_directory(
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
-def get_storage_account_connection_string(
-    account_credentials: dict, resource_group_name: str, account_name: str
+async def get_storage_account_connection_string(
+    account_credentials: AzureCredentials, resource_group_name: str, account_name: str
 ) -> DeploymentResponse:
     """
     Get the connection string for the storage account and file share.
 
     :param account_credentials: user account credentials
-    :type account_credentials: dict
+    :type account_credentials: AzureCredentials
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :param account_name: The account name.
@@ -145,12 +165,10 @@ def get_storage_account_connection_string(
     """
     try:
         # Create a client to the storage account.
-        storage_client = StorageManagementClient(
-            account_credentials["credentials"], account_credentials["subscription_id"]
-        )
+        storage_client = StorageManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
 
         # Get the storage account key.
-        keys = storage_client.storage_accounts.list_keys(resource_group_name, account_name)
+        keys = await storage_client.storage_accounts.list_keys(resource_group_name, account_name)
 
         # Create a connection string to the file share.
         conn_string = f"DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName={account_name};AccountKey={keys.keys[0].value}"  # type: ignore
@@ -162,7 +180,7 @@ def get_storage_account_connection_string(
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
-def get_randomized_name(prefix: str) -> str:
+async def get_randomized_name(prefix: str) -> str:
     """
     Get a randomized name.
 
@@ -174,14 +192,14 @@ def get_randomized_name(prefix: str) -> str:
     return f"{prefix}{random.randint(1,100000):05}"
 
 
-def create_storage_account(
-    account_credentials: dict, resource_group_name: str, account_name_prefix: str, location: str
+async def create_storage_account(
+    account_credentials: AzureCredentials, resource_group_name: str, account_name_prefix: str, location: str
 ) -> DeploymentResponse:
     """
     Create a storage account and file share.
 
     :param account_credentials: The account credentials.
-    :type account_credentials: dict
+    :type account_credentials: AzureCredentials
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :param account_name_prefix: The account name prefix.
@@ -194,34 +212,30 @@ def create_storage_account(
     """
     try:
         # Provision the storage account, starting with a management object.
-        storage_client = StorageManagementClient(
-            account_credentials["credentials"], account_credentials["subscription_id"]
-        )
+        storage_client = StorageManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
 
         # Check if the account name is available. Storage account names must be unique across
         # Azure because they're used in URLs.
         number_tries = 0
         name_found = False
-        account_name = get_randomized_name(account_name_prefix)
+        account_name = await get_randomized_name(account_name_prefix)
         while (name_found is False) and (number_tries < 10):
             number_tries += 1
-            availability_result = storage_client.storage_accounts.check_name_availability({"name": account_name})  # type: ignore
+            availability_result = await storage_client.storage_accounts.check_name_availability({"name": account_name})  # type: ignore
             if availability_result.name_available:
                 name_found = True
             else:
-                account_name_prefix = get_randomized_name(account_name_prefix)
+                account_name_prefix = await get_randomized_name(account_name_prefix)
 
         if name_found is False:
             raise Exception("Unable to find an available storage account name.")
 
         # The name is available, so provision the account
-        poller = storage_client.storage_accounts.begin_create(
+        await storage_client.storage_accounts.begin_create(
             resource_group_name,
             account_name,
             {"location": location, "kind": "StorageV2", "sku": {"name": "Standard_LRS"}},  # type: ignore
         )
-        # Long-running operations return a poller object; calling poller.result() waits for completion.
-        account_result = poller.result()
 
         return DeploymentResponse(status="Success", response=account_name, note="Deployment Successful")
     except AzureError as azure_error:
@@ -230,14 +244,14 @@ def create_storage_account(
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
-def create_file_share(
-    account_credentials: dict, resource_group_name: str, account_name: str, file_share_name: str
+async def create_file_share(
+    account_credentials: AzureCredentials, resource_group_name: str, account_name: str, file_share_name: str
 ) -> DeploymentResponse:
     """
     Create a file share in azure storage account.
 
     :param account_credentials: The account credentials.
-    :type account_credentials: dict
+    :type account_credentials: AzureCredentials
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :param account_name: The account name.
@@ -248,12 +262,10 @@ def create_file_share(
     :rtype: DeploymentResponse
     """
     try:
-        storage_client = StorageManagementClient(
-            account_credentials["credentials"], account_credentials["subscription_id"]
-        )
+        storage_client = StorageManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
 
         # Create a file share in the storage account.
-        storage_client.file_shares.create(resource_group_name, account_name, file_share_name, {})  # type: ignore
+        await storage_client.file_shares.create(resource_group_name, account_name, file_share_name, {})  # type: ignore
 
         return DeploymentResponse(status="Success", note="Deployment Successful")
     except AzureError as azure_error:
@@ -262,12 +274,12 @@ def create_file_share(
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
-def create_resource_group(accountCredentials: dict, resource_group_name: str, location: str):
+async def create_resource_group(account_credentials: AzureCredentials, resource_group_name: str):
     """
     Deploy the template to a resource group.
 
-    :param accountCredentials: The account credentials.
-    :type accountCredentials: dict
+    :param account_credentials: The account credentials.
+    :type account_credentials: AzureCredentials
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :param location: The location.
@@ -275,36 +287,38 @@ def create_resource_group(accountCredentials: dict, resource_group_name: str, lo
     :return: provisioning state of the resource group.
     :rtype: str
     """
-    client = ResourceManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
-    response = client.resource_groups.create_or_update(resource_group_name, {"location": location})  # type: ignore
+
+    client = ResourceManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
+    response: ResourceGroup = await client.resource_groups.create_or_update(resource_group_name, {"location": account_credentials.location})  # type: ignore
     return response.properties.provisioning_state  # type: ignore
 
 
-def authenticate(client_id: str, client_secret: str, tenant_id: str, subscription_id: str) -> dict:
+async def authenticate() -> AzureCredentials:
     """
     Authenticate using client_id and client_secret.
 
-    :param client_id: The client id.
-    :type client_id: str
-    :param client_secret: The client secret.
-    :type client_secret: str
-    :param tenant_id: The tenant id.
-    :type tenant_id: str
-    :param subscription_id: The azure subscription id to use.
-    :type subscription_id: str
     :return: The credentials and subscription id.
     :rtype: dict
     """
-    credentials = ClientSecretCredential(client_id=client_id, client_secret=client_secret, tenant_id=tenant_id)
-    return {"credentials": credentials, "subscription_id": subscription_id}
+
+    credentials = ClientSecretCredential(
+        client_id=get_secret("azure_client_id"),
+        client_secret=get_secret("azure_client_secret"),
+        tenant_id=get_secret("azure_tenant_id"),
+    )
+    return AzureCredentials(
+        credentials=credentials, subscription_id=get_secret("azure_subscription_id"), location="westus"
+    )
 
 
-def deploy_template(accountCredentials: str, resource_group_name: str, template: str, parameters: dict):
+async def deploy_template(
+    account_credentials: AzureCredentials, resource_group_name: str, template: str, parameters: dict
+):
     """
     Deploy the template to a resource group.
 
-    :param accountCredentials: The account credentials.
-    :type accountCredentials: str
+    :param account_credentials: The account credentials.
+    :type account_credentials: str
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :param template: The azure arm template.
@@ -313,7 +327,7 @@ def deploy_template(accountCredentials: str, resource_group_name: str, template:
     :type parameters: dict
     :return: The deployment response.
     """
-    client = ResourceManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
+    client = ResourceManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
 
     parameters = {k: {"value": v} for k, v in parameters.items()}
     deployment_properties = {
@@ -322,29 +336,32 @@ def deploy_template(accountCredentials: str, resource_group_name: str, template:
         "parameters": parameters,
     }
 
-    deployment_async_operation = client.deployments.begin_create_or_update(
-        resource_group_name, "azure-sample", {"properties": deployment_properties}  # type: ignore
+    # Get a unique deployment name
+    deployment_name = await get_randomized_name("deployment")
+
+    # Deploy the template
+    deployment_state: AsyncLROPoller = await client.deployments.begin_create_or_update(
+        resource_group_name, deployment_name, {"properties": deployment_properties}  # type: ignore
     )
-    deployment_async_operation.wait()
 
-    return deployment_async_operation.status()
+    # Wait for the deployment to complete
+    await deployment_state.wait()
 
 
-def delete_resouce_group(accountCredentials: dict, resource_group_name: str) -> DeleteResponse:
+async def delete_resouce_group(account_credentials: AzureCredentials, resource_group_name: str) -> DeleteResponse:
     """
     Delete the resource group.
 
-    :param accountCredentials: The account credentials.
-    :type accountCredentials: str
+    :param account_credentials: The account credentials.
+    :type account_credentials: str
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :return: The delete response.
     :rtype: DeleteResponse
     """
     try:
-        client = ResourceManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
-        delete_async_operation = client.resource_groups.begin_delete(resource_group_name)
-        delete_async_operation.wait()
+        client = ResourceManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
+        delete_async_operation = await client.resource_groups.begin_delete(resource_group_name)
 
         return DeleteResponse(status="Success", note="")
     except AzureError as azure_error:
@@ -353,12 +370,12 @@ def delete_resouce_group(accountCredentials: dict, resource_group_name: str) -> 
         return DeleteResponse(status="Fail", note=str(exception))
 
 
-def get_ip(accountCredentials: dict, resource_group_name: str, ip_resource_name: str) -> str:
+async def get_ip(account_credentials: AzureCredentials, resource_group_name: str, ip_resource_name: str) -> str:
     """
     Get the IP address of the resource.
 
-    :param accountCredentials: The account credentials.
-    :type accountCredentials: dict
+    :param account_credentials: The account credentials.
+    :type account_credentials: AzureCredentials
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :param ip_resource_name: The ip resource name.
@@ -366,19 +383,43 @@ def get_ip(accountCredentials: dict, resource_group_name: str, ip_resource_name:
     :return: The ip address.
     :rtype: str
     """
-    client = NetworkManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
-    foo = client.public_ip_addresses.get(resource_group_name, ip_resource_name)
+    client = NetworkManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
+    foo = await client.public_ip_addresses.get(resource_group_name, ip_resource_name)
     return foo.ip_address
 
 
-def deploy_module(
-    account_credentials: dict, resource_group_name: str, module_name: str, virtual_machine_name: str, vm_size: str
+async def get_private_ip(
+    account_credentials: AzureCredentials, resource_group_name: str, network_interface_name: str
+) -> str:
+    """
+    Get the private IP address of the resource.
+
+    :param account_credentials: The account credentials.
+    :type account_credentials: AzureCredentials
+    :param resource_group_name: The resource group name.
+    :type resource_group_name: str
+    :param network_interface_name: The network interface name.
+    :type network_interface_name: str
+    :return: The private ip address.
+    :rtype: str
+    """
+    client = NetworkManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
+    network_interfaces = await client.network_interfaces.get(resource_group_name, network_interface_name)
+    return network_interfaces.ip_configurations[0].private_ip_address
+
+
+async def deploy_module(
+    account_credentials: AzureCredentials,
+    resource_group_name: str,
+    module_name: str,
+    virtual_machine_name: str,
+    vm_size: str,
 ) -> DeploymentResponse:
     """
     Deploy the template to a resource group.
 
     :param account_credentials: The account credentials.
-    :type account_credentials: dict
+    :type account_credentials: AzureCredentials
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
     :param module_name: The name of the module.
@@ -392,7 +433,7 @@ def deploy_module(
     """
     try:
         # Create the resource group
-        create_resource_group(account_credentials, resource_group_name, "westus")
+        await create_resource_group(account_credentials, resource_group_name)
 
         template_path = os.path.join(module_name + ".json")
 
@@ -408,9 +449,11 @@ def deploy_module(
             "subnetName": get_secret("azure_scn_subnet_name"),
             "virtualNetworkId": get_secret("azure_scn_virtual_network_id"),
         }
-        deploy_status = deploy_template(account_credentials, resource_group_name, template, parameters)
+        await deploy_template(account_credentials, resource_group_name, template, parameters)
 
-        virtual_machine_public_ip = get_ip(account_credentials, resource_group_name, virtual_machine_name + "-ip")
+        virtual_machine_public_ip = await get_private_ip(
+            account_credentials, resource_group_name, virtual_machine_name + "-nic"
+        )
 
         return DeploymentResponse(status="Success", ip_address=virtual_machine_public_ip, note="Deployment Successful")
 
@@ -418,3 +461,96 @@ def deploy_module(
         return DeploymentResponse(status="Fail", ip_address="", note=str(azure_error))
     except Exception as exception:
         return DeploymentResponse(status="Fail", ip_address="", note=str(exception))
+
+
+async def create_rsa_key(
+    account_credentials: AzureCredentials, key_name: str, key_size: int
+) -> Optional[KeyVaultObject]:
+    """
+    Create an RSA key of given size(minimum 3072).
+
+    :param account_credentials: The account credentials.
+    :type account_credentials: AzureCredentials
+    """
+    key_client = KeyClient(vault_url=get_secret("azure_keyvault_url"), credential=account_credentials.credentials)  # type: ignore
+
+    if key_size < 3072:
+        raise ValueError("Key size must be at least 3072 bits.")
+
+    # Create an RSA key
+    rsa_key = await key_client.create_rsa_key(key_name, size=key_size)
+
+    if not rsa_key.properties.version:
+        raise ValueError("Key version is not set.")
+
+    return KeyVaultObject(name=key_name, version=rsa_key.properties.version)
+
+
+async def wrap_aes_key(aes_key: bytes, wrapping_key: KeyVaultObject) -> Optional[KeyVaultObject]:
+    """
+    Wrap the AES key with the RSA key and then store it in the keyvault.
+
+    :param account_credentials: The account credentials.
+    :type account_credentials: AzureCredentials
+    :param aes_key: The AES key.
+    :type aes_key: bytes
+    :param rsa_key_id: The RSA key id.
+    :type rsa_key_id: str
+    """
+    # Authenticate to Azure
+    account_credentials = await authenticate()
+
+    # Wrap the AES key with the RSA key
+    key_client = KeyClient(vault_url=get_secret("azure_keyvault_url"), credential=account_credentials.credentials)  # type: ignore
+
+    # There is an option to add the key version to the key name, but it is not required.
+    crypto_client = key_client.get_cryptography_client(key_name=wrapping_key.name, key_version=wrapping_key.version)
+
+    # Wrap the AES key with the RSA key
+    wrapped_aes_key = await crypto_client.wrap_key(KeyWrapAlgorithm.rsa_oaep_256, aes_key)
+
+    # Store the wrapped AES key in the keyvault as a secret
+    secret_client = SecretClient(vault_url=get_secret("azure_keyvault_url"), credential=account_credentials.credentials)  # type: ignore
+    encoded_key = b64encode(wrapped_aes_key.encrypted_key).decode("ascii")
+
+    # The secret is created with the same name as the wrapping key
+    secret_set_response = await secret_client.set_secret(wrapping_key.name, encoded_key)
+
+    if not secret_set_response.name or not secret_set_response.properties.version:
+        raise ValueError("Secret name or version is not set.")
+
+    return KeyVaultObject(name=secret_set_response.name, version=secret_set_response.properties.version)
+
+
+async def unwrap_aes_with_rsa_key(wrapped_aes_key: KeyVaultObject, wrapping_key: KeyVaultObject) -> bytes:
+    """
+    Unwrap the AES key with the RSA key.
+
+    :param account_credentials: The account credentials.
+    :type account_credentials: AzureCredentials
+    :param wrapped_aes_key: The wrapped AES key.
+    :type wrapped_aes_key: bytes
+    :param rsa_key_id: The RSA key id.
+    :type rsa_key_id: str
+    :return: The unwrapped AES key.
+    :rtype: bytes
+    """
+    # Authenticate to Azure
+    account_credentials = await authenticate()
+
+    # Get the secret from the keyvault
+    secret_client = SecretClient(vault_url=get_secret("azure_keyvault_url"), credential=account_credentials.credentials)  # type: ignore
+    secret_get_response = await secret_client.get_secret(name=wrapped_aes_key.name, version=wrapped_aes_key.version)
+
+    # UnWrap the secret with the RSA key
+    key_client = KeyClient(vault_url=get_secret("azure_keyvault_url"), credential=account_credentials.credentials)  # type: ignore
+    crypto_client = key_client.get_cryptography_client(key_name=wrapping_key.name, key_version=wrapping_key.version)
+
+    if not secret_get_response.value:
+        raise ValueError("Secret value is not set.")
+
+    unwrapped_aes_key = await crypto_client.unwrap_key(
+        KeyWrapAlgorithm.rsa_oaep_256, b64decode(secret_get_response.value.encode("ascii"))
+    )
+
+    return unwrapped_aes_key.key

@@ -25,6 +25,7 @@ mkdir -p "$imageName"_dir
 
 # Copy the binaries to the folder
 cp vm_initializer.py "$imageName"_dir/
+cp decrypt_file.py "$imageName"_dir/
 
 # Run the docker container
 docker run \

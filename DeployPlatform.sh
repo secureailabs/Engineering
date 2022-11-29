@@ -54,6 +54,10 @@ if [ -z "${AZURE_CLIENT_SECRET}" ]; then
   echo "environment variable AZURE_CLIENT_SECRET is undefined"
   exit 1
 fi
+if [ -z "${AZURE_OBJECT_ID}" ]; then
+  echo "environment variable AZURE_OBJECT_ID is undefined"
+  exit 1
+fi
 
 # Build and Package the Platform Services
 make package_apiservices -j
@@ -65,9 +69,6 @@ mkdir -p $tempDeployDir
 
 # Copy the files to the temporary directory
 cp Binary/DatabaseInitializationTool $tempDeployDir
-cp Binary/igr_001.csvp $tempDeployDir
-cp Binary/igr_002.csvp $tempDeployDir
-cp Binary/mgr_001.csvp $tempDeployDir
 cp Binary/DatabaseInitializationSettings.json $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 cp Binary/newwebfrontend.tar.gz $tempDeployDir
@@ -98,6 +99,7 @@ docker run \
   --env AZURE_TENANT_ID=$AZURE_TENANT_ID \
   --env AZURE_CLIENT_ID=$AZURE_CLIENT_ID \
   --env AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET \
+  --env AZURE_OBJECT_ID=$AZURE_OBJECT_ID \
   azuredeploymenttools
 popd
 

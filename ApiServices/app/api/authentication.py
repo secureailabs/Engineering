@@ -15,6 +15,7 @@ from time import time
 from typing import List
 
 from app.data import operations as data_service
+from app.log import log_message
 from app.utils.secrets import get_secret
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -109,6 +110,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         algorithm=ALGORITHM,
     )
 
+    message = f"[Login For Access Token]: user_email:{form_data.username}"
+    await log_message(message)
+
     return LoginSuccess_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
 
@@ -148,12 +152,11 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
             algorithm=ALGORITHM,
         )
 
+        message = f"[Refresh For Access Token]: user_id: {user_id}"
+        await log_message(message)
+
     except JWTError as exception:
         raise credentials_exception
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
 
     return LoginSuccess_Out(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
@@ -180,5 +183,8 @@ async def get_current_user_info(current_user: User_Db = Depends(get_current_user
     if not found_organization:
         raise HTTPException(status_code=404, detail="Organization not found")
     found_organization_db = Organization_db(**found_organization)
+
+    message = f"[Get Current User Info]: user_id:{current_user.id}"
+    await log_message(message)
 
     return UserInfo_Out(**found_user_db.dict(), organization=BasicObjectInfo(**found_organization_db.dict()))

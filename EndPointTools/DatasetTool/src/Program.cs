@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 
 namespace DatasetTool;
 
@@ -43,33 +43,46 @@ class Program
                 // Create a user session object
                 var user_session = new UserSession(ip_address, email, password);
 
+                // Get the data federation id
+                ModelDataFederation data_federation = user_session.GetFederation(dataset_configuration.m_configuration.data_federation);
+                if (data_federation == null)
+                {
+                    throw new Exception("Data federation not found");
+                }
+
+                // Check if the dataset configuration format matches the data federation format
+                if (dataset_configuration.m_configuration.dataset.format != data_federation.data_format)
+                {
+                    throw new Exception("Dataset format does not match the data federation designated format");
+                }
+
                 // Get the list of the datasets
                 Guid dataset_id = user_session.GetDatasetId(dataset_configuration.m_configuration.dataset.name);
-
                 // If the dataset is not found, create it
                 if (dataset_id.CompareTo(Guid.Empty) == 0)
                 {
                     System.Console.WriteLine("Dataset not found, creating it");
-                    dataset_id = user_session.CreateDatasetAndAddToFederation(dataset_configuration.m_configuration.dataset, dataset_configuration.m_configuration.data_federation);
+                    dataset_id = user_session.CreateDatasetAndAddToFederation(dataset_configuration.m_configuration.dataset, data_federation.id);
                 }
 
                 // Create and Register the dataset version metadata
                 var dataset_version = new DatasetVersion(dataset_configuration.m_configuration.dataset_version.name,
                     dataset_configuration.m_configuration.dataset_version.description,
                     dataset_configuration.m_configuration.dataset_version.tags,
-                    dataset_id);
+                    dataset_id,
+                    dataset_configuration.m_configuration.dataset.format);
 
                 // Add all the dataset files
                 foreach (var data_source in dataset_configuration.m_configuration.data_source)
                 {
-                    dataset_version.AddDatasetFile(data_source);
+                    dataset_version.AddDatasetSource(data_source);
                 }
 
                 // Register the dataset version with the portal
                 Guid dataset_version_id = user_session.RegisterDatasetVersion(dataset_id, dataset_version.GetMetadataJson());
 
                 // Update the dataset version with the dataset files
-                dataset_version.dataset_version_id = dataset_version_id;
+                dataset_version.m_dataset_version_id = dataset_version_id;
 
                 // Get the azure connection string
                 var azure_connection_string = user_session.GetConnectionStringForDatasetVersion(dataset_version_id);
@@ -78,8 +91,12 @@ class Program
                     throw new Exception("Could not get the connection string for the dataset version");
                 }
 
+                // Get the encryption key from the backend
+                string encryption_key = user_session.GetEncryptionKeyForDataset(dataset_id, data_federation.id);
+                // string encryption_key = "DhA5lu3lYGnvOIztQn/IGLX6ar1T25AuVaMMuwLuJGs=";
+
                 // Upload the dataset
-                dataset_version.UploadToAzure(azure_connection_string);
+                dataset_version.ValidateAndUploadToAzure(azure_connection_string, encryption_key);
 
                 // Mark the dataset version as ready
                 user_session.MarkDatasetVersionAsActive(dataset_version_id);

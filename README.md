@@ -13,24 +13,13 @@ Open a terminal and clone the git repository:
 $ git clone https://github.com/secureailabs/Engineering.git
 ```
 
-# Installing and Configuring MongoDB
-
-Run install.sh to install and configure MongoDB Community Edition, MongoDB C Driver, and MongoDB C++ Driver on Ubuntu 20.04.
-
-## Running the Script
-
-Open a terminal and add install.sh as an executable:
+## For a full end-to-end deployment
+Download the datascience repository which is added as a submodule to this repository
 ```sh
-sudo chmod +x install.sh
-```
-
-Run the script:
-```sh
-./install.sh
+git submodule update
 ```
 
 ## Building Binaries
-
 From root of Repository run the following commands to build and verify Binaries
 
 **Linux**
@@ -38,7 +27,7 @@ From root of Repository run the following commands to build and verify Binaries
 make clean
 make all -j
 ```
-Outputs: 
+Outputs:
 ```
 ll -lrt Binary/
 ```
@@ -53,10 +42,13 @@ WindowsPlatformDeliverables.tar
 ```
 
 ## DeployPlatform to Azure
+DeployPlatform is required to run behind SAIL VPN. \
+Please ensure connection to `vnet-sail-wus-hub-001` and have access to SAIL private vnets in Azure \
+
 Set environment variables to use `Deploy Platform Service Principal` - Ask Stanley if unclear \
 `AZURE_SUBSCRIPTION_ID` should reflect the Azure Subscription you wish to deploy your resources in.
 ```
-export AZURE_SUBSCRIPTION_ID="xxxx" 
+export AZURE_SUBSCRIPTION_ID="xxxx"
 export AZURE_TENANT_ID="xxxx"
 export AZURE_CLIENT_ID="xxxx"
 export AZURE_CLIENT_SECRET="xxxx"
@@ -68,4 +60,4 @@ Run the DeployPlatform script with `--help` for guidance
 
 ## DeployPlatform locally with Docker
 There is a readme under `Docker/`
-Please see the documentation 
+Please see the documentation

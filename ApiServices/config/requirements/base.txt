@@ -55,7 +55,9 @@ motor==3.0.0
 pymongo==4.1.1
 # python-multipart
 python-multipart==0.0.5
+aiohttp==3.8.3
 # Temporary to apiservices
+pyzmq==22.0.3
 azure-mgmt-resource
 msrestazure
 azure-identity
@@ -63,3 +65,5 @@ azure-mgmt-compute
 azure-mgmt-network
 azure-mgmt-storage
 azure-storage-file-share
+azure-keyvault-keys
+azure-keyvault-secrets

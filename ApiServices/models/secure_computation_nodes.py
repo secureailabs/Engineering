@@ -22,8 +22,13 @@ from pydantic import Field, StrictStr
 from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
-class SecureComputationNodeType(Enum):
+class SecureComputationNodeSize(Enum):
     Standard_D4s_v4 = "Standard_D4s_v4"
+
+
+class SecureComputationNodeType(Enum):
+    SCN = "SCN"
+    SMART_BROKER = "SMART_BROKER"
 
 
 class SecureComputationNodeState(Enum):
@@ -44,6 +49,7 @@ class SecureComputationNode_Base(SailBaseModel):
     data_federation_provision_id: PyObjectId = Field(...)
     dataset_id: PyObjectId = Field(...)
     dataset_version_id: PyObjectId = Field(...)
+    size: SecureComputationNodeSize = Field(...)
     type: SecureComputationNodeType = Field(...)
 
 
@@ -94,3 +100,16 @@ class SecureComputationNodeInitializationVector(SailBaseModel):
     storage_account_name: StrictStr = Field(...)
     dataset_version_id: PyObjectId = Field(...)
     dataset_id: PyObjectId = Field(...)
+    dataset_key: StrictStr = Field(...)
+
+
+class SmartBrokerScnInfo(SailBaseModel):
+    id: PyObjectId = Field(alias="_id")
+    ip_address: IPv4Address = Field(...)
+    dataset_id: PyObjectId = Field(...)
+    dataset_version_id: PyObjectId = Field(...)
+
+
+class SmartBrokerInitializationVector(SailBaseModel):
+    access_token: StrictStr = Field(...)
+    secure_computation_nodes: List[SmartBrokerScnInfo] = Field(...)

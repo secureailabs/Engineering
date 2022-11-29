@@ -47,7 +47,7 @@ for dataset in $datasets; do
     mv local_dataset/$dataset $dir_name/
     echo "Launching SCN $scn_name"
     sed "s/LOCAL_DATASET_NAME/$dataset/g" rpcrelated/InitializationVector_local.json > rpcrelated/InitializationVector.json
-    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -r $dsRepo -d > /dev/null
+    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -r $dsRepo -d
     if [ -z "$scn_names" ]; then
         scn_names="$scn_name"
     else

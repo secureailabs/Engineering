@@ -18,6 +18,9 @@ fi
 
 # Unpack the tar package
 tar -xvf package.tar.gz
+ls /app
+# Move the DS Library to /ds
+mv /app/datascience /ds
 
 # Use the InitializationVector to get the connection string of the dataset
 datasetStoragePassword=$(cat InitializationVector.json | jq -r '.dataset_storage_password')
@@ -66,6 +69,7 @@ fi
 
 # Install the rpc library
 pip3 install /app/zero
+ls /ds
 pip3 install /ds/sail-safe-functions
 pip3 install /ds/sail-safe-functions-orchestrator
 pip3 install /ds/helper-libs

@@ -70,8 +70,8 @@ declare -a ListOfDockerImages=(
     "newwebfrontend"
     "securecomputationnode"
     "devopsconsole"
-    "rpcrelated",
-    "smart_broker",
+    "rpcrelated"
+    "smart_broker"
     "auditserver"
 )
 

@@ -3,13 +3,8 @@ set -e
 
 PrintHelp() {
     echo ""
-<<<<<<< HEAD
-    echo "Usage: $0 -s [Service Name] -d -c -n [Docker Name] -x [SCN Names] -r [DS Repo Path]"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | smart_broker"
-=======
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver"
->>>>>>> main
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver | smart_broker"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     echo -e "\t-n Name to give the running docker image"
@@ -115,14 +110,8 @@ elif [ "apiservices" == "$imageName" ]; then
     make -C $rootDir package_apiservices -s -j
     # Check for Azure environment variables
     if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
-<<<<<<< HEAD
-        echo "environment variable AZURE_SUBSCRIPTION_ID is undefined, setting to development subscription"
-        AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
-=======
         echo "environment variable AZURE_SUBSCRIPTION_ID is undefined. Using development as default."
         AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
-        # exit 1
->>>>>>> main
     fi
     if [ ${AZURE_SUBSCRIPTION_ID} == "3d2b9951-a0c8-4dc3-8114-2776b047b15c" ]; then
         cp apiservices/InitializationVectorScratchPad.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
@@ -151,8 +140,13 @@ elif [ "securecomputationnode" == "$imageName" ]; then
     cp securecomputationnode/InitializationVector.json $rootDir/Binary/securecomputationnode_dir
     runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6801 -v $rootDir/Binary/securecomputationnode_dir:/app $imageName"
 elif [ "rpcrelated" == "$imageName" ]; then
-    bash -c "cd $rootDir/RPCLib;./package.sh"
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
+    if [ ! -f $rootDir/Binary/rpcrelated_dir/package.tar.gz ]; then
+        echo "RPC Package not found, building"
+        pushd $rootDir/RPCLib/
+        ./package.sh
+        popd
+    fi
     if [ $localDataset ]; then
         runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
         echo "Local"
@@ -163,7 +157,7 @@ elif [ "rpcrelated" == "$imageName" ]; then
         echo "No DS repo provided, not starting service!!!"
         PrintHelp
     fi
-    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app -v $dsRepo:/ds $imageName" 
+    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "smart_broker" == "$imageName" ]; then
     if [ -z "$scnNames" ]; then
         echo "No SCN names for smart broker!"

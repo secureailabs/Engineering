@@ -29,7 +29,6 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-RUN mkdir /ds
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

@@ -198,7 +198,7 @@ def update_fw_dnat_rules(
             fw_api_policy_rule_collection_info,
         ).result()
     elif module_name == "newwebfrontend":
-        fw_api_policy_rule_collection_info.rule_collections[0].rules.append(
+        fw_web_policy_rule_collection_info.rule_collections[0].rules.append(
             update_nat_rule_policy(firewall_ip_name, firewall_ip, private_ip_address, "443")
         )
         async_updated_fw_pol_result = client.firewall_policy_rule_collection_groups.begin_create_or_update(
@@ -207,5 +207,5 @@ def update_fw_dnat_rules(
             "WEBFRONTRuleCollectionGroup",
             fw_web_policy_rule_collection_info,
         ).result()
-    print(f"Updated a new Firewall DNAT RULE for{module_name}")
+    print(f"Updated a new Firewall DNAT RULE for {module_name}")
     return async_updated_fw_pol_result

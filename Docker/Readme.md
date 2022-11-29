@@ -42,6 +42,10 @@ make all -j
 ```
 ./RunService.sh -s rpcrelated
 ```
+### Audit server
+```
+./RunService.sh -s auditserver
+```
 ### Shutdown and Deprovision services
 
 #### All Docker
@@ -82,7 +86,10 @@ DeprovisionService.sh -s all
 ```
 ./DeprovisionService.sh -s rpcrelated
 ```
-
+### Audit Server
+```
+./DeprovisionService.sh -s auditserver
+```
 #### Note:
 1. Use the `-d` flag to run the services in the background in docker detached mode.
 2. To access the backend portal from any other container use `apiservices` as a domain name. e.g. the frontend webApp must connect to `https://apiservices:6200` instead of `https://127.0.0.1:6200/`

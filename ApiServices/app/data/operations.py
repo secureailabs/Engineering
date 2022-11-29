@@ -12,8 +12,9 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
+from typing import Any, Dict, List, Optional
+
 import motor.motor_asyncio
-from typing import Optional
 
 client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://127.0.0.1:27017/")
 sail_db = client.sailDatabase
@@ -27,7 +28,7 @@ async def find_all(collection) -> list:
     return await sail_db[collection].find().to_list(None)
 
 
-async def find_by_query(collection, query) -> list:
+async def find_by_query(collection, query) -> List[Dict[str, Any]]:
     return await sail_db[collection].find(query).to_list(None)
 
 

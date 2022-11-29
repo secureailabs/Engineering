@@ -9,15 +9,22 @@ remoteDataConnector: SharedCommonCode
 	@make -C $(REMOTE_DATA_CONNECTOR) all
 	@echo "orchestrator done!"
 
-package_apiservices: SharedCommonCode package_rpcrelated
+package_apiservices: SharedCommonCode package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated.json ApiServices
+	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker.json ApiServices
 	@cp Binary/rpcrelated_dir/package.tar.gz ApiServices
+	@cp Binary/smartbroker.tar.gz ApiServices
 	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
 	@rm ApiServices/package.tar.gz
+	@rm ApiServices/smartbroker.tar.gz
 	@rm ApiServices/rpcrelated.json
+	@rm ApiServices/smartbroker.json
 
 package_rpcrelated:
 	@cd RPCLib && ./package.sh
+
+package_smartbroker:
+	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/*' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz datascience
 
 orchestrator: SharedCommonCode EndPointTools/Orchestrator
 	@make -C $(ORCHESTRATOR) all

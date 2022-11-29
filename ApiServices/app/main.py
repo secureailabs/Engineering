@@ -12,6 +12,7 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
+import logging
 import threading
 
 import fastapi.openapi.utils as utils
@@ -19,13 +20,10 @@ from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictStr
-from fastapi.requests import Request
-from app.log import log_message
-
-import logging
 
 from app.api import (
     accounts,
@@ -37,7 +35,7 @@ from app.api import (
     internal_utils,
     secure_computation_nodes,
 )
-from app.log import _AsyncLogger
+from app.log import _AsyncLogger, log_message
 
 server = FastAPI(
     title="Secure AI Labs API Services",

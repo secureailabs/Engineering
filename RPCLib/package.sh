@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #package necessary files and dirs
-tar -zcvf package.tar.gz test_server.py private_keys public_keys zero ../datascience
+tar --exclude='../datascience/**venv**' --exclude='../datascience/Docker/*' -zcvf package.tar.gz test_server.py private_keys public_keys zero ../datascience 
 
 #move the package to Binary
 mkdir -p ../Binary/rpcrelated_dir/

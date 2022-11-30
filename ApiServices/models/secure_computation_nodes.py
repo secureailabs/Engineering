@@ -101,6 +101,9 @@ class SecureComputationNodeInitializationVector(SailBaseModel):
     dataset_version_id: PyObjectId = Field(...)
     dataset_id: PyObjectId = Field(...)
     dataset_key: StrictStr = Field(...)
+    researcher_id: PyObjectId = Field(...)
+    researcher_user_id: PyObjectId = Field(...)
+    data_federation_id: PyObjectId = Field(...)
 
 
 class SmartBrokerScnInfo(SailBaseModel):

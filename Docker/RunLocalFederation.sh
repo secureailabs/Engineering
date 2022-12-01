@@ -67,11 +67,3 @@ if [ -n "$container_id" ]; then
 fi
 
 ./Run.sh
-
-echo "Cleaning up working area"
-
-rm -rf local_dataset
-rm -rf local_federation
-
-echo "Done launching local federation"
-echo "Access SCN cluster at: 127.0.0.1:9001"

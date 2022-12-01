@@ -153,17 +153,6 @@ elif [ "rpcrelated" == "$imageName" ]; then
         ls $localDataset
     fi
     runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
-elif [ "smart_broker" == "$imageName" ]; then
-    if [ -z "$scnNames" ]; then
-        echo "No SCN names for smart broker!"
-        PrintHelp
-    fi
-    if [ -z $dsRepo ];
-    then
-        echo "No DS repo provided, not starting service!!!"
-        PrintHelp
-    fi
-    runtimeFlags="$runtimeFlags -p 9003:9003 -v $dsRepo:/ds -v $rootDir/Binary/rpcrelated_dir:/app -e SCN_NAMES=$scnNames $imageName "
 elif [ "auditserver" == "$imageName" ]; then
     runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then

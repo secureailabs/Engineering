@@ -152,11 +152,6 @@ elif [ "rpcrelated" == "$imageName" ]; then
         echo "Local"
         ls $localDataset
     fi
-    if [ -z $dsRepo ];
-    then
-        echo "No DS repo provided, not starting service!!!"
-        PrintHelp
-    fi
     runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "smart_broker" == "$imageName" ]; then
     if [ -z "$scnNames" ]; then

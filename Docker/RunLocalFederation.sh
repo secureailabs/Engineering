@@ -11,17 +11,15 @@ PrintHelp() {
 
 # Parse the input parameters
 test_package=""
-dsRepo=""
 while getopts "r:d:" opt; do
     case "$opt" in
     d) test_package="$OPTARG" ;;
-    r) dsRepo="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
 
 # Confirm we have required arguments
-if [ -z "$test_package" ] || [ -z "$dsRepo" ]; then
+if [ -z "$test_package" ]; then
     PrintHelp
 fi
 
@@ -47,7 +45,7 @@ for dataset in $datasets; do
     mv local_dataset/$dataset $dir_name/
     echo "Launching SCN $scn_name"
     sed "s/LOCAL_DATASET_NAME/$dataset/g" rpcrelated/InitializationVector_local.json > rpcrelated/InitializationVector.json
-    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -r $dsRepo -d
+    ./RunService.sh -s rpcrelated -l `pwd`/$dir_name -n $scn_name -d
     if [ -z "$scn_names" ]; then
         scn_names="$scn_name"
     else
@@ -59,7 +57,16 @@ for dataset in $datasets; do
 done
 
 
-./RunService.sh -s smart_broker -r "$dsRepo" -x "$scn_names"
+cd ../datascience/Docker/smartbroker
+
+container_id=`docker ps -qa --filter "name=smartbroker"`
+if [ -n "$container_id" ]; then
+    echo "Container smartbroker already exists, shutting down and removing"
+    docker stop smartbroker
+    docker rm smartbroker
+fi
+
+./Run.sh
 
 echo "Cleaning up working area"
 

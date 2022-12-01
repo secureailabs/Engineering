@@ -10,3 +10,4 @@ SCN
 **/.env.pass
 **/node_modules
 RPCLib/zero/zero.egg-info/*
+**/build

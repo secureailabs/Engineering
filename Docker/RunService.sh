@@ -4,11 +4,10 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver | smart_broker"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver "
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     echo -e "\t-n Name to give the running docker image"
-    echo -e "\t-x String containing the SCN names"
     exit 1 # Exit script after printing help
 }
 
@@ -17,16 +16,13 @@ detach=false
 cleanDatabase=false
 dockerName=""
 scnNames=""
-dsRepo=""
-while getopts "r:x:n:l:s:d opt:c opt:" opt; do
+while getopts "n:l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
     c) cleanDatabase=true ;;
     l) localDataset="$OPTARG" ;;
     n) dockerName="$OPTARG" ;;
-    x) scnNames="$OPTARG" ;;
-    r) dsRepo="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -149,8 +145,6 @@ elif [ "rpcrelated" == "$imageName" ]; then
     fi
     if [ $localDataset ]; then
         runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
-        echo "Local"
-        ls $localDataset
     fi
     runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "auditserver" == "$imageName" ]; then

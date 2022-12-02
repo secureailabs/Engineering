@@ -39,6 +39,7 @@ from models.secure_computation_nodes import (
     RegisterSecureComputationNode_Out,
     SecureComputationNode_Db,
     SecureComputationNodeInitializationVector,
+    SecureComputationNodeSize,
     SecureComputationNodeState,
     SecureComputationNodeType,
     SmartBrokerInitializationVector,
@@ -314,7 +315,12 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
     """
     try:
         # Provision the secure computation node
-        secure_computation_node_db = await provision_virtual_machine(secure_computation_node_db, "rpcrelated")
+        if secure_computation_node_db.size == SecureComputationNodeSize.Standard_DC4ads_v5:
+            secure_computation_node_db = await provision_virtual_machine(
+                secure_computation_node_db, "securecomputationnode"
+            )
+        else:
+            secure_computation_node_db = await provision_virtual_machine(secure_computation_node_db, "rpcrelated")
 
         # Create a SCN initialization vector json
         securecomputationnode_json = SecureComputationNodeInitializationVector(
@@ -455,7 +461,7 @@ async def provision_virtual_machine(
         resource_group_name,
         template_name,
         str(virtual_machine_info_db.id),
-        "Standard_D4s_v4",
+        jsonable_encoder(virtual_machine_info_db.size),
     )
     if deploy_response.status != "Success":
         raise Exception(deploy_response.note)

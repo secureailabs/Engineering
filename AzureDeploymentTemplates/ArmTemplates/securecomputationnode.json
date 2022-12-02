@@ -97,10 +97,10 @@
       "properties": {
         "securityRules": [
           {
-            "name": "InboundAllow_9090_6800_3500",
+            "name": "InboundAllow_9090_5556",
             "properties": {
-              "description": "9090 for bootstrap tool\n6800 for remote data connector\n3500 for job engine",
-              "protocol": "TCP",
+              "description": "9090 for bootstrap tool\n5556 for rpc server.",
+              "protocol": "Tcp",
               "sourcePortRange": "*",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
@@ -110,27 +110,28 @@
               "sourcePortRanges": [],
               "destinationPortRanges": [
                 "9090",
-                "3500",
-                "6800"
+                "5556"
               ],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []
             }
           },
           {
-            "name": "OutboundAllow_8000",
+            "name": "OutboundAllow_8000_445",
             "properties": {
-              "description": "Interact with SAIL Platform Services ",
-              "protocol": "TCP",
+              "description": "Interact with SAIL Platform Services.\n 445 for SMB mount of dataset",
+              "protocol": "Tcp",
               "sourcePortRange": "*",
-              "destinationPortRange": "8000",
               "sourceAddressPrefix": "*",
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 110,
               "direction": "Outbound",
               "sourcePortRanges": [],
-              "destinationPortRanges": [],
+              "destinationPortRanges": [
+                "8000",
+                "445"
+              ],
               "sourceAddressPrefixes": [],
               "destinationAddressPrefixes": []
             }
@@ -199,7 +200,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2020-12-01",
+      "apiVersion": "2022-03-01",
       "name": "[parameters('vmName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
@@ -215,8 +216,12 @@
             "name": "[concat(parameters('vmName'), '-disk')]",
             "caching": "ReadWrite",
             "managedDisk": {
-              "storageAccountType": "Standard_LRS"
-            }
+              "storageAccountType": "Premium_LRS",
+              "securityProfile": {
+                "securityEncryptionType": "DiskWithVMGuestState"
+              }
+            },
+            "deleteOption": "Delete"
           },
           "imageReference": {
             "id": "[parameters('VmImageResourceId')]"
@@ -224,8 +229,20 @@
         },
         "osProfile": {
           "adminUsername": "[parameters('adminUsername')]",
-          "computerName": "SailScn",
+          "computerName": "SailConfidentialScn",
           "adminPassword": "[parameters('adminPassword')]"
+        },
+        "securityProfile": {
+          "securityType": "ConfidentialVM",
+          "uefiSettings": {
+            "secureBootEnabled": true,
+            "vTpmEnabled": true
+          }
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -233,6 +250,35 @@
               "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
             }
           ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2018-10-01",
+      "name": "[concat(parameters('vmName'),'/GuestAttestation')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Security.LinuxAttestation",
+        "type": "GuestAttestation",
+        "typeHandlerVersion": "1.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "AttestationConfig": {
+            "MaaSettings": {
+              "maaEndpoint": "",
+              "maaTenantName": "GuestAttestation"
+            },
+            "AscSettings": {
+              "ascReportingEndpoint": "",
+              "ascReportingFrequency": ""
+            },
+            "useCustomToken": "false",
+            "disableAlerts": "false"
+          }
         }
       }
     }

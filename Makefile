@@ -5,6 +5,7 @@ include Make/newwebfrontend.mk
 
 package_apiservices: SharedCommonCode package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated.json ApiServices
+	@cp AzureDeploymentTemplates/ArmTemplates/securecomputationnode.json ApiServices
 	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker.json ApiServices
 	@cp Binary/rpcrelated_dir/package.tar.gz ApiServices
 	@cp Binary/smartbroker.tar.gz ApiServices
@@ -12,6 +13,7 @@ package_apiservices: SharedCommonCode package_rpcrelated package_smartbroker
 	@rm ApiServices/package.tar.gz
 	@rm ApiServices/smartbroker.tar.gz
 	@rm ApiServices/rpcrelated.json
+	@rm ApiServices/securecomputationnode.json
 	@rm ApiServices/smartbroker.json
 
 package_rpcrelated:

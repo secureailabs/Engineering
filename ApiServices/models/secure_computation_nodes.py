@@ -24,6 +24,7 @@ from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 class SecureComputationNodeSize(Enum):
     Standard_D4s_v4 = "Standard_D4s_v4"
+    Standard_DC4ads_v5 = "Standard_DC4ads_v5"
 
 
 class SecureComputationNodeType(Enum):

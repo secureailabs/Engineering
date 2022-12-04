@@ -1,4 +1,7 @@
 {
-    "dataset_version_id": "a89302dc-4f6f-11ed-bdc3-0242ac120002.zip",
-    "local_dataset" : "true"
+    "dataset_storage_password": "ZxBjff5TsqwmgnSLkWQLve7hKs1of5IynKqeWE1cTc2Yu+n8VmJzZgRdcPP9giiKQqi49hoegher+AStxuimXA==",
+    "storage_account_name": "sailvmimages9821",
+    "dataset_version_id": "r4sep2019_fhirv1_20_1.zip",
+    "dataset_id": "01460dcf-2d1d-4119-8cd6-3c41d6cd5fd8",
+    "local_dataset": "true"
 }

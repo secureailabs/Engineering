@@ -17,10 +17,8 @@ import pytest
 from assertpy.assertpy import assert_that
 from cerberus import Validator
 from models.authentication import LoginSuccess_Out
-from tests.workflow_tests.api_portal.sail_portal_api import (SailPortalApi,
-                                                             SailPortalFastApi)
-from tests.workflow_tests.config import (DATAOWNER_EMAIL, RESEARCHER_EMAIL,
-                                         SAIL_PASS, TEMP_PASS)
+from tests.workflow_tests.api_portal.sail_portal_api import SailPortalApi, SailPortalFastApi
+from tests.workflow_tests.config import DATAOWNER_EMAIL, RESEARCHER_EMAIL, SAIL_PASS, TEMP_PASS
 
 
 def debug_helper(response):

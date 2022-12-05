@@ -14,6 +14,7 @@
 import sys
 
 import pytest
+import random
 from tests.workflow_tests.api_portal.account_management_api import AccountManagementApi, AccountManagementFastApi
 from tests.workflow_tests.api_portal.azure_template_managment_api import AzureTemplateApi
 from tests.workflow_tests.api_portal.datafederation_management_api import DataFederationManagementApi
@@ -22,6 +23,8 @@ from tests.workflow_tests.api_portal.datasetfamily_management_api import Dataset
 from tests.workflow_tests.api_portal.digital_contract_management_api import DigitalContractManagementApi
 from tests.workflow_tests.api_portal.sail_portal_api import SailPortalApi, SailPortalFastApi
 from tests.workflow_tests.api_portal.virtual_machine_api import VirtualMachineApi
+from tests.workflow_tests.utils.organization_helper import Organization, User
+from tests.workflow_tests.utils.helpers import random_name
 from tests.workflow_tests.config import (
     API_PORTAL_IP,
     DATAOWNER_EMAIL,
@@ -191,3 +194,60 @@ def virtualmachine_management(get_base_url):
     :rtype: [type]
     """
     return VirtualMachineApi(base_url=get_base_url)
+
+
+@pytest.fixture
+def create_valid_organization():
+    new_org = Organization(
+        name=f"Test Org {random_name(8)}", 
+        description=f"Description {random_name(16)}", 
+        avatar=f"Avatar{random_name(8)}", 
+        admin_name=f"admin{random_name(4)}", 
+        admin_job_title=f"admintitle{random_name(4)}", 
+        admin_email=f"{random_name(4)}@{random_name(4)}.com", 
+        admin_password="password1", 
+        admin_avatar=f"adminavatar{random_name(4)}"
+    )
+
+    return new_org
+
+@pytest.fixture
+def create_invalid_organization():
+    new_org = Organization(
+        name=None, 
+        description=None, 
+        avatar=None, 
+        admin_name=None, 
+        admin_job_title=None, 
+        admin_email=None, 
+        admin_password=None, 
+        admin_avatar=None
+    )
+
+    return new_org
+
+@pytest.fixture
+def create_valid_user():
+    new_user = User(
+        name=f"Name{random_name(8)}",
+        email=f"{random_name(4)}@{random_name(4)}.com",
+        job_title=f"title{random_name(4)}",
+        role="ADMIN",
+        avatar=f"avatar{random_name(8)}",
+        password="password1"
+    )
+
+    return new_user
+
+@pytest.fixture
+def create_invalid_user():
+    new_user = User(
+        name=None,
+        email=None,
+        job_title=None,
+        role=None,
+        avatar=None,
+        password=None
+    )
+
+    return new_user

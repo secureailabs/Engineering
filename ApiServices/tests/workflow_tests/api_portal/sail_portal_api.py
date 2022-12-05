@@ -13,6 +13,7 @@
 # -------------------------------------------------------------------------------
 import requests
 from tests.workflow_tests.utils.helpers import get_response_values
+from tests.workflow_tests.utils.organization_helper import Organization, User
 
 
 class SailPortalFastApi:
@@ -26,6 +27,7 @@ class SailPortalFastApi:
         self.password = password
         self.headers = {"Content-Type": "application/json", "Accept": "application/json"}
 
+    # [POST] /login
     def login_for_access_token(self):
         """
         Login to Sail Api portal
@@ -40,9 +42,11 @@ class SailPortalFastApi:
             response = requests.post(f"{self.base_url}/login", headers=headers, data=payload, verify=False)
         except requests.exceptions.RequestException as error:
             print(f"\n{error}")
+
         # Return request response: status code
         return response, response.json()
 
+    # [POST] /refresh-token
     def get_refresh_token(self):
         """
         Refresh the JWT token for the user
@@ -57,8 +61,298 @@ class SailPortalFastApi:
             response = requests.post(f"{self.base_url}/refresh-token", headers=self.headers, json=payload, verify=False)
         except requests.exceptions.RequestException as error:
             print(f"\n{error}")
+
         # Return request response: status code
         return response, response.json()
+
+    # [GET] /me
+    def get_basic_user_info(self):
+        """
+        Get basic user information for the logged in user.
+
+        :returns: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+
+        try:
+            response = requests.get(f"{self.base_url}/me", headers=request_headers, verify=False)
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code
+        return response, response.json()
+
+    # TODO: Evaluate this function after permissioned user is created.
+    # [GET] /organizations
+    def get_all_organizations(self):
+        """
+        Get all organizations.
+
+        :returns: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+
+        try:
+            response = requests.get(f"{self.base_url}/organizations", headers=request_headers, verify=False)
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code
+        return response, response.json()
+
+    # [GET] /organizations/{organization_id}
+    def get_organization_by_id(self, org_id):
+        """
+        Get update user password from  Sail Api portal
+
+        :param current_password:
+        :type current_password: string
+        :param new_password:
+        :type new_password: string
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+
+        # Attempt to get an organization by ID
+        try:
+            #  params as json
+            response = requests.get(
+                f"{self.base_url}/organizations/{org_id}", verify=False, headers=request_headers
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response, response.json()
+
+    # [POST] /organizations
+    def register_new_organization(self, new_org: Organization):
+        """
+        Register a new organization using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+        
+        json_params = {
+            "name": new_org.name,
+            "description": new_org.description,
+            "avatar": new_org.avatar,
+            "admin_name": new_org.admin_name,
+            "admin_job_title": new_org.admin_job_title,
+            "admin_email": new_org.admin_email,
+            "admin_password": new_org.admin_password,
+            "admin_avatar": new_org.admin_avatar,
+        }
+        
+        # Attempt to register a new organization
+        try:
+            #  params as json
+            response = requests.post(
+                f"{self.base_url}/organizations", verify=False, headers=request_headers, json=json_params
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response, response.json()
+
+    # [PUT] /organizations/{organization_id}
+    def update_organization_info(self, org_id, new_name, new_description, new_avatar):
+        """
+        Update organization information using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+
+        json_params = {
+            "name": new_name,
+            "description": new_description,
+            "avatar": new_avatar,
+        }
+        
+        # Attempt to update organization info
+        try:
+            #  params as json
+            response = requests.put(
+                f"{self.base_url}/organizations/{org_id}", verify=False, headers=request_headers, json=json_params
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response
+
+    # TODO: Verify organization is deleted
+    # [DELETE] /organizations/{organization_id}
+    def delete_organization(self, org_id):
+        """
+        Delete an organization using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+        
+        # Attempt to delete an organization
+        try:
+            #  params as json
+            response = requests.delete(
+                f"{self.base_url}/organizations/{org_id}", verify=False, headers=request_headers
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response, response.json()
+
+    # [GET] /organizations/{organization_id}/users
+    def get_organization_users(self, org_id):
+        """
+        Get users of an organization using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+        
+        # Attempt to get an organizations users
+        try:
+            #  params as json
+            response = requests.get(
+                f"{self.base_url}/organizations/{org_id}/users", verify=False, headers=request_headers
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response, response.json()
+
+    # [POST] /organizations/{organization_id}/users/{user_id}
+    def register_new_user_to_organization(self, org_id, new_user: User):
+        """
+        Register a new user to an organization using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+
+        json_params = {
+            "name": new_user.name,
+            "email": new_user.email,
+            "job_title": new_user.job_title,
+            "role": new_user.role,
+            "avatar": new_user.avatar,
+            "password": new_user.password,
+        }
+
+        
+        # Attempt to register a new user to the organization
+        try:
+            #  params as json
+            response = requests.post(
+                f"{self.base_url}/organizations/{org_id}/users", verify=False, headers=request_headers, json=json_params
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response, response.json()
+
+    # [GET] /organizations/{organization_id}/users/{user_id}
+    def get_organization_user_by_id(self, org_id, user_id):
+        """
+        Get user of an organization by ID using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+        
+        # Attempt to get organization user by ID
+        try:
+            #  params as json
+            response = requests.get(
+                f"{self.base_url}/organizations/{org_id}/users/{user_id}", verify=False, headers=request_headers
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response, response.json()
+
+    # [PUT] /organizations/{organizations_id}/users/{user_id}
+    def update_organization_user(self, org_id, user_id, new_job_title, new_role, new_account_state, new_avatar):
+        """
+        Update user of an organization by ID using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+
+        json_params = {
+            "job_title": new_job_title,
+            "role": new_role,
+            "account_state": new_account_state,
+            "avatar": new_avatar,
+        }
+        
+        # Attempt to update organization user info
+        try:
+            #  params as json
+            response = requests.put(
+                f"{self.base_url}/organizations/{org_id}/users/{user_id}", verify=False, headers=request_headers, json=json_params
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response
+
+    # TODO: Verify organization user is deleted
+    # [DELETE] /organizations/{organizations_id}/users/{user_id}
+    def delete_organization_user_by_id(self, org_id, user_id):
+        """
+        Delete an organization user using the Sail Api portal.
+
+        :return: response, response.json()
+        :rtype: (string, string)
+        """
+        authed_user_access_token = self.login_for_access_token()[1].get("access_token")
+        request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
+        
+        # Attempt to delete user from organization
+        try:
+            #  params as json
+            response = requests.delete(
+                f"{self.base_url}/organizations/{org_id}/users/{user_id}", verify=False, headers=request_headers
+            )
+        except requests.exceptions.RequestException as error:
+            print(f"\n{error}")
+
+        # Return request response: status code, output, and user eosb
+        return response
+
+
+
 
 
 class SailPortalApi:

@@ -26,6 +26,11 @@ def debug_helper(response):
     print(f"{response.url}")
     print(f"------------END--------------")
 
+def print_response_values(function_name, response, response_json):
+    print(f"\n\n=========={function_name}==========")
+    print(f"Test Response: {response}\n")
+    print(f"Test Response JSON: {response_json}\n")
+
 
 @pytest.mark.fastapi
 @pytest.mark.parametrize(
@@ -110,7 +115,7 @@ def test_bad_fastapi_login_invalid_user_entry(get_base_url: str, email: str, pas
         "researcher_sail_fast_api_portal",
     ],
 )
-def test_get_current_user_refresh_token(sail_portal, request):
+def test_fastapi_get_current_user_refresh_token(sail_portal, request):
     """
     Refresh the JWT token for the current logged in user
 
@@ -134,6 +139,53 @@ def test_get_current_user_refresh_token(sail_portal, request):
     assert_that(is_valid, description=validator.errors).is_true()
     assert_that(test_response.status_code).is_equal_to(200)
     assert_that(LoginSuccess_Out(**test_response_json))
+
+
+@pytest.mark.fastapi
+@pytest.mark.parametrize(
+    "email, password",
+    [
+        (RESEARCHER_EMAIL, SAIL_PASS),
+        (DATAOWNER_EMAIL, SAIL_PASS),
+    ]
+)
+def test_fastapi_get_basic_user_information(get_base_url: str, email: str, password: str):
+    """
+    Testing get request for basic user information
+
+    :param sail_portal: fixture, SailPortalApi
+    :type sail_portal: class : api_portal.sail_portal_api.SailPortalApi
+    """
+    # Arrange
+    sail_portal = SailPortalFastApi(base_url=get_base_url, email=email, password=password)
+    schema = {
+        "name": {"type": "string"},
+        "email": {"type": "string"},
+        "job_title": {"type": "string"},
+        "role": {"type": "string"},
+        "avatar": {"type": "string", "default": "AVATAR"},  # avatar variable currently NaN/Null/None. keeping for future iterations.
+        "id": {"type": "string"},
+        "organization": {
+            "type": "dict",
+            "schema": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+            },
+        },
+    }
+    validator = Validator(schema)
+
+    # Act
+    test_response, test_response_json = sail_portal.get_basic_user_info()
+
+    # Assert
+    is_valid = validator.validate(test_response_json)
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(200)
+
+
+
+
 
 
 # TODO BROKEN : "detail": "Operation not permitted" requires not implemented SAIL_ACTOR

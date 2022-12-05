@@ -807,7 +807,6 @@ def test_fastapi_delete_invalid_user_from_organization(sail_portal: SailPortalFa
 
     # Act
     delete_response = sail_portal.delete_organization_user_by_id(org_id, user_id)
-    print_response_values("After Delete User Response", delete_response, delete_response.json())
 
     # Assert
     is_valid = validator.validate(delete_response.json())

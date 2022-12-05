@@ -1,18 +1,18 @@
 {
     "dataset":
     {
-        "name": "IGR Dataset",
+        "name": "MGR Dataset",
         "description": "dataset description",
         "tags": "my dataset tags",
         "format": "FHIR"
     },
     "dataset_version":
     {
-        "name": "IGR Dataset #1",
-        "description": "IGR Dataset"
+        "name": "MGR Dataset #1",
+        "description": "MGR Dataset"
     },
     "data_federation": "KCA Consortium",
     "data_source": [
-        "SampleFhir/patient_data/igr"
+        "SampleFhir/patient_data/mgr"
     ]
 }

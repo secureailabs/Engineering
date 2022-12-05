@@ -122,9 +122,7 @@ class SailPortalFastApi:
         # Attempt to get an organization by ID
         try:
             #  params as json
-            response = requests.get(
-                f"{self.base_url}/organizations/{org_id}", verify=False, headers=request_headers
-            )
+            response = requests.get(f"{self.base_url}/organizations/{org_id}", verify=False, headers=request_headers)
         except requests.exceptions.RequestException as error:
             print(f"\n{error}")
 
@@ -141,7 +139,7 @@ class SailPortalFastApi:
         """
         authed_user_access_token = self.login_for_access_token()[1].get("access_token")
         request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
-        
+
         json_params = {
             "name": new_org.name,
             "description": new_org.description,
@@ -152,7 +150,7 @@ class SailPortalFastApi:
             "admin_password": new_org.admin_password,
             "admin_avatar": new_org.admin_avatar,
         }
-        
+
         # Attempt to register a new organization
         try:
             #  params as json
@@ -181,7 +179,7 @@ class SailPortalFastApi:
             "description": new_description,
             "avatar": new_avatar,
         }
-        
+
         # Attempt to update organization info
         try:
             #  params as json
@@ -205,13 +203,11 @@ class SailPortalFastApi:
         """
         authed_user_access_token = self.login_for_access_token()[1].get("access_token")
         request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
-        
+
         # Attempt to delete an organization
         try:
             #  params as json
-            response = requests.delete(
-                f"{self.base_url}/organizations/{org_id}", verify=False, headers=request_headers
-            )
+            response = requests.delete(f"{self.base_url}/organizations/{org_id}", verify=False, headers=request_headers)
         except requests.exceptions.RequestException as error:
             print(f"\n{error}")
 
@@ -228,7 +224,7 @@ class SailPortalFastApi:
         """
         authed_user_access_token = self.login_for_access_token()[1].get("access_token")
         request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
-        
+
         # Attempt to get an organizations users
         try:
             #  params as json
@@ -261,7 +257,6 @@ class SailPortalFastApi:
             "password": new_user.password,
         }
 
-        
         # Attempt to register a new user to the organization
         try:
             #  params as json
@@ -284,7 +279,7 @@ class SailPortalFastApi:
         """
         authed_user_access_token = self.login_for_access_token()[1].get("access_token")
         request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
-        
+
         # Attempt to get organization user by ID
         try:
             #  params as json
@@ -314,12 +309,15 @@ class SailPortalFastApi:
             "account_state": new_account_state,
             "avatar": new_avatar,
         }
-        
+
         # Attempt to update organization user info
         try:
             #  params as json
             response = requests.put(
-                f"{self.base_url}/organizations/{org_id}/users/{user_id}", verify=False, headers=request_headers, json=json_params
+                f"{self.base_url}/organizations/{org_id}/users/{user_id}",
+                verify=False,
+                headers=request_headers,
+                json=json_params,
             )
         except requests.exceptions.RequestException as error:
             print(f"\n{error}")
@@ -338,7 +336,7 @@ class SailPortalFastApi:
         """
         authed_user_access_token = self.login_for_access_token()[1].get("access_token")
         request_headers = {"Authorization": f"Bearer {authed_user_access_token}"}
-        
+
         # Attempt to delete user from organization
         try:
             #  params as json
@@ -350,9 +348,6 @@ class SailPortalFastApi:
 
         # Return request response: status code, output, and user eosb
         return response
-
-
-
 
 
 class SailPortalApi:

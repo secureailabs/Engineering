@@ -17,14 +17,17 @@ import pytest
 from assertpy.assertpy import assert_that
 from cerberus import Validator
 from models.authentication import LoginSuccess_Out
-from tests.workflow_tests.api_portal.sail_portal_api import SailPortalApi, SailPortalFastApi
-from tests.workflow_tests.config import DATAOWNER_EMAIL, RESEARCHER_EMAIL, SAIL_PASS, TEMP_PASS
+from tests.workflow_tests.api_portal.sail_portal_api import (SailPortalApi,
+                                                             SailPortalFastApi)
+from tests.workflow_tests.config import (DATAOWNER_EMAIL, RESEARCHER_EMAIL,
+                                         SAIL_PASS, TEMP_PASS)
 
 
 def debug_helper(response):
     print(f"\n----------HELLO------------")
     print(f"{response.url}")
     print(f"------------END--------------")
+
 
 def print_response_values(function_name, response, response_json):
     print(f"\n\n=========={function_name}==========")
@@ -147,7 +150,7 @@ def test_fastapi_get_current_user_refresh_token(sail_portal, request):
     [
         (RESEARCHER_EMAIL, SAIL_PASS),
         (DATAOWNER_EMAIL, SAIL_PASS),
-    ]
+    ],
 )
 def test_fastapi_get_basic_user_information(get_base_url: str, email: str, password: str):
     """
@@ -163,7 +166,10 @@ def test_fastapi_get_basic_user_information(get_base_url: str, email: str, passw
         "email": {"type": "string"},
         "job_title": {"type": "string"},
         "role": {"type": "string"},
-        "avatar": {"type": "string", "default": "AVATAR"},  # avatar variable currently NaN/Null/None. keeping for future iterations.
+        "avatar": {
+            "type": "string",
+            "default": "AVATAR",
+        },  # avatar variable currently NaN/Null/None. keeping for future iterations.
         "id": {"type": "string"},
         "organization": {
             "type": "dict",
@@ -182,10 +188,6 @@ def test_fastapi_get_basic_user_information(get_base_url: str, email: str, passw
     is_valid = validator.validate(test_response_json)
     assert_that(is_valid, description=validator.errors).is_true()
     assert_that(test_response.status_code).is_equal_to(200)
-
-
-
-
 
 
 # TODO BROKEN : "detail": "Operation not permitted" requires not implemented SAIL_ACTOR

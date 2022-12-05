@@ -19,6 +19,9 @@ from ipaddress import IPv4Address
 from typing import List
 
 import aiohttp
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi.encoders import jsonable_encoder
+
 import app.utils.azure as azure
 from app.api.authentication import get_current_user
 from app.api.data_federations import get_existing_dataset_key
@@ -27,8 +30,6 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.secure_computation_nodes import (
@@ -322,6 +323,9 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             dataset_version_id=secure_computation_node_db.dataset_version_id,
             dataset_id=secure_computation_node_db.dataset_id,
             dataset_key=dataset_key,
+            data_federation_id=secure_computation_node_db.data_federation_id,
+            researcher_id=secure_computation_node_db.researcher_id,
+            researcher_user_id=secure_computation_node_db.researcher_user_id,
         )
 
         with open(str(secure_computation_node_db.id), "w") as outfile:

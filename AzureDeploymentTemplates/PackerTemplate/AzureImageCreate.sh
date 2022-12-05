@@ -3,9 +3,7 @@
 # Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
 source .env.dev
 Location="westus"
-ResourceGroup=$AZURE_RESOURCE_GROUP
-StorageAccountName=$AZURE_STORAGE_ACCOUNT
-GIT=$(git rev-parse --short HEAD)
+
 PrintHelp()
 {
     echo ""
@@ -62,23 +60,23 @@ if [ -z "$ci_flag" ]; then
         case $REPLY in
             1)
                 echo -e "\n==== Setting env variables for $opt ===="
-                export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
+                export AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID
                 ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                StorageAccountName=$DEVELOPMENT_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                imageGalleryName=$DEVELOPMENT_IMAGE_GALLERY_NAME # This needs to get updated per choice of subscription
                 break
                 ;;
             2)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
                 ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                StorageAccountName=$RELEASE_CANDIDATE_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                imageGalleryName=$RELEASE_CANDIDATE_IMAGE_GALLERY_NAME # This needs to get updated per choice of subscription
                 break
                 ;;
             3)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
                 ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                StorageAccountName=$PRODUCTION_GA_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                imageGalleryName=$PRODUCTION_GA_IMAGE_GALLERY_NAME # This needs to get updated per choice of subscription
                 break
                 ;;
             4)
@@ -114,45 +112,29 @@ az group create \
 --name $ResourceGroup \
 --location $Location
 
-# Create storage account
-az storage account create \
+# Create the shared image gallery
+az sig create \
 --resource-group $ResourceGroup \
---name $StorageAccountName \
---location $Location \
---sku Standard_LRS \
---kind StorageV2 \
---access-tier Hot
+--gallery-name $imageGalleryName \
+--location $Location
+
+# Create the image definition
+az sig image-definition create \
+--resource-group $ResourceGroup \
+--gallery-name $imageGalleryName \
+--gallery-image-definition $imageName \
+--features SecurityType=ConfidentialVMSupported \
+--publisher "SAIL" \
+--hyper-v-generation V2 \
+--offer $imageName \
+--sku "Standard_LRS" \
+--os-type "Linux"
 
 # Ubuntu vhd Image
-output=$(packer build \
+packer build \
 -var location=$Location \
--var storage_resource_group=$ResourceGroup \
--var storage_account=$StorageAccountName \
+-var resource_group_name=$ResourceGroup \
 -var module=$imageName \
 -var docker_dir=$dockerDir \
-packer-vhd-ubuntu.json | tee /dev/tty)
-
-# Specify vhdImageUrl to use
-temp=$(echo "$output" | grep -Po "OSDiskUri: (https:*.*sailimages.*.vhd)")
-vhdImageUrl=$(echo "$temp" | grep -Po "https:*.*vhd")
-
-# Create managed image from vhd
-az image create \
---resource-group $ResourceGroup \
---name $imageName \
---source $vhdImageUrl \
---location $Location \
---os-type "Linux" \
---storage-sku "Standard_LRS" \
---tags git=$GIT
-
-# # Optionally to create a VM with the image
-# az vm create \
-# --resource-group $ResourceGroup \
-# --name "$imageName"Vm \
-# --image $imageName \
-# --admin-username saildeveloper \
-# --admin-password "Password@123"
-
-# # Optionally upload the packages to the Virtual VirtualMachine
-# ./UploadPackageAndInitializationVector --IpAddress=<VmIp> --Package=PlatformServices.tar.gz --InitializationVector=InitializationVector.json
+-var gallery_name=$imageGalleryName \
+packer-vhd-ubuntu.json

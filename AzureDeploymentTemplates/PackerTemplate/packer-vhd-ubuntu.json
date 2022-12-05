@@ -4,11 +4,11 @@
         "tenant_id": "{{env `AZURE_TENANT_ID`}}",
         "client_id": "{{env `AZURE_CLIENT_ID`}}",
         "client_secret": "{{env `AZURE_CLIENT_SECRET`}}",
+        "module": "",
         "docker_dir": "",
         "location": "",
-        "storage_resource_group": "",
-        "storage_account": "",
-        "module": ""
+        "resource_group_name": "",
+        "gallery_name": ""
     },
     "sensitive-variables": [
         "client_secret"
@@ -31,10 +31,19 @@
             "private_virtual_network_with_public_ip": true,
             "custom_data_file": "",
             "polling_duration_timeout": "0h30m0s",
-            "resource_group_name": "{{user `storage_resource_group`}}",
-            "storage_account": "{{user `storage_account`}}",
-            "capture_container_name": "sailimages",
-            "capture_name_prefix": "{{user `module`}}"
+            "shared_image_gallery_destination": {
+                "subscription": "{{user `subscription_id`}}",
+                "resource_group": "{{user `resource_group_name`}}",
+                "gallery_name": "{{user `gallery_name`}}",
+                "image_name": "{{user `module`}}",
+                "image_version": "1.0.0",
+                "replication_regions": [
+                    "{{user `location`}}"
+                ],
+                "storage_account_type": "Standard_LRS"
+            },
+            "managed_image_name": "{{user `module`}}",
+            "managed_image_resource_group_name": "{{user `resource_group_name`}}"
         }
     ],
     "provisioners": [

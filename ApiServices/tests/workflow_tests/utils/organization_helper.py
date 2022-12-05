@@ -11,7 +11,6 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
-import random
 
 
 class Organization:
@@ -19,7 +18,9 @@ class Organization:
     Organization class
     """
 
-    def __init__(self, name, description, avatar, admin_name, admin_job_title, admin_email, admin_password, admin_avatar):
+    def __init__(
+        self, name, description, avatar, admin_name, admin_job_title, admin_email, admin_password, admin_avatar
+    ):
         self.name = name
         self.description = description
         self.avatar = avatar
@@ -45,7 +46,7 @@ class Organization:
 
 class User:
     """
-    User class 
+    User class
     """
 
     def __init__(self, name, email, job_title, role, avatar, password):

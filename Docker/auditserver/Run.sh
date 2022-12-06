@@ -33,7 +33,11 @@ docker run \
 -p 9090:9091 \
 -p 9093:9093 \
 -p 9096:9096 \
+<<<<<<< HEAD
 -v $(pwd)/"$imageName"_dir:/app \
 -v $(pwd)/certs:/etc/nginx/certs \
+=======
+--net sailNetwork \
+>>>>>>> BOARD-1981_BOARD-2065 aduit for user activity
 --name auditserver \
 $imageName

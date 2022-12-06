@@ -15,6 +15,7 @@
 
 import asyncio
 import inspect
+import json
 import logging
 import os
 import signal
@@ -171,12 +172,28 @@ class ZeroServer:
 
         self._ro_router[obj.__name__] = obj
 
+    def read_initialization_vector(self) -> tuple:
+        """
+        read initialization vecotr, obtain researcher_id, researcher_user_id and data_federation_id
+
+        :return: a tuple contains the three attributes
+        :rtype: tuple
+        """
+
+        file_path = "/app/InitializationVector.json"
+        iv_json = {}
+        with open(file_path, "r") as f:
+            iv_json = json.load(f)
+        return iv_json["research_id"], iv_json["researcher_user_id"], iv_json["data_federation_id"]
+
     def run(self):
         """
         start server run
         """
         try:
             # utilize all the cores
+            self._research_id, self._research_user_id, self._data_federation_id = self.read_initialization_vector()
+
             cores = os.cpu_count()
 
             #matplotlib.use("Agg")

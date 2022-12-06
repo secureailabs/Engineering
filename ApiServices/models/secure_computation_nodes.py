@@ -96,6 +96,7 @@ class UpdateSecureComputationNode_In(SailBaseModel):
 
 
 class SecureComputationNodeInitializationVector(SailBaseModel):
+    secure_computation_node_id: PyObjectId = Field(...)
     dataset_storage_password: StrictStr = Field(...)
     storage_account_name: StrictStr = Field(...)
     dataset_version_id: PyObjectId = Field(...)
@@ -104,6 +105,7 @@ class SecureComputationNodeInitializationVector(SailBaseModel):
     researcher_id: PyObjectId = Field(...)
     researcher_user_id: PyObjectId = Field(...)
     data_federation_id: PyObjectId = Field(...)
+    version: StrictStr = Field(...)
 
 
 class SmartBrokerScnInfo(SailBaseModel):
@@ -114,5 +116,10 @@ class SmartBrokerScnInfo(SailBaseModel):
 
 
 class SmartBrokerInitializationVector(SailBaseModel):
+    smart_broker_id: PyObjectId = Field(...)
     access_token: StrictStr = Field(...)
     secure_computation_nodes: List[SmartBrokerScnInfo] = Field(...)
+    researcher_id: PyObjectId = Field(...)
+    researcher_user_id: PyObjectId = Field(...)
+    data_federation_id: PyObjectId = Field(...)
+    version: StrictStr = Field(...)

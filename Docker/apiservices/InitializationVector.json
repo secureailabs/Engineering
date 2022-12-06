@@ -18,6 +18,7 @@
     "azure_scn_virtual_network_id": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/ScratchPad_Network_RG/providers/Microsoft.Network/virtualNetworks/MGMT_Vnet",
     "azure_keyvault_url": "https://sailkeyvault99915.vault.azure.net/",
     "owner": "default",
+    "version": "default",
     "audit_service_ip": "auditserver",
     "audit_service_port": "3100"
 }

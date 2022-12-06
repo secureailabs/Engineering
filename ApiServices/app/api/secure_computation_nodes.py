@@ -318,6 +318,7 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
 
         # Create a SCN initialization vector json
         securecomputationnode_json = SecureComputationNodeInitializationVector(
+            secure_computation_node_id=secure_computation_node_db.id,
             storage_account_name=get_secret("azure_storage_account_name"),
             dataset_storage_password=get_secret("azure_storage_account_password"),
             dataset_version_id=secure_computation_node_db.dataset_version_id,
@@ -326,6 +327,7 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             data_federation_id=secure_computation_node_db.data_federation_id,
             researcher_id=secure_computation_node_db.researcher_id,
             researcher_user_id=secure_computation_node_db.researcher_user_id,
+            version=get_secret("version"),
         )
 
         with open(str(secure_computation_node_db.id), "w") as outfile:
@@ -394,7 +396,13 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
 
         # Create a SCN initialization vector json
         smart_broker_json = SmartBrokerInitializationVector(
-            secure_computation_nodes=secure_computation_nodes, access_token=""
+            smart_broker_id=smart_broker_node_db.id,
+            secure_computation_nodes=secure_computation_nodes,
+            access_token="",
+            researcher_id=smart_broker_node_db.researcher_id,
+            researcher_user_id=smart_broker_node_db.researcher_user_id,
+            data_federation_id=smart_broker_node_db.data_federation_id,
+            version=get_secret("version"),
         )
 
         with open(str(smart_broker_node_db.id), "w") as outfile:

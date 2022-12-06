@@ -231,6 +231,7 @@ def deploy_apiservices(
     storage_resource_group_name,
     key_vault_url,
     owner,
+    version: str,
 ):
     """
     Deploy Api Services
@@ -257,6 +258,7 @@ def deploy_apiservices(
     backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
+    backend_json["version"] = version
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -438,6 +440,7 @@ if __name__ == "__main__":
     AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
     OWNER = os.environ.get("OWNER")
     PURPOSE = os.environ.get("PURPOSE")
+    VERSION = os.environ.get("VERSION")
 
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
@@ -485,6 +488,7 @@ if __name__ == "__main__":
         storage_resource_group_name,
         key_vault_url,
         OWNER,
+        VERSION,
     )
     print("API Services server: ", platform_services_ip)
 

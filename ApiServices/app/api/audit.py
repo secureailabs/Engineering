@@ -13,117 +13,140 @@
 # -------------------------------------------------------------------------------
 
 import asyncio
-import json
+import functools
+import time
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.api.authentication import RoleChecker, get_current_user
+from app.api.authentication import get_current_user
 from app.data import operations as data_service
+from app.utils.secrets import get_secret
 from models.accounts import UserRole
+from models.audit import QueryRequest, QueryResult
 from models.authentication import TokenData
-from models.common import AuditIncident, PyObjectId
+from models.common import PyObjectId
 
 router = APIRouter()
 
 
 endpoint = "/loki/api/v1/query_range"
-config = {}
-with open("InitializationVector.json", "r") as f:
-    config = json.load(f)
-audit_server_endpoint = f"{config['audit_server_ip']}{endpoint}:{config['audit_server_port']}"
+audit_server_ip = get_secret("audit_service_ip")
+audit_server_port = get_secret("audit_service_port")
+audit_server_endpoint = f"http://{audit_server_ip}:{audit_server_port}{endpoint}"
+print(audit_server_endpoint)
+
 
 # #######################################################################################################################
-@router.post(
+@router.get(
     path="/audit/activity/time/",
     description="query by a LogQL string",
     response_model=QueryResult,
     response_model_by_alias=False,
-    status_code=status.HTTP_201_OK,
+    status_code=status.HTTP_200_OK,
 )
 async def audit_query_activity_by_time(
-    start: int,
-    end: int,
+    start: int = None,
+    end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    if start is None:
+        start = time.time() - 3600
+    if end is None:
+        end = time.time()
+
     query = {
-        "query": f'{{job_name="user_activity"}}',
+        "query": '{job="user_activity"}',
         "start": start,
         "end": end,
     }
     response = await query_user_activity(query, current_user)
-    return response
+    return QueryResult(**response.json())
 
 
 # #######################################################################################################################
-@router.post(
+@router.get(
     path="/audit/computation/time/",
     description="query by a LogQL string",
     response_model=QueryResult,
     response_model_by_alias=False,
-    status_code=status.HTTP_201_OK,
+    status_code=status.HTTP_200_OK,
 )
 async def audit_query_computation_by_time(
-    start: int,
-    end: int,
+    start: int = None,
+    end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    if start is None:
+        start = time.time() - 3600
+    if end is None:
+        end = time.time()
 
     query = {
-        "query": f'{{job_name="user_activity"}}',
+        "query": '{job="user_activity"}',
         "start": start,
         "end": end,
     }
     response = await query_computation(query, current_user)
 
-    return response
+    return QueryResult(**response.json())
 
 
 # #######################################################################################################################
-@router.post(
+@router.get(
     path="/audit/activity/userID/",
     description="query by a LogQL string",
     response_model=QueryResult,
     response_model_by_alias=False,
-    status_code=status.HTTP_201_OK,
+    status_code=status.HTTP_200_OK,
 )
 async def audit_query_activity_by_userID(
-    user_id: pyObjectId,
-    start: int = 0,
-    end: int = 100,
+    user_id: PyObjectId,
+    start: int = None,
+    end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    if start is None:
+        start = time.time() - 3600
+    if end is None:
+        end = time.time()
 
     query = {
-        "query": f'{{job_name="user_activity"}} |= {user_id}',
+        "query": f'{{job="user_activity"}} |= `{str(user_id)}`',
         "start": start,
         "end": end,
     }
     response = await query_user_activity(query, current_user)
-    return response
+    return QueryResult(**response.json())
 
 
 # #######################################################################################################################
-@router.post(
+@router.get(
     path="/audit/computation/userID/",
     description="query by a LogQL string",
     response_model=QueryResult,
     response_model_by_alias=False,
-    status_code=status.HTTP_201_OK,
+    status_code=status.HTTP_200_OK,
 )
 async def audit_query_computation_by_userID(
     user_id: PyObjectId,
-    start: int,
-    end: int,
+    start: int = None,
+    end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+
+    if start is None:
+        start = time.time() - 3600
+    if end is None:
+        end = time.time()
+
     query = {
-        "query": f'{{job_name="user_activity"}} |= `{user_id}`',
+        "query": f'{{job="computation"}} |= `{str(user_id)}`',
         "start": start,
         "end": end,
     }
     response = await query_computation(query, current_user)
-    return response
+    return QueryResult(**response.json())
 
 
 async def query_computation(
@@ -133,11 +156,11 @@ async def query_computation(
     try:
         response = {}
         # the user is SAIL tech support, no restriction
-        if current_user.role == UserRole.SAIL_ADMIN:
+        if current_user.role == UserRole.ADMIN:
             response = await audit_query(query)
 
         # the user is research org admin, can only get info related to the VMs belongs to the org.
-        elif current_user == UserRole.ADMIN:
+        elif current_user == UserRole.ORGANIZATION_ADMIN:
             provision_db = await data_service.find_by_query(
                 "data-federation-provsions",
                 {"organization_id": str(current_user.organization_id)},
@@ -153,7 +176,7 @@ async def query_computation(
                     scn_ids += scn_id
                     scn_ids += "|"
                 scn_ids = scn_ids[:-1]
-                query["query"] = f'{query["query"]} |= `{scn_ids}`'
+                query["query"] = f'{query["query"]} |= `{str(scn_ids)}`'
             response = await audit_query(query)
 
         # the user is the data owner admin, can only get info about the data they own.
@@ -167,7 +190,7 @@ async def query_computation(
                     dataset_ids += data.id
                     dataset_ids += "|"
                 dataset_ids = dataset_ids[:-1]
-                query["query"] = f'{query["query"]} |= `{dataset_ids}`'
+                query["query"] = f'{query["query"]} |= `{str(dataset_ids)}`'
             response = await audit_query(query)
 
         # for other user identity, this is forbidden
@@ -183,34 +206,39 @@ async def query_computation(
 
 
 # #######################################################################################################################
-@router.post(
+@router.get(
     path="/audit/computation/dataID/",
     description="query by a LogQL string",
     response_model=QueryResult,
     response_model_by_alias=False,
-    status_code=status.HTTP_201_OK,
+    status_code=status.HTTP_200_OK,
 )
 async def audit_query_compuation_by_dataID(
     dataset_id: PyObjectId,
-    start: int = 0,
-    end: int = 100,
+    start: int = None,
+    end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
     try:
+        if start is None:
+            start = time.time() - 3600
+        if end is None:
+            end = time.time()
+
         query = {
-            "query": f'{{job_name="computation"}} |= `{dataset_id}`',
+            "query": f'{{job="computation"}} |= `{str(dataset_id)}`',
             "start": start,
             "end": end,
         }
 
         response = {}
         # the user is SAIL tech support, no restriction
-        if current_user.role == UserRole.SAIL_ADMIN:
+        if current_user.role == UserRole.ADMIN:
             response = await audit_query(query)
 
         # the user is research org admin, can only get info about data and nodes owned by the org.
         # check if data belongs to org
-        elif current_user == UserRole.ADMIN:
+        elif current_user == UserRole.ORGANIZATION_ADMIN:
             data_ids = await get_dataset_from_user_node(current_user)
             if dataset_id in data_ids:
                 response = await audit_query(query)
@@ -230,7 +258,7 @@ async def audit_query_compuation_by_dataID(
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        return response
+        return QueryResult(**response.json())
 
     except HTTPException as http_exception:
         raise http_exception
@@ -257,44 +285,49 @@ async def get_dataset_from_user_node(
 
 
 # #######################################################################################################################
-@router.post(
+@router.get(
     path="/audit/activity/dataID/",
     description="query by a LogQL string",
     response_model=QueryResult,
     response_model_by_alias=False,
-    status_code=status.HTTP_201_OK,
+    status_code=status.HTTP_200_OK,
 )
 async def audit_query_activity_by_dataID(
     data_id: PyObjectId,
-    start: int = 0,
-    end: int = 100,
+    start: int = None,
+    end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+
+    if start is None:
+        start = time.time() - 3600
+    if end is None:
+        end = time.time()
+
     query = {
-        "query": f'{{job_name="user_activity"}} |= `{data_id}`',
+        "query": f'{{job="user_activity"}} |= `{str(data_id)}`',
         "start": start,
         "end": end,
     }
 
     response = await query_user_activity(query, current_user)
-    return response
+    return QueryResult(**response.json())
 
 
 # #######################################################################################################################
-@router.post(
+@router.get(
     path="/audit/",
     description="query by a LogQL string",
     response_model=QueryResult,
     response_model_by_alias=False,
-    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
-    status_code=status.HTTP_201_OK,
+    status_code=status.HTTP_200_OK,
 )
 async def audit_query_general(
-    query: dict,
+    query: QueryRequest,
     current_user: TokenData = Depends(get_current_user),
 ):
-    response = await query_user_activity(query, current_user)
-    return response
+    response = await query_user_activity(**query.dict(), current_user=current_user)
+    return QueryResult(**response.json())
 
 
 async def query_user_activity(
@@ -303,8 +336,8 @@ async def query_user_activity(
 ):
     try:
         # the user is SAIL tech support, no restriction
-        if current_user.role == UserRole.SAIL_ADMIN:
-            response = await audit_query(dict)
+        if current_user.role == UserRole.ADMIN:
+            response = await audit_query(query)
         # for other user identity, this is forbidden
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
@@ -337,7 +370,10 @@ async def audit_query(
     try:
         event_loop = asyncio.get_event_loop()
 
-        response = await event_loop.run_in_executor(None, requests.get, audit_server_endpoint, query)
+        response = await event_loop.run_in_executor(
+            None,
+            functools.partial(requests.get, audit_server_endpoint, params=query),
+        )
         return response
 
     except Exception as exception:

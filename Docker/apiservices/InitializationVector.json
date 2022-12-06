@@ -4,7 +4,7 @@
     "password_pepper": "06ac6368872b368a8c67e41c1a8faa46e8471818cdbb442345fbb2205b9fc225",
     "sail_email": "no-reply@secureailabs.com",
     "sail_password": "password",
-    "azure_subscription_id":"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "azure_subscription_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "azure_tenant_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "azure_client_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "azure_client_secret": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",

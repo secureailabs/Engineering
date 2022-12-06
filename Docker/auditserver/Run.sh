@@ -1,5 +1,5 @@
 #!/bin/bash
-imageName=audit
+imageName=auditserver
 
 # Check if docker is installed
 docker --version
@@ -26,5 +26,6 @@ docker run \
 -p 3100:3100 \
 -p 9093:9093 \
 -p 9096:9096 \
---name audit \
+--net sailNetwork \
+--name auditserver \
 $imageName

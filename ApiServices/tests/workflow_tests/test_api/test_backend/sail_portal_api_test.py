@@ -116,7 +116,7 @@ def test_bad_fastapi_login_invalid_user_entry(get_base_url: str, email: str, pas
         "researcher_sail_fast_api_portal",
     ],
 )
-def test_fastapi_get_current_user_refresh_token(sail_portal, request):
+def test_fastapi_get_current_user_refresh_token(sail_portal: SailPortalFastApi, request):
     """
     Refresh the JWT token for the current logged in user
 

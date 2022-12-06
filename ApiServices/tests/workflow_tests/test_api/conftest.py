@@ -197,6 +197,12 @@ def virtualmachine_management(get_base_url):
 
 @pytest.fixture
 def create_valid_organization():
+    """
+    Fixture to create a valid organization for /organization endpoint testing.
+
+    :return: new_org
+    :rtype: Organization
+    """
     new_org = Organization(
         name=f"Test Org {random_name(8)}",
         description=f"Description {random_name(16)}",
@@ -213,7 +219,13 @@ def create_valid_organization():
 
 @pytest.fixture
 def create_invalid_organization():
-    new_org = Organization(
+    """
+    Fixture to create an invalid organization for /organization endpoint testing.
+
+    :return: invalid_org
+    :rtype: Organization
+    """
+    invalid_org = Organization(
         name=None,
         description=None,
         avatar=None,
@@ -224,11 +236,17 @@ def create_invalid_organization():
         admin_avatar=None,
     )
 
-    return new_org
+    return invalid_org
 
 
 @pytest.fixture
 def create_valid_user():
+    """
+    Fixture to create a valid user for /organization endpoint testing.
+
+    :return: new_user
+    :rtype: User
+    """
     new_user = User(
         name=f"Name{random_name(8)}",
         email=f"{random_name(4)}@{random_name(4)}.com",
@@ -243,6 +261,12 @@ def create_valid_user():
 
 @pytest.fixture
 def create_invalid_user():
-    new_user = User(name=None, email=None, job_title=None, role=None, avatar=None, password=None)
+    """
+    Fixture to create an invalid user for /organization endpoint testing.
 
-    return new_user
+    :return: invalid_user
+    :rtype: User
+    """
+    invalid_user = User(name=None, email=None, job_title=None, role=None, avatar=None, password=None)
+
+    return invalid_user

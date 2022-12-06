@@ -55,11 +55,10 @@ def test_fastapi_get_valid_organization(sail_portal: SailPortalFastApi, request)
 
     validator = Validator(schema)
 
+    # Act
     info_response, info_response_json = sail_portal.get_basic_user_info()
     org_id = info_response_json["organization"].get("id")
     test_response, test_response_json = sail_portal.get_organization_by_id(org_id)
-
-    # print_response_values("Get Valid Organization", test_response, test_response_json)
 
     # Assert
     is_valid = validator.validate(test_response_json)
@@ -71,11 +70,12 @@ def test_fastapi_get_valid_organization(sail_portal: SailPortalFastApi, request)
 @pytest.mark.parametrize(
     "sail_portal, org_id",
     [
+        ("data_owner_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
+        ("researcher_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
+        ("data_owner_sail_fast_api_portal", f"{random_name(8)}-{random_name(8)}-{random_name(12)}"),
+        ("researcher_sail_fast_api_portal", f"{random_name(8)}-{random_name(8)}-{random_name(12)}"),
         ("data_owner_sail_fast_api_portal", random_name(32)),
-        ("data_owner_sail_fast_api_portal", random_name(32)),
-        ("data_owner_sail_fast_api_portal", random_name(32)),
-        ("data_owner_sail_fast_api_portal", random_name(32)),
-        ("data_owner_sail_fast_api_portal", random_name(32)),
+        ("researcher_sail_fast_api_portal", random_name(32)),
     ],
 )
 def test_fastapi_get_invalid_organization(sail_portal: SailPortalFastApi, org_id: str, request):
@@ -98,9 +98,8 @@ def test_fastapi_get_invalid_organization(sail_portal: SailPortalFastApi, org_id
 
     validator = Validator(schema)
 
+    # Act
     test_response, test_response_json = sail_portal.get_organization_by_id(org_id)
-
-    # print_response_values("Get Invalid Organization", test_response, test_response_json, access_token)
 
     # Assert
     is_valid = validator.validate(test_response_json)
@@ -113,6 +112,7 @@ def test_fastapi_get_invalid_organization(sail_portal: SailPortalFastApi, org_id
     "sail_portal, new_org",
     [
         ("data_owner_sail_fast_api_portal", "create_valid_organization"),
+        ("researcher_sail_fast_api_portal", "create_valid_organization"),
     ],
 )
 def test_fastapi_register_new_valid_organization(sail_portal: SailPortalFastApi, new_org: Organization, request):
@@ -138,9 +138,6 @@ def test_fastapi_register_new_valid_organization(sail_portal: SailPortalFastApi,
 
     # Act
     test_response, test_response_json = sail_portal.register_new_organization(new_org=new_org)
-
-    # new_org.pretty_print()
-    # print_response_values("Register New Valid Organization", test_response, test_response_json)
 
     # Assert
     is_valid = validator.validate(test_response_json)
@@ -180,9 +177,6 @@ def test_fastapi_register_new_invalid_organization(sail_portal: SailPortalFastAp
 
     # Act
     test_response, test_response_json = sail_portal.register_new_organization(new_org=new_org)
-
-    # new_org.pretty_print()
-    # print_response_values("Register New Invalid Organization", test_response, test_response_json)
 
     # Assert
     is_valid = validator.validate(test_response_json)
@@ -230,6 +224,18 @@ def test_fastapi_update_valid_organization_valid_credentials(
     # Arrange
     sail_portal = request.getfixturevalue(sail_portal)
 
+    schema = {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "avatar": {
+            "type": "string",
+            "default": "AVATAR",
+        },  # avatar variable currently NaN/Null/None. keeping for future iterations.
+        "id": {"type": "string"},
+    }
+
+    validator = Validator(schema)
+
     _, info_response_json = sail_portal.get_basic_user_info()
     org_id = info_response_json["organization"].get("id")
 
@@ -240,6 +246,8 @@ def test_fastapi_update_valid_organization_valid_credentials(
     test_response, test_response_json = sail_portal.get_organization_by_id(org_id)
 
     # Assert
+    is_valid = validator.validate(test_response_json)
+    assert_that(is_valid, description=validator.errors).is_true()
     assert_that(update_response.status_code).is_equal_to(204)
     assert_that(test_response_json["name"]).is_equal_to(new_name)
     assert_that(test_response_json["description"]).is_equal_to(new_description)
@@ -282,7 +290,7 @@ def test_fastapi_update_valid_organization_invalid_credentials(
     target_org_id = info_response_json["organization"].get("id")
 
     schema = {
-        "error": {"type": "string"},
+        "detail": {"type": "string"},
     }
 
     validator = Validator(schema)
@@ -295,8 +303,8 @@ def test_fastapi_update_valid_organization_invalid_credentials(
     test_response, test_response_json = sail_portal.get_organization_by_id(target_org_id)
 
     # Assert
-    # is_valid = validator.validate(update_response_json)
-    # assert_that(is_valid, description=validator.errors).is_true()
+    is_valid = validator.validate(update_response.json())
+    assert_that(is_valid, description=validator.errors).is_true()
     assert_that(update_response.status_code).is_equal_to(403)
     assert_that(test_response_json["name"]).is_equal_to(original_response_json["name"])
     assert_that(test_response_json["description"]).is_equal_to(original_response_json["description"])
@@ -307,8 +315,8 @@ def test_fastapi_update_valid_organization_invalid_credentials(
 @pytest.mark.parametrize(
     "sail_portal, org_id",
     [
-        ("researcher_sail_fast_api_portal", random_name(32)),
-        ("data_owner_sail_fast_api_portal", random_name(32)),
+        ("researcher_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
+        ("data_owner_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
     ],
 )
 def test_fastapi_update_invalid_organization(sail_portal: SailPortalFastApi, org_id: str, request):
@@ -378,8 +386,6 @@ def test_fastapi_get_valid_organization_users(sail_portal: SailPortalFastApi, re
     # Act
     test_response, test_response_json = sail_portal.get_organization_users(org_id)
 
-    # print_response_values("Get Organization Users", test_response, test_response_json)
-
     # Assert
     is_valid = validator.validate(test_response_json)
     assert_that(is_valid, description=validator.errors).is_true()
@@ -390,16 +396,16 @@ def test_fastapi_get_valid_organization_users(sail_portal: SailPortalFastApi, re
 @pytest.mark.parametrize(
     "sail_portal, org_id",
     [
-        ("researcher_sail_fast_api_portal", random_name(32)),
-        ("researcher_sail_fast_api_portal", random_name(32)),
-        ("researcher_sail_fast_api_portal", random_name(32)),
-        ("researcher_sail_fast_api_portal", random_name(32)),
-        ("researcher_sail_fast_api_portal", random_name(32)),
+        ("researcher_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
+        ("data_owner_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
+        ("researcher_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
+        ("data_owner_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
+        ("researcher_sail_fast_api_portal", f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(12)}"),
     ],
 )
 def test_fastapi_get_invalid_organization_users(sail_portal: SailPortalFastApi, org_id: str, request):
     """
-    Testing getting all users of a valid organization
+    Testing getting all users of an invalid organization
 
     :param get_base_url: fixture, gets base url
     :type get_base_url: string
@@ -422,8 +428,6 @@ def test_fastapi_get_invalid_organization_users(sail_portal: SailPortalFastApi, 
     # Act
     test_response, test_response_json = sail_portal.get_organization_users(org_id)
 
-    # print_response_values("Get Organization Users", test_response, test_response_json)
-
     # Assert
     is_valid = validator.validate(test_response_json)
     assert_that(is_valid, description=validator.errors).is_true()
@@ -440,7 +444,7 @@ def test_fastapi_get_invalid_organization_users(sail_portal: SailPortalFastApi, 
 )
 def test_fastapi_get_organization_valid_user(sail_portal: SailPortalFastApi, request):
     """
-    Testing getting a valid user from an organization.  Currently gets the first user in the users list, then tries to get that user data. Can be updated to loop through the user list.
+    Testing getting a valid user from an organization.
 
     :param get_base_url: fixture, gets base url
     :type get_base_url: string
@@ -477,10 +481,9 @@ def test_fastapi_get_organization_valid_user(sail_portal: SailPortalFastApi, req
     # Act
     _, org_response_json = sail_portal.get_organization_users(org_id)
 
+    # Assert
     for user in org_response_json["users"]:
         test_response, test_response_json = sail_portal.get_organization_user_by_id(org_id, user["id"])
-
-        # Assert
         is_valid = validator.validate(test_response_json)
         assert_that(is_valid, description=validator.errors).is_true()
         assert_that(test_response.status_code).is_equal_to(200)
@@ -562,14 +565,11 @@ def test_fastapi_register_valid_user_to_organization(sail_portal: SailPortalFast
     # Act
     test_response, test_response_json = sail_portal.register_new_user_to_organization(org_id, new_user)
 
-    # print_response_values("Register New User to Organization", test_response, test_response_json)
-
     _, verify_response_json = sail_portal.get_organization_users(org_id)
     users = verify_response_json["users"]
 
     is_found = False
     for x in users:
-        # print(f"\n{x}\n")
         if x["id"] == test_response_json["id"]:
             is_found = True
 
@@ -651,6 +651,27 @@ def test_fastapi_update_valid_user_valid_data(
     # Arrange
     sail_portal = request.getfixturevalue(sail_portal)
 
+    schema = {
+        "name": {"type": "string"},
+        "email": {"type": "string"},
+        "job_title": {"type": "string"},
+        "role": {"type": "string"},
+        "avatar": {
+            "type": "string",
+            "default": "AVATAR",
+        },  # avatar variable currently NaN/Null/None. keeping for future iterations.
+        "id": {"type": "string"},
+        "organization": {
+            "type": "dict",
+            "schema": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+            },
+        },
+    }
+
+    validator = Validator(schema)
+
     _, info_response_json = sail_portal.get_basic_user_info()
     user_id = info_response_json["id"]
     org_id = info_response_json["organization"].get("id")
@@ -665,6 +686,8 @@ def test_fastapi_update_valid_user_valid_data(
     _, verify_response_json = sail_portal.get_organization_user_by_id(org_id, user_id)
 
     # Assert
+    is_valid = validator.validate(verify_response_json)
+    assert_that(is_valid, description=validator.errors).is_true()
     assert_that(update_response.status_code).is_equal_to(204)
     assert_that(verify_response_json["role"]).is_equal_to(new_role)
     assert_that(verify_response_json["job_title"]).is_equal_to(new_job_title)
@@ -692,7 +715,7 @@ def test_fastapi_update_valid_user_valid_data(
 )
 def test_fastapi_update_invalid_user_valid_data(sail_portal: SailPortalFastApi, user_id: str, request):
     """
-    Testing updating a valid organization user with valid data.
+    Testing updating an invalid organization user with valid data.
 
     :param sail_portal: sail_portal fixture
     :type sail_portal: object
@@ -751,8 +774,6 @@ def test_fastapi_get_all_organizations(sail_portal: SailPortalFastApi, request):
     # Act
     test_response, test_response_json = sail_portal.get_all_organizations()
 
-    # print_response_values("Get All Organizations (Broken)", test_response, test_response_json)
-
     # Assert
     is_valid = validator.validate(test_response_json)
     assert_that(is_valid, description=validator.errors).is_true()
@@ -796,9 +817,10 @@ def test_fastapi_delete_valid_user_from_organization(sail_portal: SailPortalFast
     delete_response = sail_portal.delete_organization_user_by_id(org_id, user_id)
 
     verify_response, verify_response_json = sail_portal.get_organization_user_by_id(org_id, user_id)
-    # print_response_values("After Delete User Response", verify_response, verify_response_json)
 
     # Assert
+    is_valid = validator.validate(verify_response_json)
+    assert_that(is_valid, description=validator.errors).is_true()
     assert_that(verify_response.status_code).is_equal_to(422)
     assert_that(delete_response.status_code).is_equal_to(204)
 
@@ -814,7 +836,7 @@ def test_fastapi_delete_valid_user_from_organization(sail_portal: SailPortalFast
 )
 def test_fastapi_delete_invalid_user_from_organization(sail_portal: SailPortalFastApi, user_id: str, request):
     """
-    Test deleting a valid organization user with valid credentials
+    Test deleting an invalid organization user with valid credentials
 
     :param get_base_url: fixture, gets base url
     :type get_base_url: string

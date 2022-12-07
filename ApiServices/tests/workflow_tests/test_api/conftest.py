@@ -30,6 +30,8 @@ from tests.workflow_tests.config import (
     RESEARCHER_EMAIL,
     SAIL_PASS,
 )
+from tests.workflow_tests.utils.helpers import random_name
+from tests.workflow_tests.utils.organization_helper import Organization, User
 
 
 def pytest_addoption(parser):
@@ -191,3 +193,80 @@ def virtualmachine_management(get_base_url):
     :rtype: [type]
     """
     return VirtualMachineApi(base_url=get_base_url)
+
+
+@pytest.fixture
+def create_valid_organization():
+    """
+    Fixture to create a valid organization for /organization endpoint testing.
+
+    :return: new_org
+    :rtype: Organization
+    """
+    new_org = Organization(
+        name=f"Test Org {random_name(8)}",
+        description=f"Description {random_name(16)}",
+        avatar=f"Avatar{random_name(8)}",
+        admin_name=f"admin{random_name(4)}",
+        admin_job_title=f"admintitle{random_name(4)}",
+        admin_email=f"{random_name(4)}@{random_name(4)}.com",
+        admin_password="password1",
+        admin_avatar=f"adminavatar{random_name(4)}",
+    )
+
+    return new_org
+
+
+@pytest.fixture
+def create_invalid_organization():
+    """
+    Fixture to create an invalid organization for /organization endpoint testing.
+
+    :return: invalid_org
+    :rtype: Organization
+    """
+    invalid_org = Organization(
+        name=None,
+        description=None,
+        avatar=None,
+        admin_name=None,
+        admin_job_title=None,
+        admin_email=None,
+        admin_password=None,
+        admin_avatar=None,
+    )
+
+    return invalid_org
+
+
+@pytest.fixture
+def create_valid_user():
+    """
+    Fixture to create a valid user for /organization endpoint testing.
+
+    :return: new_user
+    :rtype: User
+    """
+    new_user = User(
+        name=f"Name{random_name(8)}",
+        email=f"{random_name(4)}@{random_name(4)}.com",
+        job_title=f"title{random_name(4)}",
+        role="ADMIN",
+        avatar=f"avatar{random_name(8)}",
+        password="password1",
+    )
+
+    return new_user
+
+
+@pytest.fixture
+def create_invalid_user():
+    """
+    Fixture to create an invalid user for /organization endpoint testing.
+
+    :return: invalid_user
+    :rtype: User
+    """
+    invalid_user = User(name=None, email=None, job_title=None, role=None, avatar=None, password=None)
+
+    return invalid_user

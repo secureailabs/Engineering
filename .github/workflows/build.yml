@@ -88,7 +88,7 @@ jobs:
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
           docker exec -w /Workspace ubuntu_dev_CI sh -c "make clean"
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "make all  -j"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
           docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
           cd Docker/

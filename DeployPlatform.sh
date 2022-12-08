@@ -88,6 +88,9 @@ if [ $retVal -ne 0 ]; then
   popd
 fi
 
+# Get short git commit id
+gitCommitId=$(git rev-parse --short HEAD)
+
 # Run the docker image to deploy the application on the Azure
 pushd $tempDeployDir
 docker run \
@@ -100,6 +103,7 @@ docker run \
   --env AZURE_CLIENT_ID=$AZURE_CLIENT_ID \
   --env AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET \
   --env AZURE_OBJECT_ID=$AZURE_OBJECT_ID \
+  --env VERSION=$gitCommitId
   azuredeploymenttools
 popd
 

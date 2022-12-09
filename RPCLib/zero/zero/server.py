@@ -219,6 +219,9 @@ class ZeroServer:
                 self._device_ipc,
                 self._device_port,
                 self._serializer,
+                self._research_id,
+                self._research_user_id,
+                self._data_federation_id,
                 self._rpc_input_type_map,
                 self._rpc_return_type_map,
                 self._secret_result_cache,
@@ -319,6 +322,9 @@ class _Worker:
         ipc: str,
         port: int,
         serializer: str,
+        researcher_id: str,
+        researcher_user_id: str,
+        data_federation_id: str,
         rpc_input_type_map: dict,
         rpc_return_type_map: dict,
         secret_result_cache: dict,
@@ -358,6 +364,9 @@ class _Worker:
             ipc,
             port,
             serializer,
+            researcher_id,
+            researcher_user_id,
+            data_federation_id,
             rpc_input_type_map,
             rpc_return_type_map,
             secret_result_cache,
@@ -377,6 +386,9 @@ class _Worker:
         ipc,
         port,
         serializer,
+        researcher_id,
+        researcher_user_id,
+        data_federation_id,
         rpc_input_type_map,
         rpc_return_type_map,
         secret_result_cache,
@@ -411,6 +423,9 @@ class _Worker:
         self._ipc = ipc
         self._port = port
         self._serializer = serializer
+        self._researcher_id = researcher_id
+        self._researcher_user_id = researcher_user_id
+        self._data_federation_id = data_federation_id
         self._loop = asyncio.new_event_loop()
         # self._loop = uvloop.new_event_loop()
         self._rpc_input_type_map = rpc_input_type_map
@@ -634,9 +649,7 @@ class _Worker:
         :return: function result
         :rtype: Any
         """
-        audit_msg = (
-            f"activity: function call; func_name:{msg['function_name']}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
-        )
+        audit_msg = f"[function call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] func_name:{msg['function_name']}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
         self._async_logger.log(audit_msg)
 
         rpc = msg["function_name"]
@@ -665,7 +678,7 @@ class _Worker:
         object_id = msg["object_id"]
         method_name = msg["method_name"]
 
-        audit_msg = f"activity: method call; object_id:{object_id}; method_name:{method_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
+        audit_msg = f"[Method call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] object_id:{object_id}; method_name:{method_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
         self._async_logger.log(audit_msg)
 
         try:
@@ -692,7 +705,7 @@ class _Worker:
         """
         class_name = msg["class_name"]
 
-        audit_msg = f"activity: constructor call; class_name:{class_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
+        audit_msg = f"[constructor call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] class_name:{class_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
         self._async_logger.log(audit_msg)
 
         if class_name in self._ro_router:
@@ -717,7 +730,7 @@ class _Worker:
         """
         object_id = msg["object_id"]
 
-        audit_msg = f"activity: destructor call; object_id:{msg['object_id']}"
+        audit_msg = f"[destructor call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] object_id:{msg['object_id']}"
         self._async_logger.log(audit_msg)
 
         try:
@@ -738,7 +751,7 @@ class _Worker:
         """
         object_id = msg["object_id"]
 
-        audit_msg = f"activity: attribute call"
+        audit_msg = f"[attribute call][Researcher ID: {self._researcher_id}][Researcher user ID: {self.researcher_user_id}][Data Federation ID: {self._data_federation_id}] object_id:{object_id}"
         self._async_logger.log(audit_msg)
 
         try:

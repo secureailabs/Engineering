@@ -10,9 +10,6 @@ RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get install -y
 
-COPY loki-linux-amd64 /app/loki-linux-amd64
-COPY loki-local-config.yaml /app/loki-local-config.yaml
-
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

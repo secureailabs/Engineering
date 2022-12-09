@@ -10,7 +10,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -m [Image Name] [-a]"
     echo "Usage: $0"
-    echo -e "\t-m Module Name: apiservices | newwebfrontend | rpcrelated | smartbroker"
+    echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | newwebfrontend | securecomputationnode | rpcrelated | smartbroker | auditserver"
     echo -e "\t-a ci_flag will be set to true"
     exit 1 # Exit script after printing help
 }
@@ -55,7 +55,7 @@ if [ -z "$ci_flag" ]; then
     # Bash Menu
     # TODO Technially all subscriptions for this script can share 1 SP: Discussion We should create singular SP for PACKER
     echo -e "\nPlease Specify # for targeted subscription to upload image: "
-    options=("Development" "Release Candidate" "ProductionGA" "Quit")
+    options=("Development" "Release Candidate" "ProductionGA" "Test" "Quit")
     select opt in "${options[@]}"
     do
         case $REPLY in
@@ -81,6 +81,13 @@ if [ -z "$ci_flag" ]; then
                 break
                 ;;
             4)
+                echo -e "\n==== Setting env variables for $opt ===="
+                export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
+                ResourceGroup="3d2b9951-a0c8-4dc3-8114-2776b047b15c" # This needs to get updated per choice of subscription
+                StorageAccountName="sailvmimages9999" # This needs to get updated per choice of subscription
+                break
+                ;;
+            5)
                 exit 0
                 ;;
         esac

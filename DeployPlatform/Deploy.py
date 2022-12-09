@@ -10,7 +10,8 @@ from azure.core.exceptions import AzureError
 from azure.keyvault.keys import KeyClient
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
-from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
+from azure.mgmt.monitor.models import (DiagnosticSettingsResource, LogSettings,
+                                       MetricSettings)
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
 from database_initialization import initialize_database
@@ -218,6 +219,55 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     return keyvault_url
 
 
+def deploy_audit_service(
+    account_credentials,
+    deployment_name,
+    storage_account_name,
+    storage_account_password,
+    storage_resource_group_name,
+    key_vault_url,
+    owner,
+):
+    """
+    Deploy Audit Service
+    """
+    subscription_id = account_credentials["subscription_id"]
+
+    # Get params to update json
+    set_parameters = set_params(subscription_id, "auditserver")
+    # Deploy the frontend server
+    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver")
+
+    # Read backend json from file and set params
+    with open("auditserver.json", "r") as backend_json_fd:
+        backend_json = json.load(backend_json_fd)
+    backend_json["owner"] = owner
+    backend_json["azure_subscription_id"] = subscription_id
+    backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
+    backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
+    backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
+    backend_json["azure_scn_image_id"] = set_parameters["azure_scn_image_id"]
+    backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
+    backend_json["azure_storage_resource_group"] = storage_resource_group_name
+    backend_json["azure_storage_account_name"] = storage_account_name
+    backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
+    backend_json["azure_storage_account_password"] = storage_account_password
+    backend_json["azure_keyvault_url"] = key_vault_url
+
+    with open("auditserver.json", "w") as outfile:
+        json.dump(backend_json, outfile)
+
+    # Sleeping for a minute
+    time.sleep(60)
+
+    upload_package(audit_service_ip, "auditserver.json", "auditserver.tar.gz")
+
+    # Sleeping for some time
+    time.sleep(90)
+
+    return audit_service_ip
+
+
 def deploy_apiservices(
     account_credentials,
     deployment_name,
@@ -227,6 +277,8 @@ def deploy_apiservices(
     key_vault_url,
     owner,
     version: str,
+    audit_service_ip,
+    audit_service_port=3100,
 ):
     """
     Deploy Api Services
@@ -254,6 +306,8 @@ def deploy_apiservices(
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
     backend_json["version"] = version
+    backend_json["audit_service_ip"] = audit_service_ip
+    backend_json["audit_service_port"] = audit_service_port
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -471,6 +525,18 @@ if __name__ == "__main__":
         storage_account_id=storage_account_id,
     )
 
+    # Deploy the audit services
+    audit_service_ip = deploy_audit_service(
+        account_credentials,
+        deployment_id,
+        storage_account_name,
+        storage_accout_password,
+        storage_resource_group_name,
+        key_vault_url,
+        OWNER,
+    )
+    print("Audit Service server: ", audit_service_ip)
+
     # Deploy the API services
     platform_services_ip = deploy_apiservices(
         account_credentials,
@@ -481,6 +547,7 @@ if __name__ == "__main__":
         key_vault_url,
         OWNER,
         VERSION,
+        audit_service_ip,
     )
     print("API Services server: ", platform_services_ip)
 

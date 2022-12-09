@@ -29,6 +29,10 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+RUN useradd --system promtail
+COPY promtail-local-config.yaml /promtail-local-config.yaml
+COPY promtail-linux-amd64 /promtail-linux-amd64
+
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 

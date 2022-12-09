@@ -14,6 +14,9 @@ package_apiservices: package_rpcrelated package_smartbroker
 	@rm ApiServices/rpcrelated*.json
 	@rm ApiServices/smartbroker*.json
 
+package_audit_service:
+	@cd AuditService && ./package.sh
+
 package_rpcrelated:
 	@cd RPCLib && ./package.sh
 

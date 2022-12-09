@@ -333,6 +333,8 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             researcher_id=secure_computation_node_db.researcher_id,
             researcher_user_id=secure_computation_node_db.researcher_user_id,
             version=get_secret("version"),
+            audit_service_ip=get_secret("audit_service_ip"),
+            audit_service_port=get_secret("audit_service_port"),
         )
 
         with open(str(secure_computation_node_db.id), "w") as outfile:

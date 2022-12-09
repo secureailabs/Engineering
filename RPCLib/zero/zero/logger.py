@@ -78,7 +78,7 @@ class _AsyncLogger:  # pragma: no cover
         _AsyncLogger.ipc = ipc
 
         logger = logging.getLogger()
-        file_handler = logging.FileHandler("audit.log")
+        file_handler = logging.FileHandler("/app/rpc_audit.log")
         logger.addHandler(file_handler)
 
         ctx = zmq.Context()

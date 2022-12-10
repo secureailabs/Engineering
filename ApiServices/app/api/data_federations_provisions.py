@@ -14,7 +14,7 @@
 
 from typing import List
 
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 
 from app.api.authentication import get_current_user

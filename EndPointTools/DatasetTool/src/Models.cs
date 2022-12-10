@@ -19,7 +19,11 @@ class ModelDatasetVersionMetadata
 
 class ModelDatasetHeader
 {
-    public ModelDatasetVersionMetadata dataset_version { get; set; } = default!;
+    public string dataset_packaging_format { get; set; } = default!;
+    public string data_federation_name { get; set; } = default!;
+    public Guid data_federation_id { get; set; } = default!;
+    public string dataset_name { get; set; } = default!;
+    public Guid dataset_id { get; set; } = default!;
     public string aes_tag { get; set; } = default!;
     public string aes_nonce { get; set; } = default!;
 }

@@ -93,10 +93,29 @@ class Program
 
                 // Get the encryption key from the backend
                 string encryption_key = user_session.GetEncryptionKeyForDataset(dataset_id, data_federation.id);
-                // string encryption_key = "DhA5lu3lYGnvOIztQn/IGLX6ar1T25AuVaMMuwLuJGs=";
+
+                // Create a dataset header
+                ModelDatasetHeader dataset_header = new ModelDatasetHeader();
+                dataset_header.dataset_id = dataset_id;
+                dataset_header.dataset_name = dataset_configuration.m_configuration.dataset.name;
+                dataset_header.data_federation_id = data_federation.id;
+                dataset_header.data_federation_name = data_federation.name;
+                if (dataset_configuration.m_configuration.dataset.format == "FHIR")
+                {
+                    dataset_header.dataset_packaging_format = "fhirv1";
+                }
+                else if (dataset_configuration.m_configuration.dataset.format == "CSV")
+                {
+                    dataset_header.dataset_packaging_format = "csvv1";
+                }
+                else
+                {
+                    throw new Exception("Unknown dataset format");
+                }
+                // dataset_header.dataset_packaging_format = dataset_configuration.m_configuration.dataset.format;
 
                 // Upload the dataset
-                dataset_version.ValidateAndUploadToAzure(azure_connection_string, encryption_key);
+                dataset_version.ValidateAndUploadToAzure(azure_connection_string, encryption_key, dataset_header);
 
                 // Mark the dataset version as ready
                 user_session.MarkDatasetVersionAsActive(dataset_version_id);

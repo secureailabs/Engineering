@@ -60,9 +60,9 @@ if [ -z "${AZURE_OBJECT_ID}" ]; then
 fi
 
 # Build and Package the Platform Services
-make package_apiservices -j
-make databaseInitializationTool -j
-make package_newwebfrontend -j
+make package_apiservices
+make databaseInitializationTool
+make package_newwebfrontend
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir

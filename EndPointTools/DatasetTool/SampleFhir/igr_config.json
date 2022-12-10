@@ -13,6 +13,6 @@
     },
     "data_federation": "KCA Consortium",
     "data_source": [
-        "SampleFhir/patient_data"
+        "SampleFhir/patient_data/igr"
     ]
 }

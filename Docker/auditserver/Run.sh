@@ -20,12 +20,18 @@ else
     exit 1
 fi
 
+# Create a folder to hold all the Binaries
+mkdir -p "$imageName"_dir
+
+# Copy the binaries to the folder
+cp vm_initializer.py "$imageName"_dir/
+
 # Run the docker container
 docker run \
 -it \
 -p 3100:3100 \
 -p 9093:9093 \
 -p 9096:9096 \
---net sailNetwork \
+-v $(pwd)/"$imageName"_dir:/app \
 --name auditserver \
 $imageName

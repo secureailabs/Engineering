@@ -16,4 +16,5 @@ fi
 # Unpack the tar package
 tar -xf package.tar.gz
 
+# initialize the loki server
 loki-linux-amd64 -config.file=loki-local-config.yaml

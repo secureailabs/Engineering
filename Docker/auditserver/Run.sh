@@ -28,10 +28,12 @@ cp vm_initializer.py "$imageName"_dir/
 
 # Run the docker container
 docker run \
--it \
+-dit \
 -p 3100:3100 \
+-p 9090:9091 \
 -p 9093:9093 \
 -p 9096:9096 \
 -v $(pwd)/"$imageName"_dir:/app \
+-v $(pwd)/certs:/etc/nginx/certs \
 --name auditserver \
 $imageName

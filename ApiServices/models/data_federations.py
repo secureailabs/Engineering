@@ -15,10 +15,9 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import Field, StrictStr
-
 from models.common import BasicObjectInfo, KeyVaultObject, PyObjectId, SailBaseModel
 from models.secure_computation_nodes import SecureComputationNodeSize
+from pydantic import Field, StrictStr
 
 
 class DataFederationState(Enum):
@@ -35,6 +34,7 @@ class DataFederation_Base(SailBaseModel):
     name: StrictStr = Field(...)
     description: StrictStr = Field(...)
     data_format: DataFederationDataFormat = Field(...)
+    data_model: Optional[StrictStr] = Field(...)
 
 
 class DataSubmitterIdKeyPair(SailBaseModel):

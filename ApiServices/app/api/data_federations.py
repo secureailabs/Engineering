@@ -570,6 +570,45 @@ async def invite_data_submitter(
 
 
 ########################################################################################################################
+@router.put(
+    path="/data-federations/{data_federation_id}/data-models",
+    description="Add a data model to a data federation",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def add_data_model(
+    data_federation_id: PyObjectId,
+    data_model: str = Body(media_type="application/json"),
+    current_user: TokenData = Depends(get_current_user),
+):
+    """
+    Add a data model to the data federation
+
+    :param data_federation_id: data federation for which the fhir profile is being added
+    :type data_federation_id: PyObjectId
+    :param data_model: data model json to be added
+    :type data_model: str
+    :param current_user: current user information, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises http_exception: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :return: None
+    :rtype: None
+    """
+    # Only data federation owner can add a fhir profile
+    update_response = await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+        {"$setOnInsert:": {"data_model": data_model}},
+    )
+    if update_response.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Data Federation not found for the current organization or the data model already exists",
+        )
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+########################################################################################################################
 @router.delete(
     path="/data-federations/{data_federation_id}",
     description="Disable the data federation",

@@ -534,7 +534,6 @@ if __name__ == "__main__":
         storage_resource_group_name,
         key_vault_url,
         OWNER,
-        audit_service_ip,
     )
     print("Audit Service server: ", audit_service_ip)
 

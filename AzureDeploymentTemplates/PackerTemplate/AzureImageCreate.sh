@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
-source .env.dev
+source .env
 Location="westus"
 
 PrintHelp()
@@ -127,7 +127,7 @@ az sig image-definition create \
 --publisher "SAIL" \
 --hyper-v-generation V2 \
 --offer $imageName \
---sku "Standard_LRS" \
+--sku "sail" \
 --os-type "Linux"
 
 # Ubuntu vhd Image

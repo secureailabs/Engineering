@@ -15,9 +15,9 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
 from fastapi.encoders import jsonable_encoder
-from pydantic import EmailStr
+from pydantic import EmailStr, Json
 
 import app.utils.azure as azure
 from app.api.accounts import get_all_admins, get_organization, get_user
@@ -576,8 +576,9 @@ async def invite_data_submitter(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def add_data_model(
+    request: Request,
     data_federation_id: PyObjectId,
-    data_model: str = Body(media_type="application/json"),
+    data_model: dict = Body(),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -594,16 +595,33 @@ async def add_data_model(
     :rtype: None
     """
     # Only data federation owner can add a fhir profile
-    update_response = await data_service.update_one(
-        DB_COLLECTION_DATA_FEDERATIONS,
-        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
-        {"$setOnInsert:": {"data_model": data_model}},
-    )
-    if update_response.matched_count == 0:
+    data_model_str = (await request.body()).decode("utf-8")
+    if len(data_model_str) == 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Data Federation not found for the current organization or the data model already exists",
+            detail="Data model is empty",
         )
+
+    # Get the data federation
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    data_federation_db = DataFederation_Db(**data_federation_db)
+
+    if data_federation_db.data_model is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The data model already exists",
+        )
+
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": {"data_model": data_model_str}},
+    )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

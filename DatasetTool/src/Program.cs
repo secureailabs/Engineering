@@ -50,6 +50,12 @@ class Program
                     throw new Exception("Data federation not found");
                 }
 
+                // Data federation model should not be empty
+                if (data_federation.data_model == null || data_federation.data_model.Length == 0)
+                {
+                    throw new Exception("Data federation model is not set. Kindly ask the data federation owner to set the model.");
+                }
+
                 // Check if the dataset configuration format matches the data federation format
                 if (dataset_configuration.m_configuration.dataset.format != data_federation.data_format)
                 {

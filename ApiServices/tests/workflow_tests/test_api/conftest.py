@@ -14,22 +14,26 @@
 import sys
 
 import pytest
-from tests.workflow_tests.api_portal.account_management_api import AccountManagementApi, AccountManagementFastApi
-from tests.workflow_tests.api_portal.azure_template_managment_api import AzureTemplateApi
-from tests.workflow_tests.api_portal.datafederation_management_api import DataFederationManagementApi
-from tests.workflow_tests.api_portal.dataset_management_api import DataSetManagementApi
-from tests.workflow_tests.api_portal.datasetfamily_management_api import DatasetFamilyManagementApi
-from tests.workflow_tests.api_portal.digital_contract_management_api import DigitalContractManagementApi
-from tests.workflow_tests.api_portal.sail_portal_api import SailPortalApi, SailPortalFastApi
-from tests.workflow_tests.api_portal.virtual_machine_api import VirtualMachineApi
-from tests.workflow_tests.config import (
-    API_PORTAL_IP,
-    DATAOWNER_EMAIL,
-    ORCHESTRATOR_PATH,
-    PORT,
-    RESEARCHER_EMAIL,
-    SAIL_PASS,
-)
+from tests.workflow_tests.api_portal.account_management_api import (
+    AccountManagementApi, AccountManagementFastApi)
+from tests.workflow_tests.api_portal.azure_template_managment_api import \
+    AzureTemplateApi
+from tests.workflow_tests.api_portal.datafederation_management_api import \
+    DataFederationManagementApi
+from tests.workflow_tests.api_portal.dataset_management_api import (
+    DataSetManagementApi, DataSetManagementFastApi)
+from tests.workflow_tests.api_portal.datasetfamily_management_api import \
+    DatasetFamilyManagementApi
+from tests.workflow_tests.api_portal.digital_contract_management_api import \
+    DigitalContractManagementApi
+from tests.workflow_tests.api_portal.sail_portal_api import (SailPortalApi,
+                                                             SailPortalFastApi)
+from tests.workflow_tests.api_portal.virtual_machine_api import \
+    VirtualMachineApi
+from tests.workflow_tests.config import (API_PORTAL_IP, DATAOWNER_EMAIL,
+                                         ORCHESTRATOR_PATH, PORT,
+                                         RESEARCHER_EMAIL, SAIL_PASS)
+from tests.workflow_tests.utils.dataset_helpers import Dataset, DatasetVersion
 from tests.workflow_tests.utils.helpers import random_name
 from tests.workflow_tests.utils.organization_helper import Organization, User
 
@@ -125,6 +129,17 @@ def account_management(get_base_url):
     :rtype: class : api_portal.account_management_api.AccountManagementApi
     """
     return AccountManagementApi(base_url=get_base_url)
+
+
+@pytest.fixture
+def dataset_management_fast_api(get_base_url):
+    """
+    Fixture for DataSetManagementApi
+
+    :return: DataSetManagementApi
+    :rtype: class : api_portal.dataset_management_api.DataSetManagementApi
+    """
+    return DataSetManagementFastApi(base_url=get_base_url)
 
 
 @pytest.fixture
@@ -270,3 +285,74 @@ def create_invalid_user():
     invalid_user = User(name=None, email=None, job_title=None, role=None, avatar=None, password=None)
 
     return invalid_user
+
+
+@pytest.fixture
+def create_valid_dataset_csv():
+    """
+    Fixture to create a valid dataset for /datasets endpoint testing.
+    """
+    new_dataset = Dataset(
+        name=f"DatasetName{random_name(4)}",
+        description=f"DatasetDescription {random_name(4)}",
+        tags=f"{random_name(8)} {random_name(4)} {random_name(8)}",
+        format="CSV"
+    )
+
+    return new_dataset
+
+
+@pytest.fixture
+def create_valid_dataset_fhir():
+    """
+    Fixture to create a valid dataset for /datasets endpoint testing.
+    """
+    new_dataset = Dataset(
+        name=f"DatasetName{random_name(8)}",
+        description=f"DatasetDescription{random_name(16)}",
+        tags=f"{random_name(8)},{random_name(4)},{random_name(16)}",
+        format="FHIR"
+    )
+
+    return new_dataset
+
+
+@pytest.fixture
+def create_invalid_dataset():
+    """
+    Fixture to create a valid dataset for /datasets endpoint testing.
+    """
+    new_dataset = Dataset(
+        name=12345,
+        description=None,
+        tags=None,
+        format=None
+    )
+
+    return new_dataset
+
+
+@pytest.fixture
+def create_valid_dataset_version():
+
+    new_dataset_version = DatasetVersion(
+        dataset_id="TEMP",
+        description=f"DatasetVersionDescription {random_name(8)}",
+        name=f"DatasetVersionName{random_name(4)}",
+        state="NOT_UPLOADED"
+    )
+
+    return new_dataset_version
+
+
+@pytest.fixture
+def create_invalid_dataset_version():
+
+    new_dataset_version = DatasetVersion(
+        dataset_id=12345,
+        description=None,
+        name=None,
+        state=None
+    )
+
+    return new_dataset_version

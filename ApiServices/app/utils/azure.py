@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+from app.utils.secrets import get_secret
 from azure.core.exceptions import AzureError
 from azure.core.polling import AsyncLROPoller
 from azure.identity.aio import ClientSecretCredential
@@ -33,10 +34,8 @@ from azure.mgmt.resource.resources.models import DeploymentMode, ResourceGroup
 from azure.mgmt.storage.aio import StorageManagementClient
 from azure.storage.fileshare import FileSasPermissions, generate_file_sas
 from azure.storage.fileshare.aio import ShareDirectoryClient
-from pydantic import BaseModel, Field, StrictStr
-
-from app.utils.secrets import get_secret
 from models.common import KeyVaultObject
+from pydantic import BaseModel, Field, StrictStr
 
 
 class DeploymentResponse(BaseModel):
@@ -287,9 +286,17 @@ async def create_resource_group(account_credentials: AzureCredentials, resource_
     :return: provisioning state of the resource group.
     :rtype: str
     """
-
+    module_name = resource_group_name.split("-")[-1]
     client = ResourceManagementClient(account_credentials.credentials, account_credentials.subscription_id)  # type: ignore
-    response: ResourceGroup = await client.resource_groups.create_or_update(resource_group_name, {"location": account_credentials.location})  # type: ignore
+    response: ResourceGroup = await client.resource_groups.create_or_update(
+        resource_group_name,
+        {
+            "location": account_credentials.location,
+            "tags": {
+                "module": module_name,
+            },
+        },
+    )  # type: ignore
     return response.properties.provisioning_state  # type: ignore
 
 

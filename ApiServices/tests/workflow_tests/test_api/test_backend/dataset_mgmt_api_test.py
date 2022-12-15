@@ -47,7 +47,7 @@ def print_response_values(function_name, response, response_json):
     print(f"Test Response JSON: {response_json}\n")
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management",
     [
@@ -89,7 +89,7 @@ def test_fastapi_get_all_datasets(
     assert_that(test_response.status_code).is_equal_to(200)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset",
     [
@@ -142,7 +142,7 @@ def test_fastapi_register_valid_dataset(
     assert_that(test_response.status_code).is_equal_to(201)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset",
     [
@@ -195,7 +195,7 @@ def test_fastapi_register_invalid_dataset(
     assert_that(test_response.status_code).is_equal_to(422)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management",
     [
@@ -258,7 +258,7 @@ def test_fastapi_get_valid_dataset(
         assert_that(verify_response.status_code).is_equal_to(200)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, dataset_id",
     [
@@ -313,7 +313,7 @@ def test_fastapi_get_invalid_dataset(
     assert_that(test_response.status_code).is_equal_to(422)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, sail_portal_target, dataset_management, new_dataset",
     [
@@ -393,7 +393,7 @@ def test_fastapi_update_valid_dataset_invalid_credentials(
     assert_that(update_response.status_code).is_equal_to(403)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset",
     [
@@ -455,7 +455,7 @@ def test_fastapi_update_valid_dataset_invalid_data(
     assert_that(update_response.status_code).is_equal_to(422)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset, dataset_id",
     [
@@ -516,7 +516,7 @@ def test_fastapi_update_invalid_dataset(
     assert_that(update_response.status_code).is_equal_to(422)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management",
     [
@@ -586,7 +586,7 @@ def test_fastapi_delete_valid_dataset(
     assert_that(delete_response.status_code).is_equal_to(204)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, sail_portal_target, dataset_management",
     [
@@ -648,7 +648,7 @@ def test_fastapi_delete_valid_dataset_invalid_credentials(
     assert_that(delete_response.status_code).is_equal_to(403)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, dataset_id",
     [

@@ -14,11 +14,11 @@
 import pytest
 from assertpy.assertpy import assert_that
 from cerberus import Validator
-from tests.workflow_tests.api_portal.dataset_management_api import \
-    DataSetManagementFastApi
+from tests.workflow_tests.api_portal.dataset_management_api import (
+    DataSetManagementFastApi,
+)
 from tests.workflow_tests.api_portal.sail_portal_api import SailPortalFastApi
-from tests.workflow_tests.utils.dataset_helpers import (DatasetVersion,
-                                                        random_name)
+from tests.workflow_tests.utils.dataset_helpers import DatasetVersion, random_name
 
 
 def print_response_values(
@@ -42,7 +42,7 @@ def print_response_values(
         print(f"Test Response JSON: {response_json}\n")
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management",
     [
@@ -90,7 +90,7 @@ def test_fastapi_get_all_dataset_versions(
         assert_that(test_response.status_code).is_equal_to(200)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management",
     [
@@ -162,7 +162,7 @@ def test_fastapi_get_valid_dataset_version(
             assert_that(test_response.status_code).is_equal_to(200)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, dataset_version_id",
     [
@@ -218,7 +218,7 @@ def test_fastapi_get_invalid_dataset_version(
     assert_that(test_response.status_code).is_equal_to(422)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset_version",
     [
@@ -284,7 +284,7 @@ def test_fastapi_register_valid_dataset_version(
     assert_that(register_response.status_code).is_equal_to(201)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset_version",
     [
@@ -341,7 +341,7 @@ def test_fastapi_register_invalid_dataset_version(
     assert_that(register_response.status_code).is_equal_to(422)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset_version",
     [
@@ -453,7 +453,7 @@ def test_fastapi_update_valid_dataset_version_valid_credentials(
     )
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, sail_portal_target, dataset_management, new_dataset_version",
     [
@@ -533,7 +533,7 @@ def test_fastapi_update_valid_dataset_version_invalid_credentials(
     assert_that(update_response.status_code).is_equal_to(404)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, new_dataset_version, dataset_version_id",
     [
@@ -594,7 +594,7 @@ def test_fastapi_update_invalid_dataset_version(
     assert_that(update_response.status_code).is_equal_to(422)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management",
     [
@@ -659,7 +659,7 @@ def test_fastapi_delete_valid_dataset_version(
     assert_that(delete_response.status_code).is_equal_to(204)
 
 
-@pytest.mark.fastapi
+@pytest.mark.azure
 @pytest.mark.parametrize(
     "sail_portal, dataset_management, dataset_version_id",
     [

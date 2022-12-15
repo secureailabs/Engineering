@@ -8,7 +8,8 @@
         "docker_dir": "",
         "location": "",
         "resource_group_name": "",
-        "gallery_name": ""
+        "gallery_name": "",
+        "version": ""
     },
     "sensitive-variables": [
         "client_secret"
@@ -36,7 +37,7 @@
                 "resource_group": "{{user `resource_group_name`}}",
                 "gallery_name": "{{user `gallery_name`}}",
                 "image_name": "{{user `module`}}",
-                "image_version": "1.0.0",
+                "image_version": "{{user `version`}}",
                 "replication_regions": [
                     "{{user `location`}}"
                 ],

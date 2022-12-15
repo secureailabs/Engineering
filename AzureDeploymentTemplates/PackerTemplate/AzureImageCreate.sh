@@ -3,7 +3,8 @@
 # Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
 source .env
 Location="westus"
-
+ImageGalleryName="sail_image_gallery"
+ImageVersion=1.0.0
 PrintHelp()
 {
     echo ""
@@ -20,13 +21,13 @@ do
     echo "opt: $opt $OPTARG"
     case "$opt" in
         a ) ci_flag="yes" ;;
-        m ) imageName="$OPTARG" ;;
+        m ) ImageName="$OPTARG" ;;
         ? ) PrintHelp ;;
     esac
 done
 
 # Check if the module name is provided
-if [ -z "$imageName" ]; then
+if [ -z "$ImageName" ]; then
     echo "No module specified."
     exit 1
 fi
@@ -35,7 +36,7 @@ fi
 dockerDir=$(realpath ../..)
 
 # The smartbroker module is in a the datascience folder under Engineering
-if [ "$imageName" == "smartbroker" ]; then
+if [ "$ImageName" == "smartbroker" ]; then
     dockerDir=$(realpath ../../datascience)
 fi
 
@@ -62,21 +63,18 @@ if [ -z "$ci_flag" ]; then
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID
                 ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                imageGalleryName=$DEVELOPMENT_IMAGE_GALLERY_NAME # This needs to get updated per choice of subscription
                 break
                 ;;
             2)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
                 ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                imageGalleryName=$RELEASE_CANDIDATE_IMAGE_GALLERY_NAME # This needs to get updated per choice of subscription
                 break
                 ;;
             3)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
                 ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                imageGalleryName=$PRODUCTION_GA_IMAGE_GALLERY_NAME # This needs to get updated per choice of subscription
                 break
                 ;;
             4)
@@ -103,7 +101,7 @@ echo "$output"
 echo -e "\n==== Azure Image Delete As Required ====\n"
 az image delete \
 --resource-group $ResourceGroup \
---name $imageName
+--name $ImageName
 echo "Deletion Completed, continuing..."
 
 echo -e "\n==== Azure VHD& Image Creation Begins ====\n"
@@ -115,26 +113,27 @@ az group create \
 # Create the shared image gallery
 az sig create \
 --resource-group $ResourceGroup \
---gallery-name $imageGalleryName \
+--gallery-name $ImageGalleryName \
 --location $Location
 
 # Create the image definition
 az sig image-definition create \
 --resource-group $ResourceGroup \
---gallery-name $imageGalleryName \
---gallery-image-definition $imageName \
+--gallery-name $ImageGalleryName \
+--gallery-image-definition $ImageName \
 --features SecurityType=ConfidentialVMSupported \
---publisher "SAIL" \
+--publisher "Secure AI Labs" \
 --hyper-v-generation V2 \
---offer $imageName \
+--offer $ImageName \
 --sku "sail" \
 --os-type "Linux"
 
-# Ubuntu vhd Image
+# Ubuntu Image in shared image gallery
 packer build \
 -var location=$Location \
 -var resource_group_name=$ResourceGroup \
--var module=$imageName \
+-var module=$ImageName \
 -var docker_dir=$dockerDir \
--var gallery_name=$imageGalleryName \
+-var gallery_name=$ImageGalleryName \
+-var version=$ImageVersion \
 packer-vhd-ubuntu.json

@@ -4,20 +4,25 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver "
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
+    echo -e "\t-n Name to give the running docker image"
     exit 1 # Exit script after printing help
 }
 
 # Parese the input parameters
 detach=false
 cleanDatabase=false
-while getopts "s:d opt:c opt:" opt; do
+dockerName=""
+scnNames=""
+while getopts "n:l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
     c) cleanDatabase=true ;;
+    l) localDataset="$OPTARG" ;;
+    n) dockerName="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -25,6 +30,10 @@ done
 # Print Help in case parameters are not correct
 if [ -z "$imageName" ] || [ -z "$detach" ]; then
     PrintHelp
+fi
+
+if [ -z "$dockerName" ]; then
+    dockerName=$imageName
 fi
 echo "Running $imageName"
 echo "Detach: $detach"
@@ -75,7 +84,7 @@ mkdir -p $rootDir/Binary/"$imageName"_dir
 cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 
 # Prepare the flags for the docker run command
-runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
+runtimeFlags="$detachFlags --name $dockerName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
     make -C $rootDir orchestrator -s
@@ -99,7 +108,6 @@ elif [ "apiservices" == "$imageName" ]; then
     if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
         echo "environment variable AZURE_SUBSCRIPTION_ID is undefined. Using development as default."
         AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
-        # exit 1
     fi
     if [ ${AZURE_SUBSCRIPTION_ID} == "3d2b9951-a0c8-4dc3-8114-2776b047b15c" ]; then
         cp apiservices/InitializationVectorScratchPad.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
@@ -128,9 +136,17 @@ elif [ "securecomputationnode" == "$imageName" ]; then
     cp securecomputationnode/InitializationVector.json $rootDir/Binary/securecomputationnode_dir
     runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6801 -v $rootDir/Binary/securecomputationnode_dir:/app $imageName"
 elif [ "rpcrelated" == "$imageName" ]; then
-    bash -c "cd $rootDir/RPCLib;./package.sh"
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
-    runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+    if [ ! -f $rootDir/Binary/rpcrelated_dir/package.tar.gz ]; then
+        echo "RPC Package not found, building"
+        pushd $rootDir/RPCLib/
+        ./package.sh
+        popd
+    fi
+    if [ $localDataset ]; then
+        runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
+    fi
+    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "auditserver" == "$imageName" ]; then
     runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then

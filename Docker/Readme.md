@@ -8,6 +8,14 @@ Go to Engineering/
 make clean
 
 make all -j 
+
+```
+### Clone down datascience repo as submodule
+```
+https://github.com/secureailabs/datascience
+cd Engineering/datascience/
+git submodule update --init --remote
+cd Engineering/
 ```
 
 ## Build all the docker images

@@ -1,6 +1,8 @@
 #!/bin/bash
 export tempDeployDir=$(mktemp -d --tmpdir=.)
 
+# This is part 1 of a series of scripts to run to quickly delete resources from azure.
+
 PrintHelp()
 {
     echo ""
@@ -115,7 +117,7 @@ do
                         echo "PROCEEDING..."
                         for rgname in `az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv`; do
                             echo Deleting ${rgname}
-                            # az group delete -n ${rgname} --yes --no-wait
+                            az group delete -n ${rgname} --yes --no-wait
                         done
                         break
                         ;;
@@ -134,7 +136,7 @@ do
                         echo "PROCEEDING..."
                         for rgname in `az group list --query "[?contains(name,'$owner')].{name:name}" --output tsv`; do
                             echo Deleting ${rgname}
-                            # az group delete -n ${rgname} --yes --no-wait
+                            az group delete -n ${rgname} --yes --no-wait
                         done
                         break
                         ;;
@@ -149,5 +151,7 @@ do
     esac
 done
 
-echo "COMPLETED deleting of ResourceGroups based on Query."
-echo "Please wait a few moments and verify deletion of resources in azure"
+echo "=============================================================="
+echo -e "\nCOMPLETED deleting of ResourceGroups based on Query."
+echo -e "Please wait a few moments and verify deletion of resources in azure\n"
+echo "=============================================================="

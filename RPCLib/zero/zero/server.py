@@ -23,6 +23,7 @@ import sys
 import time
 import typing
 import uuid
+import threading
 from functools import partial
 from importlib import import_module
 from multiprocessing import Manager
@@ -90,6 +91,16 @@ def load_safe_function(name_module:str, name_class:str) -> None:
     for function_tuple in list_function_tuple:
         object_class = function_tuple[1]
         return {name_class:object_class}
+
+class Audit_log_task(threading.Thread):
+    """
+    Auxillary class for audit log server in isolated thread
+    """
+    def run(self):
+        """
+        Start async logger server
+        """
+        _AsyncLogger.start_log_poller(_AsyncLogger.ipc, _AsyncLogger.port)
 
 class ZeroServer:
     def __init__(self, host: str = "0.0.0.0", port: int = 5559):
@@ -184,7 +195,7 @@ class ZeroServer:
         iv_json = {}
         with open(file_path, "r") as f:
             iv_json = json.load(f)
-        return iv_json["research_id"], iv_json["researcher_user_id"], iv_json["data_federation_id"]
+        return iv_json["researcher_id"], iv_json["researcher_user_id"], iv_json["data_federation_id"]
 
     def run(self):
         """
@@ -231,9 +242,9 @@ class ZeroServer:
             )
             self._pool.map_async(spawn_worker, [1])
 
-            self._start_queue_device()
             self._start_logger()
-
+            self._start_queue_device()
+            
             # TODO: by default we start the device with processes, but we need support to run only router
             # asyncio.run(self._start_router())
 
@@ -272,7 +283,8 @@ class ZeroServer:
         ZeroMQ.queue_device(self._host, self._port, self._device_ipc, self._device_port)
 
     def _start_logger(self):
-        _AsyncLogger.start_log_poller(_AsyncLogger.ipc, _AsyncLogger.port)
+        t = Audit_log_task()
+        t.start()
 
     async def _start_router(self):  # pragma: no cover
         """

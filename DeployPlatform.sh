@@ -60,7 +60,7 @@ if [ -z "${AZURE_CLIENT_SECRET}" ]; then
   echo "environment variable AZURE_CLIENT_SECRET is undefined"
   exit 1
 fi
-if [ -z "${AZURE_OBJECT_ID}" ]; then
+if [ -z "${AZURE_OBJECT_ID}" ]; then/
   echo "environment variable AZURE_OBJECT_ID is undefined"
   exit 1
 fi

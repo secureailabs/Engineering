@@ -107,8 +107,8 @@ class SecureComputationNodeInitializationVector(SailBaseModel):
     researcher_user_id: PyObjectId = Field(...)
     data_federation_id: PyObjectId = Field(...)
     version: StrictStr = Field(...)
-    audit_server_ip: StrictStr = Field(...)
-    audit_server_port: int = Field(...)
+    audit_service_ip: StrictStr = Field(...)
+    audit_service_port: StrictStr = Field(...)
 
 
 class SmartBrokerScnInfo(SailBaseModel):

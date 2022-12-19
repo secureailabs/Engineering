@@ -136,7 +136,7 @@
         },
         "osProfile": {
           "adminUsername": "[parameters('adminUsername')]",
-          "computerName": "SailBackend",
+          "computerName": "SailAudit",
           "adminPassword": "[parameters('adminPassword')]"
         },
         "networkProfile": {

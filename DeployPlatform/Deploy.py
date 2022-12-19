@@ -278,7 +278,7 @@ def deploy_apiservices(
     owner,
     version: str,
     audit_service_ip,
-    audit_service_port=3100,
+    audit_service_port="3100",
 ):
     """
     Deploy Api Services
@@ -590,5 +590,5 @@ if __name__ == "__main__":
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")
 
-    # # Delete the resource group for the backend server
-    # # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
+    # Delete the resource group for the backend server
+    # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")

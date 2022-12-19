@@ -84,7 +84,7 @@ async def audit_query_computation_by_time(
         end = time.time()
 
     query = {
-        "query": '{job="user_activity"}',
+        "query": '{job="computation"}',
         "start": start,
         "end": end,
     }

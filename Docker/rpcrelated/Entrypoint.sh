@@ -38,8 +38,8 @@ auditIP=$(cat InitializationVector.json | jq -r '.audit_service_ip')
 auditPort=$(cat InitializationVector.json | jq -r '.audit_service_port')
 
 # modify the audit service ip of promtail config file
-sed -i "s,auditserver,$auditIP,g" /promtail-local-config.yaml
-sed -i "s,3100,$auditPort,g" /promtail-local-config.yaml
+sed -i "s,auditserver,$auditIP,g" /app/promtail-local-config.yaml
+sed -i "s,3100,$auditPort,g" /app/promtail-local-config.yaml
 
 mountDir="/mnt/azure"
 datasetDir="/data/$datasetId"
@@ -86,7 +86,7 @@ pip3 install /ds/sail-safe-functions-orchestrator
 pip3 install /ds/helper-libs
 
 # Start the promtail client
-/promtail-linux-amd64 -config.file=/promtail-local-config.yaml  > /promtail.log 2>&1&
+/app/promtail-linux-amd64 -config.file=/app/promtail-local-config.yaml  > /app/promtail.log 2>&1&
 
 # Start the rpc server
 PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER=/app/private_keys/server.key_secret PATH_DIR_DATASET=/data/ python3 /ds/sail-safe-functions-test/integration_test/test_server.py 5556

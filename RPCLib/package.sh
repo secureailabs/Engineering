@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #package necessary files and dirs
-tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -zcvf package.tar.gz test_server.py private_keys public_keys zero ../datascience
+tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -zcvf package.tar.gz promtail-linux-amd64 promtail-local-config.yaml test_server.py private_keys public_keys zero ../datascience
 
 #move the package to Binary
 mkdir -p ../Binary/rpcrelated_dir/

@@ -83,7 +83,7 @@ if [ -z "$ci_flag" ]; then
             4)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
-                ResourceGroup="3d2b9951-a0c8-4dc3-8114-2776b047b15c" # This needs to get updated per choice of subscription
+                ResourceGroup="sail-test" # This needs to get updated per choice of subscription
                 StorageAccountName="sailvmimages9999" # This needs to get updated per choice of subscription
                 break
                 ;;

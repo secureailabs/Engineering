@@ -8,7 +8,7 @@
     "azure_tenant_id": "3e74e5ef-7e6a-4cf0-8573-680ca49b64d8",
     "azure_client_id": "d7cd4787-7e2e-4f62-b5be-9a3d05098209",
     "azure_client_secret": "jzK8Q~XkAtSwg~L.47IrKLNv33zIbVApxPr02awb",
-    "azure_scn_image_id": "/subscriptions/3d2b9951-a0c8-4dc3-8114-2776b047b15c/resourceGroups/InitializerImageStorageRg/providers/Microsoft.Compute/images/",
+    "azure_scn_image_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/{0}/versions/0.0.0",
     "azure_scn_user_name": "sailuser",
     "azure_scn_password": "SailPassword@123",
     "azure_scn_subnet_name": "PlatformService_eastus",
@@ -22,4 +22,3 @@
     "audit_service_ip": "auditserver",
     "audit_service_port": "3100"
 }
-

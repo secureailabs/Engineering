@@ -29,11 +29,10 @@ class DeploymentResponse(BaseModel):
 
 DEV_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/Dev-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/galleries/    /images/{0}/versions/1.0.0",
+    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/{0}/versions/0.0.0",
     "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
-    "azure_scn_image_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
     "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
     "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
     "azure_storage_account_name": "sailvmimages9827",
@@ -47,7 +46,6 @@ RELEASE_CANDIDATE_PARAMS = {
     "virtualNetworkId": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-rls-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-rls-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-rls-platformservice-01",  # change this line depending on your vnet
-    "azure_scn_image_id": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
     "azure_scn_subnet_name": "snet-sail-wus-rls-scn-01",
     "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
     "azure_storage_account_name": "sailvmimages9828",
@@ -61,7 +59,6 @@ PRODUCTIONGA_PARAMS = {
     "virtualNetworkId": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-prd-platformservice-01",  # change this line depending on your vnet
-    "azure_scn_image_id": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
     "azure_scn_subnet_name": "snet-sail-wus-prd-scn-01",
     "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
     "azure_storage_account_name": "sailvmimages9829",
@@ -250,7 +247,7 @@ def deploy_apiservices(
     backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
     backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
     backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
-    backend_json["azure_scn_image_id"] = set_parameters["azure_scn_image_id"]
+    backend_json["azure_scn_image_id"] = set_parameters["vmImageResourceId"]
     backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
     backend_json["azure_storage_resource_group"] = storage_resource_group_name
     backend_json["azure_storage_account_name"] = storage_account_name

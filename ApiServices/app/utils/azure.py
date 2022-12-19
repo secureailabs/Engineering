@@ -450,7 +450,7 @@ async def deploy_module(
         parameters = {
             "vmName": virtual_machine_name,
             "vmSize": vm_size,
-            "vmImageResourceId": get_secret("azure_scn_image_id") + module_name,
+            "vmImageResourceId": get_secret("azure_scn_image_id").format(module_name),
             "adminUserName": get_secret("azure_scn_user_name"),
             "adminPassword": get_secret("azure_scn_password"),
             "subnetName": get_secret("azure_scn_subnet_name"),

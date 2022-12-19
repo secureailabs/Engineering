@@ -4,7 +4,7 @@
 source .env
 Location="westus"
 ImageGalleryName="sail_image_gallery"
-ImageVersion=1.0.0
+
 PrintHelp()
 {
     echo ""
@@ -51,6 +51,9 @@ if [ $retVal -ne 0 ]; then
     exit $retVal
 fi
 
+# Get the version from the VERSION file
+ImageVersionFromFile=$(cat ../../VERSION)
+
 if [ -z "$ci_flag" ]; then
     # Bash Menu
     # TODO Technially all subscriptions for this script can share 1 SP: Discussion We should create singular SP for PACKER
@@ -61,20 +64,23 @@ if [ -z "$ci_flag" ]; then
         case $REPLY in
             1)
                 echo -e "\n==== Setting env variables for $opt ===="
-                export AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID
+                export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
                 ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                ImageVersion=0.0.0
                 break
                 ;;
             2)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
                 ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                ImageVersion=$ImageVersionFromFile
                 break
                 ;;
             3)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
                 ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                ImageVersion=$ImageVersionFromFile
                 break
                 ;;
             4)
@@ -122,7 +128,7 @@ az sig image-definition create \
 --gallery-name $ImageGalleryName \
 --gallery-image-definition $ImageName \
 --features SecurityType=ConfidentialVMSupported \
---publisher "Secure AI Labs" \
+--publisher "Secure-AI-Labs" \
 --hyper-v-generation V2 \
 --offer $ImageName \
 --sku "sail" \
@@ -136,4 +142,4 @@ packer build \
 -var docker_dir=$dockerDir \
 -var gallery_name=$ImageGalleryName \
 -var version=$ImageVersion \
-packer-vhd-ubuntu.json
+packer-sig-ubuntu.json

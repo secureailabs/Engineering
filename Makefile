@@ -4,17 +4,15 @@ include Make/newwebfrontend.mk
 .PHONY: databaseInitializationTool package all clean SharedCommonCode
 
 package_apiservices: SharedCommonCode package_rpcrelated package_smartbroker
-	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated.json ApiServices
-	@cp AzureDeploymentTemplates/ArmTemplates/securecomputationnode.json ApiServices
-	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker.json ApiServices
+	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated*.json ApiServices
+	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker*.json ApiServices
 	@cp Binary/rpcrelated_dir/package.tar.gz ApiServices
 	@cp Binary/smartbroker.tar.gz ApiServices
 	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
 	@rm ApiServices/package.tar.gz
 	@rm ApiServices/smartbroker.tar.gz
-	@rm ApiServices/rpcrelated.json
-	@rm ApiServices/securecomputationnode.json
-	@rm ApiServices/smartbroker.json
+	@rm ApiServices/rpcrelated*.json
+	@rm ApiServices/smartbroker*.json
 
 package_rpcrelated:
 	@cd RPCLib && ./package.sh

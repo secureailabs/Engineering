@@ -6,8 +6,7 @@ export tempDeployDir=$(mktemp -d --tmpdir=.)
 PrintHelp()
 {
     echo ""
-    echo "Usage: $0 -p [Purpose:[Nightly, Bugfix, etc..]] -o [Owner: [Prawal, Stanley]]"
-    echo -e "\t-p Purpose: purpose of deployment. No spaces. "
+    echo "Usage: $0 -o [Owner: [Prawal, Stanley]]"
     echo -e "\t-o Triggered By: deployment owner name. No spaces."
     exit 1 # Exit script after printing help
 }
@@ -21,22 +20,20 @@ if [ $retVal -ne 0 ]; then
 fi
 
 # Parse the input parameters
-while getopts "p:o:" opt
+while getopts "o:" opt
 do
     echo "opt: $opt $OPTARG"
     case "$opt" in
-        p ) purpose="$OPTARG" ;;
         o ) owner="$OPTARG" ;;
         ? ) PrintHelp ;;
     esac
 done
 
 # Print Help in case parameters are not correct
-if [ -z "$purpose" ] || [ -z "$owner" ]
+if [ -z "$owner" ]
 then
     PrintHelp
 fi
-echo "Purpose: $purpose"
 echo "Owner: $owner"
 
 # Check for Azure environment variables
@@ -74,7 +71,7 @@ az account set --subscription $AZURE_SUBSCRIPTION_ID
 echo -e "\n==== Verify Subscription Set Properly ====\n"
 az account show
 
-
+# List out resources for visualization based on query parameters
 echo -e "\nPlease Specify # for resource search parameters: "
 options=("Platform Services" "SCN" "Platform Services and SCN" "Quit")
 select opt in "${options[@]}"
@@ -99,7 +96,7 @@ do
 done
 
 echo -e "\nThe following resources were found:\n$output\n"
-
+# Delete the resources based on selected options
 echo -e "Please Specify # : "
 options=("Delete resources of specified guid" "Delete all resources associated with owner" "Quit")
 select opt in "${options[@]}"

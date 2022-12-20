@@ -150,7 +150,7 @@ ImageName=$(echo "$output" | grep "ImageName:" | cut -d':' -f2 | tr -d '[:space:
 gitCommitHash=$(git rev-parse --short HEAD)
 
 # Tag the image with the short git commit hash
-az image tag \
+az image update \
 --resource-group $ResourceGroup \
 --name $ImageName \
---tags gitCommitHash=$gitCommitHash
+--set tags.gitCommitHash=$gitCommitHash

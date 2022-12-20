@@ -1,8 +1,0 @@
-DatasetProperty,Title,"KCA Consortium Data - MGH"
-DatasetProperty,Description,"Patient data derived from internal kidney cancer patient registry. Covers patients admitted 1995 to present. Conforms to KCA Consortium Data Model ver 1.0"
-DatasetProperty,Tags,""
-DatasetProperty,DatasetFamily,"7ab6431d-1287-4541-af8b-b29cedd73500"
-DatasetProperty,DatasetFamilyDescription,"IGR Dataset Family,7ab6431d-1287-4541-af8b-b29cedd73500"
-TablePackage,"igr_001_a.sailtable"
-TablePackage,"igr_001_b.sailtable"
-TablePackage,"igr_001_c.sailtable"

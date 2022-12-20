@@ -63,6 +63,7 @@ jobs:
           echo "${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
           docker image prune --all -f
+          rm -rf ./datascience/ || true
 
   build:
     runs-on: [self-hosted, Linux, x64, docker]
@@ -122,7 +123,6 @@ jobs:
           docker kill $(docker ps -q)
           docker rm $(docker ps -a -q)
           sudo make clean
-          rm -rf datascience/
 
   # stop-runner:
   #   # Always stop runner even if build step fails

@@ -50,6 +50,7 @@ jobs:
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
           docker stop apiservices || true && docker rm apiservices || true
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
+          rm -rf ./datascience/ || true
           git clone https://$PAT@github.com/secureailabs/datascience.git datascience
           git -C ./datascience/ submodule update --init --remote
           cd Docker/

@@ -73,7 +73,7 @@ cp Binary/DatabaseInitializationSettings.json $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 cp Binary/newwebfrontend.tar.gz $tempDeployDir
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
-cp -r InternalTools/DeployPlatform/* $tempDeployDir
+cp -r DeployPlatform/* $tempDeployDir
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime
 cp Docker/apiservices/InitializationVector.json $tempDeployDir/apiservices.json

@@ -12,10 +12,8 @@ make all -j
 ```
 ### Clone down datascience repo as submodule
 ```
-https://github.com/secureailabs/datascience
-cd Engineering/datascience/
-git submodule update --init --remote
 cd Engineering/
+git submodule update --init
 ```
 
 ## Build all the docker images

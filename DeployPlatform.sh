@@ -60,9 +60,9 @@ if [ -z "${AZURE_OBJECT_ID}" ]; then
 fi
 
 # Build and Package the Platform Services
-make package_apiservices -j
-make databaseInitializationTool -j
-make package_newwebfrontend -j
+make package_apiservices
+make databaseInitializationTool
+make package_newwebfrontend
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir
@@ -73,7 +73,7 @@ cp Binary/DatabaseInitializationSettings.json $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 cp Binary/newwebfrontend.tar.gz $tempDeployDir
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
-cp -r InternalTools/DeployPlatform/* $tempDeployDir
+cp -r DeployPlatform/* $tempDeployDir
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime
 cp Docker/apiservices/InitializationVector.json $tempDeployDir/apiservices.json
@@ -103,7 +103,7 @@ docker run \
   --env AZURE_CLIENT_ID=$AZURE_CLIENT_ID \
   --env AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET \
   --env AZURE_OBJECT_ID=$AZURE_OBJECT_ID \
-  --env VERSION=$gitCommitId
+  --env VERSION=$gitCommitId \
   azuredeploymenttools
 popd
 

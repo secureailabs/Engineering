@@ -1,0 +1,21 @@
+{
+    "dataset":
+    {
+        "name": "MGR Dataset",
+        "description": "dataset description",
+        "tags": "my dataset tags",
+        "format": "CSV"
+    },
+    "dataset_version":
+    {
+        "name": "MGR Dataset #1",
+        "description": "MGR Dataset"
+    },
+    "data_federation": "KCA Consortium",
+    "data_source": [
+        "SampleData/mgr_001_a.csv",
+        "SampleData/mgr_001_b.csv",
+        "SampleData/mgr_001_c.csv",
+        "SampleData/kidney_clean_2.csv"
+    ]
+}

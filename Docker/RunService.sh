@@ -4,20 +4,25 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver"
+    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver "
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
+    echo -e "\t-n Name to give the running docker image"
     exit 1 # Exit script after printing help
 }
 
 # Parese the input parameters
 detach=false
 cleanDatabase=false
-while getopts "s:d opt:c opt:" opt; do
+dockerName=""
+scnNames=""
+while getopts "n:l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
     c) cleanDatabase=true ;;
+    l) localDataset="$OPTARG" ;;
+    n) dockerName="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -25,6 +30,10 @@ done
 # Print Help in case parameters are not correct
 if [ -z "$imageName" ] || [ -z "$detach" ]; then
     PrintHelp
+fi
+
+if [ -z "$dockerName" ]; then
+    dockerName=$imageName
 fi
 echo "Running $imageName"
 echo "Detach: $detach"
@@ -65,7 +74,7 @@ if $cleanDatabase; then
 fi
 
 # Build the bootstrap tool to create the database
-make -C $rootDir vmInitializer -s -j
+make -C $rootDir vmInitializer -s
 
 # Create a folder to hold all the Binaries
 rm -rf $rootDir/Binary/"$imageName"_dir
@@ -75,10 +84,10 @@ mkdir -p $rootDir/Binary/"$imageName"_dir
 cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 
 # Prepare the flags for the docker run command
-runtimeFlags="$detachFlags --name $imageName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
+runtimeFlags="$detachFlags --name $dockerName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
-    make -C $rootDir orchestrator -s -j
+    make -C $rootDir orchestrator -s
     cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail
     runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator/sail:/app -v $rootDir/EndPointTools/SafeObjectTools/SafeObjects:/SafeObjects $imageName"
 elif [ "devopsconsole" == "$imageName" ]; then
@@ -94,12 +103,11 @@ elif [ "apiservices" == "$imageName" ]; then
         echo "Creating database volume"
         docker volume create $sailDatabaseVolumeName
     fi
-    make -C $rootDir package_apiservices -s -j
+    make -C $rootDir package_apiservices -s
     # Check for Azure environment variables
     if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
         echo "environment variable AZURE_SUBSCRIPTION_ID is undefined. Using development as default."
         AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
-        # exit 1
     fi
     if [ ${AZURE_SUBSCRIPTION_ID} == "3d2b9951-a0c8-4dc3-8114-2776b047b15c" ]; then
         cp apiservices/InitializationVectorScratchPad.json.bak $rootDir/Binary/apiservices_dir/InitializationVector.json
@@ -113,24 +121,32 @@ elif [ "apiservices" == "$imageName" ]; then
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 8000:8001 -p 9080:9080 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
-    make -C $rootDir package_webfrontend -s -j
+    make -C $rootDir package_webfrontend -s
     cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
     cp $rootDir/Binary/webfrontend.tar.gz $rootDir/Binary/webfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/webfrontend_dir:/app $imageName"
 elif [ "newwebfrontend" == "$imageName" ]; then
-    make -C $rootDir package_newwebfrontend -s -j
+    make -C $rootDir package_newwebfrontend -s
     cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
     cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName"
 elif [ "securecomputationnode" == "$imageName" ]; then
-    make -C $rootDir package_securecomputationnode -s -j
+    make -C $rootDir package_securecomputationnode -s
     cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/securecomputationnode_dir/package.tar.gz
     cp securecomputationnode/InitializationVector.json $rootDir/Binary/securecomputationnode_dir
     runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6801 -v $rootDir/Binary/securecomputationnode_dir:/app $imageName"
 elif [ "rpcrelated" == "$imageName" ]; then
-    bash -c "cd $rootDir/RPCLib;./package.sh"
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
-    runtimeFlags="$runtimeFlags -p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+    if [ ! -f $rootDir/Binary/rpcrelated_dir/package.tar.gz ]; then
+        echo "RPC Package not found, building"
+        pushd $rootDir/RPCLib/
+        ./package.sh
+        popd
+    fi
+    if [ $localDataset ]; then
+        runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
+    fi
+    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
 elif [ "auditserver" == "$imageName" ]; then
     runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
 elif [ "remotedataconnector" == "$imageName" ]; then

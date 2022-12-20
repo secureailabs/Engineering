@@ -443,7 +443,7 @@ async def deploy_module(
         await create_resource_group(account_credentials, resource_group_name)
 
         # Provision the secure computation node
-        if secure_computation_node_db.size == SecureComputationNodeSize.Standard_DC4ads_v5:
+        if vm_size == "Standard_DC4ads_v5":
             template_path = f"{module_name}-cvm.json"
         else:
             template_path = f"{module_name}.json"

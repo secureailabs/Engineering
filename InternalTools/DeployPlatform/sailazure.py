@@ -7,7 +7,15 @@ from azure.mgmt.resource.resources.models import DeploymentMode
 def create_resource_group(accountCredentials, resource_group_name, location):
     """Deploy the template to a resource group."""
     client = ResourceManagementClient(accountCredentials["credentials"], accountCredentials["subscription_id"])
-    response = client.resource_groups.create_or_update(resource_group_name, {"location": location})
+    response = client.resource_groups.create_or_update(
+        resource_group_name,
+        {
+            "location": location,
+            "tags": {
+                "deployed_method": "DeployPlatform",
+            },
+        },
+    )
     return response.properties.provisioning_state
 
 

@@ -6,17 +6,19 @@ USER root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-git \
-curl \
-python3.9 \
-pip
+    git \
+    curl \
+    python3.9 \
+    python3-venv \
+    pip
 
 # GIT
 ARG git_personal_token
 RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf " https://github.com/"
-RUN git clone https://$git_personal_token@github.com/secureailabs/SailTAP.git /Test
-WORKDIR /Test
+RUN git clone https://$git_personal_token@github.com/secureailabs/Engineering.git /Test
+WORKDIR /Test/ApiServices
 RUN git pull
-RUN pip install -r requirements.txt
+RUN pip install -U pip setuptools wheel
+RUN pip install -r config/requirements/all_requirements.txt --only-binary=:all: --no-binary=python-multipart,assertpy,cerberus
 
 CMD ["/bin/bash"]

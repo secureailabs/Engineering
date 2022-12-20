@@ -134,11 +134,23 @@ az sig image-definition create \
 --os-type "Linux"
 
 # Ubuntu Image in shared image gallery
-packer build \
+output=$(packer build \
 -var location=$Location \
 -var resource_group_name=$ResourceGroup \
 -var module=$ImageName \
 -var docker_dir=$dockerDir \
 -var gallery_name=$ImageGalleryName \
 -var version=$ImageVersion \
-packer-sig-ubuntu.json
+packer-sig-ubuntu.json | tee /dev/tty)
+
+# Get the image name from the packer output
+ImageName=$(echo "$output" | grep "ImageName:" | cut -d':' -f2 | tr -d '[:space:]')
+
+# Get the short git commit hash
+gitCommitHash=$(git rev-parse --short HEAD)
+
+# Tag the image with the short git commit hash
+az image tag \
+--resource-group $ResourceGroup \
+--name $ImageName \
+--tags gitCommitHash=$gitCommitHash

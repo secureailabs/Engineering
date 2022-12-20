@@ -20,7 +20,6 @@ FINDFILES = $(wildcard $(DIR)/*.cpp)
 
 # Add common include paths once
 INCLUDE+=-I$(SHARED_COMMON_CODE)/Include
-INCLUDE+=-I$(shell realpath $(ABSROOTDIR)/ThirdPartyLibraries/LzmaSdk/Include)
 
 # We want to find our own static libraries
 LDFLAGS += -L$(ABSROOTDIR)/Binary/StaticLibraries

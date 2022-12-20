@@ -18,7 +18,7 @@ RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf
 RUN git clone https://$git_personal_token@github.com/secureailabs/Engineering.git /Test
 WORKDIR /Test/ApiServices
 RUN git pull
-# RUN ./build/test_setup.sh
-# RUN source venv38-sail_test/bin/activate
+RUN pip install -U pip setuptools wheel
+RUN pip install -r config/requirements/all_requirements.txt --only-binary=:all: --no-binary=python-multipart,assertpy,cerberus
 
 CMD ["/bin/bash"]

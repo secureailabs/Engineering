@@ -8,6 +8,12 @@ Go to Engineering/
 make clean
 
 make all -j 
+
+```
+### Clone down datascience repo as submodule
+```
+cd Engineering/
+git submodule update --init
 ```
 
 ## Build all the docker images

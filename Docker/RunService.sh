@@ -74,7 +74,7 @@ if $cleanDatabase; then
 fi
 
 # Build the bootstrap tool to create the database
-make -C $rootDir vmInitializer -s -j
+make -C $rootDir vmInitializer -s
 
 # Create a folder to hold all the Binaries
 rm -rf $rootDir/Binary/"$imageName"_dir
@@ -87,7 +87,7 @@ cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 runtimeFlags="$detachFlags --name $dockerName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.
 if [ "orchestrator" == "$imageName" ]; then
-    make -C $rootDir orchestrator -s -j
+    make -C $rootDir orchestrator -s
     cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail
     runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator/sail:/app -v $rootDir/EndPointTools/SafeObjectTools/SafeObjects:/SafeObjects $imageName"
 elif [ "devopsconsole" == "$imageName" ]; then
@@ -103,7 +103,7 @@ elif [ "apiservices" == "$imageName" ]; then
         echo "Creating database volume"
         docker volume create $sailDatabaseVolumeName
     fi
-    make -C $rootDir package_apiservices -s -j
+    make -C $rootDir package_apiservices -s
     # Check for Azure environment variables
     if [ -z "${AZURE_SUBSCRIPTION_ID}" ]; then
         echo "environment variable AZURE_SUBSCRIPTION_ID is undefined. Using development as default."
@@ -121,17 +121,17 @@ elif [ "apiservices" == "$imageName" ]; then
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 8000:8001 -p 9080:9080 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "webfrontend" == "$imageName" ]; then
-    make -C $rootDir package_webfrontend -s -j
+    make -C $rootDir package_webfrontend -s
     cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
     cp $rootDir/Binary/webfrontend.tar.gz $rootDir/Binary/webfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/webfrontend_dir:/app $imageName"
 elif [ "newwebfrontend" == "$imageName" ]; then
-    make -C $rootDir package_newwebfrontend -s -j
+    make -C $rootDir package_newwebfrontend -s
     cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
     cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName"
 elif [ "securecomputationnode" == "$imageName" ]; then
-    make -C $rootDir package_securecomputationnode -s -j
+    make -C $rootDir package_securecomputationnode -s
     cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/securecomputationnode_dir/package.tar.gz
     cp securecomputationnode/InitializationVector.json $rootDir/Binary/securecomputationnode_dir
     runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6801 -v $rootDir/Binary/securecomputationnode_dir:/app $imageName"

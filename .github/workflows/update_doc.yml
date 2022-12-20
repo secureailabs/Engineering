@@ -39,8 +39,6 @@ jobs:
     needs: clean
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
       - name: Run a multi-line script, Build Binaries
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
@@ -52,6 +50,8 @@ jobs:
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
           docker stop apiservices || true && docker rm apiservices || true
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
+          git clone https://$PAT@github.com/secureailabs/datascience.git datascience
+          git -C ./datascience/ submodule update --init --remote
           cd Docker/
           ./BuildImages.sh -i apiservices
           sudo ./RunService.sh -s apiservices -d

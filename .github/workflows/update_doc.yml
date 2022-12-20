@@ -39,8 +39,6 @@ jobs:
     needs: clean
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
       - name: Run a multi-line script, Build Binaries
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
-source .env
+source azure_constants.sh
 Location="westus"
 ImageGalleryName="sail_image_gallery"
 

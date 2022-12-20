@@ -2,7 +2,7 @@
 ROOTDIR?=$(shell realpath .)
 
 DATASET_VIEWER_TOOL:=$(ROOTDIR)/InternalTools/DatasetViewer
-DATABASE_INITIALIZATION_TOOL:=$(ROOTDIR)/InternalTools/DatabaseInitializationTool
+DATABASE_INITIALIZATION_TOOL:=$(ROOTDIR)/DatabaseInitializationTool
 SAFE_OBJECT_COMPILER:=$(ROOTDIR)/EndPointTools/SafeObjectTools/SafeObjectCompiler/Source
 CRYPTOGRAPHIC_TOOLS:=$(ROOTDIR)/InternalTools/CryptographicTools
 REMOTE_DATA_CONNECTOR:=$(ROOTDIR)/InternalTools/RemoteDataConnector

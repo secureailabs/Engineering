@@ -1,5 +1,5 @@
 # The Root directory containing all the code
-ROOTDIR=$(shell realpath ../..)
+ROOTDIR=$(shell realpath ..)
 include $(ROOTDIR)/Make/Common.mk
 
 OUTPUT_DIR=$(ABSROOTDIR)/Binary/

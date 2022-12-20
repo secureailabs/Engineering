@@ -63,7 +63,6 @@ jobs:
           echo "${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
           docker image prune --all -f
-          rm -rf ./datascience/ || true
 
   build:
     runs-on: [self-hosted, Linux, x64, docker]
@@ -81,6 +80,7 @@ jobs:
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
           docker stop apiservices || true && docker rm apiservices || true
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
+          rm -rf ./datascience/ || true
           docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
           git clone https://$PAT@github.com/secureailabs/datascience.git datascience
           git -C ./datascience/ submodule update --init --remote

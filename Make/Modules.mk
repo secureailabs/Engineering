@@ -7,7 +7,7 @@ SAFE_OBJECT_COMPILER:=$(ROOTDIR)/EndPointTools/SafeObjectTools/SafeObjectCompile
 CRYPTOGRAPHIC_TOOLS:=$(ROOTDIR)/InternalTools/CryptographicTools
 REMOTE_DATA_CONNECTOR:=$(ROOTDIR)/InternalTools/RemoteDataConnector
 
-VM_INITIALIZER:=$(ROOTDIR)/VirtualMachine/VmInitializer
+VM_INITIALIZER:=$(ROOTDIR)/VmInitializer
 VIRTUAL_MACHINE_SHARED:=$(ROOTDIR)/VirtualMachine/SharedComponents
 
 SHARED_COMMON_CODE:=$(ROOTDIR)/SharedCommonCode

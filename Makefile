@@ -1,7 +1,5 @@
 include Make/Modules.mk
-include Make/webfrontend.mk
 include Make/newwebfrontend.mk
-include Make/securecomputationnode.mk
 
 .PHONY: databaseInitializationTool package all clean SharedCommonCode
 
@@ -22,7 +20,7 @@ package_rpcrelated:
 package_smartbroker:
 	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz RPCLib/ datascience
 
-package: SharedCommonCode VirtualMachine_Shared
+package: SharedCommonCode
 	@make package_apiservices package_newwebfrontend
 	@echo "package done!"
 
@@ -37,10 +35,7 @@ vmInitializer:
 SharedCommonCode:
 	@make -C $(SHARED_COMMON_CODE) all
 
-VirtualMachine_Shared:
-	@make -C $(VIRTUAL_MACHINE_SHARED) all
-
-all: SharedCommonCode VirtualMachine_Shared
+all: SharedCommonCode
 	@make package
 	@make databaseInitializationTool vmInitializer
 	@echo "All build and packaged!"

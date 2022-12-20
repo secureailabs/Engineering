@@ -16,13 +16,12 @@ $ git clone https://github.com/secureailabs/Engineering.git
 ## For a full end-to-end deployment
 Download the datascience repository which is added as a submodule to this repository
 ```sh
-git submodule update
+git submodule update --init
 ```
 
 ## Building Binaries
 From root of Repository run the following commands to build and verify Binaries
 
-**Linux**
 ```
 make clean
 make all -j
@@ -30,16 +29,6 @@ make all -j
 Outputs:
 ```
 ll -lrt Binary/
-```
-
-**Windows**
-```
-.\Manual-WindowsPlatformDeliverables.bat
-```
-Ouputs:
-```
-WindowsPlatformDeliverables.tar
-```
 
 ## DeployPlatform to Azure
 DeployPlatform is required to run behind SAIL VPN. \

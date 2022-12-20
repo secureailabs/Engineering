@@ -122,6 +122,7 @@ jobs:
           docker kill $(docker ps -q)
           docker rm $(docker ps -a -q)
           sudo make clean
+          rm -rf datascience/
 
   # stop-runner:
   #   # Always stop runner even if build step fails

@@ -11,7 +11,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -m [Image Name] [-a]"
     echo "Usage: $0"
-    echo -e "\t-m Module Name:  apiservices | orchestrator | remotedataconnector | webfrontend | newwebfrontend | securecomputationnode | rpcrelated | smartbroker"
+    echo -e "\t-m Module Name: apiservices | newwebfrontend | rpcrelated | smartbroker"
     echo -e "\t-a ci_flag will be set to true"
     exit 1 # Exit script after printing help
 }

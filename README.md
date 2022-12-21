@@ -41,6 +41,7 @@ export AZURE_SUBSCRIPTION_ID="xxxx"
 export AZURE_TENANT_ID="xxxx"
 export AZURE_CLIENT_ID="xxxx"
 export AZURE_CLIENT_SECRET="xxxx"
+export AZURE_OBJECT_ID="xxxx"
 ```
 Run the DeployPlatform script with `--help` for guidance
 ```

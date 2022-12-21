@@ -4,7 +4,7 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -s [Service Name] -d -c"
-    echo -e "\t-s Service Name: devopsconsole | webfrontend | newwebfrontend | orchestrator | remotedataconnector | securecomputationnode | rpcrelated | auditserver "
+    echo -e "\t-s Service Name: newwebfrontend | apiservices | rpcrelated | auditserver"
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     echo -e "\t-n Name to give the running docker image"
@@ -86,14 +86,7 @@ cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $dockerName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.
-if [ "orchestrator" == "$imageName" ]; then
-    make -C $rootDir orchestrator -s
-    cp orchestrator/InitializationVector.json $rootDir/EndPointTools/Orchestrator/sail
-    runtimeFlags="$runtimeFlags -p 8080:8080 -v $rootDir/EndPointTools/Orchestrator/sail:/app -v $rootDir/EndPointTools/SafeObjectTools/SafeObjects:/SafeObjects $imageName"
-elif [ "devopsconsole" == "$imageName" ]; then
-    cp devopsconsole/InitializationVector.json $rootDir/DevopsConsole
-    runtimeFlags="$runtimeFlags -v $rootDir/DevopsConsole:/app -p 5050:443 $imageName"
-elif [ "apiservices" == "$imageName" ]; then
+if [ "apiservices" == "$imageName" ]; then
     # Create database volume if it does not exist
     foundVolumeName=$(docker volume ls --filter name=$sailDatabaseVolumeName --format {{.Name}})
     echo "$foundVolumeName"
@@ -120,21 +113,11 @@ elif [ "apiservices" == "$imageName" ]; then
     fi
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 8000:8001 -p 9080:9080 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
-elif [ "webfrontend" == "$imageName" ]; then
-    make -C $rootDir package_webfrontend -s
-    cp webfrontend/InitializationVector.json $rootDir/Binary/webfrontend_dir
-    cp $rootDir/Binary/webfrontend.tar.gz $rootDir/Binary/webfrontend_dir/package.tar.gz
-    runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/webfrontend_dir:/app $imageName"
 elif [ "newwebfrontend" == "$imageName" ]; then
     make -C $rootDir package_newwebfrontend -s
     cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
     cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName"
-elif [ "securecomputationnode" == "$imageName" ]; then
-    make -C $rootDir package_securecomputationnode -s
-    cp $rootDir/Binary/SecureComputationNode.tar.gz $rootDir/Binary/securecomputationnode_dir/package.tar.gz
-    cp securecomputationnode/InitializationVector.json $rootDir/Binary/securecomputationnode_dir
-    runtimeFlags="$runtimeFlags -p 3500:3500 -p 6800:6801 -v $rootDir/Binary/securecomputationnode_dir:/app $imageName"
 elif [ "rpcrelated" == "$imageName" ]; then
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
     if [ ! -f $rootDir/Binary/rpcrelated_dir/package.tar.gz ]; then
@@ -146,13 +129,9 @@ elif [ "rpcrelated" == "$imageName" ]; then
     if [ $localDataset ]; then
         runtimeFlags="$runtimeFlags -v $localDataset:/local_dataset"
     fi
-    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName" 
+    runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName"
 elif [ "auditserver" == "$imageName" ]; then
-    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
-elif [ "remotedataconnector" == "$imageName" ]; then
-    echo "!!! NOT IMPLEMENTED !!!"
-    exit 1
-    # runtimeFlags="$runtimeFlags -v $rootDir/Binary:/Development $imageName"
+    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName"
 else
     echo "!!! Kindly provide correct service name !!!"
     PrintHelp

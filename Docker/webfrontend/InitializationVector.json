@@ -1,6 +1,0 @@
-{
-    "PlatformServicesUrl":"https://platformservices:6200",
-    "VirtualMachinePublicIp":"https://127.0.0.1:443",
-    "TlsCertificate":"aaaa",
-    "TlsPrivateKey":"bbbb"
-}

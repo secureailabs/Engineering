@@ -1,13 +1,9 @@
 Binary
-WebFrontend/InitializationVector.json
 DevopsConsole/InitializationVector.json
-SCN
 **/venv**/*
 *.tar.gz
 *__pycache__*
 *.log
-**/.env.dev
-**/.env.pass
 **/node_modules
 RPCLib/zero/zero.egg-info/*
 **/build

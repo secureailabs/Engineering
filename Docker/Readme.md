@@ -27,22 +27,9 @@ git submodule update --init
 ```
 ./RunService.sh -s apiservices
 ```
-### Orchestrator
-```
-./RunService.sh -s orchestrator
-```
-### Remote Data Connector
-```
-./RunService.sh -s remoteDataConnector
-```
-
-### Secure Computation Node
-```
-./RunService.sh -s securecomputationnode
-```
 ### Web Frontend
 ```
-./RunService.sh -s webfrontend
+./RunService.sh -s newwebfrontend
 ```
 ### RPC server
 ```
@@ -72,21 +59,9 @@ DeprovisionService.sh -s all
 ```
 ./DeprovisionService.sh -s apiservices
 ```
-#### Orchestrator
-```
-./DeprovisionService.sh -s orchestrator
-```
-#### Remote Data Connector
-```
-./DeprovisionService.sh -s remotedataconnector
-```
-#### Secure Computation Node
-```
-./DeprovisionService.sh -s securecomputationnode
-```
 #### Web Frontend
 ```
-./DeprovisionService.sh -s webfrontend
+./DeprovisionService.sh -s newwebfrontend
 ```
 ### RPC Server
 ```

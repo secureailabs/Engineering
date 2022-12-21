@@ -39,8 +39,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN useradd --system promtail
-COPY promtail-local-config.yaml /promtail-local-config.yaml
-COPY promtail-linux-amd64 /promtail-linux-amd64
+COPY promtail_local_config.yaml /promtail_local_config.yaml
+COPY promtail_linux_amd64 /promtail_linux_amd64
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

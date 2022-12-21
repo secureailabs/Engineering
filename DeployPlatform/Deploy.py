@@ -278,7 +278,6 @@ def deploy_apiservices(
     owner,
     version: str,
     audit_service_ip,
-    audit_service_port="3100",
 ):
     """
     Deploy Api Services
@@ -306,8 +305,7 @@ def deploy_apiservices(
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
     backend_json["version"] = version
-    backend_json["audit_service_ip"] = audit_service_ip
-    backend_json["audit_service_port"] = audit_service_port
+    backend_json["audit_service_endpoint"] = f"http://{audit_service_ip}:3100/loki/api/v1/query_range"
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)

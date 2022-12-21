@@ -20,10 +20,10 @@ import logging
 import os
 import signal
 import sys
+import threading
 import time
 import typing
 import uuid
-import threading
 from functools import partial
 from importlib import import_module
 from multiprocessing import Manager
@@ -31,27 +31,20 @@ from multiprocessing.pool import Pool
 
 #import matplotlib
 import msgpack
-
 # import uvloop
 import pandas as pd
 import zmq
 import zmq.asyncio
-
 from zero.codegen import CodeGen
 from zero.common import get_next_available_port
-
 # Change
 from zero.customtypes import ProxyObject, SecretObject
 from zero.logger import _AsyncLogger
 from zero.serialize import deserializer_table, serializer_table
-from zero.type_util import (
-    get_function_input_class,
-    get_function_return_class,
-    verify_allowed_type,
-    verify_function_args,
-    verify_function_input_type,
-    verify_function_return,
-)
+from zero.type_util import (get_function_input_class,
+                            get_function_return_class, verify_allowed_type,
+                            verify_function_args, verify_function_input_type,
+                            verify_function_return)
 from zero.zero_mq import ZeroMQ
 
 logging.basicConfig(
@@ -283,8 +276,8 @@ class ZeroServer:
         ZeroMQ.queue_device(self._host, self._port, self._device_ipc, self._device_port)
 
     def _start_logger(self):
-        t = Audit_log_task()
-        t.start()
+        audit_background_task = Audit_log_task()
+        audit_background_task.start()
 
     async def _start_router(self):  # pragma: no cover
         """

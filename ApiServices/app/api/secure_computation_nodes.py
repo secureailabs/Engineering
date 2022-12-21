@@ -19,9 +19,12 @@ from ipaddress import IPv4Address
 from typing import List
 
 import aiohttp
+<<<<<<< HEAD
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 from fastapi.encoders import jsonable_encoder
 
+=======
+>>>>>>> BOARD-1981_BOARD-2065 fix according to comments
 import app.utils.azure as azure
 from app.api.authentication import get_current_user
 from app.api.data_federations import get_existing_dataset_key
@@ -30,21 +33,18 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
+from fastapi import (APIRouter, BackgroundTasks, Body, Depends, HTTPException,
+                     Response, status)
+from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.secure_computation_nodes import (
-    GetMultipleSecureComputationNode_Out,
-    GetSecureComputationNode_Out,
-    RegisterSecureComputationNode_In,
-    RegisterSecureComputationNode_Out,
-    SecureComputationNode_Db,
-    SecureComputationNodeInitializationVector,
-    SecureComputationNodeState,
-    SecureComputationNodeType,
-    SmartBrokerInitializationVector,
-    SmartBrokerScnInfo,
-    UpdateSecureComputationNode_In,
-)
+    GetMultipleSecureComputationNode_Out, GetSecureComputationNode_Out,
+    RegisterSecureComputationNode_In, RegisterSecureComputationNode_Out,
+    SecureComputationNode_Db, SecureComputationNodeInitializationVector,
+    SecureComputationNodeState, SecureComputationNodeType,
+    SmartBrokerInitializationVector, SmartBrokerScnInfo,
+    UpdateSecureComputationNode_In)
 
 DB_COLLECTION_SECURE_COMPUTATION_NODE = "secure-computation-node"
 
@@ -333,8 +333,7 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             researcher_id=secure_computation_node_db.researcher_id,
             researcher_user_id=secure_computation_node_db.researcher_user_id,
             version=get_secret("version"),
-            audit_service_ip=get_secret("audit_service_ip"),
-            audit_service_port=get_secret("audit_service_port"),
+            audit_service_endpoint=get_secret("audit_service_endpoint"),
         )
 
         with open(str(secure_computation_node_db.id), "w") as outfile:

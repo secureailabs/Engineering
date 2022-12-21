@@ -14,15 +14,14 @@
 
 import asyncio
 import functools
-import time
 import json
+import time
 
 import requests
-from fastapi import APIRouter, Depends, HTTPException, status
-
 from app.api.authentication import get_current_user
 from app.data import operations as data_service
 from app.utils.secrets import get_secret
+from fastapi import APIRouter, Depends, HTTPException, status
 from models.accounts import UserRole
 from models.audit import QueryRequest, QueryResult
 from models.authentication import TokenData
@@ -30,12 +29,13 @@ from models.common import PyObjectId
 
 router = APIRouter()
 
-
-endpoint = "/loki/api/v1/query_range"
-audit_server_ip = get_secret("audit_service_ip")
-audit_server_port = get_secret("audit_service_port")
-audit_server_endpoint = f"http://{audit_server_ip}:{audit_server_port}{endpoint}"
+audit_server_endpoint = get_secret("audit_service_endpoint")
 print(audit_server_endpoint)
+
+@router.get(
+    path = "/audit/{}"
+    description = "query "
+)
 
 
 # #######################################################################################################################
@@ -51,6 +51,18 @@ async def audit_query_activity_by_time(
     end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    query api services activities by time
+
+    :param start: start time, defaults to None
+    :type start: int, optional
+    :param end: end time, defaults to None
+    :type end: int, optional
+    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: response
+    :rtype: dict(json)
+    """
     if start is None:
         start = time.time() - 3600
     if end is None:
@@ -78,6 +90,18 @@ async def audit_query_computation_by_time(
     end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    query scn computation activities by time
+
+    :param start: start time, defaults to None
+    :type start: int, optional
+    :param end: end time, defaults to None
+    :type end: int, optional
+    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: response
+    :rtype: dict(json)
+    """
     if start is None:
         start = time.time() - 3600
     if end is None:
@@ -107,6 +131,20 @@ async def audit_query_activity_by_userID(
     end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    query api services activities by user ID
+
+    :param user_id: user id
+    :type user_id: PyObjectId
+    :param start: start time, defaults to None
+    :type start: int, optional
+    :param end: end time, defaults to None
+    :type end: int, optional
+    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: response
+    :rtype: dict(json)
+    """
     if start is None:
         start = time.time() - 3600
     if end is None:
@@ -135,6 +173,20 @@ async def audit_query_computation_by_userID(
     end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    query scn computation activities by user ID
+
+    :param user_id: user id
+    :type user_id: PyObjectId
+    :param start: start time, defaults to None
+    :type start: int, optional
+    :param end: end time, defaults to None
+    :type end: int, optional
+    :param current_user: user who perform the query, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: response
+    :rtype: response body
+    """
 
     if start is None:
         start = time.time() - 3600
@@ -154,6 +206,16 @@ async def query_computation(
     query: dict,
     current_user: TokenData,
 ):
+    """
+    perform a query on scn computation activities
+
+    :param query: query body
+    :type query: dict
+    :param current_user: the user who perform the query
+    :type current_user: TokenData
+    :return: response
+    :rtype: dict(json)
+    """
     try:
         response = {}
         # the user is SAIL tech support, no restriction
@@ -220,6 +282,23 @@ async def audit_query_compuation_by_dataID(
     end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    query incidents happened on scn related to computation by dataset id
+
+    if there is no time input, the default query time is defined starting from
+    one hour ago. (same for all query interface)
+
+    :param dataset_id: dataset id
+    :type dataset_id: PyObjectId
+    :param start: start time, defaults to None
+    :type start: int, optional
+    :param end: end time, defaults to None
+    :type end: int, optional
+    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: response json
+    :rtype: dict(json)
+    """
     try:
         if start is None:
             start = time.time() - 3600
@@ -270,6 +349,14 @@ async def audit_query_compuation_by_dataID(
 async def get_dataset_from_user_node(
     current_user: TokenData,
 ):
+    """
+    get dataset associated with an particular node
+
+    :param current_user: the user who perform the query
+    :type current_user: TokenData
+    :return: data ids on the node
+    :rtype: set
+    """
     try:
         event_loop = asyncio.get_event_loop()
         nodes_info = await event_loop.run_in_executor(None, requests.get, current_user)
@@ -299,6 +386,20 @@ async def audit_query_activity_by_dataID(
     end: int = None,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    query the api service activities by data ID
+
+    :param data_id: data id
+    :type data_id: PyObjectId
+    :param start: start time, defaults to None
+    :type start: int, optional
+    :param end: end time, defaults to None
+    :type end: int, optional
+    :param current_user: user who perform the query, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: query response
+    :rtype: dict(json)
+    """
 
     if start is None:
         start = time.time() - 3600
@@ -327,6 +428,16 @@ async def audit_query_general(
     query: QueryRequest,
     current_user: TokenData = Depends(get_current_user),
 ):
+    """
+    perform a general query
+
+    :param query: query body
+    :type query: QueryRequest
+    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :return: response
+    :rtype: dict(json)
+    """
     response = await query_user_activity(**query.dict(), current_user=current_user)
     return QueryResult(**response.json())
 
@@ -335,6 +446,16 @@ async def query_user_activity(
     query: dict,
     current_user: TokenData,
 ):
+    """
+    query for activities realted to api services
+
+    :param query: query body
+    :type query: dict
+    :param current_user: the user who perform the query
+    :type current_user: TokenData
+    :return: response data
+    :rtype: dict(json)
+    """
     try:
         # the user is SAIL tech support, no restriction
         if current_user.role == UserRole.ADMIN:

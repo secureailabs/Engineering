@@ -5,6 +5,5 @@
     "dataset_id": "01460dcf-2d1d-4119-8cd6-3c41d6cd5fd8",
     "local_dataset": "true",
     "dataset_key": "DhA5lu3lYGnvOIztQn/IGLX6ar1T25AuVaMMuwLuJGs=",
-    "audit_service_ip": "auditserver",
-    "audit_service_port": "3100"
+    "audit_service_endpoint": "http://auditserver:3100/loki/api/v1/query_range"
 }

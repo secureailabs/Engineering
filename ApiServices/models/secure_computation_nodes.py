@@ -17,9 +17,8 @@ from enum import Enum
 from ipaddress import IPv4Address
 from typing import List, Optional
 
-from pydantic import Field, StrictStr
-
 from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
+from pydantic import Field, StrictStr
 
 
 class SecureComputationNodeSize(Enum):
@@ -107,8 +106,7 @@ class SecureComputationNodeInitializationVector(SailBaseModel):
     researcher_user_id: PyObjectId = Field(...)
     data_federation_id: PyObjectId = Field(...)
     version: StrictStr = Field(...)
-    audit_service_ip: StrictStr = Field(...)
-    audit_service_port: StrictStr = Field(...)
+    audit_service_endpoint: StrictStr = Field(...)
 
 
 class SmartBrokerScnInfo(SailBaseModel):

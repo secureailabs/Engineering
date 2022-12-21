@@ -6,14 +6,21 @@
 *.bat @JENKINS-SAIL @stanleylinSail
 
 # Review for Platform Stability
-/Docker/ @prawalgangwar @stanleylinSail
+/ApiServices/ @prawalgangwar @JingweiZhangBoston @nathan-SAIL
+/AzureDeploymentTemplates/ @prawalgangwar @JingweiZhangBoston @stanleylinSail
 /CI_CD/ @JENKINS-SAIL @stanleylinSail
-/AzureDeploymentTemplates/ @prawalgangwar
-/InternalTools/DeployPlatform/ @prawalgangwar
+/DatabaseInitializationTool/ @prawalgangwar
+/DatasetTool/ @prawalgangwar
+/DeployPlatform/ @prawalgangwar @JingweiZhangBoston @stanleylinSail
 /DevopsConsole/ @prawalgangwar
+/Docker/ @prawalgangwar @stanleylinSail @JingweiZhangBoston
+/Make/ @prawalgangwar @JingweiZhangBoston
+/RPCLib/ @JingweiZhangBoston
+/SharedCommonCode/ @prawalgangwar
+/VmInitializer/ @prawalgangwar
 
 # Github Configs PR review
 .github/ @JENKINS-SAIL @stanleylinSail
 
 # Default Reviewers for all code changes
-* @David-G-SAIL @stanleylinSail @prawalgangwar @JENKINS-SAIL
+* @stanleylinSail @prawalgangwar @JENKINS-SAIL

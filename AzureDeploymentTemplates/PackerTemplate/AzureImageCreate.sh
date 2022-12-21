@@ -144,7 +144,7 @@ output=$(packer build \
 packer-sig-ubuntu.json | tee /dev/tty)
 
 # Get the image name from the packer output
-ImageName=$(echo "$output" | grep "ImageName:" | cut -d':' -f2 | tr -d '[:space:]')
+ImageName=$(echo "$output" | grep "ManagedImageName:" | cut -d':' -f2 | tr -d '[:space:]')
 
 # Get the short git commit hash
 gitCommitHash=$(git rev-parse --short HEAD)
@@ -153,4 +153,4 @@ gitCommitHash=$(git rev-parse --short HEAD)
 az image update \
 --resource-group $ResourceGroup \
 --name $ImageName \
---set tags.gitCommitHash=$gitCommitHash
+--tags gitCommitHash=$gitCommitHash

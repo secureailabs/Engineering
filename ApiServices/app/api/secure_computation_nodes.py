@@ -19,9 +19,6 @@ from ipaddress import IPv4Address
 from typing import List
 
 import aiohttp
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
-
 import app.utils.azure as azure
 from app.api.authentication import get_current_user
 from app.api.data_federations import get_existing_dataset_key
@@ -30,6 +27,8 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.secure_computation_nodes import (
@@ -39,6 +38,7 @@ from models.secure_computation_nodes import (
     RegisterSecureComputationNode_Out,
     SecureComputationNode_Db,
     SecureComputationNodeInitializationVector,
+    SecureComputationNodeSize,
     SecureComputationNodeState,
     SecureComputationNodeType,
     SmartBrokerInitializationVector,
@@ -313,7 +313,6 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
     :type dataset_key: str
     """
     try:
-        # Provision the secure computation node
         secure_computation_node_db = await provision_virtual_machine(secure_computation_node_db, "rpcrelated")
 
         # Create a SCN initialization vector json
@@ -455,7 +454,7 @@ async def provision_virtual_machine(
         resource_group_name,
         template_name,
         str(virtual_machine_info_db.id),
-        "Standard_D4s_v4",
+        jsonable_encoder(virtual_machine_info_db.size),
     )
     if deploy_response.status != "Success":
         raise Exception(deploy_response.note)

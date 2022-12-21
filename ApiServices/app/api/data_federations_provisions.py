@@ -112,7 +112,7 @@ async def provision_data_federation(
             data_federation_provision_id=provision_db.id,
             dataset_id=dataset_id,
             dataset_version_id=latest_version,
-            size=SecureComputationNodeSize.Standard_D4s_v4,
+            size=provision_req.secure_computation_nodes_size,
             type=SecureComputationNodeType.SCN,
         )
 
@@ -131,7 +131,7 @@ async def provision_data_federation(
         data_federation_provision_id=provision_db.id,
         dataset_id=PyObjectId(empty=True),
         dataset_version_id=PyObjectId(empty=True),
-        size=SecureComputationNodeSize.Standard_D4s_v4,
+        size=provision_req.secure_computation_nodes_size,
         type=SecureComputationNodeType.SMART_BROKER,
     )
     smart_broker_response = await register_secure_computation_node(

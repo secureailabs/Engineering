@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Remember to decrypt .env.dev.encrypted with 'npm run env:decrypt'
-source .env.dev
+source azure_constants.sh
 Location="westus"
-ResourceGroup=$AZURE_RESOURCE_GROUP
-StorageAccountName=$AZURE_STORAGE_ACCOUNT
-GIT=$(git rev-parse --short HEAD)
+ImageGalleryName="sail_image_gallery"
+
 PrintHelp()
 {
     echo ""
@@ -22,13 +20,13 @@ do
     echo "opt: $opt $OPTARG"
     case "$opt" in
         a ) ci_flag="yes" ;;
-        m ) imageName="$OPTARG" ;;
+        m ) ImageName="$OPTARG" ;;
         ? ) PrintHelp ;;
     esac
 done
 
 # Check if the module name is provided
-if [ -z "$imageName" ]; then
+if [ -z "$ImageName" ]; then
     echo "No module specified."
     exit 1
 fi
@@ -37,7 +35,7 @@ fi
 dockerDir=$(realpath ../..)
 
 # The smartbroker module is in a the datascience folder under Engineering
-if [ "$imageName" == "smartbroker" ]; then
+if [ "$ImageName" == "smartbroker" ]; then
     dockerDir=$(realpath ../../datascience)
 fi
 
@@ -52,6 +50,9 @@ if [ $retVal -ne 0 ]; then
     exit $retVal
 fi
 
+# Get the version from the VERSION file
+ImageVersionFromFile=$(cat ../../VERSION)
+
 if [ -z "$ci_flag" ]; then
     # Bash Menu
     # TODO Technially all subscriptions for this script can share 1 SP: Discussion We should create singular SP for PACKER
@@ -64,21 +65,21 @@ if [ -z "$ci_flag" ]; then
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
                 ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                StorageAccountName=$DEVELOPMENT_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                ImageVersion=0.0.0
                 break
                 ;;
             2)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
                 ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                StorageAccountName=$RELEASE_CANDIDATE_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                ImageVersion=$ImageVersionFromFile
                 break
                 ;;
             3)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
                 ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
-                StorageAccountName=$PRODUCTION_GA_STORAGE_ACCOUNT_NAME # This needs to get updated per choice of subscription
+                ImageVersion=$ImageVersionFromFile
                 break
                 ;;
             4)
@@ -105,7 +106,7 @@ echo "$output"
 echo -e "\n==== Azure Image Delete As Required ====\n"
 az image delete \
 --resource-group $ResourceGroup \
---name $imageName
+--name $ImageName
 echo "Deletion Completed, continuing..."
 
 echo -e "\n==== Azure VHD& Image Creation Begins ====\n"
@@ -114,45 +115,42 @@ az group create \
 --name $ResourceGroup \
 --location $Location
 
-# Create storage account
-az storage account create \
+# Create the shared image gallery
+az sig create \
 --resource-group $ResourceGroup \
---name $StorageAccountName \
---location $Location \
---sku Standard_LRS \
---kind StorageV2 \
---access-tier Hot
+--gallery-name $ImageGalleryName \
+--location $Location
 
-# Ubuntu vhd Image
+# Create the image definition
+az sig image-definition create \
+--resource-group $ResourceGroup \
+--gallery-name $ImageGalleryName \
+--gallery-image-definition $ImageName \
+--features SecurityType=ConfidentialVMSupported \
+--publisher "Secure-AI-Labs" \
+--hyper-v-generation V2 \
+--offer $ImageName \
+--sku "sail" \
+--os-type "Linux"
+
+# Ubuntu Image in shared image gallery
 output=$(packer build \
 -var location=$Location \
--var storage_resource_group=$ResourceGroup \
--var storage_account=$StorageAccountName \
--var module=$imageName \
+-var resource_group_name=$ResourceGroup \
+-var module=$ImageName \
 -var docker_dir=$dockerDir \
-packer-vhd-ubuntu.json | tee /dev/tty)
+-var gallery_name=$ImageGalleryName \
+-var version=$ImageVersion \
+packer-sig-ubuntu.json | tee /dev/tty)
 
-# Specify vhdImageUrl to use
-temp=$(echo "$output" | grep -Po "OSDiskUri: (https:*.*sailimages.*.vhd)")
-vhdImageUrl=$(echo "$temp" | grep -Po "https:*.*vhd")
+# Get the image name from the packer output
+ImageName=$(echo "$output" | grep "ManagedImageName:" | cut -d':' -f2 | tr -d '[:space:]')
 
-# Create managed image from vhd
-az image create \
+# Get the short git commit hash
+gitCommitHash=$(git rev-parse --short HEAD)
+
+# Tag the image with the short git commit hash
+az image update \
 --resource-group $ResourceGroup \
---name $imageName \
---source $vhdImageUrl \
---location $Location \
---os-type "Linux" \
---storage-sku "Standard_LRS" \
---tags git=$GIT
-
-# # Optionally to create a VM with the image
-# az vm create \
-# --resource-group $ResourceGroup \
-# --name "$imageName"Vm \
-# --image $imageName \
-# --admin-username saildeveloper \
-# --admin-password "Password@123"
-
-# # Optionally upload the packages to the Virtual VirtualMachine
-# ./UploadPackageAndInitializationVector --IpAddress=<VmIp> --Package=PlatformServices.tar.gz --InitializationVector=InitializationVector.json
+--name $ImageName \
+--tags gitCommitHash=$gitCommitHash

@@ -1,7 +1,6 @@
 .PHONY: install
 install:
 	@poetry install
-	@poetry run install
 	@poetry shell
 
 .PHONY: build

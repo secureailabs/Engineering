@@ -1,0 +1,6 @@
+{
+    "author": "",
+    "project_name": "example-project",
+    "project_slug": "{{cookiecutter.project_name|lower|replace('-', '_')}}",
+    "project_description": "This is a template repository for Python projects"
+}

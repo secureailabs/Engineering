@@ -1,0 +1,41 @@
+{
+    "workbench.editor.highlightModifiedTabs": true,
+    "editor.renderWhitespace": "all",
+    "editor.formatOnType": true,
+    "editor.bracketPairColorization.enabled": true,
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": true,
+        "strings": true
+    },
+    "editor.inlineSuggest.enabled": true,
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.useLibraryCodeForTypes": true,
+    "python.testing.pytestEnabled": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "120"
+    ],
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=2000",
+        "--max-length=120"
+    ],
+    "isort.args": [
+        "--profile=black",
+        "--line-length=120"
+    ],
+    "autoDocstring.docstringFormat": "sphinx",
+    "autoDocstring.startOnNewLine": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.codeLens": true,
+}

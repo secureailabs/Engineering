@@ -14,7 +14,7 @@
 
 from typing import List
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 from fastapi.encoders import jsonable_encoder
 
 from app.api.authentication import get_current_user
@@ -52,9 +52,10 @@ router = APIRouter()
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_201_CREATED,
+    operation_id="register_data_federation_provision",
 )
 async def provision_data_federation(
-    provision_req: RegisterDataFederationProvision_In = Body(...),
+    provision_req: RegisterDataFederationProvision_In = Body(description="Information required for provsioning"),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDataFederationProvision_Out:
     """
@@ -157,9 +158,10 @@ async def provision_data_federation(
     response_description="Data Federation Provision information and list of SCNs",
     response_model=GetDataFederationProvision,
     status_code=status.HTTP_200_OK,
+    operation_id="get_data_federation_provision_info",
 )
 async def get_data_federation_provision_info(
-    provision_id: PyObjectId,
+    provision_id: PyObjectId = Path(description="Data Federation Provision Id"),
     current_user: TokenData = Depends(get_current_user),
 ) -> GetDataFederationProvision:
     """
@@ -194,6 +196,7 @@ async def get_data_federation_provision_info(
     response_description="All Data Federation Provision information and list of SCNs for the current organization",
     response_model=GetMultipleDataFederationProvision_Out,
     status_code=status.HTTP_200_OK,
+    operation_id="get_all_data_federation_provision_info",
 )
 async def get_all_data_federation_provision_info(
     current_user: TokenData = Depends(get_current_user),
@@ -228,11 +231,12 @@ async def get_all_data_federation_provision_info(
 ########################################################################################################################
 @router.delete(
     path="/data-federations-provisions/{provision_id}",
-    description="DeProvision data federation SCNs",
+    description="Deprovision data federation SCNs",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="deprovision_data_federation",
 )
 async def deprovision_data_federation(
-    provision_id: PyObjectId,
+    provision_id: PyObjectId = Path(description="Data Federation Provision Id to deprovision"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """

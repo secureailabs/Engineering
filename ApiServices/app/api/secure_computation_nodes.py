@@ -3,8 +3,6 @@
 # secure_computation_nodes.py
 # -------------------------------------------------------------------------------
 """APIs to manage secure computation nodes"""
-import asyncio
-
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -13,12 +11,17 @@ import asyncio
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
+
+import asyncio
 import json
 import time
 from ipaddress import IPv4Address
 from typing import List
 
 import aiohttp
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
+from fastapi.encoders import jsonable_encoder
+
 import app.utils.azure as azure
 from app.api.authentication import get_current_user
 from app.api.data_federations import get_existing_dataset_key
@@ -27,8 +30,6 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.secure_computation_nodes import (
@@ -38,7 +39,6 @@ from models.secure_computation_nodes import (
     RegisterSecureComputationNode_Out,
     SecureComputationNode_Db,
     SecureComputationNodeInitializationVector,
-    SecureComputationNodeSize,
     SecureComputationNodeState,
     SecureComputationNodeType,
     SmartBrokerInitializationVector,
@@ -113,9 +113,10 @@ async def register_secure_computation_node(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    operation_id="get_all_secure_computation_nodes",
 )
 async def get_all_secure_computation_nodes(
-    data_federation_provision_id: PyObjectId,
+    data_federation_provision_id: PyObjectId = Query(description="Data federation provision id"),
     current_user: TokenData = Depends(get_current_user),
 ) -> GetMultipleSecureComputationNode_Out:
     from app.api.data_federations import get_data_federation
@@ -184,9 +185,11 @@ async def get_all_secure_computation_nodes(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    operation_id="get_secure_computation_node",
 )
 async def get_secure_computation_node(
-    secure_computation_node_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    secure_computation_node_id: PyObjectId = Path(description="UUID of Secure Computation Node"),
+    current_user: TokenData = Depends(get_current_user),
 ):
     from app.api.data_federations import get_data_federation
 
@@ -241,10 +244,13 @@ async def get_secure_computation_node(
     path="/secure-computation-node/{secure_computation_node_id}",
     description="Update secure computation node information",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="update_secure_computation_node",
 )
 async def update_secure_computation_node(
-    secure_computation_node_id: PyObjectId,
-    updated_secure_computation_node_info: UpdateSecureComputationNode_In = Body(...),
+    secure_computation_node_id: PyObjectId = Path(description="UUID of Secure Computation Node"),
+    updated_secure_computation_node_info: UpdateSecureComputationNode_In = Body(
+        description="Updated Secure Computation Node information"
+    ),
     current_user: TokenData = Depends(get_current_user),
 ):
     # Check if the secure computation node exists

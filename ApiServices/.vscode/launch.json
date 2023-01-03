@@ -8,12 +8,10 @@
             "module": "uvicorn",
             "args": [
                 "app.main:server",
-                "--workers",
-                "4",
                 "--reload",
             ],
             "jinja": true,
-            "justMyCode": false
+            "justMyCode": true
         },
     ]
 }

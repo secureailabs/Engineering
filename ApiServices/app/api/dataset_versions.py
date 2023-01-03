@@ -14,6 +14,9 @@
 from datetime import datetime, timedelta
 from typing import List
 
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
+from fastapi.encoders import jsonable_encoder
+
 import app.utils.azure as azure
 from app.api.accounts import get_organization
 from app.api.authentication import RoleChecker, get_current_user
@@ -23,8 +26,6 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
 from models.accounts import UserRole
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
@@ -53,10 +54,11 @@ router = APIRouter()
     response_model=RegisterDatasetVersion_Out,
     response_model_by_alias=False,
     status_code=status.HTTP_201_CREATED,
+    operation_id="register_dataset_version",
 )
 async def register_dataset_version(
     response: Response,
-    dataset_version_req: RegisterDatasetVersion_In = Body(...),
+    dataset_version_req: RegisterDatasetVersion_In = Body(description="Dataset Version information to register"),
     current_user: TokenData = Depends(get_current_user),
 ) -> RegisterDatasetVersion_Out:
     # Check if dataset version was already registered with the same name
@@ -108,9 +110,10 @@ async def register_dataset_version(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    operation_id="get_all_dataset_versions",
 )
 async def get_all_dataset_versions(
-    dataset_id: PyObjectId,
+    dataset_id: PyObjectId = Body(description="UUID of the dataset"),
     current_user: TokenData = Depends(get_current_user),
 ) -> GetMultipleDatasetVersion_Out:
     query = {"dataset_id": str(dataset_id)}
@@ -149,9 +152,11 @@ async def get_all_dataset_versions(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    operation_id="get_dataset_version",
 )
 async def get_dataset_version(
-    dataset_version_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    dataset_version_id: PyObjectId = Path(description="UUID of the dataset version"),
+    current_user: TokenData = Depends(get_current_user),
 ) -> GetDatasetVersion_Out:
     dataset_version = await data_service.find_one(DB_COLLECTION_DATASET_VERSIONS, {"_id": str(dataset_version_id)})
     if not dataset_version:
@@ -178,9 +183,11 @@ async def get_dataset_version(
     response_model=GetDatasetVersionConnectionString_Out,
     status_code=status.HTTP_200_OK,
     response_model_by_alias=False,
+    operation_id="get_dataset_version_connection_string",
 )
 async def get_dataset_version_connection_string(
-    dataset_version_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    dataset_version_id: PyObjectId = Path(description="UUID of the dataset version"),
+    current_user: TokenData = Depends(get_current_user),
 ) -> GetDatasetVersionConnectionString_Out:
     dataset_version = await data_service.find_one(
         DB_COLLECTION_DATASET_VERSIONS,
@@ -227,10 +234,13 @@ async def get_dataset_version_connection_string(
     path="/dataset-versions/{dataset_version_id}",
     description="Update dataset information",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="update_dataset_version",
 )
 async def update_dataset_version(
-    dataset_version_id: PyObjectId,
-    updated_dataset_version_info: UpdateDatasetVersion_In = Body(...),
+    dataset_version_id: PyObjectId = Path(description="UUID of the dataset version"),
+    updated_dataset_version_info: UpdateDatasetVersion_In = Body(
+        description="Object containing the information to be updated"
+    ),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -280,9 +290,11 @@ async def update_dataset_version(
     description="Disable a dataset version",
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="soft_delete_dataset_version",
 )
 async def soft_delete_dataset_version(
-    dataset_version_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    dataset_version_id: PyObjectId = Path(description="UUID of the dataset version"),
+    current_user: TokenData = Depends(get_current_user),
 ):
     # Dataset must be part of same organization
     dataset_version_db = await data_service.find_one(DB_COLLECTION_DATASET_VERSIONS, {"_id": str(dataset_version_id)})

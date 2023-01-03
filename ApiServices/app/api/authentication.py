@@ -11,20 +11,22 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
+
 from time import time
 from typing import List
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 from app.data import operations as data_service
 from app.log import log_message
 from app.utils.secrets import get_secret
-from fastapi import APIRouter, Body, Depends, HTTPException, status
-from fastapi.encoders import jsonable_encoder
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
 from models.accounts import Organization_db, User_Db, UserInfo_Out, UserRole
 from models.authentication import LoginSuccess_Out, RefreshToken_In, TokenData
 from models.common import BasicObjectInfo
-from passlib.context import CryptContext
 
 DB_COLLECTION_USERS = "users"
 DB_COLLECTION_ORGANIZATIONS = "organizations"
@@ -77,6 +79,7 @@ class RoleChecker:
     description="User login with email and password",
     response_model=LoginSuccess_Out,
     response_model_by_alias=False,
+    operation_id="login",
 )
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     exception_authentication_failed = HTTPException(
@@ -117,8 +120,15 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 ########################################################################################################################
-@router.post(path="/refresh-token", description="Refresh the JWT token for the user", response_model=LoginSuccess_Out)
-async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body(...)):
+@router.post(
+    path="/refresh-token",
+    description="Refresh the JWT token for the user",
+    response_model=LoginSuccess_Out,
+    operation_id="get_refresh_token",
+)
+async def refresh_for_access_token(
+    refresh_token_request: RefreshToken_In = Body(description="Refresh token request"),
+):
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials."
@@ -169,8 +179,11 @@ async def refresh_for_access_token(refresh_token_request: RefreshToken_In = Body
     response_model=UserInfo_Out,
     response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
+    operation_id="get_current_user_info",
 )
-async def get_current_user_info(current_user: User_Db = Depends(get_current_user)):
+async def get_current_user_info(
+    current_user: User_Db = Depends(get_current_user),
+):
     found_user = await data_service.find_one(DB_COLLECTION_USERS, {"_id": str(current_user.id)})
     if not found_user:
         raise HTTPException(status_code=404, detail="User not found")

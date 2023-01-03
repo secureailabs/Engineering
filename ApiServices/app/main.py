@@ -23,6 +23,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+#from fastapi_responses import custom_openapi
 from pydantic import BaseModel, Field, StrictStr
 
 from app.api import (
@@ -38,11 +39,12 @@ from app.api import (
 from app.log import _AsyncLogger, log_message
 
 server = FastAPI(
-    title="Secure AI Labs API Services",
+    title="SAIL",
     description="All the private and public APIs for the Secure AI Labs",
     version="0.1.0",
     docs_url=None,
 )
+#server.openapi = custom_openapi(server)
 
 
 class Audit_log_task(threading.Thread):
@@ -99,6 +101,7 @@ async def server_error_exception_handler(request: Request, exc: Exception):
 
 
 utils.validation_error_response_definition = ValidationError.schema()
+
 
 # Run the uvicorn server
 # uvicorn.run("app.main:server", host="127.0.0.1", port=8000, log_level="info")

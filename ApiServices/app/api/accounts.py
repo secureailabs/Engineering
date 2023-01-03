@@ -11,11 +11,14 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
+
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Response, status
+from fastapi.encoders import jsonable_encoder
+
 from app.api.authentication import RoleChecker, get_current_user, get_password_hash
 from app.data import operations as data_service
 from app.log import log_message
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
-from fastapi.encoders import jsonable_encoder
 from models.accounts import (
     GetMultipleOrganizations_Out,
     GetMultipleUsers_Out,
@@ -50,8 +53,11 @@ router = APIRouter()
     response_model=RegisterOrganization_Out,
     response_model_by_alias=False,
     status_code=status.HTTP_201_CREATED,
+    operation_id="register_organization",
 )
-async def register_organization(organization: RegisterOrganization_In = Body(...)):
+async def register_organization(
+    organization: RegisterOrganization_In = Body(description="Organization details"),
+):
     # Check if the admin is already registered
     user_db = await data_service.find_one(DB_COLLECTION_USERS, {"email": organization.admin_email})
     if user_db:
@@ -73,7 +79,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
         avatar=organization.admin_avatar,
     )
 
-    admin_user = await data_service.insert_one(DB_COLLECTION_USERS, jsonable_encoder(admin_user_db))
+    await data_service.insert_one(DB_COLLECTION_USERS, jsonable_encoder(admin_user_db))
 
     message = f"[Organization Register]: name:{organization.admin_name}, email:{organization.admin_email}, job_title:{organization.admin_job_title}"
     await log_message(message)
@@ -91,6 +97,7 @@ async def register_organization(organization: RegisterOrganization_In = Body(...
     response_model_exclude_unset=True,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.SAIL_ADMIN]))],
     status_code=status.HTTP_200_OK,
+    operation_id="get_all_organizations",
 )
 async def get_all_organizations(current_user: TokenData = Depends(get_current_user)):
     organizations = await data_service.find_all(DB_COLLECTION_ORGANIZATIONS)
@@ -109,9 +116,11 @@ async def get_all_organizations(current_user: TokenData = Depends(get_current_us
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    operation_id="get_organization",
 )
 async def get_organization(
-    organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    organization_id: PyObjectId = Path(description="UUID of the requested organization"),
+    current_user: TokenData = Depends(get_current_user),
 ) -> GetOrganizations_Out:
     organization = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
     if not organization:
@@ -129,10 +138,11 @@ async def get_organization(
     description="Update organization information",
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="update_organization",
 )
 async def update_organization(
-    organization_id: PyObjectId,
-    update_organization_info: UpdateOrganization_In = Body(...),
+    organization_id: PyObjectId = Path(description="UUID of the requested organization"),
+    update_organization_info: UpdateOrganization_In = Body(description="Organization details to update"),
     current_user: TokenData = Depends(get_current_user),
 ):
     # User must be part of same organization
@@ -169,8 +179,12 @@ async def update_organization(
     description="Disable the organization and all the users",
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="soft_delete_organization",
 )
-async def soft_delete_organization(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+async def soft_delete_organization(
+    organization_id: PyObjectId = Path(description="UUID of the organization to be deleted"),
+    current_user: TokenData = Depends(get_current_user),
+):
     # User must be part of same organization
     if organization_id != current_user.organization_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
@@ -212,10 +226,11 @@ async def soft_delete_organization(organization_id: PyObjectId, current_user: To
     response_model_by_alias=False,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_201_CREATED,
+    operation_id="register_user",
 )
 async def register_user(
-    organization_id: PyObjectId,
-    user: RegisterUser_In = Body(...),
+    organization_id: PyObjectId = Path(description="UUID of the organization to add the user to"),
+    user: RegisterUser_In = Body(description="User details to register with the organization"),
     current_user: TokenData = Depends(get_current_user),
 ):
     # User must be part of same organization
@@ -252,8 +267,12 @@ async def register_user(
     response_model_exclude_unset=True,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN, UserRole.SAIL_ADMIN]))],
     status_code=status.HTTP_200_OK,
+    operation_id="get_users",
 )
-async def get_users(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+async def get_users(
+    organization_id: PyObjectId = Path(description="UUID of the organization"),
+    current_user: TokenData = Depends(get_current_user),
+):
     # User must be part of same organization
     if organization_id != current_user.organization_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
@@ -275,7 +294,7 @@ async def get_users(organization_id: PyObjectId, current_user: TokenData = Depen
     message = f"[Get Users]: user_id:{current_user.id}, users:{users}"
     await log_message(message)
 
-    return GetMultipleUsers_Out(users=users)
+    return GetMultipleUsers_Out(users=users)  # type: ignore
 
 
 ########################################################################################################################
@@ -312,7 +331,7 @@ async def get_all_admins(organization_id: PyObjectId) -> GetMultipleUsers_Out:
     message = f"[Get All Admins]"
     await log_message(message)
 
-    return GetMultipleUsers_Out(users=users)
+    return GetMultipleUsers_Out(users=users)  # type: ignore
 
 
 ########################################################################################################################
@@ -324,9 +343,12 @@ async def get_all_admins(organization_id: PyObjectId) -> GetMultipleUsers_Out:
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN, UserRole.SAIL_ADMIN]))],
+    operation_id="get_user",
 )
 async def get_user(
-    organization_id: PyObjectId, user_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    organization_id: PyObjectId = Path(description="UUID of the organization"),
+    user_id: PyObjectId = Path(description="UUID of the user"),
+    current_user: TokenData = Depends(get_current_user),
 ):
     # Check if the user exists
     user_db = await data_service.find_one(
@@ -353,11 +375,12 @@ async def get_user(
     path="/organizations/{organization_id}/users/{user_id}",
     description="Update user information",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="update_user_info",
 )
 async def update_user_info(
-    organization_id: PyObjectId,
-    user_id: PyObjectId,
-    update_user_info: UpdateUser_In = Body(...),
+    organization_id: PyObjectId = Path(description="UUID of the organization"),
+    user_id: PyObjectId = Path(description="UUID of the user"),
+    update_user_info: UpdateUser_In = Body(description="User information to update"),
     current_user: TokenData = Depends(get_current_user),
 ):
     # User must be part of same organization
@@ -403,9 +426,12 @@ async def update_user_info(
     path="/organizations/{organization_id}/users/{user_id}",
     description="Soft Delete user",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="soft_delete_user",
 )
 async def soft_delete_user(
-    organization_id: PyObjectId, user_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    organization_id: PyObjectId = Path(description="UUID of the organization"),
+    user_id: PyObjectId = Path(description="UUID of the user"),
+    current_user: TokenData = Depends(get_current_user),
 ):
     # User must be part of same organization
     if organization_id != current_user.organization_id:

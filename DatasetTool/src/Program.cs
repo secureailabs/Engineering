@@ -50,6 +50,12 @@ class Program
                     throw new Exception("Data federation not found");
                 }
 
+                // Data federation model should not be empty
+                if (data_federation.data_model == null || data_federation.data_model.Length == 0)
+                {
+                    throw new Exception("Data federation model is not set. Kindly ask the data federation owner to set the model.");
+                }
+
                 // Check if the dataset configuration format matches the data federation format
                 if (dataset_configuration.m_configuration.dataset.format != data_federation.data_format)
                 {
@@ -112,10 +118,9 @@ class Program
                 {
                     throw new Exception("Unknown dataset format");
                 }
-                // dataset_header.dataset_packaging_format = dataset_configuration.m_configuration.dataset.format;
 
                 // Upload the dataset
-                dataset_version.ValidateAndUploadToAzure(azure_connection_string, encryption_key, dataset_header);
+                dataset_version.ValidateAndUploadToAzure(azure_connection_string, encryption_key, dataset_header, data_federation.data_model);
 
                 // Mark the dataset version as ready
                 user_session.MarkDatasetVersionAsActive(dataset_version_id);

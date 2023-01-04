@@ -113,7 +113,20 @@
 			],
 			"Data Federation": [
 				{
-					"DataFederationName": "KCA Consortium",
+					"DataFederationName": "KCA Consortium - CSV",
+					"DataFederationDescription": "The Kidney Cancer Consortium",
+					"DatasetFormat": "CSV",
+					"DataSubmitters" : [
+						"Mercy General Hospital",
+						"International Genetics Research Facility"
+					],
+					"Researchers" : [
+						"Secure AI Labs"
+					],
+					"data_model" : "csv_data_model.json"
+				},
+				{
+					"DataFederationName": "KCA Consortium - FHIR",
 					"DataFederationDescription": "The Kidney Cancer Consortium",
 					"DatasetFormat": "FHIR",
 					"DataSubmitters" : [
@@ -122,7 +135,8 @@
 					],
 					"Researchers" : [
 						"Secure AI Labs"
-					]
+					],
+					"data_model" : "fhir_data_model.json"
 				}
 			]
 		}

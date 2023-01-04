@@ -34,4 +34,5 @@ class ModelDataFederation
     public Guid id { get; set; } = default!;
     public string state { get; set; } = default!;
     public string data_format { get; set; } = default!;
+    public string data_model { get; set; } = null!;
 }

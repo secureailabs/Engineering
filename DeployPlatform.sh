@@ -70,6 +70,7 @@ mkdir -p $tempDeployDir
 # Copy the files to the temporary directory
 cp Binary/DatabaseInitializationTool $tempDeployDir
 cp Binary/DatabaseInitializationSettings.json $tempDeployDir
+cp Binary/*data_model.json $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 cp Binary/newwebfrontend.tar.gz $tempDeployDir
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz

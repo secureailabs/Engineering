@@ -76,7 +76,7 @@ class DatasetVersion
     /// Package the dataset file into a tar file, encrypt it and upload it to the Azure File Share
     /// </summary>
     /// <param name="connection_string"> Connection string with write permission to the file share </param>
-    public void ValidateAndUploadToAzure(string connection_string, string encryption_key, ModelDatasetHeader dataset_header)
+    public void ValidateAndUploadToAzure(string connection_string, string encryption_key, ModelDatasetHeader dataset_header, string data_model)
     {
         // Validate the dataset
         Validate();
@@ -98,9 +98,10 @@ class DatasetVersion
         File.WriteAllText(dataset_header_file, JsonConvert.SerializeObject(dataset_header));
 
         // Create a data_model zip file
-        // TODO: add correct data models when they are available
+        string data_model_file = "data_model.json";
         string data_model_zip_file = "data_model.zip";
-        CreateZipFromFiles(data_model_zip_file, new string[] { "dataset_header.json" });
+        File.WriteAllText(data_model_file, data_model);
+        CreateZipFromFiles(data_model_zip_file, new string[] { "data_model.json" });
 
         // Create a zip file with the dataset header, data model and data content
         string[] big_zip_files = { dataset_header_file, data_model_zip_file, data_content_zip_file };
@@ -120,6 +121,7 @@ class DatasetVersion
         File.Delete(data_content_zip_file);
         File.Delete(data_model_zip_file);
         File.Delete(dataset_header_file);
+        File.Delete(data_model_file);
         File.Delete(dataset_file);
     }
 

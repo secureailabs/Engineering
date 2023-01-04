@@ -15,9 +15,9 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
 from fastapi.encoders import jsonable_encoder
-from pydantic import EmailStr
+from pydantic import EmailStr, Json
 
 import app.utils.azure as azure
 from app.api.accounts import get_all_admins, get_organization, get_user
@@ -565,6 +565,63 @@ async def invite_data_submitter(
 
     message = f"[Invite Data Submitter]: user_id:{current_user.id}, data_federation_id: {data_federation_id}, organization_id: {data_submitter_organization_id}"
     await log_message(message)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+########################################################################################################################
+@router.put(
+    path="/data-federations/{data_federation_id}/data-models",
+    description="Add a data model to a data federation",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def add_data_model(
+    request: Request,
+    data_federation_id: PyObjectId,
+    data_model: dict = Body(),
+    current_user: TokenData = Depends(get_current_user),
+):
+    """
+    Add a data model to the data federation
+
+    :param data_federation_id: data federation for which the fhir profile is being added
+    :type data_federation_id: PyObjectId
+    :param data_model: data model json to be added
+    :type data_model: str
+    :param current_user: current user information, defaults to Depends(get_current_user)
+    :type current_user: TokenData, optional
+    :raises http_exception: HTTP_404_NOT_FOUND, "DataFederation not found"
+    :return: None
+    :rtype: None
+    """
+    # Only data federation owner can add a fhir profile
+    data_model_str = (await request.body()).decode("utf-8")
+    if len(data_model_str) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Data model is empty",
+        )
+
+    # Get the data federation
+    data_federation_db = await data_service.find_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id), "organization_id": str(current_user.organization_id)},
+    )
+    if not data_federation_db:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="DataFederation not found")
+    data_federation_db = DataFederation_Db(**data_federation_db)
+
+    if data_federation_db.data_model is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The data model already exists",
+        )
+
+    await data_service.update_one(
+        DB_COLLECTION_DATA_FEDERATIONS,
+        {"_id": str(data_federation_id)},
+        {"$set": {"data_model": data_model_str}},
+    )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

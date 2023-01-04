@@ -14,6 +14,7 @@
 #include "Exceptions.h"
 #include "ExceptionRegister.h"
 #include "Organization.h"
+#include "FileUtils.h"
 
 #include <filesystem>
 #include <iostream>
@@ -388,9 +389,12 @@ void __thiscall Organization::RegisterDataFederations(
 
         StructuredBuffer oRegistrationParameters;
 
+        std::string strDataModelFile = oFederation.GetString("data_model");
+
         oRegistrationParameters.PutString("name", oFederation.GetString("DataFederationName"));
         oRegistrationParameters.PutString("description", oFederation.GetString("DataFederationDescription"));
         oRegistrationParameters.PutString("data_format", oFederation.GetString("DatasetFormat"));
+        oRegistrationParameters.PutString("data_model", ::ReadFileAsString(strDataModelFile));
 
         std::string strFederationIdentifier = oSailPlatformServicesSession.RegisterDataFederation(oRegistrationParameters);
         if ( m_stlDataFederationIdentifiers.find(oFederation.GetString("DataFederationName")) == m_stlDataFederationIdentifiers.end())

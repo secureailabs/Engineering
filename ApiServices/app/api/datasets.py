@@ -184,7 +184,7 @@ async def update_dataset(
         dataset_db.name = updated_dataset_info.name
 
     if updated_dataset_info.tag:
-        dataset_db.tag = updated_dataset_info.tag
+        dataset_db.tags = updated_dataset_info.tag
 
     await data_service.update_one(
         DB_COLLECTION_DATASETS,

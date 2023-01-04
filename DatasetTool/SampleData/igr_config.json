@@ -11,11 +11,8 @@
         "name": "IGR Dataset #1",
         "description": "IGR Dataset"
     },
-    "data_federation": "KCA Consortium",
+    "data_federation": "KCA Consortium - CSV",
     "data_source": [
-        "SampleData/igr_001_a.csv",
-        "SampleData/igr_001_b.csv",
-        "SampleData/igr_001_c.csv",
-        "SampleData/kidney_clean_1.csv"
+        "SampleData/data_frame_0.csv"
     ]
 }

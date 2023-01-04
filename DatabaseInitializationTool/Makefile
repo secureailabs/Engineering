@@ -24,7 +24,7 @@ $(OBJDIR)%.o: $(ABSROOTDIR)%.cpp
 $(OUTPUT): $(OBJS) SharedCommonCode
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(filter %.o,$^) -o $@ $(LDFLAGS)
-	@cp -f $(SAMPLEFILES)/DatabaseInitializationSettings.json $(ABSROOTDIR)/Binary
+	@cp -f $(SAMPLEFILES)/* $(ABSROOTDIR)/Binary
 	@chmod a+rwx,g+rwx,o+rwx $(ABSROOTDIR)/Binary
 
 clean:

@@ -15,13 +15,12 @@ import datetime
 import uuid
 from datetime import timezone
 
-from utils.helpers import random_name
+from tests.workflow_tests.utils.helpers import random_name
 
 
 def get_dataset_payload():
     """
     Helper to return template for dataset payload
-
     :return: dataset_payload, rand_uuid, dataset_name
     :rtype: (dict, str, str)
     """
@@ -70,3 +69,42 @@ def get_dataset_payload():
         },
     }
     return dataset_payload, rand_uuid, dataset_name
+
+
+class Dataset:
+    """
+    Dataset Helper Class
+    """
+
+    def __init__(self, name: str, description: str, tags: str, format: str):
+        self.name = name
+        self.description = description
+        self.tags = tags
+        self.format = format
+
+    def pretty_print(self):
+        print(f"Dataset Name: {self.name}")
+        print(f"Dataset Description: {self.description}")
+        print(f"Dataset tags: {self.tags}")
+        print(f"Dataset Format: {self.format}")
+
+
+class DatasetVersion:
+    """
+    Dataset Version Helper Class
+    """
+
+    def __init__(self, dataset_id: str, description: str, name: str, state: str):
+        self.dataset_id = dataset_id
+        self.description = description
+        self.name = name
+        self.state = state
+
+    def pretty_print(self):
+        print(f"Dataset-Version ID: {self.dataset_id}")
+        print(f"Dataset-Version Description: {self.description}")
+        print(f"Dataset-Version Name: {self.name}")
+        print(f"Dataset-Version State: {self.state}")
+
+    def set_dataset_id(self, new_dataset_id: str):
+        self.dataset_id = new_dataset_id

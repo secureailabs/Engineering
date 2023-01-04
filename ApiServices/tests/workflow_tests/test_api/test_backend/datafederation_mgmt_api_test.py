@@ -53,7 +53,7 @@ def print_federation_data(federation):
         data_submitter_invite_list += f"\n|\tID:\t{data_submitter_invite}\n|"
     research_invite_list = f""
     for research_invite in federation.get("research_organizations_invites_id"):
-        research_invite_list += f"\n|\t\ID:\t{research_invite}\n|"
+        research_invite_list += f"\n|\tID:\t{research_invite}\n|"
     print(
         f"\n\n|Federation Name:\t\t{federation.get('name')}\n\
 |Description:\t\t\t{federation.get('description')}\n\
@@ -193,7 +193,7 @@ def print_all_data(
             data_submitter_invite_list += f"\n|\tID:\t{data_submitter_invite}\n|"
         research_invite_list = f""
         for research_invite in federation_response_json.get("research_organizations_invites_id"):
-            research_invite_list += f"\n|\t\ID:\t{research_invite}\n|"
+            research_invite_list += f"\n|\tID:\t{research_invite}\n|"
         print(
             f"|Federation Name:\t\t{federation.get('name')}\n\
 |Description:\t\t\t{federation.get('description')}\n\

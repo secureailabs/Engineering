@@ -68,7 +68,8 @@ jobs:
           pwd
           ls -l
           cd AzureDeploymentTemplates/PackerTemplate/
-          sudo -E ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
+          source azure_constants.sh
+          ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
 
       - name: Condition 2 Release Candidate
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
@@ -84,7 +85,8 @@ jobs:
           pwd
           ls -l
           cd AzureDeploymentTemplates/PackerTemplate/
-          sudo -E ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
+          source azure_constants.sh
+          ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
 
       - name: Condition 3 ProductionGA
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
@@ -100,4 +102,5 @@ jobs:
           pwd
           ls -l
           cd AzureDeploymentTemplates/PackerTemplate/
-          sudo -E ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
+          source azure_constants.sh
+          ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}

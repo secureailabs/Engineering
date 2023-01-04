@@ -14,16 +14,16 @@
 
 import asyncio
 import functools
-import json
-import time
 
 import requests
 from app.api.authentication import get_current_user
-from app.data import operations as data_service
+from app.api.data_federations_provisions import \
+    get_all_data_federation_provision_info
+from app.api.datasets import get_all_datasets
 from app.utils.secrets import get_secret
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.accounts import UserRole
-from models.audit import QueryRequest, QueryResult
+from models.audit import QueryInput, QueryResult
 from models.authentication import TokenData
 from models.common import PyObjectId
 
@@ -32,177 +32,57 @@ router = APIRouter()
 audit_server_endpoint = get_secret("audit_service_endpoint")
 print(audit_server_endpoint)
 
-@router.get(
-    path = "/audit/{}"
-    description = "query "
-)
 
-
-# #######################################################################################################################
+########################################################################################################################
 @router.get(
-    path="/audit/activity/time/",
-    description="query by a LogQL string",
+    path="/audit/",
+    description="query by logQL",
     response_model=QueryResult,
     response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
 )
-async def audit_query_activity_by_time(
-    start: int = None,
-    end: int = None,
+async def audit_incidents_query(
+    query: QueryInput,
     current_user: TokenData = Depends(get_current_user),
 ):
     """
-    query api services activities by time
+    perform a audit query
 
-    :param start: start time, defaults to None
-    :type start: int, optional
-    :param end: end time, defaults to None
-    :type end: int, optional
+    :param query: query input
+    :type query: QueryInput
     :param current_user: the user who perform the query, defaults to Depends(get_current_user)
     :type current_user: TokenData, optional
-    :return: response
-    :rtype: dict(json)
+    :return: response body
+    :rtype: json(dict)
     """
-    if start is None:
-        start = time.time() - 3600
-    if end is None:
-        end = time.time()
+    query = query.json()
+    label = query.pop("label")
+    response = {}
 
-    query = {
-        "query": '{job="user_activity"}',
-        "start": start,
-        "end": end,
-    }
-    response = await query_user_activity(query, current_user)
-    return QueryResult(**response.json())
+    query_str = f'{{job={label}}}'
 
+    if "userID" in query:
+        userID = query.pop("userID")
+        query_str = f'{query_str} |= `{str(userID)}`'
+        query["query"] = query_str
+        if label == "computation":
+            response = await query_computation_byUserID(query, current_user)
 
-# #######################################################################################################################
-@router.get(
-    path="/audit/computation/time/",
-    description="query by a LogQL string",
-    response_model=QueryResult,
-    response_model_by_alias=False,
-    status_code=status.HTTP_200_OK,
-)
-async def audit_query_computation_by_time(
-    start: int = None,
-    end: int = None,
-    current_user: TokenData = Depends(get_current_user),
-):
-    """
-    query scn computation activities by time
+    elif "dataID" in query:
+        dataID = query.pop("dataID")
+        query_str = f'{query_str} |= `{str(dataID)}`'
+        query["query"] = query_str
+        if label == "computation":
+            response = await query_compuation_by_dataID(dataID, query, current_user)
 
-    :param start: start time, defaults to None
-    :type start: int, optional
-    :param end: end time, defaults to None
-    :type end: int, optional
-    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
-    :type current_user: TokenData, optional
-    :return: response
-    :rtype: dict(json)
-    """
-    if start is None:
-        start = time.time() - 3600
-    if end is None:
-        end = time.time()
-
-    query = {
-        "query": '{job="computation"}',
-        "start": start,
-        "end": end,
-    }
-    response = await query_computation(query, current_user)
+    if label == "user_activity":
+        response = await query_user_activity(query, current_user)
 
     return QueryResult(**response.json())
 
 
 # #######################################################################################################################
-@router.get(
-    path="/audit/activity/userID/",
-    description="query by a LogQL string",
-    response_model=QueryResult,
-    response_model_by_alias=False,
-    status_code=status.HTTP_200_OK,
-)
-async def audit_query_activity_by_userID(
-    user_id: PyObjectId,
-    start: int = None,
-    end: int = None,
-    current_user: TokenData = Depends(get_current_user),
-):
-    """
-    query api services activities by user ID
-
-    :param user_id: user id
-    :type user_id: PyObjectId
-    :param start: start time, defaults to None
-    :type start: int, optional
-    :param end: end time, defaults to None
-    :type end: int, optional
-    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
-    :type current_user: TokenData, optional
-    :return: response
-    :rtype: dict(json)
-    """
-    if start is None:
-        start = time.time() - 3600
-    if end is None:
-        end = time.time()
-
-    query = {
-        "query": f'{{job="user_activity"}} |= `{str(user_id)}`',
-        "start": start,
-        "end": end,
-    }
-    response = await query_user_activity(query, current_user)
-    return QueryResult(**response.json())
-
-
-# #######################################################################################################################
-@router.get(
-    path="/audit/computation/userID/",
-    description="query by a LogQL string",
-    response_model=QueryResult,
-    response_model_by_alias=False,
-    status_code=status.HTTP_200_OK,
-)
-async def audit_query_computation_by_userID(
-    user_id: PyObjectId,
-    start: int = None,
-    end: int = None,
-    current_user: TokenData = Depends(get_current_user),
-):
-    """
-    query scn computation activities by user ID
-
-    :param user_id: user id
-    :type user_id: PyObjectId
-    :param start: start time, defaults to None
-    :type start: int, optional
-    :param end: end time, defaults to None
-    :type end: int, optional
-    :param current_user: user who perform the query, defaults to Depends(get_current_user)
-    :type current_user: TokenData, optional
-    :return: response
-    :rtype: response body
-    """
-
-    if start is None:
-        start = time.time() - 3600
-    if end is None:
-        end = time.time()
-
-    query = {
-        "query": f'{{job="computation"}} |= `{str(user_id)}`',
-        "start": start,
-        "end": end,
-    }
-    response = await query_computation(query, current_user)
-    return QueryResult(**response.json())
-
-
-async def query_computation(
+async def query_computation_byUserID(
     query: dict,
     current_user: TokenData,
 ):
@@ -216,136 +96,106 @@ async def query_computation(
     :return: response
     :rtype: dict(json)
     """
-    try:
-        response = {}
-        # the user is SAIL tech support, no restriction
-        if current_user.role == UserRole.ADMIN:
-            response = await audit_query(query)
 
-        # the user is research org admin, can only get info related to the VMs belongs to the org.
-        elif current_user == UserRole.ORGANIZATION_ADMIN:
-            provision_db = await data_service.find_by_query(
-                "data-federation-provsions",
-                {"organization_id": str(current_user.organization_id)},
-            )
+    response = {}
+    # the user is SAIL tech support, no restriction
+    if current_user.role == UserRole.ADMIN:
+        response = await audit_query(query)
 
-            provision_VMs = []
-            for provision in provision_db:
-                provision_VMs.extend(provision.secure_computation_nodes_id)
+    # the user is research org admin, can only get info related to the VMs belongs to the org.
+    elif current_user == UserRole.ORGANIZATION_ADMIN:
 
-            if len(provision_VMs) != 0:
-                scn_ids = ""
-                for scn_id in provision_VMs:
-                    scn_ids += scn_id
-                    scn_ids += "|"
-                scn_ids = scn_ids[:-1]
-                query["query"] = f'{query["query"]} |= `{str(scn_ids)}`'
-            response = await audit_query(query)
+        provision_db = get_all_data_federation_provision_info(current_user)
+        provision_db = provision_db.data_federation_provisions
 
-        # the user is the data owner admin, can only get info about the data they own.
-        elif current_user == UserRole.DATASET_ADMIN:
-            datasets = await data_service.find_by_query(
-                "datasets", {"organization_id": str(current_user.organization_id)}
-            )
-            if len(datasets) != 0:
-                dataset_ids = ""
-                for data in datasets:
-                    dataset_ids += data.id
-                    dataset_ids += "|"
-                dataset_ids = dataset_ids[:-1]
-                query["query"] = f'{query["query"]} |= `{str(dataset_ids)}`'
-            response = await audit_query(query)
+        provision_VMs = []
+        for provision in provision_db:
+            provision_VMs.extend(provision.secure_computation_nodes_id)
 
-        # for other user identity, this is forbidden
-        else:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+        if len(provision_VMs) != 0:
+            scn_ids = ""
+            for scn_id in provision_VMs:
+                scn_ids += scn_id
+                scn_ids += "|"
+            scn_ids = scn_ids[:-1]
+            query["query"] = f'{query["query"]} |= `{str(scn_ids)}`'
+        response = await audit_query(query)
 
-        return response
+    # the user is the data owner admin, can only get info about the data they own.
+    elif current_user == UserRole.DATASET_ADMIN:
 
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+        datasets = await get_all_datasets(current_user)
+        datasets = datasets.datasets
+
+        if len(datasets) != 0:
+            dataset_ids = ""
+            for data in datasets:
+                dataset_ids += data.id
+                dataset_ids += "|"
+            dataset_ids = dataset_ids[:-1]
+            query["query"] = f'{query["query"]} |= `{str(dataset_ids)}`'
+        response = await audit_query(query)
+
+    # for other user identity, this is forbidden
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+
+    return response
 
 
-# #######################################################################################################################
-@router.get(
-    path="/audit/computation/dataID/",
-    description="query by a LogQL string",
-    response_model=QueryResult,
-    response_model_by_alias=False,
-    status_code=status.HTTP_200_OK,
-)
-async def audit_query_compuation_by_dataID(
+########################################################################################################################
+
+async def query_compuation_by_dataID(
     dataset_id: PyObjectId,
-    start: int = None,
-    end: int = None,
-    current_user: TokenData = Depends(get_current_user),
+    query: dict,
+    current_user: TokenData,
 ):
     """
-    query incidents happened on scn related to computation by dataset id
-
-    if there is no time input, the default query time is defined starting from
-    one hour ago. (same for all query interface)
+    query scn computation activities by dataID
 
     :param dataset_id: dataset id
     :type dataset_id: PyObjectId
-    :param start: start time, defaults to None
-    :type start: int, optional
-    :param end: end time, defaults to None
-    :type end: int, optional
-    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
+    :param query: query body
+    :type query: dict
+    :param current_user: the user who perform the operation, defaults to Depends(get_current_user)
     :type current_user: TokenData, optional
-    :return: response json
-    :rtype: dict(json)
+    :return: response
+    :rtype: json(dict)
     """
-    try:
-        if start is None:
-            start = time.time() - 3600
-        if end is None:
-            end = time.time()
 
-        query = {
-            "query": f'{{job="computation"}} |= `{str(dataset_id)}`',
-            "start": start,
-            "end": end,
-        }
+    response = {}
+    # the user is SAIL tech support, no restriction
+    if current_user.role == UserRole.ADMIN:
+        response = await audit_query(query)
 
-        response = {}
-        # the user is SAIL tech support, no restriction
-        if current_user.role == UserRole.ADMIN:
+    # the user is research org admin, can only get info about data and nodes owned by the org.
+    # check if data belongs to org
+    elif current_user == UserRole.ORGANIZATION_ADMIN:
+        data_ids = await get_dataset_from_user_node(current_user)
+        if dataset_id in data_ids:
             response = await audit_query(query)
-
-        # the user is research org admin, can only get info about data and nodes owned by the org.
-        # check if data belongs to org
-        elif current_user == UserRole.ORGANIZATION_ADMIN:
-            data_ids = await get_dataset_from_user_node(current_user)
-            if dataset_id in data_ids:
-                response = await audit_query(query)
-            else:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
-
-        # the user is the data owner admin, can only get info about the data they own.
-        # check if data belongs to owner
-        elif current_user == UserRole.DATASET_ADMIN:
-            data_id = await data_service.find_one("datasets", {"_id": str(dataset_id)})
-            if not data_id:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
-            else:
-                response = await audit_query(query)
-
-        # for other user identity, this is forbidden
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-        return QueryResult(**response.json())
+    # the user is the data owner admin, can only get info about the data they own.
+    # check if data belongs to owner
+    elif current_user == UserRole.DATASET_ADMIN:
+        ###
+        data_id = await get_all_datasets(current_user)
+        data_id = data_id.datasets
+        if len(data_id) == 0:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+        else:
+            response = await audit_query(query)
 
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    # for other user identity, this is forbidden
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+
+    return QueryResult(**response.json())
 
 
+########################################################################################################################
 async def get_dataset_from_user_node(
     current_user: TokenData,
 ):
@@ -357,91 +207,18 @@ async def get_dataset_from_user_node(
     :return: data ids on the node
     :rtype: set
     """
-    try:
-        event_loop = asyncio.get_event_loop()
-        nodes_info = await event_loop.run_in_executor(None, requests.get, current_user)
+    event_loop = asyncio.get_event_loop()
+    nodes_info = await event_loop.run_in_executor(None, requests.get, current_user)
 
-        data_busket = set()
-        for node in nodes_info:
-            for data in node["datasets"]:
-                data_busket.update(data.id)
+    data_busket = set()
+    for node in nodes_info:
+        for data in node["datasets"]:
+            data_busket.update(data.id)
 
-        return data_busket
-
-    except Exception as exception:
-        raise exception
+    return data_busket
 
 
-# #######################################################################################################################
-@router.get(
-    path="/audit/activity/dataID/",
-    description="query by a LogQL string",
-    response_model=QueryResult,
-    response_model_by_alias=False,
-    status_code=status.HTTP_200_OK,
-)
-async def audit_query_activity_by_dataID(
-    data_id: PyObjectId,
-    start: int = None,
-    end: int = None,
-    current_user: TokenData = Depends(get_current_user),
-):
-    """
-    query the api service activities by data ID
-
-    :param data_id: data id
-    :type data_id: PyObjectId
-    :param start: start time, defaults to None
-    :type start: int, optional
-    :param end: end time, defaults to None
-    :type end: int, optional
-    :param current_user: user who perform the query, defaults to Depends(get_current_user)
-    :type current_user: TokenData, optional
-    :return: query response
-    :rtype: dict(json)
-    """
-
-    if start is None:
-        start = time.time() - 3600
-    if end is None:
-        end = time.time()
-
-    query = {
-        "query": f'{{job="user_activity"}} |= `{str(data_id)}`',
-        "start": start,
-        "end": end,
-    }
-
-    response = await query_user_activity(query, current_user)
-    return QueryResult(**response.json())
-
-
-# #######################################################################################################################
-@router.get(
-    path="/audit/",
-    description="query by a LogQL string",
-    response_model=QueryResult,
-    response_model_by_alias=False,
-    status_code=status.HTTP_200_OK,
-)
-async def audit_query_general(
-    query: QueryRequest,
-    current_user: TokenData = Depends(get_current_user),
-):
-    """
-    perform a general query
-
-    :param query: query body
-    :type query: QueryRequest
-    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
-    :type current_user: TokenData, optional
-    :return: response
-    :rtype: dict(json)
-    """
-    response = await query_user_activity(**query.dict(), current_user=current_user)
-    return QueryResult(**response.json())
-
-
+########################################################################################################################
 async def query_user_activity(
     query: dict,
     current_user: TokenData,
@@ -456,22 +233,17 @@ async def query_user_activity(
     :return: response data
     :rtype: dict(json)
     """
-    try:
-        # the user is SAIL tech support, no restriction
-        if current_user.role == UserRole.ADMIN:
-            response = await audit_query(query)
-        # for other user identity, this is forbidden
-        else:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
-        return response
 
-    except HTTPException as http_exception:
-        raise http_exception
-    except Exception as exception:
-        raise exception
+    # the user is SAIL tech support, no restriction
+    if current_user.role == UserRole.ADMIN:
+        response = await audit_query(query)
+    # for other user identity, this is forbidden
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+    return response
 
 
-# #######################################################################################################################
+########################################################################################################################
 async def audit_query(
     query: dict,
 ):
@@ -489,14 +261,10 @@ async def audit_query(
     :return: response
     :rtype: dict
     """
-    try:
-        event_loop = asyncio.get_event_loop()
+    event_loop = asyncio.get_event_loop()
 
-        response = await event_loop.run_in_executor(
-            None,
-            functools.partial(requests.get, audit_server_endpoint, params=query),
-        )
-        return response
-
-    except Exception as exception:
-        raise exception
+    response = await event_loop.run_in_executor(
+        None,
+        functools.partial(requests.get, audit_server_endpoint, params=query),
+    )
+    return response

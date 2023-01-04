@@ -7,7 +7,6 @@ import uuid
 import requests
 import sailazure
 from azure.core.exceptions import AzureError
-from azure.keyvault.keys import KeyClient
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
 from azure.mgmt.monitor.models import (DiagnosticSettingsResource, LogSettings,
@@ -28,6 +27,18 @@ class DeploymentResponse(BaseModel):
 
 
 DEV_PARAMS = {
+    "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
+    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/{0}/versions/0.0.0",
+    "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
+    + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
+    "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
+    "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
+    "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
+    "azure_storage_account_name": "sailvmimages9827",
+    "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
+}
+
+TEST_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
     "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/{0}/versions/0.0.0",
     "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
@@ -65,8 +76,9 @@ PRODUCTIONGA_PARAMS = {
     "azure_scn_virtual_network_id": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",
 }
 
+global_test_flag = True
 
-def set_params(subscription_id, module_name):
+def set_params(subscription_id, module_name, test):
     """
     Set Params based on selected subscription
 
@@ -79,7 +91,10 @@ def set_params(subscription_id, module_name):
     }
 
     if subscription_id == "b7a46052-b7b1-433e-9147-56efbfe28ac5":
-        parameters.update(DEV_PARAMS)
+        if test:
+            parameters.update(TEST_PARAMS)
+        else:
+            parameters.update(DEV_PARAMS)
     elif subscription_id == "40cdb551-8a8d-401f-b884-db1599022002":
         parameters.update(RELEASE_CANDIDATE_PARAMS)
     elif subscription_id == "ba383264-b9d6-4dba-b71f-58b3755382d8":
@@ -117,7 +132,7 @@ def deploy_module(account_credentials, deployment_name, module_name):
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
 
-    set_parameters: dict[str, str] = set_params(subscription_id, module_name)
+    set_parameters: dict[str, str] = set_params(subscription_id, module_name, global_test_flag)
     parameters = {
         "vmName": set_parameters["vmName"],
         "vmSize": set_parameters["vmSize"],
@@ -222,10 +237,6 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
 def deploy_audit_service(
     account_credentials,
     deployment_name,
-    storage_account_name,
-    storage_account_password,
-    storage_resource_group_name,
-    key_vault_url,
     owner,
 ):
     """
@@ -234,13 +245,14 @@ def deploy_audit_service(
     subscription_id = account_credentials["subscription_id"]
 
     # Get params to update json
-    set_parameters = set_params(subscription_id, "auditserver")
+    set_parameters = set_params(subscription_id, "auditserver", global_test_flag)
     # Deploy the frontend server
     audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver")
 
     # Read backend json from file and set params
     with open("auditserver.json", "r") as backend_json_fd:
         backend_json = json.load(backend_json_fd)
+
     backend_json["owner"] = owner
     backend_json["azure_subscription_id"] = subscription_id
     backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
@@ -248,11 +260,6 @@ def deploy_audit_service(
     backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
     backend_json["azure_scn_image_id"] = set_parameters["azure_scn_image_id"]
     backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
-    backend_json["azure_storage_resource_group"] = storage_resource_group_name
-    backend_json["azure_storage_account_name"] = storage_account_name
-    backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
-    backend_json["azure_storage_account_password"] = storage_account_password
-    backend_json["azure_keyvault_url"] = key_vault_url
 
     with open("auditserver.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -285,7 +292,7 @@ def deploy_apiservices(
     subscription_id = account_credentials["subscription_id"]
 
     # Get params to update json
-    set_parameters = set_params(subscription_id, "apiservices")
+    set_parameters = set_params(subscription_id, "apiservices", global_test_flag)
     # Deploy the frontend server
     apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices")
 
@@ -527,10 +534,6 @@ if __name__ == "__main__":
     audit_service_ip = deploy_audit_service(
         account_credentials,
         deployment_id,
-        storage_account_name,
-        storage_accout_password,
-        storage_resource_group_name,
-        key_vault_url,
         OWNER,
     )
     print("Audit Service server: ", audit_service_ip)

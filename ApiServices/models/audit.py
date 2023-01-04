@@ -3,6 +3,9 @@
 # audit.py
 # -------------------------------------------------------------------------------
 """Models used by audit query service"""
+from typing import Optional, Union
+
+from models.common import SailBaseModel
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -13,14 +16,18 @@
 # -------------------------------------------------------------------------------
 from pydantic import Field, StrictStr
 
-from models.common import SailBaseModel
-
 
 class QueryResult(SailBaseModel):
     status: StrictStr = Field(...)
     data: dict = Field(...)
 
 
-class QueryRequest(SailBaseModel):
-    query: StrictStr = Field(...)
-    limit: int = 100
+class QueryInput(SailBaseModel):
+    label: StrictStr = Field(...)
+    userID: Optional[StrictStr] = Field(...)
+    dataID: Optional[StrictStr] = Field(...)
+    start: Optional[Union[int, float]] = Field(...)
+    end: Optional[Union[int, float]] = Field(...)
+    limit: Optional[int] = Field(...)
+    step: Optional[StrictStr] = Field(...)
+    direction: Optional[StrictStr] = Field(...)

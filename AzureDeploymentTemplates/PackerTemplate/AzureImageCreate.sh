@@ -3,6 +3,7 @@
 source azure_constants.sh
 Location="westus"
 ImageGalleryName="sail_image_gallery"
+ResourceGroup="SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg"
 
 PrintHelp()
 {

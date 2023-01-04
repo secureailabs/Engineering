@@ -15,15 +15,15 @@
 import pytest
 from assertpy.assertpy import assert_that
 from cerberus import Validator
-from tests.workflow_tests.api_portal.datafederation_management_api import (
-    DataFederationManagementFastApi,
-)
-from tests.workflow_tests.api_portal.dataset_management_api import (
-    DataSetManagementFastApi,
-)
+from tests.workflow_tests.api_portal.datafederation_management_api import \
+    DataFederationManagementFastApi
+from tests.workflow_tests.api_portal.dataset_management_api import \
+    DataSetManagementFastApi
 from tests.workflow_tests.api_portal.sail_portal_api import SailPortalFastApi
+from tests.workflow_tests.utils.dataset_helpers import Dataset
 from tests.workflow_tests.utils.federation_helpers import DataFederation
 from tests.workflow_tests.utils.helpers import random_name
+from tests.workflow_tests.utils.organization_helper import Organization
 
 
 def print_response_values(function_name, response, response_json):
@@ -34,6 +34,40 @@ def print_response_values(function_name, response, response_json):
     print(f"Test Response JSON: {response_json}\n")
     print(
         f"============================================================{function_name}============================================================\n"
+    )
+
+
+def print_federation_data(federation):
+    organization = federation.get('organization')
+    data_submitter_organizations = f""
+    for submitter in federation.get("data_submitter_organizations"):
+        data_submitter_organizations += f"\n|\t\tName:\t{submitter.get('name')}\n|\t\tID:\t{submitter.get('id')}\n|"
+    research_organizations = f""
+    for researcher in federation.get("research_organizations"):
+        research_organizations += f"\n|\t\t|Name:\t{researcher.get('name')}\n|\t\tID:\t{researcher.get('id')}\n|"
+    dataset_list = f""
+    for dataset_list_element in federation.get("datasets"):
+        dataset_list += f"\n|\t\tName:\t{dataset_list_element.get('name')}\n|\t\tID:\t{dataset_list_element.get('id')}\n|"
+    data_submitter_invite_list = f""
+    for data_submitter_invite in federation.get("data_submitter_organizations_invites_id"):
+        data_submitter_invite_list += f"\n|\tID:\t{data_submitter_invite}\n|"
+    research_invite_list = f""
+    for research_invite in federation.get("research_organizations_invites_id"):
+        research_invite_list += f"\n|\t\ID:\t{research_invite}\n|"
+    print(
+        f"\n\n|Federation Name:\t\t{federation.get('name')}\n\
+|Description:\t\t\t{federation.get('description')}\n\
+|ID:\t\t\t\t{federation.get('id')}\n\
+|Data Format:\t\t\t{federation.get('data_format')}\n\
+|Creation Time:\t\t\t{federation.get('creation_time')}\n\
+|Organization Name:\t\t{organization.get('name')}\n\
+|Organization ID:\t\t{organization.get('id')}\n\
+|State:\t\t\t\t{federation.get('state')}\n\
+|Data Submitter Organizations:\t{data_submitter_organizations}\n\
+|Research Organizations:\t{research_organizations}\n\
+|Datasets:\t\t\t{dataset_list}\n\
+|Data Submitter Organizations Invites ID:\t{data_submitter_invite_list}\n\
+|Research Organizations Invites ID:\t{research_invite_list}"
     )
 
 
@@ -143,30 +177,37 @@ def print_all_data(
         "-------------------------------------------------------------------------------------------------------------"
     )
     for federation in federations_json.get("data_federations"):
+        federation_response, federation_response_json = federation_mgmt.get_data_federation_by_id(sail_portal, federation.get('id'))
+        organization = federation_response_json.get('organization')
         data_submitter_organizations = f""
-        for submitter in federation.get("data_submitter_organizations"):
+        for submitter in federation_response_json.get("data_submitter_organizations"):
             data_submitter_organizations += f"\n|\t\tName:\t{submitter.get('name')}\n|\t\tID:\t{submitter.get('id')}\n|"
         research_organizations = f""
-        for researcher in federation.get("research_organizations"):
+        for researcher in federation_response_json.get("research_organizations"):
             research_organizations += f"\n|\t\t|Name:\t{researcher.get('name')}\n|\t\tID:\t{researcher.get('id')}\n|"
         dataset_list = f""
-        for dataset_list_element in federation.get("datasets"):
+        for dataset_list_element in federation_response_json.get("datasets"):
             dataset_list += f"\n|\t\tName:\t{dataset_list_element.get('name')}\n|\t\tID:\t{dataset_list_element.get('id')}\n|"
-        invite_list = f""
-        for invite_list_element in federation.get("research_organizations_invites_id"):
-            invite_list += f"\n|\t\tName:\t{invite_list_element.get('name')}\n|\t\tID:\t{invite_list_element.get('id')}\n|"
+        data_submitter_invite_list = f""
+        for data_submitter_invite in federation_response_json.get("data_submitter_organizations_invites_id"):
+            data_submitter_invite_list += f"\n|\tID:\t{data_submitter_invite}\n|"
+        research_invite_list = f""
+        for research_invite in federation_response_json.get("research_organizations_invites_id"):
+            research_invite_list += f"\n|\t\ID:\t{research_invite}\n|"
         print(
             f"|Federation Name:\t\t{federation.get('name')}\n\
 |Description:\t\t\t{federation.get('description')}\n\
 |ID:\t\t\t\t{federation.get('id')}\n\
 |Data Format:\t\t\t{federation.get('data_format')}\n\
 |Creation Time:\t\t\t{federation.get('creation_time')}\n\
+|Organization Name:\t\t{organization.get('name')}\n\
+|Organization ID:\t\t{organization.get('id')}\n\
 |State:\t\t\t\t{federation.get('state')}\n\
 |Data Submitter Organizations:\t{data_submitter_organizations}\n\
 |Research Organizations:\t{research_organizations}\n\
 |Datasets:\t\t\t{dataset_list}\n\
-|Data Submitter Organizations Invites ID:\t{federation.get('data_submitter_organization_invites_id')}\n\
-|Research Organizations Invites ID:\t{invite_list}"
+|Data Submitter Organizations Invites ID:\t{data_submitter_invite_list}\n\
+|Research Organizations Invites ID:\t{research_invite_list}"
         )
         print(
             "----------------------------------------------------------------------------------------------------"
@@ -270,8 +311,16 @@ def test_debug_print_data(
     dataset_management = request.getfixturevalue(dataset_management)
     federation_management = request.getfixturevalue(federation_management)
 
+    test_portal = SailPortalFastApi(base_url=data_owner_portal.base_url, email="4mk7@mkgu.com", password="password1")
+
+    #organization_response, org_response_json = data_owner_portal.get_organization_by_id("654a70d1-a7c3-404d-8336-a135abba653e")
+    #print_response_values("KCA", organization_response, org_response_json)
+    #users_response, users_response_json = data_owner_portal.get_organization_users("654a70d1-a7c3-404d-8336-a135abba653e")
+    #print_response_values("Users", users_response, users_response_json)
+
     print_all_data(data_owner_portal, dataset_management, federation_management)
     print_all_data(researcher_portal, dataset_management, federation_management)
+    print_all_data(test_portal, dataset_management, federation_management)
 
 
 @pytest.mark.fastapi
@@ -336,7 +385,7 @@ def test_fastapi_get_all_data_federation(
 @pytest.mark.parametrize(
     "sail_portal, federation_management, new_federation",
     [
-        # ("data_owner_sail_fast_api_portal", "datafederation_management_fast_api", "create_valid_data_federation"),
+        ("data_owner_sail_fast_api_portal", "datafederation_management_fast_api", "create_valid_data_federation"),
         (
             "researcher_sail_fast_api_portal",
             "datafederation_management_fast_api",
@@ -769,27 +818,21 @@ def test_fastapi_update_invalid_data_federation(
 
 @pytest.mark.fastapi
 @pytest.mark.parametrize(
-    "sail_portal, federation_management, new_name, new_description",
+    "sail_portal, federation_management",
     [
         (
             "data_owner_sail_fast_api_portal",
             "datafederation_management_fast_api",
-            f"Test Update Name-{random_name(4)}",
-            f"This is an updated Test Data Federation Description-{random_name(4)}",
         ),
         (
             "researcher_sail_fast_api_portal",
             "datafederation_management_fast_api",
-            f"Test Update Name-{random_name(4)}",
-            f"This is an updated Test Data Federation Description-{random_name(4)}",
         ),
     ],
 )
-def test_fastapi_delete_valid_data_federation(
+def test_fastapi_delete_valid_data_federation_authorized_user(
     sail_portal: SailPortalFastApi,
     federation_management: DataFederationManagementFastApi,
-    new_name: str,
-    new_description: str,
     request,
 ):
     """ """
@@ -839,6 +882,56 @@ def test_fastapi_delete_valid_data_federation(
     assert_that(is_valid, description=validator.errors).is_true()
     assert_that(verify_response_json.get("state")).is_equal_to("INACTIVE")
     assert_that(test_response.status_code).is_equal_to(204)
+
+
+@pytest.mark.fastapi
+@pytest.mark.parametrize(
+    "sail_portal, sail_portal_target, federation_management",
+    [
+        (
+            "data_owner_sail_fast_api_portal",
+            "researcher_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+        ),
+        (
+            "researcher_sail_fast_api_portal",
+            "data_owner_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+        ),
+    ],
+)
+def test_fastapi_delete_valid_data_federation_unauthorized_user(
+    sail_portal: SailPortalFastApi,
+    sail_portal_target: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    request,
+):
+    """ """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    sail_portal_target = request.getfixturevalue(sail_portal_target)
+    federation_management = request.getfixturevalue(federation_management)
+
+    schema = {
+        "detail": {"type": "string"},
+    }
+
+    validator = Validator(schema)
+
+    # Act
+    _, federations_json = federation_management.get_all_data_federations(sail_portal)
+    federation = federations_json.get("data_federations")[
+        len(federations_json.get("data_federations")) - 1
+    ]
+
+    test_response = federation_management.delete_data_federation_by_id(
+        sail_portal_target, federation.get("id")
+    )
+
+    # Assert
+    is_valid = validator.validate(test_response.json())
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(403)
 
 
 @pytest.mark.fastapi
@@ -903,9 +996,124 @@ def test_fastapi_delete_invalid_data_federation(
 
 # TODO: test_fastapi_invalid_data_federation_invite_invalid_researcher
 
-# * TODO: test_fastapi_valid_data_federation_register_valid_researcher
 
-# * TODO: test_fastapi_valid_data_federation_register_invalid_researcher
+@pytest.mark.fastapi
+@pytest.mark.parametrize(
+    "sail_portal, federation_management, new_organization",
+    [
+        ("data_owner_sail_fast_api_portal", "datafederation_management_fast_api", "create_valid_organization"),
+        ("researcher_sail_fast_api_portal", "datafederation_management_fast_api", "create_valid_organization"),
+    ],
+)
+def test_fastapi_valid_data_federation_register_valid_researcher(
+    sail_portal: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    new_organization: Organization,
+    request,
+):
+    """
+
+    """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    federation_management = request.getfixturevalue(federation_management)
+    new_organization = request.getfixturevalue(new_organization)
+
+    schema = {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "data_format": {"type": "string"},
+        "id": {"type": "string"},
+        "creation_time": {"type": "string"},
+        "organization": {
+            "type": "dict",
+            "schema": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+            },
+        },
+        "state": {"type": "string"},
+        "data_submitter_organizations": {"type": "list"},
+        "research_organizations": {"type": "list"},
+        "datasets": {"type": "list"},
+        "data_submitter_organizations_invites_id": {"type": "list"},
+        "research_organizations_invites_id": {"type": "list"},
+    }
+
+    validator = Validator(schema)
+
+    # Act
+    _, federations_json = federation_management.get_all_data_federations(sail_portal)
+    federation = federations_json.get("data_federations")[len(federations_json.get("data_federations")) - 1]
+
+    fed_response, fed_response_json = federation_management.get_data_federation_by_id(sail_portal, federation.get('id'))
+
+    new_organization.pretty_print()
+    reg_new_org_response, reg_new_org_response_json = sail_portal.register_new_organization(new_organization)
+
+    test_response = federation_management.register_researcher_to_data_federation(sail_portal, federation.get('id'), reg_new_org_response_json.get('id'))
+
+    fed_response, fed_response_json = federation_management.get_data_federation_by_id(sail_portal, federation.get('id'))
+
+    research_organizations = fed_response_json.get('research_organizations')
+    is_added = False
+    for org in research_organizations:
+        if org.get('id') == reg_new_org_response_json.get('id'):
+            is_added = True
+            break
+
+    # Assert
+    is_valid = validator.validate(fed_response_json)
+    assert_that(is_added).is_true()
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(204)
+
+
+@pytest.mark.active
+@pytest.mark.parametrize(
+    "sail_portal, federation_management, invalid_org_id",
+    [
+        (
+            "data_owner_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+        (
+            "researcher_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+    ],
+)
+def test_fastapi_valid_data_federation_register_invalid_researcher(
+    sail_portal: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    invalid_org_id: str,
+    request,
+):
+    """
+
+    """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    federation_management = request.getfixturevalue(federation_management)
+
+    schema = {
+        "error": {"type": "string"},
+    }
+
+    validator = Validator(schema)
+
+    # Act
+    _, federations_json = federation_management.get_all_data_federations(sail_portal)
+    federation = federations_json.get("data_federations")[len(federations_json.get("data_federations")) - 1]
+
+    test_response = federation_management.register_researcher_to_data_federation(sail_portal, federation.get('id'), invalid_org_id)
+
+    # Assert
+    is_valid = validator.validate(test_response)
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(422)
 
 # * TODO: test_fastapi_invalid_data_federation_register_valid_researcher
 
@@ -1010,15 +1218,339 @@ def test_fastapi_valid_organization_get_all_invites(
 
 # TODO: test_fastapi_invalid_organization_accept_invalid_invite
 
-# * TODO: test_fastapi_valid_data_federation_add_valid_dataset
+@pytest.mark.fastapi
+@pytest.mark.parametrize(
+    "sail_portal, federation_management, dataset_management, new_dataset",
+    [
+        (
+            "data_owner_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            "create_valid_dataset_fhir",
+        ),
+        (
+            "researcher_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            "create_valid_dataset_fhir",
+        ),
+    ],
+)
+def test_fastapi_valid_data_federation_add_valid_dataset(
+    sail_portal: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    dataset_management: DataSetManagementFastApi,
+    new_dataset: Dataset,
+    request,
+):
+    """ """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    federation_management = request.getfixturevalue(federation_management)
+    dataset_management = request.getfixturevalue(dataset_management)
+    new_dataset = request.getfixturevalue(new_dataset)
 
-# * TODO: test_fastapi_valid_data_federation_add_invalid_dataset
+    schema = {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "data_format": {"type": "string"},
+        "id": {"type": "string"},
+        "creation_time": {"type": "string"},
+        "organization": {
+            "type": "dict",
+            "schema": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+            },
+        },
+        "state": {"type": "string"},
+        "data_submitter_organizations": {"type": "list"},
+        "research_organizations": {"type": "list"},
+        "datasets": {"type": "list"},
+        "data_submitter_organizations_invites_id": {"type": "list"},
+        "research_organizations_invites_id": {"type": "list"},
+    }
 
-# * TODO: test_fastapi_invalid_data_federation_add_valid_dataset
+    validator = Validator(schema)
 
-# * TODO: test_fastapi_invalid_data_federation_add_invalid_dataset
+    # Act
+    _, federations_json = federation_management.get_all_data_federations(sail_portal)
+    federation = federations_json.get("data_federations")[0]
 
-# ? TODO: test_fastapi_valid_data_federation_delete_valid_dataset
+    _, reg_dataset_response_json = dataset_management.register_dataset(sail_portal, new_dataset)
+    new_dataset_id = reg_dataset_response_json.get('id')
+
+    # Get dataset
+    _, dataset_json = dataset_management.get_dataset_by_id(sail_portal, new_dataset_id)
+
+    test_response = federation_management.add_dataset_to_federation(sail_portal, federation.get('id'), dataset_json.get('id'))
+
+    _, updated_federation_json = federation_management.get_data_federation_by_id(sail_portal, federation.get('id'))
+
+    updated_dataset_list = updated_federation_json.get('datasets')
+
+    is_added = False
+    for dataset in updated_dataset_list:
+        if(dataset.get('id') == new_dataset_id):
+            is_added = True
+            break
+
+    # Assert
+    assert_that(is_added).is_true()
+    is_valid = validator.validate(updated_federation_json)
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(204)
+
+
+@pytest.mark.fastapi
+@pytest.mark.parametrize(
+    "sail_portal, federation_management, dataset_management, invalid_dataset_id",
+    [
+        (
+            "data_owner_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+        (
+            "researcher_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+    ],
+)
+def test_fastapi_valid_data_federation_add_invalid_dataset(
+    sail_portal: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    dataset_management: DataSetManagementFastApi,
+    invalid_dataset_id: str,
+    request,
+):
+    """ """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    federation_management = request.getfixturevalue(federation_management)
+    dataset_management = request.getfixturevalue(dataset_management)
+
+    schema = {
+        "error": {"type": "string"},
+    }
+
+    validator = Validator(schema)
+
+    # Act
+    _, federations_json = federation_management.get_all_data_federations(sail_portal)
+    federation = federations_json.get("data_federations")[0]
+
+    test_response = federation_management.add_dataset_to_federation(sail_portal, federation.get('id'), invalid_dataset_id)
+
+    _, updated_federation_json = federation_management.get_data_federation_by_id(sail_portal, federation.get('id'))
+
+    updated_dataset_list = updated_federation_json.get('datasets')
+
+    is_added = False
+    for dataset in updated_dataset_list:
+        if(dataset.get('id') == invalid_dataset_id):
+            is_added = True
+            break
+
+    # Assert
+    assert_that(is_added).is_false()
+    is_valid = validator.validate(test_response.json())
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(422)
+
+
+@pytest.mark.fastapi
+@pytest.mark.parametrize(
+    "sail_portal, federation_management, dataset_management, new_dataset, invalid_federation_id",
+    [
+        (
+            "data_owner_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            "create_valid_dataset_fhir",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+        (
+            "researcher_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            "create_valid_dataset_fhir",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+    ],
+)
+def test_fastapi_invalid_data_federation_add_valid_dataset(
+    sail_portal: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    dataset_management: DataSetManagementFastApi,
+    new_dataset: Dataset,
+    invalid_federation_id: str,
+    request,
+):
+    """ """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    federation_management = request.getfixturevalue(federation_management)
+    dataset_management = request.getfixturevalue(dataset_management)
+    new_dataset = request.getfixturevalue(new_dataset)
+
+    schema = {
+        "error": {"type": "string"},
+    }
+
+    validator = Validator(schema)
+
+    # Act
+    _, datasets_json = dataset_management.get_all_datasets(sail_portal)
+    dataset = datasets_json.get("datasets")[0]
+
+    test_response = federation_management.add_dataset_to_federation(sail_portal, invalid_federation_id, dataset.get('id'))
+
+    # Assert
+    is_valid = validator.validate(test_response.json())
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(422)
+
+
+@pytest.mark.fastapi
+@pytest.mark.parametrize(
+    "sail_portal, federation_management, dataset_management, invalid_dataset_id, invalid_federation_id",
+    [
+        (
+            "data_owner_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+        (
+            "researcher_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "dataset_management_fast_api",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+            f"{random_name(8)}-{random_name(4)}-{random_name(4)}-{random_name(4)}-{random_name(12)}",
+        ),
+    ],
+)
+def test_fastapi_invalid_data_federation_add_invalid_dataset(
+    sail_portal: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    dataset_management: DataSetManagementFastApi,
+    invalid_dataset_id: str,
+    invalid_federation_id: str,
+    request,
+):
+    """ """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    federation_management = request.getfixturevalue(federation_management)
+    dataset_management = request.getfixturevalue(dataset_management)
+
+    schema = {
+        "error": {"type": "string"},
+    }
+
+    validator = Validator(schema)
+
+    # Act
+    _, datasets_json = dataset_management.get_all_datasets(sail_portal)
+    dataset = datasets_json.get("datasets")[0]
+
+    test_response = federation_management.add_dataset_to_federation(sail_portal, invalid_federation_id, invalid_dataset_id)
+
+    # Assert
+    is_valid = validator.validate(test_response.json())
+    assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(422)
+
+
+# TODO: Currently returns "404 Error : {detail: unauthorized}"
+@pytest.mark.broken
+@pytest.mark.parametrize(
+    "sail_portal, federation_management, dataset_management",
+    [
+        (
+            "data_owner_sail_fast_api_portal",
+            "datafederation_management_fast_api",
+            "create_valid_dataset_fhir",
+        ),
+        #(
+        #    "researcher_sail_fast_api_portal",
+        #    "datafederation_management_fast_api",
+        #    "create_valid_dataset_fhir",
+        #),
+    ],
+)
+def test_fastapi_valid_data_federation_delete_valid_dataset(
+    sail_portal: SailPortalFastApi,
+    federation_management: DataFederationManagementFastApi,
+    dataset_management: DataSetManagementFastApi,
+    request,
+):
+    """ """
+    # Arrange
+    sail_portal = request.getfixturevalue(sail_portal)
+    federation_management = request.getfixturevalue(federation_management)
+    dataset_management = request.getfixturevalue(dataset_management)
+
+    schema = {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "data_format": {"type": "string"},
+        "id": {"type": "string"},
+        "creation_time": {"type": "string"},
+        "organization": {
+            "type": "dict",
+            "schema": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+            },
+        },
+        "state": {"type": "string"},
+        "data_submitter_organizations": {"type": "list"},
+        "research_organizations": {"type": "list"},
+        "datasets": {"type": "list"},
+        "data_submitter_organizations_invites_id": {"type": "list"},
+        "research_organizations_invites_id": {"type": "list"},
+    }
+
+    validator = Validator(schema)
+
+    # Act
+    _, federations_json = federation_management.get_all_data_federations(sail_portal)
+    federation = federations_json.get("data_federations")[0]
+
+    print_federation_data(federation)
+    original_datasets = federation.get('datasets')
+    target_dataset = original_datasets[len(original_datasets) - 1]
+
+    test_response = federation_management.remove_dataset_from_data_federation(sail_portal, federation.get('id'), target_dataset.get('id'))
+
+    print_response_values("Test Response", test_response, "No JSON")
+
+    # verify less datasets
+    _, new_federations_json = federation_management.get_all_data_federations(sail_portal)
+    new_federation = federations_json.get("data_federations")[0]
+
+    print_federation_data(new_federation)
+    updated_datasets = new_federation.get('datasets')
+    is_removed = False
+    if(len(updated_datasets) < len(original_datasets)):
+        is_removed = True
+
+    for dataset in updated_datasets:
+        if(dataset.get('id') == target_dataset.get('id')):
+            is_removed = False
+            break
+
+    # Assert
+    assert_that(is_removed).is_true()
+    #is_valid = validator.validate(updated_federation_json)
+    #assert_that(is_valid, description=validator.errors).is_true()
+    assert_that(test_response.status_code).is_equal_to(204)
 
 # ? TODO: test_fastapi_valid_data_federation_delete_invalid_dataset
 

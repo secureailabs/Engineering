@@ -4,6 +4,9 @@ source azure_constants.sh
 Location="westus"
 ImageGalleryName="sail_image_gallery"
 ResourceGroup="SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg"
+# Get the version from the VERSION file
+ImageVersionFromFile=$(cat ../../VERSION)
+ImageVersion=0.0.0 # change the version manually or use ImageVersionFromFile
 
 PrintHelp()
 {
@@ -50,9 +53,6 @@ if [ $retVal -ne 0 ]; then
     echo "apt-get update && apt-get install -y packer"
     exit $retVal
 fi
-
-# Get the version from the VERSION file
-ImageVersionFromFile=$(cat ../../VERSION)
 
 if [ -z "$ci_flag" ]; then
     # Bash Menu
@@ -145,7 +145,7 @@ output=$(packer build \
 packer-sig-ubuntu.json | tee /dev/tty)
 
 # Get the image name from the packer output
-ImageName=$(echo "$output" | grep "ManagedImageName:" | cut -d':' -f2 | tr -d '[:space:]')
+# ImageName=$(echo "$output" | grep "ManagedImageName:" | cut -d':' -f2 | tr -d '[:space:]')
 
 # Get the short git commit hash
 gitCommitHash=$(git rev-parse --short HEAD)

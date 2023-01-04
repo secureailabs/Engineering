@@ -15,9 +15,9 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, Response, status
 from fastapi.encoders import jsonable_encoder
-from pydantic import EmailStr, Json
+from pydantic import EmailStr
 
 import app.utils.azure as azure
 from app.api.accounts import get_all_admins, get_organization, get_user
@@ -90,9 +90,11 @@ def getEmailInviteContent(data_federation: str, inviter_organization: str) -> st
     response_model=RegisterDataFederation_Out,
     response_model_by_alias=False,
     status_code=status.HTTP_201_CREATED,
+    operation_id="register_data_federation",
 )
 async def register_data_federation(
-    data_federation_req: RegisterDataFederation_In = Body(...), current_user: TokenData = Depends(get_current_user)
+    data_federation_req: RegisterDataFederation_In = Body(description="Data Federation details to be registered"),
+    current_user: TokenData = Depends(get_current_user),
 ):
     # Add the data federation to the database
     data_federation_db = DataFederation_Db(
@@ -115,11 +117,14 @@ async def register_data_federation(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    operation_id="get_all_data_federations",
 )
 async def get_all_data_federations(
-    data_submitter_id: Optional[PyObjectId] = None,
-    researcher_id: Optional[PyObjectId] = None,
-    dataset_id: Optional[PyObjectId] = None,
+    data_submitter_id: Optional[PyObjectId] = Query(
+        default=None, description="UUID of Data Submitter in the data federation"
+    ),
+    researcher_id: Optional[PyObjectId] = Query(default=None, description="UUID of Researcher in the data federation"),
+    dataset_id: Optional[PyObjectId] = Query(default=None, description="UUID of Dataset in the data federation"),
     current_user: TokenData = Depends(get_current_user),
 ) -> GetMultipleDataFederation_Out:
     if (data_submitter_id) and (data_submitter_id == current_user.organization_id):
@@ -198,9 +203,11 @@ async def get_all_data_federations(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
+    operation_id="get_data_federation",
 )
 async def get_data_federation(
-    data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation"),
+    current_user: TokenData = Depends(get_current_user),
 ) -> GetDataFederation_Out:
     data_federation = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
     if not data_federation:
@@ -241,10 +248,11 @@ async def get_data_federation(
     path="/data-federations/{data_federation_id}",
     description="Update data federation information",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="update_data_federation",
 )
 async def update_data_federation(
-    data_federation_id: PyObjectId,
-    updated_data_federation_info: UpdateDataFederation_In = Body(...),
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation"),
+    updated_data_federation_info: UpdateDataFederation_In = Body(description="Updated Data federation information"),
     current_user: TokenData = Depends(get_current_user),
 ):
     # DataFederation must be part of same organization
@@ -279,10 +287,11 @@ async def update_data_federation(
     path="/data-federations/{data_federation_id}/researcher/{researcher_organization_id}",
     description="Invite a researcher to join a data federation",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="invite_researcher",
 )
 async def invite_researcher(
-    data_federation_id: PyObjectId,
-    researcher_organization_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation"),
+    researcher_organization_id: PyObjectId = Path(description="UUID of the researcher organization to be invited"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -362,10 +371,13 @@ async def invite_researcher(
     path="/data-federations/{data_federation_id}/data-submitter/{data_submitter_organization_id}",
     description="Automatically add a data submitter to the data federation, bypassing an invite path",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="register_data_submitter",
 )
 async def register_data_submitter(
-    data_federation_id: PyObjectId,
-    data_submitter_organization_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation"),
+    data_submitter_organization_id: PyObjectId = Path(
+        description="UUID of the data submitter organization to be invited"
+    ),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -432,10 +444,11 @@ async def register_data_submitter(
     path="/data-federations/{data_federation_id}/researcher/{researcher_organization_id}",
     description="Automatically add a researcher to the data federation, bypassing an invite path",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="register_researcher",
 )
 async def register_researcher(
-    data_federation_id: PyObjectId,
-    researcher_organization_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation"),
+    researcher_organization_id: PyObjectId = Path(description="UUID of the researcher organization to be added"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -489,10 +502,13 @@ async def register_researcher(
     path="/data-federations/{data_federation_id}/data-submitter/{data_submitter_organization_id}",
     description="Invite a data submitter to join a data federation",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="invite_data_submitter",
 )
 async def invite_data_submitter(
-    data_federation_id: PyObjectId,
-    data_submitter_organization_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation"),
+    data_submitter_organization_id: PyObjectId = Path(
+        description="UUID of the data submitter organization to be invited"
+    ),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -574,11 +590,12 @@ async def invite_data_submitter(
     path="/data-federations/{data_federation_id}/data-models",
     description="Add a data model to a data federation",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="add_data_model",
 )
 async def add_data_model(
     request: Request,
-    data_federation_id: PyObjectId,
-    data_model: dict = Body(),
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation"),
+    data_model: dict = Body(description="Data model(json) to be added"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -632,9 +649,11 @@ async def add_data_model(
     description="Disable the data federation",
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="soft_delete_data_federation",
 )
 async def soft_delete_data_federation(
-    data_federation_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    data_federation_id: PyObjectId = Path(description="UUID of the data federation to be deprovisioned"),
+    current_user: TokenData = Depends(get_current_user),
 ):
     # DataFederation must be part of same organization
     data_federation_db = await data_service.find_one(DB_COLLECTION_DATA_FEDERATIONS, {"_id": str(data_federation_id)})
@@ -694,8 +713,12 @@ async def register_invite(invite_req: RegisterInvite_In):
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
+    operation_id="get_all_invites",
 )
-async def get_all_invites(organization_id: PyObjectId, current_user: TokenData = Depends(get_current_user)):
+async def get_all_invites(
+    organization_id: PyObjectId = Path(description="UUID of the organization for which to list all the invited"),
+    current_user: TokenData = Depends(get_current_user),
+):
     """
     Get list of all the pending invites received. Only ADMIN roles have access.
 
@@ -746,9 +769,12 @@ async def get_all_invites(organization_id: PyObjectId, current_user: TokenData =
     response_model_exclude_unset=True,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
+    operation_id="get_invite",
 )
 async def get_invite(
-    organization_id: PyObjectId, invite_id: PyObjectId, current_user: TokenData = Depends(get_current_user)
+    organization_id: PyObjectId = Path(description="UUID of the invired organization"),
+    invite_id: PyObjectId = Path(description="UUID of the invite to be fetched"),
+    current_user: TokenData = Depends(get_current_user),
 ):
     """
     Get the information about an invite
@@ -795,11 +821,12 @@ async def get_invite(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.ADMIN]))],
+    operation_id="accept_or_reject_invite",
 )
 async def accept_or_reject_invite(
-    organization_id: PyObjectId,
-    invite_id: PyObjectId,
-    updated_invite: PatchInvite_In = Body(...),
+    organization_id: PyObjectId = Path(description="UUID of the invited organization"),
+    invite_id: PyObjectId = Path(description="UUID of the invite to be approved to rejected"),
+    updated_invite: PatchInvite_In = Body(description="The accpet or reject information"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -906,10 +933,13 @@ async def send_invite_email(subject: str, email_body: str, emails: List[EmailStr
     path="/data-federations/{data_federation_id}/datasets/{dataset_id}",
     description="Add a dataset to a data federation",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="add_dataset",
 )
 async def add_dataset(
-    data_federation_id: PyObjectId,
-    dataset_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(
+        description="UUID of the Data federation to which the dataset is being added"
+    ),
+    dataset_id: PyObjectId = Path(description="UUID of the dataset that is being added to the data federation"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -968,10 +998,13 @@ async def add_dataset(
     path="/data-federations/{data_federation_id}/datasets/{dataset_id}",
     description="Remove a dataset from a data federation",
     status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="remove_dataset",
 )
 async def remove_dataset(
-    data_federation_id: PyObjectId,
-    dataset_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(
+        description="UUID of the Data federation from which the dataset is being removed"
+    ),
+    dataset_id: PyObjectId = Path(description="UUID of the dataset that is being removed from the data federation"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -1025,10 +1058,11 @@ async def remove_dataset(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_201_CREATED,
+    operation_id="get_dataset_key",
 )
 async def get_dataset_key(
-    data_federation_id: PyObjectId,
-    dataset_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(description="UUID of the Data federation to which the dataset belongs"),
+    dataset_id: PyObjectId = Path(description="UUID of the dataset for which the key is being requested"),
     create_if_not_found: bool = True,
     current_user: TokenData = Depends(get_current_user),
 ):
@@ -1102,10 +1136,11 @@ async def get_dataset_key(
     response_model_by_alias=False,
     response_model_exclude_unset=True,
     status_code=status.HTTP_201_CREATED,
+    operation_id="get_existing_dataset_key",
 )
 async def get_existing_dataset_key(
-    data_federation_id: PyObjectId,
-    dataset_id: PyObjectId,
+    data_federation_id: PyObjectId = Path(description="UUID of the Data federation to which the dataset belongs"),
+    dataset_id: PyObjectId = Path(description="UUID of the dataset for which the key is being requested"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """

@@ -1,9 +1,6 @@
 #!/bin/bash
 
 source azure_constants.sh
-Location="westus"
-ImageGalleryName="sail_image_gallery"
-ResourceGroup="SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg"
 # Get the version from the VERSION file
 ImageVersionFromFile=$(cat ../../VERSION)
 ImageVersion=0.0.0 # change the version manually or use ImageVersionFromFile
@@ -65,21 +62,21 @@ if [ -z "$ci_flag" ]; then
             1)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
-                ResourceGroup=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                RESOURCE_GROUP=$DEVELOPMENT_RESOURCE_GROUP # This needs to get updated per choice of subscription
                 ImageVersion=0.0.0
                 break
                 ;;
             2)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$RELEASE_CANDIDATE_SUBSCRIPTION_ID
-                ResourceGroup=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                RESOURCE_GROUP=$RELEASE_CANDIDATE_RESOURCE_GROUP # This needs to get updated per choice of subscription
                 ImageVersion=$ImageVersionFromFile
                 break
                 ;;
             3)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$PRODUCTION_GA_SUBSCRIPTION_ID
-                ResourceGroup=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
+                RESOURCE_GROUP=$PRODUCTION_GA_RESOURCE_GROUP # This needs to get updated per choice of subscription
                 ImageVersion=$ImageVersionFromFile
                 break
                 ;;
@@ -100,32 +97,32 @@ az account show
 # list custom SAIL managed images
 echo -e "\n==== Azure Image List ====\n"
 output=$(az image list \
---resource-group $ResourceGroup)
+--resource-group $RESOURCE_GROUP)
 echo "$output"
 
 # Delete old custom SAIL managed images
 echo -e "\n==== Azure Image Delete As Required ====\n"
 az image delete \
---resource-group $ResourceGroup \
+--resource-group $RESOURCE_GROUP \
 --name $ImageName
 echo "Deletion Completed, continuing..."
 
 echo -e "\n==== Azure VHD& Image Creation Begins ====\n"
 # Create resource group for storage account
 az group create \
---name $ResourceGroup \
---location $Location
+--name $RESOURCE_GROUP \
+--location $LOCATION
 
 # Create the shared image gallery
 az sig create \
---resource-group $ResourceGroup \
---gallery-name $ImageGalleryName \
---location $Location
+--resource-group $RESOURCE_GROUP \
+--gallery-name $IMAGE_GALLERY_NAME \
+--location $LOCATION
 
 # Create the image definition
 az sig image-definition create \
---resource-group $ResourceGroup \
---gallery-name $ImageGalleryName \
+--resource-group $RESOURCE_GROUP \
+--gallery-name $IMAGE_GALLERY_NAME \
 --gallery-image-definition $ImageName \
 --features SecurityType=ConfidentialVMSupported \
 --publisher "Secure-AI-Labs" \
@@ -136,22 +133,19 @@ az sig image-definition create \
 
 # Ubuntu Image in shared image gallery
 output=$(packer build \
--var location=$Location \
--var resource_group_name=$ResourceGroup \
+-var location=$LOCATION \
+-var resource_group_name=$RESOURCE_GROUP \
 -var module=$ImageName \
 -var docker_dir=$dockerDir \
--var gallery_name=$ImageGalleryName \
+-var gallery_name=$IMAGE_GALLERY_NAME \
 -var version=$ImageVersion \
 packer-sig-ubuntu.json | tee /dev/tty)
-
-# Get the image name from the packer output
-# ImageName=$(echo "$output" | grep "ManagedImageName:" | cut -d':' -f2 | tr -d '[:space:]')
 
 # Get the short git commit hash
 gitCommitHash=$(git rev-parse --short HEAD)
 
 # Tag the image with the short git commit hash
 az image update \
---resource-group $ResourceGroup \
+--resource-group $RESOURCE_GROUP \
 --name $ImageName \
 --tags gitCommitHash=$gitCommitHash

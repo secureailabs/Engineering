@@ -29,6 +29,9 @@ mv InitializationVector.json ApiServices/
 # Start the local mongodb database
 mongod --port 27017 --dbpath /srv/mongodb/db0 --bind_ip localhost --fork --logpath /var/log/mongod.log
 
+# Install fastapi-responses
+pip3 install ApiServices/external_tools/fastapi-responses
+
 # modify the audit service ip of promtail config file
 sed -i "s,auditserver,$auditIP,g" /promtail-local-config.yaml
 sed -i "s,3100,$auditPort,g" /promtail-local-config.yaml

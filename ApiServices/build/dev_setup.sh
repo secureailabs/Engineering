@@ -13,6 +13,7 @@ source venv38-sail_dev/bin/activate
 # Install all the requirements
 pip install -U pip setuptools wheel
 pip install -r config/requirements/prod_requirements.txt --only-binary=:all: --no-binary=python-multipart
+pip install external_tools/fastapi-responses
 
 # Install redoc-cli for static document generation
 curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -

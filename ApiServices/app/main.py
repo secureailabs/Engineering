@@ -23,7 +23,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-#from fastapi_responses import custom_openapi
+from fastapi_responses import custom_openapi
 from pydantic import BaseModel, Field, StrictStr
 
 from app.api import (
@@ -44,7 +44,7 @@ server = FastAPI(
     version="0.1.0",
     docs_url=None,
 )
-#server.openapi = custom_openapi(server)
+server.openapi = custom_openapi(server)
 
 
 class Audit_log_task(threading.Thread):

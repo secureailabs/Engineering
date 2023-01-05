@@ -9,7 +9,8 @@
         "location": "",
         "resource_group_name": "",
         "gallery_name": "",
-        "version": ""
+        "version": "",
+        "gitCommitHash": ""
     },
     "sensitive-variables": [
         "client_secret"
@@ -44,7 +45,10 @@
                 "storage_account_type": "Standard_LRS"
             },
             "managed_image_name": "{{user `module`}}",
-            "managed_image_resource_group_name": "{{user `resource_group_name`}}"
+            "managed_image_resource_group_name": "{{user `resource_group_name`}}",
+            "azure_tags": {
+                "gitCommitHash": "{{user `gitCommitHash`}}"
+            }
         }
     ],
     "provisioners": [

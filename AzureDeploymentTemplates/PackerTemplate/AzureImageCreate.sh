@@ -131,6 +131,9 @@ az sig image-definition create \
 --sku "sail" \
 --os-type "Linux"
 
+# Get the short git commit hash
+gitCommitHash=$(git rev-parse --short HEAD)
+
 # Ubuntu Image in shared image gallery
 packer build \
 -var location=$LOCATION \
@@ -139,10 +142,8 @@ packer build \
 -var docker_dir=$dockerDir \
 -var gallery_name=$IMAGE_GALLERY_NAME \
 -var version=$ImageVersion \
+-var gitCommitHash=$gitCommitHash \
 packer-sig-ubuntu.json
-
-# Get the short git commit hash
-gitCommitHash=$(git rev-parse --short HEAD)
 
 # Tag the image with the short git commit hash
 az image update \

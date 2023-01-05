@@ -132,14 +132,14 @@ az sig image-definition create \
 --os-type "Linux"
 
 # Ubuntu Image in shared image gallery
-output=$(packer build \
+packer build \
 -var location=$LOCATION \
 -var resource_group_name=$RESOURCE_GROUP \
 -var module=$ImageName \
 -var docker_dir=$dockerDir \
 -var gallery_name=$IMAGE_GALLERY_NAME \
 -var version=$ImageVersion \
-packer-sig-ubuntu.json | tee /dev/tty)
+packer-sig-ubuntu.json
 
 # Get the short git commit hash
 gitCommitHash=$(git rev-parse --short HEAD)

@@ -241,13 +241,13 @@ def create_valid_organization():
     """
     new_org = Organization(
         name=f"Test Org {random_name(8)}",
-        description=f"Description {random_name(16)}",
-        avatar=f"Avatar{random_name(8)}",
-        admin_name=f"admin{random_name(4)}",
-        admin_job_title=f"admintitle{random_name(4)}",
-        admin_email=f"{random_name(4)}@{random_name(4)}.com",
+        description=f"Description-{random_name(16)}",
+        avatar=f"Avatar-{random_name(8)}",
+        admin_name=f"AdminName-{random_name(4)}",
+        admin_job_title=f"AdminTitle-{random_name(4)}",
+        admin_email=f"AdminEmail@{random_name(4)}.com",
         admin_password="password1",
-        admin_avatar=f"adminavatar{random_name(4)}",
+        admin_avatar=f"AdminAvatar-{random_name(4)}",
     )
 
     return new_org
@@ -424,3 +424,11 @@ def create_invalid_data_federation():
     )
 
     return new_federation
+
+
+def pytest_configure():
+    pytest.new_organizations = []
+
+    pytest.new_datasets = []
+
+    pytest.new_federations = []

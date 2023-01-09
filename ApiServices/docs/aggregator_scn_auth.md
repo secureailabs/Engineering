@@ -6,7 +6,7 @@ The Nodes provisioned for a federation need to interact with the API services wi
 
 * **SCN** - Secure Computation Node
 * **Aggregator SCN** - The SCN that aggregates the compute resources from the other SCNs
-* **Compute SCN** - The SCN that provides compute resources to the Aggregator SCN and hosts the datasets
+* **Participant SCN** - The SCN that provides compute resources to the Aggregator SCN and hosts the datasets
 * **Researcher** - A researcher user of the API that has a compute scope
 * **API Services** - SAIL API services that provide authentication and database services
 
@@ -24,17 +24,18 @@ Access Token with a 'scn' scope that can only make calls to the API Services fro
 
 # SCN Provisioning
 
-The researcher can provision a federation by calling the API Services with a compute_access_token. The API Services will then provision the Aggregator SCN and the Compute SCN to provision the federation.
+The researcher can provision a federation by calling the API Services with a compute_access_token. The API Services will then provision the Aggregator SCN and the Participant SCN to provision the federation.
 
 ```plantuml
-@startuml
+@startuml Federation_Provisioning
 autonumber "#."
 title  Federation Provisioning
+skinparam backgroundColor #EEEEEE
 skinparam sequenceMessageAlign center
 actor Researcher #red
 participant API_Services #LightBlue
 participant Aggregator_SCN #LightGreen
-participant Compute_SCN #LightGrey
+participant Participant_SCN #LightGrey
 
 Researcher -> API_Services : /login with compute scope
 
@@ -44,7 +45,7 @@ Researcher -> API_Services : /data-federation-provision with compute_access_toke
 
 Researcher <-- API_Services : Federation accepted or rejected
 
-API_Services -> Compute_SCN : scn_access_token in initialization vector
+API_Services -> Participant_SCN : scn_access_token in initialization vector
 
 API_Services -> Aggregator_SCN : scn_access_token in initialization vector
 
@@ -54,21 +55,22 @@ API_Services --> Researcher : Aggregator SCN Status
 
 @enduml
 ```
-
+![](assets/Federation_Provisioning.svg)
 
 # Aggregator SCN Operations
 
-After the provisioning of the federation, the researcher can connect to the Aggregator SCN and perform computations on the datasets hosted by the Compute SCN.
+After the provisioning of the federation, the researcher can connect to the Aggregator SCN and perform computations on the datasets hosted by the Participant SCN.
 
 ```plantuml
-@startuml Connect to Aggregator SCN
+@startuml Connect_to_Aggregator_SCN
 autonumber "#."
 title Connect to Aggregator SCN
+skinparam backgroundColor #EEEEEE
 skinparam sequenceMessageAlign center
 actor Researcher #red
 participant API_Services #LightBlue
 participant Aggregator_SCN #LightGreen
-participant Compute_SCN #LightGrey
+participant Participant_SCN #LightGrey
 
 Researcher -> API_Services : /login with compute scope
 
@@ -88,7 +90,7 @@ group#Gold #Pink New or expired session
     end note
 end
 
-Aggregator_SCN <-> Compute_SCN : RPC interaction
+Aggregator_SCN <-> Participant_SCN : RPC interaction
 
 Researcher <- Aggregator_SCN : Computation Result
 
@@ -96,6 +98,8 @@ Researcher -> API_Services : deprovision federation
 
 @enduml
 ```
+
+![](assets/Connect_to_Aggregator_SCN.svg)
 
 # To be decided
 - Do we need to revoke access for a compute session ?

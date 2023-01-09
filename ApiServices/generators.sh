@@ -1,3 +1,12 @@
+#!/bin/bash
+
+generatedDir="generated"
+
+# Create the generated folder if it doesn't exist
+mkdir -p $generatedDir
+
+pushd $generatedDir
+
 # delete existing openapi.json
 rm -f docs/openapi.json
 
@@ -21,3 +30,5 @@ openapi-python-client generate --path docs/openapi.json
 
 # Generate API documentation
 redoc-cli bundle -o docs/index.html docs/openapi.json
+
+popd

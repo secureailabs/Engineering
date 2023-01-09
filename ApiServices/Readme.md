@@ -60,9 +60,7 @@ The static generated redoc html documentatation html file is also available in d
 
 #### Python client
 ```
-cd external_tools/openapi-python-client
-poetry build -f wheel
-pip install dist/openapi_python_client-0.12.3-py3-none-any.whl --force-reinstall
+pip install git+https://github.com/secureailabs/openapi-python-client.git
 ```
 This will install the openapi-python-client package in your virtual environment. You can now use the package to generate a python client for the api using the generator script in `ApiServices/generated/generator.sh`.
 Make sure to activate the virtual environment before running the generator script and update the IP address in the script to point to the api server.

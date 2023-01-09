@@ -13,10 +13,11 @@
 # -------------------------------------------------------------------------------
 from typing import Dict, List
 
+from fastapi import APIRouter, Response, status
+
 from app.api.accounts import get_organization
 from app.api.datasets import get_dataset
 from app.data import operations as data_service
-from fastapi import APIRouter, Response, status
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 
@@ -25,7 +26,10 @@ router = APIRouter()
 
 ########################################################################################################################
 @router.delete(
-    path="/database", description="Drop the database", status_code=status.HTTP_204_NO_CONTENT, response_model=None
+    path="/database",
+    description="Drop the database",
+    status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="drop_database",
 )
 async def register_dataset():
     await data_service.drop()

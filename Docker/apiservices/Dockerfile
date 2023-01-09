@@ -15,6 +15,7 @@ RUN apt-get update && \
   wget \
   curl \
   sudo \
+  git \
   build-essential \
   python3-pip \
   jq

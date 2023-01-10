@@ -555,13 +555,12 @@ class DataFederationManagementFastApi:
         # Return request response: status code
         return response, response.json()
 
-    # TODO: Test where the BOOL value goes in request
     def get_or_create_data_federation_dataset_key(
         self,
         sail_portal: SailPortalFastApi,
         federation_id: str,
         dataset_id: str,
-        create_if_not_found: bool,
+        create_if_not_found: str,
     ):
         """
         Get a dataset encryption key by either retreiving and unwrapping, or creating.\n
@@ -585,7 +584,7 @@ class DataFederationManagementFastApi:
 
         try:
             response = requests.post(
-                f"{self.base_url}/data-federations/{federation_id}/dataset_key/{dataset_id}",
+                f"{self.base_url}/data-federations/{federation_id}/dataset_key/{dataset_id}?create_if_not_found={create_if_not_found}",
                 headers=request_headers,
                 verify=False,
             )
@@ -661,7 +660,7 @@ class DataFederationManagementFastApi:
         try:
             #  params as json
             response = requests.get(
-                f"{self.base_url}/data-federations-provisions/{provision_id}",
+                f"{self.base_url}/data-federations-provsions/{provision_id}",
                 verify=False,
                 headers=request_headers,
             )
@@ -689,7 +688,7 @@ class DataFederationManagementFastApi:
         try:
             #  params as json
             response = requests.get(
-                f"{self.base_url}/data-federations-provisions",
+                f"{self.base_url}/data-federations-provsions",
                 verify=False,
                 headers=request_headers,
             )

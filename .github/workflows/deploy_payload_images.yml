@@ -12,7 +12,7 @@
 #
 #
 
-name: Deploy Platform
+name: Deploy Payload Images
 
 on:
   workflow_dispatch:

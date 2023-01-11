@@ -110,8 +110,8 @@ echo "Deletion Completed, continuing..."
 az sig image-version delete \
 --gallery-image-version $ImageVersion \
 --gallery-image-definition $ImageName \
---gallery-name $ImageGalleryName \
---resource-group $ResourceGroup
+--gallery-name $IMAGE_GALLERY_NAME \
+--resource-group $RESOURCE_GROUP
 echo "Image Version Deletion Completed, continuing..."
 
 echo -e "\n==== Azure Managed Image Creation Begins ====\n"

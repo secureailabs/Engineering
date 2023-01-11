@@ -1,17 +1,3 @@
-# Engineering
-# deploy_platform.yml
-# Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
-#
-# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
-# Private and Confidential. Internal Use Only.
-#
-#     This software contains proprietary information which shall not
-#     be reproduced or transferred to other documents and shall not
-#     be disclosed to others for any purpose without
-#     prior written permission of Secure Ai Labs, Inc.
-#
-#
-
 name: Deploy Payload Images
 
 on:
@@ -26,13 +12,6 @@ jobs:
   Setup_Environment:
     runs-on: [self-hosted, Linux, x64, docker]
     steps:
-      - name: Options selected
-        run: |
-          echo "Subscription: ${{ github.event.inputs.subscription }}"
-          echo "Preload Datasets: ${{ github.event.inputs.preload_dataset }}"
-          echo "Purpose of Deployment: ${{ github.event.inputs.purpose }}"
-          echo "Owner of Deployment: ${{ github.event.inputs.owner }}"
-
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
@@ -43,22 +22,8 @@ jobs:
           persist-credentials: true
           submodules: true
 
-      # - name: Checkout DS Repo
-      #   uses: actions/checkout@v3
-      #   with:
-      #     repository: secureailabs/datascience
-      #     token: ${{ secrets.JENKINS_BUILD_TOKEN }}
-      #     path: datascience
-      #     ref: main
-
-      # - name: checkout submodule
-      #   run: |
-      #     git submodule update
-
       - name: Condition 2 Release Candidate
         run: |
           cd datascience
           ls
           git status
-
-

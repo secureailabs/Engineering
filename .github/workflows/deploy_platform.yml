@@ -86,7 +86,7 @@ jobs:
           set -e
           pwd
           ls -l
-          if ${{ github.event.inputs.preload_dataset }}"; then
+          if ${{ github.event.inputs.preload_dataset == 'true' }}"; then
             echo "entered if statement"
             echo "entered if statement"
             echo "entered if statement"

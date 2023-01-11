@@ -27,12 +27,9 @@ on:
           - ProductionGA
 
       preload_dataset:
-        description: Preload dataset with DatasetTool
+        description: Preload dataset with DatasetTool (True or False)
         required: true
-        type: choice
-        options:
-          - Yes
-          - No
+        type: boolean
 
       purpose:
         description: "Purpose of Deployment"
@@ -52,6 +49,13 @@ jobs:
   Setup_Environment:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     steps:
+      - name: Options selected
+        run: |
+          echo "Subscription: ${{ github.event.inputs.subscription }}"
+          echo "Preload Datasets: ${{ github.event.inputs.preload_dataset }}"
+          echo "Purpose of Deployment: ${{ github.event.inputs.purpose }}"
+          echo "Owner of Deployment: ${{ github.event.inputs.owner }}"
+
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
@@ -82,7 +86,7 @@ jobs:
           set -e
           pwd
           ls -l
-          if echo ${{ github.event.inputs.preload_dataset }} | grep -c "Yes"; then
+          if ${{ github.event.preload_dataset }}"; then
             echo "entered if statement"
             echo "entered if statement"
             echo "entered if statement"

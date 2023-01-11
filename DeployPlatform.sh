@@ -81,7 +81,7 @@ cp ApiServices/generated/sail-client/dist/sail_client-0.1.0-py3-none-any.whl $te
 cp database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl $tempDeployDir
 
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
-cp -r InternalTools/DeployPlatform/* $tempDeployDir
+cp -r DeployPlatform/* $tempDeployDir
 cp Binary/auditserver.tar.gz $tempDeployDir
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime

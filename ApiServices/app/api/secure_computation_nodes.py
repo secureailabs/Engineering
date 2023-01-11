@@ -19,12 +19,6 @@ from ipaddress import IPv4Address
 from typing import List
 
 import aiohttp
-<<<<<<< HEAD
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
-from fastapi.encoders import jsonable_encoder
-
-=======
->>>>>>> BOARD-1981_BOARD-2065 fix according to comments
 import app.utils.azure as azure
 from app.api.authentication import get_current_user
 from app.api.data_federations import get_existing_dataset_key
@@ -33,7 +27,7 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
-from fastapi import (APIRouter, BackgroundTasks, Body, Depends, HTTPException,
+from fastapi import (APIRouter, Body, Depends, HTTPException, Path, Query,
                      Response, status)
 from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData

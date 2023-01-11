@@ -40,13 +40,13 @@ DEV_PARAMS = {
 
 TEST_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery_1/images/{0}/versions/0.0.0",
+    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/sail_test/providers/Microsoft.Compute/galleries/sail_image_gallery_1/images/{0}/versions/0.1.0",
     "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
     "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
-    "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
-    "azure_storage_account_name": "sailvmimages9827",
+    "azure_storage_resource_group": "sail_test",
+    "azure_storage_account_name": "sailvmimages9998",
     "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
 }
 
@@ -258,7 +258,6 @@ def deploy_audit_service(
     backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
     backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
     backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
-    backend_json["azure_scn_image_id"] = set_parameters["azure_scn_image_id"]
     backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
 
     with open("auditserver.json", "w") as outfile:
@@ -312,7 +311,7 @@ def deploy_apiservices(
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
     backend_json["version"] = version
-    backend_json["audit_service_endpoint"] = f"http://{audit_service_ip}:3100/loki/api/v1/query_range"
+    backend_json["audit_service_endpoint"] = f"http://{audit_service_ip}:3100/loki/api/v1/push"
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)

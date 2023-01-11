@@ -24,7 +24,7 @@ on:
 
 jobs:
   Setup_Environment:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    runs-on: [self-hosted, Linux, x64, docker]
     steps:
       - name: Options selected
         run: |

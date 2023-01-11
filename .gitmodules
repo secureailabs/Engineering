@@ -1,3 +1,4 @@
 [submodule "datascience"]
 	path = datascience
 	url = git@github.com:secureailabs/datascience.git
+	branch = main

@@ -27,7 +27,7 @@ on:
           - ProductionGA
 
       preload_dataset:
-        description: Preload dataset with DatasetTool (True or False)
+        description: Preload dataset with DatasetTool
         required: true
         type: boolean
 
@@ -98,6 +98,7 @@ jobs:
             echo "entered else statement"
             echo "entered else statement"
             echo "entered else statement"
+          fi
 
       - name: Condition 2 Release Candidate
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
@@ -121,6 +122,7 @@ jobs:
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
             sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          fi
 
       - name: Condition 3 ProductionGA
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}

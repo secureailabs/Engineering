@@ -82,8 +82,7 @@ jobs:
       - name: checkout submodule
         run: |
           git submodule init
-          git submodule update --remote
-
+          git submodule update
       - name: Run a multi-line script, Build Binaries
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}

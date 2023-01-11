@@ -17,6 +17,7 @@ from typing import List, Optional
 
 from pydantic import EmailStr, Field, StrictStr
 
+from models.authentication import TokenScope
 from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
@@ -97,6 +98,7 @@ class User_Db(User_Base):
 class UserInfo_Out(User_Base):
     id: PyObjectId = Field(alias="_id")
     organization: BasicObjectInfo = Field(...)
+    scope: List[TokenScope] = Field(...)
 
 
 class RegisterUser_In(User_Base):

@@ -23,14 +23,15 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Respon
 from fastapi.encoders import jsonable_encoder
 
 import app.utils.azure as azure
-from app.api.authentication import get_current_user
+from app.api.authentication import ScopeChecker, create_jwt_token, get_current_user
 from app.api.data_federations import get_existing_dataset_key
 from app.api.dataset_versions import get_dataset_version
 from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
-from models.authentication import TokenData
+from models.accounts import UserRole
+from models.authentication import TokenData, TokenScope
 from models.common import BasicObjectInfo, PyObjectId
 from models.secure_computation_nodes import (
     GetMultipleSecureComputationNode_Out,
@@ -90,9 +91,11 @@ async def register_secure_computation_node(
             current_user=current_user,
         )
         # Start the provisioning of the secure computation node in a background thread which will update the IP address
-        add_async_task(provision_secure_computation_node(secure_computation_node_db, dataset_key.dataset_key))
+        add_async_task(
+            provision_secure_computation_node(secure_computation_node_db, dataset_key.dataset_key, current_user)
+        )
     elif secure_computation_node_req.type == SecureComputationNodeType.SMART_BROKER:
-        add_async_task(provision_smart_broker(secure_computation_node_db))
+        add_async_task(provision_smart_broker(secure_computation_node_db, current_user))
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid secure computation node type")
 
@@ -245,6 +248,7 @@ async def get_secure_computation_node(
     description="Update secure computation node information",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="update_secure_computation_node",
+    dependencies=[Depends(ScopeChecker(allowed_scope=[TokenScope.AGGREGATOR_SCN, TokenScope.PARTICIPANT_SCN]))],
 )
 async def update_secure_computation_node(
     secure_computation_node_id: PyObjectId = Path(description="UUID of Secure Computation Node"),
@@ -309,7 +313,11 @@ async def deprovision_secure_computation_nodes(
 
 ########################################################################################################################
 # TODO: these are temporary functions. They should be removed after the HANU is ready
-async def provision_secure_computation_node(secure_computation_node_db: SecureComputationNode_Db, dataset_key: str):
+async def provision_secure_computation_node(
+    secure_computation_node_db: SecureComputationNode_Db,
+    dataset_key: str,
+    current_user: TokenData,
+):
     """
     Provision a secure computation node
 
@@ -317,12 +325,24 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
     :type secure_computation_node_db: SecureComputationNode_Db
     :param dataset_key: dataset key
     :type dataset_key: str
+    :param current_user: current user information
+    :type current_user: TokenData
     """
     try:
         secure_computation_node_db = await provision_virtual_machine(secure_computation_node_db, "rpcrelated")
 
+        # Create an access token for the participant secure computation node that is valid for 1 year
+        access_token = create_jwt_token(
+            user_id=secure_computation_node_db.researcher_user_id,
+            organization_id=secure_computation_node_db.researcher_id,
+            role=current_user.role,
+            scope=[TokenScope.PARTICIPANT_SCN],
+            expiry_minutes=60 * 24 * 365,
+        )
+
         # Create a SCN initialization vector json
         securecomputationnode_json = SecureComputationNodeInitializationVector(
+            access_token=access_token,
             secure_computation_node_id=secure_computation_node_db.id,
             storage_account_name=get_secret("azure_storage_account_name"),
             dataset_storage_password=get_secret("azure_storage_account_password"),
@@ -354,12 +374,17 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
 
 
 ########################################################################################################################
-async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db):
+async def provision_smart_broker(
+    smart_broker_node_db: SecureComputationNode_Db,
+    current_user: TokenData,
+):
     """
     Provision a smart broker node
 
     :param smart_broker_node_db: smart broker node information
     :type smart_broker_node_db: SecureComputationNode_Db
+    :param current_user: current user information
+    :type current_user: TokenData
     """
     try:
         # Provision the secure computation node
@@ -399,11 +424,20 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
                 )
             )
 
+        # Create an access token for the aggregator secure computation node that is valid for 1 year
+        access_token = create_jwt_token(
+            user_id=smart_broker_node_db.researcher_user_id,
+            organization_id=smart_broker_node_db.researcher_id,
+            role=current_user.role,
+            scope=[TokenScope.AGGREGATOR_SCN],
+            expiry_minutes=60 * 24 * 365,
+        )
+
         # Create a SCN initialization vector json
         smart_broker_json = SmartBrokerInitializationVector(
+            access_token=access_token,
             smart_broker_id=smart_broker_node_db.id,
             secure_computation_nodes=secure_computation_nodes,
-            access_token="",
             researcher_id=smart_broker_node_db.researcher_id,
             researcher_user_id=smart_broker_node_db.researcher_user_id,
             data_federation_id=smart_broker_node_db.data_federation_id,

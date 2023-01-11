@@ -14,16 +14,16 @@
 
 from typing import List
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Response, status
 from fastapi.encoders import jsonable_encoder
 
-from app.api.authentication import get_current_user
+from app.api.authentication import ScopeChecker, get_current_user
 from app.api.data_federations import get_data_federation
 from app.api.dataset_versions import get_all_dataset_versions
 from app.api.secure_computation_nodes import deprovision_secure_computation_nodes, register_secure_computation_node
 from app.data import operations as data_service
 from app.log import log_message
-from models.authentication import TokenData
+from models.authentication import TokenData, TokenScope
 from models.common import PyObjectId
 from models.data_federations import (
     DataFederationProvision_Db,
@@ -32,11 +32,7 @@ from models.data_federations import (
     RegisterDataFederationProvision_In,
     RegisterDataFederationProvision_Out,
 )
-from models.secure_computation_nodes import (
-    RegisterSecureComputationNode_In,
-    SecureComputationNodeSize,
-    SecureComputationNodeType,
-)
+from models.secure_computation_nodes import RegisterSecureComputationNode_In, SecureComputationNodeType
 
 DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS = "data-federation-provsions"
 
@@ -53,6 +49,7 @@ router = APIRouter()
     response_model_exclude_unset=True,
     status_code=status.HTTP_201_CREATED,
     operation_id="register_data_federation_provision",
+    dependencies=[Depends(ScopeChecker(allowed_scope=[TokenScope.COMPUTE]))],
 )
 async def provision_data_federation(
     provision_req: RegisterDataFederationProvision_In = Body(description="Information required for provsioning"),

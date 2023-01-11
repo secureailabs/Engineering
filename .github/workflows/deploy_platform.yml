@@ -77,6 +77,7 @@ jobs:
 
   Deploy_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
+    needs: Setup_Environment
     steps:
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}

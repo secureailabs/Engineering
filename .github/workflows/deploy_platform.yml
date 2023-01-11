@@ -75,6 +75,9 @@ jobs:
           git submodule init
           git submodule update --remote
 
+  Deploy_Platform:
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    steps:
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}
         env:
@@ -87,17 +90,16 @@ jobs:
           pwd
           ls -l
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
-            echo "entered if statement"
-            echo "entered if statement"
-            echo "entered if statement"
-            echo "entered if statement"
-            echo "entered if statement"
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            cd DatasetTool/
+            dotnet build
+            dotnet publish -c Release
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
-            echo "entered else statement"
-            echo "entered else statement"
-            echo "entered else statement"
-            echo "entered else statement"
-            echo "entered else statement"
+            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
           fi
 
       - name: Condition 2 Release Candidate
@@ -111,7 +113,7 @@ jobs:
           set -e
           pwd
           ls -l
-          if echo ${{ github.event.inputs.preload_dataset }} | grep -c "Yes"; then
+          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
@@ -135,4 +137,15 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            cd DatasetTool/
+            dotnet build
+            dotnet publish -c Release
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
+          else
+            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          fi

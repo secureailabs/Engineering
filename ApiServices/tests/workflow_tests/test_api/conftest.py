@@ -15,24 +15,39 @@ import sys
 
 import pytest
 from tests.workflow_tests.api_portal.account_management_api import (
-    AccountManagementApi, AccountManagementFastApi)
-from tests.workflow_tests.api_portal.azure_template_managment_api import \
-    AzureTemplateApi
+    AccountManagementApi,
+    AccountManagementFastApi,
+)
+from tests.workflow_tests.api_portal.azure_template_managment_api import (
+    AzureTemplateApi,
+)
 from tests.workflow_tests.api_portal.datafederation_management_api import (
-    DataFederationManagementApi, DataFederationManagementFastApi)
+    DataFederationManagementApi,
+    DataFederationManagementFastApi,
+)
 from tests.workflow_tests.api_portal.dataset_management_api import (
-    DataSetManagementApi, DataSetManagementFastApi)
-from tests.workflow_tests.api_portal.datasetfamily_management_api import \
-    DatasetFamilyManagementApi
-from tests.workflow_tests.api_portal.digital_contract_management_api import \
-    DigitalContractManagementApi
-from tests.workflow_tests.api_portal.sail_portal_api import (SailPortalApi,
-                                                             SailPortalFastApi)
-from tests.workflow_tests.api_portal.virtual_machine_api import \
-    VirtualMachineApi
-from tests.workflow_tests.config import (API_PORTAL_IP, DATAOWNER_EMAIL,
-                                         ORCHESTRATOR_PATH, PORT,
-                                         RESEARCHER_EMAIL, SAIL_PASS)
+    DataSetManagementApi,
+    DataSetManagementFastApi,
+)
+from tests.workflow_tests.api_portal.datasetfamily_management_api import (
+    DatasetFamilyManagementApi,
+)
+from tests.workflow_tests.api_portal.digital_contract_management_api import (
+    DigitalContractManagementApi,
+)
+from tests.workflow_tests.api_portal.sail_portal_api import (
+    SailPortalApi,
+    SailPortalFastApi,
+)
+from tests.workflow_tests.api_portal.virtual_machine_api import VirtualMachineApi
+from tests.workflow_tests.config import (
+    API_PORTAL_IP,
+    DATAOWNER_EMAIL,
+    ORCHESTRATOR_PATH,
+    PORT,
+    RESEARCHER_EMAIL,
+    SAIL_PASS,
+)
 from tests.workflow_tests.utils.dataset_helpers import Dataset, DatasetVersion
 from tests.workflow_tests.utils.federation_helpers import DataFederation
 from tests.workflow_tests.utils.helpers import random_name

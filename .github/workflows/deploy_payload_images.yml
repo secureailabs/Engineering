@@ -49,8 +49,21 @@ jobs:
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
       - name: Check out source repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
+      - name: Checkout DS Repo
+        uses: actions/checkout@v3
+        with:
+          repository: secureailabs/datascience
+          token:  ${{ secrets.JENKINS_BUILD_TOKEN }}
+          path: datascience
+          persist-credentials: true
+          
+      - name: checkout submodule
+        run: |
+          git submodule init
+          git submodule update
+      
       - name: "Make requirements"
         run: make vmInitializer
 
@@ -67,8 +80,6 @@ jobs:
           set -e
           pwd
           ls -l
-          cd AzureDeploymentTemplates/PackerTemplate/
-          ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
 
       - name: Condition 2 Release Candidate
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}

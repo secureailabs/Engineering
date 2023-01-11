@@ -60,7 +60,7 @@ jobs:
       - name: checkout submodule
         run: |
           git submodule init
-          git submodule update
+          git submodule update --remote
 
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}

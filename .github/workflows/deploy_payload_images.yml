@@ -1,6 +1,6 @@
 # Engineering
-# deploy_payload_images.yml
-# Deployment of SAIL payload images to a specified Subscription in Azure
+# deploy_platform.yml
+# Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
 #
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.
@@ -12,105 +12,45 @@
 #
 #
 
-name: Deploy Payload Images
+name: Deploy Platform
 
 on:
   workflow_dispatch:
     inputs:
-      subscription:
-        description: Choose Subscription
+      owner:
+        description: "Owner of Deployment"
         required: true
-        type: choice
-        options:
-          - Development
-          - Release Candidate
-          - ProductionGA
-
-      image:
-        description: Choose image
-        required: true
-        type: choice
-        options:
-          - apiservices
-          - newwebfrontend
-          - rpcrelated
-          - smartbroker
-
-env:
-  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  AZURE_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_PACKER_AZURE_CLIENT_ID }}
-  AZURE_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_PACKER_AZURE_CLIENT_SECRET }}
+        type: string
 
 jobs:
-  deploy_images:
+  Setup_Environment:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     steps:
+      - name: Options selected
+        run: |
+          echo "Subscription: ${{ github.event.inputs.subscription }}"
+          echo "Preload Datasets: ${{ github.event.inputs.preload_dataset }}"
+          echo "Purpose of Deployment: ${{ github.event.inputs.purpose }}"
+          echo "Owner of Deployment: ${{ github.event.inputs.owner }}"
+
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
       - name: Check out source repository
         uses: actions/checkout@v3
-
-      - name: Checkout DS Repo
-        uses: actions/checkout@v3
         with:
-          repository: secureailabs/datascience
-          token:  ${{ secrets.JENKINS_BUILD_TOKEN }}
-          path: datascience
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           persist-credentials: true
-          
+
       - name: checkout submodule
         run: |
           git submodule init
-          git submodule update
-      
-      - name: "Make requirements"
-        run: make vmInitializer
-
-      - name: Condition 1 Development
-        if: ${{ github.event.inputs.subscription == 'Development' }}
-        env:
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
-          AZURE_RESOURCE_GROUP: ${{ secrets.DEVELOPMENT_RESOURCE_GROUP }}
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.DEVELOPMENT_STORAGE_ACCOUNT_NAME }}
-        run: |
-          echo "${{ github.head_ref }}"
-          echo "${{ github.workspace }}"
-          sudo chown -R $USER:$USER ${{ github.workspace }}
-          set -e
-          pwd
-          ls -l
-          cd AzureDeploymentTemplates/PackerTemplate/
-          ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
+          git submodule update --remote
 
       - name: Condition 2 Release Candidate
-        if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
-        env:
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
-          AZURE_RESOURCE_GROUP: ${{ secrets.RELEASE_CANDIDATE_AZURE_RESOURCE_GROUP }}
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.RELEASE_CANDIDATE_AZURE_STORAGE_ACCOUNT_NAME }}
         run: |
-          echo "${{ github.head_ref }}"
-          echo "${{ github.workspace }}"
-          sudo chown -R $USER:$USER ${{ github.workspace }}
-          set -e
-          pwd
-          ls -l
-          cd AzureDeploymentTemplates/PackerTemplate/
-          ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
+          cd datascience
+          ls
+          git status
 
-      - name: Condition 3 ProductionGA
-        if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
-        env:
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
-          AZURE_RESOURCE_GROUP: ${{ secrets.PRODUCTION_GA_AZURE_RESOURCE_GROUP }}
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.PRODUCTION_GA_AZURE_STORAGE_ACCOUNT_NAME }}
-        run: |
-          echo "${{ github.head_ref }}"
-          echo "${{ github.workspace }}"
-          sudo chown -R $USER:$USER ${{ github.workspace }}
-          set -e
-          pwd
-          ls -l
-          cd AzureDeploymentTemplates/PackerTemplate/
-          ./AzureImageCreate.sh -a -m ${{ github.event.inputs.image }}
+

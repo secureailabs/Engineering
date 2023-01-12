@@ -74,11 +74,13 @@ fi
 pip3 install /app/zero
 ls /ds
 pip3 install /ds/sail-safe-functions
-pip3 install /ds/sail-safe-functions-orchestrator
-pip3 install /ds/helper-libs
 
 # Start the rpc server
-PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER=/app/private_keys/server.key_secret PATH_DIR_DATASET=/data/ python3 /ds/sail-safe-functions-test/integration_test/test_server.py 5556
+xport PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"
+export PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT="/app/RPCLib/private_keys/client.key_secret"
+export PATH_DIR_DATASET="/data/"
+
+python3 /ds/sail-participant-zeromq/server.py 5556
 
 # To keep the container running
 tail -f /dev/null

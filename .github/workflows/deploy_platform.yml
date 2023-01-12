@@ -25,6 +25,12 @@ on:
           - Development
           - Release Candidate
           - ProductionGA
+
+      preload_dataset:
+        description: Preload dataset with DatasetTool
+        required: true
+        type: boolean
+
       purpose:
         description: "Purpose of Deployment"
         required: true
@@ -43,12 +49,27 @@ jobs:
   Setup_Environment:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     steps:
+      - name: Options selected
+        run: |
+          echo "Subscription: ${{ github.event.inputs.subscription }}"
+          echo "Preload Datasets: ${{ github.event.inputs.preload_dataset }}"
+          echo "Purpose of Deployment: ${{ github.event.inputs.purpose }}"
+          echo "Owner of Deployment: ${{ github.event.inputs.owner }}"
+
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
       - name: Check out source repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          persist-credentials: true
+          submodules: true
 
+  Deploy_Platform:
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    needs: Setup_Environment
+    steps:
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}
         env:
@@ -60,7 +81,18 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            cd DatasetTool/
+            dotnet build
+            dotnet publish -c Release
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
+          else
+            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          fi
 
       - name: Condition 2 Release Candidate
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
@@ -73,7 +105,18 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            cd DatasetTool/
+            dotnet build
+            dotnet publish -c Release
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
+          else
+            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          fi
 
       - name: Condition 3 ProductionGA
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
@@ -86,4 +129,15 @@ jobs:
           set -e
           pwd
           ls -l
-          sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            cd DatasetTool/
+            dotnet build
+            dotnet publish -c Release
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
+          else
+            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          fi

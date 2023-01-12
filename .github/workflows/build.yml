@@ -18,7 +18,7 @@ jobs:
     name: Lint
     steps:
       - name: Check out source repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up Python environment
         uses: actions/setup-python@v2
         with:
@@ -68,7 +68,13 @@ jobs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: clean
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out source repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          persist-credentials: true
+          submodules: true
+
       - name: Run a multi-line script, Build Binaries
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
@@ -80,10 +86,7 @@ jobs:
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
           docker stop apiservices || true && docker rm apiservices || true
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
-          rm -rf ./datascience/ || true
           docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
-          git clone https://$PAT@github.com/secureailabs/datascience.git datascience
-          git -C ./datascience/ submodule update --init --remote
           docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
           docker exec -w /Workspace ubuntu_dev_CI sh -c "git config --global --add safe.directory '*'"
           docker exec -w /Workspace ubuntu_dev_CI sh -c "git submodule update"

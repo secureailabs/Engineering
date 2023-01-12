@@ -50,20 +50,11 @@ jobs:
 
       - name: Check out source repository
         uses: actions/checkout@v3
-
-      - name: Checkout DS Repo
-        uses: actions/checkout@v3
         with:
-          repository: secureailabs/datascience
-          token:  ${{ secrets.JENKINS_BUILD_TOKEN }}
-          path: datascience
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           persist-credentials: true
-          
-      - name: checkout submodule
-        run: |
-          git submodule init
-          git submodule update
-      
+          submodules: true
+
       - name: "Make requirements"
         run: make vmInitializer
 

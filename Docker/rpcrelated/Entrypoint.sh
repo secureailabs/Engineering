@@ -76,7 +76,7 @@ ls /ds
 pip3 install /ds/sail-safe-functions
 
 # Start the rpc server
-xport PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"
+export PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"
 export PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT="/app/RPCLib/private_keys/client.key_secret"
 export PATH_DIR_DATASET="/data/"
 

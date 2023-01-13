@@ -1,0 +1,143 @@
+{
+    "organizations": [
+        {
+            "name": "Secure AI Labs",
+            "description": "Adminstrators and maintainers of the platform",
+            "admin":
+            {
+                "name": "Admin",
+                "title": "Platform Administrator",
+                "email": "admin@secureailabs.com"
+            }
+        },
+        {
+            "name": "International Genetics Research Facility",
+            "description": "231 54th Street, New York, New York, 02345",
+            "admin":
+            {
+                "name": "Lily Bart",
+                "title": "System Administrator",
+                "email": "lbart@igr.com"
+            },
+            "users": [
+                {
+                    "name": "Philip Carey",
+                    "title": "Network Engineer",
+                    "email": "pcarey@igr.com",
+                    "role": "USER"
+                },
+                {
+                    "email": "abede@igr.com",
+                    "name": "Adam Bede",
+                    "title": "Supply Generator",
+                    "role": "USER"
+                },
+                {
+                    "email": "iarcher@igr.com",
+                    "name": "Isabel Archar",
+                    "title": "Security Expert",
+                    "role": "USER"
+                },
+                {
+                    "email": "achristie@igr.com",
+                    "name": "Anna Christie",
+                    "title": "Research Scientist",
+                    "role": "USER"
+                },
+                {
+                    "email": "rcory@igr.com",
+                    "name": "Richard Cory",
+                    "title": "Data Scientist",
+                    "role": "USER"
+                }
+            ]
+        },
+        {
+            "name": "Mercy General Hospital",
+            "description": "4001 J St, Sacramento, CA 95819, United States",
+            "admin":
+            {
+                "email": "nadams@mghl.com",
+                "name": "Nick Adams",
+                "title": "System Administrator"
+            },
+            "users": [
+                {
+                    "email": "nhelmer@mghl.com",
+                    "name": "Nora Helmer",
+                    "title": "Network Engineer",
+                    "role": "USER"
+                },
+                {
+                    "email": "sbowles@mghl.com",
+                    "name": "Sally Bowles",
+                    "title": "Hardware Engineer",
+                    "role": "USER"
+                },
+                {
+                    "email": "ncarter@mghl.com",
+                    "name": "Nick Carter",
+                    "title": "Supply Generator",
+                    "role": "USER"
+                },
+                {
+                    "email": "pmason@mghl.com",
+                    "name": "Perry Mason",
+                    "title": "Research Scientist",
+                    "role": "USER"
+                },
+                {
+                    "email": "dquilp@mghl.com",
+                    "name": "Daniel Quilp",
+                    "title": "Data Scientist",
+                    "role": "USER"
+                }
+            ]
+        },
+        {
+            "name": "Kidney Cancer Association",
+            "description": "The Kidney Cancer Association was founded in 1990 by Eugene P. Schonfeld and a small group of patients and doctors in Chicago, Illinois and has grown into an international non-profit organization. The KCA promotes scientific advances through two annual research symposiums and a robust grant program, participates in legislative advocacy, and seeks to be a source of education and resources for patients, caregivers, and anyone impacted by kidney cancer.",
+            "admin": {
+                "email": "sallie@kidneycancer.org",
+                "name": "Sallie Director",
+                "title": "Medical Director"
+            },
+            "users": [
+                {
+                    "email": "iarcher@kidneycancer.org",
+                    "name": "Isabel Archer",
+                    "title": "System Administrator",
+                    "role": "USER"
+                }
+            ],
+            "data_federations": [
+                {
+                    "name": "KCA Consortium - CSV",
+                    "description": "The Kidney Cancer Consortium",
+                    "data_format": "CSV",
+                    "data_submitters": [
+                        "Mercy General Hospital",
+                        "International Genetics Research Facility"
+                    ],
+                    "researchers": [
+                        "Secure AI Labs"
+                    ],
+                    "data_model": "csv_data_model.json"
+                },
+                {
+                    "name": "KCA Consortium - FHIR",
+                    "description": "The Kidney Cancer Consortium",
+                    "data_format": "FHIR",
+                    "data_submitters": [
+                        "Mercy General Hospital",
+                        "International Genetics Research Facility"
+                    ],
+                    "researchers": [
+                        "Secure AI Labs"
+                    ],
+                    "data_model": "fhir_data_model.json"
+                }
+            ]
+        }
+    ]
+}

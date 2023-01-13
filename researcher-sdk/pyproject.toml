@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "researcher_sdk"
+version = "0.1.0"
+description = ""
+authors = ["Secure AI Labs"]
+readme = "README.md"
+packages = [{include = "researcher_sdk"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+flake8 = "4.0.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

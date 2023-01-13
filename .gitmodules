@@ -1,3 +1,9 @@
 [submodule "datascience"]
 	path = datascience
 	url = git@github.com:secureailabs/datascience.git
+[submodule "ApiServices/external_tools/openapi-python-client"]
+	path = ApiServices/external_tools/openapi-python-client
+	url = git@github.com:prawalgangwar/openapi-python-client.git
+[submodule "ApiServices/external_tools/fastapi-responses"]
+	path = ApiServices/external_tools/fastapi-responses
+	url = git@github.com:prawalgangwar/fastapi-responses.git

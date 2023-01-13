@@ -1,2 +1,2 @@
-pyzmq==22.0.3
+pyzmq==24.0.1
 msgpack==1.0.4

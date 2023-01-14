@@ -3,6 +3,7 @@
 # audit.py
 # -------------------------------------------------------------------------------
 """Models used by audit query service"""
+import time
 from typing import Optional, Union
 
 from models.common import SailBaseModel
@@ -20,14 +21,3 @@ from pydantic import Field, StrictStr
 class QueryResult(SailBaseModel):
     status: StrictStr = Field(...)
     data: dict = Field(...)
-
-
-class QueryInput(SailBaseModel):
-    label: StrictStr = Field(...)
-    userID: Optional[StrictStr] = Field(...)
-    dataID: Optional[StrictStr] = Field(...)
-    start: Optional[Union[int, float]] = Field(...)
-    end: Optional[Union[int, float]] = Field(...)
-    limit: Optional[int] = Field(...)
-    step: Optional[StrictStr] = Field(...)
-    direction: Optional[StrictStr] = Field(...)

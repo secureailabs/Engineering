@@ -14,6 +14,8 @@
 
 import asyncio
 import functools
+import time
+from typing import Optional, Union
 
 import requests
 from app.api.authentication import get_current_user
@@ -23,13 +25,15 @@ from app.api.datasets import get_all_datasets
 from app.utils.secrets import get_secret
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.accounts import UserRole
-from models.audit import QueryInput, QueryResult
+from models.audit import QueryResult
 from models.authentication import TokenData
 from models.common import PyObjectId
+from pydantic import Field, StrictStr
 
 router = APIRouter()
 
-audit_server_endpoint = get_secret("audit_service_endpoint")
+audit_server_ip = get_secret("audit_service_ip")
+audit_server_endpoint = f"http://{audit_server_ip}:3100/loki/api/v1/query_range"
 print(audit_server_endpoint)
 
 
@@ -37,12 +41,20 @@ print(audit_server_endpoint)
 @router.get(
     path="/audit/",
     description="query by logQL",
+    response_description="audit log by stream",
     response_model=QueryResult,
     response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
 )
 async def audit_incidents_query(
-    query: QueryInput,
+    label: StrictStr,
+    userID: Optional[StrictStr] = None,
+    dataID: Optional[StrictStr] = None,
+    start: Optional[Union[int, float]] = None,
+    end: Optional[Union[int, float]] = None,
+    limit: Optional[int] = None,
+    step: Optional[StrictStr] = None,
+    direction: Optional[StrictStr] = None,
     current_user: TokenData = Depends(get_current_user),
 ):
     """
@@ -55,11 +67,19 @@ async def audit_incidents_query(
     :return: response body
     :rtype: json(dict)
     """
-    query = query.json()
+    query_raw = locals()
+    query = {}
+    query_raw.pop("current_user")
+    for key in query_raw:
+        if query_raw[key] is not None:
+            query[key] = query_raw[key]
+
     label = query.pop("label")
     response = {}
 
-    query_str = f'{{job={label}}}'
+    query_str = f'{{job="{label}"}}'
+    '{job="user_activity"}'
+    query["query"] = query_str
 
     if "userID" in query:
         userID = query.pop("userID")
@@ -77,6 +97,9 @@ async def audit_incidents_query(
 
     if label == "user_activity":
         response = await query_user_activity(query, current_user)
+
+    print(query)
+    print(response)
 
     return QueryResult(**response.json())
 

@@ -34,10 +34,10 @@ if [ "$localDataset" = "null" ]; then
 fi
 
 # Use the InitializationVector to populate the IP address of the audit services
-auditEndpoint=$(cat InitializationVector.json | jq -r '.audit_service_endpoint')
+auditIP=$(cat InitializationVector.json | jq -r '.audit_service_ip')
 
 # modify the audit service ip of promtail config file
-sed -i "s,http\:\/\/auditserver\:3100\/loki\/api\/v1\/query_range,$auditEndpoint,g" /app/promtail_local_config.yaml
+sed -i "s,auditserver,$auditIP,g" /app/promtail_local_config.yaml
 
 mountDir="/mnt/azure"
 datasetDir="/data/$datasetId"

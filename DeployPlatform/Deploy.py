@@ -254,11 +254,11 @@ def deploy_audit_service(
         backend_json = json.load(backend_json_fd)
 
     backend_json["owner"] = owner
-    backend_json["azure_subscription_id"] = subscription_id
-    backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
-    backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
-    backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
-    backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
+    # backend_json["azure_subscription_id"] = subscription_id
+    # backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
+    # backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
+    # backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
+    # backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
 
     with open("auditserver.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -311,7 +311,7 @@ def deploy_apiservices(
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
     backend_json["version"] = version
-    backend_json["audit_service_endpoint"] = f"http://{audit_service_ip}:3100/loki/api/v1/push"
+    backend_json["audit_service_ip"] = audit_service_ip
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)

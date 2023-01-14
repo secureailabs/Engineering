@@ -83,8 +83,8 @@ if [ -z "$ci_flag" ]; then
             4)
                 echo -e "\n==== Setting env variables for $opt ===="
                 export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
-                ResourceGroup="sail_test" # This needs to get updated per choice of subscription
-                ImageGalleryName="sail_image_gallery_1"
+                RESOURCE_GROUP="sail_test" # This needs to get updated per choice of subscription
+                IMAGE_GALLERY_NAME="sail_image_gallery_1"
                 ImageVersion=$ImageVersionFromFile
                 break
                 ;;
@@ -118,8 +118,8 @@ echo "Deletion Completed, continuing..."
 az sig image-version delete \
 --gallery-image-version $ImageVersion \
 --gallery-image-definition $ImageName \
---gallery-name $ImageGalleryName \
---resource-group $ResourceGroup
+--gallery-name $IMAGE_GALLERY_NAME \
+--resource-group $RESOURCE_GROUP
 echo "Image Version Deletion Completed, continuing..."
 
 echo -e "\n==== Azure Managed Image Creation Begins ====\n"

@@ -7,3 +7,5 @@ DevopsConsole/InitializationVector.json
 **/node_modules
 RPCLib/zero/zero.egg-info/*
 **/build
+**tmp**
+

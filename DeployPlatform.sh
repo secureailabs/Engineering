@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -x
+
 export tempDeployDir=$(mktemp -d --tmpdir=.)
 
 PrintHelp()
@@ -9,6 +12,9 @@ PrintHelp()
     echo -e "\t-o Triggered By: deployment owner name. No spaces."
     exit 1 # Exit script after printing help
 }
+
+# Install build tools
+./install.sh
 
 # Check if docker is installed
 docker --version
@@ -61,33 +67,28 @@ fi
 
 # Build and Package the Platform Services
 make package_apiservices
-make databaseInitializationTool
-make package_newwebfrontend
+make sail_client database_initializer
+# make package_newwebfrontend
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir
 
 # Copy the files to the temporary directory
-cp Binary/DatabaseInitializationTool $tempDeployDir
-cp Binary/DatabaseInitializationSettings.json $tempDeployDir
-cp Binary/*data_model.json $tempDeployDir
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
-cp Binary/newwebfrontend.tar.gz $tempDeployDir
+# cp Binary/newwebfrontend.tar.gz $tempDeployDir
+cp ApiServices/generated/sail-client/dist/sail_client-0.1.0-py3-none-any.whl $tempDeployDir
+cp database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl $tempDeployDir
+
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
 cp -r DeployPlatform/* $tempDeployDir
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime
 cp Docker/apiservices/InitializationVector.json $tempDeployDir/apiservices.json
 
-# Check for the docker image and create it if it does not exist
-docker images | grep -x "azuredeploymenttools"
-retVal=$?
-if [ $retVal -ne 0 ]; then
-  echo "Error: Docker image not found"
-  pushd $tempDeployDir
-  docker build -t azuredeploymenttools .
-  popd
-fi
+# Build the docker image
+pushd $tempDeployDir
+docker build -t azuredeploymenttools .
+popd
 
 # Get short git commit id
 gitCommitId=$(git rev-parse --short HEAD)

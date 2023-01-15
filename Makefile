@@ -1,7 +1,7 @@
 include Make/Modules.mk
 include Make/newwebfrontend.mk
 
-.PHONY: databaseInitializationTool package all clean SharedCommonCode
+.PHONY: package all clean sail_client database_initializer vmInitializer package_apiservices package_rpcrelated package_smartbroker
 
 package_apiservices: SharedCommonCode package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated*.json ApiServices
@@ -20,24 +20,26 @@ package_rpcrelated:
 package_smartbroker:
 	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz RPCLib/ datascience
 
-package: SharedCommonCode
+package:
 	@make package_apiservices package_newwebfrontend
 	@echo "package done!"
 
-databaseInitializationTool: SharedCommonCode
-	@make -C $(DATABASE_INITIALIZATION_TOOL) all
-	@echo "databaseInitializationTool done!"
+sail_client:
+	@cd ApiServices/generated/sail-client && poetry build
+	@echo "sail_client done!"
+
+database_initializer:
+	@cd database-initialization && poetry build
+	@echo "database_initializer done!"
 
 vmInitializer:
 	@make -C $(VM_INITIALIZER) all
 	@echo "vmInitializer done!"
 
-SharedCommonCode:
-	@make -C $(SHARED_COMMON_CODE) all
-
-all: SharedCommonCode
+all:
 	@make package
-	@make databaseInitializationTool vmInitializer
+	@make sail_client database_initializer
+	@make vmInitializer
 	@echo "All build and packaged!"
 
 clean:

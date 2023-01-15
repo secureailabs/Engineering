@@ -68,6 +68,9 @@ jobs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: clean
     steps:
+      - name: Clear repository
+        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+
       - name: Check out source repository
         uses: actions/checkout@v3
         with:
@@ -97,12 +100,19 @@ jobs:
           docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
           docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
+          sudo apt-get install -y python3-pip
+          pip3 install poetry
+          export PATH="/home/gha-runner/.local/bin:$PATH"
+          poetry
+          make database_initializer sail_client
+          pip3 install ApiServices/generated/sail-client/dist/sail_client-0.1.0-py3-none-any.whl
+          pip3 install database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl
           cd Docker/
           ./BuildImages.sh -i apiservices
           sudo ./RunService.sh -s apiservices -d
           sleep 60
           cd ..
-          ./Binary/DatabaseInitializationTool --ip=10.0.2.4 --settings="DatabaseInitializationSettings.json" --allsteps
+          database-initialization --hostname=https://10.0.2.4:8000
 
   test:
     runs-on: [self-hosted, Linux, x64, docker]

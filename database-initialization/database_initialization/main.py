@@ -23,15 +23,8 @@ from .initializer import Initializer
 
 
 def initialize_database(
-    configuration: Optional[str] = typer.Option(
-        default=None,
-        help="Path to configuration file. If not provided, the default template will be used",
-    ),
-    hostname: str = typer.Option(
-        ...,
-        help="Hostname or IP address of the api service.",
-        prompt=True,
-    ),
+    hostname: str,
+    configuration: Optional[str] = None,
 ):
     """
     Initialize the database with the provided configuration
@@ -69,8 +62,30 @@ def initialize_database(
     initializer.register_data_federations()
 
 
+def cli_wrapper(
+    configuration: Optional[str] = typer.Option(
+        default=None,
+        help="Path to configuration file. If not provided, the default template will be used",
+    ),
+    hostname: str = typer.Option(
+        ...,
+        help="Hostname or IP address of the api service.",
+        prompt=True,
+    ),
+):
+    """
+    Initialize the database with the provided configuration
+
+    :param configuration: Json file containing the information that needs to comply with the format in the template, defaults to template configuration")
+    :type configuration: Optional[str], optional
+    :param hostname: Hostname or IP address of the api service. Should have the format http(s)://<hostname>:<port>
+    :type hostname: str
+    """
+    initialize_database(hostname=hostname, configuration=configuration)
+
+
 def app():
-    typer.run(initialize_database)
+    typer.run(cli_wrapper)
 
 
 if __name__ == "__main__":

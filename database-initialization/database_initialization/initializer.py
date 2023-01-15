@@ -142,11 +142,11 @@ class Initializer:
                 )
 
                 # Add the data submitter to the data federation
-                # for data_submitter in federation["data_submitters"]:
-                #     self.auth_operations[admin_user["email"]].register_data_submitter(
-                #         data_submitter_organization_id=self.org_manager.get_id_by_name(data_submitter),
-                #         data_federation_id=data_federation_id.id,
-                #     )
+                for data_submitter in federation["data_submitters"]:
+                    self.auth_operations[admin_user["email"]].register_data_submitter(
+                        data_submitter_organization_id=self.org_manager.get_id_by_name(data_submitter),
+                        data_federation_id=data_federation_id.id,
+                    )
 
                 # Add the researchers to the data federation
                 for researcher in federation["researchers"]:

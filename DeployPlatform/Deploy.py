@@ -1,10 +1,8 @@
 import json
 import os
 import random
-import subprocess
 import time
 import uuid
-from re import sub
 
 import requests
 import sailazure
@@ -15,6 +13,7 @@ from azure.mgmt.monitor import MonitorManagementClient
 from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
+from database_initialization import initialize_database
 from pydantic import BaseModel, Field, StrictStr
 
 
@@ -268,16 +267,8 @@ def deploy_apiservices(
     time.sleep(90)
 
     # Run database tools for the backend server
-    database_tools_run = subprocess.run(
-        [
-            "./DatabaseInitializationTool",
-            "--ip=" + apiservices_ip,
-            "--settings=./DatabaseInitializationSettings.json",
-            "--allsteps",
-        ],
-        stdout=subprocess.PIPE,
-    )
-    print("Api Services Database Initialization Tool run: ", database_tools_run)
+    initialize_database(hostname=f"https://{apiservices_ip}:8000")
+    print("Api Services Database Initialization Tool run: Success")
 
     return apiservices_ip
 
@@ -440,7 +431,7 @@ if __name__ == "__main__":
 
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
-        exit(0)
+        exit(1)
     deployment_id = OWNER + "-" + str(uuid.uuid1()) + "-" + PURPOSE
 
     # Authenticate the azure credentials

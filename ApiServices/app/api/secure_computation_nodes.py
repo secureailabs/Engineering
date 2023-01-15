@@ -27,8 +27,7 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
-from fastapi import (APIRouter, Body, Depends, HTTPException, Path, Query,
-                     Response, status)
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
 from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId

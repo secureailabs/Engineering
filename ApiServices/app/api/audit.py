@@ -14,7 +14,6 @@
 
 import asyncio
 import functools
-import time
 from typing import Optional, Union
 
 import requests
@@ -97,9 +96,6 @@ async def audit_incidents_query(
 
     if label == "user_activity":
         response = await query_user_activity(query, current_user)
-
-    print(query)
-    print(response)
 
     return QueryResult(**response.json())
 

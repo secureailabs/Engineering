@@ -254,11 +254,6 @@ def deploy_audit_service(
         backend_json = json.load(backend_json_fd)
 
     backend_json["owner"] = owner
-    # backend_json["azure_subscription_id"] = subscription_id
-    # backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
-    # backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
-    # backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
-    # backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
 
     with open("auditserver.json", "w") as outfile:
         json.dump(backend_json, outfile)

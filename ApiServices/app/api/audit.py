@@ -22,7 +22,7 @@ from app.api.data_federations_provisions import \
     get_all_data_federation_provision_info
 from app.api.datasets import get_all_datasets
 from app.utils.secrets import get_secret
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from models.accounts import UserRole
 from models.audit import QueryResult
 from models.authentication import TokenData
@@ -38,7 +38,7 @@ print(audit_server_endpoint)
 
 ########################################################################################################################
 @router.get(
-    path="/audit/",
+    path="/audit",
     description="query by logQL",
     response_description="audit log by stream",
     response_model=QueryResult,
@@ -47,24 +47,38 @@ print(audit_server_endpoint)
 )
 async def audit_incidents_query(
     label: StrictStr,
-    userID: Optional[StrictStr] = None,
-    dataID: Optional[StrictStr] = None,
-    start: Optional[Union[int, float]] = None,
-    end: Optional[Union[int, float]] = None,
-    limit: Optional[int] = None,
-    step: Optional[StrictStr] = None,
-    direction: Optional[StrictStr] = None,
+    userID: Optional[StrictStr] = Query(default=None, description="query events related to a specific user id"),
+    dataID: Optional[StrictStr] = Query(default=None, description="query events related to a specific data id"),
+    start: Optional[Union[int, float]] = Query(default=None, description="starting timestamp of the query range"),
+    end: Optional[Union[int, float]] = Query(default=None, description="ending timestamp of the query range"),
+    limit: Optional[int] = Query(default=None, description="query events number limit"),
+    step: Optional[StrictStr] = Query(default=None, description="query events time interval"),
+    direction: Optional[StrictStr] = Query(default=None, description="query events order"),
     current_user: TokenData = Depends(get_current_user),
 ):
     """
-    perform a audit query
+    perform a query on audit log
 
-    :param query: query input
-    :type query: QueryInput
-    :param current_user: the user who perform the query, defaults to Depends(get_current_user)
+    :param label: label of the query event type, either "user_activity" for platform logs or "computation" for scn logs.
+    :type label: StrictStr
+    :param userID: query events related to a specific userID, optional
+    :type userID: Optional[StrictStr], optional
+    :param dataID: query events related to a specific dataID, optional
+    :type dataID: Optional[StrictStr], optional
+    :param start: query starting timestamp, unix epoch format, default is an hour ago.
+    :type start: Optional[Union[int, float]], optional
+    :param end: query ending timestamp, unix epoch format, default is now.
+    :type end: Optional[Union[int, float]], optional
+    :param limit: number of events limit returned per query, default is 100.
+    :type limit: Optional[int], optional
+    :param step: time interval for query events
+    :type step: Optional[StrictStr], optional
+    :param direction: query events order, either "backward" or "forward"
+    :type direction: Optional[StrictStr], optional
+    :param current_user: current user who perform the query
     :type current_user: TokenData, optional
-    :return: response body
-    :rtype: json(dict)
+    :return: query results
+    :rtype: dict(json)
     """
     query_raw = locals()
     query = {}
@@ -85,14 +99,14 @@ async def audit_incidents_query(
         query_str = f'{query_str} |= `{str(userID)}`'
         query["query"] = query_str
         if label == "computation":
-            response = await query_computation_byUserID(query, current_user)
+            response = await query_computation_by_user_id(query, current_user)
 
     elif "dataID" in query:
         dataID = query.pop("dataID")
         query_str = f'{query_str} |= `{str(dataID)}`'
         query["query"] = query_str
         if label == "computation":
-            response = await query_compuation_by_dataID(dataID, query, current_user)
+            response = await query_computation_by_data_id(dataID, query, current_user)
 
     if label == "user_activity":
         response = await query_user_activity(query, current_user)
@@ -101,7 +115,7 @@ async def audit_incidents_query(
 
 
 # #######################################################################################################################
-async def query_computation_byUserID(
+async def query_computation_by_user_id(
     query: dict,
     current_user: TokenData,
 ):
@@ -164,7 +178,7 @@ async def query_computation_byUserID(
 
 ########################################################################################################################
 
-async def query_compuation_by_dataID(
+async def query_computation_by_data_id(
     dataset_id: PyObjectId,
     query: dict,
     current_user: TokenData,

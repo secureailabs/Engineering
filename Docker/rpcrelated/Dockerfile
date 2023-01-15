@@ -12,8 +12,6 @@ RUN apt-get update && \
     uuid \
     nginx \
     jq \
-    vim \
-    netcat \
     iputils-ping \
     unzip \
     cifs-utils \

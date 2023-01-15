@@ -122,10 +122,6 @@ elif [ "auditserver" == "$imageName" ]; then
     make -C $rootDir package_audit_service -s -j
     cp $rootDir/Binary/audit_server.tar.gz $rootDir/Binary/audit_server_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
-elif [ "remotedataconnector" == "$imageName" ]; then
-    echo "!!! NOT IMPLEMENTED !!!"
-    exit 1
-    # runtimeFlags="$runtimeFlags -v $rootDir/Binary:/Development $imageName"
 else
     echo "!!! Kindly provide correct service name !!!"
     PrintHelp

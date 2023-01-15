@@ -68,8 +68,9 @@ fi
 # Build and Package the Platform Services
 make package_apiservices
 make sail_client database_initializer
+make databaseInitializationTool
+make package_newwebfrontend
 make package_audit_service
-# make package_newwebfrontend
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir

@@ -84,7 +84,7 @@ async def audit_incidents_query(
     query = {}
     query_raw.pop("current_user")
     for key in query_raw:
-        if query_raw[key] is not None:
+        if query_raw[key]:
             query[key] = query_raw[key]
 
     label = query.pop("label")

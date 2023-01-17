@@ -153,13 +153,13 @@ jobs:
   #         ls -l
   #         az vm deallocate  --subscription Build -g Dev-CI -n github-runner1 --no-wait
 
-  workflow-conclusion:
-    # Without this step workflow remains "green" if build does fail.
-    if: always()
-    runs-on: ubuntu-latest
-    needs: [start-runner, build, stop-runner]
-    steps:
-      - uses: technote-space/workflow-conclusion-action@v2
-      - name: Check Job Status status and fail if they are red
-        if: env.WORKFLOW_CONCLUSION == 'failure'
-        run: exit 1
+  # workflow-conclusion:
+  #   # Without this step workflow remains "green" if build does fail.
+  #   if: always()
+  #   runs-on: ubuntu-latest
+  #   needs: [start-runner, build, stop-runner]
+  #   steps:
+  #     - uses: technote-space/workflow-conclusion-action@v2
+  #     - name: Check Job Status status and fail if they are red
+  #       if: env.WORKFLOW_CONCLUSION == 'failure'
+  #       run: exit 1

@@ -73,6 +73,7 @@ fi
 # Install the rpc library
 pip3 install /app/zero
 ls /ds
+pip3 install /ds/sail-core
 pip3 install /ds/sail-safe-functions
 
 # Start the rpc server

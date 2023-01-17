@@ -38,12 +38,14 @@ jobs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: clean
     steps:
-      - name: Build documentation
+      - name: Checkout code
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           persist-credentials: true
           submodules: true
+
+      - name: Build api server
         run: |
           set -e
           pwd

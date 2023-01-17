@@ -28,7 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: 'Documentation'
+          ref: Documentation
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           persist-credentials: true
           submodules: true
@@ -54,5 +54,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v1
         with:
+          branch: Documentation
           ref: Documentation
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}

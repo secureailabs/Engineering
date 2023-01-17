@@ -59,11 +59,9 @@ jobs:
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           cd Docker/
           ./BuildImages.sh -i apiservices
-          id=$(sudo ./RunService.sh -s apiservices -d)
-          echo "id: $id"
-          sleep 120
+          sudo ./RunService.sh -s apiservices -d
+          sleep 240
           cd ..
-          docker logs $id
 
   docs:
     runs-on: [self-hosted, Linux, x64, docker]

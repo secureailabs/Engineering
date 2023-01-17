@@ -44,11 +44,12 @@ print(audit_server_endpoint)
     response_model=QueryResult,
     response_model_by_alias=False,
     status_code=status.HTTP_200_OK,
+    operation_id="audit_incidents_query",
 )
 async def audit_incidents_query(
     label: StrictStr,
-    userID: Optional[StrictStr] = Query(default=None, description="query events related to a specific user id"),
-    dataID: Optional[StrictStr] = Query(default=None, description="query events related to a specific data id"),
+    user_id: Optional[StrictStr] = Query(default=None, description="query events related to a specific user id"),
+    data_id: Optional[StrictStr] = Query(default=None, description="query events related to a specific data id"),
     start: Optional[Union[int, float]] = Query(default=None, description="starting timestamp of the query range"),
     end: Optional[Union[int, float]] = Query(default=None, description="ending timestamp of the query range"),
     limit: Optional[int] = Query(default=None, description="query events number limit"),
@@ -61,10 +62,10 @@ async def audit_incidents_query(
 
     :param label: label of the query event type, either "user_activity" for platform logs or "computation" for scn logs.
     :type label: StrictStr
-    :param userID: query events related to a specific userID, optional
-    :type userID: Optional[StrictStr], optional
-    :param dataID: query events related to a specific dataID, optional
-    :type dataID: Optional[StrictStr], optional
+    :param user_id: query events related to a specific userID, optional
+    :type user_id: Optional[StrictStr], optional
+    :param data_id: query events related to a specific dataID, optional
+    :type data_id: Optional[StrictStr], optional
     :param start: query starting timestamp, unix epoch format, default is an hour ago.
     :type start: Optional[Union[int, float]], optional
     :param end: query ending timestamp, unix epoch format, default is now.
@@ -94,19 +95,19 @@ async def audit_incidents_query(
     '{job="user_activity"}'
     query["query"] = query_str
 
-    if "userID" in query:
-        userID = query.pop("userID")
-        query_str = f'{query_str} |= `{str(userID)}`'
+    if "user_id" in query:
+        user_id = query.pop("user_id")
+        query_str = f'{query_str} |= `{str(user_id)}`'
         query["query"] = query_str
         if label == "computation":
             response = await query_computation_by_user_id(query, current_user)
 
-    elif "dataID" in query:
-        dataID = query.pop("dataID")
-        query_str = f'{query_str} |= `{str(dataID)}`'
+    elif "data_id" in query:
+        data_id = query.pop("data_id")
+        query_str = f'{query_str} |= `{str(data_id)}`'
         query["query"] = query_str
         if label == "computation":
-            response = await query_computation_by_data_id(dataID, query, current_user)
+            response = await query_computation_by_data_id(data_id, query, current_user)
 
     if label == "user_activity":
         response = await query_user_activity(query, current_user)

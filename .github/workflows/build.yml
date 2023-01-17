@@ -45,6 +45,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v1
         with:
-          branch: Documentation
-          ref: Documentation
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}

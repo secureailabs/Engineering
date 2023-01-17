@@ -1,48 +1,167 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
-
+# CI workflow Docker Build
+name: CI for Development Repository
 on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  pull_request:
+    branches: [main]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow one concurrent deployment
+# Only one concurrent action at a time for group tag.
 concurrency:
-  group: "pages"
+  group: CI-Build-Development
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  flake8-lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v3
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          # Module level import not at top of file (E402)
+          # Block comment should start with '# ' (E265)
+          # Local variable name is assigned to but never used (F841)
+          # f-string without any placeholders (F541)
+          # Multiple statements on one line (semicolon) (E702)
+          # Module imported but unused (F401)
+          # Line too long (82 &gt; 79 characters) (E501)
+          # Line break occurred before a binary operator (W503)
+          ignore: "E402,E265,F841,F541,E702,F401,E501,W503"
+          max-line-length: 120
+          path: "ApiServices"
+
+  start-runner:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Output HeadRef
+        run: echo "${{ github.head_ref }}"
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Start self-hosted runner
+        run: |
+          az vm start --subscription Build -g Dev-CI -n github-runner1
+
+  clean:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: start-runner
+    steps:
+      - name: cleanup
+        run: |
+          echo "${{ github.head_ref }}"
+          echo "${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          docker image prune --all -f
+
+  build:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: clean
+    steps:
+      - name: Clear repository
+        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+
+      - name: Check out source repository
         uses: actions/checkout@v3
         with:
-          ref: Documentation
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           persist-credentials: true
           submodules: true
-      - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: './docs'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
-        with:
-          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+
+      - name: Run a multi-line script, Build Binaries
+        env:
+          PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
+        run: |
+          set -e
+          pwd
+          ls -l
+          sudo chmod 666 /var/run/docker.sock
+          docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
+          docker stop apiservices || true && docker rm apiservices || true
+          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
+          # docker build -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
+          # docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "git config --global --add safe.directory '*'"
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "git submodule update"
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "docker --version"
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "make clean"
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
+          # docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+          # docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
+          sudo apt-get install -y python3-pip
+          pip3 install poetry
+          export PATH="$HOME/.poetry/bin:$PATH"
+          poetry
+          make database_initializer sail_client
+          pip3 install ApiServices/generated/sail-client/dist/sail_client-0.1.0-py3-none-any.whl
+          pip3 install database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl
+          cd Docker/
+          ./BuildImages.sh -i apiservices
+          sudo ./RunService.sh -s apiservices -d
+          sleep 60
+          cd ..
+          database-initialization --hostname=https://10.0.2.4:8000
+
+  test:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: build
+    steps:
+      - name: Run Tests
+        run: |
+          set -e
+          GIT=$(git rev-parse --short HEAD)
+          docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
+          docker exec -w /Test/ ubuntu_tst_bash sh -c "git switch -c $GIT"
+          docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip 10.0.2.4  --port 8000"
+
+  teardown:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: test
+    steps:
+      - name: Stop and Remove Docker Containers
+        run: |
+          set -e
+          docker ps -a
+          docker kill $(docker ps -q)
+          docker rm $(docker ps -a -q)
+          sudo make clean
+
+  # stop-runner:
+  #   # Always stop runner even if build step fails
+  #   if: always()
+  #   runs-on: ubuntu-latest
+  #   needs: [start-runner, build, teardown]
+  #   steps:
+  #     - name: Azure Login
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+  #     - name: Deallocate self-hosted runner
+  #       run: |
+  #         pwd
+  #         ls -l
+  #         az vm deallocate  --subscription Build -g Dev-CI -n github-runner1 --no-wait
+
+  workflow-conclusion:
+    # Without this step workflow remains "green" if build does fail.
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [start-runner, build, test]
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v2
+      - name: Check Job Status status and fail if they are red
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1

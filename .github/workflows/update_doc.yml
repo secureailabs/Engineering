@@ -1,9 +1,9 @@
 name: Update Documentation
 
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches:
       - main
@@ -38,10 +38,12 @@ jobs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: clean
     steps:
-      - uses: actions/checkout@v3
-      - name: Run a multi-line script, Build Binaries
-        env:
-          PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
+      - name: Build documentation
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          persist-credentials: true
+          submodules: true
         run: |
           set -e
           pwd
@@ -50,9 +52,6 @@ jobs:
           docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
           docker stop apiservices || true && docker rm apiservices || true
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
-          rm -rf ./datascience/ || true
-          git clone https://$PAT@github.com/secureailabs/datascience.git datascience
-          git -C ./datascience/ submodule update --init --remote
           cd Docker/
           ./BuildImages.sh -i apiservices
           sudo ./RunService.sh -s apiservices -d
@@ -67,10 +66,10 @@ jobs:
         run: |
           node -v
           redoc-cli --version
-          rm -f ApiServices/docs/openapi.json
-          wget https://127.0.0.1:8000/openapi.json -P ApiServices/docs/ --no-check-certificate
-          redoc-cli bundle -o docs/index.html ApiServices/docs/openapi.json
-          cp ApiServices/docs/ . -rf
+          rm -rf ApiServices/generated/docs
+          wget https://127.0.0.1:8000/openapi.json -P ApiServices/generated/docs/ --no-check-certificate
+          redoc-cli bundle -o docs/index.html ApiServices/generated/docs/openapi.json
+          cp ApiServices/generated/docs/ . -rf
 
       - name: check for changes
         run: git status
@@ -88,6 +87,31 @@ jobs:
           branch: Documentation
           github_token: ${{ secrets.GITHUB_TOKEN }}
           force: true
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: Documentation
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          persist-credentials: true
+          submodules: true
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './docs'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
+        with:
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]

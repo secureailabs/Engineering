@@ -60,7 +60,7 @@ jobs:
           cd Docker/
           ./BuildImages.sh -i apiservices
           sudo ./RunService.sh -s apiservices -d
-          sleep 60
+          sleep 120
           cd ..
 
   docs:

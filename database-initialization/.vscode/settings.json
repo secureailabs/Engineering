@@ -42,4 +42,5 @@
     "autoDocstring.startOnNewLine": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.codeLens": true,
+    "json.format.keepLines": true
 }

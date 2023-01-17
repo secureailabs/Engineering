@@ -11,3 +11,7 @@ azure-mgmt-monitor
 
 # fastapi
 pydantic==1.9.1
+
+# database-init
+/database_initialization-0.1.0-py3-none-any.whl
+/sail_client-0.1.0-py3-none-any.whl

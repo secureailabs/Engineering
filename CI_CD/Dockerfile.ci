@@ -33,8 +33,8 @@ ARG git_personal_token
 RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf " https://github.com/"
 RUN git clone https://$git_personal_token@github.com/secureailabs/Engineering.git /Engineering
 RUN sh /Engineering/install.sh
-RUN git clone https://$git_personal_token@github.com/secureailabs/datascience.git Engineering/datascience
-RUN git -C ./Engineering/datascience/ submodule update --init --remote
+RUN git clone https://$git_personal_token@github.com/secureailabs/datascience.git /Engineering/datascience
+RUN git -C /Engineering submodule update
 
 EXPOSE 27017 8000
 WORKDIR /Engineering

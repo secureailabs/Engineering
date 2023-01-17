@@ -21,8 +21,8 @@ Then run `sudo -E ./DeployPlatform.sh -p [Purpose:[Nightly, Bugfix, etc..]] -o [
 ## This script will
 - Build and package all the relevant tools and packages.
 - Create a backend virtual machine using the latest code and Initialization Vector in Docker/backend/InitializationVector.json
-- Run DatabaseTools to populate the database on the server.
-- Create a webfrontend virtual machine from the latest code with the initialization vector created at run time containing PlatformServicesUrl and VirtualMachinePublicIp which are the public IP address of the backend and the webfrontend VMs.
+- Run database-intializer to populate the database on the server.
+- (Currently disabled) Create a webfrontend virtual machine from the latest code with the initialization vector created at run time containing PlatformServicesUrl and VirtualMachinePublicIp which are the public IP address of the backend and the webfrontend VMs.
 
 Note: The webfrontend takes some time to start up. So try connecting to it after 4-5 minutes the script ends.
 

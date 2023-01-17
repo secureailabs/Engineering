@@ -11,10 +11,11 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
+
+from typing import Optional
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, StrictStr
-from typing import Optional
 
 
 class PyObjectId(UUID):
@@ -48,7 +49,7 @@ class SailBaseModel(BaseModel):
 
 
 class BasicObjectInfo(SailBaseModel):
-    id: PyObjectId = Field(..., alias="_id")
+    id: PyObjectId = Field(...)
     name: StrictStr = Field(...)
 
 

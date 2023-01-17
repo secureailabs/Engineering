@@ -28,6 +28,6 @@ tomli==2.0.1
 torch==1.12.1
 typing-extensions==4.2.0
 uvicorn==0.20.0
-
+wheel==0.38.4
 
 

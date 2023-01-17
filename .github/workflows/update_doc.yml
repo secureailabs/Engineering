@@ -59,7 +59,7 @@ jobs:
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           cd Docker/
           ./BuildImages.sh -i apiservices
-          sudo ./RunService.sh -s apiservices -d
+          sudo ./RunService.sh -s apiservices
           sleep 120
           cd ..
 

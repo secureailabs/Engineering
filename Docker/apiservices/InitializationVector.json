@@ -19,5 +19,5 @@
     "azure_keyvault_url": "https://sailkeyvault33120.vault.azure.net/",
     "owner": "default",
     "version": "default",
-    "audit_service_ip": "http://auditserver:3100/loki/api/v1/push"
+    "audit_service_ip": "auditserver"
 }

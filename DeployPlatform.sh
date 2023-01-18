@@ -106,6 +106,7 @@ docker run \
   --env AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET \
   --env AZURE_OBJECT_ID=$AZURE_OBJECT_ID \
   --env VERSION=$gitCommitId \
+  --env PUBLIC_IP=$PUBLIC_IP \
   azuredeploymenttools
 popd
 

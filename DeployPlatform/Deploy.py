@@ -429,6 +429,11 @@ if __name__ == "__main__":
     PURPOSE = os.environ.get("PURPOSE")
     VERSION = os.environ.get("VERSION")
 
+    # Check if public ip is required
+    public_ip = False
+    if "PUBLIC_IP" in os.environ:
+        public_ip = os.getenv("PUBLIC_IP", "False") == "True"
+
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
         exit(1)
@@ -489,21 +494,22 @@ if __name__ == "__main__":
     # print("Frontend server: ", frontend_ip)
 
     # Deploy Firewall IPv4Address and update DNAT Rules
-    api_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "apiservices", platform_services_ip)
-    # web_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "newwebfrontend", frontend_ip)
+    if public_ip:
+        api_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "apiservices", platform_services_ip)
+        # web_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "newwebfrontend", frontend_ip)
 
-    # Summary
-    print("\n\n===============================================================")
-    print("================= SUMMARY: Deploy Firewall =====================")
-    print(f"apiservices-firewall_ip_name: {api_fw_info['apiservices-firewall_ip_name']}")
-    print(f"apiservices-firewall_ip: {api_fw_info['apiservices-firewall_ip']}")
-    print(f"apiservices-firewall_ip_id: {api_fw_info['apiservices-firewall_ip_id']}")
-    # print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
-    # print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
-    # print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
-    print(
-        f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
-    )
+        # Summary
+        print("\n\n===============================================================")
+        print("================= SUMMARY: Deploy Firewall =====================")
+        print(f"apiservices-firewall_ip_name: {api_fw_info['apiservices-firewall_ip_name']}")
+        print(f"apiservices-firewall_ip: {api_fw_info['apiservices-firewall_ip']}")
+        print(f"apiservices-firewall_ip_id: {api_fw_info['apiservices-firewall_ip_id']}")
+        # print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
+        # print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
+        # print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
+        print(
+            f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
+        )
     print("\n\n===============================================================")
     print("================= SUMMARY: Deploy Platform =====================")
     # print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")
@@ -511,7 +517,8 @@ if __name__ == "__main__":
     #     f"Deployment complete. Please visit the link to access the public demo: https://{web_fw_info['newwebfrontend-firewall_ip']}"
     # )
     print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
-    print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
+    if public_ip:
+        print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
     print(f"Deployment ID: {deployment_id}")
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")

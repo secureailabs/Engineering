@@ -125,7 +125,8 @@ jobs:
           sudo ./RunService.sh -s apiservices -d
           sleep 120
           cd ..
-          sudo database-initialization --hostname=https://127.0.0.1:8000
+          sudo database-initialization --hostname=https://10.0.2.4:8000
+          sleep 10
 
       - name: Dump docker logs on failure
         if: failure()

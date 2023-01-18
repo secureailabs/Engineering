@@ -38,7 +38,7 @@ print(audit_server_endpoint)
 
 ########################################################################################################################
 @router.get(
-    path="/audit",
+    path="/audit-logs",
     description="query by logQL",
     response_description="audit log by stream",
     response_model=QueryResult,

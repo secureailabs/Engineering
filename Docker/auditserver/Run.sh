@@ -1,5 +1,5 @@
 #!/bin/bash
-imageName=audit
+imageName=auditserver
 
 # Check if docker is installed
 docker --version
@@ -20,11 +20,20 @@ else
     exit 1
 fi
 
+# Create a folder to hold all the Binaries
+mkdir -p "$imageName"_dir
+
+# Copy the binaries to the folder
+cp vm_initializer.py "$imageName"_dir/
+
 # Run the docker container
 docker run \
--it \
+-dit \
 -p 3100:3100 \
+-p 9090:9091 \
 -p 9093:9093 \
 -p 9096:9096 \
---name audit \
+-v $(pwd)/"$imageName"_dir:/app \
+-v $(pwd)/certs:/etc/nginx/certs \
+--name auditserver \
 $imageName

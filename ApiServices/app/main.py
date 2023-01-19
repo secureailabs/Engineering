@@ -28,6 +28,7 @@ from pydantic import BaseModel, Field, StrictStr
 
 from app.api import (
     accounts,
+    audit,
     authentication,
     data_federations,
     data_federations_provisions,
@@ -60,6 +61,7 @@ class Audit_log_task(threading.Thread):
 
 
 # Add all the API services here exposed to the public
+server.include_router(audit.router)
 server.include_router(authentication.router)
 server.include_router(accounts.router)
 server.include_router(data_federations.router)

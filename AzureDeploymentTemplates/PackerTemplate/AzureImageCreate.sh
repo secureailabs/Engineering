@@ -10,7 +10,7 @@ PrintHelp()
     echo ""
     echo "Usage: $0 -m [Image Name] [-a]"
     echo "Usage: $0"
-    echo -e "\t-m Module Name: apiservices | newwebfrontend | rpcrelated | smartbroker"
+    echo -e "\t-m Module Name:  apiservices | newwebfrontend | rpcrelated | smartbroker | auditserver"
     echo -e "\t-a ci_flag will be set to true"
     exit 1 # Exit script after printing help
 }
@@ -55,7 +55,7 @@ if [ -z "$ci_flag" ]; then
     # Bash Menu
     # TODO Technially all subscriptions for this script can share 1 SP: Discussion We should create singular SP for PACKER
     echo -e "\nPlease Specify # for targeted subscription to upload image: "
-    options=("Development" "Release Candidate" "ProductionGA" "Quit")
+    options=("Development" "Release Candidate" "ProductionGA" "Test" "Quit")
     select opt in "${options[@]}"
     do
         case $REPLY in
@@ -81,6 +81,14 @@ if [ -z "$ci_flag" ]; then
                 break
                 ;;
             4)
+                echo -e "\n==== Setting env variables for $opt ===="
+                export AZURE_SUBSCRIPTION_ID=$DEVELOPMENT_SUBSCRIPTION_ID
+                RESOURCE_GROUP="sail_test" # This needs to get updated per choice of subscription
+                IMAGE_GALLERY_NAME="sail_image_gallery_1"
+                ImageVersion=$ImageVersionFromFile
+                break
+                ;;
+            5)
                 exit 0
                 ;;
         esac
@@ -110,8 +118,8 @@ echo "Deletion Completed, continuing..."
 az sig image-version delete \
 --gallery-image-version $ImageVersion \
 --gallery-image-definition $ImageName \
---gallery-name $ImageGalleryName \
---resource-group $ResourceGroup
+--gallery-name $IMAGE_GALLERY_NAME \
+--resource-group $RESOURCE_GROUP
 echo "Image Version Deletion Completed, continuing..."
 
 echo -e "\n==== Azure Managed Image Creation Begins ====\n"

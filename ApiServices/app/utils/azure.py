@@ -3,8 +3,6 @@
 # azure.py
 # -------------------------------------------------------------------------------
 """Temporary azure functions"""
-import asyncio
-
 # -------------------------------------------------------------------------------
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
 # Private and Confidential. Internal Use Only.

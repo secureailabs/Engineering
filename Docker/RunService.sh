@@ -119,7 +119,9 @@ elif [ "rpcrelated" == "$imageName" ]; then
     fi
     runtimeFlags="$runtimeFlags --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged -v $rootDir/Binary/rpcrelated_dir:/app $imageName"
 elif [ "auditserver" == "$imageName" ]; then
-    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName"
+    make -C $rootDir package_audit_service -s -j
+    cp $rootDir/Binary/audit_server.tar.gz $rootDir/Binary/audit_server_dir/package.tar.gz
+    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
 else
     echo "!!! Kindly provide correct service name !!!"
     PrintHelp

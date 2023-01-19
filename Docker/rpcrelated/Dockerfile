@@ -12,6 +12,7 @@ RUN apt-get update && \
     uuid \
     nginx \
     jq \
+    iputils-ping \
     unzip \
     cifs-utils \
     python3-dev \
@@ -28,6 +29,8 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
+
+RUN useradd --system promtail
 
 COPY Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

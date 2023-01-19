@@ -7,10 +7,10 @@ import uuid
 import requests
 import sailazure
 from azure.core.exceptions import AzureError
-from azure.keyvault.keys import KeyClient
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
-from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
+from azure.mgmt.monitor.models import (DiagnosticSettingsResource, LogSettings,
+                                       MetricSettings)
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
 from database_initialization import initialize_database
@@ -35,6 +35,18 @@ DEV_PARAMS = {
     "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
     "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
     "azure_storage_account_name": "sailvmimages9827",
+    "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
+}
+
+TEST_PARAMS = {
+    "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
+    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/sail_test/providers/Microsoft.Compute/galleries/sail_image_gallery_1/images/{0}/versions/0.1.0",
+    "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
+    + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
+    "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
+    "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
+    "azure_storage_resource_group": "sail_test",
+    "azure_storage_account_name": "sailvmimages9998",
     "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
 }
 
@@ -64,8 +76,7 @@ PRODUCTIONGA_PARAMS = {
     "azure_scn_virtual_network_id": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",
 }
 
-
-def set_params(subscription_id, module_name):
+def set_params(subscription_id, module_name, test_flag=False):
     """
     Set Params based on selected subscription
 
@@ -78,7 +89,10 @@ def set_params(subscription_id, module_name):
     }
 
     if subscription_id == "b7a46052-b7b1-433e-9147-56efbfe28ac5":
-        parameters.update(DEV_PARAMS)
+        if test_flag:
+            parameters.update(TEST_PARAMS)
+        else:
+            parameters.update(DEV_PARAMS)
     elif subscription_id == "40cdb551-8a8d-401f-b884-db1599022002":
         parameters.update(RELEASE_CANDIDATE_PARAMS)
     elif subscription_id == "ba383264-b9d6-4dba-b71f-58b3755382d8":
@@ -99,7 +113,7 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
     print("Upload package status: ", response.status_code)
 
 
-def deploy_module(account_credentials, deployment_name, module_name):
+def deploy_module(account_credentials, deployment_name, module_name, test_flag):
     """Deploy the template to a resource group."""
     print("Deploying module: ", module_name)
 
@@ -116,7 +130,7 @@ def deploy_module(account_credentials, deployment_name, module_name):
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
 
-    set_parameters: dict[str, str] = set_params(subscription_id, module_name)
+    set_parameters: dict[str, str] = set_params(subscription_id, module_name, test_flag)
     parameters = {
         "vmName": set_parameters["vmName"],
         "vmSize": set_parameters["vmSize"],
@@ -218,6 +232,42 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     return keyvault_url
 
 
+def deploy_audit_service(
+    account_credentials,
+    deployment_name,
+    owner,
+    test_flag,
+):
+    """
+    Deploy Audit Service
+    """
+    subscription_id = account_credentials["subscription_id"]
+
+    # Get params to update json
+    set_parameters = set_params(subscription_id, "auditserver", test_flag)
+    # Deploy the frontend server
+    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag)
+
+    # Read backend json from file and set params
+    with open("auditserver.json", "r") as backend_json_fd:
+        backend_json = json.load(backend_json_fd)
+
+    backend_json["owner"] = owner
+
+    with open("auditserver.json", "w") as outfile:
+        json.dump(backend_json, outfile)
+
+    # Sleeping for a minute
+    time.sleep(60)
+
+    upload_package(audit_service_ip, "auditserver.json", "auditserver.tar.gz")
+
+    # Sleeping for some time
+    time.sleep(90)
+
+    return audit_service_ip
+
+
 def deploy_apiservices(
     account_credentials,
     deployment_name,
@@ -227,6 +277,8 @@ def deploy_apiservices(
     key_vault_url,
     owner,
     version: str,
+    audit_service_ip,
+    test_flag,
 ):
     """
     Deploy Api Services
@@ -234,9 +286,9 @@ def deploy_apiservices(
     subscription_id = account_credentials["subscription_id"]
 
     # Get params to update json
-    set_parameters = set_params(subscription_id, "apiservices")
+    set_parameters = set_params(subscription_id, "apiservices", test_flag)
     # Deploy the frontend server
-    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices")
+    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", test_flag)
 
     # Read backend json from file and set params
     with open("apiservices.json", "r") as backend_json_fd:
@@ -254,6 +306,7 @@ def deploy_apiservices(
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
     backend_json["version"] = version
+    backend_json["audit_service_ip"] = audit_service_ip
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -273,9 +326,9 @@ def deploy_apiservices(
     return apiservices_ip
 
 
-def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
+def deploy_frontend(account_credentials, deployment_name, platform_services_ip, test_flag):
     """Deploy the frontend server"""
-    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend")
+    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend", test_flag)
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
@@ -428,6 +481,9 @@ if __name__ == "__main__":
     OWNER = os.environ.get("OWNER")
     PURPOSE = os.environ.get("PURPOSE")
     VERSION = os.environ.get("VERSION")
+    TEST_FLAG = False
+    if PURPOSE == "test":
+        TEST_FLAG = True
 
     # Check if public ip is required
     public_ip = False
@@ -471,6 +527,15 @@ if __name__ == "__main__":
         storage_account_id=storage_account_id,
     )
 
+    # Deploy the audit services
+    audit_service_ip = deploy_audit_service(
+        account_credentials,
+        deployment_id,
+        OWNER,
+        TEST_FLAG,
+    )
+    print("Audit Service server: ", audit_service_ip)
+
     # Deploy the API services
     platform_services_ip = deploy_apiservices(
         account_credentials,
@@ -481,6 +546,8 @@ if __name__ == "__main__":
         key_vault_url,
         OWNER,
         VERSION,
+        audit_service_ip,
+        TEST_FLAG,
     )
     print("API Services server: ", platform_services_ip)
 
@@ -523,5 +590,5 @@ if __name__ == "__main__":
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")
 
-    # # Delete the resource group for the backend server
-    # # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
+    # Delete the resource group for the backend server
+    # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")

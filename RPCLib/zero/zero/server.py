@@ -15,10 +15,12 @@
 
 import asyncio
 import inspect
+import json
 import logging
 import os
 import signal
 import sys
+import threading
 import time
 import typing
 import uuid
@@ -29,27 +31,20 @@ from multiprocessing.pool import Pool
 
 #import matplotlib
 import msgpack
-
 # import uvloop
 import pandas as pd
 import zmq
 import zmq.asyncio
-
 from zero.codegen import CodeGen
 from zero.common import get_next_available_port
-
 # Change
 from zero.customtypes import ProxyObject, SecretObject
 from zero.logger import _AsyncLogger
 from zero.serialize import deserializer_table, serializer_table
-from zero.type_util import (
-    get_function_input_class,
-    get_function_return_class,
-    verify_allowed_type,
-    verify_function_args,
-    verify_function_input_type,
-    verify_function_return,
-)
+from zero.type_util import (get_function_input_class,
+                            get_function_return_class, verify_allowed_type,
+                            verify_function_args, verify_function_input_type,
+                            verify_function_return)
 from zero.zero_mq import ZeroMQ
 
 logging.basicConfig(
@@ -89,6 +84,16 @@ def load_safe_function(name_module:str, name_class:str) -> None:
     for function_tuple in list_function_tuple:
         object_class = function_tuple[1]
         return {name_class:object_class}
+
+class Audit_log_task(threading.Thread):
+    """
+    Auxillary class for audit log server in isolated thread
+    """
+    def run(self):
+        """
+        Start async logger server
+        """
+        _AsyncLogger.start_log_poller(_AsyncLogger.ipc, _AsyncLogger.port)
 
 class ZeroServer:
     def __init__(self, host: str = "0.0.0.0", port: int = 5559):
@@ -171,12 +176,28 @@ class ZeroServer:
 
         self._ro_router[obj.__name__] = obj
 
+    def read_initialization_vector(self) -> tuple:
+        """
+        read initialization vecotr, obtain researcher_id, researcher_user_id and data_federation_id
+
+        :return: a tuple contains the three attributes
+        :rtype: tuple
+        """
+
+        file_path = "/app/InitializationVector.json"
+        iv_json = {}
+        with open(file_path, "r") as f:
+            iv_json = json.load(f)
+        return iv_json["researcher_id"], iv_json["researcher_user_id"], iv_json["data_federation_id"]
+
     def run(self):
         """
         start server run
         """
         try:
             # utilize all the cores
+            self._research_id, self._research_user_id, self._data_federation_id = self.read_initialization_vector()
+
             cores = os.cpu_count()
 
             #matplotlib.use("Agg")
@@ -202,6 +223,9 @@ class ZeroServer:
                 self._device_ipc,
                 self._device_port,
                 self._serializer,
+                self._research_id,
+                self._research_user_id,
+                self._data_federation_id,
                 self._rpc_input_type_map,
                 self._rpc_return_type_map,
                 self._secret_result_cache,
@@ -211,9 +235,9 @@ class ZeroServer:
             )
             self._pool.map_async(spawn_worker, [1])
 
-            self._start_queue_device()
             self._start_logger()
-
+            self._start_queue_device()
+            
             # TODO: by default we start the device with processes, but we need support to run only router
             # asyncio.run(self._start_router())
 
@@ -252,7 +276,8 @@ class ZeroServer:
         ZeroMQ.queue_device(self._host, self._port, self._device_ipc, self._device_port)
 
     def _start_logger(self):
-        _AsyncLogger.start_log_poller(_AsyncLogger.ipc, _AsyncLogger.port)
+        audit_background_task = Audit_log_task()
+        audit_background_task.start()
 
     async def _start_router(self):  # pragma: no cover
         """
@@ -302,6 +327,9 @@ class _Worker:
         ipc: str,
         port: int,
         serializer: str,
+        researcher_id: str,
+        researcher_user_id: str,
+        data_federation_id: str,
         rpc_input_type_map: dict,
         rpc_return_type_map: dict,
         secret_result_cache: dict,
@@ -341,6 +369,9 @@ class _Worker:
             ipc,
             port,
             serializer,
+            researcher_id,
+            researcher_user_id,
+            data_federation_id,
             rpc_input_type_map,
             rpc_return_type_map,
             secret_result_cache,
@@ -360,6 +391,9 @@ class _Worker:
         ipc,
         port,
         serializer,
+        researcher_id,
+        researcher_user_id,
+        data_federation_id,
         rpc_input_type_map,
         rpc_return_type_map,
         secret_result_cache,
@@ -394,6 +428,9 @@ class _Worker:
         self._ipc = ipc
         self._port = port
         self._serializer = serializer
+        self._researcher_id = researcher_id
+        self._researcher_user_id = researcher_user_id
+        self._data_federation_id = data_federation_id
         self._loop = asyncio.new_event_loop()
         # self._loop = uvloop.new_event_loop()
         self._rpc_input_type_map = rpc_input_type_map
@@ -617,9 +654,7 @@ class _Worker:
         :return: function result
         :rtype: Any
         """
-        audit_msg = (
-            f"activity: function call; func_name:{msg['function_name']}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
-        )
+        audit_msg = f"[function call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] func_name:{msg['function_name']}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
         self._async_logger.log(audit_msg)
 
         rpc = msg["function_name"]
@@ -648,7 +683,7 @@ class _Worker:
         object_id = msg["object_id"]
         method_name = msg["method_name"]
 
-        audit_msg = f"activity: method call; object_id:{object_id}; method_name:{method_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
+        audit_msg = f"[Method call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] object_id:{object_id}; method_name:{method_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
         self._async_logger.log(audit_msg)
 
         try:
@@ -675,7 +710,7 @@ class _Worker:
         """
         class_name = msg["class_name"]
 
-        audit_msg = f"activity: constructor call; class_name:{class_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
+        audit_msg = f"[constructor call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] class_name:{class_name}; args:{msg['vargs']}; kwargs:{msg['kwargs']}"
         self._async_logger.log(audit_msg)
 
         if class_name in self._ro_router:
@@ -700,7 +735,7 @@ class _Worker:
         """
         object_id = msg["object_id"]
 
-        audit_msg = f"activity: destructor call; object_id:{msg['object_id']}"
+        audit_msg = f"[destructor call][Researcher ID: {self._researcher_id}][Researcher user ID: {self._researcher_user_id}][Data Federation ID: {self._data_federation_id}] object_id:{msg['object_id']}"
         self._async_logger.log(audit_msg)
 
         try:
@@ -721,7 +756,7 @@ class _Worker:
         """
         object_id = msg["object_id"]
 
-        audit_msg = f"activity: attribute call"
+        audit_msg = f"[attribute call][Researcher ID: {self._researcher_id}][Researcher user ID: {self.researcher_user_id}][Data Federation ID: {self._data_federation_id}] object_id:{object_id}"
         self._async_logger.log(audit_msg)
 
         try:

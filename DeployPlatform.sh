@@ -68,7 +68,8 @@ fi
 # Build and Package the Platform Services
 make package_apiservices
 make sail_client database_initializer
-# make package_newwebfrontend
+#make package_newwebfrontend
+make package_audit_service
 
 # Create a temporary directory to store the files
 mkdir -p $tempDeployDir
@@ -81,9 +82,11 @@ cp database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl $
 
 cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
 cp -r DeployPlatform/* $tempDeployDir
+cp Binary/auditserver.tar.gz $tempDeployDir
 
 # TODO: Prawal. This is a temporary fix. Ideally the initializationVector should be generated at runtime
 cp Docker/apiservices/InitializationVector.json $tempDeployDir/apiservices.json
+cp Docker/apiservices/InitializationVector.json $tempDeployDir/auditserver.json
 
 # Build the docker image
 pushd $tempDeployDir

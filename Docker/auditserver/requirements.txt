@@ -1,0 +1,15 @@
+fastapi==0.78.0
+uvicorn==0.17.6
+pytest==7.1.2
+requests==2.27.1
+bcrypt==3.2.2
+passlib==1.7.4
+passlib[bcrypt]
+pydantic[email]
+flake8==4.0.1
+black==22.3.0
+pyflakes==2.4.0
+python-multipart==0.0.5
+psutil==5.9.1
+aiohttp==3.8.3
+msgpack==1.0.3

@@ -123,7 +123,7 @@
         },
         "storageProfile": {
           "osDisk": {
-            "createOption": "fromImage",
+            "createOption": "FromImage",
             "name": "[concat(parameters('vmName'), '-disk')]",
             "caching": "ReadWrite",
             "managedDisk": {

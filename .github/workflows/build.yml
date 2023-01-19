@@ -132,8 +132,8 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v2
         with:
-          images: 'apiservices'
-          tail: '300'
+          images: "apiservices"
+          tail: "300"
 
   test:
     runs-on: [self-hosted, Linux, x64, docker]

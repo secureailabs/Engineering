@@ -11,7 +11,7 @@
         "name": "IGR Dataset #1",
         "description": "IGR Dataset"
     },
-    "data_federation": "KCA Consortium",
+    "data_federation": "KCA Consortium - FHIR",
     "data_source": [
         "SampleFhir/patient_data/igr"
     ]

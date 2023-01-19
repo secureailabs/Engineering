@@ -11,7 +11,7 @@
         "name": "MGR Dataset #1",
         "description": "MGR Dataset"
     },
-    "data_federation": "KCA Consortium",
+    "data_federation": "KCA Consortium - FHIR",
     "data_source": [
         "SampleFhir/patient_data/mgr"
     ]

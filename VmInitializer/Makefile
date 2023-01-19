@@ -1,8 +1,6 @@
 # The Root directory containing all the code
 ROOTDIR=$(shell realpath ..)
-include $(ROOTDIR)/Make/Common.mk
-
-OUTPUT_DIR=$(ABSROOTDIR)/Binary/
+OUTPUT_DIR=$(ROOTDIR)/Binary/
 
 .PHONY: all, clean
 

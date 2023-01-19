@@ -189,28 +189,17 @@ async def soft_delete_organization(
     if organization_id != current_user.organization_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-    # TODO: Transaction. Make this atomic transaction
-    # Check if the organization exists
-    organization_db = await data_service.find_one(DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)})
-    if not organization_db:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
-
-    # Disable all the users except admin
-    users = await data_service.find_by_query(DB_COLLECTION_USERS, {"organization_id": str(organization_id)})
-    for user in users:
-        user_db = User_Db(**user)
-        if user_db.role != UserRole.ADMIN:
-            user_db.account_state = UserAccountState.INACTIVE
-            await data_service.update_one(
-                DB_COLLECTION_USERS, {"_id": str(user_db.id)}, {"$set": jsonable_encoder(user_db)}
-            )
+    # Disable all the users except admin user
+    await data_service.update_many(
+        DB_COLLECTION_USERS, {"organization_id": str(organization_id)}, {"$set": {"account_state": "INACTIVE"}}
+    )
 
     # Disable the organization
-    organization_db = Organization_db(**organization_db)  # type: ignore
-    organization_db.organization_state = OrganizationState.INACTIVE
-    await data_service.update_one(
-        DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)}, {"$set": jsonable_encoder(organization_db)}
+    organization_disable_result = await data_service.update_one(
+        DB_COLLECTION_ORGANIZATIONS, {"_id": str(organization_id)}, {"$set": {"state": "INACTIVE"}}
     )
+    if not organization_disable_result.modified_count:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
 
     message = f"[Organization Soft Delete]: user_id:{current_user.id}, organization_id:{organization_id}"
     await log_message(message)

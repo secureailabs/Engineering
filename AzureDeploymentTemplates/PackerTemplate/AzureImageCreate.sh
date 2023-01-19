@@ -107,7 +107,14 @@ az image delete \
 --name $ImageName
 echo "Deletion Completed, continuing..."
 
-echo -e "\n==== Azure VHD& Image Creation Begins ====\n"
+az sig image-version delete \
+--gallery-image-version $ImageVersion \
+--gallery-image-definition $ImageName \
+--gallery-name $ImageGalleryName \
+--resource-group $ResourceGroup
+echo "Image Version Deletion Completed, continuing..."
+
+echo -e "\n==== Azure Managed Image Creation Begins ====\n"
 # Create resource group for storage account
 az group create \
 --name $RESOURCE_GROUP \

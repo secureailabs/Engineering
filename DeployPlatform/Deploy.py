@@ -76,9 +76,7 @@ PRODUCTIONGA_PARAMS = {
     "azure_scn_virtual_network_id": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",
 }
 
-global_test_flag = True
-
-def set_params(subscription_id, module_name, test):
+def set_params(subscription_id, module_name, test_flag=False):
     """
     Set Params based on selected subscription
 
@@ -91,7 +89,7 @@ def set_params(subscription_id, module_name, test):
     }
 
     if subscription_id == "b7a46052-b7b1-433e-9147-56efbfe28ac5":
-        if test:
+        if test_flag:
             parameters.update(TEST_PARAMS)
         else:
             parameters.update(DEV_PARAMS)
@@ -115,7 +113,7 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
     print("Upload package status: ", response.status_code)
 
 
-def deploy_module(account_credentials, deployment_name, module_name):
+def deploy_module(account_credentials, deployment_name, module_name, test_flag):
     """Deploy the template to a resource group."""
     print("Deploying module: ", module_name)
 
@@ -132,7 +130,7 @@ def deploy_module(account_credentials, deployment_name, module_name):
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
 
-    set_parameters: dict[str, str] = set_params(subscription_id, module_name, global_test_flag)
+    set_parameters: dict[str, str] = set_params(subscription_id, module_name, test_flag)
     parameters = {
         "vmName": set_parameters["vmName"],
         "vmSize": set_parameters["vmSize"],
@@ -238,6 +236,7 @@ def deploy_audit_service(
     account_credentials,
     deployment_name,
     owner,
+    test_flag,
 ):
     """
     Deploy Audit Service
@@ -245,9 +244,9 @@ def deploy_audit_service(
     subscription_id = account_credentials["subscription_id"]
 
     # Get params to update json
-    set_parameters = set_params(subscription_id, "auditserver", global_test_flag)
+    set_parameters = set_params(subscription_id, "auditserver", test_flag)
     # Deploy the frontend server
-    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver")
+    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag)
 
     # Read backend json from file and set params
     with open("auditserver.json", "r") as backend_json_fd:
@@ -279,6 +278,7 @@ def deploy_apiservices(
     owner,
     version: str,
     audit_service_ip,
+    test_flag,
 ):
     """
     Deploy Api Services
@@ -286,9 +286,9 @@ def deploy_apiservices(
     subscription_id = account_credentials["subscription_id"]
 
     # Get params to update json
-    set_parameters = set_params(subscription_id, "apiservices", global_test_flag)
+    set_parameters = set_params(subscription_id, "apiservices", test_flag)
     # Deploy the frontend server
-    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices")
+    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", test_flag)
 
     # Read backend json from file and set params
     with open("apiservices.json", "r") as backend_json_fd:
@@ -326,9 +326,9 @@ def deploy_apiservices(
     return apiservices_ip
 
 
-def deploy_frontend(account_credentials, deployment_name, platform_services_ip):
+def deploy_frontend(account_credentials, deployment_name, platform_services_ip, test_flag):
     """Deploy the frontend server"""
-    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend")
+    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend", test_flag)
 
     # Prepare the initialization vector for the frontend server
     initialization_vector = {
@@ -481,6 +481,9 @@ if __name__ == "__main__":
     OWNER = os.environ.get("OWNER")
     PURPOSE = os.environ.get("PURPOSE")
     VERSION = os.environ.get("VERSION")
+    TEST_FLAG = False
+    if PURPOSE == "test":
+        TEST_FLAG = True
 
     # Check if public ip is required
     public_ip = False
@@ -529,6 +532,7 @@ if __name__ == "__main__":
         account_credentials,
         deployment_id,
         OWNER,
+        TEST_FLAG,
     )
     print("Audit Service server: ", audit_service_ip)
 
@@ -543,6 +547,7 @@ if __name__ == "__main__":
         OWNER,
         VERSION,
         audit_service_ip,
+        TEST_FLAG,
     )
     print("API Services server: ", platform_services_ip)
 

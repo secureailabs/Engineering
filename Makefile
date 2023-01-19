@@ -3,7 +3,7 @@ include Make/newwebfrontend.mk
 
 .PHONY: package all clean sail_client database_initializer vmInitializer package_apiservices package_rpcrelated package_smartbroker
 
-package_apiservices: SharedCommonCode package_rpcrelated package_smartbroker
+package_apiservices: package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated*.json ApiServices
 	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker*.json ApiServices
 	@cp Binary/rpcrelated_dir/package.tar.gz ApiServices

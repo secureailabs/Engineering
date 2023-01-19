@@ -9,101 +9,118 @@ on:
       - main
 
 jobs:
-  # start-runner:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Output HeadRef
-  #       run: echo "${{ github.head_ref }}"
+  start-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output HeadRef
+        run: echo "${{ github.head_ref }}"
 
-  #     - name: Azure Login
-  #       uses: azure/login@v1
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-  #     - name: Start self-hosted runner
-  #       run: |
-  #         az vm start --subscription Build -g Dev-CI -n github-runner1
+      - name: Start self-hosted runner
+        run: |
+          az vm start --subscription Build -g Dev-CI -n github-runner1
 
-  # clean:
-  #   runs-on: [self-hosted, Linux, x64, docker]
-  #   needs: start-runner
-  #   steps:
-  #     - name: cleanup
-  #       run: |
-  #         echo "${{ github.head_ref }}"
-  #         echo "${{ github.workspace }}"
-  #         sudo chown -R $USER:$USER ${{ github.workspace }}
+  clean:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: start-runner
+    steps:
+      - name: cleanup
+        run: |
+          echo "${{ github.head_ref }}"
+          echo "${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
 
-  # build:
-  #   runs-on: [self-hosted, Linux, x64, docker]
-  #   needs: clean
-  #   steps:
-  #     - name: Clear repository
-  #       run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+  build:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: clean
+    steps:
+      - name: Clear repository
+        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-  #       with:
-  #         token: ${{ secrets.JENKINS_BUILD_TOKEN }}
-  #         persist-credentials: true
-  #         submodules: true
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          persist-credentials: true
+          submodules: true
 
-  #     - name: Build api server
-  #       run: |
-  #         set -e
-  #         pwd
-  #         ls -l
-  #         sudo chmod 666 /var/run/docker.sock
-  #         docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
-  #         docker stop apiservices || true && docker rm apiservices || true
-  #         docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
-  #         cd Docker/
-  #         ./BuildImages.sh -i apiservices
-  #         sudo ./RunService.sh -s apiservices -d
-  #         sleep 240
-  #         cd ..
+      - name: Build api server
+        run: |
+          set -e
+          pwd
+          ls -l
+          sudo chmod 666 /var/run/docker.sock
+          docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
+          docker stop apiservices || true && docker rm apiservices || true
+          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
+          cd Docker/
+          ./BuildImages.sh -i apiservices
+          sudo ./RunService.sh -s apiservices -d
+          sleep 240
+          cd ..
 
-  # docs:
-  #   runs-on: [self-hosted, Linux, x64, docker]
-  #   needs: build
-  #   steps:
-  #     - name: Update Documentation
-  #       run: |
-  #         node -v
-  #         redoc-cli --version
-  #         rm -rf ApiServices/generated/docs
-  #         wget https://127.0.0.1:8000/openapi.json -P ApiServices/generated/docs/ --no-check-certificate
-  #         redoc-cli bundle -o docs/index.html ApiServices/generated/docs/openapi.json
-  #         cp ApiServices/generated/docs/ . -rf
+  docs:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: build
+    steps:
+      - name: Update Documentation
+        run: |
+          node -v
+          redoc-cli --version
+          rm -rf ApiServices/generated/docs
+          wget https://127.0.0.1:8000/openapi.json -P ApiServices/generated/docs/ --no-check-certificate
+          redoc-cli bundle -o docs/index.html ApiServices/generated/docs/openapi.json
+          cp ApiServices/generated/docs/ . -rf
 
-  #     - name: check for changes
-  #       run: git status
+      - name: check for changes
+        run: git status
 
-  #     - name: commit changed files
-  #       run: |
-  #         git config --local user.email "Jenkins@secureailabs.com"
-  #         git config --local user.name "GitHub Action test"
-  #         git add .
-  #         git commit -m "Auto updating Docs"
+      - name: commit changed files
+        run: |
+          git config --local user.email "Jenkins@secureailabs.com"
+          git config --local user.name "GitHub Action test"
+          git add .
+          git commit -m "Auto updating Docs"
 
-  #     - name: Push changes
-  #       uses: ad-m/github-push-action@master
-  #       with:
-  #         branch: Documentation
-  #         github_token: ${{ secrets.JENKINS_BUILD_TOKEN }}
-  #         force: true
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: Documentation
+          github_token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          force: true
 
-  # teardown:
-  #   runs-on: [self-hosted, Linux, x64, docker]
-  #   needs: docs
-  #   steps:
-  #     - name: Stop and Remove Docker Containers
-  #       run: |
-  #         set -e
-  #         docker ps -a
-  #         docker kill $(docker ps -q)
-  #         docker rm $(docker ps -a -q)
-  #         sudo make clean
+  teardown:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: docs
+    steps:
+      - name: Stop and Remove Docker Containers
+        run: |
+          set -e
+          docker ps -a
+          docker kill $(docker ps -q)
+          docker rm $(docker ps -a -q)
+          sudo make clean
+
+  stop-runner:
+    # Always stop runner even if build step fails
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [start-runner, build, teardown]
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deallocate self-hosted runner
+        run: |
+          pwd
+          ls -l
+          az vm deallocate  --subscription Build -g Dev-CI -n github-runner1 --no-wait
 
   deploy:
     environment:
@@ -114,6 +131,7 @@ jobs:
       pages: write
       id-token: write
     runs-on: ubuntu-latest
+    needs: docs
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -127,37 +145,20 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: './docs'
+          path: "./docs"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
         with:
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}
 
-  # stop-runner:
-  #   # Always stop runner even if build step fails
-  #   if: always()
-  #   runs-on: ubuntu-latest
-  #   needs: [start-runner, build, teardown]
-  #   steps:
-  #     - name: Azure Login
-  #       uses: azure/login@v1
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-  #     - name: Deallocate self-hosted runner
-  #       run: |
-  #         pwd
-  #         ls -l
-  #         az vm deallocate  --subscription Build -g Dev-CI -n github-runner1 --no-wait
-
-  # workflow-conclusion:
-  #   # Without this step workflow remains "green" if build does fail.
-  #   if: always()
-  #   runs-on: ubuntu-latest
-  #   needs: [start-runner, build, docs, deploy]
-  #   steps:
-  #     - uses: technote-space/workflow-conclusion-action@v2
-  #     - name: Check Job Status status and fail if they are red
-  #       if: env.WORKFLOW_CONCLUSION == 'failure'
-  #       run: exit 1
+  workflow-conclusion:
+    # Without this step workflow remains "green" if build does fail.
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [start-runner, build, docs, deploy]
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v2
+      - name: Check Job Status status and fail if they are red
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        run: exit 1

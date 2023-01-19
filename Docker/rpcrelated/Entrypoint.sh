@@ -77,8 +77,9 @@ pip3 install /ds/sail-core
 pip3 install /ds/sail-safe-functions
 
 # Start the rpc server
-export PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"
-export PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT="/app/RPCLib/private_keys/client.key_secret"
+export PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/public_keys/"
+export PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT="/app/private_keys/client.key_secret"
+export PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER="/app/private_keys/server.key_secret"
 export PATH_DIR_DATASET="/data/"
 
 python3 /ds/sail-participant-zeromq/server.py 5556

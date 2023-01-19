@@ -112,10 +112,13 @@ jobs:
           submodules: true
       - name: Setup Pages
         uses: actions/configure-pages@v2
+        with:
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: './docs'
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1

@@ -15,12 +15,10 @@
 import pytest
 from assertpy.assertpy import assert_that
 from cerberus import Validator
-from tests.workflow_tests.api_portal.datafederation_management_api import (
-    DataFederationManagementFastApi,
-)
-from tests.workflow_tests.api_portal.dataset_management_api import (
-    DataSetManagementFastApi,
-)
+from tests.workflow_tests.api_portal.datafederation_management_api import \
+    DataFederationManagementFastApi
+from tests.workflow_tests.api_portal.dataset_management_api import \
+    DataSetManagementFastApi
 from tests.workflow_tests.api_portal.sail_portal_api import SailPortalFastApi
 from tests.workflow_tests.utils.dataset_helpers import Dataset
 from tests.workflow_tests.utils.federation_helpers import DataFederation

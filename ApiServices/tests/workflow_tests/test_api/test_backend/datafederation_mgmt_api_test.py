@@ -15,12 +15,10 @@
 import pytest
 from assertpy.assertpy import assert_that
 from cerberus import Validator
-from tests.workflow_tests.api_portal.datafederation_management_api import (
-    DataFederationManagementFastApi,
-)
-from tests.workflow_tests.api_portal.dataset_management_api import (
-    DataSetManagementFastApi,
-)
+from tests.workflow_tests.api_portal.datafederation_management_api import \
+    DataFederationManagementFastApi
+from tests.workflow_tests.api_portal.dataset_management_api import \
+    DataSetManagementFastApi
 from tests.workflow_tests.api_portal.sail_portal_api import SailPortalFastApi
 from tests.workflow_tests.utils.dataset_helpers import Dataset
 from tests.workflow_tests.utils.federation_helpers import DataFederation
@@ -77,62 +75,24 @@ def print_federation_data(federation):
     )
 
 
-datasetfederation_payload = {
-    "DataFederationDescription": "This data federation has been created for the purposes of unit testing",
-    "DataFederationName": "Unit test data federation",
-}
+def get_federation(sail_portal: SailPortalFastApi, federation_management: DataFederationManagementFastApi):
+    federation = None
+    for new_federation in pytest.new_federations:
+        if new_federation.get("admin_email") == sail_portal.email:
+            _, federation = federation_management.get_data_federation_by_id(
+                sail_portal, new_federation.get("id")
+            )
+            break
 
-datasetfederation_payload_no_name = {
-    "DataFederationDescription": "This data federation has been created for the purposes of unit testing",
-}
+    if federation is None:
+        _, federations_json = federation_management.get_all_data_federations(
+            sail_portal
+        )
+        federation = federations_json.get("data_federations")[
+            len(federations_json.get("data_federations")) - 1
+        ]
 
-datasetfederation_payload_no_description = {
-    "DataFederationName": "Descriptionless Federation",
-}
-
-datasetfederation_payload_short_name = {
-    "DataFederationDescription": "This data federation has been created for the purposes of unit testing",
-    "DataFederationName": "a",
-}
-
-datasetfederation_payload_empty_name = {
-    "DataFederationDescription": "This data federation has been created for the purposes of unit testing",
-    "DataFederationName": "",
-}
-
-datasetfederation_payload_empty_desc = {
-    "DataFederationDescription": "",
-    "DataFederationName": "Unit test data federation",
-}
-
-datasetfederation_payload_empty_desc_name = {
-    "DataFederationDescription": "",
-    "DataFederationName": "",
-}
-
-datasetfederation_payload_long_name = {
-    "DataFederationDescription": "This data federation has been created for the purposes of unit testing",
-    # Our maximum name length is 255 characters
-    "DataFederationName": "a" * 256,
-}
-
-datasetfederation_payload_short_desc = {
-    "DataFederationDescription": "a",
-    "DataFederationName": "Unit test data federation",
-}
-
-datasetfederation_payload_long_desc = {
-    # Our maximum description length is 1000 characters
-    "DataFederationDescription": "a" * 1001,
-    "DataFederationName": "Unit test data federation",
-}
-
-datasetfederation_payload_long_desc_long_name = {
-    # Our maximum description length is 1000 characters
-    "DataFederationDescription": "a" * 1001,
-    # Our maximum name length is 255 characters
-    "DataFederationName": "a" * 256,
-}
+    return federation
 
 
 @pytest.mark.azure
@@ -508,21 +468,8 @@ def test_fastapi_update_valid_data_federation_authorized_user(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
+    federation = get_federation(sail_portal, federation_management)
 
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
     original_federation = DataFederation(
         federation.get("name"),
         federation.get("description"),
@@ -781,21 +728,7 @@ def test_fastapi_valid_data_federation_register_valid_researcher(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     (
         reg_new_org_response,
@@ -1082,21 +1015,7 @@ def test_fastapi_valid_data_federation_register_valid_data_submitter(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     (
         reg_new_org_response,
@@ -1321,7 +1240,7 @@ def test_fastapi_invalid_data_federation_register_invalid_data_submitter(
 
 
 # TODO: Revisit when [BOARD-2199] is resolved.
-@pytest.mark.broken
+@pytest.mark.active
 @pytest.mark.parametrize(
     "sail_portal, federation_management",
     [
@@ -1553,21 +1472,7 @@ def test_fastapi_valid_data_federation_invite_valid_researcher(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     old_research_invite_count = len(federation.get("research_organizations_invites_id"))
 
@@ -1655,21 +1560,7 @@ def test_fastapi_valid_data_federation_invite_invalid_researcher(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     old_research_invite_count = len(federation.get("research_organizations_invites_id"))
 
@@ -1886,21 +1777,7 @@ def test_fastapi_valid_data_federation_invite_valid_data_submitter(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     old_research_invite_count = len(
         federation.get("data_submitter_organizations_invites_id")
@@ -1989,21 +1866,7 @@ def test_fastapi_valid_data_federation_invite_invalid_data_submitter(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     old_research_invite_count = len(federation.get("research_organizations_invites_id"))
 
@@ -3318,21 +3181,7 @@ def test_fastapi_provision_valid_federation_valid_scn_size(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     test_response, test_response_json = federation_management.provision_data_federation(
         sail_portal, federation.get("id"), scn_size
@@ -3397,21 +3246,7 @@ def test_fastapi_provision_valid_federation_invalid_scn_size(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     test_response, test_response_json = federation_management.provision_data_federation(
         sail_portal, federation.get("id"), scn_size
@@ -3923,21 +3758,7 @@ def test_fastapi_delete_valid_data_federation_authorized_user(
     validator = Validator(schema)
 
     # Act
-    federation = None
-    for new_federation in pytest.new_federations:
-        if new_federation.get("admin_email") == sail_portal.email:
-            _, federation = federation_management.get_data_federation_by_id(
-                sail_portal, new_federation.get("id")
-            )
-            break
-
-    if federation is None:
-        _, federations_json = federation_management.get_all_data_federations(
-            sail_portal
-        )
-        federation = federations_json.get("data_federations")[
-            len(federations_json.get("data_federations")) - 1
-        ]
+    federation = get_federation(sail_portal, federation_management)
 
     test_response = federation_management.delete_data_federation_by_id(
         sail_portal, federation.get("id")
@@ -4078,221 +3899,3 @@ def test_fastapi_delete_invalid_data_federation(
     is_valid = validator.validate(test_response.json())
     assert_that(is_valid, description=validator.errors).is_true()
     assert_that(test_response.status_code).is_equal_to(422)
-
-
-# * -------------------------------------------------------------- OLD API BELOW --------------------------------------------------------------
-# ! -------------------------------------------------------------- OLD API BELOW --------------------------------------------------------------
-# ? -------------------------------------------------------------- OLD API BELOW --------------------------------------------------------------
-
-
-@pytest.mark.deprecated
-def test_register_good_data_federation(
-    data_owner_sail_portal, datafederation_management
-):
-    """
-    Test Dataowner register of a good data federation
-
-    :param data_owner_sail_portal: fixture, SailPortalApi
-    :type data_owner_sail_portal: class : api_portal.sail_portal_api.SailPortalApi
-    :param datafederation_management: fixture, DataFederationManagementApi
-    :type datafederation_management: datafederation_management_api.DataFederationManagementApi
-    """
-    # Arrange
-    expect_json_schema = {"Eosb": {"type": "string"}, "Status": {"type": "number"}}
-    validator = Validator(expect_json_schema)
-
-    # Act
-    (
-        test_response,
-        test_response_json,
-        user_eosb,
-    ) = datafederation_management.register_data_federation(
-        data_owner_sail_portal, payload=datasetfederation_payload
-    )
-
-    # Assert
-    assert_that(test_response.status_code).is_equal_to(201)
-    # pretty_print(msg="Test Response:", data=test_response_json)
-    is_valid = validator.validate(test_response_json)
-    assert_that(is_valid, description=validator.errors).is_true()
-    assert_that(user_eosb)
-
-
-@pytest.mark.deprecated
-@pytest.mark.parametrize(
-    "request_information",
-    [
-        datasetfederation_payload_no_description,
-        datasetfederation_payload_no_name,
-        datasetfederation_payload_short_name,
-        datasetfederation_payload_short_desc,
-        datasetfederation_payload_long_name,
-        datasetfederation_payload_long_desc,
-        datasetfederation_payload_long_desc_long_name,
-        datasetfederation_payload_empty_name,
-        datasetfederation_payload_empty_desc,
-        datasetfederation_payload_empty_desc_name,
-    ],
-)
-def test_register_bad_data_federation(
-    data_owner_sail_portal, datafederation_management, request_information
-):
-    """
-    Test Dataowner register of a good data federation
-
-    :param data_owner_sail_portal: fixture, SailPortalApi
-    :type data_owner_sail_portal: class : api_portal.sail_portal_api.SailPortalApi
-    :param datafederation_management: fixture, DataFederationManagementApi
-    :type datafederation_management: datafederation_management_api.DataFederationManagementApi
-    """
-    # Act
-    test_response, _, _ = datafederation_management.register_data_federation(
-        data_owner_sail_portal, payload=request_information
-    )
-
-    # Assert
-    assert_that(test_response.status_code).is_equal_to(400)
-
-
-@pytest.mark.deprecated
-def test_list_data_federations(data_owner_sail_portal, datafederation_management):
-    """
-    Test Dataowner list of a data federations
-
-    :param data_owner_sail_portal: fixture, SailPortalApi
-    :type data_owner_sail_portal: class : api_portal.sail_portal_api.SailPortalApi
-    :param datafederation_management: fixture, DataFederationManagementApi
-    :type datafederation_management: datafederation_management_api.DataFederationManagementApi
-    """
-    # Arrange
-    schema = {
-        "DataFederations": {
-            "type": "dict",
-            "valueschema": {
-                "type": "dict",
-                "schema": {
-                    "Description": {"type": "string"},
-                    "Name": {"type": "string"},
-                    "DataSubmitterOrganizations": {
-                        "type": "dict",
-                        "keysrules": {
-                            "type": "string",
-                            "regex": r"{0[4567][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                        },
-                    },
-                    "DatasetFamilies": {"type": "dict"},
-                    "ResearcherOrganizations": {
-                        "type": "dict",
-                        "keysrules": {
-                            "type": "string",
-                            "regex": r"{0[4567][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                        },
-                    },
-                    "Identifier": {
-                        "type": "string",
-                        "regex": r"{1[89AB][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                    },
-                    "OrganizationName": {"type": "string"},
-                    "OrganizationIdentifier": {
-                        "type": "string",
-                        "regex": r"{0[4567][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                    },
-                },
-            },
-            "keysrules": {
-                "type": "string",
-                "regex": r"{1[89AB][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-            },
-        },
-        "Eosb": {"type": "string"},
-        "Status": {"type": "number"},
-    }
-    validator = Validator(schema)
-
-    # Act
-    (
-        test_response,
-        test_response_json,
-        user_eosb,
-    ) = datafederation_management.list_data_federations(data_owner_sail_portal)
-
-    # Assert
-    assert_that(test_response.status_code).is_equal_to(200)
-    is_valid = validator.validate(test_response_json)
-    assert_that(is_valid, description=validator.errors).is_true()
-    assert_that(user_eosb)
-
-
-@pytest.mark.deprecated
-def test_list_data_federations_none_linked(
-    researcher_sail_portal, datafederation_management
-):
-    """
-    Test Researcher list of a data federations who hasn't created or participated in any federation
-
-    :param data_owner_sail_portal: fixture, SailPortalApi
-    :type data_owner_sail_portal: class : api_portal.sail_portal_api.SailPortalApi
-    :param datafederation_management: fixture, DataFederationManagementApi
-    :type datafederation_management: datafederation_management_api.DataFederationManagementApi
-    """
-    # Arrange
-    schema = {
-        "DataFederations": {
-            "type": "dict",
-            "valueschema": {
-                "type": "dict",
-                "schema": {
-                    "Description": {"type": "string"},
-                    "Name": {"type": "string"},
-                    "DataSubmitterOrganizations": {
-                        "type": "dict",
-                        "keysrules": {
-                            "type": "string",
-                            "regex": r"{0[4567][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                        },
-                    },
-                    "DatasetFamilies": {"type": "dict"},
-                    "ResearcherOrganizations": {
-                        "type": "dict",
-                        "keysrules": {
-                            "type": "string",
-                            "regex": r"{0[4567][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                        },
-                    },
-                    "Identifier": {
-                        "type": "string",
-                        "regex": r"{1[89AB][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                    },
-                    "OrganizationName": {"type": "string"},
-                    "OrganizationIdentifier": {
-                        "type": "string",
-                        "regex": r"{0[4567][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-                    },
-                },
-            },
-            "keysrules": {
-                "type": "string",
-                "regex": r"{1[89AB][A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}}",
-            },
-        },
-        "Eosb": {"type": "string"},
-        "Status": {"type": "number"},
-    }
-    validator = Validator(schema)
-
-    # Act
-    (
-        test_response,
-        test_response_json,
-        user_eosb,
-    ) = datafederation_management.list_data_federations(researcher_sail_portal)
-
-    # Assert
-    assert_that(test_response.status_code).is_equal_to(200)
-    assert_that(user_eosb)
-    federation_identifiers = test_response_json.get("DataFederations").keys()
-    # We should have 0 federations that this user can use at this stage
-    assert_that(len(federation_identifiers)).is_equal_to(0)
-    # We still expect a well formed response with 0 entries
-    is_valid = validator.validate(test_response_json)
-    assert_that(is_valid, description=validator.errors).is_true()

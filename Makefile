@@ -25,7 +25,7 @@ package_smartbroker:
 	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz RPCLib/ datascience
 
 package:
-	@make package_apiservices package_newwebfrontend
+	@make package_audit_service package_apiservices package_newwebfrontend
 	@echo "package done!"
 
 sail_client:

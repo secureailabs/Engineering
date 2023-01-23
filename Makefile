@@ -41,6 +41,7 @@ vmInitializer:
 	@echo "vmInitializer done!"
 
 all:
+	@mkdir Binary
 	@make package
 	@make sail_client database_initializer
 	@make vmInitializer

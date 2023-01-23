@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import tarfile
 import time
 import uuid
 
@@ -13,6 +14,7 @@ from azure.mgmt.monitor.models import (DiagnosticSettingsResource, LogSettings,
                                        MetricSettings)
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
+from azure.storage.blob import BlobServiceClient
 from database_initialization import initialize_database
 from pydantic import BaseModel, Field, StrictStr
 
@@ -234,6 +236,7 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
 
 def deploy_audit_service(
     account_credentials,
+    storage_account_name,
     deployment_name,
     owner,
     test_flag,
@@ -248,14 +251,19 @@ def deploy_audit_service(
     # Deploy the frontend server
     audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag)
 
-    # Read backend json from file and set params
-    with open("auditserver.json", "r") as backend_json_fd:
-        backend_json = json.load(backend_json_fd)
 
-    backend_json["owner"] = owner
+    # Read backend json from file and set params
+    with open("auditserver.json", "r") as audit_json_fd:
+        audit_json = json.load(audit_json_fd)
+
+    audit_json["owner"] = owner
+    audit_json["azure_storage_account_name"] = storage_account_name
+    audit_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
+    audit_json["azure_client_id"] = account_credentials["credentials"]._client_id
+    audit_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
 
     with open("auditserver.json", "w") as outfile:
-        json.dump(backend_json, outfile)
+        json.dump(audit_json, outfile)   
 
     # Sleeping for a minute
     time.sleep(60)
@@ -404,6 +412,14 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
         keys: StorageAccountListKeysResult = storage_client.storage_accounts.list_keys(resource_group_name, account_name)  # type: ignore
         storage_account_key: str = keys.keys[0].value  # type: ignore
 
+        # Create container
+        az_oauth_url = f"https://{account_name}.blob.core.windows.net"
+        #az_connnection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={storage_account_key};EndpointSuffix=core.windows.net"
+
+        blob_service_client = BlobServiceClient(account_url=az_oauth_url, credential=account_credentials["credentials"])
+        container_client = blob_service_client.get_container_client("audit")
+        container_client.create_container()
+
         return (
             DeploymentResponse(status="Success", response=account_name, note="Deployment Successful"),
             account_name,
@@ -411,8 +427,10 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
             resource_group_name,
         )
     except AzureError as azure_error:
+        print(str(azure_error))
         return DeploymentResponse(status="Fail", note=str(azure_error))
     except Exception as exception:
+        print(str(exception))
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
@@ -530,6 +548,7 @@ if __name__ == "__main__":
     # Deploy the audit services
     audit_service_ip = deploy_audit_service(
         account_credentials,
+        storage_account_name,
         deployment_id,
         OWNER,
         TEST_FLAG,

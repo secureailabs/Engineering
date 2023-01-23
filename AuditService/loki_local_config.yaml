@@ -1,10 +1,8 @@
 auth_enabled: false
-
 server:
   http_listen_address: 0.0.0.0
   http_listen_port: 3100
   grpc_listen_port: 9096
-
 common:
   path_prefix: /tmp/loki
   storage:
@@ -16,7 +14,6 @@ common:
     instance_addr: 127.0.0.1
     kvstore:
       store: inmemory
-
 schema_config:
   configs:
     - from: 2020-10-24
@@ -26,10 +23,28 @@ schema_config:
       index:
         prefix: index_
         period: 24h
-
+storage_config:
+  azure:
+    account_name: <account-name>
+    use_service_principal: true
+    # Azure tenant ID used to authenticate through Azure OAuth
+    tenant_id: <tenant-id>
+    # Azure Service Principal ID
+    client_id: <client-id>
+    # Azure Service Principal secret key
+    client_secret: <client-secret>
+    # See https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction#containers
+    container_name: audit
+    request_timeout: 0
+  boltdb_shipper:
+    active_index_directory: /data/loki/boltdb-shipper-active
+    cache_location: /data/loki/boltdb-shipper-cache
+    cache_ttl: 24h
+    shared_store: azure
+  filesystem:
+    directory: /data/loki/chunks
 ruler:
   alertmanager_url: http://localhost:9093
-
 # By default, Loki will send anonymous, but uniquely-identifiable usage and configuration
 # analytics to Grafana Labs. These statistics are sent to https://stats.grafana.org/
 #

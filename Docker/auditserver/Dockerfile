@@ -10,7 +10,11 @@ RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get install -y \
     nginx \
-    python3-pip
+    python3-pip \
+    wget \
+    jq
+
+RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
 COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

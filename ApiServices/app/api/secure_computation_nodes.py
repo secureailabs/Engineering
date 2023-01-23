@@ -27,7 +27,8 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
+from fastapi import (APIRouter, Body, Depends, HTTPException, Path, Query,
+                     Response, status)
 from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
@@ -333,7 +334,7 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             json.dump(jsonable_encoder(securecomputationnode_json), outfile)
 
         # Initilize the secure computation node
-        await initialize_virtual_machine(secure_computation_node_db, "package.tar.gz")
+        await initialize_virtual_machine(secure_computation_node_db, "rpcrelated.tar.gz")
 
     except Exception as exception:
         print(exception)

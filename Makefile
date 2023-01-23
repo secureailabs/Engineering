@@ -6,19 +6,20 @@ include Make/newwebfrontend.mk
 package_apiservices: package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated*.json ApiServices
 	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker*.json ApiServices
-	@cp Binary/rpcrelated_dir/package.tar.gz ApiServices
+	@cp Binary/rpcrelated.tar.gz ApiServices
 	@cp Binary/smartbroker.tar.gz ApiServices
 	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
-	@rm ApiServices/package.tar.gz
 	@rm ApiServices/smartbroker.tar.gz
+	@rm ApiServices/rpcrelated.tar.gz
 	@rm ApiServices/rpcrelated*.json
 	@rm ApiServices/smartbroker*.json
 
-package_audit_service:
-	@cd AuditService && ./package.sh
+.SECONDEXPANSION:
+package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService/.*")
+	@tar -cvzf Binary/auditserver.tar.gz $^
 
-package_rpcrelated:
-	@cd RPCLib && ./package.sh
+package_rpcrelated: $$(shell find RPCLib/ -type f ! -path "RPCLib/.*")
+	@tar  --exclude='datascience/.*' --exclude='datascience/notebooks'  --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' -cvzf Binary/rpcrelated.tar.gz datascience $^ 
 
 package_smartbroker:
 	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz RPCLib/ datascience

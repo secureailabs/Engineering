@@ -17,23 +17,22 @@ import functools
 from typing import Optional, Union
 
 import requests
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import StrictStr
+
 from app.api.authentication import get_current_user
-from app.api.data_federations_provisions import \
-    get_all_data_federation_provision_info
+from app.api.data_federations_provisions import get_all_data_federation_provision_info
 from app.api.datasets import get_all_datasets
 from app.utils.secrets import get_secret
-from fastapi import APIRouter, Depends, HTTPException, Query, status
 from models.accounts import UserRole
 from models.audit import QueryResult
 from models.authentication import TokenData
 from models.common import PyObjectId
-from pydantic import Field, StrictStr
 
 router = APIRouter()
 
 audit_server_ip = get_secret("audit_service_ip")
 audit_server_endpoint = f"http://{audit_server_ip}:3100/loki/api/v1/query_range"
-print(audit_server_endpoint)
 
 
 ########################################################################################################################
@@ -97,14 +96,14 @@ async def audit_incidents_query(
 
     if "user_id" in query:
         user_id = query.pop("user_id")
-        query_str = f'{query_str} |= `{str(user_id)}`'
+        query_str = f"{query_str} |= `{str(user_id)}`"
         query["query"] = query_str
         if label == "computation":
             response = await query_computation_by_user_id(query, current_user)
 
     elif "data_id" in query:
         data_id = query.pop("data_id")
-        query_str = f'{query_str} |= `{str(data_id)}`'
+        query_str = f"{query_str} |= `{str(data_id)}`"
         query["query"] = query_str
         if label == "computation":
             response = await query_computation_by_data_id(data_id, query, current_user)
@@ -178,6 +177,7 @@ async def query_computation_by_user_id(
 
 
 ########################################################################################################################
+
 
 async def query_computation_by_data_id(
     dataset_id: PyObjectId,

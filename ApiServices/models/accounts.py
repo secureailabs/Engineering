@@ -77,6 +77,7 @@ class UserRole(Enum):
 class UserAccountState(Enum):
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
+    LOCKED = "LOCKED"
 
 
 class User_Base(SailBaseModel):
@@ -93,6 +94,8 @@ class User_Db(User_Base):
     hashed_password: StrictStr = Field(...)
     account_state: UserAccountState = Field(...)
     organization_id: PyObjectId = Field(...)
+    last_login_time: Optional[datetime] = Field(default=None)
+    failed_login_attempts: int = Field(default=0)
 
 
 class UserInfo_Out(User_Base):

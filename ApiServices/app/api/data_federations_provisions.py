@@ -32,11 +32,7 @@ from models.data_federations import (
     RegisterDataFederationProvision_In,
     RegisterDataFederationProvision_Out,
 )
-from models.secure_computation_nodes import (
-    RegisterSecureComputationNode_In,
-    SecureComputationNodeSize,
-    SecureComputationNodeType,
-)
+from models.secure_computation_nodes import RegisterSecureComputationNode_In, SecureComputationNodeType
 
 DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS = "data-federation-provsions"
 

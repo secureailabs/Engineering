@@ -12,10 +12,12 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
+from datetime import datetime
+from pathlib import Path
 from time import time
 from typing import List
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -24,9 +26,9 @@ from passlib.context import CryptContext
 from app.data import operations as data_service
 from app.log import log_message
 from app.utils.secrets import get_secret
-from models.accounts import Organization_db, User_Db, UserInfo_Out, UserRole
+from models.accounts import Organization_db, User_Db, UserAccountState, UserInfo_Out, UserRole
 from models.authentication import LoginSuccess_Out, RefreshToken_In, TokenData
-from models.common import BasicObjectInfo
+from models.common import BasicObjectInfo, PyObjectId
 
 DB_COLLECTION_USERS = "users"
 DB_COLLECTION_ORGANIZATIONS = "organizations"
@@ -81,7 +83,18 @@ class RoleChecker:
     response_model_by_alias=False,
     operation_id="login",
 )
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+) -> LoginSuccess_Out:
+    """
+    User login with email and password
+
+    :param form_data: email and password of the user
+    :type form_data: OAuth2PasswordRequestForm, optional
+    :return: access token and refresh token
+    :rtype: LoginSuccess_Out
+    """
+
     exception_authentication_failed = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Incorrect username or password",
@@ -91,22 +104,56 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     found_user = await data_service.find_one(DB_COLLECTION_USERS, {"email": form_data.username})
     if not found_user:
         raise exception_authentication_failed
-
     found_user_db = User_Db(**found_user)
+
+    if found_user_db.account_state is not UserAccountState.ACTIVE:
+        raise HTTPException(
+            status_code=403,
+            detail=f"User account is {found_user_db.account_state.value}. Contact SAIL support.",
+        )
+
     password_pepper = get_secret("password_pepper")
     if not pwd_context.verify(
-        f"{found_user_db.email}{form_data.password}{password_pepper}", found_user_db.hashed_password
+        secret=f"{found_user_db.email}{form_data.password}{password_pepper}",
+        hash=found_user_db.hashed_password,
     ):
-        raise exception_authentication_failed
+        # If this is a 5th failed attempt, lock the account and increase the failed login attempts
+        # Otherwise, just increase the failed login attempts
+        if found_user_db.failed_login_attempts >= 4:
+            await data_service.update_one(
+                DB_COLLECTION_USERS,
+                {"_id": str(found_user_db.id)},
+                {
+                    "$set": {"account_state": UserAccountState.LOCKED.value},
+                    "$inc": {"failed_login_attempts": 1},
+                },
+            )
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password. Account locked."
+            )
+        else:
+            await data_service.update_one(
+                DB_COLLECTION_USERS, {"_id": str(found_user_db.id)}, {"$inc": {"failed_login_attempts": 1}}
+            )
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Incorrect username or password. {4 - found_user_db.failed_login_attempts} attempts left.",
+            )
+    else:
+        # Reset the failed login attempts and update the last login time
+        await data_service.update_one(
+            DB_COLLECTION_USERS,
+            {"_id": str(found_user_db.id)},
+            {"$set": {"failed_login_attempts": 0, "last_login_time": datetime.utcnow()}},
+        )
 
+    # Create the access token and refresh token and return them
     token_data = TokenData(**found_user_db.dict(), exp=int((time() * 1000) + (ACCESS_TOKEN_EXPIRE_MINUTES * 60 * 1000)))
-
     access_token = jwt.encode(
         claims=jsonable_encoder(token_data),
         key=get_secret("jwt_secret"),
         algorithm=ALGORITHM,
     )
-
     refresh_token = jwt.encode(
         claims=jsonable_encoder(token_data),
         key=get_secret("refresh_secret"),
@@ -201,3 +248,40 @@ async def get_current_user_info(
     await log_message(message)
 
     return UserInfo_Out(**found_user_db.dict(), organization=BasicObjectInfo(**found_organization_db.dict()))
+
+
+@router.put(
+    path="/unlock-account/{user_id}",
+    description="Unlock the user account",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(RoleChecker(allowed_roles=[UserRole.SAIL_ADMIN]))],
+    operation_id="unlock_user_account",
+)
+async def unlock_user_account(
+    user_id: PyObjectId = Path(description="The user id to unlock the account for"),
+    current_user: User_Db = Depends(get_current_user),
+):
+    """
+    Unlock the user account
+
+    :param current_user: information about the current user
+    :type current_user: User_Db, optional
+    :return: None
+    :rtype: None
+    """
+    found_user = await data_service.find_one(DB_COLLECTION_USERS, {"_id": str(user_id)})
+    if not found_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    found_user_db = User_Db(**found_user)
+
+    # Update the user account state and reset the failed login attempts to 0
+    await data_service.update_one(
+        DB_COLLECTION_USERS,
+        {"_id": str(found_user_db.id)},
+        {"$set": {"account_state": UserAccountState.ACTIVE.value, "failed_login_attempts": 0}},
+    )
+
+    message = f"[Unlock User Account]: user_id:{current_user.id}"
+    await log_message(message)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

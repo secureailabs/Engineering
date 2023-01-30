@@ -2367,7 +2367,7 @@ def test_fastapi_invalid_data_federation_add_invalid_dataset(
     assert_that(test_response.status_code).is_equal_to(422)
 
 
-# TODO: Currently returns "404 Error : {detail: unauthorized}"
+# TODO: Currently returns "Error 404: {detail: unauthorized}"
 @pytest.mark.broken
 @pytest.mark.parametrize(
     "sail_portal, federation_management, dataset_management, new_dataset",

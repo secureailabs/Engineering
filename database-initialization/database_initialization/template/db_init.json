@@ -7,7 +7,8 @@
             {
                 "name": "Admin",
                 "title": "Platform Administrator",
-                "email": "admin@secureailabs.com"
+                "email": "admin@secureailabs.com",
+                "password": "SailPassword@123"
             }
         },
         {
@@ -17,35 +18,41 @@
             {
                 "name": "Lily Bart",
                 "title": "System Administrator",
-                "email": "lbart@igr.com"
+                "email": "lbart@igr.com",
+                "password": "SailPassword@123"
             },
             "users": [
                 {
+                    "email": "pcarey@igr.com",
+                    "password": "SailPassword@123",
                     "name": "Philip Carey",
                     "title": "Network Engineer",
-                    "email": "pcarey@igr.com",
                     "role": "USER"
                 },
                 {
                     "email": "abede@igr.com",
+                    "password": "SailPassword@123",
                     "name": "Adam Bede",
                     "title": "Supply Generator",
                     "role": "USER"
                 },
                 {
                     "email": "iarcher@igr.com",
+                    "password": "SailPassword@123",
                     "name": "Isabel Archar",
                     "title": "Security Expert",
                     "role": "USER"
                 },
                 {
                     "email": "achristie@igr.com",
+                    "password": "SailPassword@123",
                     "name": "Anna Christie",
                     "title": "Research Scientist",
                     "role": "USER"
                 },
                 {
                     "email": "rcory@igr.com",
+                    "password": "SailPassword@123",
                     "name": "Richard Cory",
                     "title": "Data Scientist",
                     "role": "USER"
@@ -58,36 +65,42 @@
             "admin":
             {
                 "email": "nadams@mghl.com",
+                "password": "SailPassword@123",
                 "name": "Nick Adams",
                 "title": "System Administrator"
             },
             "users": [
                 {
                     "email": "nhelmer@mghl.com",
+                    "password": "SailPassword@123",
                     "name": "Nora Helmer",
                     "title": "Network Engineer",
                     "role": "USER"
                 },
                 {
                     "email": "sbowles@mghl.com",
+                    "password": "SailPassword@123",
                     "name": "Sally Bowles",
                     "title": "Hardware Engineer",
                     "role": "USER"
                 },
                 {
                     "email": "ncarter@mghl.com",
+                    "password": "SailPassword@123",
                     "name": "Nick Carter",
                     "title": "Supply Generator",
                     "role": "USER"
                 },
                 {
                     "email": "pmason@mghl.com",
+                    "password": "SailPassword@123",
                     "name": "Perry Mason",
                     "title": "Research Scientist",
                     "role": "USER"
                 },
                 {
                     "email": "dquilp@mghl.com",
+                    "password": "SailPassword@123",
                     "name": "Daniel Quilp",
                     "title": "Data Scientist",
                     "role": "USER"
@@ -99,12 +112,14 @@
             "description": "The Kidney Cancer Association was founded in 1990 by Eugene P. Schonfeld and a small group of patients and doctors in Chicago, Illinois and has grown into an international non-profit organization. The KCA promotes scientific advances through two annual research symposiums and a robust grant program, participates in legislative advocacy, and seeks to be a source of education and resources for patients, caregivers, and anyone impacted by kidney cancer.",
             "admin": {
                 "email": "sallie@kidneycancer.org",
+                "password": "SailPassword@123",
                 "name": "Sallie Director",
                 "title": "Medical Director"
             },
             "users": [
                 {
                     "email": "iarcher@kidneycancer.org",
+                    "password": "SailPassword@123",
                     "name": "Isabel Archer",
                     "title": "System Administrator",
                     "role": "USER"

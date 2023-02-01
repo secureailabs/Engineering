@@ -40,7 +40,6 @@ class Initializer:
         self.operations = SyncOperations(self.client)
         self.auth_operations: Dict[str, SyncAuthenticatedOperations] = {}
         self.organization_id: Dict[str, str] = {}
-        self.password = "SailPassword@123"
 
     def user_login(self, username: str, password: str):
         """
@@ -84,10 +83,10 @@ class Initializer:
                 admin_name=organization["name"],
                 admin_job_title=admin_user["title"],
                 admin_email=admin_user["email"],
-                admin_password=self.password,
+                admin_password=admin_user["password"],
             )
             # Login for each organization as admin
-            self.user_login(admin_user["email"], self.password)
+            self.user_login(admin_user["email"], admin_user["password"])
 
     def register_users(self):
         """
@@ -102,7 +101,7 @@ class Initializer:
                 register_user_req = RegisterUserIn(
                     name=user["name"],
                     email=user["email"],
-                    password=self.password,
+                    password=user["password"],
                     job_title=user["title"],
                     role=UserRole(user["role"]),
                 )

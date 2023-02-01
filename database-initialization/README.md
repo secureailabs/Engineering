@@ -12,7 +12,11 @@ This will install the dependencies and the package in editable mode.
 This will also install the sail-client dependency in the virtul environment.
 The virtual environment is created in the .venv folder and can be activated using:
 ```bash
-poetry shell
+source $(poetry env info --path)/bin/activate
+```
+or
+```bash
+source .venv/bin/activate
 ```
 
 To exit the virtual environment:

@@ -167,7 +167,7 @@ async def get_dataset_version(
     _, organization = await cache_get_basic_info_organization({}, [dataset_version.organization_id], current_user)
 
     response_data_version = GetDatasetVersion_Out(
-        **dataset_version.dict(), organization=BasicObjectInfo(_id=organization[0].id, name=organization[0].name)
+        **dataset_version.dict(), organization=BasicObjectInfo(id=organization[0].id, name=organization[0].name)
     )
 
     message = f"[Get Dataset Version]: user_id:{current_user.id}, dataset_id: {dataset_version.dataset_id}, version: {dataset_version_id}"

@@ -153,6 +153,17 @@ def account_management(get_base_url):
 def dataset_management_fast_api(get_base_url):
     """
     Fixture for DataSetManagementApi
+
+    :return: DataSetManagementApi
+    :rtype: class : api_portal.dataset_management_api.DataSetManagementApi
+    """
+    return DataSetManagementFastApi(base_url=get_base_url)
+
+
+@pytest.fixture
+def dataset_management(get_base_url):
+    """
+    Fixture for DataSetManagementApi
     :return: DataSetManagementApi
     :rtype: class : api_portal.dataset_management_api.DataSetManagementApi
     """
@@ -314,7 +325,6 @@ def create_invalid_user():
 def create_valid_dataset_csv():
     """
     Fixture to create a valid dataset for /datasets endpoint testing.
-
     :return: new_dataset
     :rtype: Dataset
     """
@@ -332,7 +342,6 @@ def create_valid_dataset_csv():
 def create_valid_dataset_fhir():
     """
     Fixture to create a valid dataset for /datasets endpoint testing.
-
     :return: new_dataset
     :rtype: Dataset
     """
@@ -353,6 +362,7 @@ def create_invalid_dataset():
 
     :return: new_dataset
     :rtype: Dataset
+    Fixture to create a valid dataset for /datasets endpoint testing.
     """
     new_dataset = Dataset(name=12345, description=None, tags=None, format=None)
 

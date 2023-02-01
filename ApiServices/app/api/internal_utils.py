@@ -47,7 +47,7 @@ async def cache_get_basic_info_organization(
         if organization_id not in organization_cache:
             organization_basic_info = await get_organization(organization_id=organization_id, current_user=current_user)
             organization_cache[organization_id] = BasicObjectInfo(
-                _id=organization_basic_info.id, name=organization_basic_info.name
+                id=organization_basic_info.id, name=organization_basic_info.name
             )
             response_basic_info_list.append(organization_cache[organization_id])
 
@@ -64,7 +64,7 @@ async def cache_get_basic_info_datasets(
     for datasets_id in datasets_id_list:
         if datasets_id not in datasets_cache:
             dataset_basic_info = await get_dataset(dataset_id=datasets_id, current_user=current_user)
-            datasets_cache[datasets_id] = BasicObjectInfo(_id=dataset_basic_info.id, name=dataset_basic_info.name)
+            datasets_cache[datasets_id] = BasicObjectInfo(id=dataset_basic_info.id, name=dataset_basic_info.name)
             response_basic_info_list.append(datasets_cache[datasets_id])
 
     return (datasets_cache, response_basic_info_list)

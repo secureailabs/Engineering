@@ -154,11 +154,9 @@ async def get_all_secure_computation_nodes(
 
             response_secure_computation_node = GetSecureComputationNode_Out(
                 **secure_computation_node.dict(),
-                data_federation=BasicObjectInfo(_id=data_federation.id, name=data_federation.name),
+                data_federation=BasicObjectInfo(id=data_federation.id, name=data_federation.name),
                 dataset=dataset_basic_info,
-                dataset_version=BasicObjectInfo(
-                    _id=dataset_version_basic_info.id, name=dataset_version_basic_info.name
-                ),
+                dataset_version=BasicObjectInfo(id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
                 data_owner=dataset_version_basic_info.organization,
                 researcher=data_researcher_basic_info,
                 researcher_user=current_user.id,
@@ -206,9 +204,9 @@ async def get_secure_computation_node(
         if organization.id == current_user.organization_id
     ][0]
 
-    dataset_basic_info = BasicObjectInfo(_id=PyObjectId(empty=True), name="")
-    dataset_version_basic_info = BasicObjectInfo(_id=PyObjectId(empty=True), name="")
-    data_owner_basic_info = BasicObjectInfo(_id=PyObjectId(empty=True), name="")
+    dataset_basic_info = BasicObjectInfo(id=PyObjectId(empty=True), name="")
+    dataset_version_basic_info = BasicObjectInfo(id=PyObjectId(empty=True), name="")
+    data_owner_basic_info = BasicObjectInfo(id=PyObjectId(empty=True), name="")
     if secure_computation_node.type == SecureComputationNodeType.SCN:
         dataset_basic_info = [
             dataset for dataset in data_federation.datasets if dataset.id == secure_computation_node.dataset_id
@@ -219,9 +217,9 @@ async def get_secure_computation_node(
 
     response_secure_computation_node = GetSecureComputationNode_Out(
         **secure_computation_node.dict(),
-        data_federation=BasicObjectInfo(_id=data_federation.id, name=data_federation.name),
+        data_federation=BasicObjectInfo(id=data_federation.id, name=data_federation.name),
         dataset=dataset_basic_info,
-        dataset_version=BasicObjectInfo(_id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
+        dataset_version=BasicObjectInfo(id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
         data_owner=data_owner_basic_info,
         researcher=data_researcher_basic_info,
         researcher_user=current_user.id,

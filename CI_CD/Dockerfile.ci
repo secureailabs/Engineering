@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     systemd \
     iproute2 \
     libcurl4-gnutls-dev \
+    python3 \
     python3-pip \
     build-essential \
     apt-transport-https \
@@ -21,6 +22,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg2 \
     software-properties-common
+
+RUN pip3 install --upgrade pip && pip3 install --upgrade poetry==1.3.2
 
 RUN curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey
 RUN add-apt-repository \
@@ -32,7 +35,6 @@ RUN apt-get update && apt-get -y install docker-ce
 ARG git_personal_token
 RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf " https://github.com/"
 RUN git clone https://$git_personal_token@github.com/secureailabs/Engineering.git /Engineering
-RUN sh /Engineering/install.sh
 RUN git clone https://$git_personal_token@github.com/secureailabs/datascience.git /Engineering/datascience
 RUN git -C /Engineering submodule update
 

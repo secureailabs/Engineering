@@ -1,9 +1,15 @@
+# Default Reviewers for all code changes
+* @stanleylinSail @JENKINS-SAIL
+
 # Review for README.md
 *.md @stanleylinSail
 
 # Review for Builds
 *.sh @JENKINS-SAIL @prawalgangwar @stanleylinSail
 *.bat @JENKINS-SAIL @stanleylinSail
+
+# Github Configs PR review
+.github/ @JENKINS-SAIL @stanleylinSail
 
 # Review for Platform Stability
 /ApiServices/ @prawalgangwar @JingweiZhangBoston @nathan-SAIL
@@ -18,9 +24,3 @@
 /RPCLib/ @JingweiZhangBoston
 /SharedCommonCode/ @prawalgangwar
 /VmInitializer/ @prawalgangwar
-
-# Github Configs PR review
-.github/ @JENKINS-SAIL @stanleylinSail
-
-# Default Reviewers for all code changes
-* @stanleylinSail @prawalgangwar @JENKINS-SAIL

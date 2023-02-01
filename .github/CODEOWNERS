@@ -1,3 +1,6 @@
+# Default Reviewers for all code changes
+* @stanleylinSail @JENKINS-SAIL
+
 # Review for README.md
 *.md @stanleylinSail
 
@@ -5,22 +8,19 @@
 *.sh @JENKINS-SAIL @prawalgangwar @stanleylinSail
 *.bat @JENKINS-SAIL @stanleylinSail
 
+# Github Configs PR review
+.github/ @JENKINS-SAIL @stanleylinSail
+
 # Review for Platform Stability
 /ApiServices/ @prawalgangwar @JingweiZhangBoston @nathan-SAIL
+/AuditService/ @JingweiZhangBoston
 /AzureDeploymentTemplates/ @prawalgangwar @JingweiZhangBoston @stanleylinSail
 /CI_CD/ @JENKINS-SAIL @stanleylinSail
-/DatabaseInitializationTool/ @prawalgangwar
 /DatasetTool/ @prawalgangwar
 /DeployPlatform/ @prawalgangwar @JingweiZhangBoston @stanleylinSail
 /DevopsConsole/ @prawalgangwar
 /Docker/ @prawalgangwar @stanleylinSail @JingweiZhangBoston
 /Make/ @prawalgangwar @JingweiZhangBoston
 /RPCLib/ @JingweiZhangBoston
-/SharedCommonCode/ @prawalgangwar
+/database-initialization/ @prawalgangwar
 /VmInitializer/ @prawalgangwar
-
-# Github Configs PR review
-.github/ @JENKINS-SAIL @stanleylinSail
-
-# Default Reviewers for all code changes
-* @stanleylinSail @prawalgangwar @JENKINS-SAIL

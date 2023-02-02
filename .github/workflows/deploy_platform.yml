@@ -18,27 +18,37 @@ on:
   workflow_dispatch:
     inputs:
       subscription:
-        description: Choose Subscription
+        description: 'Choose Subscription'
         required: true
         type: choice
+        default: 'Development'
         options:
-          - Development
-          - Release Candidate
-          - ProductionGA
+          - 'Development'
+          - 'Release Candidate'
+          - 'ProductionGA'
 
       preload_dataset:
-        description: Preload dataset with DatasetTool
+        description: 'Preload dataset with DatasetTool'
         required: true
         type: boolean
+        default: false
 
       purpose:
         description: "Purpose of Deployment"
         required: true
         type: string
+        default: 'CI_TEST'
       owner:
         description: "Owner of Deployment"
         required: true
         type: string
+        default: 'CI_RUNNER'
+
+      run_tests:
+        description: Runs tests after deployment
+        required: true
+        type: boolean
+        default: true
 
 env:
   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -89,6 +99,7 @@ jobs:
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
@@ -144,4 +155,27 @@ jobs:
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
             sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+          fi
+
+
+  test:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: Deploy_Platform
+    steps:
+      - name: Run Tests
+        if: ${{ github.event.inputs.run_tests == 'true' }}
+        run: |
+          echo "Run Tests: ${{ github.event.inputs.run_tests }}"
+          echo "Head Ref: ${{ github.head_ref }}"
+          echo "Workspace: ${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          set -e
+          pwd
+          if ${{ github.event.inputs.run_tests == 'true' }}; then
+            echo "Test Internal IP: ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}"
+            pwd
+            pytest ApiServices/workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}  --port 8000
+          else
+            echo "Test Internal IP: ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}"
+            echo "No Tests Executed."
           fi

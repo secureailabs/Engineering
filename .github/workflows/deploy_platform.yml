@@ -98,15 +98,20 @@ jobs:
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
-            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
-            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+            INTERNAL_ADDR_API_SERVICE=$(echo "${{ env.DEPLOY_OUTPUT }}" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=${{ env.INTERNAL_ADDR_API_SERVICE }}" >> $GITHUB_OUTPUT
+            echo "Internal: ${{ env.INTERNAL_ADDR_API_SERVICE }}"
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
-            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
-            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip ${{ env.INTERNAL_ADDR_API_SERVICE }}"
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip ${{ env.INTERNAL_ADDR_API_SERVICE }}"
           else
-            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "${{ env.DEPLOY_OUTPUT }}" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=${{ env.INTERNAL_ADDR_API_SERVICE }}" >> $GITHUB_OUTPUT
+            echo "Internal: ${{ env.INTERNAL_ADDR_API_SERVICE }}"
           fi
 
       - name: Condition 2 Release Candidate

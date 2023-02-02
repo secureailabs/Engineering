@@ -13,9 +13,6 @@ PrintHelp()
     exit 1 # Exit script after printing help
 }
 
-# Install build tools
-./install.sh
-
 # Check if docker is installed
 docker --version
 retVal=$?

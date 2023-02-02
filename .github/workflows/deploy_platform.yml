@@ -71,6 +71,8 @@ jobs:
   Deploy_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: Setup_Environment
+    outputs:
+      internal_ip_addr: ${{ steps.deploy_step.outputs.INTERNAL_IP_ADDR }}
     steps:
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}

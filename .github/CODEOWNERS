@@ -12,7 +12,7 @@
 .github/ @JENKINS-SAIL @stanleylinSail
 
 # Review for Platform Stability
-/ApiServices/ @prawalgangwar @JingweiZhangBoston @nathan-SAIL
+/ApiServices/ @prawalgangwar @JingweiZhangBoston @nathan-SAIL @stanleylinSail
 /AuditService/ @JingweiZhangBoston
 /AzureDeploymentTemplates/ @prawalgangwar @JingweiZhangBoston @stanleylinSail
 /CI_CD/ @JENKINS-SAIL @stanleylinSail

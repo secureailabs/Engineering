@@ -78,16 +78,15 @@ fi
 
 # Install the rpc library
 pip3 install /app/RPCLib/zero
-ls /ds
-pip3 install /ds/sail-safe-functions
-pip3 install /ds/sail-safe-functions-orchestrator
-pip3 install /ds/helper-libs
+pip3 install --trusted-host pypi.org -e /ds/sail-core
+pip3 install --trusted-host pypi.org -e /ds/sail-safe-functions
 
 # Start the promtail client
 /app/RPCLib/promtail_linux_amd64 -config.file=/app/RPCLib/promtail_local_config.yaml  > /app/promtail.log 2>&1&
 
 # Start the rpc server
-PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/RPCLib/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER=/app/RPCLib/private_keys/server.key_secret PATH_DIR_DATASET=/data/ python3 /ds/sail-safe-functions-test/integration_test/test_server.py 5556
+PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/RPCLib/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER=/app/RPCLib/private_keys/server.key_secret PATH_DIR_DATASET=/data/
+python3 /ds/sail-participant-zeromq/server.py 5010
 
 # To keep the container running
 tail -f /dev/null

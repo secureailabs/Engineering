@@ -81,6 +81,12 @@ pip3 install /app/RPCLib/zero
 pip3 install --trusted-host pypi.org -e /ds/sail-core
 pip3 install --trusted-host pypi.org -e /ds/sail-safe-functions
 
+# Set Environment variables
+export PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"
+export PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT="/app/RPCLib/private_keys/client.key_secret"
+export PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER="/app/RPCLib/private_keys/server.key_secret"
+export PATH_DIR_DATASET="/data/"
+
 # Start the promtail client
 /app/RPCLib/promtail_linux_amd64 -config.file=/app/RPCLib/promtail_local_config.yaml  > /app/promtail.log 2>&1&
 

@@ -1,5 +1,4 @@
 wheel
-scipy
 matplotlib
 python-multipart
 psutil

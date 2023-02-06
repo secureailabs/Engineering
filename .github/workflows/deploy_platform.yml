@@ -27,12 +27,6 @@ on:
           - 'Release Candidate'
           - 'ProductionGA'
 
-      preload_dataset:
-        description: 'Preload dataset with DatasetTool'
-        required: true
-        type: boolean
-        default: false
-
       purpose:
         description: "Purpose of Deployment"
         required: true
@@ -43,6 +37,12 @@ on:
         required: true
         type: string
         default: 'CI_RUNNER'
+
+      preload_dataset:
+        description: 'Preload dataset with DatasetTool'
+        required: true
+        type: boolean
+        default: false
 
       run_tests:
         description: Runs tests after deployment
@@ -185,16 +185,11 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
-          if ${{ github.event.inputs.run_tests == 'true' }}; then
-            echo "Test Internal IP: ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}"
-            pwd
-            pytest ApiServices/workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}  --port 8000
-          else
-            echo "Test Internal IP: ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}"
-            echo "No Tests Executed."
-          fi
+          ./ApiServices/build/test_setup.sh
+          source venv38-sail_test/bin/activate
+          pytest ApiServices/workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}  --port 8000
 
-      
+
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: Deploy_Platform
@@ -208,4 +203,4 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
-          printf '3\n2\ny\n' | ./Deprovision.sh -o CI_RUNNER
+          printf '3\n2\ny\n' | sudo ./Deprovision.sh -o CI_RUNNER

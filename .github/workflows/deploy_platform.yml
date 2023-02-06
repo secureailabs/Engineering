@@ -102,37 +102,25 @@ jobs:
           set -e
           pwd
           ls -l
+          git config --global --add safe.directory '*'
+          git submodule update
+          make clean
+          make all
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
-            git config --global --add safe.directory '*'
-            git submodule update
-            make clean
-            make all
-            tmp_file="$(mktemp /tmp/deploy_output.XXXXXXXXXX)" || { echo "Failed to create temp file"; exit 1; }
-            trap "rm -f $tmp_file" EXIT
-            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} | tee $tmp_file
-            internal_addr_api_service = grep -oP "SAIL API Services is hosted internally on: https://.{0,12}" $tmp_file
-            deploy_id = grep -oP "Deployment ID: CI_RUNNER-.{0,36}" $tmp_file
-            echo "INTERNAL_IP_ADDR=${internal_addr_api_service}" >> $GITHUB_OUTPUT
-            echo "DEPLOY_ID=${deploy_id}" >> $GITHUB_OUTPUT
-            echo "Internal: ${internal_addr_api_service}"
-            echo "Deploy ID: ${deploy_id}"
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
-            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $internal_addr_api_service
-            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $internal_addr_api_service
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
-            git config --global --add safe.directory '*'
-            git submodule update
-            make clean
-            make all
-            tmp_file="$(mktemp /tmp/deploy_output.XXXXXXXXXX)" || { echo "Failed to create temp file"; exit 1; }
-            trap "rm -f $tmp_file" EXIT
-            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} | tee $tmp_file
-            internal_addr_api_service = grep -oP "SAIL API Services is hosted internally on: https://.{0,12}" $tmp_file
-            deploy_id = grep -oP "Deployment ID: CI_RUNNER-.{0,36}" $tmp_file
-            echo "INTERNAL_IP_ADDR=$internal_addr_api_service" >> $GITHUB_OUTPUT
-            echo "DEPLOY_ID=$deploy_id" >> $GITHUB_OUTPUT
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
           fi
 
       - name: Condition 2 Release Candidate

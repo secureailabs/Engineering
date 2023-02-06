@@ -185,8 +185,8 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
-          pip install pytest
           ./ApiServices/build/test_setup.sh
+          source venv38-sail_test/bin/activate
           pytest ApiServices/workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}  --port 8000
 
 
@@ -194,8 +194,10 @@ jobs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: Deploy_Platform
     steps:
-      - name: Deprovision
-        if: ${{ github.event.inputs.deprovision_after == 'true' }}
+      - name: Deprovision Developement
+        if: ${{ github.event.inputs.subscription == 'Development' }}
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
         run: |
           echo "Deprovision: ${{ github.event.inputs.run_tests }}"
           echo "Head Ref: ${{ github.head_ref }}"
@@ -204,4 +206,8 @@ jobs:
           set -e
           pwd
           chmod +x Deprovision.sh
-          sudo ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          if ${{ github.event.inputs.deprovision_after == 'true' }}; then
+            sudo ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          else
+            echo "No Deprovision."
+          fi

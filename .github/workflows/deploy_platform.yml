@@ -186,7 +186,6 @@ jobs:
           set -e
           pwd
           ./ApiServices/build/test_setup.sh
-          source venv38-sail_test/bin/activate
           pytest ApiServices/workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}  --port 8000
 
 
@@ -203,4 +202,4 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
-          printf '3\n2\ny\n' | sudo ./Deprovision.sh -o CI_RUNNER
+          sudo ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")

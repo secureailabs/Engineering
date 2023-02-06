@@ -45,7 +45,7 @@ on:
         default: false
 
       run_tests:
-        description: Runs tests after deployment
+        description: Runs tests
         required: true
         type: boolean
         default: true
@@ -173,7 +173,7 @@ jobs:
 
 
   Test:
-    runs-on: [self-hosted, Linux, x64, docker]
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: Deploy_Platform
     steps:
       - name: Run Tests
@@ -191,7 +191,7 @@ jobs:
 
 
   Deprovision_Platform:
-    runs-on: [self-hosted, Linux, x64, docker]
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: Deploy_Platform
     steps:
       - name: Deprovision Developement
@@ -199,7 +199,7 @@ jobs:
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
         run: |
-          echo "Deprovision: ${{ github.event.inputs.run_tests }}"
+          echo "Deprovision: ${{ github.event.inputs.deprovision_after }}"
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
@@ -207,7 +207,7 @@ jobs:
           pwd
           chmod +x Deprovision.sh
           if ${{ github.event.inputs.deprovision_after == 'true' }}; then
-            sudo ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
           else
             echo "No Deprovision."
           fi

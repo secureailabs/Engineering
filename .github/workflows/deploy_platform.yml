@@ -202,4 +202,4 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
-          sudo ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")

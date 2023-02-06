@@ -183,11 +183,14 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           if ${{ github.event.inputs.run_tests == 'true' }}; then
-            docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
             GIT=$(git rev-parse --short HEAD)
+            docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
+            docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
             docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
             docker exec -w /Test/ ubuntu_tst_bash sh -c "git switch -c $GIT"
             docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}  --port 8000"
+            docker kill ubuntu_tst_bash
+            docker rm ubuntu_tst_bash
           else
             echo "No Tests Run."
           fi
@@ -195,7 +198,8 @@ jobs:
 
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
-    needs: Test
+    if: ${{ always() }}
+    needs: [Deploy_Platform, Test]
     steps:
       - name: Deprovision Developement
         if: ${{ github.event.inputs.subscription == 'Development' }}

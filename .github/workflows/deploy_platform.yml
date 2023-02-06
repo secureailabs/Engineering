@@ -185,6 +185,7 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
+          pip install pytest
           ./ApiServices/build/test_setup.sh
           pytest ApiServices/workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip ${{ needs.Deploy_Platform.outputs.internal_ip_addr }}  --port 8000
 
@@ -202,4 +203,5 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
-          sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          chmod +x Deprovision.sh
+          sudo ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")

@@ -92,7 +92,7 @@ jobs:
       deployment_id: ${{ steps.deploy_step.outputs.DEPLOY_ID }}
     steps:
       - name: Condition 1 Development
-      - id: deploy_step
+        id: deploy_step
         if: ${{ github.event.inputs.subscription == 'Development' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}

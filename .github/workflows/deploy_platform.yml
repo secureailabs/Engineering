@@ -183,7 +183,9 @@ jobs:
         run: |
           sudo chown -R $USER:$USER ${{ github.workspace }}
           if ${{ github.event.inputs.run_tests == 'true' }}; then
-            INTERNAL_IP_ADDR="${${{needs.Deploy_Platform.outputs.internal_ip_addr}}%:*}"
+            deploy_output_str=${{needs.Deploy_Platform.outputs.internal_ip_addr}}
+            INTERNAL_IP_ADDR=${deploy_output_str%:*}
+            echo "Deploy Output Str: $deploy_output_str"
             echo "Internal: $INTERNAL_IP_ADDR"
             GIT=$(git rev-parse --short HEAD)
             docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true

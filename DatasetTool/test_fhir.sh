@@ -20,9 +20,9 @@ fi
 unzip SampleFhir/patient_data.zip -d SampleFhir/
 
 # Run the dataset tool for IGR dataset
-bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleFhir/igr_config.json --ip 172.20.100.7:8000
+bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleFhir/igr_config.json --ip 172.20.100.6:8000
 
 # Run the dataset tool for IGR dataset
-bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleFhir/mghl_config.json --ip 172.20.100.7:8000
+bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleFhir/mghl_config.json --ip 172.20.100.6:8000
 
 rm -rf SampleFhir/patient_data

@@ -125,7 +125,7 @@ jobs:
           fi
 
       - name: Condition 2 Release Candidate
-        id: deploy_step
+        id: deploy_step_release
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
@@ -158,7 +158,7 @@ jobs:
           fi
 
       - name: Condition 3 ProductionGA
-        id: deploy_step
+        id: deploy_step_prod
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}

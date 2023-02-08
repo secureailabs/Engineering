@@ -15,6 +15,44 @@
 name: Deploy Platform
 
 on:
+  workflow_call:
+    inputs:
+      subscription:
+        description: 'Choose Subscription'
+        required: true
+        type: choice
+        default: 'Development'
+        options:
+          - 'Development'
+          - 'Release Candidate'
+          - 'ProductionGA'
+      purpose:
+        description: "Purpose of Deployment"
+        required: true
+        type: string
+        default: 'CI_TEST'
+      owner:
+        description: "Owner of Deployment"
+        required: true
+        type: string
+        default: 'CI_RUNNER'
+      preload_dataset:
+        description: 'Preload dataset with DatasetTool'
+        required: true
+        type: boolean
+        default: true
+      run_tests:
+        description: Runs tests
+        required: true
+        type: boolean
+        default: true
+      deprovision_after:
+        description: Deprovision after deployment
+        required: true
+        type: boolean
+        default: true
+    secrets: inherit
+
   workflow_dispatch:
     inputs:
       subscription:
@@ -42,7 +80,7 @@ on:
         description: 'Preload dataset with DatasetTool'
         required: true
         type: boolean
-        default: false
+        default: true
 
       run_tests:
         description: Runs tests

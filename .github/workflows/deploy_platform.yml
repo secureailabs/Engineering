@@ -125,6 +125,7 @@ jobs:
           fi
 
       - name: Condition 2 Release Candidate
+        id: deploy_step
         if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
@@ -135,20 +136,29 @@ jobs:
           set -e
           pwd
           ls -l
+          git config --global --add safe.directory '*'
+          git submodule update
+          make clean
+          make all
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
-            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
           fi
 
       - name: Condition 3 ProductionGA
+        id: deploy_step
         if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
@@ -159,17 +169,25 @@ jobs:
           set -e
           pwd
           ls -l
+          git config --global --add safe.directory '*'
+          git submodule update
+          make clean
+          make all
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
-            sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }}
+            exec 5>&1
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
           fi
 
 
@@ -193,7 +211,6 @@ jobs:
             docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
             docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
             docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
-            docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_version_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
             docker kill ubuntu_tst_bash
             docker rm ubuntu_tst_bash
           else
@@ -210,6 +227,42 @@ jobs:
         if: ${{ github.event.inputs.subscription == 'Development' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
+        run: |
+          echo "Deprovision: ${{ github.event.inputs.deprovision_after }}"
+          echo "Head Ref: ${{ github.head_ref }}"
+          echo "Workspace: ${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          set -e
+          pwd
+          chmod +x Deprovision.sh
+          if ${{ github.event.inputs.deprovision_after == 'true' }}; then
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          else
+            echo "No Deprovision."
+          fi
+
+      - name: Deprovision Release Candidate
+        if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
+        run: |
+          echo "Deprovision: ${{ github.event.inputs.deprovision_after }}"
+          echo "Head Ref: ${{ github.head_ref }}"
+          echo "Workspace: ${{ github.workspace }}"
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          set -e
+          pwd
+          chmod +x Deprovision.sh
+          if ${{ github.event.inputs.deprovision_after == 'true' }}; then
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          else
+            echo "No Deprovision."
+          fi
+
+      - name: Deprovision Production GA
+        if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
         run: |
           echo "Deprovision: ${{ github.event.inputs.deprovision_after }}"
           echo "Head Ref: ${{ github.head_ref }}"

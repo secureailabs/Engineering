@@ -125,7 +125,7 @@ jobs:
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
-    needs: test
+    needs: call-deploy-platform-workflow
     steps:
       - name: Stop and Remove Docker Containers
         run: |
@@ -156,7 +156,7 @@ jobs:
     # Without this step workflow remains "green" if build does fail.
     if: always()
     runs-on: ubuntu-latest
-    needs: [start-runner, build, test]
+    needs: [start-runner, build, call-deploy-platform-workflow]
     steps:
       - uses: technote-space/workflow-conclusion-action@v2
       - name: Check Job Status status and fail if they are red

@@ -20,12 +20,8 @@ on:
       subscription:
         description: 'Choose Subscription'
         required: true
-        type: choice
+        type: string
         default: 'Development'
-        options:
-          - 'Development'
-          - 'Release Candidate'
-          - 'ProductionGA'
       purpose:
         description: "Purpose of Deployment"
         required: true
@@ -80,19 +76,19 @@ on:
         description: 'Preload dataset with DatasetTool'
         required: true
         type: boolean
-        default: true
+        default: false
 
       run_tests:
         description: Runs tests
         required: true
         type: boolean
-        default: true
+        default: false
 
       deprovision_after:
         description: Deprovision after deployment
         required: true
         type: boolean
-        default: true
+        default: false
 
 env:
   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}

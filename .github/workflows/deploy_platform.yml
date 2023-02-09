@@ -138,7 +138,7 @@ jobs:
           set -e
           pwd
           ls -l
-          if ${{ inputs.preload_dataset == 'true' }}; then
+          if ${{ inputs.preload_dataset == true }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
@@ -171,7 +171,7 @@ jobs:
           set -e
           pwd
           ls -l
-          if ${{ inputs.preload_dataset == 'true' }}; then
+          if ${{ inputs.preload_dataset == true }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
@@ -200,7 +200,7 @@ jobs:
           set -e
           pwd
           ls -l
-          if ${{ inputs.preload_dataset == 'true' }}; then
+          if ${{ inputs.preload_dataset == true }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
@@ -219,7 +219,7 @@ jobs:
 
 
   Test:
-    runs-on: [self-hosted, Linux, x64, docker]
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: Deploy_Platform
     steps:
       - name: Run Tests
@@ -227,7 +227,7 @@ jobs:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
         run: |
           sudo chown -R $USER:$USER ${{ github.workspace }}
-          if ${{ inputs.run_tests == 'true' }}; then
+          if ${{ inputs.run_tests == true }}; then
             deploy_output_str=${{needs.Deploy_Platform.outputs.internal_ip_addr}}
             INTERNAL_IP_ADDR=${deploy_output_str%:*}
             GIT=$(git rev-parse --short HEAD)
@@ -263,7 +263,7 @@ jobs:
           set -e
           pwd
           chmod +x Deprovision.sh
-          if ${{ inputs.deprovision_after == 'true' }}; then
+          if ${{ inputs.deprovision_after == true }}; then
             sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
           else
             echo "No Deprovision."

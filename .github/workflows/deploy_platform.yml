@@ -179,6 +179,8 @@ jobs:
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+            DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
@@ -189,7 +191,9 @@ jobs:
             mkdir Binary
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+            echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
           fi
 
       - name: Condition 3 ProductionGA
@@ -210,6 +214,8 @@ jobs:
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+            DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
+            echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
@@ -220,7 +226,9 @@ jobs:
             mkdir Binary
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+            echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
           fi
 
 
@@ -265,12 +273,14 @@ jobs:
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
-          echo "Deprovision GUID: ${{needs.Deploy_Platform.outputs.deployment_id}}"
+          deploy_output_str=${{needs.Deploy_Platform.outputs.deployment_id}}
+          deployment_id=${cut -c 26-61<<< deploy_output_str}
+          echo "Deprovision GUID: $deployment_id"
           set -e
           pwd
           chmod +x Deprovision.sh
           if ${{ inputs.deprovision_after == true }}; then
-            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
           else
             echo "No Deprovision."
           fi
@@ -284,11 +294,14 @@ jobs:
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
+          deploy_output_str=${{needs.Deploy_Platform.outputs.deployment_id}}
+          deployment_id=${cut -c 26-61<<< deploy_output_str}
+          echo "Deprovision GUID: $deployment_id"
           set -e
           pwd
           chmod +x Deprovision.sh
-          if ${{ inputs.deprovision_after == 'true' }}; then
-            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          if ${{ inputs.deprovision_after == true }}; then
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
           else
             echo "No Deprovision."
           fi
@@ -302,11 +315,14 @@ jobs:
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
+          deploy_output_str=${{needs.Deploy_Platform.outputs.deployment_id}}
+          deployment_id=${cut -c 26-61<<< deploy_output_str}
+          echo "Deprovision GUID: $deployment_id"
           set -e
           pwd
           chmod +x Deprovision.sh
-          if ${{ inputs.deprovision_after == 'true' }}; then
-            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
+          if ${{ inputs.deprovision_after == true }}; then
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
           else
             echo "No Deprovision."
           fi

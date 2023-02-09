@@ -126,7 +126,8 @@ jobs:
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
-    needs: call-deploy-platform-workflow
+    if: ${{ always() }}
+    needs: [build, call-deploy-platform-workflow]
     steps:
       - name: Stop and Remove Docker Containers
         run: |

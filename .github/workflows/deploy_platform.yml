@@ -102,10 +102,12 @@ jobs:
     steps:
       - name: Options selected
         run: |
-          echo "Subscription: ${{ github.event.inputs.subscription }}"
-          echo "Preload Datasets: ${{ github.event.inputs.preload_dataset }}"
-          echo "Purpose of Deployment: ${{ github.event.inputs.purpose }}"
-          echo "Owner of Deployment: ${{ github.event.inputs.owner }}"
+          echo "Subscription: ${{ inputs.subscription }}"
+          echo "Preload Datasets: ${{ inputs.preload_dataset }}"
+          echo "Purpose of Deployment: ${{ inputs.purpose }}"
+          echo "Owner of Deployment: ${{ inputs.owner }}"
+          echo "Run Tests after Deployment: ${{ inputs.run_tests }}"
+          echo "Deprovision when finished: ${{ inputs.deprovision_after }}"
 
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
@@ -126,7 +128,7 @@ jobs:
     steps:
       - name: Condition 1 Development
         id: deploy_step
-        if: ${{ github.event.inputs.subscription == 'Development' }}
+        if: ${{ inputs.subscription == 'Development' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
         run: |
@@ -136,9 +138,9 @@ jobs:
           set -e
           pwd
           ls -l
-          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
+          if ${{ inputs.preload_dataset == 'true' }}; then
             exec 5>&1
-            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
             DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
@@ -150,7 +152,7 @@ jobs:
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
             exec 5>&1
-            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
@@ -159,7 +161,7 @@ jobs:
 
       - name: Condition 2 Release Candidate
         id: deploy_step_release
-        if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
+        if: ${{ inputs.subscription == 'Release Candidate' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
         run: |
@@ -169,9 +171,9 @@ jobs:
           set -e
           pwd
           ls -l
-          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
+          if ${{ inputs.preload_dataset == 'true' }}; then
             exec 5>&1
-            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
             cd DatasetTool/
@@ -181,14 +183,14 @@ jobs:
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
             exec 5>&1
-            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
           fi
 
       - name: Condition 3 ProductionGA
         id: deploy_step_prod
-        if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
+        if: ${{ inputs.subscription == 'ProductionGA' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
         run: |
@@ -198,9 +200,9 @@ jobs:
           set -e
           pwd
           ls -l
-          if ${{ github.event.inputs.preload_dataset == 'true' }}; then
+          if ${{ inputs.preload_dataset == 'true' }}; then
             exec 5>&1
-            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
             cd DatasetTool/
@@ -210,7 +212,7 @@ jobs:
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
             exec 5>&1
-            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
+            DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
           fi
@@ -225,7 +227,7 @@ jobs:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
         run: |
           sudo chown -R $USER:$USER ${{ github.workspace }}
-          if ${{ github.event.inputs.run_tests == 'true' }}; then
+          if ${{ inputs.run_tests == 'true' }}; then
             deploy_output_str=${{needs.Deploy_Platform.outputs.internal_ip_addr}}
             INTERNAL_IP_ADDR=${deploy_output_str%:*}
             GIT=$(git rev-parse --short HEAD)
@@ -249,11 +251,11 @@ jobs:
     needs: [Deploy_Platform, Test]
     steps:
       - name: Deprovision Developement
-        if: ${{ github.event.inputs.subscription == 'Development' }}
+        if: ${{ inputs.subscription == 'Development' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
         run: |
-          echo "Deprovision: ${{ github.event.inputs.deprovision_after }}"
+          echo "Deprovision: ${{ inputs.deprovision_after }}"
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
@@ -261,43 +263,43 @@ jobs:
           set -e
           pwd
           chmod +x Deprovision.sh
-          if ${{ github.event.inputs.deprovision_after == 'true' }}; then
+          if ${{ inputs.deprovision_after == 'true' }}; then
             sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
           else
             echo "No Deprovision."
           fi
 
       - name: Deprovision Release Candidate
-        if: ${{ github.event.inputs.subscription == 'Release Candidate' }}
+        if: ${{ inputs.subscription == 'Release Candidate' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
         run: |
-          echo "Deprovision: ${{ github.event.inputs.deprovision_after }}"
+          echo "Deprovision: ${{ inputs.deprovision_after }}"
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
           chmod +x Deprovision.sh
-          if ${{ github.event.inputs.deprovision_after == 'true' }}; then
+          if ${{ inputs.deprovision_after == 'true' }}; then
             sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
           else
             echo "No Deprovision."
           fi
 
       - name: Deprovision Production GA
-        if: ${{ github.event.inputs.subscription == 'ProductionGA' }}
+        if: ${{ inputs.subscription == 'ProductionGA' }}
         env:
           AZURE_SUBSCRIPTION_ID: ${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
         run: |
-          echo "Deprovision: ${{ github.event.inputs.deprovision_after }}"
+          echo "Deprovision: ${{ inputs.deprovision_after }}"
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
           pwd
           chmod +x Deprovision.sh
-          if ${{ github.event.inputs.deprovision_after == 'true' }}; then
+          if ${{ inputs.deprovision_after == 'true' }}; then
             sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n2\ny\n")
           else
             echo "No Deprovision."

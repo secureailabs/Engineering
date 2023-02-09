@@ -10,8 +10,7 @@ import sailazure
 from azure.core.exceptions import AzureError
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
-from azure.mgmt.monitor.models import (DiagnosticSettingsResource, LogSettings,
-                                       MetricSettings)
+from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
 from azure.storage.blob import BlobServiceClient
@@ -77,6 +76,7 @@ PRODUCTIONGA_PARAMS = {
     "azure_storage_account_name": "sailvmimages9829",
     "azure_scn_virtual_network_id": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",
 }
+
 
 def set_params(subscription_id, module_name, test_flag=False):
     """
@@ -262,7 +262,7 @@ def deploy_audit_service(
     audit_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
 
     with open("auditserver.json", "w") as outfile:
-        json.dump(audit_json, outfile)   
+        json.dump(audit_json, outfile)
 
     # Sleeping for a minute
     time.sleep(60)
@@ -286,6 +286,7 @@ def deploy_apiservices(
     version: str,
     audit_service_ip,
     test_flag,
+    slack_webhook_url,
 ):
     """
     Deploy Api Services
@@ -314,6 +315,7 @@ def deploy_apiservices(
     backend_json["azure_keyvault_url"] = key_vault_url
     backend_json["version"] = version
     backend_json["audit_service_ip"] = audit_service_ip
+    backend_json["slack_webhook"] = slack_webhook_url
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
@@ -413,7 +415,7 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
 
         # Create container
         az_oauth_url = f"https://{account_name}.blob.core.windows.net"
-        #az_connnection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={storage_account_key};EndpointSuffix=core.windows.net"
+        # az_connnection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={storage_account_key};EndpointSuffix=core.windows.net"
 
         blob_service_client = BlobServiceClient(account_url=az_oauth_url, credential=account_credentials["credentials"])
         container_client = blob_service_client.get_container_client("audit")
@@ -507,6 +509,9 @@ if __name__ == "__main__":
     if "PUBLIC_IP" in os.environ:
         public_ip = os.getenv("PUBLIC_IP", "False") == "True"
 
+    if "SLACK_WEBHOOK_URL" in os.environ:
+        slack_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
+
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
         exit(1)
@@ -566,6 +571,7 @@ if __name__ == "__main__":
         VERSION,
         audit_service_ip,
         TEST_FLAG,
+        slack_webhook_url,
     )
     print("API Services server: ", platform_services_ip)
 

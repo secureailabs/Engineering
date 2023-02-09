@@ -19,5 +19,6 @@
     "azure_keyvault_url": "https://sailkeyvault13910.vault.azure.net/",
     "owner": "default",
     "version": "default",
-    "audit_service_ip": "auditserver"
+    "audit_service_ip": "auditserver",
+    "slack_webhook": ""
 }

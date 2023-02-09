@@ -114,7 +114,7 @@ jobs:
   deploy_platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: build
-    uses: ./.github/workflows/deploy_platform.yml@main
+    uses: ./.github/workflows/deploy_platform.yml
     with:
       subscription: 'Development'
       purpose: ${{ github.event.number }}

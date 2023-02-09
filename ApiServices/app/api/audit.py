@@ -96,15 +96,15 @@ async def audit_incidents_query(
         user_id = query.pop("user_id")
         query_str = f"{query_str} |= `{str(user_id)}`"
         query["query"] = query_str
-        # if label == "computation":
-        #    response = await query_computation_by_user_id(query, current_user)
+        if label == "computation":
+           response = await query_computation_by_user_id(query, current_user)
 
     elif "data_id" in query:
         data_id = query.pop("data_id")
         query_str = f"{query_str} |= `{str(data_id)}`"
         query["query"] = query_str
-        # if label == "computation":
-        #    response = await query_computation_by_data_id(data_id, query, current_user)
+        if label == "computation":
+           response = await query_computation_by_data_id(data_id, query, current_user)
 
     if label == "user_activity":
         response = await query_user_activity(query, current_user)

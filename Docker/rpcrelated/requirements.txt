@@ -1,9 +1,9 @@
-wheel
-matplotlib
-python-multipart
-psutil
-msgpack
-pyzmq
+wheel==0.38.4
+matplotlib==3.6.3
+python-multipart==0.0.5
+psutil==5.9.4
+msgpack==1.0.4
+pyzmq==25.0.0
 pycryptodome
 black==22.3.0
 click==8.1.2

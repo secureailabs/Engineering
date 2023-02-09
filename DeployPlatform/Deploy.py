@@ -112,7 +112,7 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
     response = requests.put(
         "https://" + virtual_machine_ip + ":9090/initialization-data", headers=headers, files=files, verify=False
     )
-    print("Upload package status: ", response.status_code)
+    print(f"Upload package, {package_file} status: {response.status_code}")
 
 
 def deploy_module(account_credentials, deployment_name, module_name, test_flag):
@@ -144,7 +144,7 @@ def deploy_module(account_credentials, deployment_name, module_name, test_flag):
     }
 
     deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
-    print(module_name + " server status: ", deploy_status)
+    print(f"{module_name} server status: {deploy_status}")
 
     # virtual_machine_public_ip = sailazure.get_ip(account_credentials, resource_group_name, module_name + "-ip")
     virtual_machine_private_ip = sailazure.get_private_ip(

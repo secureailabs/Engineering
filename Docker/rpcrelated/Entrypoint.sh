@@ -91,7 +91,6 @@ export PATH_DIR_DATASET="/data/"
 /app/RPCLib/promtail_linux_amd64 -config.file=/app/RPCLib/promtail_local_config.yaml  > /app/promtail.log 2>&1&
 
 # Start the rpc server
-PATH_DIR_PUBLIC_KEY_ZEROMQ=/app/RPCLib/public_keys/ PATH_FILE_PRIVATE_KEY_ZEROMQ_SERVER=/app/RPCLib/private_keys/server.key_secret PATH_DIR_DATASET=/data/
 python3 /ds/sail-participant-zeromq/server.py 5556
 
 # To keep the container running

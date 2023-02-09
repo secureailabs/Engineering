@@ -114,7 +114,7 @@ jobs:
   deploy_platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: build
-    uses: secureailabs/Engineering/.github/workflows/deploy_platform.yml
+    uses: secureailabs/Engineering/.github/workflows/deploy_platform.yml@main
     with:
       subscription: 'Development'
       purpose: ${{ github.event.number }}

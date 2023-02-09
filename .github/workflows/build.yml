@@ -112,7 +112,6 @@ jobs:
           tail: "300"
 
   call-deploy-platform-workflow:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: build
     uses: ./.github/workflows/deploy_platform.yml
     with:

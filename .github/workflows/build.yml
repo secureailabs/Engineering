@@ -59,6 +59,7 @@ jobs:
       - name: Start self-hosted runner
         run: |
           az vm start --subscription Build -g Dev-CI -n github-runner1
+          az vm start --subscription Build -g Dev-CI -n github-runner2
 
   clean:
     runs-on: [self-hosted, Linux, x64, docker]

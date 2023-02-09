@@ -73,7 +73,7 @@ jobs:
           docker image prune --all -f
 
   build:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    runs-on: [self-hosted, Linux, x64, docker]
     needs: clean
     steps:
       - name: Clear repository

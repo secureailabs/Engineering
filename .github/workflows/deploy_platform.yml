@@ -274,7 +274,7 @@ jobs:
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
           deploy_output_str=${{needs.Deploy_Platform.outputs.deployment_id}}
-          deployment_id=${cut -c 26-61<<< deploy_output_str}
+          deployment_id=${cut -c 26-61<<< $deploy_output_str}
           echo "Deprovision GUID: $deployment_id"
           set -e
           pwd

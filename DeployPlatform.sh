@@ -108,6 +108,7 @@ docker run \
   --env AZURE_OBJECT_ID=$AZURE_OBJECT_ID \
   --env VERSION=$gitCommitId \
   --env PUBLIC_IP=$PUBLIC_IP \
+  --env SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL \
   azuredeploymenttools
 popd
 

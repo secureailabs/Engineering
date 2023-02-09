@@ -12,11 +12,14 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
+import json
 import logging
 import threading
+import traceback
 
+import aiohttp
 import fastapi.openapi.utils as utils
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.openapi.docs import get_swagger_ui_html
@@ -37,7 +40,10 @@ from app.api import (
     internal_utils,
     secure_computation_nodes,
 )
+from app.data import operations as data_service
 from app.log import _AsyncLogger, log_message
+from app.utils.secrets import get_secret
+from models.common import PyObjectId
 
 server = FastAPI(
     title="SAIL",
@@ -94,12 +100,44 @@ async def server_error_exception_handler(request: Request, exc: Exception):
     :param exc: The exception object
     :type exc: Exception
     """
-    message = f"Unkown Exception: {str(exc)} in request: {request.method} {request.url}"
-    # Log the error to the uvicorn logger
-    logger = logging.getLogger("uvicorn.error")
-    logger.error(message)
+    message = {
+        "_id": str(PyObjectId()),
+        "exception": f"{str(exc)}",
+        "request": f"{request.method} {request.url}",
+        "stack_trace": f"{traceback.format_exc()}",
+    }
+
+    # if the slack webhook is set, send the error to slack via aiohttp
+    if get_secret("slack_webhook"):
+        headers = {"Content-type": "application/json"}
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                get_secret("slack_webhook"),
+                headers=headers,
+                json={
+                    "text": json.dumps(
+                        {
+                            "id": message["_id"],
+                            "owner": get_secret("owner"),
+                            "exception": message["exception"],
+                        },
+                        indent=2,
+                    )
+                },
+            ) as response:
+                logging.info(f"Slack webhook response: {response.status}")
+
+    # Add it to the sail database audit log
+    await data_service.insert_one("errors", jsonable_encoder(message))
+
     # Add the exception to the audit log as well
-    await log_message(message)
+    await log_message(json.dumps(message))
+
+    # Respond with a 500 error
+    return Response(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content="Internal Server Error id: {}".format(message["_id"]),
+    )
 
 
 utils.validation_error_response_definition = ValidationError.schema()

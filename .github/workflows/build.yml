@@ -111,10 +111,10 @@ jobs:
           images: "apiservices"
           tail: "300"
 
-  deploy_platform:
+  call-deploy-platform-workflow:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: build
-    uses: secureailabs/Engineering/.github/workflows/deploy_platform.yml
+    uses: ./.github/workflows/deploy_platform.yml
     with:
       subscription: 'Development'
       purpose: ${{ github.event.number }}

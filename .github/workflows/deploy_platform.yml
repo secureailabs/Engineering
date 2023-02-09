@@ -40,17 +40,17 @@ on:
         description: 'Preload dataset with DatasetTool'
         required: true
         type: boolean
-        default: true
+        default: false
       run_tests:
         description: Runs tests
         required: true
         type: boolean
-        default: true
+        default: false
       deprovision_after:
         description: Deprovision after deployment
         required: true
         type: boolean
-        default: true
+        default: false
     secrets: inherit
 
   workflow_dispatch:
@@ -141,15 +141,13 @@ jobs:
           set -e
           pwd
           ls -l
-          git config --global --add safe.directory '*'
-          git submodule update
-          make clean
-          make all
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
             INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+            DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
             echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+            echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
@@ -174,10 +172,6 @@ jobs:
           set -e
           pwd
           ls -l
-          git config --global --add safe.directory '*'
-          git submodule update
-          make clean
-          make all
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
@@ -207,10 +201,6 @@ jobs:
           set -e
           pwd
           ls -l
-          git config --global --add safe.directory '*'
-          git submodule update
-          make clean
-          make all
           if ${{ github.event.inputs.preload_dataset == 'true' }}; then
             exec 5>&1
             DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ github.event.inputs.purpose }} -o ${{ github.event.inputs.owner }} |tee >(cat - >&5))
@@ -230,7 +220,7 @@ jobs:
 
 
   Test:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    runs-on: [self-hosted, Linux, x64, docker]
     needs: Deploy_Platform
     steps:
       - name: Run Tests
@@ -270,6 +260,7 @@ jobs:
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
+          echo "Deprovision GUID: ${{needs.Deploy_Platform.outputs.deployment_id}}"
           set -e
           pwd
           chmod +x Deprovision.sh

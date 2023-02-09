@@ -74,15 +74,6 @@ jobs:
   build:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: clean
-    uses: Engineering/.github/workflows/deploy_platform.yml@main
-    with:
-      subscription: 'Development'
-      purpose: 'CI_TEST'
-      owner: 'CI_RUNNER'
-      preload_dataset: true
-      run_tests: true
-      deprovision_after: true
-    secrets: inherit
     steps:
       - name: Clear repository
         run: sudo rm -rf $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
@@ -94,18 +85,24 @@ jobs:
           persist-credentials: true
           submodules: true
 
-      - name: Call DeployPlatform
-        uses: lewagon/wait-on-check-action@v1.2.0
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Deprovision_Platform'
+      - name: Run a multi-line script, Build Binaries
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
         run: |
           set -e
           pwd
           ls -l
-
+          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
+          docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
+          docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "git config --global --add safe.directory '*'"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "git submodule update"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "docker --version"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "make clean"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
+          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
 
       - name: Dump docker logs on failure
         if: failure()
@@ -114,17 +111,18 @@ jobs:
           images: "apiservices"
           tail: "300"
 
-  test:
-    runs-on: [self-hosted, Linux, x64, docker]
+  deploy_platform:
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: build
-    steps:
-      - name: Run Tests
-        run: |
-          set -e
-          GIT=$(git rev-parse --short HEAD)
-          docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
-          docker exec -w /Test/ ubuntu_tst_bash sh -c "git switch -c $GIT"
-          docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip 10.0.2.4  --port 8000"
+    uses: .github/workflows/deploy_platform.yml@main
+    with:
+      subscription: 'Development'
+      purpose: ${{ github.event.number }}
+      owner: 'CI_RUNNER'
+      preload_dataset: true
+      run_tests: true
+      deprovision_after: true
+    secrets: inherit
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]

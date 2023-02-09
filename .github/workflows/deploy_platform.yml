@@ -47,7 +47,6 @@ on:
         required: true
         type: boolean
         default: false
-    secrets: inherit
 
   workflow_dispatch:
     inputs:

@@ -273,9 +273,8 @@ jobs:
           echo "Head Ref: ${{ github.head_ref }}"
           echo "Workspace: ${{ github.workspace }}"
           sudo chown -R $USER:$USER ${{ github.workspace }}
-          deploy_output_str=${{needs.Deploy_Platform.outputs.deployment_id}}
-          deployment_id=${deploy_output_str:25:36}
-          echo "Deprovision GUID: $deployment_id"
+          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+          deployment_id=$(echo ${deploy_output_str:25:36})
           set -e
           pwd
           chmod +x Deprovision.sh

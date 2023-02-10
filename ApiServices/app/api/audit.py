@@ -115,8 +115,6 @@ async def audit_incidents_query(
 
 
 ########################################################################################################################
-
-
 async def query_computation(
     query: dict,
     current_user: TokenData,

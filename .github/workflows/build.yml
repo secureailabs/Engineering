@@ -119,7 +119,7 @@ jobs:
     uses: ./.github/workflows/deploy_platform.yml
     with:
       subscription: 'Development'
-      purpose: ${{ github.event.number }}
+      purpose: 'PR-${{ github.event.pull_request.number }}'
       owner: 'CI_RUNNER'
       preload_dataset: true
       run_tests: true
@@ -129,7 +129,7 @@ jobs:
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
     if: ${{ always() }}
-    needs: [build, call-deploy-platform-workflow]
+    needs: build
     steps:
       - name: Stop and Remove Docker Containers
         run: |

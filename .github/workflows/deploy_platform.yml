@@ -126,12 +126,16 @@ jobs:
         run: |
           if ${{ inputs.subscription == 'Development' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Development"
           elif ${{ inputs.subscription == 'Release Candidate' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Release Candidate"
           elif ${{ inputs.subscription == 'ProductionGA' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Production GA"
           else
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: None (Defaulted to Development)"
           fi
 
       - name: Deploy To Subscription
@@ -192,16 +196,28 @@ jobs:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: [Deploy_Platform]
     steps:
+      - name: Deprovision Parameters
+        run: |
+          echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
+          owner="Deployment ID: ${{ inputs.owner }}"
+          deployment_id=${deploy_output_str##$owner-}
+          deployment_id=$(echo ${deployment_id:0:36})
+          echo $deployment_id
+
       - name: Determine Subscription
         run: |
           if ${{ inputs.subscription == 'Development' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Development"
           elif ${{ inputs.subscription == 'Release Candidate' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Release Candidate"
           elif ${{ inputs.subscription == 'ProductionGA' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Production GA"
           else
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: None (Defaulted to Development)"
           fi
 
       - name: Deprovision

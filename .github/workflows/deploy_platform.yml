@@ -210,7 +210,7 @@ jobs:
           owner="Deployment ID: ${{ inputs.owner }}"
           purpose="-${{ inputs.purpose }}"
           deployment_id=${deploy_output_str##$owner-}
-          deployment_id=${deployment_id%%$purpose} 
+          deployment_id=$(echo ${deployment_id:0:36}) 
           echo $deployment_id
           set -e
           pwd

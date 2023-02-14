@@ -59,7 +59,6 @@ on:
           - 'Development'
           - 'Release Candidate'
           - 'ProductionGA'
-
       purpose:
         description: "Purpose of Deployment"
         required: true
@@ -70,19 +69,16 @@ on:
         required: true
         type: string
         default: 'CI_RUNNER'
-
       preload_dataset:
         description: 'Preload dataset with DatasetTool'
         required: true
         type: boolean
         default: false
-
       run_tests:
         description: Runs tests
         required: true
         type: boolean
         default: false
-
       deprovision_after:
         description: Deprovision after deployment
         required: true
@@ -194,7 +190,7 @@ jobs:
 
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
-    needs: [Deploy_Platform, Test]
+    needs: [Deploy_Platform]
     steps:
       - name: Determine Subscription
         run: |
@@ -212,9 +208,9 @@ jobs:
         run: |
           deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
           owner="Deployment ID: ${{ inputs.owner }}"
-          purpose="${{ inputs.purpose }}"
+          purpose="-${{ inputs.purpose }}"
           deployment_id=${deploy_output_str##$owner-}
-          deployment_id=${deployment_id%%-$purpose} 
+          deployment_id=${deployment_id%%$purpose} 
           echo $deployment_id
           set -e
           pwd

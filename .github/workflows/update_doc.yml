@@ -63,6 +63,13 @@ jobs:
           sleep 240
           cd ..
 
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
+        with:
+          images: "apiservices"
+          tail: "300"
+
   docs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: build

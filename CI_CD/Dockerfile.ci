@@ -25,20 +25,18 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip3 install --upgrade pip && pip3 install --upgrade poetry==1.3.2
 
-RUN curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey
-RUN add-apt-repository \
-    "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-    $(lsb_release -cs) stable"
-RUN apt-get update && apt-get -y install docker-ce
-
 # GIT
 ARG git_personal_token
+ARG branch
 RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf " https://github.com/"
-RUN git clone https://$git_personal_token@github.com/secureailabs/Engineering.git /Engineering
+RUN git clone -b $branch https://$git_personal_token@github.com/secureailabs/Engineering.git /Engineering
 RUN git clone https://$git_personal_token@github.com/secureailabs/datascience.git /Engineering/datascience
 RUN git -C /Engineering submodule update
 
-EXPOSE 27017 8000
+# Set Working Directory
 WORKDIR /Engineering
+#  Run the make command to test build
+RUN git rev-parse --short HEAD
+RUN make all
 
 CMD ["/bin/bash"]

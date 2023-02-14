@@ -198,6 +198,7 @@ jobs:
     steps:
       - name: Deprovision Parameters
         run: |
+          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
           echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
           owner="Deployment ID: ${{ inputs.owner }}"
           deployment_id=${deploy_output_str##$owner-}

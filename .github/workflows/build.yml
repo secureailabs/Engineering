@@ -88,23 +88,14 @@ jobs:
       - name: Run a multi-line script, Build Binaries
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
           set -e
           pwd
           ls -l
           sudo chmod 666 /var/run/docker.sock
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
-          docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
-          docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "git config --global --add safe.directory '*'"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "git submodule update"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "docker --version"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "make clean"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker ps -a
+          docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Dockerfile.ci .
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]

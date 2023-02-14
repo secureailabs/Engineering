@@ -58,6 +58,7 @@ jobs:
       - name: Start self-hosted runner
         run: |
           az vm start --subscription Build -g Dev-CI -n github-runner1
+          az vm start --subscription Build -g Dev-CI -n github-runner2-DeployPlatform
 
   clean:
     runs-on: [self-hosted, Linux, x64, docker]
@@ -92,8 +93,6 @@ jobs:
           pwd
           ls -l
           sudo chmod 666 /var/run/docker.sock
-          docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
-          docker stop apiservices || true && docker rm apiservices || true
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
           docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
@@ -105,27 +104,7 @@ jobs:
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
           docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
           docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
-          sudo apt-get install -y python3-pip jq
-          sudo pip3 install poetry
-          export PATH="/home/gha-runner/.local/bin:$PATH"
-          sudo poetry
-          sudo make database_initializer sail_client
-          sudo pip3 install ApiServices/generated/sail-client/dist/sail_client-0.1.0-py3-none-any.whl
-          sudo pip3 install database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl
-          cd Docker/apiservices
-          jq --arg AZURE_SUBSCRIPTION_ID "$AZURE_SUBSCRIPTION_ID" '.azure_subscription_id=$AZURE_SUBSCRIPTION_ID' InitializationVector.json > tmp.$$.json && mv tmp.$$.json InitializationVector.json
-          jq --arg AZURE_TENANT_ID "$AZURE_TENANT_ID" '.azure_tenant_id=$AZURE_TENANT_ID' InitializationVector.json > tmp.$$.json && mv tmp.$$.json InitializationVector.json
-          jq --arg AZURE_CLIENT_ID "$AZURE_CLIENT_ID" '.azure_client_id=$AZURE_CLIENT_ID' InitializationVector.json > tmp.$$.json && mv tmp.$$.json InitializationVector.json
-          jq --arg AZURE_CLIENT_SECRET "$AZURE_CLIENT_SECRET" '.azure_client_secret=$AZURE_CLIENT_SECRET' InitializationVector.json > tmp.$$.json && mv tmp.$$.json InitializationVector.json
-          cat InitializationVector.json
-          cd ..
-          ./BuildImages.sh -i apiservices
-          sudo ./RunService.sh -s apiservices -d
-          sleep 120
-          cd ..
-          sudo database-initialization --hostname=https://10.0.2.4:8000
-          sleep 10
+          docker ps -a
 
       - name: Dump docker logs on failure
         if: failure()
@@ -134,21 +113,22 @@ jobs:
           images: "apiservices"
           tail: "300"
 
-  test:
-    runs-on: [self-hosted, Linux, x64, docker]
+  call-deploy-platform-workflow:
     needs: build
-    steps:
-      - name: Run Tests
-        run: |
-          set -e
-          GIT=$(git rev-parse --short HEAD)
-          docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
-          docker exec -w /Test/ ubuntu_tst_bash sh -c "git switch -c $GIT"
-          docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip 10.0.2.4  --port 8000"
+    uses: ./.github/workflows/deploy_platform.yml
+    with:
+      subscription: 'Development'
+      purpose: 'PR-${{ github.event.pull_request.number }}'
+      owner: 'CI_RUNNER'
+      preload_dataset: true
+      run_tests: true
+      deprovision_after: true
+    secrets: inherit
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
-    needs: test
+    if: ${{ always() }}
+    needs: build
     steps:
       - name: Stop and Remove Docker Containers
         run: |
@@ -179,7 +159,7 @@ jobs:
     # Without this step workflow remains "green" if build does fail.
     if: always()
     runs-on: ubuntu-latest
-    needs: [start-runner, build, test]
+    needs: [start-runner, build, call-deploy-platform-workflow]
     steps:
       - uses: technote-space/workflow-conclusion-action@v2
       - name: Check Job Status status and fail if they are red

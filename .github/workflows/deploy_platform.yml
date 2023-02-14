@@ -211,7 +211,7 @@ jobs:
         run: |
           deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
           owner="Deployment ID: ${{ inputs.owner }}"
-          purpose="${{ purpose }}"
+          purpose="${{ inputs.purpose }}"
           deployment_id=${deploy_output_str##$owner-}
           deployment_id=${deployment_id%%-$purpose} 
           echo $deployment_id

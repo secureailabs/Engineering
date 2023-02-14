@@ -221,7 +221,27 @@ jobs:
             echo "Subscription: None (Defaulted to Development)"
           fi
 
-      - name: Deprovision
+      - name: Deprovision (No Test)
+        if: ${{ inputs.run_tests == false }}
+        run: |
+          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+          owner="Deployment ID: ${{ inputs.owner }}"
+          purpose="-${{ inputs.purpose }}"
+          deployment_id=${deploy_output_str##$owner-}
+          deployment_id=$(echo ${deployment_id:0:36}) 
+          echo $deployment_id
+          set -e
+          pwd
+          chmod +x Deprovision.sh
+          if ${{ inputs.deprovision_after == true }}; then
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
+          else
+            echo "No Deprovision."
+          fi
+
+      - name: Deprovision (Test)
+        needs: Test
+        if: ${{ inputs.run_tests == true }}
         run: |
           deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
           owner="Deployment ID: ${{ inputs.owner }}"

@@ -190,16 +190,18 @@ jobs:
   # docker rm ubuntu_tst_bash
 
   Wait_Test_Completion:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    runs-on: ubuntu-latest
     if: ${{ inputs.run_tests == true }}
     needs: Test
     steps:
       - name: Wait for tests to succeed
-        uses: lewagon/wait-on-check-action@v1.0.0
+        uses: lewagon/wait-on-check-action@master
         with:
           ref: ${{ github.sha }}
           check-name: "Tests"
           repo-token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          allowed-conclusions: success
+          verbose: true
           wait-interval: 10
 
   Deprovision_Platform:

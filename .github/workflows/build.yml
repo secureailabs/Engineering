@@ -113,18 +113,6 @@ jobs:
   #         images: "apiservices"
   #         tail: "300"
 
-  call-deploy-platform-workflow:
-    needs: build
-    uses: ./.github/workflows/deploy_platform.yml
-    with:
-      subscription: "Development"
-      purpose: "PR-${{ github.event.pull_request.number }}"
-      owner: "CI_RUNNER"
-      preload_dataset: true
-      run_tests: true
-      deprovision_after: true
-    secrets: inherit
-
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
     if: ${{ always() }}
@@ -132,11 +120,24 @@ jobs:
     steps:
       - name: Stop and Remove Docker Containers
         run: |
-          set -e
-          docker ps -a
-          docker kill $(docker ps -q)
-          docker rm $(docker ps -a -q)
-          sudo make clean
+          echo "entered Teardown Job"
+  # set -e
+  # docker ps -a
+  # docker kill $(docker ps -q)
+  # docker rm $(docker ps -a -q)
+  # sudo make clean
+
+  call-deploy-platform-workflow:
+    needs: build
+    uses: ./.github/workflows/deploy_platform.yml
+    with:
+      subscription: "Development"
+      purpose: "PR-${{ github.event.pull_request.number }}"
+      owner: "CI_RUNNER"
+      preload_dataset: false
+      run_tests: true
+      deprovision_after: true
+    secrets: inherit
 
   # stop-runner:
   #   # Always stop runner even if build step fails

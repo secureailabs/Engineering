@@ -71,12 +71,12 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           docker image prune --all -f
 
-  # build:
-  #   runs-on: [self-hosted, Linux, x64, docker]
-  #   needs: clean
-  #   steps:
-  #     - name: Clear repository
-  #       run: sudo rm -rf $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+  build:
+    runs-on: [self-hosted, Linux, x64, docker]
+    needs: clean
+    steps:
+      - name: Clear repository
+        run: sudo rm -rf $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
   #     - name: Check out source repository
   #       uses: actions/checkout@v3

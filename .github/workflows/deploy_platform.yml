@@ -194,35 +194,61 @@ jobs:
 
   Wait_Test_Completion:
     runs-on: ubuntu-latest
-    if: ${{ inputs.run_tests == true }}
+    if: ${{ always() && !cancelled() && needs.Test.result == 'success' && inputs.run_tests == true }}
     needs: [Test]
     steps:
-      - name: Wait for tests to succeed
-        uses: lewagon/wait-on-check-action@master
-        if: github.event_name != 'pull_request'
-        with:
-          ref: ${{ github.sha }}
-          check-name: "Run Tests"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          allowed-conclusions: success
-          verbose: true
-          wait-interval: 10
 
-      - name: Wait for tests to succeed
-        uses: lewagon/wait-on-check-action@master
-        if: github.event_name == 'pull_request'
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          check-name: "Run Tests"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          allowed-conclusions: success
-          verbose: true
-          wait-interval: 10
+  Deprovision_Platform_after_test:
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    if: ${{ inputs.run_tests == true }}
+    needs: [Deploy_Platform, Test]
+    steps:
+      - name: Deprovision Parameters
+        run: |
+          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+          echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
+          owner="Deployment ID: ${{ inputs.owner }}"
+          deployment_id=${deploy_output_str##$owner-}
+          deployment_id=$(echo ${deployment_id:0:36})
+          echo $deployment_id
+
+      - name: Determine Subscription
+        run: |
+          if ${{ inputs.subscription == 'Development' }}; then
+            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Development"
+          elif ${{ inputs.subscription == 'Release Candidate' }}; then
+            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Release Candidate"
+          elif ${{ inputs.subscription == 'ProductionGA' }}; then
+            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: Production GA"
+          else
+            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "Subscription: None (Defaulted to Development)"
+          fi
+
+      - name: Deprovision
+        run: |
+          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+          owner="Deployment ID: ${{ inputs.owner }}"
+          purpose="-${{ inputs.purpose }}"
+          deployment_id=${deploy_output_str##$owner-}
+          deployment_id=$(echo ${deployment_id:0:36}) 
+          echo $deployment_id
+          set -e
+          pwd
+          chmod +x Deprovision.sh
+          if ${{ inputs.deprovision_after == true }}; then
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
+          else
+            echo "No Deprovision."
+          fi
 
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
-    if: ${{ inputs.deprovision_after == true }}
-    needs: [Deploy_Platform, Wait_Test_Completion]
+    if: ${{ always() && !cancelled() && inputs.run_tests == false && inputs.deprovision_after == true }}
+    needs: [Deploy_Platform]
     steps:
       - name: Deprovision Parameters
         run: |

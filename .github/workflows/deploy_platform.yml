@@ -198,7 +198,7 @@ jobs:
         uses: lewagon/wait-on-check-action@master
         with:
           ref: ${{ github.sha }}
-          check-name: "Tests"
+          check-name: "Run Tests"
           repo-token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           allowed-conclusions: success
           verbose: true

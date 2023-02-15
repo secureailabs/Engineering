@@ -71,55 +71,55 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }}
           docker image prune --all -f
 
-  build:
-    runs-on: [self-hosted, Linux, x64, docker]
-    needs: clean
-    steps:
-      - name: Clear repository
-        run: sudo rm -rf $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+  # build:
+  #   runs-on: [self-hosted, Linux, x64, docker]
+  #   needs: clean
+  #   steps:
+  #     - name: Clear repository
+  #       run: sudo rm -rf $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
-      - name: Check out source repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
-          persist-credentials: true
-          submodules: true
+  #     - name: Check out source repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+  #         persist-credentials: true
+  #         submodules: true
 
-      - name: Run a multi-line script, Build Binaries
-        env:
-          PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
-        run: |
-          set -e
-          pwd
-          ls -l
-          sudo chmod 666 /var/run/docker.sock
-          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
-          docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
-          docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "git config --global --add safe.directory '*'"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "git submodule update"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "docker --version"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "make clean"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
-          docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
-          docker ps -a
+  #     - name: Run a multi-line script, Build Binaries
+  #       env:
+  #         PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
+  #       run: |
+  #         set -e
+  #         pwd
+  #         ls -l
+  #         sudo chmod 666 /var/run/docker.sock
+  #         docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
+  #         docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Dockerfile.ci .
+  #         docker run --name ubuntu_dev_CI -dit -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/Workspace -w="/Workspace" ubuntu-ci:1.0 /bin/bash
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "git config --global --add safe.directory '*'"
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "git submodule update"
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "docker --version"
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "make clean"
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "make all"
+  #         docker exec -w /Workspace ubuntu_dev_CI sh -c "ls -l"
+  #         docker ps -a
 
-      - name: Dump docker logs on failure
-        if: failure()
-        uses: jwalton/gh-docker-logs@v2
-        with:
-          images: "apiservices"
-          tail: "300"
+  #     - name: Dump docker logs on failure
+  #       if: failure()
+  #       uses: jwalton/gh-docker-logs@v2
+  #       with:
+  #         images: "apiservices"
+  #         tail: "300"
 
   call-deploy-platform-workflow:
     needs: build
     uses: ./.github/workflows/deploy_platform.yml
     with:
-      subscription: 'Development'
-      purpose: 'PR-${{ github.event.pull_request.number }}'
-      owner: 'CI_RUNNER'
+      subscription: "Development"
+      purpose: "PR-${{ github.event.pull_request.number }}"
+      owner: "CI_RUNNER"
       preload_dataset: true
       run_tests: true
       deprovision_after: true

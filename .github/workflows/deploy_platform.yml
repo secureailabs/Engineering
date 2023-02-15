@@ -192,12 +192,6 @@ jobs:
   # docker kill ubuntu_tst_bash
   # docker rm ubuntu_tst_bash
 
-  Wait_Test_Completion:
-    runs-on: ubuntu-latest
-    if: ${{ always() && !cancelled() && needs.Test.result == 'success' && inputs.run_tests == true }}
-    needs: [Test]
-    steps:
-
   Deprovision_Platform_after_test:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     if: ${{ inputs.run_tests == true }}

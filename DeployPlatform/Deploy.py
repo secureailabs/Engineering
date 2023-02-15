@@ -501,6 +501,7 @@ if __name__ == "__main__":
     PURPOSE = os.environ.get("PURPOSE")
     VERSION = os.environ.get("VERSION")
     TEST_FLAG = False
+    guid = str(uuid.uuid1())
     if PURPOSE == "test":
         TEST_FLAG = True
 
@@ -515,7 +516,7 @@ if __name__ == "__main__":
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
         exit(1)
-    deployment_id = OWNER + "-" + str(uuid.uuid1()) + "-" + PURPOSE
+    deployment_id = OWNER + "-" + guid + "-" + PURPOSE
 
     # Authenticate the azure credentials
     account_credentials = sailazure.authenticate(
@@ -541,78 +542,89 @@ if __name__ == "__main__":
         + storage_account_name
     )
 
-    # Provision a key vault
-    key_vault_url = deploy_key_vault(
-        account_credentials=account_credentials,
-        deployment_name=deployment_id,
-        key_vault_name_prefix="sailkeyvault",
-        storage_account_id=storage_account_id,
-    )
+    print("\n\n===============================================================")
+    print("================= SUMMARY: Deploy BLAH =====================")
+    print(f"SAIL API Services is hosted internally on: https://127.0.0.1:8000")
+    print(f"Deployment GUID: {guid}")
+    print(f"Deployment ID: {deployment_id}")
+    # 
+    # Temporary commenting out provision tasks for testing CI
+    # 
+    # # Provision a key vault
+    # key_vault_url = deploy_key_vault(
+    #     account_credentials=account_credentials,
+    #     deployment_name=deployment_id,
+    #     key_vault_name_prefix="sailkeyvault",
+    #     storage_account_id=storage_account_id,
+    # )
 
-    # Deploy the audit services
-    audit_service_ip = deploy_audit_service(
-        account_credentials,
-        storage_account_name,
-        deployment_id,
-        OWNER,
-        TEST_FLAG,
-    )
-    print("Audit Service server: ", audit_service_ip)
+    # # Deploy the audit services
+    # audit_service_ip = deploy_audit_service(
+    #     account_credentials,
+    #     storage_account_name,
+    #     deployment_id,
+    #     OWNER,
+    #     TEST_FLAG,
+    # )
+    # print("Audit Service server: ", audit_service_ip)
 
-    # Deploy the API services
-    platform_services_ip = deploy_apiservices(
-        account_credentials,
-        deployment_id,
-        storage_account_name,
-        storage_accout_password,
-        storage_resource_group_name,
-        key_vault_url,
-        OWNER,
-        VERSION,
-        audit_service_ip,
-        TEST_FLAG,
-        slack_webhook_url,
-    )
-    print("API Services server: ", platform_services_ip)
-
-    # Commented out deployment of webfrontend as not used atm BOARD-2148
-    # # Deploy the frontend server
-    # frontend_ip = deploy_frontend(
+    # # Deploy the API services
+    # platform_services_ip = deploy_apiservices(
     #     account_credentials,
     #     deployment_id,
-    #     platform_services_ip,
+    #     storage_account_name,
+    #     storage_accout_password,
+    #     storage_resource_group_name,
+    #     key_vault_url,
+    #     OWNER,
+    #     VERSION,
+    #     audit_service_ip,
+    #     TEST_FLAG,
+    #     slack_webhook_url,
     # )
-    # print("Frontend server: ", frontend_ip)
+    # print("API Services server: ", platform_services_ip)
 
-    # Deploy Firewall IPv4Address and update DNAT Rules
-    if public_ip:
-        api_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "apiservices", platform_services_ip)
-        # web_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "newwebfrontend", frontend_ip)
+    # # Commented out deployment of webfrontend as not used atm BOARD-2148
+    # # # Deploy the frontend server
+    # # frontend_ip = deploy_frontend(
+    # #     account_credentials,
+    # #     deployment_id,
+    # #     platform_services_ip,
+    # # )
+    # # print("Frontend server: ", frontend_ip)
 
-        # Summary
-        print("\n\n===============================================================")
-        print("================= SUMMARY: Deploy Firewall =====================")
-        print(f"apiservices-firewall_ip_name: {api_fw_info['apiservices-firewall_ip_name']}")
-        print(f"apiservices-firewall_ip: {api_fw_info['apiservices-firewall_ip']}")
-        print(f"apiservices-firewall_ip_id: {api_fw_info['apiservices-firewall_ip_id']}")
-        # print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
-        # print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
-        # print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
-        print(
-            f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
-        )
-    print("\n\n===============================================================")
-    print("================= SUMMARY: Deploy Platform =====================")
-    # print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")
-    # print(
-    #     f"Deployment complete. Please visit the link to access the public demo: https://{web_fw_info['newwebfrontend-firewall_ip']}"
-    # )
-    print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
-    if public_ip:
-        print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
-    print(f"Deployment ID: {deployment_id}")
-    print("Kindly delete all the resource group created on azure with the deployment ID.")
-    print("===============================================================\n\n")
+    # # Deploy Firewall IPv4Address and update DNAT Rules
+    # if public_ip:
+    #     api_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "apiservices", platform_services_ip)
+    #     # web_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "newwebfrontend", frontend_ip)
 
-    # Delete the resource group for the backend server
-    # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
+    #     # Summary
+    #     print("\n\n===============================================================")
+    #     print("================= SUMMARY: Deploy Firewall =====================")
+    #     print(f"apiservices-firewall_ip_name: {api_fw_info['apiservices-firewall_ip_name']}")
+    #     print(f"apiservices-firewall_ip: {api_fw_info['apiservices-firewall_ip']}")
+    #     print(f"apiservices-firewall_ip_id: {api_fw_info['apiservices-firewall_ip_id']}")
+    #     # print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
+    #     # print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
+    #     # print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
+    #     print(
+    #         f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
+    #     )
+    # print("\n\n===============================================================")
+    # print("================= SUMMARY: Deploy Platform =====================")
+    # # print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")
+    # # print(
+    # #     f"Deployment complete. Please visit the link to access the public demo: https://{web_fw_info['newwebfrontend-firewall_ip']}"
+    # # )
+    # print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
+    # if public_ip:
+    #     print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
+    # print(f"Deployment ID: {deployment_id}")
+    # print("Kindly delete all the resource group created on azure with the deployment ID.")
+    # print("===============================================================\n\n")
+
+    # # Delete the resource group for the backend server
+    # # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
+
+
+

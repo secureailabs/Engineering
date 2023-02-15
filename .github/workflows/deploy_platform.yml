@@ -195,11 +195,11 @@ jobs:
     needs: Test
     steps:
       - name: Wait for tests to succeed
-        uses: lewagon/wait-on-check-action@v1.0.0
+        uses: lewagon/wait-on-check-action@master
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.sha }}
           check-name: "Tests"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           wait-interval: 10
 
   Deprovision_Platform:

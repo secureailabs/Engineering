@@ -199,6 +199,18 @@ jobs:
     steps:
       - name: Wait for tests to succeed
         uses: lewagon/wait-on-check-action@master
+        if: github.event_name != "pull_request"
+        with:
+          ref: ${{ github.sha }}
+          check-name: "Run Tests"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          allowed-conclusions: success
+          verbose: true
+          wait-interval: 30
+
+      - name: Wait for tests to succeed
+        uses: lewagon/wait-on-check-action@master
+        if: github.event_name == "pull_request"
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           check-name: "Run Tests"

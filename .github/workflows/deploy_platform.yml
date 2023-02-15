@@ -189,10 +189,23 @@ jobs:
   # docker kill ubuntu_tst_bash
   # docker rm ubuntu_tst_bash
 
+  Wait_Test_Completion:
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    if: ${{ inputs.run_tests == true }}
+    needs: Test
+    steps:
+      - name: Wait for tests to succeed
+        uses: lewagon/wait-on-check-action@v1.0.0
+        with:
+          ref: ${{ github.ref }}
+          check-name: "Run Tests"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     if: ${{ inputs.deprovision_after == true }}
-    needs: [Deploy_Platform]
+    needs: [Deploy_Platform, Wait_Test_Completion]
     steps:
       - name: Deprovision Parameters
         run: |
@@ -218,14 +231,6 @@ jobs:
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
             echo "Subscription: None (Defaulted to Development)"
           fi
-
-      - name: Wait for tests to succeed
-        uses: lewagon/wait-on-check-action@v1.0.0
-        with:
-          ref: ${{ github.ref }}
-          check-name: "Run Tests"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
 
       - name: Deprovision
         run: |

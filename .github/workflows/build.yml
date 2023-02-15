@@ -75,8 +75,11 @@ jobs:
     runs-on: [self-hosted, Linux, x64, docker]
     needs: clean
     steps:
-      - name: Clear repository
-        run: sudo rm -rf $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+      - name: build
+        run: |
+          echo "entered build job"
+  # - name: Clear repository
+  #   run: sudo rm -rf $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
 
   #     - name: Check out source repository
   #       uses: actions/checkout@v3

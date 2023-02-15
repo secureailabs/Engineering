@@ -12,7 +12,10 @@
 #
 #
 
-name: Deploy Platform
+name: "Deploy Platform"
+
+permissions:
+  checks: read
 
 on:
   workflow_call:
@@ -192,14 +195,14 @@ jobs:
   Wait_Test_Completion:
     runs-on: ubuntu-latest
     if: ${{ inputs.run_tests == true }}
-    needs: Test
+    needs: [Test]
     steps:
       - name: Wait for tests to succeed
         uses: lewagon/wait-on-check-action@master
         with:
           ref: $${{github.sha}}
           check-name: "Run Tests"
-          repo-token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           allowed-conclusions: success
           verbose: true
           wait-interval: 10

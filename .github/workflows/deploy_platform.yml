@@ -211,19 +211,26 @@ jobs:
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     env:
-      CHECKTEST: ${{needs.Check_Test_Selection.outputs.check}}
+      CHECKTESTRAN: ${{needs.Check_Test_Selection.outputs.check}}
     if: |
-      env.CHECKTEST && ${{ inputs.deprovision_after == 'true' }}
+      always() &&
+      (needs.Check_Test_Selection.result == 'success')
     needs: [Deploy_Platform, Check_Test_Selection]
     steps:
       - name: Deprovision Parameters
         run: |
-          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-          echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
-          owner="Deployment ID: ${{ inputs.owner }}"
-          deployment_id=${deploy_output_str##$owner-}
-          deployment_id=$(echo ${deployment_id:0:36})
-          echo $deployment_id
+          echo "CHECK TEST RAN: $CHECKTESTRAN"
+          if ${{ inputs.deprovision_after == true }}; then
+            deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+            echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
+            owner="Deployment ID: ${{ inputs.owner }}"
+            deployment_id=${deploy_output_str##$owner-}
+            deployment_id=$(echo ${deployment_id:0:36})
+            echo $deployment_id
+          else
+            echo "Step Display Deprovision Parameters not required"
+            echo "deprovision_after option was not selected"
+          fi
 
       - name: Determine Subscription
         run: |
@@ -243,13 +250,18 @@ jobs:
 
       - name: Deprovision
         run: |
-          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-          owner="Deployment ID: ${{ inputs.owner }}"
-          purpose="-${{ inputs.purpose }}"
-          deployment_id=${deploy_output_str##$owner-}
-          deployment_id=$(echo ${deployment_id:0:36}) 
-          echo $deployment_id
-          set -e
-          pwd
-          chmod +x Deprovision.sh
+          if ${{ inputs.deprovision_after == true }}; then
+            deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+            owner="Deployment ID: ${{ inputs.owner }}"
+            purpose="-${{ inputs.purpose }}"
+            deployment_id=${deploy_output_str##$owner-}
+            deployment_id=$(echo ${deployment_id:0:36}) 
+            echo $deployment_id
+            set -e
+            pwd
+            chmod +x Deprovision.sh
             sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
+          else
+            echo "Step Deprovision not required"
+            echo "deprovision_after option was not selected"
+          fi

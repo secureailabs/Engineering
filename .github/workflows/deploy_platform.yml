@@ -192,15 +192,27 @@ jobs:
 
   Check_Test_Selection:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
-    if: ${{ inputs.run_tests == true }}
     needs: [Deploy_Platform, Test]
+    if: |
+      always() &&
+      (needs.Job2.result == 'skipped')
+    outputs:
+      check: ${{ steps.check.outputs.run_test }}
     steps:
       - name: Verified Test option selected
-        run: echo "Test option was selected"
+        id: check
+        run: |
+          if ${{ inputs.run_tests == true }}; then
+            echo "run_test=yes" >> $GITHUB_OUTPUT
+          else
+            echo "run_test=no" >> $GITHUB_OUTPUT
+          fi
 
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
-    if: ${{ inputs.deprovision_after == true }}
+    env:
+      TEST_RAN: ${{needs.Check_Test_Selection.outputs.check}}
+    if: env.TEST_RAN && ${{ inputs.deprovision_after == true }}
     needs: [Deploy_Platform, Check_Test_Selection]
     steps:
       - name: Deprovision Parameters

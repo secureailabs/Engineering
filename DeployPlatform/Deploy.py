@@ -618,6 +618,3 @@ if __name__ == "__main__":
 
     # Delete the resource group for the backend server
     # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
-
-
-

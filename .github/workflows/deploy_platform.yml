@@ -78,7 +78,7 @@ on:
         type: boolean
         default: false
       run_tests:
-        description: Runs tests
+        description: Runs tests [Requires preloaded dataset]
         required: true
         type: boolean
         default: false
@@ -190,57 +190,18 @@ jobs:
           docker kill ubuntu_tst_bash
           docker rm ubuntu_tst_bash
 
-  Deprovision_Platform_after_test:
+  Check_Test_Selection:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     if: ${{ inputs.run_tests == true }}
     needs: [Deploy_Platform, Test]
     steps:
-      - name: Deprovision Parameters
-        run: |
-          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-          echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
-          owner="Deployment ID: ${{ inputs.owner }}"
-          deployment_id=${deploy_output_str##$owner-}
-          deployment_id=$(echo ${deployment_id:0:36})
-          echo $deployment_id
-
-      - name: Determine Subscription
-        run: |
-          if ${{ inputs.subscription == 'Development' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Development"
-          elif ${{ inputs.subscription == 'Release Candidate' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Release Candidate"
-          elif ${{ inputs.subscription == 'ProductionGA' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Production GA"
-          else
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: None (Defaulted to Development)"
-          fi
-
-      - name: Deprovision
-        run: |
-          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-          owner="Deployment ID: ${{ inputs.owner }}"
-          purpose="-${{ inputs.purpose }}"
-          deployment_id=${deploy_output_str##$owner-}
-          deployment_id=$(echo ${deployment_id:0:36}) 
-          echo $deployment_id
-          set -e
-          pwd
-          chmod +x Deprovision.sh
-          if ${{ inputs.deprovision_after == true }}; then
-            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
-          else
-            echo "No Deprovision."
-          fi
+      - name: Verified Test option selected
+        run: echo "Test option was selected"
 
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
-    if: ${{ always() && !cancelled() && inputs.run_tests == false && inputs.deprovision_after == true }}
-    needs: [Deploy_Platform]
+    if: ${{ inputs.deprovision_after == true }}
+    needs: [Deploy_Platform, Check_Test_Selection]
     steps:
       - name: Deprovision Parameters
         run: |
@@ -278,4 +239,4 @@ jobs:
           set -e
           pwd
           chmod +x Deprovision.sh
-          sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")

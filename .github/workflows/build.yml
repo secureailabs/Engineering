@@ -96,6 +96,7 @@ jobs:
           sudo chmod 666 /var/run/docker.sock
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Dockerfile.ci .
+          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]

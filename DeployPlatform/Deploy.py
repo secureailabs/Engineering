@@ -516,7 +516,7 @@ if __name__ == "__main__":
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
         exit(1)
-    deployment_id = OWNER + "-" + guid + "-" + PURPOSE
+    deployment_id2 = f"{OWNER}-{guid}-{PURPOSE}"
 
     # Authenticate the azure credentials
     account_credentials = sailazure.authenticate(

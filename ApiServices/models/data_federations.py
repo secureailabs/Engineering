@@ -11,13 +11,15 @@
 #     be disclosed to others for any purpose without
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
+
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
+from pydantic import Field, StrictStr
+
 from models.common import BasicObjectInfo, KeyVaultObject, PyObjectId, SailBaseModel
 from models.secure_computation_nodes import SecureComputationNodeSize
-from pydantic import Field, StrictStr
 
 
 class DataFederationState(Enum):
@@ -136,6 +138,15 @@ class GetMultipleInvite_Out(SailBaseModel):
     invites: List[GetInvite_Out] = Field(...)
 
 
+class DataFederationProvisionState(Enum):
+    CREATING = "CREATING"
+    CREATED = "CREATED"
+    CREATION_FAILED = "CREATION_FAILED"
+    DELETING = "DELETING"
+    DELETED = "DELETED"
+    DELETION_FAILED = "DELETION_FAILED"
+
+
 class DataFederationProvision_Base(SailBaseModel):
     data_federation_id: PyObjectId = Field(...)
     secure_computation_nodes_size: SecureComputationNodeSize = Field(...)
@@ -146,6 +157,7 @@ class DataFederationProvision_Db(DataFederationProvision_Base):
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     smart_broker_id: PyObjectId = Field(...)
+    state: DataFederationProvisionState = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 
@@ -154,6 +166,7 @@ class GetDataFederationProvision(DataFederationProvision_Base):
     creation_time: datetime = Field(default_factory=datetime.utcnow)
     organization_id: PyObjectId = Field(...)
     smart_broker_id: PyObjectId = Field(...)
+    state: DataFederationProvisionState = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(default_factory=list)
 
 
@@ -170,4 +183,5 @@ class RegisterDataFederationProvision_Out(DataFederationProvision_Base):
     creation_time: datetime = Field(...)
     organization_id: PyObjectId = Field(...)
     smart_broker_id: PyObjectId = Field(...)
+    state: DataFederationProvisionState = Field(...)
     secure_computation_nodes_id: List[PyObjectId] = Field(...)

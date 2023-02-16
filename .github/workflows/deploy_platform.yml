@@ -195,7 +195,7 @@ jobs:
     needs: [Deploy_Platform, Test]
     if: |
       always() &&
-      (needs.Test.result == 'skipped')
+      (needs.Test.result == 'success' || needs.Test.result == 'skipped')
     outputs:
       check: ${{ steps.check.outputs.run_test }}
     steps:
@@ -211,8 +211,9 @@ jobs:
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     env:
-      TEST_RAN: ${{needs.Check_Test_Selection.outputs.check}}
-    if: env.TEST_RAN && ${{ inputs.deprovision_after == true }}
+      CHECKTEST: ${{needs.Check_Test_Selection.outputs.check}}
+    if: |
+      env.CHECKTEST && ${{ inputs.deprovision_after == 'true' }}
     needs: [Deploy_Platform, Check_Test_Selection]
     steps:
       - name: Deprovision Parameters

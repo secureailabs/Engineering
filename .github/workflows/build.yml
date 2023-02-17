@@ -96,6 +96,7 @@ jobs:
           sudo chmod 666 /var/run/docker.sock
           docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
           docker build --no-cache -t ubuntu-ci:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Dockerfile.ci .
+          docker stop ubuntu_dev_CI || true && docker rm ubuntu_dev_CI || true
 
   teardown:
     runs-on: [self-hosted, Linux, x64, docker]
@@ -106,8 +107,8 @@ jobs:
         run: |
           set -e
           docker ps -a
-          docker kill $(docker ps -q)
-          docker rm $(docker ps -a -q)
+          docker kill $(docker ps -q) || true
+          docker rm $(docker ps -a -q) || true
           sudo make clean
 
   call-deploy-platform-workflow:

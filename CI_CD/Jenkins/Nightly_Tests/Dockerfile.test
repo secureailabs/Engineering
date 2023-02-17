@@ -14,10 +14,15 @@ RUN apt-get update && apt-get install -y \
 
 # GIT
 ARG git_personal_token
+ARG branch
 RUN git config --global url."https://$git_personal_token:@github.com/".insteadOf " https://github.com/"
-RUN git clone https://$git_personal_token@github.com/secureailabs/Engineering.git /Test
+RUN git clone -b  $branch https://$git_personal_token@github.com/secureailabs/Engineering.git /Test
+
+# Set Working Directory
 WORKDIR /Test/ApiServices
-RUN git pull
+RUN git rev-parse --short HEAD
+
+# Install dependencies for Test platform
 RUN pip install -U pip setuptools wheel
 RUN pip install -r config/requirements/all_requirements.txt --only-binary=:all: --no-binary=python-multipart,assertpy,cerberus
 

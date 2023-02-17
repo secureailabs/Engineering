@@ -12,28 +12,31 @@
 #
 #
 
-name: Deploy Platform
+name: "Deploy Platform"
+
+permissions:
+  checks: read
 
 on:
   workflow_call:
     inputs:
       subscription:
-        description: 'Choose Subscription'
+        description: "Choose Subscription"
         required: true
         type: string
-        default: 'Development'
+        default: "Development"
       purpose:
         description: "Purpose of Deployment"
         required: true
         type: string
-        default: 'CI_TEST'
+        default: "CI_TEST"
       owner:
         description: "Owner of Deployment"
         required: true
         type: string
-        default: 'CI_RUNNER'
+        default: "CI_RUNNER"
       preload_dataset:
-        description: 'Preload dataset with DatasetTool'
+        description: "Preload dataset with DatasetTool"
         required: true
         type: boolean
         default: false
@@ -51,31 +54,31 @@ on:
   workflow_dispatch:
     inputs:
       subscription:
-        description: 'Choose Subscription'
+        description: "Choose Subscription"
         required: true
         type: choice
-        default: 'Development'
+        default: "Development"
         options:
-          - 'Development'
-          - 'Release Candidate'
-          - 'ProductionGA'
+          - "Development"
+          - "Release Candidate"
+          - "ProductionGA"
       purpose:
         description: "Purpose of Deployment"
         required: true
         type: string
-        default: 'CI_TEST'
+        default: "CI_TEST"
       owner:
         description: "Owner of Deployment"
         required: true
         type: string
-        default: 'CI_RUNNER'
+        default: "CI_RUNNER"
       preload_dataset:
-        description: 'Preload dataset with DatasetTool'
+        description: "Preload dataset with DatasetTool"
         required: true
         type: boolean
         default: false
       run_tests:
-        description: Runs tests
+        description: Runs tests [Requires preloaded dataset]
         required: true
         type: boolean
         default: false
@@ -150,9 +153,9 @@ jobs:
           exec 5>&1
           mkdir Binary
           DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
-          INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+          INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
           echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
-          DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment ID: CI_RUNNER-" | cut -f3  -d "/" |tee >(cat - >&5))
+          DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":" | tee >(cat - >&5))
           echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
           if ${{ inputs.preload_dataset == true }}; then
             cd DatasetTool/
@@ -164,46 +167,70 @@ jobs:
             echo "Not Preloading Datasets."
           fi
 
-
   Test:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
+    if: ${{ inputs.run_tests == true }}
     needs: Deploy_Platform
     steps:
       - name: Run Tests
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
           sudo chown -R $USER:$USER ${{ github.workspace }}
           if ${{ inputs.run_tests == true }}; then
             deploy_output_str=${{needs.Deploy_Platform.outputs.internal_ip_addr}}
             INTERNAL_IP_ADDR=${deploy_output_str%:*}
-            GIT=$(git rev-parse --short HEAD)
             docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
-            docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
+            docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
             docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
-            docker exec -w /Test/ ubuntu_tst_bash sh -c "git switch -c $GIT"
             docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
             docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
             docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
-            docker kill ubuntu_tst_bash
-            docker rm ubuntu_tst_bash
-          else
-            echo "No Tests Run."
           fi
+          docker kill ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
 
+  Check_Test_Selection:
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    needs: [Deploy_Platform, Test]
+    if: |
+      always() &&
+      (needs.Test.result == 'success' || needs.Test.result == 'skipped')
+    outputs:
+      check: ${{ steps.check.outputs.run_test }}
+    steps:
+      - name: Verified Test option selected
+        id: check
+        run: |
+          if ${{ inputs.run_tests == true }}; then
+            echo "run_test=yes" >> $GITHUB_OUTPUT
+          else
+            echo "run_test=no" >> $GITHUB_OUTPUT
+          fi
 
   Deprovision_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
-    needs: [Deploy_Platform]
+    env:
+      CHECKTESTRAN: ${{needs.Check_Test_Selection.outputs.check}}
+    if: |
+      always() &&
+      (needs.Check_Test_Selection.result == 'success')
+    needs: [Deploy_Platform, Check_Test_Selection]
     steps:
       - name: Deprovision Parameters
         run: |
-          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-          echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
-          owner="Deployment ID: ${{ inputs.owner }}"
-          deployment_id=${deploy_output_str##$owner-}
-          deployment_id=$(echo ${deployment_id:0:36})
-          echo $deployment_id
+          echo "CHECK TEST RAN: $CHECKTESTRAN"
+          if ${{ inputs.deprovision_after == true }}; then
+            deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+            echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
+            owner="Deployment ID: ${{ inputs.owner }}"
+            deployment_id=${deploy_output_str##$owner-}
+            deployment_id=$(echo ${deployment_id:0:36})
+            echo $deployment_id
+          else
+            echo "Step Display Deprovision Parameters not required"
+            echo "deprovision_after option was not selected"
+          fi
 
       - name: Determine Subscription
         run: |
@@ -223,17 +250,18 @@ jobs:
 
       - name: Deprovision
         run: |
-          deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-          owner="Deployment ID: ${{ inputs.owner }}"
-          purpose="-${{ inputs.purpose }}"
-          deployment_id=${deploy_output_str##$owner-}
-          deployment_id=$(echo ${deployment_id:0:36}) 
-          echo $deployment_id
-          set -e
-          pwd
-          chmod +x Deprovision.sh
           if ${{ inputs.deprovision_after == true }}; then
+            deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
+            owner="Deployment ID: ${{ inputs.owner }}"
+            purpose="-${{ inputs.purpose }}"
+            deployment_id=${deploy_output_str##$owner-}
+            deployment_id=$(echo ${deployment_id:0:36}) 
+            echo $deployment_id
+            set -e
+            pwd
+            chmod +x Deprovision.sh
             sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
           else
-            echo "No Deprovision."
+            echo "Step Deprovision not required"
+            echo "deprovision_after option was not selected"
           fi

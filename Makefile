@@ -50,5 +50,5 @@ all:
 	@echo "All build and packaged!"
 
 clean:
-	@rm -rf Docker/datascience
+	@rm -rf Docker/rpcrelated/datascience
 	@rm -rf Binary

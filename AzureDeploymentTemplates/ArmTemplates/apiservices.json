@@ -53,11 +53,18 @@
       "metadata": {
         "description": "IP address prefix for the subnet"
       }
+    },
+    "customData": {
+      "type": "string",
+      "metadata": {
+        "description": "Custom data to be passed to the VM"
+      }
     }
   },
   "variables": {
     "networkInterfaceName": "[concat(parameters('vmName'), '-nic')]",
-    "virtualNetworkName": "[concat(parameters('vmName'), '-vnet')]"
+    "virtualNetworkName": "[concat(parameters('vmName'), '-vnet')]",
+    "customDataBase64": "[base64(parameters('customData'))]"
   },
   "resources": [
     {
@@ -137,7 +144,8 @@
         "osProfile": {
           "adminUsername": "[parameters('adminUsername')]",
           "computerName": "SailBackend",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminPassword": "[parameters('adminPassword')]",
+          "customData": "[variables('customDataBase64')]"
         },
         "networkProfile": {
           "networkInterfaces": [

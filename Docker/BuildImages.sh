@@ -4,9 +4,34 @@ set -e
 PrintHelp() {
     echo ""
     echo "Usage: $0 -i [Image Name]"
+    echo "Usage: $0 -i [Image Name] -p"
     echo "Usage: $0"
     echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver"
     exit 1 # Exit script after printing help
+}
+
+# function to tag and push the input image to the docker hub
+PushImageToRegistry() {
+    # check if the CONTAINER_REGISTRY_NAME is set
+    if [ -z "$CONTAINER_REGISTRY_NAME" ]; then
+        echo "CONTAINER_REGISTRY_NAME is not set"
+        exit 1
+    fi
+
+    # check if the azure registry is logged in
+    echo "log in to azure registry"
+    az acr login --name "$CONTAINER_REGISTRY_NAME"
+
+    # Get the version from the ../VERSION file
+    version=$(cat ../VERSION)
+
+    # Get the current git commit hash
+    gitCommitHash=$(git rev-parse --short HEAD)
+
+    echo "Tag and Pushing image to azure hub"
+    tag=v"$version"_"$gitCommitHash"
+    docker tag "$1" "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
+    docker push "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
 }
 
 # Check if docker is installed
@@ -18,9 +43,10 @@ if [ $retVal -ne 0 ]; then
 fi
 
 # Parse the input parameters
-while getopts "i:" opt; do
+while getopts "i:p" opt; do
     echo "opt: $opt $OPTARG"
     case "$opt" in
+    p) pushImage=true ;;
     i) imageName="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
@@ -58,11 +84,10 @@ if [ -z "$imageName" ]; then
     echo "No image specified. Building all of them..."
 else
     echo "Building image $imageName"
-    pushd "$imageName"
-    docker build . -t "$imageName"
-    # TODO: Prawal
-    # docker build . -t "$imageName:$(git rev-parse --short HEAD)"
-    popd
+    docker build -t "$imageName" -f "$imageName"/Dockerfile .
+    if $pushImage; then
+        PushImageToRegistry "$imageName"
+    fi
     exit 0
 fi
 
@@ -76,9 +101,10 @@ declare -a ListOfDockerImages=(
 
 for val in "${ListOfDockerImages[@]}"; do
     echo -e "\nBuilding for ${val} ..."
-    pushd "${val}"
     docker build . -t "${val}"
-    popd
+    if $pushImage; then
+        PushImageToRegistry "$val"
+    fi
 done
 
 echo "--------------------------------------------------"

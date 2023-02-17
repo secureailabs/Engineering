@@ -15,7 +15,6 @@ PrintHelp() {
 detach=false
 cleanDatabase=false
 dockerName=""
-scnNames=""
 while getopts "n:l:s:d opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
@@ -73,9 +72,6 @@ if $cleanDatabase; then
     docker volume rm -f $sailDatabaseVolumeName
 fi
 
-# Build the bootstrap tool to create the database
-make -C $rootDir vmInitializer -s
-
 # Create a folder to hold all the Binaries
 rm -rf $rootDir/Binary/"$imageName"_dir
 mkdir -p $rootDir/Binary/"$imageName"_dir
@@ -121,7 +117,7 @@ elif [ "rpcrelated" == "$imageName" ]; then
 elif [ "auditserver" == "$imageName" ]; then
     make -C $rootDir package_audit_service -s -j
     cp $rootDir/Binary/audit_server.tar.gz $rootDir/Binary/audit_server_dir/package.tar.gz
-    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName" 
+    runtimeFlags="$runtimeFlags -p 3100:3100 -p 9093:9093 -p 9096:9096 $imageName"
 else
     echo "!!! Kindly provide correct service name !!!"
     PrintHelp

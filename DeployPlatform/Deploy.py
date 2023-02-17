@@ -7,6 +7,7 @@ import uuid
 
 import requests
 import sailazure
+import yaml
 from azure.core.exceptions import AzureError
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
@@ -110,12 +111,16 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
         "bin_package": open(package_file, "rb"),
     }
     response = requests.put(
-        "https://" + virtual_machine_ip + ":9090/initialization-data", headers=headers, files=files, verify=False
+        "https://" + virtual_machine_ip + ":9090/initialization-data",
+        headers=headers,
+        files=files,
+        verify=False,
+        timeout=(60, 30),
     )
     print(f"Upload package, {package_file} status: {response.status_code}")
 
 
-def deploy_module(account_credentials, deployment_name, module_name, test_flag):
+def deploy_module(account_credentials, deployment_name, module_name, test_flag, custom_data):
     """Deploy the template to a resource group."""
     print("Deploying module: ", module_name)
 
@@ -141,6 +146,7 @@ def deploy_module(account_credentials, deployment_name, module_name, test_flag):
         "vmImageResourceId": set_parameters["vmImageResourceId"].format(module_name),
         "subnetName": set_parameters["subnetName"],
         "virtualNetworkId": set_parameters["virtualNetworkId"],
+        "customData": custom_data,
     }
 
     deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
@@ -234,6 +240,35 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     return keyvault_url
 
 
+def create_cloud_init_file(initialization_json: dict, imageName: str):
+    """Create the cloud init file"""
+    cloud_init_file = "#cloud-config\n"
+
+    cloud_init_yaml = {}
+
+    # Copy the initialization.json file to the VM
+    cloud_init_yaml["write_files"] = [
+        {
+            "path": "/etc/initialization.json",
+            "content": json.dumps(initialization_json, indent=4),
+        }
+    ]
+
+    cloud_init_yaml["runcmd"] = [
+        ["bash -c sudo docker stop $(docker ps -a -q)"],
+        ["bash -c sudo docker rmi $(docker images -q)"],
+        [f"bash -c mkdir -p /opt/{imageName}_dir"],
+        [
+            f"bash -c az acr login --name developmentdockerregistry --username DevelopmentDockerRegistry --password 5ojmm/LV00J6xaqwlMODyE0srZ1PhBm/jB0zofAxiu+ACRDjKbya"
+        ],
+        [f"bash -c sudo docker run -d -p 80:80 -v /opt/{imageName}_dir:/app/data --name {imageName} {imageName}"],
+    ]
+
+    cloud_init_file += yaml.dump(cloud_init_yaml)
+
+    return cloud_init_file
+
+
 def deploy_audit_service(
     account_credentials,
     storage_account_name,
@@ -248,8 +283,6 @@ def deploy_audit_service(
 
     # Get params to update json
     set_parameters = set_params(subscription_id, "auditserver", test_flag)
-    # Deploy the frontend server
-    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag)
 
     # Read backend json from file and set params
     with open("auditserver.json", "r") as audit_json_fd:
@@ -264,8 +297,11 @@ def deploy_audit_service(
     with open("auditserver.json", "w") as outfile:
         json.dump(audit_json, outfile)
 
-    # Sleeping for a minute
-    time.sleep(60)
+    # Create a cloud-init file
+    custom_data = create_cloud_init_file(audit_json, "auditserver")
+
+    # Deploy the frontend server
+    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag, custom_data)
 
     upload_package(audit_service_ip, "auditserver.json", "auditserver.tar.gz")
 
@@ -523,40 +559,35 @@ if __name__ == "__main__":
     account_credentials["object_id"] = AZURE_OBJECT_ID
 
     # Deploy Storage Account
-    (
-        storage_account,
-        storage_account_name,
-        storage_accout_password,
-        storage_resource_group_name,
-    ) = create_storage_account(account_credentials, deployment_id, "saildatastorage", "westus")
+    # (
+    #     storage_account,
+    #     storage_account_name,
+    #     storage_accout_password,
+    #     storage_resource_group_name,
+    # ) = create_storage_account(account_credentials, deployment_id, "saildatastorage", "westus")
 
     # Create storage account id
-    storage_account_id = (
-        "/subscriptions/"
-        + account_credentials["subscription_id"]
-        + "/resourceGroups/"
-        + storage_resource_group_name
-        + "/providers/Microsoft.Storage/storageAccounts/"
-        + storage_account_name
-    )
+    # storage_account_id = f"/subscriptions/{account_credentials["subscription_id"]}/resourceGroups/{storage_resource_group_name}/providers/Microsoft.Storage/storageAccounts/{storage_account_name}"
 
     # Provision a key vault
-    key_vault_url = deploy_key_vault(
-        account_credentials=account_credentials,
-        deployment_name=deployment_id,
-        key_vault_name_prefix="sailkeyvault",
-        storage_account_id=storage_account_id,
-    )
+    # key_vault_url = deploy_key_vault(
+    #     account_credentials=account_credentials,
+    #     deployment_name=deployment_id,
+    #     key_vault_name_prefix="sailkeyvault",
+    #     storage_account_id=storage_account_id,
+    # )
 
     # Deploy the audit services
     audit_service_ip = deploy_audit_service(
         account_credentials,
-        storage_account_name,
+        "storage_account_name",
         deployment_id,
         OWNER,
         TEST_FLAG,
     )
     print("Audit Service server: ", audit_service_ip)
+
+    exit(0)
 
     # Deploy the API services
     platform_services_ip = deploy_apiservices(

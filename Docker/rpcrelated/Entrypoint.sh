@@ -78,8 +78,6 @@ fi
 
 # Install the rpc library
 pip3 install /app/RPCLib/zero
-pip3 install -e /ds/sail-core
-pip3 install -e /ds/sail-safe-functions
 
 # Set Environment variables
 export PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"

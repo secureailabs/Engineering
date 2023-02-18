@@ -32,6 +32,7 @@ from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
+from models.data_federations import DataFederationProvisionState
 from models.secure_computation_nodes import (
     GetMultipleSecureComputationNode_Out,
     GetSecureComputationNode_Out,
@@ -360,6 +361,8 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
     :param smart_broker_node_db: smart broker node information
     :type smart_broker_node_db: SecureComputationNode_Db
     """
+    from app.api.data_federations_provisions import update_provision_state
+
     try:
         # Provision the secure computation node
         smart_broker_node_db = await provision_virtual_machine(smart_broker_node_db, "smartbroker")
@@ -415,6 +418,11 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
         # Initilize the secure computation node
         await initialize_virtual_machine(smart_broker_node_db, "smartbroker.tar.gz")
 
+        # After the smart broker is initialized, update the state of the data federation provision to READY
+        await update_provision_state(
+            smart_broker_node_db.data_federation_provision_id, DataFederationProvisionState.CREATED
+        )
+
     except Exception as exception:
         print(exception)
         # Update the database to mark the VM as FAILED
@@ -424,6 +432,11 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(smart_broker_node_db.id)},
             {"$set": jsonable_encoder(smart_broker_node_db)},
+        )
+
+        # Update the state of the data federation provision to FAILED
+        await update_provision_state(
+            smart_broker_node_db.data_federation_provision_id, DataFederationProvisionState.CREATION_FAILED
         )
 
 
@@ -522,6 +535,8 @@ async def delete_resource_group(data_federation_provision_id: PyObjectId, curren
     :param current_user: current user information
     :type current_user: TokenData
     """
+    from app.api.data_federations_provisions import update_provision_state
+
     try:
         # Delete the scn resource group
         owner = get_secret("owner")
@@ -542,6 +557,12 @@ async def delete_resource_group(data_federation_provision_id: PyObjectId, curren
             },
             {"$set": {"state": "DELETED"}},
         )
+
+        # Update the federation status as deleted
+        await update_provision_state(
+            provision_id=data_federation_provision_id, state=DataFederationProvisionState.DELETED
+        )
+
     except Exception as exception:
         print(exception)
         # Update the database to mark the VM as FAILED
@@ -552,4 +573,9 @@ async def delete_resource_group(data_federation_provision_id: PyObjectId, curren
                 "researcher_id": str(current_user.organization_id),
             },
             {"$set": {"state": "DELETE_FAILED"}},
+        )
+
+        # Update the federation status as delete failed
+        await update_provision_state(
+            provision_id=data_federation_provision_id, state=DataFederationProvisionState.DELETION_FAILED
         )

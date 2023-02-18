@@ -12,9 +12,9 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Response, status
 from fastapi.encoders import jsonable_encoder
 
 from app.api.authentication import get_current_user
@@ -27,6 +27,7 @@ from models.authentication import TokenData
 from models.common import PyObjectId
 from models.data_federations import (
     DataFederationProvision_Db,
+    DataFederationProvisionState,
     GetDataFederationProvision,
     GetMultipleDataFederationProvision_Out,
     RegisterDataFederationProvision_In,
@@ -34,9 +35,103 @@ from models.data_federations import (
 )
 from models.secure_computation_nodes import RegisterSecureComputationNode_In, SecureComputationNodeType
 
-DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS = "data-federation-provsions"
-
 router = APIRouter()
+
+
+class DataFederationProvision:
+    """
+    Data Federation Provision CRUD operations
+    """
+
+    DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS = "data-federation-provsions"
+
+    @staticmethod
+    async def create(
+        data_federation_provision: DataFederationProvision_Db,
+    ):
+        """
+        Create a new data federation provision
+
+        :param data_federation_provision: data federation provision
+        :type data_federation_provision: DataFederationProvision_Db
+        :return: data federation provision
+        :rtype: DataFederationProvision_Db
+        """
+        return await data_service.insert_one(
+            collection=DataFederationProvision.DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS,
+            data=jsonable_encoder(data_federation_provision),
+        )
+
+    @staticmethod
+    async def read(
+        data_federation_provision_id: Optional[PyObjectId] = None,
+        organization_id: Optional[PyObjectId] = None,
+        throw_on_not_found: bool = True,
+    ) -> List[DataFederationProvision_Db]:
+        """
+        Read a data federation provision
+
+        :param data_federation_provision_id: data federation provision id
+        :type data_federation_provision_id: PyObjectId
+        :return: data federation provision
+        :rtype: DataFederationProvision_Db
+        """
+
+        data_federation_provision_list = []
+
+        query = {}
+        if data_federation_provision_id:
+            query["_id"] = data_federation_provision_id
+        if organization_id:
+            query["organization_id"] = organization_id
+
+        if not query:
+            raise Exception("Invalid query")
+
+        response = await data_service.find_by_query(
+            collection=DataFederationProvision.DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS,
+            query=jsonable_encoder(query),
+        )
+
+        if response:
+            for data_federation_provision in response:
+                data_federation_provision_list.append(DataFederationProvision_Db(**data_federation_provision))
+        elif throw_on_not_found:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Data Federation Provision not found",
+            )
+
+        return data_federation_provision_list
+
+    @staticmethod
+    async def update(
+        data_federation_provision_id: PyObjectId,
+        state: Optional[DataFederationProvisionState] = None,
+    ):
+        """
+        Update a data federation provision
+
+        :param data_federation_provision_id: _description_
+        :type data_federation_provision_id: PyObjectId
+        :param state: _description_, defaults to None
+        :type state: Optional[DataFederationProvisionState], optional
+        :return: _description_
+        :rtype: _type_
+        """
+
+        update_request = {}
+        if state:
+            update_request["state"] = state
+
+        if not update_request:
+            raise Exception("Invalid update request")
+
+        return await data_service.update_many(
+            collection=DataFederationProvision.DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS,
+            query={"_id": data_federation_provision_id},
+            data={"$set": jsonable_encoder(update_request)},
+        )
 
 
 ########################################################################################################################
@@ -90,6 +185,7 @@ async def provision_data_federation(
         organization_id=current_user.organization_id,
         secure_computation_nodes_size=provision_req.secure_computation_nodes_size,
         smart_broker_id=PyObjectId(),
+        state=DataFederationProvisionState.CREATING,
         secure_computation_nodes_id=[],
     )
 
@@ -139,7 +235,8 @@ async def provision_data_federation(
     # Update the smart broker id
     provision_db.smart_broker_id = smart_broker_response.id
 
-    await data_service.insert_one(DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS, jsonable_encoder(provision_db))
+    # Add to the database
+    await DataFederationProvision.create(provision_db)
 
     message = f"[Provision Data Federation]: user_id:{current_user.id}, provision_id: {provision_db.id}"
     await log_message(message)
@@ -172,17 +269,15 @@ async def get_data_federation_provision_info(
     :rtype: GetDataFederationProvision
     """
     # Get the data federation provision
-    provision_db = await data_service.find_one(
-        DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS,
-        {"_id": str(provision_id), "organization_id": str(current_user.organization_id)},
+    provision_db = await DataFederationProvision.read(
+        data_federation_provision_id=provision_id,
+        organization_id=current_user.organization_id,
     )
-    if not provision_db:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data Federation Provision not found")
 
     message = f"[Get Data Federation Provision Info]: user_id:{current_user.id}, provision_id: {provision_id}"
     await log_message(message)
 
-    return GetDataFederationProvision(**provision_db)
+    return GetDataFederationProvision(**(provision_db[0].dict()))
 
 
 ########################################################################################################################
@@ -209,14 +304,11 @@ async def get_all_data_federation_provision_info(
     :rtype: GetDataFederationProvision
     """
     # Get the data federation provision
-    provision_db = await data_service.find_by_query(
-        DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS,
-        {"organization_id": str(current_user.organization_id)},
-    )
+    provision_info = await DataFederationProvision.read(organization_id=current_user.organization_id)
 
     response_list: List[GetDataFederationProvision] = []
-    for provision in provision_db:
-        response_list.append(GetDataFederationProvision(**provision))
+    for provision in provision_info:
+        response_list.append(GetDataFederationProvision(**provision.dict()))
 
     message = f"[Get All Data Federation Provision Info]: user_id:{current_user.id}"
     await log_message(message)
@@ -246,6 +338,9 @@ async def deprovision_data_federation(
     :return: None
     :rtype: Response
     """
+    # Change the provision state to deprovisioning
+    await update_provision_state(provision_id=provision_id, state=DataFederationProvisionState.DELETING)
+
     # Provision the SCN and get the SCN id
     await deprovision_secure_computation_nodes(
         data_federation_provision_id=provision_id,
@@ -256,3 +351,23 @@ async def deprovision_data_federation(
     await log_message(message)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+async def update_provision_state(
+    provision_id: PyObjectId,
+    state: DataFederationProvisionState,
+) -> None:
+    """
+    Update the provision state
+
+    :param provision_id: Data Federation Provision Id
+    :type provision_id: PyObjectId
+    :param state: Data Federation Provision State
+    :type state: DataFederationProvisionState
+    :return: None
+    :rtype: None
+    """
+    await DataFederationProvision.update(
+        data_federation_provision_id=provision_id,
+        state=state,
+    )

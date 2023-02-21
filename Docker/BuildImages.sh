@@ -27,6 +27,11 @@ while getopts "i:" opt; do
 done
 
 echo "--------------------------------------------------"
+echo "making rpcrealted package"
+echo "--------------------------------------------------"
+make package_rpcrelated
+
+echo "--------------------------------------------------"
 echo "--------------------------------------------------"
 # Prune unused docker networks
 docker network prune -f
@@ -75,3 +80,8 @@ for val in "${ListOfDockerImages[@]}"; do
     docker build . -t "${val}"
     popd
 done
+
+echo "--------------------------------------------------"
+echo "cleaning up"
+echo "--------------------------------------------------"
+make clean_datascience

@@ -29,7 +29,7 @@ done
 echo "--------------------------------------------------"
 echo "making apiservice package"
 echo "--------------------------------------------------"
-make package_apiservices
+(cd ../ && make package_apiservices)
 
 echo "--------------------------------------------------"
 echo "--------------------------------------------------"
@@ -84,4 +84,4 @@ done
 echo "--------------------------------------------------"
 echo "cleaning up"
 echo "--------------------------------------------------"
-make clean_datascience
+(cd ../ && make clean_datascience)

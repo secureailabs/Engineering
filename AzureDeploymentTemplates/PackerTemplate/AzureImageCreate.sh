@@ -95,6 +95,12 @@ if [ -z "$ci_flag" ]; then
     done
 fi
 
+# mv the datascience repo to Docker/rpcrelated
+echo "--------------------------------------------------"
+echo "making apiservices package"
+echo "--------------------------------------------------"
+(cd ../../ && make package_apiservices)
+
 # Set the subscription
 echo -e "==== Login to Azure and Set Subscription ====\n"
 az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
@@ -165,3 +171,9 @@ az image update \
 --resource-group $RESOURCE_GROUP \
 --name $ImageName \
 --tags gitCommitHash=$gitCommitHash
+
+# clean up the datascience moved to Docker/rpcrelated
+echo "--------------------------------------------------"
+echo "cleaning up"
+echo "--------------------------------------------------"
+(cd ../../ && make clean_datascience)

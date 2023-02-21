@@ -259,11 +259,11 @@ jobs:
             echo $deployment_id
             set -e
             pwd
-            if ${{ steps.deploy_step.outcome == 'success' }}; then
+            if [ "$deployment_id" == ""]; then
+              echo "Deploy Canceled/Failed: Deprovision canceled."
+            else
               chmod +x Deprovision.sh
               sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
-            else
-              echo "Deploy Canceled/Failed: Deprovision canceled."
             fi
           else
             echo "Step Deprovision not required"

@@ -42,5 +42,6 @@ COPY rpcrelated/Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
 COPY vm-initializer/vm_initializer.py /vm_initializer.py
+COPY vm-initializer/decrypt_file.py /decrypt_file.py
 
 ENTRYPOINT [ "/Entrypoint.sh" ]

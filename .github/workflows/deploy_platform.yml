@@ -259,7 +259,11 @@ jobs:
             echo $deployment_id
             set -e
             pwd
-            if [ "$deployment_id" == ""]; then
+            if [ "$deployment_id" = ""]; then
+              echo "Deploy Canceled/Failed: Deprovision canceled."
+            elif [ "$deployment_id" = " "]; then
+              echo "Deploy Canceled/Failed: Deprovision canceled."
+            elif [ ! "$deployment_id" ]; then
               echo "Deploy Canceled/Failed: Deprovision canceled."
             else
               chmod +x Deprovision.sh

@@ -10,6 +10,7 @@ nginx -g 'daemon off;' 2>&1 | tee /app/nginx.log &
 # vm_initializer.py will download the package.tar.gz and InitializationVector.json
 # if they are not already present on the file system.
 # Forcing a zero exit status as the api server is killed from within and there is no graceful way to do this.
+mv /vm_initializer.py ./vm_initializer.py
 python3 vm_initializer.py || true
 retVal=$?
 if [ $retVal -ne 0 ]; then

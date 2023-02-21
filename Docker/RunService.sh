@@ -76,9 +76,6 @@ fi
 rm -rf $rootDir/Binary/"$imageName"_dir
 mkdir -p $rootDir/Binary/"$imageName"_dir
 
-# Copy the binaries to the folder
-cp $rootDir/Binary/vm_initializer.py $rootDir/Binary/"$imageName"_dir/
-
 # Prepare the flags for the docker run command
 runtimeFlags="$detachFlags --name $dockerName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.

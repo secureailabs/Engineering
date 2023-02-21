@@ -3,19 +3,14 @@ include Make/newwebfrontend.mk
 
 .PHONY: package all clean sail_client database_initializer vmInitializer package_apiservices package_rpcrelated package_smartbroker
 
-bin_dir:
-	@mkdir -p Binary
-
-package_apiservices: bin_dir package_rpcrelated package_smartbroker
-	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated*.json ApiServices
-	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker*.json ApiServices
+package_apiservices: package_rpcrelated package_smartbroker
+	@cp AzureDeploymentTemplates/ArmTemplates/sailvm*.json ApiServices
 	@cp Binary/rpcrelated.tar.gz ApiServices
 	@cp Binary/smartbroker.tar.gz ApiServices
 	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
 	@rm ApiServices/smartbroker.tar.gz
 	@rm ApiServices/rpcrelated.tar.gz
-	@rm ApiServices/rpcrelated*.json
-	@rm ApiServices/smartbroker*.json
+	@rm ApiServices/sailvm*.json
 
 .SECONDEXPANSION:
 package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService/.*")

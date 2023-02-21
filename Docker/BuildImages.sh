@@ -30,8 +30,10 @@ PushImageToRegistry() {
 
     echo "Tag and Pushing image to azure hub"
     tag=v"$version"_"$gitCommitHash"
+    echo "Tag: $tag"
     docker tag "$1" "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
     docker push "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
+    echo Image url: "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
 }
 
 # Check if docker is installed

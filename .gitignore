@@ -8,4 +8,4 @@ DevopsConsole/InitializationVector.json
 RPCLib/zero/zero.egg-info/*
 **/build
 **tmp**
-
+deploy_config.sh

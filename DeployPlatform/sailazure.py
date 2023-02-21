@@ -40,7 +40,6 @@ def deploy_template(accountCredentials, resource_group_name, template, parameter
         resource_group_name, "azure-sample", {"properties": deployment_properties}
     )
     deployment_async_operation.wait()
-    print("deployment_async_operation result ", deployment_async_operation.result())
 
     return deployment_async_operation.status()
 

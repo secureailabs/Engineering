@@ -48,4 +48,3 @@ RUN chmod +x /Entrypoint.sh
 COPY vm-initializer/vm_initializer.py /vm_initializer.py
 
 ENTRYPOINT [ "/Entrypoint.sh" ]
-CMD ["/bin/bash"]

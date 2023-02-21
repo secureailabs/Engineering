@@ -11,12 +11,6 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 mkdir -p /opt/certs
 cp nginx-selfsigned.crt /opt/certs
 cp nginx-selfsigned.key /opt/certs
-# cp vm_initializer.py /opt/
-# cp decrypt_file.py /opt/
-cp Run.sh /opt/
-chmod +x /opt/Run.sh
-
-(crontab -l; echo "@reboot cd /opt; sudo ./Run.sh > VmImageInit.log") | crontab -
 
 # To cleanup the user details
 /usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync

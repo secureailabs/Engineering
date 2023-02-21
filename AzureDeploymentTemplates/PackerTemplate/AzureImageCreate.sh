@@ -27,56 +27,56 @@ if [ $retVal -ne 0 ]; then
 fi
 
 # Check if the AZURE_SUBSCRIPTION_ID is set
-if [ -z "$AZURE_SUBSCRIPTION_ID" ]; then
+if [ -z $AZURE_SUBSCRIPTION_ID ]; then
     echo "AZURE_SUBSCRIPTION_ID is not set. Set it and retry."
     exit 1
 fi
 
 # Set the subscription
 echo -e "==== Login to Azure and Set Subscription ====\n"
-az login --service-principal --username "$AZURE_CLIENT_ID" --password "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
-az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+az account set --subscription $AZURE_SUBSCRIPTION_ID
 az account show
 
 # list custom SAIL managed images
 echo -e "\n==== Azure Image List ====\n"
 az image list \
---resource-group "$RESOURCE_GROUP"
+--resource-group $RESOURCE_GROUP
 
 # Delete old custom SAIL managed images
 echo -e "\n==== Azure Image Delete As Required ====\n"
 az image delete \
---resource-group "$RESOURCE_GROUP" \
+--resource-group $RESOURCE_GROUP \
 --name $ImageName
 
 az sig image-version delete \
---gallery-image-version "$ImageVersion" \
---gallery-image-definition "$ImageName" \
---gallery-name "$IMAGE_GALLERY_NAME" \
---resource-group "$RESOURCE_GROUP"
+--gallery-image-version $ImageVersion \
+--gallery-image-definition $ImageName \
+--gallery-name $IMAGE_GALLERY_NAME \
+--resource-group $RESOURCE_GROUP
 echo "Image Version Deletion Completed, continuing..."
 
 # Create resource group for storage account
 echo -e "\n==== Azure Managed Image Creation Begins ====\n"
 az group create \
---name "$RESOURCE_GROUP" \
---location "$LOCATION"
+--name $RESOURCE_GROUP \
+--location $LOCATION
 
 # Create the shared image gallery
 az sig create \
---resource-group "$RESOURCE_GROUP" \
---gallery-name "$IMAGE_GALLERY_NAME" \
---location "$LOCATION"
+--resource-group $RESOURCE_GROUP \
+--gallery-name $IMAGE_GALLERY_NAME \
+--location $LOCATION
 
 # Create the image definition
 az sig image-definition create \
---resource-group "$RESOURCE_GROUP" \
---gallery-name "$IMAGE_GALLERY_NAME" \
---gallery-image-definition "$ImageName" \
+--resource-group $RESOURCE_GROUP \
+--gallery-name $IMAGE_GALLERY_NAME \
+--gallery-image-definition $ImageName \
 --features SecurityType=ConfidentialVMSupported \
 --publisher "Secure-AI-Labs" \
 --hyper-v-generation V2 \
---offer "$ImageName" \
+--offer $ImageName \
 --sku "sail" \
 --os-type "Linux"
 

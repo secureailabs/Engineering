@@ -56,7 +56,9 @@ jobs:
           submodules: true
 
       - name: "Make requirements"
-        run: make vmInitializer
+        run: |
+          make vmInitializer
+          make apiservices
 
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}

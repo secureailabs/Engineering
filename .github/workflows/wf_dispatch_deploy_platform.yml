@@ -151,7 +151,7 @@ jobs:
           pwd
           ls -l
           exec 5>&1
-          mkdir Binary
+          mkdir Binary || true
           DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
           INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
           echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT

@@ -121,7 +121,6 @@ jobs:
   Deploy_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
     needs: Setup_Environment
-    id: deploy_job
     outputs:
       internal_ip_addr: ${{ steps.deploy_step.outputs.INTERNAL_IP_ADDR }}
       deployment_id: ${{ steps.deploy_step.outputs.DEPLOY_ID }}
@@ -260,7 +259,7 @@ jobs:
             echo $deployment_id
             set -e
             pwd
-            if ${{ steps.deploy_job.outcome == 'success' }}; then
+            if ${{ steps.deploy_step.outcome == 'success' }}; then
               chmod +x Deprovision.sh
               sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
             else

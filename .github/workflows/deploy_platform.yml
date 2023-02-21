@@ -101,12 +101,13 @@ jobs:
     steps:
       - name: Options selected
         run: |
-          echo "Subscription: ${{ inputs.subscription }}"
-          echo "Preload Datasets: ${{ inputs.preload_dataset }}"
-          echo "Purpose of Deployment: ${{ inputs.purpose }}"
-          echo "Owner of Deployment: ${{ inputs.owner }}"
-          echo "Run Tests after Deployment: ${{ inputs.run_tests }}"
-          echo "Deprovision when finished: ${{ inputs.deprovision_after }}"
+          echo "## Options Selected" >> $GITHUB_STEP_SUMMARY
+          echo "Subscription:&emsp&emsp&emsp `${{ inputs.subscription }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Preload Datasets:&emsp$&emsp `${{ inputs.preload_dataset }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Purpose of Deployment:&emsp `${{ inputs.purpose }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Owner of Deployment:&emsp `${{ inputs.owner }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Run Tests after Deployment:&emsp `${{ inputs.run_tests }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Deprovision when finished:&emsp `${{ inputs.deprovision_after }}"` >> $GITHUB_STEP_SUMMARY
 
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
@@ -127,18 +128,19 @@ jobs:
     steps:
       - name: Determine Subscription
         run: |
+          echo "## Deploy Platform" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.subscription == 'Development' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Development"
+            echo "Subscription:&emsp; `Development` " >> $GITHUB_STEP_SUMMARY
           elif ${{ inputs.subscription == 'Release Candidate' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Release Candidate"
+            echo "Subscription:&emsp; `Release Candidate` " >> $GITHUB_STEP_SUMMARY
           elif ${{ inputs.subscription == 'ProductionGA' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Production GA"
+            echo "Subscription:&emsp; `Production GA` " >> $GITHUB_STEP_SUMMARY
           else
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: None (Defaulted to Development)"
+            echo "Subscription:&emsp; `None (Defaulted to Development)` " >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Deploy To Subscription
@@ -155,16 +157,23 @@ jobs:
           DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
           INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
           echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+          echo "Sail API Services is hosted internally on: `https://&emsp;$INTERNAL_ADDR_API_SERVICE` " >> $GITHUB_STEP_SUMMARY
           DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":" | tee >(cat - >&5))
           echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
+          echo " `$DEPLOY_GUID_ID` " >> $GITHUB_STEP_SUMMARY
+          echo "## Preload Dataset" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.preload_dataset == true }}; then
             cd DatasetTool/
             dotnet build
             dotnet publish -c Release
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
+            echo "### Dataset 1" >> $GITHUB_STEP_SUMMARY
+            echo "$dataset_output01" >> $GITHUB_STEP_SUMMARY
+            echo "### Dataset 2" >> $GITHUB_STEP_SUMMARY
+            echo "$dataset_output02" >> $GITHUB_STEP_SUMMARY
           else
-            echo "Not Preloading Datasets."
+            echo "No Preloaded Datasets." >> $GITHUB_STEP_SUMMARY
           fi
 
   Test:
@@ -181,6 +190,7 @@ jobs:
           if ${{ inputs.run_tests == true }}; then
             deploy_output_str=${{needs.Deploy_Platform.outputs.internal_ip_addr}}
             INTERNAL_IP_ADDR=${deploy_output_str%:*}
+            echo "Test Internal IP:&emsp; `$INTERNAL_IP_ADDR` " >> $GITHUB_STEP_SUMMARY
             docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
             docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
             docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
@@ -204,8 +214,10 @@ jobs:
         run: |
           if ${{ inputs.run_tests == true }}; then
             echo "run_test=yes" >> $GITHUB_OUTPUT
+            echo "Run Tests: YES" >> $GITHUB_STEP_SUMMARY
           else
             echo "run_test=no" >> $GITHUB_OUTPUT
+            echo "Run Tests: NO" >> $GITHUB_STEP_SUMMARY
           fi
 
   Deprovision_Platform:
@@ -219,7 +231,8 @@ jobs:
     steps:
       - name: Deprovision Parameters
         run: |
-          echo "CHECK TEST RAN: $CHECKTESTRAN"
+          echo "## Deprovision Platform" >> $GITHUB_STEP_SUMMARY
+          echo "CHECK TEST RAN: $CHECKTESTRAN" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.deprovision_after == true }}; then
             deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
             echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
@@ -228,24 +241,24 @@ jobs:
             deployment_id=$(echo ${deployment_id:0:36})
             echo $deployment_id
           else
-            echo "Step Display Deprovision Parameters not required"
-            echo "deprovision_after option was not selected"
+            echo "Step Display Deprovision Parameters not required" >> $GITHUB_STEP_SUMMARY
+            echo "deprovision_after option was not selected" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Determine Subscription
         run: |
           if ${{ inputs.subscription == 'Development' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Development"
+            echo "Subscription:&emsp; `Development` " >> $GITHUB_STEP_SUMMARY
           elif ${{ inputs.subscription == 'Release Candidate' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Release Candidate"
+            echo "Subscription:&emsp; `Release Candidate` " >> $GITHUB_STEP_SUMMARY
           elif ${{ inputs.subscription == 'ProductionGA' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Production GA"
+            echo "Subscription:&emsp; `Production GA` " >> $GITHUB_STEP_SUMMARY
           else
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: None (Defaulted to Development)"
+            echo "Subscription:&emsp; `None (Defaulted to Development)` " >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Deprovision
@@ -255,13 +268,13 @@ jobs:
             owner="Deployment ID: ${{ inputs.owner }}"
             purpose="-${{ inputs.purpose }}"
             deployment_id=${deploy_output_str##$owner-}
-            deployment_id=$(echo ${deployment_id:0:36}) 
-            echo $deployment_id
+            deployment_id=$(echo ${deployment_id:0:36})
+            echo "Deployment ID:&emsp; `$deployment_id` " >> $GITHUB_STEP_SUMMARY
             set -e
             pwd
             chmod +x Deprovision.sh
             sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
           else
-            echo "Step Deprovision not required"
-            echo "deprovision_after option was not selected"
+            echo "Step Deprovision not required" >> $GITHUB_STEP_SUMMARY
+            echo "deprovision_after option was not selected" >> $GITHUB_STEP_SUMMARY
           fi

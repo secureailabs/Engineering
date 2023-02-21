@@ -12,7 +12,7 @@
 #
 #
 
-name: Deploy Payload Images
+name: "Deploy Payload Images to Azure"
 
 on:
   workflow_dispatch:

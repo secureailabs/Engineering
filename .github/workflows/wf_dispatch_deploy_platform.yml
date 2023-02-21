@@ -12,7 +12,7 @@
 #
 #
 
-name: "Deploy Platform"
+name: "Deploy Platform to Azure"
 
 permissions:
   checks: read

@@ -1,4 +1,4 @@
-name: Update Documentation
+name: "CI Update Documentation"
 
 on:
   # Allows you to run this workflow manually from the Actions tab

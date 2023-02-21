@@ -259,8 +259,12 @@ jobs:
             echo $deployment_id
             set -e
             pwd
-            chmod +x Deprovision.sh
-            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
+            if [ "$deployment_id" = "" ] || [ "$deployment_id" = " " ] || [ ! "$deployment_id" ]; then
+              echo "Deploy Canceled/Failed: Deprovision canceled."
+            else
+              chmod +x Deprovision.sh
+              sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
+            fi
           else
             echo "Step Deprovision not required"
             echo "deprovision_after option was not selected"

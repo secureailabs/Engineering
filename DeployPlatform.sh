@@ -63,7 +63,6 @@ if [ -z "${AZURE_OBJECT_ID}" ]; then
 fi
 
 # Build and Package the Platform Services
-make package_rpcrelated
 make package_audit_service
 make package_apiservices
 make sail_client database_initializer

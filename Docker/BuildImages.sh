@@ -27,9 +27,9 @@ while getopts "i:" opt; do
 done
 
 echo "--------------------------------------------------"
-echo "making rpcrealted package"
+echo "making apiservice package"
 echo "--------------------------------------------------"
-make package_rpcrelated
+make package_apiservices
 
 echo "--------------------------------------------------"
 echo "--------------------------------------------------"

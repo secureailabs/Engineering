@@ -106,6 +106,10 @@ do
             echo "Deleting resources of specified guid!"
             while true; do
                 read -p "Enter guid of platform you wish to delete: " GUID
+                if [ -z $GUID ]; then
+                    echo "GUID entered was empty; exiting..."
+                    exit 0
+                fi
                 echo -e "\nList of Resources staged for deletion\n"
                 az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv
                 read -p "Do you wish to continue?  " yn

@@ -2,6 +2,7 @@
 
 > ## PREREQISITE REQUIREMENTS
 `../../Binary/vm_initializer.py` should exist before running this script which can be created by running `make all` in the `VirtualMachine/VmInitializer` directory.
+Package Apiservices and its dependencies need to be built before running the script by running `make package_apiservices` in the `Engineering` directory.
 
 > ### Install AZURE CLI
 https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt

@@ -27,6 +27,11 @@ while getopts "i:" opt; do
 done
 
 echo "--------------------------------------------------"
+echo "making apiservice package"
+echo "--------------------------------------------------"
+(cd ../ && make package_apiservices)
+
+echo "--------------------------------------------------"
 echo "--------------------------------------------------"
 # Prune unused docker networks
 docker network prune -f
@@ -75,3 +80,8 @@ for val in "${ListOfDockerImages[@]}"; do
     docker build . -t "${val}"
     popd
 done
+
+echo "--------------------------------------------------"
+echo "cleaning up"
+echo "--------------------------------------------------"
+(cd ../ && make clean_datascience)

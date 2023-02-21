@@ -1,5 +1,5 @@
 # CI workflow Docker Build
-name: CI for Development Repository
+name: "CI for Development Repository"
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -113,7 +113,7 @@ jobs:
 
   call-deploy-platform-workflow:
     needs: build
-    uses: ./.github/workflows/deploy_platform.yml
+    uses: ./.github/workflows/wf_dispatch_deploy_platform.yml
     with:
       subscription: "Development"
       purpose: "PR-${{ github.event.pull_request.number }}"

@@ -1,4 +1,4 @@
-name: Update Documentation
+name: "CI Update Documentation"
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -47,6 +47,12 @@ jobs:
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           persist-credentials: true
           submodules: true
+
+      - name: make
+        run: |
+          sudo make clean
+          mkdir Binary || true
+          make package_apiservices
 
       - name: Build api server
         run: |

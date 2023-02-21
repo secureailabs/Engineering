@@ -17,17 +17,16 @@ import functools
 from typing import Optional, Union
 
 import requests
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import StrictStr
-
 from app.api.authentication import get_current_user
 from app.api.data_federations_provisions import get_all_data_federation_provision_info
 from app.api.datasets import get_all_datasets
 from app.utils.secrets import get_secret
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from models.accounts import UserRole
 from models.audit import QueryResult
 from models.authentication import TokenData
 from models.common import PyObjectId
+from pydantic import StrictStr
 
 router = APIRouter()
 
@@ -91,7 +90,6 @@ async def audit_incidents_query(
     response = {}
 
     query_str = f'{{job="{label}"}}'
-    '{job="user_activity"}'
     query["query"] = query_str
 
     if "user_id" in query:
@@ -110,8 +108,52 @@ async def audit_incidents_query(
 
     if label == "user_activity":
         response = await query_user_activity(query, current_user)
+    elif label == "computation":
+        response = await query_computation(query, current_user)
 
     return QueryResult(**response.json())
+
+
+########################################################################################################################
+async def query_computation(
+    query: dict,
+    current_user: TokenData,
+):
+    """
+    query computation activities
+
+    :param query: loki query json
+    :type query: dict
+    :param current_user: the user who perform the query
+    :type current_user: TokenData
+    :return: query result
+    :rtype: json(dict)
+    """
+
+    response = {}
+    # the user is SAIL tech support, no restriction
+    if current_user.role == UserRole.ADMIN:
+        response = await audit_query(query)
+
+    # the user is research org admin, can only get info about data and nodes owned by the org.
+    # check if data belongs to org
+    elif current_user == UserRole.ORGANIZATION_ADMIN:
+        organization_id = current_user.organization_id
+        query["query"] = f"{query['query']} |= `{str(organization_id)}`"
+        response = await audit_query(query)
+
+    # the user is the data owner admin, can only get info about the data they own.
+    # check if data belongs to owner
+    elif current_user == UserRole.DATASET_ADMIN:
+        user_id = current_user.id
+        query["query"] = f"{query['query']} |= `{str(user_id)}`"
+        response = await audit_query(query)
+
+    # for other user identity, this is forbidden
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
+
+    return response
 
 
 # #######################################################################################################################
@@ -226,7 +268,7 @@ async def query_computation_by_data_id(
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized")
 
-    return QueryResult(**response.json())
+    return response
 
 
 ########################################################################################################################

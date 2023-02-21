@@ -26,9 +26,14 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-
 COPY requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY datascience /datascience
+WORKDIR /datascience/sail-core
+RUN pip3 install -e /datascience/sail-core
+WORKDIR /datascience/sail-safe-functions
+RUN pip3 install -e /datascience/sail-safe-functions
 
 RUN useradd --system promtail
 

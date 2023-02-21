@@ -19,6 +19,8 @@ package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService
 	@tar -cvzf Binary/auditserver.tar.gz $^
 
 package_rpcrelated: $$(shell find RPCLib/ -type f ! -path "RPCLib/.*")
+	@cp -r datascience Docker/rpcrelated
+	@cp datascience/Docker/sail-scn-docker/requirements.txt Docker/rpcrelated/datascience/sail-safe-functions
 	@tar  --exclude='datascience/.*' --exclude='datascience/notebooks'  --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' -cvzf Binary/rpcrelated.tar.gz datascience $^ 
 
 package_smartbroker:
@@ -48,4 +50,5 @@ all:
 	@echo "All build and packaged!"
 
 clean:
+	@rm -rf Docker/rpcrelated/datascience
 	@rm -rf Binary

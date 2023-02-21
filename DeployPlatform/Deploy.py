@@ -415,8 +415,6 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
 
         # Create container
         az_oauth_url = f"https://{account_name}.blob.core.windows.net"
-        # az_connnection_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={storage_account_key};EndpointSuffix=core.windows.net"
-
         blob_service_client = BlobServiceClient(account_url=az_oauth_url, credential=account_credentials["credentials"])
         container_client = blob_service_client.get_container_client("audit")
         container_client.create_container()

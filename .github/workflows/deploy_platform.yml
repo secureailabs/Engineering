@@ -193,7 +193,8 @@ jobs:
           sed -i 's/$SLACK_WEBHOOK_URL/'"$SLACK_WEBHOOK_URL"'/g' deploy_config.sh
           sed -i 's/$DOCKER_REGISTRY_URL/'"$DOCKER_REGISTRY_URL"'/g' deploy_config.sh
           sed -i 's/$DOCKER_REGISTRY_USERNAME/'"$DOCKER_REGISTRY_USERNAME"'/g' deploy_config.sh
-          sed -i 's/$DOCKER_REGISTRY_PASSWORD/'"$DOCKER_REGISTRY_PASSWORD"'/g' deploy_config.sh
+          # Kindly ensure that the password does not contain @
+          sed -i 's@$DOCKER_REGISTRY_PASSWORD@'"$DOCKER_REGISTRY_PASSWORD"'@g' deploy_config.sh
           if ${{ inputs.api_services_tag != 'default'}}
           then
             sed -i 's/$API_SERVICES_TAG/'"${{ inputs.api_services_tag }}"'/g' deploy_config.sh

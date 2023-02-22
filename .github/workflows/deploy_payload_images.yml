@@ -58,7 +58,7 @@ jobs:
       - name: "Make requirements"
         run: |
           make vmInitializer
-          make apiservices
+          make package_apiservices
 
       - name: Condition 1 Development
         if: ${{ github.event.inputs.subscription == 'Development' }}

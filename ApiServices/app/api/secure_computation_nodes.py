@@ -19,10 +19,8 @@ from ipaddress import IPv4Address
 from typing import List
 
 import aiohttp
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
-from fastapi.encoders import jsonable_encoder
-
 import app.utils.azure as azure
+import yaml
 from app.api.authentication import get_current_user
 from app.api.data_federations import get_existing_dataset_key
 from app.api.dataset_versions import get_dataset_version
@@ -30,6 +28,8 @@ from app.data import operations as data_service
 from app.log import log_message
 from app.utils.background_couroutines import add_async_task
 from app.utils.secrets import get_secret
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Response, status
+from fastapi.encoders import jsonable_encoder
 from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.data_federations import DataFederationProvisionState
@@ -318,8 +318,6 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
     :type dataset_key: str
     """
     try:
-        secure_computation_node_db = await provision_virtual_machine(secure_computation_node_db, "rpcrelated")
-
         # Create a SCN initialization vector json
         securecomputationnode_json = SecureComputationNodeInitializationVector(
             secure_computation_node_id=secure_computation_node_db.id,
@@ -337,6 +335,10 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
 
         with open(str(secure_computation_node_db.id), "w") as outfile:
             json.dump(jsonable_encoder(securecomputationnode_json), outfile)
+
+        secure_computation_node_db = await provision_virtual_machine(
+            secure_computation_node_db, "rpcrelated", jsonable_encoder(securecomputationnode_json)
+        )
 
         # Initilize the secure computation node
         await initialize_virtual_machine(secure_computation_node_db, "rpcrelated.tar.gz")
@@ -364,8 +366,22 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
     from app.api.data_federations_provisions import update_provision_state
 
     try:
+
+        # Create a SCN initialization vector json
+        smart_broker_json = SmartBrokerInitializationVector(
+            smart_broker_id=smart_broker_node_db.id,
+            secure_computation_nodes=[],
+            access_token="",
+            researcher_id=smart_broker_node_db.researcher_id,
+            researcher_user_id=smart_broker_node_db.researcher_user_id,
+            data_federation_id=smart_broker_node_db.data_federation_id,
+            version=get_secret("version"),
+        )
+
         # Provision the secure computation node
-        smart_broker_node_db = await provision_virtual_machine(smart_broker_node_db, "smartbroker")
+        smart_broker_node_db = await provision_virtual_machine(
+            smart_broker_node_db, "smartbroker", jsonable_encoder(smart_broker_json)
+        )
 
         # Wait for all the SCNs to be ready with a timeout of 15 minutes
         secure_computation_node_dbs = []
@@ -402,15 +418,7 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
             )
 
         # Create a SCN initialization vector json
-        smart_broker_json = SmartBrokerInitializationVector(
-            smart_broker_id=smart_broker_node_db.id,
-            secure_computation_nodes=secure_computation_nodes,
-            access_token="",
-            researcher_id=smart_broker_node_db.researcher_id,
-            researcher_user_id=smart_broker_node_db.researcher_user_id,
-            data_federation_id=smart_broker_node_db.data_federation_id,
-            version=get_secret("version"),
-        )
+        smart_broker_json.secure_computation_nodes = secure_computation_nodes
 
         with open(str(smart_broker_node_db.id), "w") as outfile:
             json.dump(jsonable_encoder(smart_broker_json), outfile)
@@ -440,9 +448,54 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
         )
 
 
+def create_cloud_init_file(initialization_json: dict, image_name: str):
+    """
+    Create a cloud init file
+
+    :param initialization_json: initialization vector json
+    :type initialization_json: dict
+    :param image_name: name of the docker image
+    :type image_name: str
+    :return: cloud init file contents
+    :rtype: str
+    """
+    cloud_init_file = "#cloud-config\n"
+
+    cloud_init_yaml = {}
+
+    # Copy the initialization.json file to the VM
+    cloud_init_yaml["write_files"] = [
+        {
+            "path": "/etc/initialization.json",
+            "content": json.dumps(initialization_json, indent=4),
+        }
+    ]
+
+    cloud_init_yaml["runcmd"] = [
+        f"sudo mkdir -p /opt/{image_name}_dir",
+        "sudo docker login {0} --username {1} --password {2}".format(
+            get_secret("docker_registry_url"),
+            get_secret("docker_registry_username"),
+            get_secret("docker_registry_password"),
+        ),
+        "sudo docker run -dit {0} -v /opt/{3}_dir:/app -v /opt/certs:/etc/nginx/certs --name {3} {1}/{3}:{2}".format(
+            get_secret(f"{image_name}_docker_params"),
+            get_secret("docker_registry_url"),
+            get_secret(f"{image_name}_image_tag"),
+            image_name,
+        ),
+    ]
+
+    cloud_init_file += yaml.dump(cloud_init_yaml)
+
+    return cloud_init_file
+
+
 ########################################################################################################################
 async def provision_virtual_machine(
-    virtual_machine_info_db: SecureComputationNode_Db, template_name: str
+    virtual_machine_info_db: SecureComputationNode_Db,
+    template_name: str,
+    initialization_vector_json: dict,
 ) -> SecureComputationNode_Db:
     """
     Provision a virtual machine
@@ -451,6 +504,8 @@ async def provision_virtual_machine(
     :type virtual_machine_info_db: SecureComputationNode_Db
     :param template_name: template name
     :type template_name: str
+    :param initialization_vector_json: initialization vector json
+    :type initialization_vector_json: str
     :rtype: SecureComputationNode_Db
     """
     # Update the database to mark the VM as being created
@@ -470,9 +525,9 @@ async def provision_virtual_machine(
     deploy_response: azure.DeploymentResponse = await azure.deploy_module(
         account_credentials,
         resource_group_name,
-        template_name,
         str(virtual_machine_info_db.id),
         jsonable_encoder(virtual_machine_info_db.size),
+        custom_data=create_cloud_init_file(initialization_vector_json, template_name),
     )
     if deploy_response.status != "Success":
         raise Exception(deploy_response.note)
@@ -499,22 +554,32 @@ async def initialize_virtual_machine(virtual_machine_info_db: SecureComputationN
     :param package_filename: package filename
     :type package_filename: str
     """
-    # Sleeping for 1.5 minutes
-    await asyncio.sleep(90)
+    # try for 5 minutes with a 15 second timeout for each request
+    uploaded = False
+    for _ in range(20):
+        try:
+            headers = {"accept": "application/json"}
+            files = {
+                "initialization_vector": open(str(virtual_machine_info_db.id), "rb"),
+                "bin_package": open(package_filename, "rb"),
+            }
+            async with aiohttp.ClientSession() as session:
+                async with session.put(
+                    "https://" + str(virtual_machine_info_db.ipaddress) + ":9090/initialization-data",
+                    headers=headers,
+                    data=files,
+                    verify_ssl=False,
+                ) as resp:
+                    print("Upload package status: ", resp.status)
+                    if resp.status == 200:
+                        uploaded = True
+            break
+        except Exception as exception:
+            print(f"upload_package: {str(exception)}, retrying...")
+            time.sleep(15)
 
-    headers = {"accept": "application/json"}
-    files = {
-        "initialization_vector": open(str(virtual_machine_info_db.id), "rb"),
-        "bin_package": open(package_filename, "rb"),
-    }
-    async with aiohttp.ClientSession() as session:
-        async with session.put(
-            "https://" + str(virtual_machine_info_db.ipaddress) + ":9090/initialization-data",
-            headers=headers,
-            data=files,
-            verify_ssl=False,
-        ) as resp:
-            print("Upload package status: ", resp.status)
+    if not uploaded:
+        raise Exception("Failed to upload package. Timeout.")
 
     # Update the database to mark the VM as WAITING_FOR_DATA
     virtual_machine_info_db.state = SecureComputationNodeState.WAITING_FOR_DATA
@@ -525,7 +590,6 @@ async def initialize_virtual_machine(virtual_machine_info_db: SecureComputationN
     )
 
 
-########################################################################################################################
 async def delete_resource_group(data_federation_provision_id: PyObjectId, current_user: TokenData):
     """
     Delete a resource group

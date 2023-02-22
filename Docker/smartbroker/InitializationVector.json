@@ -1,0 +1,18 @@
+{
+    "access_token": "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7",
+    "refresh_token": "52bb444a1aabb9a76792527e6605349e1cbc7fafb8624de4e0ddde4f84ad4066",
+    "secure_computation_nodes": [
+        {
+            "ip_address": "scn_a892ffd0-4f6f-11ed-bdc3-0242ac120002",
+            "dataset_id": "a892ffd0-4f6f-11ed-bdc3-0242ac120002"
+        },
+        {
+            "ip_address": "scn_a89301b0-4f6f-11ed-bdc3-0242ac120002",
+            "dataset_id": "a89301b0-4f6f-11ed-bdc3-0242ac120002"
+        },
+        {
+            "ip_address": "scn_a89302dc-4f6f-11ed-bdc3-0242ac120002",
+            "dataset_id": "a89302dc-4f6f-11ed-bdc3-0242ac120002"
+        }
+    ]
+}

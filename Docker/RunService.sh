@@ -76,8 +76,21 @@ fi
 rm -rf $rootDir/Binary/"$imageName"_dir
 mkdir -p $rootDir/Binary/"$imageName"_dir
 
+
+# Create sailNetwork if it does not exist
+networkName="sailNetwork"
+foundNetworkName=$(docker network ls --filter name=$networkName --format {{.Name}})
+echo "$foundNetworkName"
+if [ "$foundNetworkName" == "$networkName" ]; then
+    echo "Network already exists"
+else
+    echo "Creating network"
+    docker network create --subnet=172.31.252.0/24 $networkName
+fi
+docker network ls
+
 # Prepare the flags for the docker run command
-runtimeFlags="$detachFlags --name $dockerName --network sailNetwork -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
+runtimeFlags="$detachFlags --name $dockerName --network $networkName -v $rootDir/DevopsConsole/certs:/etc/nginx/certs"
 # TODO: issue because sailNetwork is shared.
 if [ "apiservices" == "$imageName" ]; then
     # Create database volume if it does not exist

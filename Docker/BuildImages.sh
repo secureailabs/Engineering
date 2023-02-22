@@ -6,7 +6,7 @@ PrintHelp() {
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0 -i [Image Name] -p"
     echo "Usage: $0"
-    echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver"
+    echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver | smartbroker"
     exit 1 # Exit script after printing help
 }
 
@@ -66,21 +66,6 @@ docker network prune -f
 echo "--------------------------------------------------"
 echo "--------------------------------------------------"
 
-# Create sailNetwork if it does not exist
-networkName="sailNetwork"
-foundNetworkName=$(docker network ls --filter name=$networkName --format {{.Name}})
-echo "$foundNetworkName"
-if [ "$foundNetworkName" == "$networkName" ]; then
-    echo "Network already exists"
-else
-    echo "Creating network"
-    docker network create --subnet=172.31.252.0/24 $networkName
-fi
-echo "--------------------------------------------------"
-docker network ls
-echo "--------------------------------------------------"
-echo "--------------------------------------------------"
-
 # Build the asked image if it specified in the input parameters
 if [ -z "$imageName" ]; then
     echo "No image specified. Building all of them..."
@@ -99,6 +84,7 @@ declare -a ListOfDockerImages=(
     "newwebfrontend"
     "rpcrelated"
     "auditserver"
+    "smartbroker"
 )
 
 for val in "${ListOfDockerImages[@]}"; do

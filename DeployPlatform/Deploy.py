@@ -366,6 +366,15 @@ def deploy_apiservices(
     backend_json["version"] = VERSION
     backend_json["audit_service_ip"] = audit_service_ip
     backend_json["slack_webhook"] = SLACK_WEBHOOK_URL
+    backend_json["docker_registry_url"] = DOCKER_REGISTRY_URL
+    backend_json["docker_registry_username"] = DOCKER_REGISTRY_USERNAME
+    backend_json["docker_registry_password"] = DOCKER_REGISTRY_PASSWORD
+    backend_json["smartbroker_docker_params"] = "-p 8000:8001 -p 9090:9091 "
+    backend_json["smartbroker_image_tag"] = AGGREGATOR_SCN_TAG
+    backend_json[
+        "rpcrelated_docker_params"
+    ] = "-p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
+    backend_json["rpcrelated_image_tag"] = PARTICIPANT_SCN_TAG
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)

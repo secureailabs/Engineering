@@ -129,7 +129,7 @@ class DataFederationProvision:
 
         return await data_service.update_many(
             collection=DataFederationProvision.DB_COLLECTION_DATA_FEDERATIONS_PROVISIONS,
-            query={"_id": data_federation_provision_id},
+            query={"_id": str(data_federation_provision_id)},
             data={"$set": jsonable_encoder(update_request)},
         )
 

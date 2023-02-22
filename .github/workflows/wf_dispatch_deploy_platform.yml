@@ -1,5 +1,5 @@
 # Engineering
-# deploy_platform.yml
+# wf_dispatch_deploy_platform.yml
 # Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
 #
 # Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
@@ -12,7 +12,7 @@
 #
 #
 
-name: "Deploy Platform"
+name: "Deploy Platform to Azure"
 
 permissions:
   checks: read
@@ -183,7 +183,7 @@ jobs:
           pwd
           ls -l
           exec 5>&1
-          mkdir Binary
+          mkdir Binary || true
 
           sed -i 's/$AZURE_SUBSCRIPTION_ID/'"$AZURE_SUBSCRIPTION_ID"'/g' deploy_config.sh
           sed -i 's/$AZURE_TENANT_ID/'"$AZURE_TENANT_ID"'/g' deploy_config.sh
@@ -281,12 +281,10 @@ jobs:
         run: |
           echo "CHECK TEST RAN: $CHECKTESTRAN"
           if ${{ inputs.deprovision_after == true }}; then
-            deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            echo "${{needs.Deploy_Platform.outputs.deployment_id}}"
-            owner="Deployment ID: ${{ inputs.owner }}"
-            deployment_id=${deploy_output_str##$owner-}
-            deployment_id=$(echo ${deployment_id:0:36})
-            echo $deployment_id
+            echo "Purpose of Deployment: ${{ inputs.purpose }}"
+            echo "Owner of Deployment: ${{ inputs.owner }}"
+            deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
+            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id"
           else
             echo "Step Display Deprovision Parameters not required"
             echo "deprovision_after option was not selected"
@@ -311,12 +309,10 @@ jobs:
       - name: Deprovision
         run: |
           if ${{ inputs.deprovision_after == true }}; then
-            deploy_output_str="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            owner="Deployment ID: ${{ inputs.owner }}"
-            purpose="-${{ inputs.purpose }}"
-            deployment_id=${deploy_output_str##$owner-}
-            deployment_id=$(echo ${deployment_id:0:36})
-            echo $deployment_id
+            echo "Purpose of Deployment: ${{ inputs.purpose }}"
+            echo "Owner of Deployment: ${{ inputs.owner }}"
+            deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
+            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id"
             set -e
             pwd
             if [ "$deployment_id" = "" ] || [ "$deployment_id" = " " ] || [ ! "$deployment_id" ]; then

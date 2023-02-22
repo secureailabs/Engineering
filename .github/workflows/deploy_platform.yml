@@ -102,12 +102,12 @@ jobs:
       - name: Options selected
         run: |
           echo "## Options Selected" >> $GITHUB_STEP_SUMMARY
-          echo "Subscription:&emsp&emsp&emsp `${{ inputs.subscription }}"` >> $GITHUB_STEP_SUMMARY
-          echo "Preload Datasets:&emsp$&emsp `${{ inputs.preload_dataset }}"` >> $GITHUB_STEP_SUMMARY
-          echo "Purpose of Deployment:&emsp `${{ inputs.purpose }}"` >> $GITHUB_STEP_SUMMARY
-          echo "Owner of Deployment:&emsp `${{ inputs.owner }}"` >> $GITHUB_STEP_SUMMARY
-          echo "Run Tests after Deployment:&emsp `${{ inputs.run_tests }}"` >> $GITHUB_STEP_SUMMARY
-          echo "Deprovision when finished:&emsp `${{ inputs.deprovision_after }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Subscription:&emsp;&emsp;&emsp; `${{ inputs.subscription }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Preload Datasets:&emsp;$&emsp; `${{ inputs.preload_dataset }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Purpose of Deployment:&emsp; `${{ inputs.purpose }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Owner of Deployment:&emsp; `${{ inputs.owner }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Run Tests after Deployment:&emsp; `${{ inputs.run_tests }}"` >> $GITHUB_STEP_SUMMARY
+          echo "Deprovision when finished:&emsp; `${{ inputs.deprovision_after }}"` >> $GITHUB_STEP_SUMMARY
 
       - name: Clear repository
         run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
@@ -157,7 +157,7 @@ jobs:
           DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
           INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
           echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
-          echo "Sail API Services is hosted internally on: `https://&emsp;$INTERNAL_ADDR_API_SERVICE` " >> $GITHUB_STEP_SUMMARY
+          echo "Sail API Services is hosted internally on: `https://$INTERNAL_ADDR_API_SERVICE` " >> $GITHUB_STEP_SUMMARY
           DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":" | tee >(cat - >&5))
           echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
           echo " `$DEPLOY_GUID_ID` " >> $GITHUB_STEP_SUMMARY

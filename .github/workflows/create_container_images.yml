@@ -60,16 +60,16 @@ jobs:
         run: |
           if ${{ inputs.subscription == 'Development' }}; then
             export AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
-            export CONTAINER_REGISTRY_NAME=${{ secrets.DEVELOPMENT_CONTAINER_REGISTRY_NAME }}
+            export DOCKER_REGISTRY_NAME=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_NAME }}
           elif ${{ inputs.subscription == 'Release Candidate' }}; then
             export AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
-            export CONTAINER_REGISTRY_NAME=${{ secrets.RELEASE_CANDIDATE_CONTAINER_REGISTRY_NAME }}
+            export DOCKER_REGISTRY_NAME=${{ secrets.RELEASE_CANDIDATE_DOCKER_REGISTRY_NAME }}
           elif ${{ inputs.subscription == 'ProductionGA' }}; then
             export AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
-            export CONTAINER_REGISTRY_NAME=${{ secrets.PRODUCTION_GA_CONTAINER_REGISTRY_NAME }}
+            export DOCKER_REGISTRY_NAME=${{ secrets.PRODUCTION_GA_DOCKER_REGISTRY_NAME }}
           else
             export AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
-            export CONTAINER_REGISTRY_NAME=${{ secrets.DEVELOPMENT_CONTAINER_REGISTRY_NAME }}
+            export DOCKER_REGISTRY_NAME=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_NAME }}
           fi
 
       - name: Azure Login
@@ -79,6 +79,7 @@ jobs:
 
       - name: Create Image
         run: |
+          make package_rpcrelated
           cd Docker
           if ${{ github.event.inputs.image == 'all' }}; then
             ./BuildImages.sh -p

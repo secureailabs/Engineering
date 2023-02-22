@@ -12,15 +12,15 @@ PrintHelp() {
 
 # function to tag and push the input image to the docker hub
 PushImageToRegistry() {
-    # check if the CONTAINER_REGISTRY_NAME is set
-    if [ -z "$CONTAINER_REGISTRY_NAME" ]; then
-        echo "CONTAINER_REGISTRY_NAME is not set"
+    # check if the DOCKER_REGISTRY_NAME is set
+    if [ -z "$DOCKER_REGISTRY_NAME" ]; then
+        echo "DOCKER_REGISTRY_NAME is not set"
         exit 1
     fi
 
     # check if the azure registry is logged in
     echo "log in to azure registry"
-    az acr login --name "$CONTAINER_REGISTRY_NAME"
+    az acr login --name "$DOCKER_REGISTRY_NAME"
 
     # Get the version from the ../VERSION file
     version=$(cat ../VERSION)
@@ -31,9 +31,9 @@ PushImageToRegistry() {
     echo "Tag and Pushing image to azure hub"
     tag=v"$version"_"$gitCommitHash"
     echo "Tag: $tag"
-    docker tag "$1" "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
-    docker push "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
-    echo Image url: "$CONTAINER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
+    docker tag "$1" "$DOCKER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
+    docker push "$DOCKER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
+    echo Image url: "$DOCKER_REGISTRY_NAME".azurecr.io/"$1":"$tag"
 }
 
 # Check if docker is installed

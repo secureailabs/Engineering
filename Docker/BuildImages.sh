@@ -6,7 +6,7 @@ PrintHelp() {
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0 -i [Image Name] -p"
     echo "Usage: $0"
-    echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver | smartbroker"
+    echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver | smartbroker -p to push the image to the docker registry"
     exit 1 # Exit script after printing help
 }
 

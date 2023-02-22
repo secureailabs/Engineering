@@ -6,15 +6,6 @@ source azure_constants.sh
 ImageVersion=$(cat ../../VERSION)
 ImageName="sailbaseimage"
 
-PrintHelp()
-{
-    echo ""
-    echo "Usage: $0 [-a]"
-    echo "Usage: $0"
-    echo -e "\t-a ci_flag will be set to true"
-    exit 1 # Exit script after printing help
-}
-
 # Check if packer is installed
 packer --version
 retVal=$?
@@ -48,6 +39,7 @@ echo -e "\n==== Azure Image Delete As Required ====\n"
 az image delete \
 --resource-group $RESOURCE_GROUP \
 --name $ImageName
+echo "Deletion Completed, continuing..."
 
 az sig image-version delete \
 --gallery-image-version $ImageVersion \

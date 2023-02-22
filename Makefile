@@ -4,7 +4,7 @@ include Make/newwebfrontend.mk
 .PHONY: package all clean sail_client database_initializer vmInitializer package_apiservices package_rpcrelated package_smartbroker
 
 bin_dir:
-	@mkdir Binary
+	@mkdir -p Binary
 
 package_apiservices: bin_dir package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated*.json ApiServices
@@ -23,6 +23,7 @@ package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService
 
 package_rpcrelated: $$(shell find RPCLib/ -type f ! -path "RPCLib/.*")
 	@cp -r datascience Docker/rpcrelated
+	@chmod -R 777 Docker/rpcrelated/datascience
 	@cp datascience/Docker/sail-scn-docker/requirements.txt Docker/rpcrelated/datascience/sail-safe-functions
 	@tar  --exclude='datascience/.*' --exclude='datascience/notebooks'  --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' -cvzf Binary/rpcrelated.tar.gz datascience $^ 
 

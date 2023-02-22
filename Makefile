@@ -52,3 +52,6 @@ all:
 clean:
 	@rm -rf Docker/rpcrelated/datascience
 	@rm -rf Binary
+
+clean_datascience:
+	@rm -rf Docker/rpcrelated/datascience

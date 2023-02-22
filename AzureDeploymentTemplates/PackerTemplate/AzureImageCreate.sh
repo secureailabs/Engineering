@@ -165,3 +165,9 @@ az image update \
 --resource-group $RESOURCE_GROUP \
 --name $ImageName \
 --tags gitCommitHash=$gitCommitHash
+
+# clean up the datascience moved to Docker/rpcrelated
+echo "--------------------------------------------------"
+echo "cleaning up"
+echo "--------------------------------------------------"
+(cd ../../ && make clean_datascience)

@@ -3,7 +3,10 @@ include Make/newwebfrontend.mk
 
 .PHONY: package all clean sail_client database_initializer vmInitializer package_apiservices package_rpcrelated package_smartbroker
 
-package_apiservices: package_rpcrelated package_smartbroker
+bin_dir:
+	@mkdir Binary
+
+package_apiservices: bin_dir package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/rpcrelated*.json ApiServices
 	@cp AzureDeploymentTemplates/ArmTemplates/smartbroker*.json ApiServices
 	@cp Binary/rpcrelated.tar.gz ApiServices
@@ -27,7 +30,7 @@ package_smartbroker:
 	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz RPCLib/ datascience
 
 package:
-	@make package_audit_service package_apiservices package_newwebfrontend
+	@make package_audit_service package_apiservices package_newwebfrontend package_rpcrelated
 	@echo "package done!"
 
 sail_client:

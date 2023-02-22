@@ -7,6 +7,7 @@ import uuid
 
 import requests
 import sailazure
+import yaml
 from azure.core.exceptions import AzureError
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
@@ -16,6 +17,24 @@ from azure.mgmt.storage.models import StorageAccountListKeysResult
 from azure.storage.blob import BlobServiceClient
 from database_initialization import initialize_database
 from pydantic import BaseModel, Field, StrictStr
+
+AZURE_SUBSCRIPTION_ID = os.environ["AZURE_SUBSCRIPTION_ID"]
+AZURE_TENANT_ID = os.environ["AZURE_TENANT_ID"]
+AZURE_CLIENT_ID = os.environ["AZURE_CLIENT_ID"]
+AZURE_OBJECT_ID = os.environ["AZURE_OBJECT_ID"]
+AZURE_CLIENT_SECRET = os.environ["AZURE_CLIENT_SECRET"]
+OWNER = os.environ["OWNER"]
+PURPOSE = os.environ["PURPOSE"]
+VERSION = os.environ["VERSION"]
+DOCKER_REGISTRY_URL = os.environ["DOCKER_REGISTRY_URL"]
+DOCKER_REGISTRY_USERNAME = os.environ["DOCKER_REGISTRY_USERNAME"]
+DOCKER_REGISTRY_PASSWORD = os.environ["DOCKER_REGISTRY_PASSWORD"]
+API_SERVICES_TAG = os.environ["API_SERVICES_TAG"]
+AUDIT_SERVICES_TAG = os.environ["AUDIT_SERVICES_TAG"]
+AGGREGATOR_SCN_TAG = os.environ["AGGREGATOR_SCN_TAG"]
+PARTICIPANT_SCN_TAG = os.environ["PARTICIPANT_SCN_TAG"]
+WEB_FRONTEND_TAG = os.environ["WEB_FRONTEND_TAG"]
+SLACK_WEBHOOK_URL = os.environ["SLACK_WEBHOOK_URL"]
 
 
 class DeploymentResponse(BaseModel):
@@ -29,7 +48,7 @@ class DeploymentResponse(BaseModel):
 
 DEV_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/{0}/versions/0.0.0",
+    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/sailbaseimage/versions/0.1.0",
     "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
@@ -41,7 +60,7 @@ DEV_PARAMS = {
 
 TEST_PARAMS = {
     "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/sail_test/providers/Microsoft.Compute/galleries/sail_image_gallery_1/images/{0}/versions/0.1.0",
+    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/sail_test/providers/Microsoft.Compute/galleries/sail_image_gallery_1/images/sailbaseimage/versions/0.1.0",
     "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
     + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
     "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
@@ -104,18 +123,28 @@ def set_params(subscription_id, module_name, test_flag=False):
 
 
 def upload_package(virtual_machine_ip, initialization_vector_file, package_file):
-    headers = {"accept": "application/json"}
-    files = {
-        "initialization_vector": open(initialization_vector_file, "rb"),
-        "bin_package": open(package_file, "rb"),
-    }
-    response = requests.put(
-        "https://" + virtual_machine_ip + ":9090/initialization-data", headers=headers, files=files, verify=False
-    )
-    print(f"Upload package, {package_file} status: {response.status_code}")
+    # try for 5 minutes with a 15 second timeout for each request
+    for _ in range(20):
+        try:
+            headers = {"accept": "application/json"}
+            files = {
+                "initialization_vector": open(initialization_vector_file, "rb"),
+                "bin_package": open(package_file, "rb"),
+            }
+            response = requests.put(
+                "https://" + virtual_machine_ip + ":9090/initialization-data",
+                headers=headers,
+                files=files,
+                verify=False,
+            )
+            print(f"Upload package, {package_file} status: {response.status_code}")
+            break
+        except Exception as exception:
+            print(f"upload_package: {str(exception)}, retrying...")
+            time.sleep(15)
 
 
-def deploy_module(account_credentials, deployment_name, module_name, test_flag):
+def deploy_module(account_credentials, deployment_name, module_name, test_flag, custom_data):
     """Deploy the template to a resource group."""
     print("Deploying module: ", module_name)
 
@@ -127,7 +156,7 @@ def deploy_module(account_credentials, deployment_name, module_name, test_flag):
     # Create the resource group
     sailazure.create_resource_group(account_credentials, resource_group_name, "westus")
 
-    template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", module_name + ".json")
+    template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", "sailvm.json")
 
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
@@ -138,9 +167,10 @@ def deploy_module(account_credentials, deployment_name, module_name, test_flag):
         "vmSize": set_parameters["vmSize"],
         "adminUserName": set_parameters["adminUserName"],
         "adminPassword": set_parameters["adminPassword"],
-        "vmImageResourceId": set_parameters["vmImageResourceId"].format(module_name),
+        "vmImageResourceId": set_parameters["vmImageResourceId"],
         "subnetName": set_parameters["subnetName"],
         "virtualNetworkId": set_parameters["virtualNetworkId"],
+        "customData": custom_data,
     }
 
     deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
@@ -234,11 +264,35 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     return keyvault_url
 
 
+def create_cloud_init_file(initialization_json: dict, imageName: str, docker_params: str, image_tag: str):
+    """Create the cloud init file"""
+    cloud_init_file = "#cloud-config\n"
+
+    cloud_init_yaml = {}
+
+    # Copy the initialization.json file to the VM
+    cloud_init_yaml["write_files"] = [
+        {
+            "path": "/etc/initialization.json",
+            "content": json.dumps(initialization_json, indent=4),
+        }
+    ]
+
+    cloud_init_yaml["runcmd"] = [
+        f"sudo mkdir -p /opt/{imageName}_dir",
+        f"sudo docker login {DOCKER_REGISTRY_URL} --username {DOCKER_REGISTRY_USERNAME} --password {DOCKER_REGISTRY_PASSWORD}",
+        f"sudo docker run -dit {docker_params} -v /opt/{imageName}_dir:/app -v /opt/certs:/etc/nginx/certs --name {imageName} {DOCKER_REGISTRY_URL}/{imageName}:{image_tag}",
+    ]
+
+    cloud_init_file += yaml.dump(cloud_init_yaml)
+
+    return cloud_init_file
+
+
 def deploy_audit_service(
     account_credentials,
     storage_account_name,
     deployment_name,
-    owner,
     test_flag,
 ):
     """
@@ -248,14 +302,12 @@ def deploy_audit_service(
 
     # Get params to update json
     set_parameters = set_params(subscription_id, "auditserver", test_flag)
-    # Deploy the frontend server
-    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag)
 
     # Read backend json from file and set params
     with open("auditserver.json", "r") as audit_json_fd:
         audit_json = json.load(audit_json_fd)
 
-    audit_json["owner"] = owner
+    audit_json["owner"] = OWNER
     audit_json["azure_storage_account_name"] = storage_account_name
     audit_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
     audit_json["azure_client_id"] = account_credentials["credentials"]._client_id
@@ -264,13 +316,16 @@ def deploy_audit_service(
     with open("auditserver.json", "w") as outfile:
         json.dump(audit_json, outfile)
 
-    # Sleeping for a minute
-    time.sleep(60)
+    # Create a cloud-init file
+    custom_data = create_cloud_init_file(
+        audit_json, "auditserver", "-p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096", AUDIT_SERVICES_TAG
+    )
 
+    # Deploy the frontend server
+    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag, custom_data)
+
+    # Upload the package to the audit server
     upload_package(audit_service_ip, "auditserver.json", "auditserver.tar.gz")
-
-    # Sleeping for some time
-    time.sleep(90)
 
     return audit_service_ip
 
@@ -282,11 +337,8 @@ def deploy_apiservices(
     storage_account_password,
     storage_resource_group_name,
     key_vault_url,
-    owner,
-    version: str,
     audit_service_ip,
     test_flag,
-    slack_webhook_url,
 ):
     """
     Deploy Api Services
@@ -295,13 +347,11 @@ def deploy_apiservices(
 
     # Get params to update json
     set_parameters = set_params(subscription_id, "apiservices", test_flag)
-    # Deploy the frontend server
-    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", test_flag)
 
     # Read backend json from file and set params
     with open("apiservices.json", "r") as backend_json_fd:
         backend_json = json.load(backend_json_fd)
-    backend_json["owner"] = owner
+    backend_json["owner"] = OWNER
     backend_json["azure_subscription_id"] = subscription_id
     backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
     backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
@@ -313,16 +363,29 @@ def deploy_apiservices(
     backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
-    backend_json["version"] = version
+    backend_json["version"] = VERSION
     backend_json["audit_service_ip"] = audit_service_ip
-    backend_json["slack_webhook"] = slack_webhook_url
+    backend_json["slack_webhook"] = SLACK_WEBHOOK_URL
+    backend_json["docker_registry_url"] = DOCKER_REGISTRY_URL
+    backend_json["docker_registry_username"] = DOCKER_REGISTRY_USERNAME
+    backend_json["docker_registry_password"] = DOCKER_REGISTRY_PASSWORD
+    backend_json["smartbroker_docker_params"] = "-p 8000:8001 -p 9090:9091 "
+    backend_json["smartbroker_image_tag"] = AGGREGATOR_SCN_TAG
+    backend_json[
+        "rpcrelated_docker_params"
+    ] = "-p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
+    backend_json["rpcrelated_image_tag"] = PARTICIPANT_SCN_TAG
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)
 
-    # Sleeping for a minute
-    time.sleep(60)
+    # Create a cloud-init file
+    custom_data = create_cloud_init_file(backend_json, "apiservices", "-p 9090:9091 -p 8000:8001", API_SERVICES_TAG)
 
+    # Deploy the apiservices server
+    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", test_flag, custom_data)
+
+    # Upload the package to the apiservices server
     upload_package(apiservices_ip, "apiservices.json", "apiservices.tar.gz")
 
     # Sleeping for some time
@@ -335,25 +398,28 @@ def deploy_apiservices(
     return apiservices_ip
 
 
-def deploy_frontend(account_credentials, deployment_name, platform_services_ip, test_flag):
-    """Deploy the frontend server"""
-    frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend", test_flag)
+# def deploy_frontend(account_credentials, deployment_name, platform_services_ip, test_flag):
+#     """Deploy the frontend server"""
 
-    # Prepare the initialization vector for the frontend server
-    initialization_vector = {
-        "ApiServicesUrl": "https://" + platform_services_ip + ":8000",
-        "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":443",
-    }
+#     # Prepare the initialization vector for the frontend server
+#     initialization_vector = {
+#         "ApiServicesUrl": "https://" + platform_services_ip + ":8000",
+#         "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":443",
+#     }
 
-    with open("newwebfrontend.json", "w") as outfile:
-        json.dump(initialization_vector, outfile)
+#     with open("newwebfrontend.json", "w") as outfile:
+#         json.dump(initialization_vector, outfile)
 
-    # Sleeping for two minutes
-    time.sleep(90)
+#     # Create a cloud-init file
+#     custom_data = create_cloud_init_file(backend_json, "newwebfrontend", "-p 9090:9091 -p 443:443")
 
-    upload_package(frontend_server_ip, "newwebfrontend.json", "newwebfrontend.tar.gz")
+#     # Deploy the frontend server
+#     frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend", test_flag)
 
-    return frontend_server_ip
+#     # Upload the package to the frontend server
+#     upload_package(frontend_server_ip, "newwebfrontend.json", "newwebfrontend.tar.gz")
+
+#     return frontend_server_ip
 
 
 def create_storage_account(account_credentials: dict, deployment_name: str, account_name_prefix: str, location: str):
@@ -490,16 +556,7 @@ def update_firewall(deployment_name, module_name, private_ip_address):
 
 
 if __name__ == "__main__":
-    AZURE_SUBSCRIPTION_ID = os.environ.get("AZURE_SUBSCRIPTION_ID")
-    AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID")
-    AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID")
-    AZURE_OBJECT_ID = os.environ.get("AZURE_OBJECT_ID")
-    AZURE_CLIENT_SECRET = os.environ.get("AZURE_CLIENT_SECRET")
-    OWNER = os.environ.get("OWNER")
-    PURPOSE = os.environ.get("PURPOSE")
-    VERSION = os.environ.get("VERSION")
     TEST_FLAG = False
-    guid = str(uuid.uuid1())
     if PURPOSE == "test":
         TEST_FLAG = True
 
@@ -508,12 +565,11 @@ if __name__ == "__main__":
     if "PUBLIC_IP" in os.environ:
         public_ip = os.getenv("PUBLIC_IP", "False") == "True"
 
-    if "SLACK_WEBHOOK_URL" in os.environ:
-        slack_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
-
     if not OWNER or not PURPOSE:
         print("Please set the OWNER and PURPOSE environment variables")
         exit(1)
+
+    guid = str(uuid.uuid1())
     deployment_id = f"{OWNER}-{guid}-{PURPOSE}"
 
     # Authenticate the azure credentials
@@ -531,14 +587,7 @@ if __name__ == "__main__":
     ) = create_storage_account(account_credentials, deployment_id, "saildatastorage", "westus")
 
     # Create storage account id
-    storage_account_id = (
-        "/subscriptions/"
-        + account_credentials["subscription_id"]
-        + "/resourceGroups/"
-        + storage_resource_group_name
-        + "/providers/Microsoft.Storage/storageAccounts/"
-        + storage_account_name
-    )
+    storage_account_id = f"/subscriptions/{AZURE_SUBSCRIPTION_ID}/resourceGroups/{storage_resource_group_name}/providers/Microsoft.Storage/storageAccounts/{storage_account_name}"
 
     # Provision a key vault
     key_vault_url = deploy_key_vault(
@@ -553,7 +602,6 @@ if __name__ == "__main__":
         account_credentials,
         storage_account_name,
         deployment_id,
-        OWNER,
         TEST_FLAG,
     )
     print("Audit Service server: ", audit_service_ip)
@@ -566,11 +614,8 @@ if __name__ == "__main__":
         storage_accout_password,
         storage_resource_group_name,
         key_vault_url,
-        OWNER,
-        VERSION,
         audit_service_ip,
         TEST_FLAG,
-        slack_webhook_url,
     )
     print("API Services server: ", platform_services_ip)
 

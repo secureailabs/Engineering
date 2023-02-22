@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from app.utils.secrets import get_secret
 from azure.core.exceptions import AzureError
 from azure.core.polling import AsyncLROPoller
 from azure.identity.aio import ClientSecretCredential
@@ -32,8 +31,10 @@ from azure.mgmt.resource.resources.models import DeploymentMode, ResourceGroup
 from azure.mgmt.storage.aio import StorageManagementClient
 from azure.storage.fileshare import FileSasPermissions, generate_file_sas
 from azure.storage.fileshare.aio import ShareDirectoryClient
-from models.common import KeyVaultObject
 from pydantic import BaseModel, Field, StrictStr
+
+from app.utils.secrets import get_secret
+from models.common import KeyVaultObject
 
 
 class DeploymentResponse(BaseModel):
@@ -416,9 +417,9 @@ async def get_private_ip(
 async def deploy_module(
     account_credentials: AzureCredentials,
     resource_group_name: str,
-    module_name: str,
     virtual_machine_name: str,
     vm_size: str,
+    custom_data: str,
 ) -> DeploymentResponse:
     """
     Deploy the template to a resource group.
@@ -427,12 +428,12 @@ async def deploy_module(
     :type account_credentials: AzureCredentials
     :param resource_group_name: The resource group name.
     :type resource_group_name: str
-    :param module_name: The name of the module.
-    :type module_name: str
     :param virtual_machine_name: The name of the virtual machine.
     :type virtual_machine_name: str
     :param vm_size: The azure specific vm size.
     :type vm_size: str
+    :param custom_data: The custom data to pass to the vm.
+    :type custom_data: str
     :return: The deployment response.
     :rtype: DeploymentResponse
     """
@@ -442,9 +443,9 @@ async def deploy_module(
 
         # Provision the secure computation node
         if vm_size == "Standard_DC4ads_v5":
-            template_path = f"{module_name}-cvm.json"
+            template_path = "sailvm-cvm.json"
         else:
-            template_path = f"{module_name}.json"
+            template_path = "sailvm.json"
 
         with open(template_path, "r") as template_file_fd:
             template = json.load(template_file_fd)
@@ -452,11 +453,12 @@ async def deploy_module(
         parameters = {
             "vmName": virtual_machine_name,
             "vmSize": vm_size,
-            "vmImageResourceId": get_secret("azure_scn_image_id").format(module_name),
+            "vmImageResourceId": get_secret("azure_scn_image_id"),
             "adminUserName": get_secret("azure_scn_user_name"),
             "adminPassword": get_secret("azure_scn_password"),
             "subnetName": get_secret("azure_scn_subnet_name"),
             "virtualNetworkId": get_secret("azure_scn_virtual_network_id"),
+            "customData": custom_data,
         }
         await deploy_template(account_credentials, resource_group_name, template, parameters)
 

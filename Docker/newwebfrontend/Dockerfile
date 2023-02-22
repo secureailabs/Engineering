@@ -20,13 +20,14 @@ RUN apt-get install -y nodejs  && \
 RUN npm install --global yarn
 RUN node --version
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY newwebfrontend/nginx.conf /etc/nginx/nginx.conf
 
-COPY requirements.txt /requirements.txt
+COPY newwebfrontend/requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY Entrypoint.sh /Entrypoint.sh
+COPY newwebfrontend/Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
+COPY vm-initializer/vm_initializer.py /vm_initializer.py
+
 ENTRYPOINT [ "/Entrypoint.sh" ]
-CMD ["/bin/bash"]

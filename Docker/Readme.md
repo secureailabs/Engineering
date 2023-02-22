@@ -21,6 +21,11 @@ git submodule update --init
 ./BuildImage.sh
 ```
 
+## Build and push docker images
+```
+./BuildImage.sh -i <image_name> -p
+```
+
 ## Run the services
 
 ### Backend Api Services Portal

@@ -20,16 +20,17 @@ RUN apt-get update && \
     python3.8-venv \
     zip
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY rpcrelated/nginx.conf /etc/nginx/nginx.conf
 
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-COPY requirements.txt /requirements.txt
+
+COPY rpcrelated/requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY datascience /datascience
+COPY rpcrelated/datascience /datascience
 WORKDIR /datascience/sail-core
 RUN pip3 install -e /datascience/sail-core
 WORKDIR /datascience/sail-safe-functions
@@ -37,8 +38,10 @@ RUN pip3 install -e /datascience/sail-safe-functions
 
 RUN useradd --system promtail
 
-COPY Entrypoint.sh /Entrypoint.sh
+COPY rpcrelated/Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
 
+COPY vm-initializer/vm_initializer.py /vm_initializer.py
+COPY vm-initializer/decrypt_file.py /decrypt_file.py
+
 ENTRYPOINT [ "/Entrypoint.sh" ]
-CMD ["/bin/bash"]

@@ -9,6 +9,7 @@ azure-keyvault-keys
 azure-mgmt-keyvault
 azure-mgmt-monitor
 azure-storage-blob
+pyyaml
 
 # fastapi
 pydantic==1.9.1

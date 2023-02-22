@@ -34,7 +34,7 @@ ll -lrt Binary/
 DeployPlatform is required to run behind SAIL VPN. \
 Please ensure connection to `vnet-sail-wus-hub-001` and have access to SAIL private vnets in Azure \
 
-Set environment variables to use `Deploy Platform Service Principal` - Ask Stanley if unclear \
+Set environment variables in deploy_config.sh to use `Deploy Platform Service Principal` - Ask Stanley if unclear \
 `AZURE_SUBSCRIPTION_ID` should reflect the Azure Subscription you wish to deploy your resources in.
 ```
 export AZURE_SUBSCRIPTION_ID="xxxx"
@@ -42,7 +42,14 @@ export AZURE_TENANT_ID="xxxx"
 export AZURE_CLIENT_ID="xxxx"
 export AZURE_CLIENT_SECRET="xxxx"
 export AZURE_OBJECT_ID="xxxx"
+export DOCKER_REGISTRY_URL="xxx"
+export DOCKER_REGISTRY_USERNAME="xxx"
+export DOCKER_REGISTRY_PASSWORD="xxx"
 ```
+One can optionally update the version of the docker container images to be used for deployment by changin the x_TAG variables in deploy_config.sh with the required version.
+Build image using the Docker/BuildImage.sh script and copy the tag from the result of the build. Update the deploy_config.sh with the tag.
+If everything works, feel free to update the default values in the script.
+
 Run the DeployPlatform script with `--help` for guidance
 ```
 ./DeplayPlatform.sh --help

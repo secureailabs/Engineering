@@ -35,6 +35,26 @@ on:
         required: true
         type: string
         default: "CI_RUNNER"
+      api_services_tag:
+        description: "API Services Docker image Tag"
+        required: true
+        type: string
+        default: "default"
+      audit_service_tag:
+        description: "Audit Service Docker image Tag"
+        required: true
+        type: string
+        default: "default"
+      aggregator_scn_tag:
+        description: "Aggregator SCN Docker image Tag"
+        required: true
+        type: string
+        default: "default"
+      participant_scn_tag:
+        description: "Participant SCN Docker image Tag"
+        required: true
+        type: string
+        default: "default"
       preload_dataset:
         description: "Preload dataset with DatasetTool"
         required: true
@@ -129,15 +149,27 @@ jobs:
         run: |
           if ${{ inputs.subscription == 'Development' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_URL=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_USERNAME=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
             echo "Subscription: Development"
           elif ${{ inputs.subscription == 'Release Candidate' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_URL=${{ secrets.RELEASE_CANDIDATE_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_USERNAME=${{ secrets.RELEASE_CANDIDATE_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.RELEASE_CANDIDATE_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
             echo "Subscription: Release Candidate"
           elif ${{ inputs.subscription == 'ProductionGA' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_URL=${{ secrets.PRODUCTION_GA_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_USERNAME=${{ secrets.PRODUCTION_GA_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.PRODUCTION_GA_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
             echo "Subscription: Production GA"
           else
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_URL=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_USERNAME=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
             echo "Subscription: None (Defaulted to Development)"
           fi
 
@@ -152,6 +184,34 @@ jobs:
           ls -l
           exec 5>&1
           mkdir Binary
+
+          sed -i 's/$AZURE_SUBSCRIPTION_ID/'"$AZURE_SUBSCRIPTION_ID"'/g' deploy_config.sh
+          sed -i 's/$AZURE_TENANT_ID/'"$AZURE_TENANT_ID"'/g' deploy_config.sh
+          sed -i 's/$AZURE_CLIENT_ID/'"$AZURE_CLIENT_ID"'/g' deploy_config.sh
+          sed -i 's/$AZURE_CLIENT_SECRET/'"$AZURE_CLIENT_SECRET"'/g' deploy_config.sh
+          sed -i 's/$AZURE_OBJECT_ID/'"$AZURE_OBJECT_ID"'/g' deploy_config.sh
+          sed -i 's/$SLACK_WEBHOOK_URL/'"$SLACK_WEBHOOK_URL"'/g' deploy_config.sh
+          sed -i 's/$DOCKER_REGISTRY_URL/'"$DOCKER_REGISTRY_URL"'/g' deploy_config.sh
+          sed -i 's/$DOCKER_REGISTRY_USERNAME/'"$DOCKER_REGISTRY_USERNAME"'/g' deploy_config.sh
+          # Kindly ensure that the password does not contain @
+          sed -i 's@$DOCKER_REGISTRY_PASSWORD@'"$DOCKER_REGISTRY_PASSWORD"'@g' deploy_config.sh
+          if ${{ inputs.api_services_tag != 'default'}}
+          then
+            sed -i 's/$API_SERVICES_TAG/'"${{ inputs.api_services_tag }}"'/g' deploy_config.sh
+          fi
+          if ${{ inputs.audit_service_tag != 'default'}}
+          then
+            sed -i 's/$AUDIT_SERVICES_TAG/'"${{ inputs.audit_service_tag }}"'/g' deploy_config.sh
+          fi
+          if ${{ inputs.aggregator_scn_tag != 'default'}}
+          then
+            sed -i 's/$AGGREGATOR_SCN_TAG/'"${{ inputs.aggregator_scn_tag }}"'/g' deploy_config.sh
+          fi
+          if ${{ inputs.participant_scn_tag != 'default'}}
+          then
+            sed -i 's/$PARTICIPANT_SCN_TAG/'"${{ inputs.participant_scn_tag }}"'/g' deploy_config.sh
+          fi
+
           DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
           INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
           echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
@@ -255,7 +315,7 @@ jobs:
             owner="Deployment ID: ${{ inputs.owner }}"
             purpose="-${{ inputs.purpose }}"
             deployment_id=${deploy_output_str##$owner-}
-            deployment_id=$(echo ${deployment_id:0:36}) 
+            deployment_id=$(echo ${deployment_id:0:36})
             echo $deployment_id
             set -e
             pwd

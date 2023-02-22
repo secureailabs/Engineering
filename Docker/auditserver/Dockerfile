@@ -16,12 +16,14 @@ RUN apt-get update && \
 
 RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
-COPY requirements.txt /requirements.txt
+COPY auditserver/requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY auditserver/nginx.conf /etc/nginx/nginx.conf
 
-COPY Entrypoint.sh /Entrypoint.sh
+COPY auditserver/Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh
+
+COPY vm-initializer/vm_initializer.py /vm_initializer.py
 
 ENTRYPOINT [ "/Entrypoint.sh" ]

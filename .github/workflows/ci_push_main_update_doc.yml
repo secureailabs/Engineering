@@ -48,6 +48,12 @@ jobs:
           persist-credentials: true
           submodules: true
 
+      - name: make
+        run: |
+          sudo make clean
+          mkdir Binary || true
+          make package_apiservices
+
       - name: Build api server
         run: |
           set -e

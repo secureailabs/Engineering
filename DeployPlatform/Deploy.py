@@ -654,7 +654,7 @@ if __name__ == "__main__":
     print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
     if public_ip:
         print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
-    print(f"Deployment GUID: {guid}")
+    print(f"Deployment GUID:{guid}")
     print(f"Deployment ID: {deployment_id}")
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")

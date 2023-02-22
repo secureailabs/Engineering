@@ -1,0 +1,62 @@
+# Engineering
+# create_vm_image.yml
+# Create SAIL virtual machine images to a specified Subscription in Azure
+#
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+#
+
+name: Create VM Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      subscription:
+        description: Choose Subscription
+        required: true
+        type: choice
+        options:
+          - Development
+          - Release Candidate
+          - ProductionGA
+
+env:
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.SERVICE_PRINCIPAL_PACKER_AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_PACKER_AZURE_CLIENT_SECRET }}
+
+jobs:
+  deploy_images:
+    runs-on: [self-hosted, Linux, x64, docker, Platform]
+    steps:
+      - name: Clear repository
+        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
+
+      - name: Check out source repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.JENKINS_BUILD_TOKEN }}
+          persist-credentials: true
+          submodules: true
+
+      - name: Determine Subscription
+        run: |
+          if ${{ inputs.subscription == 'Development' }}; then
+            export AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
+          elif ${{ inputs.subscription == 'Release Candidate' }}; then
+            export AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}
+          elif ${{ inputs.subscription == 'ProductionGA' }}; then
+            export AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}
+          else
+            export AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}
+          fi
+
+      - name: Create Image
+        run: |
+          cd AzureDeploymentTemplates/PackerTemplate
+          ./AzureImageCreate.sh

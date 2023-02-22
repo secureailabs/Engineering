@@ -1,7 +1,7 @@
 include Make/Modules.mk
 include Make/newwebfrontend.mk
 
-.PHONY: package all clean sail_client database_initializer vmInitializer package_apiservices package_rpcrelated package_smartbroker
+.PHONY: package all clean sail_client database_initializer package_apiservices package_rpcrelated package_smartbroker
 
 package_apiservices: package_rpcrelated package_smartbroker
 	@cp AzureDeploymentTemplates/ArmTemplates/sailvm*.json ApiServices
@@ -20,7 +20,7 @@ package_rpcrelated: $$(shell find RPCLib/ -type f ! -path "RPCLib/.*")
 	@cp -r datascience Docker/rpcrelated
 	@chmod -R 777 Docker/rpcrelated/datascience
 	@cp datascience/Docker/sail-scn-docker/requirements.txt Docker/rpcrelated/datascience/sail-safe-functions
-	@tar  --exclude='datascience/.*' --exclude='datascience/notebooks'  --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' -cvzf Binary/rpcrelated.tar.gz datascience $^ 
+	@tar --exclude='datascience/.*' --exclude='datascience/notebooks' --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' -cvzf Binary/rpcrelated.tar.gz datascience $^
 
 package_smartbroker:
 	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz RPCLib/ datascience
@@ -37,15 +37,10 @@ database_initializer:
 	@cd database-initialization && poetry build
 	@echo "database_initializer done!"
 
-vmInitializer:
-	@make -C $(VM_INITIALIZER) all
-	@echo "vmInitializer done!"
-
 all:
 	@mkdir Binary
 	@make package
 	@make sail_client database_initializer
-	@make vmInitializer
 	@echo "All build and packaged!"
 
 clean:

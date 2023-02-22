@@ -22,6 +22,4 @@ export AZURE_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 --------------------------------------------------------------------------------------------------
 > ## Run image create script
-Run the AzureImageCreate.sh script to build VM images which is a two step process. \
-First it will create a VHD image using packer and then there is a manual process to convert that image to a managed image. \
-Execute: `./AzureImageCreate.sh` \
+Run the AzureImageCreate.sh script to build VM images

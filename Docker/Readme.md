@@ -23,7 +23,7 @@ git submodule update --init
 
 ## Build and push docker images
 ```
-./BuildImage.sh -p
+./BuildImage.sh -i <image_name> -p
 ```
 
 ## Run the services

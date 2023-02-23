@@ -29,6 +29,7 @@ make all -j
 Outputs:
 ```
 ll -lrt Binary/
+```
 
 ## DeployPlatform to Azure
 DeployPlatform is required to run behind SAIL VPN. \
@@ -58,3 +59,17 @@ Run the DeployPlatform script with `--help` for guidance
 ## DeployPlatform locally with Docker
 There is a readme under `Docker/`
 Please see the documentation
+
+
+# Release Process
+
+1. Create a new branch from master
+2. Upgrade the version in the `VERSION` file. e.g. from 0.1.0 to 0.2.0 according to [semantic versioning](https://semver.org/)
+3. Commit the changes and push the branch to github
+4. Run the github action [Create Container Images](https://github.com/secureailabs/Engineering/actions/workflows/wf_dispatch_create_container_images.yml) for all the services from this branch. Note the generated tag.
+5. Update the `deploy_config.sh` file with the new tags
+6. Push the new changes to github on same branch
+7. Run all the tests and QA on this branch
+8. Tag the branch with the new version. e.g. `git tag -a v0.2.0 -m "Version 0.2.0"`
+9. Push the tag to github. e.g. `git push origin v0.2.0`
+10. Once every thing works, merge the branch to master

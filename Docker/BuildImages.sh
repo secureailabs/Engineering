@@ -16,7 +16,7 @@ PushImageToRegistry() {
     # check if the DOCKER_REGISTRY_NAME is set
     if [ -z "$DOCKER_REGISTRY_NAME" ]; then
         echo "DOCKER_REGISTRY_NAME is not set"
-        exit 0
+        exit 1
     fi
 
     # check if the azure registry is logged in

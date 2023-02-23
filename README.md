@@ -71,5 +71,8 @@ Please see the documentation
 6. Push the new changes to github on same branch
 7. Run all the tests and QA on this branch
 8. Tag the branch with the new version. e.g. `git tag -a v0.2.0 -m "Version 0.2.0"`
-9. Push the tag to github. e.g. `git push origin v0.2.0`
-10. Once every thing works, merge the branch to master
+9. Create a PR which will trigger `ci_pr_main.yml` which will run end2end in Development Subscription
+10. Push the tag to github. e.g. `git push origin v0.2.0`
+11. Once every thing works, merge the branch to main
+12. Merge to main will trigger `ci_push_main_update_doc.yml` which updates github pages for api documentation
+13. A long living staging environment can then be created from major version releases in Release Candidate Subscription to be used for long term tests and possible for sales demos via a manual trigger of `wf_dispatch_deploy_platform.yml`

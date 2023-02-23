@@ -1,5 +1,18 @@
-# CI workflow Docker Build
-name: CI for Development Repository
+# Engineering
+# ci_pr_main.yml
+# Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
+#
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+#
+#
+
+name: "CI for Development Repository"
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -116,7 +129,7 @@ jobs:
 
   call-deploy-platform-workflow:
     needs: build
-    uses: ./.github/workflows/deploy_platform.yml
+    uses: ./.github/workflows/wf_dispatch_deploy_platform.yml
     with:
       subscription: "Development"
       purpose: "PR-${{ github.event.pull_request.number }}"

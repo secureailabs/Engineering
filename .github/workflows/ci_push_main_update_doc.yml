@@ -1,4 +1,18 @@
-name: Update Documentation
+# Engineering
+# ci_push_main_update_doc.yml
+# Deployment of Platform Services [api + Frontend] to a specified Subscription in Azure
+#
+# Copyright (C) 2022 Secure Ai Labs, Inc. All Rights Reserved.
+# Private and Confidential. Internal Use Only.
+#
+#     This software contains proprietary information which shall not
+#     be reproduced or transferred to other documents and shall not
+#     be disclosed to others for any purpose without
+#     prior written permission of Secure Ai Labs, Inc.
+#
+#
+
+name: "CI Update Documentation"
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -47,6 +61,12 @@ jobs:
           token: ${{ secrets.JENKINS_BUILD_TOKEN }}
           persist-credentials: true
           submodules: true
+
+      - name: make
+        run: |
+          sudo make clean
+          mkdir -p Binary
+          make package_apiservices
 
       - name: Build api server
         run: |

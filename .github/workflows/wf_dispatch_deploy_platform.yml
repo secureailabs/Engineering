@@ -183,7 +183,7 @@ jobs:
           pwd
           ls -l
           exec 5>&1
-          mkdir Binary || true
+          mkdir -p Binary
 
           sed -i 's/$AZURE_SUBSCRIPTION_ID/'"$AZURE_SUBSCRIPTION_ID"'/g' deploy_config.sh
           sed -i 's/$AZURE_TENANT_ID/'"$AZURE_TENANT_ID"'/g' deploy_config.sh

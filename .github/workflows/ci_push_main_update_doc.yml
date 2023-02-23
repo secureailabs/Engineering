@@ -65,7 +65,7 @@ jobs:
       - name: make
         run: |
           sudo make clean
-          mkdir Binary || true
+          mkdir -p Binary
           make package_apiservices
 
       - name: Build api server

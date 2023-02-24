@@ -20,17 +20,7 @@ fi
 # Unpack the tar package
 tar -xvf package.tar.gz
 
-# Move the InitializerVector to the Binary folder
-mv InitializationVector.json datascience/
-
-pushd RPCLib
-pip install -e zero
-popd
-
-# Start the Public API Server
-cd datascience
-pip install -e sail-core
-pip install -e sail-safe-functions
+pip install -e RPCLib/zero
 
 export PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"
 export PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT="/app/RPCLib/private_keys/client.key_secret"

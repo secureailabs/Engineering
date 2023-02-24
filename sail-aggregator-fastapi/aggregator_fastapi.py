@@ -4,6 +4,7 @@ import os
 import threading
 from typing import List
 
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from log.audit_log import _AsyncLogger, log_message
 from pydantic import BaseModel
@@ -16,8 +17,6 @@ from sail_safe_functions.aggregator.data_model.data_model_series import DataMode
 from sail_safe_functions.aggregator.data_model.data_model_tabular import DataModelTabular
 from sail_safe_functions.test.helper_sail_safe_functions.test_service_reference import TestServiceReference
 
-from fastapi import FastAPI, HTTPException
-
 app = FastAPI()
 
 service_reference = TestServiceReference.get_instance()
@@ -28,7 +27,7 @@ scn_names = []
 scn_ports = []
 list_dataset_id = []
 
-IV_SETTINGS_FILE = "/app/datascience/InitializationVector.json"
+IV_SETTINGS_FILE = "/app/InitializationVector.json"
 
 if os.environ.get("IV_FILEPATH") is not None:
     IV_SETTINGS_FILE = os.environ.get("IV_FILEPATH")

@@ -45,8 +45,11 @@ if [ $retVal -ne 0 ]; then
     exit $retVal
 fi
 
+# Set the default values for the input parameters
+pushImage=false
+
 # Parse the input parameters
-while getopts "i:p:" opt
+while getopts "i:p" opt
 do
     echo "opt: $opt $OPTARG"
     case "$opt" in
@@ -57,16 +60,9 @@ do
 done
 
 echo "--------------------------------------------------"
-echo "making apiservice package"
+echo "move datascience package"
 echo "--------------------------------------------------"
-(cd ../ && make package_apiservices)
-
-echo "--------------------------------------------------"
-echo "--------------------------------------------------"
-# Prune unused docker networks
-docker network prune -f
-echo "--------------------------------------------------"
-echo "--------------------------------------------------"
+(cd ../ && make move_datascience)
 
 # Build the asked image if it specified in the input parameters
 if [ -z "$imageName" ]; then

@@ -20,14 +20,13 @@ package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService
 
 package_rpcrelated: $$(shell find RPCLib/ -type f ! -path "RPCLib/.*")
 	@mkdir -p Binary
-	@cp -r datascience Docker/rpcrelated
-	@chmod -R 777 Docker/rpcrelated/datascience
-	@cp datascience/Docker/sail-scn-docker/requirements.txt Docker/rpcrelated/datascience/sail-safe-functions
-	@tar --exclude='datascience/.*' --exclude='datascience/notebooks' --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' -cvzf Binary/rpcrelated.tar.gz datascience $^
+	@cp -r datascience Docker/
+	@cp datascience/Docker/sail-scn-docker/requirements.txt Docker/datascience/sail-safe-functions
+	@tar -cvzf Binary/rpcrelated.tar.gz sail-participant-zeromq $^
 
 package_smartbroker:
 	@mkdir -p Binary
-	@tar --exclude='datascience/**venv**' --exclude='datascience/sail-safe-functions-test/sail_safe_functions_test/data_sail_safe_functions' --exclude='datascience/**pycache**' --exclude='datascience/.git' --exclude='datascience/.github' -czvf Binary/smartbroker.tar.gz RPCLib/ datascience
+	@tar -czvf Binary/smartbroker.tar.gz RPCLib/ sail-aggregator-fastapi
 
 package:
 	@make package_audit_service package_apiservices package_newwebfrontend package_rpcrelated
@@ -41,14 +40,17 @@ database_initializer:
 	@cd database-initialization && poetry build
 	@echo "database_initializer done!"
 
+move_datascience:
+	@cp -r datascience Docker/
+
 all:
 	@make package
 	@make sail_client database_initializer
 	@echo "All build and packaged!"
 
 clean:
-	@rm -rf Docker/rpcrelated/datascience
+	@rm -rf Docker/datascience
 	@rm -rf Binary
 
 clean_datascience:
-	@rm -rf Docker/rpcrelated/datascience
+	@rm -rf Docker/datascience

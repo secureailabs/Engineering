@@ -21,8 +21,6 @@ fi
 # Unpack the tar package
 tar -xvf package.tar.gz
 ls /app
-# Move the DS Library to /ds
-mv /app/datascience /ds
 
 # Use the InitializationVector to get the connection string of the dataset
 datasetStoragePassword=$(cat InitializationVector.json | jq -r '.dataset_storage_password')
@@ -91,7 +89,7 @@ export PATH_DIR_DATASET="/data/"
 /app/RPCLib/promtail_linux_amd64 -config.file=/app/RPCLib/promtail_local_config.yaml  > /app/promtail.log 2>&1&
 
 # Start the rpc server
-python3 /ds/sail-participant-zeromq/server.py 5556
+python3 /app/sail-participant-zeromq/server.py 5556
 
 # To keep the container running
 tail -f /dev/null

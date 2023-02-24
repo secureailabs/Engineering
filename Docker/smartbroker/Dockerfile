@@ -23,6 +23,12 @@ RUN rm -rf /var/lib/apt/lists/*
 COPY smartbroker/requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY datascience /datascience
+WORKDIR /datascience/sail-core
+RUN pip3 install -e /datascience/sail-core
+WORKDIR /datascience/sail-safe-functions
+RUN pip3 install -e /datascience/sail-safe-functions
+
 COPY smartbroker/nginx.conf /etc/nginx/nginx.conf
 
 COPY smartbroker/Entrypoint.sh /Entrypoint.sh

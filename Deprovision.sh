@@ -111,11 +111,13 @@ do
                     exit 0
                 fi
                 echo -e "\nList of Resources staged for deletion\n"
+                GUID="${GUID//[[:space:]]/}"
+                echo -e "The following resources were found based on inputed GUID:|$GUID|\n"
                 az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv
                 read -p "Do you wish to continue?  " yn
                 case $yn in
                     [Yy]* ) 
-                        echo "PROCEEDING..."
+                        echo -e "PROCEEDING... \n"
                         for rgname in `az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv`; do
                             echo Deleting ${rgname}
                             az group delete -n ${rgname} --yes --no-wait
@@ -134,7 +136,7 @@ do
             read -p "Do you wish to continue?  " yn
                 case $yn in
                     [Yy]* ) 
-                        echo "PROCEEDING..."
+                        echo -e "PROCEEDING... \n"
                         for rgname in `az group list --query "[?contains(name,'$owner')].{name:name}" --output tsv`; do
                             echo Deleting ${rgname}
                             az group delete -n ${rgname} --yes --no-wait

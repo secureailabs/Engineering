@@ -6,7 +6,8 @@ PrintHelp() {
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0 -i [Image Name] -p"
     echo "Usage: $0"
-    echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver | smartbroker -p to push the image to the docker registry"
+    echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver | smartbroker"
+    echo -e "\t-p Specify flag to push built image to the docker registry"
     exit 1 # Exit script after printing help
 }
 
@@ -45,11 +46,12 @@ if [ $retVal -ne 0 ]; then
 fi
 
 # Parse the input parameters
-while getopts "i:p" opt; do
+while getopts "i:p:" opt
+do
     echo "opt: $opt $OPTARG"
     case "$opt" in
-    p) pushImage=true ;;
     i) imageName="$OPTARG" ;;
+    p) pushImage=true ;;
     ?) PrintHelp ;;
     esac
 done
@@ -71,8 +73,8 @@ if [ -z "$imageName" ]; then
     echo "No image specified. Building all of them..."
 else
     echo "Building image $imageName"
-    docker build -t "$imageName" -f "$imageName"/Dockerfile .
-    if $pushImage; then
+    docker build -t "$imageName" -f "${imageName}/Dockerfile" .
+    if [ "$pushImage" = true ]; then
         PushImageToRegistry "$imageName"
     fi
     exit 0
@@ -88,9 +90,9 @@ declare -a ListOfDockerImages=(
 )
 
 for val in "${ListOfDockerImages[@]}"; do
-    echo -e "\nBuilding for ${val} ..."
-    docker build . -t "${val}"
-    if $pushImage; then
+    echo -e "\nBuilding for $val ..."
+    docker build -t "$val" -f "${val}/Dockerfile" .
+    if [ "$pushImage" = true ]; then
         PushImageToRegistry "$val"
     fi
 done

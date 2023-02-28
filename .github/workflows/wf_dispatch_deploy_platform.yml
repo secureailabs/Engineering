@@ -296,14 +296,12 @@ jobs:
     steps:
       - name: Deprovision Parameters
         run: |
-          echo "CHECK TEST RAN: $CHECKTESTRAN"
           echo "## Deprovision Platform" >> $GITHUB_STEP_SUMMARY
-          echo "CHECK TEST RAN: $CHECKTESTRAN" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.deprovision_after == true }}; then
-            echo "Purpose of Deployment: ${{ inputs.purpose }}"
-            echo "Owner of Deployment: ${{ inputs.owner }}"
+            echo "Purpose of Deployment: ${{ inputs.purpose }}" >> $GITHUB_STEP_SUMMARY
+            echo "Owner of Deployment: ${{ inputs.owner }}" >> $GITHUB_STEP_SUMMARY
             deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id"
+            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id" >> $GITHUB_STEP_SUMMARY
           else
             echo "Step Display Deprovision Parameters not required" >> $GITHUB_STEP_SUMMARY
             echo "deprovision_after option was not selected" >> $GITHUB_STEP_SUMMARY
@@ -338,7 +336,9 @@ jobs:
               echo "Deploy Canceled/Failed: Deprovision canceled." >> $GITHUB_STEP_SUMMARY
             else
               chmod +x Deprovision.sh
-              sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
+              deprov_output=$(sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n"))
+              deprov_substr=$(awk -F'Proceeding...' '{print $2}' $deprov_output)
+              echo "$deprov_substr" >> $GITHUB_STEP_SUMMARY
             fi
           else
             echo "Step Deprovision not required" >> $GITHUB_STEP_SUMMARY

@@ -16,6 +16,7 @@ RUN apt-get update && \
   sudo \
   build-essential \
   python3-pip \
+  jq \
   iputils-ping
 
 RUN rm -rf /var/lib/apt/lists/*
@@ -30,6 +31,10 @@ WORKDIR /datascience/sail-safe-functions
 RUN pip3 install -e /datascience/sail-safe-functions
 
 COPY smartbroker/nginx.conf /etc/nginx/nginx.conf
+
+RUN useradd --system promtail
+COPY smartbroker/promtail_local_config.yaml /promtail_local_config.yaml
+COPY apiservices/promtail_linux_amd64 /promtail_linux_amd64
 
 COPY smartbroker/Entrypoint.sh /Entrypoint.sh
 RUN chmod +x /Entrypoint.sh

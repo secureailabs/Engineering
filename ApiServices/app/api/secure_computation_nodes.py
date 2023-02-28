@@ -376,6 +376,7 @@ async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db)
             researcher_user_id=smart_broker_node_db.researcher_user_id,
             data_federation_id=smart_broker_node_db.data_federation_id,
             version=get_secret("version"),
+            audit_service_ip=get_secret("audit_service_ip"),
         )
 
         # Provision the secure computation node

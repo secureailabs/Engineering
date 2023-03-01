@@ -1,15 +1,6 @@
 # Readme
 
 ## Pre-requirements
-### Remake Binaries
-
-Go to Engineering/
-```
-make clean
-
-make all -j 
-
-```
 ### Clone down datascience repo as submodule
 ```
 cd Engineering/
@@ -22,7 +13,13 @@ git submodule update --init
 ```
 
 ## Build and push docker images
+Before you can push the images to the docker hub, you need to login az cli and set the subscription to the one that has the docker hub registry.
+
 ```
+az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+az account set --subscription $AZURE_SUBSCRIPTION_ID
+# set the docker hub registry, use the one provided or whatever is relevant
+export DOCKER_REGISTRY_NAME="developmentdockerregistry"
 ./BuildImage.sh -i <image_name> -p
 ```
 

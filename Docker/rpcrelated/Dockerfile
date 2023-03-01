@@ -30,7 +30,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY rpcrelated/requirements.txt /requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY rpcrelated/datascience /datascience
+COPY datascience /datascience
 WORKDIR /datascience/sail-core
 RUN pip3 install -e /datascience/sail-core
 WORKDIR /datascience/sail-safe-functions

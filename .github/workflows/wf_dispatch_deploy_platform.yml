@@ -145,6 +145,10 @@ jobs:
           echo "Preload Datasets: ${{ inputs.preload_dataset }}"
           echo "Purpose of Deployment: ${{ inputs.purpose }}"
           echo "Owner of Deployment: ${{ inputs.owner }}"
+          echo "Container used [api_services_tag]: $ {{ inputs.api_services_tag }}"
+          echo "Container used [audit_service_tag]: $ {{ inputs.audit_service_tag }}"
+          echo "Container used [aggregator_scn_tag]: $ {{ inputs.aggregator_scn_tag }}"
+          echo "Container used [participant_scn_tag]: $ {{ inputs.participant_scn_tag }}"
           echo "Run Tests after Deployment: ${{ inputs.run_tests }}"
           echo "Deprovision when finished: ${{ inputs.deprovision_after }}"
 
@@ -232,17 +236,17 @@ jobs:
             sed -i 's/$PARTICIPANT_SCN_TAG/'"${{ inputs.participant_scn_tag }}"'/g' deploy_config.sh
           fi
 
-      - name: Load Datasets
-        run: |
+          DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
+          INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
+          echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
+          DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":" | tee >(cat - >&5))
+          echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
           if ${{ inputs.preload_dataset == true }}; then
-            echo "Dotnet version"
-            /home/gha-runner/.dotnet/dotnet --version
-            echo "Dotnet version"
             cd DatasetTool/
             ls -lrt
             /home/gha-runner/.dotnet/dotnet build
             /home/gha-runner/.dotnet/dotnet publish -c Release
-            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip 172.20.100.7:8000
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else
             echo "Not Preloading Datasets."

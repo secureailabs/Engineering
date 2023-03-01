@@ -294,14 +294,20 @@ jobs:
             for line in $org_test_output
             do
               if [ "${line::15}" == "workflow_tests/" ]; then
-                echo "${line##*::}" >>  $GITHUB_STEP_SUMMARY
+                test_name=$(echo "${line##*::}")
+                test_name=$(echo "${test_name%[*}")
+                test_result=$(echo "${line##* }")
+                echo "$test_name | $test_result" >>  $GITHUB_STEP_SUMMARY
               fi
             done
             echo "### dataset_mgmt_api_test.py" >>  $GITHUB_STEP_SUMMARY
             for line in $dataset_test_output
             do
               if [ "${line::15}" == "workflow_tests/" ]; then
-                echo "${line##*::}" >>  $GITHUB_STEP_SUMMARY
+                test_name=$(echo "${line##*::}")
+                test_name=$(echo "${test_name%[*}")
+                test_result=$(echo "${line##* }")
+                echo "$test_name | $test_result" >>  $GITHUB_STEP_SUMMARY
               fi
             done
           fi

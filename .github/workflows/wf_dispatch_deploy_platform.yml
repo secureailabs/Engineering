@@ -281,13 +281,30 @@ jobs:
             org_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000")
             dataset_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000")
             echo "### sail_portal_api_test.py" >>  $GITHUB_STEP_SUMMARY
-            echo "$user_test_output" >>  $GITHUB_STEP_SUMMARY
+            for line in $user_test_output
+            do
+              if [ "${line::15}" == "workflow_tests/" ]; then
+                echo "-${line##*::}" >>  $GITHUB_STEP_SUMMARY
+              fi
+            done
             echo "### sail_organization_api_test.py" >>  $GITHUB_STEP_SUMMARY
-            echo "$org_test_output" >>  $GITHUB_STEP_SUMMARY
+            for line in $org_test_output
+            do
+              if [ "${line::15}" == "workflow_tests/" ]; then
+                echo "-${line##*::}" >>  $GITHUB_STEP_SUMMARY
+              fi
+            done
             echo "### dataset_mgmt_api_test.py" >>  $GITHUB_STEP_SUMMARY
-            echo "$dataset_test_output" >>  $GITHUB_STEP_SUMMARY
+            for line in $dataset_test_output
+            do
+              if [ "${line::15}" == "workflow_tests/" ]; then
+                echo "-${line##*::}" >>  $GITHUB_STEP_SUMMARY
+              fi
+            done
           fi
           docker kill ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
+
+          workflow_tests/test_api/test_backend/sail_portal_api_test.py::test_fastapi_login_entry[lbart@igr.com-SailPassword@123] PASSED
 
   Check_Test_Selection:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
@@ -361,7 +378,8 @@ jobs:
             else
               sudo chmod +x Deprovision.sh
               deprov_output=$(sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n"))
-              echo "${deprov_output##*PROCEEDING...}" >> $GITHUB_STEP_SUMMARY
+              deprov_substr=$(echo "${deprov_output##*PROCEEDING...}")
+              echo "$deprov_substr" >> $GITHUB_STEP_SUMMARY
             fi
           else
             echo "Step Deprovision not required" >> $GITHUB_STEP_SUMMARY

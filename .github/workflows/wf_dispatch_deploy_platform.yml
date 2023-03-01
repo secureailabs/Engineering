@@ -361,8 +361,7 @@ jobs:
             else
               sudo chmod +x Deprovision.sh
               deprov_output=$(sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n"))
-              deprov_substr=$(awk -F'Proceeding...' '{print $2}' $deprov_output)
-              echo "$deprov_output"
+              deprov_substr=${deprov_output##*PROCEEDING...}
               echo "$deprov_substr" >> $GITHUB_STEP_SUMMARY
             fi
           else

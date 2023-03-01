@@ -36,7 +36,8 @@ jobs:
 
       - name: Start self-hosted runner
         run: |
-          az vm start --subscription Build -g Dev-CI -n github-runner1
+          az vm start --subscription Development -g CI-BUILDS-WUS-RG -n github-runner-wus-generic1
+          az vm start --subscription Development -g CI-BUILDS-WUS-RG -n github-runner-wus-generic2
 
   clean:
     runs-on: [self-hosted, Linux, x64, docker]

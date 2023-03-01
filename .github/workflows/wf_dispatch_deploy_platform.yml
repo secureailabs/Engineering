@@ -87,6 +87,26 @@ on:
         required: true
         type: string
         default: "CI_TEST"
+      api_services_tag:
+        description: "API Services Docker image Tag"
+        required: true
+        type: string
+        default: "default"
+      audit_service_tag:
+        description: "Audit Service Docker image Tag"
+        required: true
+        type: string
+        default: "default"
+      aggregator_scn_tag:
+        description: "Aggregator SCN Docker image Tag"
+        required: true
+        type: string
+        default: "default"
+      participant_scn_tag:
+        description: "Participant SCN Docker image Tag"
+        required: true
+        type: string
+        default: "default"
       owner:
         description: "Owner of Deployment"
         required: true
@@ -125,6 +145,10 @@ jobs:
           echo "Preload Datasets: ${{ inputs.preload_dataset }}"
           echo "Purpose of Deployment: ${{ inputs.purpose }}"
           echo "Owner of Deployment: ${{ inputs.owner }}"
+          echo "Container used [api_services_tag]: $ {{ inputs.api_services_tag }}"
+          echo "Container used [audit_service_tag]: $ {{ inputs.audit_service_tag }}"
+          echo "Container used [aggregator_scn_tag]: $ {{ inputs.aggregator_scn_tag }}"
+          echo "Container used [participant_scn_tag]: $ {{ inputs.participant_scn_tag }}"
           echo "Run Tests after Deployment: ${{ inputs.run_tests }}"
           echo "Deprovision when finished: ${{ inputs.deprovision_after }}"
 
@@ -219,8 +243,9 @@ jobs:
           echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
           if ${{ inputs.preload_dataset == true }}; then
             cd DatasetTool/
-            dotnet build
-            dotnet publish -c Release
+            ls -lrt
+            /home/gha-runner/.dotnet/dotnet build
+            /home/gha-runner/.dotnet/dotnet publish -c Release
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
             bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
           else

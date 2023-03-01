@@ -322,10 +322,10 @@ jobs:
         run: |
           echo "## Deprovision Platform" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.deprovision_after == true }}; then
-            echo "Purpose of Deployment: ${{ inputs.purpose }}" >> $GITHUB_STEP_SUMMARY
-            echo "Owner of Deployment: ${{ inputs.owner }}" >> $GITHUB_STEP_SUMMARY
+            echo "Purpose of Deployment: ${{ inputs.purpose }}"
+            echo "Owner of Deployment: ${{ inputs.owner }}"
             deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id" >> $GITHUB_STEP_SUMMARY
+            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id"
           else
             echo "Step Display Deprovision Parameters not required" >> $GITHUB_STEP_SUMMARY
             echo "deprovision_after option was not selected" >> $GITHUB_STEP_SUMMARY
@@ -361,8 +361,7 @@ jobs:
             else
               sudo chmod +x Deprovision.sh
               deprov_output=$(sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n"))
-              deprov_substr=${deprov_output##*PROCEEDING...}
-              echo "$deprov_substr" >> $GITHUB_STEP_SUMMARY
+              echo "${deprov_output##*PROCEEDING...}" >> $GITHUB_STEP_SUMMARY
             fi
           else
             echo "Step Deprovision not required" >> $GITHUB_STEP_SUMMARY

@@ -283,12 +283,7 @@ jobs:
             echo "### sail_portal_api_test.py" >>  $GITHUB_STEP_SUMMARY
             for line in $user_test_output
             do
-              if [ "${line::15}" == "workflow_tests/" ]; then
-                test_name=$(echo "${line##*::}")
-                test_name=$(echo "${test_name%[*}")
-                test_result=$(echo "${line##* }")
-                echo "$test_name | $test_result" >>  $GITHUB_STEP_SUMMARY
-              fi
+              echo "$line" >> $GITHUB_STEP_SUMMARY
             done
             echo "### sail_organization_api_test.py" >>  $GITHUB_STEP_SUMMARY
             for line in $org_test_output
@@ -296,8 +291,8 @@ jobs:
               if [ "${line::15}" == "workflow_tests/" ]; then
                 test_name=$(echo "${line##*::}")
                 test_name=$(echo "${test_name%[*}")
-                test_result=$(echo "${line##* }")
-                echo "$test_name | $test_result" >>  $GITHUB_STEP_SUMMARY
+                test_result=$(echo "${line##*]}")
+                echo "$test_name | " >>  $GITHUB_STEP_SUMMARY
               fi
             done
             echo "### dataset_mgmt_api_test.py" >>  $GITHUB_STEP_SUMMARY
@@ -306,7 +301,7 @@ jobs:
               if [ "${line::15}" == "workflow_tests/" ]; then
                 test_name=$(echo "${line##*::}")
                 test_name=$(echo "${test_name%[*}")
-                test_result=$(echo "${line##* }")
+                test_result=$(echo "${line##*]}")
                 echo "$test_name | $test_result" >>  $GITHUB_STEP_SUMMARY
               fi
             done

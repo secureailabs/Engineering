@@ -281,32 +281,12 @@ jobs:
             org_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000")
             dataset_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000")
             test_output_str=""
-            echo "### sail_portal_api_test.py" >>  $GITHUB_STEP_SUMMARY
+            echo "### Test Results" >>  $GITHUB_STEP_SUMMARY
             echo  "$user_test_output"
             echo "$org_test_output"
             echo "$dataset_test_output"
-            for line in $user_test_output
-            do
-              if [ "${line::15}" == "workflow_tests/" ]; then
-                test_name=$(echo "${line##*::}")
-                test_output_str=$(echo "${test_name%[*}")
-              elif [ "${line}" = "PASSED" ] || [ "${line}" = "FAILED" ]; then
-                echo "${test_output_str} | ${line}" >> $GITHUB_STEP_SUMMARY
-              fi
-            done
-            echo "### sail_organization_api_test.py" >>  $GITHUB_STEP_SUMMARY
-            for line in $org_test_output
-            do
-              if [ "${line::15}" == "workflow_tests/" ]; then
-                test_name=$(echo "${line##*::}")
-                test_output_str=$(echo "${test_name%[*}")
-              elif [ "${line}" = "PASSED" ] || [ "${line}" = "FAILED" ]; then
-                echo "${test_output_str} | ${line}" >> $GITHUB_STEP_SUMMARY
-              fi
-            done
-            echo "### dataset_mgmt_api_test.py" >>  $GITHUB_STEP_SUMMARY
-            for line in $dataset_test_output
-            do
+            all_test_output=( $user_test_output $org_test_output $dataset_test_output )
+            for line in "${all_test_output[@]}" ; do
               if [ "${line::15}" == "workflow_tests/" ]; then
                 test_name=$(echo "${line##*::}")
                 test_output_str=$(echo "${test_name%[*}")
@@ -388,10 +368,10 @@ jobs:
               echo "Deploy Canceled/Failed: Deprovision canceled." >> $GITHUB_STEP_SUMMARY
             else
               sudo chmod +x Deprovision.sh
-              deprov_output=$(sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n"))
-              deprov_substr=$(echo "${deprov_output##*PROCEEDING...}")
-              deprov_substr=$(echo "${deprov_substr%=*}")
-              echo "$deprov_substr" >> $GITHUB_STEP_SUMMARY
+              sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n") | tee deprov_output.txt
+              deprov_output=$(grep Deleting deprov_output.txt)
+              echo "$deprov_output" >> $GITHUB_STEP_SUMMARY
+              rm deprov_output.txt
             fi
           else
             echo "Step Deprovision not required" >> $GITHUB_STEP_SUMMARY

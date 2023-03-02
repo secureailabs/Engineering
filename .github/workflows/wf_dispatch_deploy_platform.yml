@@ -136,8 +136,16 @@ env:
   PUBLIC_IP: "False"
 
 jobs:
-  Setup_Environment:
+  Deploy_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
+    container:
+      image: developmentdockerregistry.azurecr.io/ciubuntu:v0.1.0_5f85ced
+      credentials:
+          username: ${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_PASSWORD }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Options selected
         run: |
@@ -152,9 +160,6 @@ jobs:
           echo "Run Tests after Deployment: ${{ inputs.run_tests }}"
           echo "Deprovision when finished: ${{ inputs.deprovision_after }}"
 
-      - name: Clear repository
-        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
-
       - name: Check out source repository
         uses: actions/checkout@v3
         with:
@@ -162,13 +167,6 @@ jobs:
           persist-credentials: true
           submodules: true
 
-  Deploy_Platform:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    needs: Setup_Environment
-    outputs:
-      internal_ip_addr: ${{ steps.deploy_step.outputs.INTERNAL_IP_ADDR }}
-      deployment_id: ${{ steps.deploy_step.outputs.DEPLOY_ID }}
-    steps:
       - name: Determine Subscription
         run: |
           if ${{ inputs.subscription == 'Development' }}; then
@@ -200,14 +198,10 @@ jobs:
       - name: Deploy To Subscription
         id: deploy_step
         run: |
-          echo "${{ github.head_ref }}"
-          echo "${{ github.workspace }}"
-          sudo chown -R $USER:$USER ${{ github.workspace }}
           set -e
-          pwd
+          set -x
           ls -l
           exec 5>&1
-          mkdir -p Binary
 
           sed -i 's/$AZURE_SUBSCRIPTION_ID/'"$AZURE_SUBSCRIPTION_ID"'/g' deploy_config.sh
           sed -i 's/$AZURE_TENANT_ID/'"$AZURE_TENANT_ID"'/g' deploy_config.sh
@@ -217,6 +211,7 @@ jobs:
           sed -i 's/$SLACK_WEBHOOK_URL/'"$SLACK_WEBHOOK_URL"'/g' deploy_config.sh
           sed -i 's/$DOCKER_REGISTRY_URL/'"$DOCKER_REGISTRY_URL"'/g' deploy_config.sh
           sed -i 's/$DOCKER_REGISTRY_USERNAME/'"$DOCKER_REGISTRY_USERNAME"'/g' deploy_config.sh
+
           # Kindly ensure that the password does not contain @
           sed -i 's@$DOCKER_REGISTRY_PASSWORD@'"$DOCKER_REGISTRY_PASSWORD"'@g' deploy_config.sh
           if ${{ inputs.api_services_tag != 'default'}}
@@ -236,117 +231,47 @@ jobs:
             sed -i 's/$PARTICIPANT_SCN_TAG/'"${{ inputs.participant_scn_tag }}"'/g' deploy_config.sh
           fi
 
-          DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
-          INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
-          echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
-          DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":" | tee >(cat - >&5))
-          echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
-          if ${{ inputs.preload_dataset == true }}; then
-            cd DatasetTool/
-            ls -lrt
-            /home/gha-runner/.dotnet/dotnet build
-            /home/gha-runner/.dotnet/dotnet publish -c Release
-            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE
-            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE
-          else
-            echo "Not Preloading Datasets."
-          fi
+          DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} -c | tee >(cat - >&5))
+          INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" |tee >(cat - >&5))
+          echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_ENV
+          DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":" |tee >(cat - >&5))
+          echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_ENV
 
-  Test:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    if: ${{ inputs.run_tests == true }}
-    needs: Deploy_Platform
-    steps:
+      - name: Preload Datasets
+        if: ${{ inputs.preload_dataset == true }}
+        run: |
+            cd DatasetTool/
+            export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+            /root/.dotnet/dotnet build
+            /root/.dotnet/dotnet publish -c Release
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_IP_ADDR
+            bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_IP_ADDR
+
       - name: Run Tests
+        if: ${{ inputs.run_tests == true }} && ${{ inputs.preload_dataset == true }}
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          sudo chown -R $USER:$USER ${{ github.workspace }}
-          if ${{ inputs.run_tests == true }}; then
-            deploy_output_str=${{needs.Deploy_Platform.outputs.internal_ip_addr}}
-            INTERNAL_IP_ADDR=${deploy_output_str%:*}
-            docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
-            docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
-            docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
-            docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
-            docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
-            docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
-          fi
+          deploy_output_str=$INTERNAL_IP_ADDR
+          INTERNAL_IP_ADDR=${deploy_output_str%:*}
+          docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
+          docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
+          docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
+          docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
+          docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000"
           docker kill ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
 
-  Check_Test_Selection:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    needs: [Deploy_Platform, Test]
-    if: |
-      always() &&
-      (needs.Test.result == 'success' || needs.Test.result == 'skipped')
-    outputs:
-      check: ${{ steps.check.outputs.run_test }}
-    steps:
-      - name: Verified Test option selected
-        id: check
+      - name: Deprovision Deployment
+        if: ${{ inputs.deprovision_after == true }}
         run: |
-          if ${{ inputs.run_tests == true }}; then
-            echo "run_test=yes" >> $GITHUB_OUTPUT
+          echo "Purpose of Deployment: ${{ inputs.purpose }}"
+          echo "Owner of Deployment: ${{ inputs.owner }}"
+          echo "This is GUID of DEPLOYMENT for this CI RUN: $$DEPLOY_ID"
+          set -e
+          if [ "$$DEPLOY_ID" = "" ] || [ "$$DEPLOY_ID" = " " ] || [ ! "$$DEPLOY_ID" ]; then
+            echo "Deploy Canceled/Failed: Deprovision canceled."
           else
-            echo "run_test=no" >> $GITHUB_OUTPUT
-          fi
-
-  Deprovision_Platform:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    env:
-      CHECKTESTRAN: ${{needs.Check_Test_Selection.outputs.check}}
-    if: |
-      always() &&
-      (needs.Check_Test_Selection.result == 'success')
-    needs: [Deploy_Platform, Check_Test_Selection]
-    steps:
-      - name: Deprovision Parameters
-        run: |
-          echo "CHECK TEST RAN: $CHECKTESTRAN"
-          if ${{ inputs.deprovision_after == true }}; then
-            echo "Purpose of Deployment: ${{ inputs.purpose }}"
-            echo "Owner of Deployment: ${{ inputs.owner }}"
-            deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id"
-          else
-            echo "Step Display Deprovision Parameters not required"
-            echo "deprovision_after option was not selected"
-          fi
-
-      - name: Determine Subscription
-        run: |
-          if ${{ inputs.subscription == 'Development' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Development"
-          elif ${{ inputs.subscription == 'Release Candidate' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Release Candidate"
-          elif ${{ inputs.subscription == 'ProductionGA' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Production GA"
-          else
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: None (Defaulted to Development)"
-          fi
-
-      - name: Deprovision
-        run: |
-          if ${{ inputs.deprovision_after == true }}; then
-            echo "Purpose of Deployment: ${{ inputs.purpose }}"
-            echo "Owner of Deployment: ${{ inputs.owner }}"
-            deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id"
-            set -e
-            pwd
-            if [ "$deployment_id" = "" ] || [ "$deployment_id" = " " ] || [ ! "$deployment_id" ]; then
-              echo "Deploy Canceled/Failed: Deprovision canceled."
-            else
-              chmod +x Deprovision.sh
-              sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n")
-            fi
-          else
-            echo "Step Deprovision not required"
-            echo "deprovision_after option was not selected"
+            chmod +x Deprovision.sh
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${$DEPLOY_ID}\ny\n")
           fi

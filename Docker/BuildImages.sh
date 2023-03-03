@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-DOCKER_REGISTRY_NAME=developmentdockerregistry
-
 PrintHelp() {
     echo ""
     echo "Usage: $0 -i [Image Name]"

@@ -186,7 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [start-runner, build, docs, deploy]
     steps:
-      - uses: technote-space/workflow-conclusion-action@v2
+      - uses: technote-space/workflow-conclusion-action@v3
       - name: Check Job Status status and fail if they are red
         if: env.WORKFLOW_CONCLUSION == 'failure'
         run: exit 1

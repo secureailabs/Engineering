@@ -42,7 +42,7 @@ jobs:
       - name: Check out source repository
         uses: actions/checkout@v3
       - name: Set up Python environment
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.8"
       - name: flake8 Lint
@@ -166,7 +166,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [start-runner, build, call-deploy-platform-workflow]
     steps:
-      - uses: technote-space/workflow-conclusion-action@v2
+      - uses: technote-space/workflow-conclusion-action@v3
       - name: Check Job Status status and fail if they are red
         if: env.WORKFLOW_CONCLUSION == 'failure'
         run: exit 1

@@ -1,5 +1,13 @@
 #!/bin/bash
-
+export AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
+export AZURE_TENANT_ID="3e74e5ef-7e6a-4cf0-8573-680ca49b64d8"
+export AZURE_CLIENT_ID="c9e36c0d-d4f4-4738-85c9-fd7abf67fa19"
+export AZURE_CLIENT_SECRET="qr98Q~Ffm2Qeoeu17qPKdQ6ZWZCCajCxKhWNocQ0"
+export AZURE_OBJECT_ID="dda140d1-baeb-42b2-a590-c36911ec0c13"
+export SLACK_WEBHOOK_URL=""
+export DOCKER_REGISTRY_URL="developmentdockerregistry.azurecr.io"
+export DOCKER_REGISTRY_USERNAME="DevelopmentDockerRegistry"
+export DOCKER_REGISTRY_PASSWORD="5ojmm/LV00J6xaqwlMODyE0srZ1PhBm/jB0zofAxiu+ACRDjKbya"
 
 export AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID
 export AZURE_TENANT_ID=$AZURE_TENANT_ID
@@ -15,13 +23,13 @@ export DOCKER_REGISTRY_PASSWORD=$DOCKER_REGISTRY_PASSWORD
 # this is a hack to let the CI use default values for the tags
 # the CI will override the $ values with the user provided tags
 # if the user does not provide any tags, the default values will be used
-export API_SERVICES_TAG="v0.1.0_a7ed41cf"
+export API_SERVICES_TAG="v0.1.0_d1dae58b"
 export API_SERVICES_TAG=$API_SERVICES_TAG
-export AUDIT_SERVICES_TAG="v0.1.0_a7ed41cf"
+export AUDIT_SERVICES_TAG="v0.1.0_d1dae58b"
 export AUDIT_SERVICES_TAG=$AUDIT_SERVICES_TAG
-export AGGREGATOR_SCN_TAG="v0.1.0_a7ed41cf"
+export AGGREGATOR_SCN_TAG="v0.1.0_d1dae58b"
 export AGGREGATOR_SCN_TAG=$AGGREGATOR_SCN_TAG
-export PARTICIPANT_SCN_TAG="v0.1.0_a7ed41cf"
+export PARTICIPANT_SCN_TAG="v0.1.0_d1dae58b"
 export PARTICIPANT_SCN_TAG=$PARTICIPANT_SCN_TAG
-export WEB_FRONTEND_TAG="v0.1.0_a7ed41cf"
+export WEB_FRONTEND_TAG="v0.1.0_d1dae58b"
 export WEB_FRONTEND_TAG=$WEB_FRONTEND_TAG

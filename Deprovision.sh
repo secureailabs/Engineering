@@ -108,12 +108,14 @@ do
                 read -p "Enter guid of platform you wish to delete: " GUID
                 if [ -z $GUID ]; then
                     echo "GUID entered was empty; exiting..."
-                    exit 0
+                    exit 1
                 fi
                 echo -e "\nList of Resources staged for deletion\n"
                 GUID="${GUID//[[:space:]]/}"
+                output=$(az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv)
+                [[ -z "$output" ]] && { echo "Error: Entered GUID: $GUID did not match any resources"; exit 1; }
                 echo -e "The following resources were found based on inputed GUID:|$GUID|\n"
-                az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv
+                echo $output
                 read -p "Do you wish to continue?  " yn
                 case $yn in
                     [Yy]* ) 

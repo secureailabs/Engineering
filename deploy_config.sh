@@ -1,13 +1,4 @@
 #!/bin/bash
-export AZURE_SUBSCRIPTION_ID="b7a46052-b7b1-433e-9147-56efbfe28ac5"
-export AZURE_TENANT_ID="3e74e5ef-7e6a-4cf0-8573-680ca49b64d8"
-export AZURE_CLIENT_ID="c9e36c0d-d4f4-4738-85c9-fd7abf67fa19"
-export AZURE_CLIENT_SECRET="qr98Q~Ffm2Qeoeu17qPKdQ6ZWZCCajCxKhWNocQ0"
-export AZURE_OBJECT_ID="dda140d1-baeb-42b2-a590-c36911ec0c13"
-export SLACK_WEBHOOK_URL=""
-export DOCKER_REGISTRY_URL="developmentdockerregistry.azurecr.io"
-export DOCKER_REGISTRY_USERNAME="DevelopmentDockerRegistry"
-export DOCKER_REGISTRY_PASSWORD="5ojmm/LV00J6xaqwlMODyE0srZ1PhBm/jB0zofAxiu+ACRDjKbya"
 
 export AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID
 export AZURE_TENANT_ID=$AZURE_TENANT_ID

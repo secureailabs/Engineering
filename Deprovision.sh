@@ -106,10 +106,7 @@ do
             echo "Deleting resources of specified guid!"
             while true; do
                 read -p "Enter guid of platform you wish to delete: " GUID
-                if [ -z $GUID ]; then
-                    echo "GUID entered was empty; exiting..."
-                    exit 1
-                fi
+                [[ -z "$GUID" ]] && { echo "GUID entered was empty; exiting..."; exit 1; }
                 echo -e "\nList of Resources staged for deletion\n"
                 GUID="${GUID//[[:space:]]/}"
                 output=$(az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv)
@@ -119,7 +116,7 @@ do
                 read -p "Do you wish to continue?  " yn
                 case $yn in
                     [Yy]* ) 
-                        echo -e "PROCEEDING... \n"
+                        echo -e "\nPROCEEDING... \n"
                         for rgname in `az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv`; do
                             echo Deleting ${rgname}
                             az group delete -n ${rgname} --yes --no-wait
@@ -138,7 +135,7 @@ do
             read -p "Do you wish to continue?  " yn
                 case $yn in
                     [Yy]* ) 
-                        echo -e "PROCEEDING... \n"
+                        echo -e "\nPROCEEDING... \n"
                         for rgname in `az group list --query "[?contains(name,'$owner')].{name:name}" --output tsv`; do
                             echo Deleting ${rgname}
                             az group delete -n ${rgname} --yes --no-wait

@@ -26,6 +26,15 @@ export PATH_DIR_PUBLIC_KEY_ZEROMQ="/app/RPCLib/public_keys/"
 export PATH_FILE_PRIVATE_KEY_ZEROMQ_CLIENT="/app/RPCLib/private_keys/client.key_secret"
 export PATH_DIR_DATASET="/data/"
 
+# Use the InitializationVector to populate the IP address of the audit services
+auditIP=$(cat InitializationVector.json | jq -r '.audit_service_ip')
+
+# modify the audit service ip of promtail config file
+sed -i "s,auditserver,$auditIP,g" /promtail_local_config.yaml
+
+# Start the promtail client
+/promtail_linux_amd64 -config.file=/promtail_local_config.yaml  > /promtail.log 2>&1&
+
 cd sail-aggregator-fastapi
 uvicorn aggregator_fastapi:app --host 0.0.0.0 --port 8000
 

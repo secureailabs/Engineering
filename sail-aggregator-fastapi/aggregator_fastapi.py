@@ -116,7 +116,7 @@ async def validate(series):
     :type: None
     """
     if not query_limit_n(series):
-        message = "Validation Failure: Sample size too small"
+        message = "[smartbroker][privacy_violation]Validation Failure: Sample size too small"
         await log_validation_failure(message)
         raise HTTPException(status_code=500, detail=message)
     else:

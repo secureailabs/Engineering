@@ -33,7 +33,7 @@ from models.data_federations import (
     RegisterDataFederationProvision_In,
     RegisterDataFederationProvision_Out,
 )
-from models.secure_computation_nodes import RegisterSecureComputationNode_In, SecureComputationNodeType
+from models.secure_computation_nodes import DatasetInformation, RegisterSecureComputationNode_In
 
 router = APIRouter()
 
@@ -191,6 +191,7 @@ async def provision_data_federation(
 
     # Get the dataset versions for the data federation
     datasets = data_federation_db.datasets
+    dataset_info: List[DatasetInformation] = []
     for dataset in datasets:
         # Get the dataset versions
         dataset_id = dataset.id
@@ -199,33 +200,18 @@ async def provision_data_federation(
         # Get the latest version
         latest_version = response.dataset_versions[0].id
 
-        # Provision the latest version
-        register_scn_params = RegisterSecureComputationNode_In(
-            data_federation_id=provision_req.data_federation_id,
-            data_federation_provision_id=provision_db.id,
-            dataset_id=dataset_id,
-            dataset_version_id=latest_version,
-            size=provision_req.secure_computation_nodes_size,
-            type=SecureComputationNodeType.SCN,
+        dataset_info.append(
+            DatasetInformation(
+                id=dataset_id, version_id=latest_version, data_owner_id=response.dataset_versions[0].organization.id
+            )
         )
-
-        # Provision the SCN and get the SCN id
-        # FIXME: Prawal this is very slow fix this.
-        scn_provision_response = await register_secure_computation_node(
-            secure_computation_node_req=register_scn_params,
-            current_user=current_user,
-        )
-
-        provision_db.secure_computation_nodes_id.append(scn_provision_response.id)
 
     # Create a smart broker for the data federation provision which is also a SCN
     register_smart_broker_params = RegisterSecureComputationNode_In(
         data_federation_id=provision_req.data_federation_id,
         data_federation_provision_id=provision_db.id,
-        dataset_id=PyObjectId(empty=True),
-        dataset_version_id=PyObjectId(empty=True),
+        datasets=dataset_info,
         size=provision_req.secure_computation_nodes_size,
-        type=SecureComputationNodeType.SMART_BROKER,
     )
     smart_broker_response = await register_secure_computation_node(
         secure_computation_node_req=register_smart_broker_params,

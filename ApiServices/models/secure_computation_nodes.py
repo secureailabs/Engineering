@@ -17,18 +17,15 @@ from enum import Enum
 from ipaddress import IPv4Address
 from typing import List, Optional
 
-from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 from pydantic import Field, StrictStr
+
+from app.api import datasets
+from models.common import BasicObjectInfo, PyObjectId, SailBaseModel
 
 
 class SecureComputationNodeSize(Enum):
     Standard_D4s_v4 = "Standard_D4s_v4"
     Standard_DC4ads_v5 = "Standard_DC4ads_v5"
-
-
-class SecureComputationNodeType(Enum):
-    SCN = "SCN"
-    SMART_BROKER = "SMART_BROKER"
 
 
 class SecureComputationNodeState(Enum):
@@ -44,13 +41,26 @@ class SecureComputationNodeState(Enum):
     DELETE_FAILED = "DELETE_FAILED"
 
 
+class DatasetInformation(SailBaseModel):
+    id: PyObjectId = Field()
+    version_id: PyObjectId = Field()
+    data_owner_id: PyObjectId = Field()
+
+
+class DatasetInformationWithKey(DatasetInformation):
+    key: StrictStr = Field()
+
+
+class DatasetBasicInformation(SailBaseModel):
+    dataset: BasicObjectInfo = Field()
+    version: BasicObjectInfo = Field()
+    data_owner: BasicObjectInfo = Field()
+
+
 class SecureComputationNode_Base(SailBaseModel):
     data_federation_id: PyObjectId = Field(...)
     data_federation_provision_id: PyObjectId = Field(...)
-    dataset_id: PyObjectId = Field(...)
-    dataset_version_id: PyObjectId = Field(...)
     size: SecureComputationNodeSize = Field(...)
-    type: SecureComputationNodeType = Field(...)
 
 
 class SecureComputationNode_Db(SecureComputationNode_Base):
@@ -61,11 +71,11 @@ class SecureComputationNode_Db(SecureComputationNode_Base):
     detail: Optional[StrictStr] = Field(default=None)
     ipaddress: Optional[IPv4Address] = Field(default=None)
     researcher_id: PyObjectId = Field(default=None)
-    data_owner_id: PyObjectId = Field(default=None)
+    datasets: List[DatasetInformation] = Field(...)
 
 
 class RegisterSecureComputationNode_In(SecureComputationNode_Base):
-    pass
+    datasets: List[DatasetInformation] = Field(...)
 
 
 class RegisterSecureComputationNode_Out(SailBaseModel):
@@ -75,12 +85,9 @@ class RegisterSecureComputationNode_Out(SailBaseModel):
 class GetSecureComputationNode_Out(SailBaseModel):
     id: PyObjectId = Field(alias="_id")
     data_federation: BasicObjectInfo = Field(...)
-    dataset: BasicObjectInfo = Field(...)
-    dataset_version: BasicObjectInfo = Field(...)
+    datasets: List[DatasetBasicInformation] = Field(...)
     researcher: BasicObjectInfo = Field(default=None)
-    data_owner: BasicObjectInfo = Field(default=None)
     researcher_user: PyObjectId = Field(...)
-    type: SecureComputationNodeType = Field(...)
     timestamp: datetime = Field(...)
     state: SecureComputationNodeState = Field(...)
     detail: Optional[StrictStr] = Field(default=None)
@@ -99,28 +106,9 @@ class SecureComputationNodeInitializationVector(SailBaseModel):
     secure_computation_node_id: PyObjectId = Field(...)
     dataset_storage_password: StrictStr = Field(...)
     storage_account_name: StrictStr = Field(...)
-    dataset_version_id: PyObjectId = Field(...)
-    dataset_id: PyObjectId = Field(...)
-    dataset_key: StrictStr = Field(...)
+    datasets: List[DatasetInformationWithKey] = Field(...)
     researcher_id: PyObjectId = Field(...)
     researcher_user_id: PyObjectId = Field(...)
     data_federation_id: PyObjectId = Field(...)
     version: StrictStr = Field(...)
     audit_service_ip: StrictStr = Field(...)
-
-
-class SmartBrokerScnInfo(SailBaseModel):
-    id: PyObjectId = Field(alias="_id")
-    ip_address: IPv4Address = Field(...)
-    dataset_id: PyObjectId = Field(...)
-    dataset_version_id: PyObjectId = Field(...)
-
-
-class SmartBrokerInitializationVector(SailBaseModel):
-    smart_broker_id: PyObjectId = Field(...)
-    access_token: StrictStr = Field(...)
-    secure_computation_nodes: List[SmartBrokerScnInfo] = Field(...)
-    researcher_id: PyObjectId = Field(...)
-    researcher_user_id: PyObjectId = Field(...)
-    data_federation_id: PyObjectId = Field(...)
-    version: StrictStr = Field(...)

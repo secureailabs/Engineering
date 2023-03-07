@@ -34,6 +34,9 @@ from models.authentication import TokenData
 from models.common import BasicObjectInfo, PyObjectId
 from models.data_federations import DataFederationProvisionState
 from models.secure_computation_nodes import (
+    DatasetBasicInformation,
+    DatasetInformation,
+    DatasetInformationWithKey,
     GetMultipleSecureComputationNode_Out,
     GetSecureComputationNode_Out,
     RegisterSecureComputationNode_In,
@@ -41,9 +44,6 @@ from models.secure_computation_nodes import (
     SecureComputationNode_Db,
     SecureComputationNodeInitializationVector,
     SecureComputationNodeState,
-    SecureComputationNodeType,
-    SmartBrokerInitializationVector,
-    SmartBrokerScnInfo,
     UpdateSecureComputationNode_In,
 )
 
@@ -54,8 +54,8 @@ router = APIRouter()
 
 ########################################################################################################################
 async def register_secure_computation_node(
-    secure_computation_node_req: RegisterSecureComputationNode_In = Body(...),
-    current_user: TokenData = Depends(get_current_user),
+    secure_computation_node_req: RegisterSecureComputationNode_In,
+    current_user: TokenData,
 ) -> RegisterSecureComputationNode_Out:
     """
     Register a secure computation node
@@ -73,29 +73,33 @@ async def register_secure_computation_node(
         researcher_user_id=current_user.id,
         state=SecureComputationNodeState.REQUESTED,
         researcher_id=current_user.organization_id,
-        data_owner_id=PyObjectId(empty=True),
     )
-    if secure_computation_node_req.type == SecureComputationNodeType.SCN:
-        # Check if the digital contract and dataset exist
-        dataset_version_db = await get_dataset_version(secure_computation_node_req.dataset_version_id, current_user)
+
+    dataset_with_keys: List[DatasetInformationWithKey] = []
+    for dataset in secure_computation_node_req.datasets:
+        # Check if dataset version exist
+        dataset_version_db = await get_dataset_version(dataset.version_id, current_user)
         if not dataset_version_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dataset Version not found")
-
-        # Set the dataowner id in the secure computation node
-        secure_computation_node_db.data_owner_id = dataset_version_db.organization.id
 
         # Get the encryption key of the dataset
         dataset_key = await get_existing_dataset_key(
             data_federation_id=secure_computation_node_db.data_federation_id,
-            dataset_id=secure_computation_node_db.dataset_id,
+            dataset_id=dataset.id,
             current_user=current_user,
         )
-        # Start the provisioning of the secure computation node in a background thread which will update the IP address
-        add_async_task(provision_secure_computation_node(secure_computation_node_db, dataset_key.dataset_key))
-    elif secure_computation_node_req.type == SecureComputationNodeType.SMART_BROKER:
-        add_async_task(provision_smart_broker(secure_computation_node_db))
-    else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid secure computation node type")
+
+        dataset_with_keys.append(
+            DatasetInformationWithKey(
+                id=dataset.id,
+                version_id=dataset.version_id,
+                data_owner_id=dataset.data_owner_id,
+                key=dataset_key.dataset_key,
+            )
+        )
+
+    # Start the provisioning of the secure computation node in a background thread which will update the IP address
+    add_async_task(provision_secure_computation_node(secure_computation_node_db, dataset_with_keys))
 
     await data_service.insert_one(DB_COLLECTION_SECURE_COMPUTATION_NODE, jsonable_encoder(secure_computation_node_db))
 
@@ -146,25 +150,25 @@ async def get_all_secure_computation_nodes(
         for secure_computation_node in secure_computation_nodes:
             secure_computation_node = SecureComputationNode_Db(**secure_computation_node)
 
-            # Skip if it is a smart broker
-            if secure_computation_node.type == SecureComputationNodeType.SMART_BROKER:
-                continue
+            dataset_info: List[DatasetBasicInformation] = []
+            for dataset in secure_computation_node.datasets:
+                # Get the basic information of the dataset
+                dataset_basic_info = [dataset for dataset in data_federation.datasets if dataset.id == dataset.id][0]
 
-            dataset_basic_info = [
-                dataset for dataset in data_federation.datasets if dataset.id == secure_computation_node.dataset_id
-            ][0]
+                # Get the basic information of the data version
+                dataset_version_basic_info = await get_dataset_version(dataset.version_id, current_user)
 
-            # Get the basic information of the data version
-            dataset_version_basic_info = await get_dataset_version(
-                secure_computation_node.dataset_version_id, current_user
-            )
+                dataset_info.append(
+                    DatasetBasicInformation(
+                        dataset=BasicObjectInfo(id=dataset_basic_info.id, name=dataset_basic_info.name),
+                        version=BasicObjectInfo(id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
+                        data_owner=dataset_version_basic_info.organization,
+                    )
+                )
 
             response_secure_computation_node = GetSecureComputationNode_Out(
                 **secure_computation_node.dict(),
                 data_federation=BasicObjectInfo(id=data_federation.id, name=data_federation.name),
-                dataset=dataset_basic_info,
-                dataset_version=BasicObjectInfo(id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
-                data_owner=dataset_version_basic_info.organization,
                 researcher=data_researcher_basic_info,
                 researcher_user=current_user.id,
             )
@@ -214,20 +218,26 @@ async def get_secure_computation_node(
     dataset_basic_info = BasicObjectInfo(id=PyObjectId(empty=True), name="")
     dataset_version_basic_info = BasicObjectInfo(id=PyObjectId(empty=True), name="")
     data_owner_basic_info = BasicObjectInfo(id=PyObjectId(empty=True), name="")
-    if secure_computation_node.type == SecureComputationNodeType.SCN:
-        dataset_basic_info = [
-            dataset for dataset in data_federation.datasets if dataset.id == secure_computation_node.dataset_id
-        ][0]
+
+    dataset_info: List[DatasetBasicInformation] = []
+    for dataset in secure_computation_node.datasets:
+        # Get the basic information of the dataset
+        dataset_basic_info = [dataset for dataset in data_federation.datasets if dataset.id == dataset.id][0]
+
         # Get the basic information of the data version
-        dataset_version_basic_info = await get_dataset_version(secure_computation_node.dataset_version_id, current_user)
-        data_owner_basic_info = dataset_version_basic_info.organization
+        dataset_version_basic_info = await get_dataset_version(dataset.version_id, current_user)
+
+        dataset_info.append(
+            DatasetBasicInformation(
+                dataset=BasicObjectInfo(id=dataset_basic_info.id, name=dataset_basic_info.name),
+                version=BasicObjectInfo(id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
+                data_owner=dataset_version_basic_info.organization,
+            )
+        )
 
     response_secure_computation_node = GetSecureComputationNode_Out(
         **secure_computation_node.dict(),
         data_federation=BasicObjectInfo(id=data_federation.id, name=data_federation.name),
-        dataset=dataset_basic_info,
-        dataset_version=BasicObjectInfo(id=dataset_version_basic_info.id, name=dataset_version_basic_info.name),
-        data_owner=data_owner_basic_info,
         researcher=data_researcher_basic_info,
         researcher_user=current_user.id,
     )
@@ -308,7 +318,9 @@ async def deprovision_secure_computation_nodes(
 
 ########################################################################################################################
 # TODO: these are temporary functions. They should be removed after the HANU is ready
-async def provision_secure_computation_node(secure_computation_node_db: SecureComputationNode_Db, dataset_key: str):
+async def provision_secure_computation_node(
+    secure_computation_node_db: SecureComputationNode_Db, datasets: List[DatasetInformationWithKey]
+):
     """
     Provision a secure computation node
 
@@ -323,9 +335,7 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             secure_computation_node_id=secure_computation_node_db.id,
             storage_account_name=get_secret("azure_storage_account_name"),
             dataset_storage_password=get_secret("azure_storage_account_password"),
-            dataset_version_id=secure_computation_node_db.dataset_version_id,
-            dataset_id=secure_computation_node_db.dataset_id,
-            dataset_key=dataset_key,
+            datasets=datasets,
             data_federation_id=secure_computation_node_db.data_federation_id,
             researcher_id=secure_computation_node_db.researcher_id,
             researcher_user_id=secure_computation_node_db.researcher_user_id,
@@ -337,7 +347,7 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             json.dump(jsonable_encoder(securecomputationnode_json), outfile)
 
         secure_computation_node_db = await provision_virtual_machine(
-            secure_computation_node_db, "rpcrelated", jsonable_encoder(securecomputationnode_json)
+            secure_computation_node_db, "securecomputationnode", jsonable_encoder(securecomputationnode_json)
         )
 
         # Initilize the secure computation node
@@ -352,100 +362,6 @@ async def provision_secure_computation_node(secure_computation_node_db: SecureCo
             DB_COLLECTION_SECURE_COMPUTATION_NODE,
             {"_id": str(secure_computation_node_db.id)},
             {"$set": jsonable_encoder(secure_computation_node_db)},
-        )
-
-
-########################################################################################################################
-async def provision_smart_broker(smart_broker_node_db: SecureComputationNode_Db):
-    """
-    Provision a smart broker node
-
-    :param smart_broker_node_db: smart broker node information
-    :type smart_broker_node_db: SecureComputationNode_Db
-    """
-    from app.api.data_federations_provisions import update_provision_state
-
-    try:
-
-        # Create a SCN initialization vector json
-        smart_broker_json = SmartBrokerInitializationVector(
-            smart_broker_id=smart_broker_node_db.id,
-            secure_computation_nodes=[],
-            access_token="",
-            researcher_id=smart_broker_node_db.researcher_id,
-            researcher_user_id=smart_broker_node_db.researcher_user_id,
-            data_federation_id=smart_broker_node_db.data_federation_id,
-            version=get_secret("version"),
-            audit_service_ip=get_secret("audit_service_ip"),
-        )
-
-        # Provision the secure computation node
-        smart_broker_node_db = await provision_virtual_machine(
-            smart_broker_node_db, "smartbroker", jsonable_encoder(smart_broker_json)
-        )
-
-        # Wait for all the SCNs to be ready with a timeout of 15 minutes
-        secure_computation_node_dbs = []
-        start_time = time.time()
-        while True:
-            if time.time() - start_time > 900:
-                raise Exception("Timeout waiting for SCNs to be ready")
-            await asyncio.sleep(10)
-            secure_computation_node_dbs = await data_service.find_by_query(
-                DB_COLLECTION_SECURE_COMPUTATION_NODE,
-                {"data_federation_provision_id": str(smart_broker_node_db.data_federation_provision_id), "type": "SCN"},
-            )
-            # Check if all the SCNs are ready/waiting for data
-            if all(
-                SecureComputationNode_Db(**secure_computation_node_db).state
-                == SecureComputationNodeState.WAITING_FOR_DATA
-                for secure_computation_node_db in secure_computation_node_dbs
-            ):
-                break
-
-        # Create a list of SCNs to be sent to the smart broker
-        secure_computation_nodes: List[SmartBrokerScnInfo] = []
-        for secure_computation_node_db in secure_computation_node_dbs:
-            secure_computation_node_db = SecureComputationNode_Db(**secure_computation_node_db)
-            if secure_computation_node_db.ipaddress is None:
-                raise Exception("IP address of SCN is not set")
-            secure_computation_nodes.append(
-                SmartBrokerScnInfo(
-                    _id=secure_computation_node_db.id,
-                    ip_address=secure_computation_node_db.ipaddress,
-                    dataset_id=secure_computation_node_db.dataset_id,
-                    dataset_version_id=secure_computation_node_db.dataset_version_id,
-                )
-            )
-
-        # Create a SCN initialization vector json
-        smart_broker_json.secure_computation_nodes = secure_computation_nodes
-
-        with open(str(smart_broker_node_db.id), "w") as outfile:
-            json.dump(jsonable_encoder(smart_broker_json), outfile)
-
-        # Initilize the secure computation node
-        await initialize_virtual_machine(smart_broker_node_db, "smartbroker.tar.gz")
-
-        # After the smart broker is initialized, update the state of the data federation provision to READY
-        await update_provision_state(
-            smart_broker_node_db.data_federation_provision_id, DataFederationProvisionState.CREATED
-        )
-
-    except Exception as exception:
-        print(exception)
-        # Update the database to mark the VM as FAILED
-        smart_broker_node_db.state = SecureComputationNodeState.FAILED
-        smart_broker_node_db.detail = str(exception)
-        await data_service.update_one(
-            DB_COLLECTION_SECURE_COMPUTATION_NODE,
-            {"_id": str(smart_broker_node_db.id)},
-            {"$set": jsonable_encoder(smart_broker_node_db)},
-        )
-
-        # Update the state of the data federation provision to FAILED
-        await update_provision_state(
-            smart_broker_node_db.data_federation_provision_id, DataFederationProvisionState.CREATION_FAILED
         )
 
 

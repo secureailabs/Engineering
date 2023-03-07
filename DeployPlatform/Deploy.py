@@ -372,9 +372,9 @@ def deploy_apiservices(
     backend_json["smartbroker_docker_params"] = "-p 8000:8001 -p 9090:9091 "
     backend_json["smartbroker_image_tag"] = AGGREGATOR_SCN_TAG
     backend_json[
-        "rpcrelated_docker_params"
-    ] = "-p 5556:5556 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
-    backend_json["rpcrelated_image_tag"] = PARTICIPANT_SCN_TAG
+        "securecomputationnode_docker_params"
+    ] = "-p 8888:8889 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
+    backend_json["securecomputationnode_image_tag"] = PARTICIPANT_SCN_TAG
 
     with open("apiservices.json", "w") as outfile:
         json.dump(backend_json, outfile)

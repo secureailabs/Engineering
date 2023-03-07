@@ -19,6 +19,11 @@ PushImageToRegistry() {
         exit 1
     fi
 
+    #login to azure account
+    echo "login to azure account"
+    az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+    az account set --subscription $AZURE_SUBSCRIPTION_ID
+
     # check if the azure registry is logged in
     echo "log in to azure registry"
     az acr login --name "$DOCKER_REGISTRY_NAME"

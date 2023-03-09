@@ -136,8 +136,16 @@ env:
   PUBLIC_IP: "False"
 
 jobs:
-  Setup_Environment:
+  Deploy_Platform:
     runs-on: [self-hosted, Linux, x64, docker, Platform]
+    container:
+      image: developmentdockerregistry.azurecr.io/ciubuntu:v0.1.0_5f85ced
+      credentials:
+        username: ${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_USERNAME }}
+        password: ${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_PASSWORD }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Options selected
         run: |
@@ -153,9 +161,6 @@ jobs:
           echo "Run Tests after Deployment: ${{ inputs.run_tests }}" >> $GITHUB_STEP_SUMMARY
           echo "Deprovision when finished: ${{ inputs.deprovision_after }}" >> $GITHUB_STEP_SUMMARY
 
-      - name: Clear repository
-        run: sudo rm -fr $GITHUB_WORKSPACE && mkdir $GITHUB_WORKSPACE
-
       - name: Check out source repository
         uses: actions/checkout@v3
         with:
@@ -163,53 +168,43 @@ jobs:
           persist-credentials: true
           submodules: true
 
-  Deploy_Platform:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    needs: Setup_Environment
-    outputs:
-      internal_ip_addr: ${{ steps.deploy_step.outputs.INTERNAL_IP_ADDR }}
-      deployment_id: ${{ steps.deploy_step.outputs.DEPLOY_ID }}
-    steps:
       - name: Determine Subscription
         run: |
+          echo "## Determine Subscription" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.subscription == 'Development' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_URL=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_USERNAME=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
-            echo "Subscription: Development" >> $GITHUB_STEP_SUMMARY
+            echo "Verified Subscription: Development" >> $GITHUB_STEP_SUMMARY
           elif ${{ inputs.subscription == 'Release Candidate' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_URL=${{ secrets.RELEASE_CANDIDATE_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_USERNAME=${{ secrets.RELEASE_CANDIDATE_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.RELEASE_CANDIDATE_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
-            echo "Subscription: Release Candidate" >> $GITHUB_STEP_SUMMARY
+            echo "Verified Subscription: Release Candidate" >> $GITHUB_STEP_SUMMARY
           elif ${{ inputs.subscription == 'ProductionGA' }}; then
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_URL=${{ secrets.PRODUCTION_GA_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_USERNAME=${{ secrets.PRODUCTION_GA_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.PRODUCTION_GA_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
-            echo "Subscription: Production GA" >> $GITHUB_STEP_SUMMARY
+            echo "Verified Subscription: Production GA" >> $GITHUB_STEP_SUMMARY
           else
             echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_URL=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_URL }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_USERNAME=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY_PASSWORD=${{ secrets.DEVELOPMENT_DOCKER_REGISTRY_PASSWORD }}" >> $GITHUB_ENV
-            echo "Subscription: None (Defaulted to Development)" >> $GITHUB_STEP_SUMMARY
+            echo "Verified Subscription: None (Defaulted to Development)" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Deploy To Subscription
         id: deploy_step
         run: |
-          echo "${{ github.head_ref }}"
-          echo "${{ github.workspace }}"
-          sudo chown -R $USER:$USER ${{ github.workspace }}
+          echo "## Deployment To Subscription" >> $GITHUB_STEP_SUMMARY
           set -e
-          pwd
+          set -x
           ls -l
           exec 5>&1
-          mkdir -p Binary
-
           sed -i 's/$AZURE_SUBSCRIPTION_ID/'"$AZURE_SUBSCRIPTION_ID"'/g' deploy_config.sh
           sed -i 's/$AZURE_TENANT_ID/'"$AZURE_TENANT_ID"'/g' deploy_config.sh
           sed -i 's/$AZURE_CLIENT_ID/'"$AZURE_CLIENT_ID"'/g' deploy_config.sh
@@ -237,143 +232,85 @@ jobs:
             sed -i 's/$PARTICIPANT_SCN_TAG/'"${{ inputs.participant_scn_tag }}"'/g' deploy_config.sh
           fi
 
-          DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} |tee >(cat - >&5))
-          INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/" | tee >(cat - >&5))
-          echo "INTERNAL_IP_ADDR=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_OUTPUT
-          echo "Sail API Services is hosted internally on: https://$INTERNAL_ADDR_API_SERVICE " >> $GITHUB_STEP_SUMMARY
-          DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":" | tee >(cat - >&5))
-          echo "DEPLOY_ID=$DEPLOY_GUID_ID" >> $GITHUB_OUTPUT
-          echo "Deployment GUID: $DEPLOY_GUID_ID " >> $GITHUB_STEP_SUMMARY
-          echo "## Preload Dataset" >> $GITHUB_STEP_SUMMARY
-          if ${{ inputs.preload_dataset == true }}; then
-            cd DatasetTool/
-            ls -lrt
-            /home/gha-runner/.dotnet/dotnet build
-            /home/gha-runner/.dotnet/dotnet publish -c Release
-            dataset_output01=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE)
-            dataset_output02=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE)
-            echo "### Dataset 1" >> $GITHUB_STEP_SUMMARY
-            echo "$dataset_output01" >> $GITHUB_STEP_SUMMARY
-            echo "### Dataset 2" >> $GITHUB_STEP_SUMMARY
-            echo "$dataset_output02" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "Not Preloading Datasets." >> $GITHUB_STEP_SUMMARY
-          fi
+          DEPLOY_OUTPUT=$(sudo -E ./DeployPlatform.sh -p ${{ inputs.purpose }} -o ${{ inputs.owner }} -c | tee >(cat - >&5))
 
-  Test:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    if: ${{ inputs.run_tests == true }}
-    needs: Deploy_Platform
-    steps:
+          INTERNAL_ADDR_API_SERVICE=$(echo "$DEPLOY_OUTPUT" | grep  "SAIL API Services is hosted internally on: https://172" | cut -f3  -d "/")
+          DEPLOY_GUID_ID=$(echo "$DEPLOY_OUTPUT" | grep  "Deployment GUID:" | cut -f2  -d ":")  
+
+          echo "Sail API Services is hosted internally on: https://$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_STEP_SUMMARY
+          echo "Deployment GUID: $DEPLOY_GUID_ID" >> $GITHUB_STEP_SUMMARY
+
+          echo "INTERNAL_ADDR_API_SERVICE=$INTERNAL_ADDR_API_SERVICE" >> $GITHUB_ENV
+          echo "DEPLOY_GUID_ID=$DEPLOY_GUID_ID" >> $GITHUB_ENV
+
+      - name: Read exported variables
+        run: |
+          echo "Test 1 : Exported Deployment GUID value: ${{ env.DEPLOY_GUID_ID }}" 
+          echo "Test 2 : Exported Deployment GUID value: $DEPLOY_GUID_ID" >> $GITHUB_STEP_SUMMARY
+          echo "Test 1 : Exported Internally hosted Sail API Services value: ${{ env.INTERNAL_ADDR_API_SERVICE }}"
+          echo "Test 2 : Exported Internally hosted Sail API Services value: $INTERNAL_ADDR_API_SERVICE" >> $GITHUB_STEP_SUMMARY
+
+      - name: Preload Datasets
+        if: ${{ inputs.preload_dataset == true }}
+        run: |
+          echo "## Preload Dataset" >> $GITHUB_STEP_SUMMARY
+          cd DatasetTool/
+          export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+          /root/.dotnet/dotnet build
+          /root/.dotnet/dotnet publish -c Release
+          dataset_output01=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE)
+          dataset_output02=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE)
+          echo "### Dataset 1" >> $GITHUB_STEP_SUMMARY
+          echo "$dataset_output01" >> $GITHUB_STEP_SUMMARY
+          echo "### Dataset 2" >> $GITHUB_STEP_SUMMARY
+          echo "$dataset_output02" >> $GITHUB_STEP_SUMMARY
+
       - name: Run Tests
+        if: ${{ inputs.run_tests == true }} && ${{ inputs.preload_dataset == true }}
         env:
           PAT: ${{ secrets.JENKINS_BUILD_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          sudo chown -R $USER:$USER ${{ github.workspace }}
-          if ${{ inputs.run_tests == true }}; then
-            deploy_output_str=${{needs.Deploy_Platform.outputs.internal_ip_addr}}
-            INTERNAL_IP_ADDR=${deploy_output_str%:*}
-            docker stop ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
-            docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
-            docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
-            user_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000")
-            org_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m "fastapi" -sv --ip $INTERNAL_IP_ADDR  --port 8000")
-            dataset_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m "azure" -sv --ip $INTERNAL_IP_ADDR  --port 8000")
-            test_output_str=""
-            echo "### Test Results" >>  $GITHUB_STEP_SUMMARY
-            echo  "$user_test_output"
-            echo "$org_test_output"
-            echo "$dataset_test_output"
-            all_test_output=( $user_test_output $org_test_output $dataset_test_output )
-            for line in "${all_test_output[@]}" ; do
-              if [ "${line::15}" == "workflow_tests/" ]; then
-                test_name=$(echo "${line##*::}")
-                test_output_str=$(echo "${test_name%[*}")
-              elif [ "${line}" = "PASSED" ] || [ "${line}" = "FAILED" ]; then
-                echo "${test_output_str} | ${line}" >> $GITHUB_STEP_SUMMARY
-              fi
-            done
+          deploy_output_str=$INTERNAL_ADDR_API_SERVICE
+          INTERNAL_IP_ADDR=${deploy_output_str%:*}
+          docker kill ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
+          docker build -t ubuntu-sailtap:1.0 --build-arg git_personal_token=$PAT --build-arg branch=$BRANCH_NAME -f CI_CD/Jenkins/Nightly_Tests/Dockerfile.test .
+          docker run --name ubuntu_tst_bash -dit ubuntu-sailtap:1.0 /bin/bash
+          echo "## Test Results" >>  $GITHUB_STEP_SUMMARY
+          user_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_portal_api_test.py -m fastapi -sv --ip $INTERNAL_IP_ADDR  --port 8000")
+          org_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/sail_organization_api_test.py -m fastapi -sv --ip $INTERNAL_IP_ADDR  --port 8000")
+          if ${{ inputs.preload_dataset == true }}; then
+            dataset_test_output=$(docker exec -w /Test/ApiServices/tests ubuntu_tst_bash sh -c "pytest workflow_tests/test_api/test_backend/dataset_mgmt_api_test.py -m azure -sv --ip $INTERNAL_IP_ADDR  --port 8000")
           fi
+          echo  "$user_test_output"
+          echo "$org_test_output"
+          echo "$dataset_test_output"
+
+          test_output_str=""
+          all_test_output=( $user_test_output $org_test_output $dataset_test_output )
+          for line in "${all_test_output[@]}" ; do
+            if [ "${line::15}" == "workflow_tests/" ]; then
+              test_name=$(echo "${line##*::}")
+              test_output_str=$(echo "${test_name%[*}")
+            elif [ "${line}" = "PASSED" ] || [ "${line}" = "FAILED" ]; then
+              echo "${test_output_str} | ${line}" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
           docker kill ubuntu_tst_bash || true && docker rm ubuntu_tst_bash || true
 
-  Check_Test_Selection:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    needs: [Deploy_Platform, Test]
-    if: |
-      always() &&
-      (needs.Test.result == 'success' || needs.Test.result == 'skipped')
-    outputs:
-      check: ${{ steps.check.outputs.run_test }}
-    steps:
-      - name: Verified Test option selected
-        id: check
-        run: |
-          if ${{ inputs.run_tests == true }}; then
-            echo "run_test=yes" >> $GITHUB_OUTPUT
-            echo "Run Tests: YES" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "run_test=no" >> $GITHUB_OUTPUT
-            echo "Run Tests: NO" >> $GITHUB_STEP_SUMMARY
-          fi
-
-  Deprovision_Platform:
-    runs-on: [self-hosted, Linux, x64, docker, Platform]
-    env:
-      CHECKTESTRAN: ${{needs.Check_Test_Selection.outputs.check}}
-    if: |
-      always() &&
-      (needs.Check_Test_Selection.result == 'success')
-    needs: [Deploy_Platform, Check_Test_Selection]
-    steps:
-      - name: Deprovision Parameters
+      - name: Deprovision Deployment
+        if: ${{ inputs.deprovision_after == true }}
         run: |
           echo "## Deprovision Platform" >> $GITHUB_STEP_SUMMARY
-          if ${{ inputs.deprovision_after == true }}; then
-            echo "Purpose of Deployment: ${{ inputs.purpose }}"
-            echo "Owner of Deployment: ${{ inputs.owner }}"
-            deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id"
+          echo "Purpose of Deployment: ${{ inputs.purpose }}" >> $GITHUB_STEP_SUMMARY
+          echo "Owner of Deployment: ${{ inputs.owner }}" >> $GITHUB_STEP_SUMMARY
+          echo "This is GUID of DEPLOYMENT for this CI RUN: $DEPLOY_GUID_ID" >> $GITHUB_STEP_SUMMARY
+          set -e
+          if [ "$DEPLOY_GUID_ID" = "" ] || [ "$DEPLOY_GUID_ID" = " " ] || [ ! "$DEPLOY_GUID_ID" ]; then
+            echo "Deploy Canceled/Failed: Deprovision canceled." >> $GITHUB_STEP_SUMMARY
           else
-            echo "Step Display Deprovision Parameters not required" >> $GITHUB_STEP_SUMMARY
-            echo "deprovision_after option was not selected" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Determine Subscription
-        run: |
-          if ${{ inputs.subscription == 'Development' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Development" >> $GITHUB_STEP_SUMMARY
-          elif ${{ inputs.subscription == 'Release Candidate' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.RELEASE_CANDIDATE_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Release Candidate" >> $GITHUB_STEP_SUMMARY
-          elif ${{ inputs.subscription == 'ProductionGA' }}; then
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.PRODUCTION_GA_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: Production GA" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "AZURE_SUBSCRIPTION_ID=${{ secrets.DEVELOPMENT_AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-            echo "Subscription: None (Defaulted to Development)" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Deprovision
-        run: |
-          if ${{ inputs.deprovision_after == true }}; then
-            echo "Purpose of Deployment: ${{ inputs.purpose }}" >> $GITHUB_STEP_SUMMARY
-            echo "Owner of Deployment: ${{ inputs.owner }}" >> $GITHUB_STEP_SUMMARY
-            deployment_id="${{needs.Deploy_Platform.outputs.deployment_id}}"
-            echo "This is GUID of DEPLOYMENT for this CI RUN: $deployment_id" >> $GITHUB_STEP_SUMMARY
-            set -e
-            pwd
-            if [ "$deployment_id" = "" ] || [ "$deployment_id" = " " ] || [ ! "$deployment_id" ]; then
-              echo "Deploy Canceled/Failed: Deprovision canceled." >> $GITHUB_STEP_SUMMARY
-            else
-              sudo chmod +x Deprovision.sh
-              sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${deployment_id}\ny\n") | tee deprov_output.txt
-              deprov_output=$(grep Deleting deprov_output.txt)
-              echo "$deprov_output" >> $GITHUB_STEP_SUMMARY
-              rm deprov_output.txt
-            fi
-          else
-            echo "Step Deprovision not required" >> $GITHUB_STEP_SUMMARY
-            echo "deprovision_after option was not selected" >> $GITHUB_STEP_SUMMARY
+            sudo chmod +x Deprovision.sh
+            sudo -E ./Deprovision.sh -o CI_RUNNER <<<$(printf "3\n1\n${DEPLOY_GUID_ID}\ny\n") | tee deprov_output.txt
+            echo "deprov_output=$(grep Deleting deprov_output.txt)" >> $GITHUB_STEP_SUMMARY
+            rm deprov_output.txt
           fi

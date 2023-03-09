@@ -77,7 +77,7 @@ jobs:
           make package_rpcrelated
           cd Docker
           if ${{ github.event.inputs.image == 'all' }}; then
-            ./BuildImages.sh -p y
+            ./BuildImages.sh -p
           else
-            ./BuildImages.sh -i ${{ github.event.inputs.image }} -p y
+            ./BuildImages.sh -i ${{ github.event.inputs.image }} -p
           fi

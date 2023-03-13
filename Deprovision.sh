@@ -112,7 +112,7 @@ do
                 output=$(az group list --query "[?contains(name,'$GUID')].{name:name}" --output tsv)
                 [[ -z "$output" ]] && { echo "Error: Entered GUID: $GUID did not match any resources"; exit 1; }
                 echo -e "The following resources were found based on inputed GUID:|$GUID|\n"
-                echo $output
+                echo "$output"
                 read -p "Do you wish to continue?  " yn
                 case $yn in
                     [Yy]* ) 

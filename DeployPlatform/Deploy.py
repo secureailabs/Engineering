@@ -281,7 +281,7 @@ def create_cloud_init_file(initialization_json: dict, imageName: str, docker_par
     cloud_init_yaml["runcmd"] = [
         f"sudo mkdir -p /opt/{imageName}_dir",
         f"sudo docker login {DOCKER_REGISTRY_URL} --username {DOCKER_REGISTRY_USERNAME} --password {DOCKER_REGISTRY_PASSWORD}",
-        f"sudo docker run -dit {docker_params} -v /opt/{imageName}_dir:/app -v /opt/certs:/etc/nginx/certs --name {imageName} {DOCKER_REGISTRY_URL}/{imageName}:{image_tag}",
+        f"sudo docker run -dit {docker_params} -v /opt/certs:/etc/nginx/certs --name {imageName} {DOCKER_REGISTRY_URL}/{imageName}:{image_tag}",
     ]
 
     cloud_init_file += yaml.dump(cloud_init_yaml)
@@ -304,9 +304,7 @@ def deploy_audit_service(
     set_parameters = set_params(subscription_id, "auditserver", test_flag)
 
     # Read backend json from file and set params
-    with open("auditserver.json", "r") as audit_json_fd:
-        audit_json = json.load(audit_json_fd)
-
+    audit_json = {}
     audit_json["owner"] = OWNER
     audit_json["azure_storage_account_name"] = storage_account_name
     audit_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
@@ -318,7 +316,7 @@ def deploy_audit_service(
 
     # Create a cloud-init file
     custom_data = create_cloud_init_file(
-        audit_json, "auditserver", "-p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096", AUDIT_SERVICES_TAG
+        audit_json, "auditserver", "-v /opt/auditserver_dir:/app -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096", AUDIT_SERVICES_TAG
     )
 
     # Deploy the frontend server
@@ -349,8 +347,14 @@ def deploy_apiservices(
     set_parameters = set_params(subscription_id, "apiservices", test_flag)
 
     # Read backend json from file and set params
-    with open("apiservices.json", "r") as backend_json_fd:
-        backend_json = json.load(backend_json_fd)
+    backend_json = {}
+    backend_json["jwt_secret"] = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+    backend_json["refresh_secret"] = "52bb444a1aabb9a76792527e6605349e1cbc7fafb8624de4e0ddde4f84ad4066"
+    backend_json["password_pepper"] = "06ac6368872b368a8c67e41c1a8faa46e8471818cdbb442345fbb2205b9fc225"
+    backend_json["sail_email"] = "no-reply@secureailabs.com"
+    backend_json["sail_password"] = "password"
+    backend_json["azure_scn_user_name"] = "sailuser"
+    backend_json["azure_scn_password"] = "SailPassword@123"
     backend_json["owner"] = OWNER
     backend_json["azure_subscription_id"] = subscription_id
     backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
@@ -376,17 +380,11 @@ def deploy_apiservices(
     ] = "-p 8888:8889 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
     backend_json["securecomputationnode_image_tag"] = PARTICIPANT_SCN_TAG
 
-    with open("apiservices.json", "w") as outfile:
-        json.dump(backend_json, outfile)
-
     # Create a cloud-init file
-    custom_data = create_cloud_init_file(backend_json, "apiservices", "-p 9090:9091 -p 8000:8001", API_SERVICES_TAG)
+    custom_data = create_cloud_init_file(backend_json, "apiservices", "-v /etc/initialization.json:/InitializationVector.json -p 9090:9091 -p 8000:8001", API_SERVICES_TAG)
 
     # Deploy the apiservices server
     apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", test_flag, custom_data)
-
-    # Upload the package to the apiservices server
-    upload_package(apiservices_ip, "apiservices.json", "apiservices.tar.gz")
 
     # Sleeping for some time
     time.sleep(90)

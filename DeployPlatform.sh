@@ -52,15 +52,14 @@ fi
 
 # Check for whether script was started via manual run of bash script
 if [ "$create_docker_flag" = "true" ]; then
-    # 
     echo "Start docker container on local machine to run DeployPlatform.sh"
     docker run -it -v $(pwd):/app -w /app --env OWNER=$owner --env PURPOSE=$purpose --env GIT_COMMIT=$gitCommitId --entrypoint="/app/Docker/ci_deploy_platform/Entrypoint.sh" developmentdockerregistry.azurecr.io/ciubuntu:v0.1.0_5f85ced
     exit 0
 fi
 
-# 
+#
 # The following lines are all run on docker container developmentdockerregistry.azurecr.io/ciubuntu
-# 
+#
 
 # Create a temporary directory to store the files
 export tempDeployDir=$(mktemp -d --tmpdir=.)
@@ -68,7 +67,6 @@ mkdir -p $tempDeployDir
 
 # Build and Package the Platform Services
 make package_audit_service
-make package_apiservices
 make sail_client database_initializer
 #make package_newwebfrontend
 
@@ -77,12 +75,8 @@ cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 # cp Binary/newwebfrontend.tar.gz $tempDeployDir
 cp ApiServices/generated/sail-client/dist/sail_client-0.1.0-py3-none-any.whl $tempDeployDir
 cp database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl $tempDeployDir
-cp Binary/apiservices.tar.gz $tempDeployDir/apiservices.tar.gz
 cp -r DeployPlatform/* $tempDeployDir
 cp Binary/auditserver.tar.gz $tempDeployDir
-# TODO: This is a temporary fix. Ideally the initializationVector should be generated at runtime
-cp Docker/apiservices/InitializationVector.json $tempDeployDir/apiservices.json
-cp Docker/apiservices/InitializationVector.json $tempDeployDir/auditserver.json
 
 # Copy the configuration file
 cp deploy_config.sh $tempDeployDir

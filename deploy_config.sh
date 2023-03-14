@@ -10,17 +10,16 @@ export DOCKER_REGISTRY_URL=$DOCKER_REGISTRY_URL
 export DOCKER_REGISTRY_USERNAME=$DOCKER_REGISTRY_USERNAME
 export DOCKER_REGISTRY_PASSWORD=$DOCKER_REGISTRY_PASSWORD
 
-
 # this is a hack to let the CI use default values for the tags
 # the CI will override the $ values with the user provided tags
 # if the user does not provide any tags, the default values will be used
-export API_SERVICES_TAG="v0.1.0_d1dae58b"
+export API_SERVICES_TAG="v0.1.0_33385ea"
 export API_SERVICES_TAG=$API_SERVICES_TAG
 export AUDIT_SERVICES_TAG="v0.1.0_d1dae58b"
 export AUDIT_SERVICES_TAG=$AUDIT_SERVICES_TAG
-export AGGREGATOR_SCN_TAG="v0.1.0_d1dae58b"
+export AGGREGATOR_SCN_TAG="v0.1.0_695de20"
 export AGGREGATOR_SCN_TAG=$AGGREGATOR_SCN_TAG
-export PARTICIPANT_SCN_TAG="v0.1.0_d1dae58b"
+export PARTICIPANT_SCN_TAG="v0.1.0_695de20"
 export PARTICIPANT_SCN_TAG=$PARTICIPANT_SCN_TAG
 export WEB_FRONTEND_TAG="v0.1.0_d1dae58b"
 export WEB_FRONTEND_TAG=$WEB_FRONTEND_TAG

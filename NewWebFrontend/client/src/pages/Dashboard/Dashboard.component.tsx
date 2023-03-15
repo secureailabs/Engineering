@@ -1,26 +1,21 @@
 import React from 'react';
 
-import {
-  MdDashboard,
-  MdViewColumn,
-  MdSettings,
-  MdHelpOutline,
-  MdLaunch,
-  MdLogout,
-  MdSystemUpdateAlt,
-  MdOutlineDocumentScanner,
-  MdOutlinePeopleAlt,
-} from 'react-icons/md';
-import { HiOutlineDesktopComputer } from 'react-icons/hi';
 import { FaServer } from 'react-icons/fa';
+import { HiOutlineDesktopComputer } from 'react-icons/hi';
+import {
+  MdDashboard, MdHelpOutline,
+  MdLaunch,
+  MdLogout, MdOutlineDocumentScanner,
+  MdOutlinePeopleAlt, MdSettings, MdSystemUpdateAlt, MdViewColumn
+} from 'react-icons/md';
 
 import DashboardRouter from '@routes/Dashboard.routes';
 
-import Sidebar from '@secureailabs/web-ui/layout/Sidebar';
 import Header from '@secureailabs/web-ui/components/Header';
+import Sidebar from '@secureailabs/web-ui/layout/Sidebar';
 
-import default_profile_image from '@assets/user.png';
 import newLogo from '@assets/newLogo.png';
+import default_profile_image from '@assets/user.png';
 
 import BreadcrumbRoutes from '@routes/Breadcrumbs/breadcrumbs.routes';
 
@@ -59,6 +54,14 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       onClick: () => {
         // @ts-ignore
         window.location.href = import.meta.env.VITE_PUBLIC_JUPYTER_URL || "http://52.152.225.54:8080/lab?token=fa8dfcf5a8cfd55402f687698847adabced336cd0423172c"
+        },
+      },
+      {
+      text: 'Launch Demo',
+      Icon: MdLaunch,
+      onClick: () => {
+        // @ts-ignore
+        window.location.href = "http://20.124.39.153:8501/demo_1"
         },
       },
     ])

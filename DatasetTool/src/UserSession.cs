@@ -201,6 +201,39 @@ class UserSession
     }
 
     /// <summary>
+    /// Check if the dataset version is already uploaded. If yes, then throw an exception
+    /// Otherwise, do nothing
+    /// </summary>
+    /// <param name="dataset_version_id"></param>
+    /// <exception cref="Exception"></exception>
+    private void CheckIfAlreadyUploaded(Guid dataset_version_id)
+    {
+        // Create the request
+        var request = new RestRequest("/dataset-versions/" + dataset_version_id, Method.Get);
+        request.AddHeader("accept", "application/json");
+        request.AddHeader("Authorization", "Bearer " + m_LoginResponse.access_token);
+
+        // Get the dataset version
+        var response = m_client.Execute(request);
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            var get_dataset_version_response = Newtonsoft.Json.JsonConvert.DeserializeObject<BasicInformation>(response.Content)!;
+            if (get_dataset_version_response.state == "ACTIVE")
+            {
+                throw new Exception("Dataset version already uploaded and active");
+            }
+            else if (get_dataset_version_response.state == "INACTIVE")
+            {
+                throw new Exception("Dataset version already uploaded and inactive");
+            }
+            else if (get_dataset_version_response.state == "ERROR")
+            {
+                throw new Exception("Dataset version already uploaded or something failed. Contact SAIL support.");
+            }
+        }
+    }
+
+    /// <summary>
     /// Register the dataset version metadata with the platform and get the version id
     /// </summary>
     /// <param name="dataset_id"> Dataset ID for the version </param>
@@ -255,6 +288,9 @@ class UserSession
         else if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             System.Console.WriteLine("Dataset version already exists. Will only be allowed to upload the file if not already uploaded");
+            // Get the dataset version id
+            var dataset_version_response = Newtonsoft.Json.JsonConvert.DeserializeObject<BasicInformation>(response.Content)!;
+            CheckIfAlreadyUploaded(dataset_version_response.id);
         }
         else if (response.StatusCode != System.Net.HttpStatusCode.Created)
         {

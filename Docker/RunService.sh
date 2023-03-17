@@ -8,6 +8,7 @@ PrintHelp() {
     echo -e "\t-d Run docker container detached"
     echo -e "\t-c Clean the database"
     echo -e "\t-n Name to give the running docker image"
+    echo -e "\t-t Optional tag (will default to 'latest')"
     exit 1 # Exit script after printing help
 }
 
@@ -15,13 +16,14 @@ PrintHelp() {
 detach=false
 cleanDatabase=false
 dockerName=""
-while getopts "n:l:s:d opt:c opt:" opt; do
+while getopts "n:l:s:d:t opt:c opt:" opt; do
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
     c) cleanDatabase=true ;;
     l) localDataset="$OPTARG" ;;
     n) dockerName="$OPTARG" ;;
+    t) imageTag="$OPTARG" ;;
     ?) PrintHelp ;;
     esac
 done
@@ -35,6 +37,7 @@ if [ -z "$dockerName" ]; then
     dockerName=$imageName
 fi
 echo "Running $imageName"
+echo "Tag: $imageTag"
 echo "Detach: $detach"
 echo "Clean Database: $cleanDatabase"
 
@@ -111,7 +114,7 @@ elif [ "newwebfrontend" == "$imageName" ]; then
     make -C $rootDir package_newwebfrontend -s
     cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
     cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
-    runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName"
+    runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName:$imageTag"
 elif [ "rpcrelated" == "$imageName" ]; then
     cp rpcrelated/InitializationVector.json $rootDir/Binary/rpcrelated_dir
     if [ ! -f $rootDir/Binary/rpcrelated_dir/package.tar.gz ]; then

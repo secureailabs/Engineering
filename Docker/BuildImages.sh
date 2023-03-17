@@ -5,6 +5,7 @@ PrintHelp() {
     echo ""
     echo "Usage: $0 -i [Image Name]"
     echo "Usage: $0 -i [Image Name] -p"
+    echo "Usage: $0 -i [Image Name] -t"
     echo "Usage: $0"
     echo -e "\t-i Image Name: apiservices | newwebfrontend | rpcrelated | auditserver | smartbroker"
     echo -e "\t-p Specify flag to push built image to the docker registry"
@@ -55,13 +56,13 @@ fi
 pushImage=false
 
 # Parse the input parameters
-while getopts "i:p:t" opt
+while getopts "i:t:p" opt
 do
     echo "opt: $opt $OPTARG"
     case "$opt" in
     i) imageName="$OPTARG" ;;
-    p) pushImage=true ;;
     t) imageTag="$OPTARG" ;;
+    p) pushImage=true ;;
     ?) PrintHelp ;;
     esac
 done
@@ -76,7 +77,7 @@ if [ -z "$imageName" ]; then
     echo "No image specified. Building all of them..."
 else
     echo "Building image $imageName"
-    docker build -t "$imageName":"$imageTag" -f "${imageName}/Dockerfile" .
+    docker build -t "$imageName:$imageTag" -f "${imageName}/Dockerfile" .
     if [ "$pushImage" = true ]; then
         PushImageToRegistry "$imageName"
     fi

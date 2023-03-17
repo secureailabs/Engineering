@@ -16,7 +16,8 @@ PrintHelp() {
 detach=false
 cleanDatabase=false
 dockerName=""
-while getopts "n:l:s:d:t opt:c opt:" opt; do
+while getopts "s:n:t:d:l opt:c opt:" opt; do
+    echo "opt: $opt $OPTARG"
     case "$opt" in
     s) imageName="$OPTARG" ;;
     d) detach=true ;;
@@ -111,6 +112,11 @@ if [ "apiservices" == "$imageName" ]; then
     cp $rootDir/Binary/apiservices.tar.gz $rootDir/Binary/apiservices_dir/package.tar.gz
     runtimeFlags="$runtimeFlags -p 8000:8001 -p 9080:9080 -v $sailDatabaseVolumeName:/srv/mongodb/db0 -v $rootDir/Binary/apiservices_dir:/app $imageName"
 elif [ "newwebfrontend" == "$imageName" ]; then
+    make -C $rootDir package_newwebfrontend -s
+    cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
+    cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz
+    runtimeFlags="$runtimeFlags -p 443:443 -v $rootDir/Binary/newwebfrontend_dir:/app $imageName:$imageTag"
+elif [ "newwebfrontend2" == "$imageName" ]; then
     make -C $rootDir package_newwebfrontend -s
     cp newwebfrontend/InitializationVector.json $rootDir/Binary/newwebfrontend_dir
     cp $rootDir/Binary/newwebfrontend.tar.gz $rootDir/Binary/newwebfrontend_dir/package.tar.gz

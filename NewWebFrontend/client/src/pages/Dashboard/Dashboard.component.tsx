@@ -61,7 +61,7 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       Icon: MdLaunch,
       onClick: () => {
         // @ts-ignore
-        window.location.href = import.meta.env.SALES_PAGE_URL || "http://20.124.39.153:8501"
+        window.open('http://20.124.39.153:8501');
         },
       },
     ])

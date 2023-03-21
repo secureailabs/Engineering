@@ -134,6 +134,7 @@ env:
   AZURE_CLIENT_SECRET: ${{ secrets.SERVICE_PRINCIPAL_DEPLOYPLATFORM_AZURE_CLIENT_SECRET }}
   AZURE_OBJECT_ID: ${{ secrets.AZURE_OBJECT_ID }}
   PUBLIC_IP: "False"
+  SSH_AZURE_VM_PASS: ${{ secrets.SSH_AZURE_VM_PASS }}
 
 jobs:
   Deploy_Platform:
@@ -258,8 +259,8 @@ jobs:
           export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
           /root/.dotnet/dotnet build
           /root/.dotnet/dotnet publish -c Release
-          dataset_output01=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password SailPassword@123 --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE)
-          dataset_output02=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password SailPassword@123 --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE)
+          dataset_output01=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email lbart@igr.com --password $SSH_AZURE_VM_PASS --config SampleData/igr_config.json --ip $INTERNAL_ADDR_API_SERVICE)
+          dataset_output02=$(bin/Release/net6.0/linux-x64/publish/DatasetTool --email nadams@mghl.com --password $SSH_AZURE_VM_PASS --config SampleData/mghl_config.json --ip $INTERNAL_ADDR_API_SERVICE)
           echo "### Dataset 1" >> $GITHUB_STEP_SUMMARY
           echo "$dataset_output01" >> $GITHUB_STEP_SUMMARY
           echo "### Dataset 2" >> $GITHUB_STEP_SUMMARY

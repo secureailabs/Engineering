@@ -25,6 +25,10 @@ RUN pip3 install -r requirements.txt
 # Install Jupyter Notebook
 RUN pip3 install -U jupyter
 
+# Install sail data layer
+COPY securecomputationnode/sail_data_layer-1.0.1-py3-none-any.whl /sail_data_layer-1.0.1-py3-none-any.whl
+RUN pip3 install /sail_data_layer-1.0.1-py3-none-any.whl
+
 COPY vm-initializer/vm_initializer.py /vm_initializer.py
 COPY vm-initializer/decrypt_file.py /decrypt_file.py
 

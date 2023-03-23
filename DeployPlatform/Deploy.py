@@ -387,7 +387,7 @@ def deploy_apiservices(
     apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", test_flag, custom_data)
 
     # Sleeping for some time
-    time.sleep(90)
+    time.sleep(120)
 
     # Run database tools for the backend server
     initialize_database(hostname=f"https://{apiservices_ip}:8000")

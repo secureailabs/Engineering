@@ -18,7 +18,7 @@ if [ $retVal -ne 0 ]; then
     exit $retVal
 fi
 
-# # Unpack the tar package
+# Unpack the tar package
 tar -xvf package.tar.gz
 
 # Use the InitializationVector to get the connection string of the dataset
@@ -27,9 +27,6 @@ storageAccountName=$(cat InitializationVector.json | jq -r '.storage_account_nam
 
 # Use the InitializationVector to populate the IP address of the audit services
 auditIP=$(cat InitializationVector.json | jq -r '.audit_service_ip')
-
-# modify the audit service ip of promtail config file
-sed -i "s,auditserver,$auditIP,g" /app/RPCLib/promtail_local_config.yaml
 
 mountDir="/mnt/azure"
 mkdir -p $mountDir

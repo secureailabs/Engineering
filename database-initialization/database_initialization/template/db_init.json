@@ -137,7 +137,7 @@
                     "researchers": [
                         "Secure AI Labs"
                     ],
-                    "data_model": "csv_data_model.json"
+                    "data_model": "data_model_pancan.json"
                 },
                 {
                     "name": "KCA Consortium - FHIR",

@@ -1,0 +1,6 @@
+python-multipart==0.0.5
+psutil==5.9.4
+pycryptodome==3.17
+fastapi==0.87.0
+tomli==2.0.1
+uvicorn==0.20.0

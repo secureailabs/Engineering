@@ -1,17 +1,7 @@
 include Make/Modules.mk
 include Make/newwebfrontend.mk
 
-.PHONY: package all clean sail_client database_initializer package_apiservices package_rpcrelated package_smartbroker
-
-package_apiservices: package_rpcrelated package_smartbroker
-	@mkdir -p Binary
-	@cp AzureDeploymentTemplates/ArmTemplates/sailvm*.json ApiServices
-	@cp Binary/rpcrelated.tar.gz ApiServices
-	@cp Binary/smartbroker.tar.gz ApiServices
-	@tar --exclude='ApiServices/**venv**' -czvf Binary/apiservices.tar.gz ApiServices
-	@rm ApiServices/smartbroker.tar.gz
-	@rm ApiServices/rpcrelated.tar.gz
-	@rm ApiServices/sailvm*.json
+.PHONY: package all clean sail_client database_initializer package_rpcrelated package_smartbroker
 
 .SECONDEXPANSION:
 package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService/.*")
@@ -29,7 +19,7 @@ package_smartbroker:
 	@tar -czvf Binary/smartbroker.tar.gz RPCLib/ sail-aggregator-fastapi
 
 package:
-	@make package_audit_service package_apiservices package_newwebfrontend package_rpcrelated
+	@make package_audit_service package_newwebfrontend package_rpcrelated
 	@echo "package done!"
 
 sail_client:

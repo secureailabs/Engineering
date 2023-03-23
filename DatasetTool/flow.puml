@@ -1,0 +1,47 @@
+@startuml Dataset_Upload
+autonumber "#."
+title  Dataset Upload - The Happy Path
+skinparam backgroundColor #EEEEEE
+skinparam sequenceMessageAlign center
+participant Dataset_Tool #LightGreen
+participant API_Services #LightBlue
+participant Azure_File_Share #LightGrey
+
+Dataset_Tool -> API_Services : /login
+API_Services --> Dataset_Tool : access_token
+Dataset_Tool -> API_Services : get data_federations
+API_Services --> Dataset_Tool : list of all data federations
+
+Dataset_Tool -> API_Services : get dataset
+API_Services --> Dataset_Tool : list of all datasets
+group#Gold #Pink Dataset not found
+    Dataset_Tool -> API_Services : create new dataset
+    API_Services -> Azure_File_Share : create FileShare for dataset
+    API_Services --> Dataset_Tool : dataset_id
+    Dataset_Tool -> API_Services : add dataset_id to federation
+end
+
+Dataset_Tool -> API_Services : register new version
+API_Services -> Azure_File_Share : create a folder in fileshare
+API_Services -> Dataset_Tool : dataset_version_id
+note right
+if version exists. upload will only be allowed if
+the file if not already uploaded
+end note
+
+Dataset_Tool -> API_Services : get connection string
+API_Services -> Azure_File_Share : get connection string valid for 30min
+Azure_File_Share -> API_Services : connection_string
+API_Services -> Dataset_Tool : connection_string
+
+Dataset_Tool -> API_Services : get encryption key
+note right
+encryption key is unique for a
+data submitter per federation
+end note
+API_Services -> Dataset_Tool : dataset encryption_key
+
+Dataset_Tool -> Azure_File_Share : upload encrypted dataset
+
+Dataset_Tool -> API_Services : set version as active
+@enduml

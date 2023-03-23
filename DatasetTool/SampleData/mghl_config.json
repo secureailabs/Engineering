@@ -13,6 +13,6 @@
     },
     "data_federation": "KCA Consortium - CSV",
     "data_source": [
-        "SampleData/data_frame_1.csv"
+        "SampleData/mgr/static_data_table.csv"
     ]
 }

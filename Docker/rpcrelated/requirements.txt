@@ -1,6 +1,0 @@
-wheel==0.38.4
-python-multipart==0.0.5
-psutil==5.9.4
-msgpack==1.0.4
-pyzmq==25.0.0
-pycryptodome==3.17

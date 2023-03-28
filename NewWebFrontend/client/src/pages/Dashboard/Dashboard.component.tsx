@@ -61,7 +61,7 @@ const Dashboard: React.FC<TDashboardProps> = ({ userData, logoutMutationFunction
       Icon: MdLaunch,
       onClick: () => {
         // @ts-ignore
-        window.open('http://20.124.39.153:8501');
+        window.open(import.meta.env.SALES_PAGE_URL || 'http://sail365-demo-portal1.eastus.cloudapp.azure.com:8501');
         },
       },
     ])

@@ -37,6 +37,7 @@ async def paired_t(cohort: dict, analysis: dict) -> dict:
                 raise Exception("filter operator not supported")
         else:
             prev_df = tmp_df
+        i += 1
 
     res_df = df[prev_df]
 

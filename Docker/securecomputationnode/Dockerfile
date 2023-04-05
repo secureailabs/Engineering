@@ -33,6 +33,9 @@ COPY vm-initializer/vm_initializer.py /vm_initializer.py
 COPY vm-initializer/decrypt_file.py /decrypt_file.py
 
 COPY securecomputationnode/Entrypoint.sh /Entrypoint.sh
+
+COPY demo_backedn/demo_backend.py demo_backend/demo_backend.py
+
 RUN chmod +x /Entrypoint.sh
 
 ENTRYPOINT [ "/Entrypoint.sh" ]

@@ -12,6 +12,7 @@ nginx -g 'daemon off;' 2>&1 | tee /app/nginx.log &
 # Forcing a zero exit status as the api server is killed from within and there is no graceful way to do this.
 mv /vm_initializer.py ./vm_initializer.py
 mv /decrypt_file.py ./decrypt_file.py
+mv /demo_backend.py ./demo_backend.py
 python3 vm_initializer.py || true
 retVal=$?
 if [ $retVal -ne 0 ]; then
@@ -74,7 +75,8 @@ while read -r id version_id key; do
   mount_datasets "$id" "$version_id" "$key"
 done
 
-jupyter notebook --no-browser --ip 0.0.0.0 --port 8888 --allow-root --NotebookApp.password='argon2:$argon2id$v=19$m=10240,t=10,p=8$CxhdT07OWZQ/VJYTmuT2GA$SFN8uqEKgga19cESOi3jLN5iecshMFPt7BpyHIoL7/g'
+#jupyter notebook --no-browser --ip 0.0.0.0 --port 8888 --allow-root --NotebookApp.password='argon2:$argon2id$v=19$m=10240,t=10,p=8$CxhdT07OWZQ/VJYTmuT2GA$SFN8uqEKgga19cESOi3jLN5iecshMFPt7BpyHIoL7/g'
+uvicorn demo_backend:app --reload
 
 # To keep the container running
 tail -f /dev/null

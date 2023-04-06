@@ -5,15 +5,33 @@ Apr. 5
 
 import pandas as pd
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-df1 = pd.read_csv("")
-df2 = pd.read_csv("")
+df1 = pd.read_csv("data_frame_0.csv")
+df2 = pd.read_csv("data_frame_1.csv")
 df = pd.concat([df1, df2])
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
 
-@app.get("/demo/paired_t")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/demo/test")
+async def test() -> dict:
+    return {"status": True, "data": "Hello World", "message": "Test passed"}
+
+@app.post("/demo/paired_t")
 async def paired_t(cohort: dict, analysis: dict) -> dict:
 
     i = 0
@@ -29,9 +47,9 @@ async def paired_t(cohort: dict, analysis: dict) -> dict:
         else:
             raise Exception("Operator not supported")
         if i >= 1:
-            if cohort["filter_operator"][i - 1] == "AND":
+            if cohort["filter_operator"][i - 1] == "and":
                 prev_df = prev_df & tmp_df
-            elif cohort["filter_operator"][i - 1] == "OR":
+            elif cohort["filter_operator"][i - 1] == "or":
                 prev_df = prev_df | tmp_df
             else:
                 raise Exception("filter operator not supported")

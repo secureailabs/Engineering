@@ -12,6 +12,17 @@
             }
         },
         {
+            "name": "Saint Jacob's Clinic",
+            "description": "Saint Jacob's Clinic is a non-profit organization. The clinic is located at 4001 J Street in Sacramento, California.",
+            "admin":
+            {
+                "name": "Michael Phelps",
+                "title": "Data Administrator",
+                "email": "michael@saintjacob.org",
+                "password": "SailPassword@123"
+            }
+        },
+        {
             "name": "International Genetics Research Facility",
             "description": "231 54th Street, New York, New York, 02345",
             "admin":
@@ -132,7 +143,8 @@
                     "data_format": "CSV",
                     "data_submitters": [
                         "Mercy General Hospital",
-                        "International Genetics Research Facility"
+                        "International Genetics Research Facility",
+                        "Saint Jacob's Clinic"
                     ],
                     "researchers": [
                         "Secure AI Labs"

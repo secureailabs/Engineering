@@ -4,19 +4,31 @@ from .add_data_model_data_model import AddDataModelDataModel
 from .basic_object_info import BasicObjectInfo
 from .body_login import BodyLogin
 from .data_federation_data_format import DataFederationDataFormat
+from .data_federation_provision_state import DataFederationProvisionState
 from .data_federation_state import DataFederationState
+from .data_model_dataframe_state import DataModelDataframeState
+from .data_model_series_state import DataModelSeriesState
+from .data_model_state import DataModelState
+from .dataset_basic_information import DatasetBasicInformation
 from .dataset_encryption_key_out import DatasetEncryptionKeyOut
 from .dataset_format import DatasetFormat
 from .dataset_state import DatasetState
 from .dataset_version_state import DatasetVersionState
 from .get_data_federation_out import GetDataFederationOut
 from .get_data_federation_provision import GetDataFederationProvision
+from .get_data_model_dataframe_out import GetDataModelDataframeOut
+from .get_data_model_out import GetDataModelOut
+from .get_data_model_series_out import GetDataModelSeriesOut
+from .get_data_model_series_out_series_schema import GetDataModelSeriesOutSeriesSchema
 from .get_dataset_out import GetDatasetOut
 from .get_dataset_version_connection_string_out import GetDatasetVersionConnectionStringOut
 from .get_dataset_version_out import GetDatasetVersionOut
 from .get_invite_out import GetInviteOut
 from .get_multiple_data_federation_out import GetMultipleDataFederationOut
 from .get_multiple_data_federation_provision_out import GetMultipleDataFederationProvisionOut
+from .get_multiple_data_model_dataframe_out import GetMultipleDataModelDataframeOut
+from .get_multiple_data_model_out import GetMultipleDataModelOut
+from .get_multiple_data_model_series_out import GetMultipleDataModelSeriesOut
 from .get_multiple_dataset_out import GetMultipleDatasetOut
 from .get_multiple_dataset_version_out import GetMultipleDatasetVersionOut
 from .get_multiple_invite_out import GetMultipleInviteOut
@@ -31,11 +43,20 @@ from .invite_state import InviteState
 from .invite_type import InviteType
 from .login_success_out import LoginSuccessOut
 from .patch_invite_in import PatchInviteIn
+from .query_result import QueryResult
+from .query_result_data import QueryResultData
 from .refresh_token_in import RefreshTokenIn
 from .register_data_federation_in import RegisterDataFederationIn
 from .register_data_federation_out import RegisterDataFederationOut
 from .register_data_federation_provision_in import RegisterDataFederationProvisionIn
 from .register_data_federation_provision_out import RegisterDataFederationProvisionOut
+from .register_data_model_dataframe_in import RegisterDataModelDataframeIn
+from .register_data_model_dataframe_out import RegisterDataModelDataframeOut
+from .register_data_model_in import RegisterDataModelIn
+from .register_data_model_out import RegisterDataModelOut
+from .register_data_model_series_in import RegisterDataModelSeriesIn
+from .register_data_model_series_in_series_schema import RegisterDataModelSeriesInSeriesSchema
+from .register_data_model_series_out import RegisterDataModelSeriesOut
 from .register_dataset_in import RegisterDatasetIn
 from .register_dataset_out import RegisterDatasetOut
 from .register_dataset_version_in import RegisterDatasetVersionIn
@@ -46,8 +67,11 @@ from .register_user_in import RegisterUserIn
 from .register_user_out import RegisterUserOut
 from .secure_computation_node_size import SecureComputationNodeSize
 from .secure_computation_node_state import SecureComputationNodeState
-from .secure_computation_node_type import SecureComputationNodeType
 from .update_data_federation_in import UpdateDataFederationIn
+from .update_data_model_dataframe_in import UpdateDataModelDataframeIn
+from .update_data_model_in import UpdateDataModelIn
+from .update_data_model_series_in import UpdateDataModelSeriesIn
+from .update_data_model_series_in_series_schema import UpdateDataModelSeriesInSeriesSchema
 from .update_dataset_in import UpdateDatasetIn
 from .update_dataset_version_in import UpdateDatasetVersionIn
 from .update_organization_in import UpdateOrganizationIn
@@ -63,19 +87,31 @@ __all__ = (
     "BasicObjectInfo",
     "BodyLogin",
     "DataFederationDataFormat",
+    "DataFederationProvisionState",
     "DataFederationState",
+    "DataModelDataframeState",
+    "DataModelSeriesState",
+    "DataModelState",
+    "DatasetBasicInformation",
     "DatasetEncryptionKeyOut",
     "DatasetFormat",
     "DatasetState",
     "DatasetVersionState",
     "GetDataFederationOut",
     "GetDataFederationProvision",
+    "GetDataModelDataframeOut",
+    "GetDataModelOut",
+    "GetDataModelSeriesOut",
+    "GetDataModelSeriesOutSeriesSchema",
     "GetDatasetOut",
     "GetDatasetVersionConnectionStringOut",
     "GetDatasetVersionOut",
     "GetInviteOut",
     "GetMultipleDataFederationOut",
     "GetMultipleDataFederationProvisionOut",
+    "GetMultipleDataModelDataframeOut",
+    "GetMultipleDataModelOut",
+    "GetMultipleDataModelSeriesOut",
     "GetMultipleDatasetOut",
     "GetMultipleDatasetVersionOut",
     "GetMultipleInviteOut",
@@ -90,11 +126,20 @@ __all__ = (
     "InviteType",
     "LoginSuccessOut",
     "PatchInviteIn",
+    "QueryResult",
+    "QueryResultData",
     "RefreshTokenIn",
     "RegisterDataFederationIn",
     "RegisterDataFederationOut",
     "RegisterDataFederationProvisionIn",
     "RegisterDataFederationProvisionOut",
+    "RegisterDataModelDataframeIn",
+    "RegisterDataModelDataframeOut",
+    "RegisterDataModelIn",
+    "RegisterDataModelOut",
+    "RegisterDataModelSeriesIn",
+    "RegisterDataModelSeriesInSeriesSchema",
+    "RegisterDataModelSeriesOut",
     "RegisterDatasetIn",
     "RegisterDatasetOut",
     "RegisterDatasetVersionIn",
@@ -105,8 +150,11 @@ __all__ = (
     "RegisterUserOut",
     "SecureComputationNodeSize",
     "SecureComputationNodeState",
-    "SecureComputationNodeType",
     "UpdateDataFederationIn",
+    "UpdateDataModelDataframeIn",
+    "UpdateDataModelIn",
+    "UpdateDataModelSeriesIn",
+    "UpdateDataModelSeriesInSeriesSchema",
     "UpdateDatasetIn",
     "UpdateDatasetVersionIn",
     "UpdateOrganizationIn",

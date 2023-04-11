@@ -6,6 +6,7 @@ class DatasetVersionState(str, Enum):
     INACTIVE = "INACTIVE"
     CREATING_DIRECTORY = "CREATING_DIRECTORY"
     NOT_UPLOADED = "NOT_UPLOADED"
+    ENCRYPTING = "ENCRYPTING"
     ERROR = "ERROR"
 
     def __str__(self) -> str:

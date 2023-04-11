@@ -1,9 +1,10 @@
 import datetime
-from typing import Any, Dict, List, Type, TypeVar, cast
+from typing import Any, Dict, List, Type, TypeVar
 
 import attr
 from dateutil.parser import isoparse
 
+from ..models.data_federation_provision_state import DataFederationProvisionState
 from ..models.secure_computation_node_size import SecureComputationNodeSize
 
 T = TypeVar("T", bound="RegisterDataFederationProvisionOut")
@@ -18,8 +19,8 @@ class RegisterDataFederationProvisionOut:
         id (str):
         creation_time (datetime.datetime):
         organization_id (str):
-        smart_broker_id (str):
-        secure_computation_nodes_id (List[str]):
+        secure_computation_node_id (str):
+        state (DataFederationProvisionState): An enumeration.
     """
 
     data_federation_id: str
@@ -27,8 +28,8 @@ class RegisterDataFederationProvisionOut:
     id: str
     creation_time: datetime.datetime
     organization_id: str
-    smart_broker_id: str
-    secure_computation_nodes_id: List[str]
+    secure_computation_node_id: str
+    state: DataFederationProvisionState
     additional_properties: Dict[str, Any] = attr.ib(init=False, factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -39,8 +40,8 @@ class RegisterDataFederationProvisionOut:
         creation_time = self.creation_time.isoformat()
 
         organization_id = self.organization_id
-        smart_broker_id = self.smart_broker_id
-        secure_computation_nodes_id = self.secure_computation_nodes_id
+        secure_computation_node_id = self.secure_computation_node_id
+        state = self.state.value
 
         field_dict: Dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -51,8 +52,8 @@ class RegisterDataFederationProvisionOut:
                 "id": id,
                 "creation_time": creation_time,
                 "organization_id": organization_id,
-                "smart_broker_id": smart_broker_id,
-                "secure_computation_nodes_id": secure_computation_nodes_id,
+                "secure_computation_node_id": secure_computation_node_id,
+                "state": state,
             }
         )
 
@@ -71,9 +72,9 @@ class RegisterDataFederationProvisionOut:
 
         organization_id = d.pop("organization_id")
 
-        smart_broker_id = d.pop("smart_broker_id")
+        secure_computation_node_id = d.pop("secure_computation_node_id")
 
-        secure_computation_nodes_id = cast(List[str], d.pop("secure_computation_nodes_id"))
+        state = DataFederationProvisionState(d.pop("state"))
 
         register_data_federation_provision_out = cls(
             data_federation_id=data_federation_id,
@@ -81,8 +82,8 @@ class RegisterDataFederationProvisionOut:
             id=id,
             creation_time=creation_time,
             organization_id=organization_id,
-            smart_broker_id=smart_broker_id,
-            secure_computation_nodes_id=secure_computation_nodes_id,
+            secure_computation_node_id=secure_computation_node_id,
+            state=state,
         )
 
         register_data_federation_provision_out.additional_properties = d

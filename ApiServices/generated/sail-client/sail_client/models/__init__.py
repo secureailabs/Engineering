@@ -19,7 +19,6 @@ from .get_data_federation_provision import GetDataFederationProvision
 from .get_data_model_dataframe_out import GetDataModelDataframeOut
 from .get_data_model_out import GetDataModelOut
 from .get_data_model_series_out import GetDataModelSeriesOut
-from .get_data_model_series_out_series_schema import GetDataModelSeriesOutSeriesSchema
 from .get_dataset_out import GetDatasetOut
 from .get_dataset_version_connection_string_out import GetDatasetVersionConnectionStringOut
 from .get_dataset_version_out import GetDatasetVersionOut
@@ -55,7 +54,6 @@ from .register_data_model_dataframe_out import RegisterDataModelDataframeOut
 from .register_data_model_in import RegisterDataModelIn
 from .register_data_model_out import RegisterDataModelOut
 from .register_data_model_series_in import RegisterDataModelSeriesIn
-from .register_data_model_series_in_series_schema import RegisterDataModelSeriesInSeriesSchema
 from .register_data_model_series_out import RegisterDataModelSeriesOut
 from .register_dataset_in import RegisterDatasetIn
 from .register_dataset_out import RegisterDatasetOut
@@ -67,11 +65,11 @@ from .register_user_in import RegisterUserIn
 from .register_user_out import RegisterUserOut
 from .secure_computation_node_size import SecureComputationNodeSize
 from .secure_computation_node_state import SecureComputationNodeState
+from .series_data_model_schema import SeriesDataModelSchema
 from .update_data_federation_in import UpdateDataFederationIn
 from .update_data_model_dataframe_in import UpdateDataModelDataframeIn
 from .update_data_model_in import UpdateDataModelIn
 from .update_data_model_series_in import UpdateDataModelSeriesIn
-from .update_data_model_series_in_series_schema import UpdateDataModelSeriesInSeriesSchema
 from .update_dataset_in import UpdateDatasetIn
 from .update_dataset_version_in import UpdateDatasetVersionIn
 from .update_organization_in import UpdateOrganizationIn
@@ -102,7 +100,6 @@ __all__ = (
     "GetDataModelDataframeOut",
     "GetDataModelOut",
     "GetDataModelSeriesOut",
-    "GetDataModelSeriesOutSeriesSchema",
     "GetDatasetOut",
     "GetDatasetVersionConnectionStringOut",
     "GetDatasetVersionOut",
@@ -138,7 +135,6 @@ __all__ = (
     "RegisterDataModelIn",
     "RegisterDataModelOut",
     "RegisterDataModelSeriesIn",
-    "RegisterDataModelSeriesInSeriesSchema",
     "RegisterDataModelSeriesOut",
     "RegisterDatasetIn",
     "RegisterDatasetOut",
@@ -150,11 +146,11 @@ __all__ = (
     "RegisterUserOut",
     "SecureComputationNodeSize",
     "SecureComputationNodeState",
+    "SeriesDataModelSchema",
     "UpdateDataFederationIn",
     "UpdateDataModelDataframeIn",
     "UpdateDataModelIn",
     "UpdateDataModelSeriesIn",
-    "UpdateDataModelSeriesInSeriesSchema",
     "UpdateDatasetIn",
     "UpdateDatasetVersionIn",
     "UpdateOrganizationIn",

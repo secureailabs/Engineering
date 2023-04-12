@@ -1,15 +1,11 @@
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Type, TypeVar, Union
+from typing import Any, Dict, List, Type, TypeVar, Union, cast
 
 import attr
 from dateutil.parser import isoparse
 
 from ..models.data_model_state import DataModelState
 from ..types import UNSET, Unset
-
-if TYPE_CHECKING:
-    from ..models.basic_object_info import BasicObjectInfo
-
 
 T = TypeVar("T", bound="GetDataModelOut")
 
@@ -22,7 +18,7 @@ class GetDataModelOut:
         description (str):
         id (str):
         organization_id (str):
-        data_model_dataframes (List['BasicObjectInfo']):
+        data_model_dataframes (List[str]):
         state (DataModelState): An enumeration.
         creation_time (Union[Unset, datetime.datetime]):
     """
@@ -31,7 +27,7 @@ class GetDataModelOut:
     description: str
     id: str
     organization_id: str
-    data_model_dataframes: List["BasicObjectInfo"]
+    data_model_dataframes: List[str]
     state: DataModelState
     creation_time: Union[Unset, datetime.datetime] = UNSET
     additional_properties: Dict[str, Any] = attr.ib(init=False, factory=dict)
@@ -41,11 +37,7 @@ class GetDataModelOut:
         description = self.description
         id = self.id
         organization_id = self.organization_id
-        data_model_dataframes = []
-        for data_model_dataframes_item_data in self.data_model_dataframes:
-            data_model_dataframes_item = data_model_dataframes_item_data.to_dict()
-
-            data_model_dataframes.append(data_model_dataframes_item)
+        data_model_dataframes = self.data_model_dataframes
 
         state = self.state.value
 
@@ -72,8 +64,6 @@ class GetDataModelOut:
 
     @classmethod
     def from_dict(cls: Type[T], src_dict: Dict[str, Any]) -> T:
-        from ..models.basic_object_info import BasicObjectInfo
-
         d = src_dict.copy()
         name = d.pop("name")
 
@@ -83,12 +73,7 @@ class GetDataModelOut:
 
         organization_id = d.pop("organization_id")
 
-        data_model_dataframes = []
-        _data_model_dataframes = d.pop("data_model_dataframes")
-        for data_model_dataframes_item_data in _data_model_dataframes:
-            data_model_dataframes_item = BasicObjectInfo.from_dict(data_model_dataframes_item_data)
-
-            data_model_dataframes.append(data_model_dataframes_item)
+        data_model_dataframes = cast(List[str], d.pop("data_model_dataframes"))
 
         state = DataModelState(d.pop("state"))
 

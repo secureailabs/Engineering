@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Type, TypeVar
 import attr
 
 if TYPE_CHECKING:
-    from ..models.register_data_model_series_in_series_schema import RegisterDataModelSeriesInSeriesSchema
+    from ..models.series_data_model_schema import SeriesDataModelSchema
 
 
 T = TypeVar("T", bound="RegisterDataModelSeriesIn")
@@ -15,12 +15,12 @@ class RegisterDataModelSeriesIn:
     Attributes:
         name (str):
         description (str):
-        series_schema (RegisterDataModelSeriesInSeriesSchema):
+        series_schema (SeriesDataModelSchema):
     """
 
     name: str
     description: str
-    series_schema: "RegisterDataModelSeriesInSeriesSchema"
+    series_schema: "SeriesDataModelSchema"
     additional_properties: Dict[str, Any] = attr.ib(init=False, factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -42,14 +42,14 @@ class RegisterDataModelSeriesIn:
 
     @classmethod
     def from_dict(cls: Type[T], src_dict: Dict[str, Any]) -> T:
-        from ..models.register_data_model_series_in_series_schema import RegisterDataModelSeriesInSeriesSchema
+        from ..models.series_data_model_schema import SeriesDataModelSchema
 
         d = src_dict.copy()
         name = d.pop("name")
 
         description = d.pop("description")
 
-        series_schema = RegisterDataModelSeriesInSeriesSchema.from_dict(d.pop("series_schema"))
+        series_schema = SeriesDataModelSchema.from_dict(d.pop("series_schema"))
 
         register_data_model_series_in = cls(
             name=name,

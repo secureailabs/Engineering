@@ -13,7 +13,7 @@
 # -------------------------------------------------------------------------------
 
 import json
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 from sail_client import SyncAuthenticatedOperations
@@ -21,7 +21,7 @@ from sail_client.models import (
     RegisterDataModelDataframeIn,
     RegisterDataModelIn,
     RegisterDataModelSeriesIn,
-    RegisterDataModelSeriesInSeriesSchema,
+    SeriesDataModelSchema,
     UpdateDataModelDataframeIn,
     UpdateDataModelIn,
 )
@@ -31,6 +31,11 @@ class SeriesDataModel(BaseModel):
     type: str
     series_name: str
     series_data_model_id: str
+    list_value: Optional[List[str]]
+    unit: Optional[str] = None
+    min: Optional[float] = None
+    max: Optional[float] = None
+    resolution: Optional[float] = None
 
 
 class DataFrameDataModel(BaseModel):
@@ -74,11 +79,20 @@ class DataModelManager:
             list_of_series_ids = []
 
             for series_data_model in data_frame_data_model.list_series_data_model:
-                foo = RegisterDataModelSeriesInSeriesSchema()
+                foo = series_data_model.dict()
                 series_data_model = RegisterDataModelSeriesIn(
                     name=series_data_model.series_name,
                     description=series_data_model.series_name,
-                    series_schema=foo,
+                    series_schema=SeriesDataModelSchema(
+                        type=series_data_model.type,
+                        series_name=series_data_model.series_name,
+                        series_data_model_id=series_data_model.series_data_model_id,
+                        list_value=series_data_model.list_value,
+                        unit=series_data_model.unit,
+                        min_=series_data_model.min,
+                        max_=series_data_model.max,
+                        resolution=series_data_model.resolution,
+                    ),
                 )
                 register_series_resp = self.operations.register_data_model_series(json_body=series_data_model)
                 list_of_series_ids.append(register_series_resp.id)

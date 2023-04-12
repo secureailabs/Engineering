@@ -6,7 +6,7 @@ from ..models.data_model_series_state import DataModelSeriesState
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.update_data_model_series_in_series_schema import UpdateDataModelSeriesInSeriesSchema
+    from ..models.series_data_model_schema import SeriesDataModelSchema
 
 
 T = TypeVar("T", bound="UpdateDataModelSeriesIn")
@@ -16,11 +16,11 @@ T = TypeVar("T", bound="UpdateDataModelSeriesIn")
 class UpdateDataModelSeriesIn:
     """
     Attributes:
-        series_schema (Union[Unset, UpdateDataModelSeriesInSeriesSchema]):
+        series_schema (Union[Unset, SeriesDataModelSchema]):
         state (Union[Unset, DataModelSeriesState]): An enumeration.
     """
 
-    series_schema: Union[Unset, "UpdateDataModelSeriesInSeriesSchema"] = UNSET
+    series_schema: Union[Unset, "SeriesDataModelSchema"] = UNSET
     state: Union[Unset, DataModelSeriesState] = UNSET
     additional_properties: Dict[str, Any] = attr.ib(init=False, factory=dict)
 
@@ -45,15 +45,15 @@ class UpdateDataModelSeriesIn:
 
     @classmethod
     def from_dict(cls: Type[T], src_dict: Dict[str, Any]) -> T:
-        from ..models.update_data_model_series_in_series_schema import UpdateDataModelSeriesInSeriesSchema
+        from ..models.series_data_model_schema import SeriesDataModelSchema
 
         d = src_dict.copy()
         _series_schema = d.pop("series_schema", UNSET)
-        series_schema: Union[Unset, UpdateDataModelSeriesInSeriesSchema]
+        series_schema: Union[Unset, SeriesDataModelSchema]
         if isinstance(_series_schema, Unset):
             series_schema = UNSET
         else:
-            series_schema = UpdateDataModelSeriesInSeriesSchema.from_dict(_series_schema)
+            series_schema = SeriesDataModelSchema.from_dict(_series_schema)
 
         _state = d.pop("state", UNSET)
         state: Union[Unset, DataModelSeriesState]

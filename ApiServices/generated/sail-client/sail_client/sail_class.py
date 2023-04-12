@@ -1510,7 +1510,7 @@ class SyncAuthenticatedOperations:
     ) -> GetMultipleDataModelOut:
         """Get All Data Model Info
 
-         Get all data model SCNs
+         Get all data model
 
         Raises:
             errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -1780,14 +1780,10 @@ class SyncAuthenticatedOperations:
 
     def get_all_data_model_series_info(
         self,
-        data_model_dataframe_id: Union[Unset, None, str] = UNSET,
     ) -> GetMultipleDataModelSeriesOut:
         """Get All Data Model Series Info
 
          Get all data model series SCNs
-
-        Args:
-            data_model_dataframe_id (Union[Unset, None, str]): Data model Id
 
         Raises:
             errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -1799,7 +1795,6 @@ class SyncAuthenticatedOperations:
 
         response = get_all_data_model_series_info.sync(
             client=self._client,
-            data_model_dataframe_id=data_model_dataframe_id,
         )
 
         if response is None:

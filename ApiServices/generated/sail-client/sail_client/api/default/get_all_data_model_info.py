@@ -56,7 +56,7 @@ def sync_detailed(
 ) -> Response[GetMultipleDataModelOut]:
     """Get All Data Model Info
 
-     Get all data model SCNs
+     Get all data model
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -84,7 +84,7 @@ def sync(
 ) -> Optional[GetMultipleDataModelOut]:
     """Get All Data Model Info
 
-     Get all data model SCNs
+     Get all data model
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -105,7 +105,7 @@ async def asyncio_detailed(
 ) -> Response[GetMultipleDataModelOut]:
     """Get All Data Model Info
 
-     Get all data model SCNs
+     Get all data model
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -131,7 +131,7 @@ async def asyncio(
 ) -> Optional[GetMultipleDataModelOut]:
     """Get All Data Model Info
 
-     Get all data model SCNs
+     Get all data model
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

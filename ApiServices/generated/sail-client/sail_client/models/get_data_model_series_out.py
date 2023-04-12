@@ -8,7 +8,7 @@ from ..models.data_model_series_state import DataModelSeriesState
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.get_data_model_series_out_series_schema import GetDataModelSeriesOutSeriesSchema
+    from ..models.series_data_model_schema import SeriesDataModelSchema
 
 
 T = TypeVar("T", bound="GetDataModelSeriesOut")
@@ -20,7 +20,7 @@ class GetDataModelSeriesOut:
     Attributes:
         name (str):
         description (str):
-        series_schema (GetDataModelSeriesOutSeriesSchema):
+        series_schema (SeriesDataModelSchema):
         id (str):
         organization_id (str):
         state (DataModelSeriesState): An enumeration.
@@ -29,7 +29,7 @@ class GetDataModelSeriesOut:
 
     name: str
     description: str
-    series_schema: "GetDataModelSeriesOutSeriesSchema"
+    series_schema: "SeriesDataModelSchema"
     id: str
     organization_id: str
     state: DataModelSeriesState
@@ -68,14 +68,14 @@ class GetDataModelSeriesOut:
 
     @classmethod
     def from_dict(cls: Type[T], src_dict: Dict[str, Any]) -> T:
-        from ..models.get_data_model_series_out_series_schema import GetDataModelSeriesOutSeriesSchema
+        from ..models.series_data_model_schema import SeriesDataModelSchema
 
         d = src_dict.copy()
         name = d.pop("name")
 
         description = d.pop("description")
 
-        series_schema = GetDataModelSeriesOutSeriesSchema.from_dict(d.pop("series_schema"))
+        series_schema = SeriesDataModelSchema.from_dict(d.pop("series_schema"))
 
         id = d.pop("id")
 

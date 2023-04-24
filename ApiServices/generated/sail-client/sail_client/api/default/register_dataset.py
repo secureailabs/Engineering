@@ -36,7 +36,6 @@ def _get_kwargs(
 def _parse_response(
     *, client: Client, response: httpx.Response
 ) -> Optional[Union[RegisterDatasetOut, ValidationError]]:
-
     if response.status_code < 200 or response.status_code >= 300:
         raise Exception(f"Failure status code: {response.status_code}. Details: {response.text}")
 

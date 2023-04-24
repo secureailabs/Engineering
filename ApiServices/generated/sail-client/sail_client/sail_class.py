@@ -4,10 +4,17 @@ from .api.default import (
     accept_or_reject_invite,
     add_data_model,
     add_dataset,
+    audit_incidents_query,
+    delete_data_model,
+    delete_data_model_dataframe,
+    delete_data_model_series,
     deprovision_data_federation,
     drop_database,
     get_all_data_federation_provision_info,
     get_all_data_federations,
+    get_all_data_model_dataframe_info,
+    get_all_data_model_info,
+    get_all_data_model_series_info,
     get_all_dataset_versions,
     get_all_datasets,
     get_all_invites,
@@ -16,6 +23,9 @@ from .api.default import (
     get_current_user_info,
     get_data_federation,
     get_data_federation_provision_info,
+    get_data_model_dataframe_info,
+    get_data_model_info,
+    get_data_model_series_info,
     get_dataset,
     get_dataset_key,
     get_dataset_version,
@@ -32,6 +42,9 @@ from .api.default import (
     login,
     register_data_federation,
     register_data_federation_provision,
+    register_data_model,
+    register_data_model_dataframe,
+    register_data_model_series,
     register_data_submitter,
     register_dataset,
     register_dataset_version,
@@ -44,7 +57,11 @@ from .api.default import (
     soft_delete_dataset_version,
     soft_delete_organization,
     soft_delete_user,
+    unlock_user_account,
     update_data_federation,
+    update_data_model,
+    update_data_model_dataframe,
+    update_data_model_series,
     update_dataset,
     update_dataset_version,
     update_organization,
@@ -57,12 +74,18 @@ from .models.body_login import BodyLogin
 from .models.dataset_encryption_key_out import DatasetEncryptionKeyOut
 from .models.get_data_federation_out import GetDataFederationOut
 from .models.get_data_federation_provision import GetDataFederationProvision
+from .models.get_data_model_dataframe_out import GetDataModelDataframeOut
+from .models.get_data_model_out import GetDataModelOut
+from .models.get_data_model_series_out import GetDataModelSeriesOut
 from .models.get_dataset_out import GetDatasetOut
 from .models.get_dataset_version_connection_string_out import GetDatasetVersionConnectionStringOut
 from .models.get_dataset_version_out import GetDatasetVersionOut
 from .models.get_invite_out import GetInviteOut
 from .models.get_multiple_data_federation_out import GetMultipleDataFederationOut
 from .models.get_multiple_data_federation_provision_out import GetMultipleDataFederationProvisionOut
+from .models.get_multiple_data_model_dataframe_out import GetMultipleDataModelDataframeOut
+from .models.get_multiple_data_model_out import GetMultipleDataModelOut
+from .models.get_multiple_data_model_series_out import GetMultipleDataModelSeriesOut
 from .models.get_multiple_dataset_out import GetMultipleDatasetOut
 from .models.get_multiple_dataset_version_out import GetMultipleDatasetVersionOut
 from .models.get_multiple_invite_out import GetMultipleInviteOut
@@ -74,11 +97,18 @@ from .models.get_secure_computation_node_out import GetSecureComputationNodeOut
 from .models.get_users_out import GetUsersOut
 from .models.login_success_out import LoginSuccessOut
 from .models.patch_invite_in import PatchInviteIn
+from .models.query_result import QueryResult
 from .models.refresh_token_in import RefreshTokenIn
 from .models.register_data_federation_in import RegisterDataFederationIn
 from .models.register_data_federation_out import RegisterDataFederationOut
 from .models.register_data_federation_provision_in import RegisterDataFederationProvisionIn
 from .models.register_data_federation_provision_out import RegisterDataFederationProvisionOut
+from .models.register_data_model_dataframe_in import RegisterDataModelDataframeIn
+from .models.register_data_model_dataframe_out import RegisterDataModelDataframeOut
+from .models.register_data_model_in import RegisterDataModelIn
+from .models.register_data_model_out import RegisterDataModelOut
+from .models.register_data_model_series_in import RegisterDataModelSeriesIn
+from .models.register_data_model_series_out import RegisterDataModelSeriesOut
 from .models.register_dataset_in import RegisterDatasetIn
 from .models.register_dataset_out import RegisterDatasetOut
 from .models.register_dataset_version_in import RegisterDatasetVersionIn
@@ -88,6 +118,9 @@ from .models.register_organization_out import RegisterOrganizationOut
 from .models.register_user_in import RegisterUserIn
 from .models.register_user_out import RegisterUserOut
 from .models.update_data_federation_in import UpdateDataFederationIn
+from .models.update_data_model_dataframe_in import UpdateDataModelDataframeIn
+from .models.update_data_model_in import UpdateDataModelIn
+from .models.update_data_model_series_in import UpdateDataModelSeriesIn
 from .models.update_dataset_in import UpdateDatasetIn
 from .models.update_dataset_version_in import UpdateDatasetVersionIn
 from .models.update_organization_in import UpdateOrganizationIn
@@ -100,6 +133,57 @@ from .types import UNSET, Unset
 class SyncAuthenticatedOperations:
     def __init__(self, client: AuthenticatedClient) -> None:
         self._client = client
+
+    def audit_incidents_query(
+        self,
+        label: str,
+        user_id: Union[Unset, None, str] = UNSET,
+        data_id: Union[Unset, None, str] = UNSET,
+        start: Union[None, Unset, float, int] = UNSET,
+        end: Union[None, Unset, float, int] = UNSET,
+        limit: Union[Unset, None, int] = UNSET,
+        step: Union[Unset, None, str] = UNSET,
+        direction: Union[Unset, None, str] = UNSET,
+    ) -> QueryResult:
+        """Audit Incidents Query
+
+         query by logQL
+
+        Args:
+            label (str):
+            user_id (Union[Unset, None, str]): query events related to a specific user id
+            data_id (Union[Unset, None, str]): query events related to a specific data id
+            start (Union[None, Unset, float, int]): starting timestamp of the query range
+            end (Union[None, Unset, float, int]): ending timestamp of the query range
+            limit (Union[Unset, None, int]): query events number limit
+            step (Union[Unset, None, str]): query events time interval
+            direction (Union[Unset, None, str]): query events order
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[QueryResult]
+        """
+
+        response = audit_incidents_query.sync(
+            client=self._client,
+            label=label,
+            user_id=user_id,
+            data_id=data_id,
+            start=start,
+            end=end,
+            limit=limit,
+            step=step,
+            direction=direction,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, QueryResult)
+        return response
 
     def get_current_user_info(
         self,
@@ -125,6 +209,30 @@ class SyncAuthenticatedOperations:
 
         assert isinstance(response, UserInfoOut)
         return response
+
+    def unlock_user_account(
+        self,
+        user_id: str,
+    ) -> None:
+        """Unlock User Account
+
+         Unlock the user account
+
+        Args:
+            user_id (str): The user id to unlock the account for
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[None]
+        """
+
+        unlock_user_account.sync(
+            user_id=user_id,
+            client=self._client,
+        )
 
     def get_all_organizations(
         self,
@@ -336,7 +444,9 @@ class SyncAuthenticatedOperations:
     ) -> None:
         """Update User Info
 
-         Update user information
+         Update user information.
+                Only organization admin can update the user role and account state for a user.
+                Only the account owner can update the job title and avatar.
 
         Args:
             organization_id (str): UUID of the organization
@@ -1139,14 +1249,14 @@ class SyncAuthenticatedOperations:
 
     def get_all_dataset_versions(
         self,
-        json_body: str,
+        dataset_id: str,
     ) -> GetMultipleDatasetVersionOut:
         """Get All Dataset Versions
 
          Get list of all the dataset-versions for the dataset
 
         Args:
-            json_body (str): UUID of the dataset
+            dataset_id (str): UUID of the dataset
 
         Raises:
             errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -1158,7 +1268,7 @@ class SyncAuthenticatedOperations:
 
         response = get_all_dataset_versions.sync(
             client=self._client,
-            json_body=json_body,
+            dataset_id=dataset_id,
         )
 
         if response is None:
@@ -1393,6 +1503,421 @@ class SyncAuthenticatedOperations:
             secure_computation_node_id=secure_computation_node_id,
             client=self._client,
             json_body=json_body,
+        )
+
+    def get_all_data_model_info(
+        self,
+    ) -> GetMultipleDataModelOut:
+        """Get All Data Model Info
+
+         Get all data model
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[GetMultipleDataModelOut]
+        """
+
+        response = get_all_data_model_info.sync(
+            client=self._client,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, GetMultipleDataModelOut)
+        return response
+
+    def register_data_model(
+        self,
+        json_body: RegisterDataModelIn,
+    ) -> RegisterDataModelOut:
+        """Register Data Model
+
+         Register a new data model
+
+        Args:
+            json_body (RegisterDataModelIn): Information required for creating data model
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[RegisterDataModelOut]
+        """
+
+        response = register_data_model.sync(
+            client=self._client,
+            json_body=json_body,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, RegisterDataModelOut)
+        return response
+
+    def get_data_model_info(
+        self,
+        data_model_id: str,
+    ) -> GetDataModelOut:
+        """Get Data Model Info
+
+         Get data model
+
+        Args:
+            data_model_id (str): Data model Id
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[GetDataModelOut]
+        """
+
+        response = get_data_model_info.sync(
+            data_model_id=data_model_id,
+            client=self._client,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, GetDataModelOut)
+        return response
+
+    def delete_data_model(
+        self,
+        data_model_id: str,
+    ) -> None:
+        """Delete Data Model
+
+         Soft delete data model
+
+        Args:
+            data_model_id (str): Data model Id to delete
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[None]
+        """
+
+        delete_data_model.sync(
+            data_model_id=data_model_id,
+            client=self._client,
+        )
+
+    def update_data_model(
+        self,
+        data_model_id: str,
+        json_body: UpdateDataModelIn,
+    ) -> None:
+        """Update Data Model
+
+         Update data model to add or remove data frames
+
+        Args:
+            data_model_id (str): Data model Id to update
+            json_body (UpdateDataModelIn): Information required for updating data model
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[None]
+        """
+
+        update_data_model.sync(
+            data_model_id=data_model_id,
+            client=self._client,
+            json_body=json_body,
+        )
+
+    def get_all_data_model_dataframe_info(
+        self,
+    ) -> GetMultipleDataModelDataframeOut:
+        """Get All Data Model Dataframe Info
+
+         Get all data model dataframe SCNs
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[GetMultipleDataModelDataframeOut]
+        """
+
+        response = get_all_data_model_dataframe_info.sync(
+            client=self._client,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, GetMultipleDataModelDataframeOut)
+        return response
+
+    def register_data_model_dataframe(
+        self,
+        json_body: RegisterDataModelDataframeIn,
+    ) -> RegisterDataModelDataframeOut:
+        """Register Data Model Dataframe
+
+         Provision data federation SCNs
+
+        Args:
+            json_body (RegisterDataModelDataframeIn): Information required for creating data model
+                dataframe
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[RegisterDataModelDataframeOut]
+        """
+
+        response = register_data_model_dataframe.sync(
+            client=self._client,
+            json_body=json_body,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, RegisterDataModelDataframeOut)
+        return response
+
+    def get_data_model_dataframe_info(
+        self,
+        data_model_dataframe_id: str,
+    ) -> GetDataModelDataframeOut:
+        """Get Data Model Dataframe Info
+
+         Get data model dataframe
+
+        Args:
+            data_model_dataframe_id (str): Data model dataframe Id
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[GetDataModelDataframeOut]
+        """
+
+        response = get_data_model_dataframe_info.sync(
+            data_model_dataframe_id=data_model_dataframe_id,
+            client=self._client,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, GetDataModelDataframeOut)
+        return response
+
+    def delete_data_model_dataframe(
+        self,
+        data_model_dataframe_id: str,
+    ) -> None:
+        """Delete Data Model Dataframe
+
+         Soft delete data model dataframe
+
+        Args:
+            data_model_dataframe_id (str): Data model dataframe Id to delete
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[None]
+        """
+
+        delete_data_model_dataframe.sync(
+            data_model_dataframe_id=data_model_dataframe_id,
+            client=self._client,
+        )
+
+    def update_data_model_dataframe(
+        self,
+        data_model_dataframe_id: str,
+        json_body: UpdateDataModelDataframeIn,
+    ) -> None:
+        """Update Data Model Dataframe
+
+         Update data model dataframe
+
+        Args:
+            data_model_dataframe_id (str): Data model dataframe Id
+            json_body (UpdateDataModelDataframeIn): Data model dataframe information
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[None]
+        """
+
+        update_data_model_dataframe.sync(
+            data_model_dataframe_id=data_model_dataframe_id,
+            client=self._client,
+            json_body=json_body,
+        )
+
+    def get_all_data_model_series_info(
+        self,
+    ) -> GetMultipleDataModelSeriesOut:
+        """Get All Data Model Series Info
+
+         Get all data model series SCNs
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[GetMultipleDataModelSeriesOut]
+        """
+
+        response = get_all_data_model_series_info.sync(
+            client=self._client,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, GetMultipleDataModelSeriesOut)
+        return response
+
+    def register_data_model_series(
+        self,
+        json_body: RegisterDataModelSeriesIn,
+    ) -> RegisterDataModelSeriesOut:
+        """Register Data Model Series
+
+         Register a new data model series
+
+        Args:
+            json_body (RegisterDataModelSeriesIn): Information required for creating data model series
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[RegisterDataModelSeriesOut]
+        """
+
+        response = register_data_model_series.sync(
+            client=self._client,
+            json_body=json_body,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, RegisterDataModelSeriesOut)
+        return response
+
+    def get_data_model_series_info(
+        self,
+        data_model_series_id: str,
+    ) -> GetDataModelSeriesOut:
+        """Get Data Model Series Info
+
+         Get data model series
+
+        Args:
+            data_model_series_id (str): Data model series Id
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[GetDataModelSeriesOut]
+        """
+
+        response = get_data_model_series_info.sync(
+            data_model_series_id=data_model_series_id,
+            client=self._client,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, GetDataModelSeriesOut)
+        return response
+
+    def update_data_model_series(
+        self,
+        data_model_series_id: str,
+        json_body: UpdateDataModelSeriesIn,
+    ) -> GetDataModelSeriesOut:
+        """Update Data Model Series
+
+         Update data model series
+
+        Args:
+            data_model_series_id (str): Data model series Id
+            json_body (UpdateDataModelSeriesIn): Data model series information
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[GetDataModelSeriesOut]
+        """
+
+        response = update_data_model_series.sync(
+            data_model_series_id=data_model_series_id,
+            client=self._client,
+            json_body=json_body,
+        )
+
+        if response is None:
+            raise Exception("No response")
+
+        assert isinstance(response, GetDataModelSeriesOut)
+        return response
+
+    def delete_data_model_series(
+        self,
+        data_model_series_id: str,
+    ) -> None:
+        """Delete Data Model Series
+
+         Soft delete data model series
+
+        Args:
+            data_model_series_id (str): Data model series Id to delete
+
+        Raises:
+            errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
+            httpx.TimeoutException: If the request takes longer than Client.timeout.
+
+        Returns:
+            Response[None]
+        """
+
+        delete_data_model_series.sync(
+            data_model_series_id=data_model_series_id,
+            client=self._client,
         )
 
 

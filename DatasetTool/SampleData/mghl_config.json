@@ -1,18 +1,16 @@
 {
-    "dataset":
-    {
+    "dataset": {
         "name": "MGR Dataset",
         "description": "dataset description",
         "tags": "my dataset tags",
         "format": "CSV"
     },
-    "dataset_version":
-    {
+    "dataset_version": {
         "name": "MGR Dataset #1",
         "description": "MGR Dataset"
     },
     "data_federation": "KCA Consortium - CSV",
     "data_source": [
-        "SampleData/mgr/static_data_table.csv"
+        "SampleData/mgr"
     ]
 }

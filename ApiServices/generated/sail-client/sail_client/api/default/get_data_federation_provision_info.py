@@ -6,7 +6,6 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.get_data_federation_provision import GetDataFederationProvision
-from ...models.http_exception_obj import HTTPExceptionObj
 from ...models.validation_error import ValidationError
 from ...types import Response
 
@@ -32,8 +31,7 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Client, response: httpx.Response
-) -> Optional[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]:
-
+) -> Optional[Union[GetDataFederationProvision, ValidationError]]:
     if response.status_code < 200 or response.status_code >= 300:
         raise Exception(f"Failure status code: {response.status_code}. Details: {response.text}")
 
@@ -45,10 +43,6 @@ def _parse_response(
         response_422 = ValidationError.from_dict(response.json())
 
         return response_422
-    if response.status_code == HTTPStatus.NOT_FOUND:
-        response_404 = HTTPExceptionObj.from_dict(response.json())
-
-        return response_404
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(f"Unexpected status code: {response.status_code}")
     else:
@@ -57,7 +51,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Client, response: httpx.Response
-) -> Response[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]:
+) -> Response[Union[GetDataFederationProvision, ValidationError]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -70,7 +64,7 @@ def sync_detailed(
     provision_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]:
+) -> Response[Union[GetDataFederationProvision, ValidationError]]:
     """Get Data Federation Provision Info
 
      Get data federation provision SCNs
@@ -83,7 +77,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]
+        Response[Union[GetDataFederationProvision, ValidationError]]
     """
 
     kwargs = _get_kwargs(
@@ -103,7 +97,7 @@ def sync(
     provision_id: str,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]:
+) -> Optional[Union[GetDataFederationProvision, ValidationError]]:
     """Get Data Federation Provision Info
 
      Get data federation provision SCNs
@@ -116,7 +110,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]
+        Response[Union[GetDataFederationProvision, ValidationError]]
     """
 
     return sync_detailed(
@@ -129,7 +123,7 @@ async def asyncio_detailed(
     provision_id: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]:
+) -> Response[Union[GetDataFederationProvision, ValidationError]]:
     """Get Data Federation Provision Info
 
      Get data federation provision SCNs
@@ -142,7 +136,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]
+        Response[Union[GetDataFederationProvision, ValidationError]]
     """
 
     kwargs = _get_kwargs(
@@ -160,7 +154,7 @@ async def asyncio(
     provision_id: str,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]:
+) -> Optional[Union[GetDataFederationProvision, ValidationError]]:
     """Get Data Federation Provision Info
 
      Get data federation provision SCNs
@@ -173,7 +167,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[GetDataFederationProvision, HTTPExceptionObj, ValidationError]]
+        Response[Union[GetDataFederationProvision, ValidationError]]
     """
 
     return (

@@ -18,6 +18,7 @@ from typing import Dict
 from sail_client import AuthenticatedClient, Client, SyncAuthenticatedOperations, SyncOperations
 from sail_client.models import BodyLogin, DataFederationDataFormat, RegisterDataFederationIn, RegisterUserIn, UserRole
 
+from .data_model import DataModelManager
 from .organization import OrganizationManager
 
 
@@ -125,6 +126,10 @@ class Initializer:
                     federation["data_model_txt"] = pkgutil.get_data(__name__, f"template/{federation['data_model']}")
                     assert federation["data_model_txt"]
                     federation["data_model_txt"] = federation["data_model_txt"].decode("utf-8")
+                    data_model_manager = DataModelManager(
+                        federation["data_model_txt"], self.auth_operations[admin_user["email"]]
+                    )
+                    data_model_manager.register_data_model()
                 else:
                     with open(federation["data_model"]) as fp:
                         federation["data_model_txt"] = fp.read()

@@ -1,0 +1,16 @@
+{
+    "dataset": {
+        "name": "SJC Dataset",
+        "description": "dataset description",
+        "tags": "my dataset tags",
+        "format": "CSV"
+    },
+    "dataset_version": {
+        "name": "SJC Dataset #1",
+        "description": "SJC Dataset"
+    },
+    "data_federation": "KCA Consortium - CSV",
+    "data_source": [
+        "SampleData/sjc"
+    ]
+}

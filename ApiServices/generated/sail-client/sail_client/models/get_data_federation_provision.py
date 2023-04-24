@@ -1,9 +1,10 @@
 import datetime
-from typing import Any, Dict, List, Type, TypeVar, Union, cast
+from typing import Any, Dict, List, Type, TypeVar, Union
 
 import attr
 from dateutil.parser import isoparse
 
+from ..models.data_federation_provision_state import DataFederationProvisionState
 from ..models.secure_computation_node_size import SecureComputationNodeSize
 from ..types import UNSET, Unset
 
@@ -18,18 +19,18 @@ class GetDataFederationProvision:
         secure_computation_nodes_size (SecureComputationNodeSize): An enumeration.
         id (str):
         organization_id (str):
-        smart_broker_id (str):
+        secure_computation_node_id (str):
+        state (DataFederationProvisionState): An enumeration.
         creation_time (Union[Unset, datetime.datetime]):
-        secure_computation_nodes_id (Union[Unset, List[str]]):
     """
 
     data_federation_id: str
     secure_computation_nodes_size: SecureComputationNodeSize
     id: str
     organization_id: str
-    smart_broker_id: str
+    secure_computation_node_id: str
+    state: DataFederationProvisionState
     creation_time: Union[Unset, datetime.datetime] = UNSET
-    secure_computation_nodes_id: Union[Unset, List[str]] = UNSET
     additional_properties: Dict[str, Any] = attr.ib(init=False, factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -38,14 +39,12 @@ class GetDataFederationProvision:
 
         id = self.id
         organization_id = self.organization_id
-        smart_broker_id = self.smart_broker_id
+        secure_computation_node_id = self.secure_computation_node_id
+        state = self.state.value
+
         creation_time: Union[Unset, str] = UNSET
         if not isinstance(self.creation_time, Unset):
             creation_time = self.creation_time.isoformat()
-
-        secure_computation_nodes_id: Union[Unset, List[str]] = UNSET
-        if not isinstance(self.secure_computation_nodes_id, Unset):
-            secure_computation_nodes_id = self.secure_computation_nodes_id
 
         field_dict: Dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -55,13 +54,12 @@ class GetDataFederationProvision:
                 "secure_computation_nodes_size": secure_computation_nodes_size,
                 "id": id,
                 "organization_id": organization_id,
-                "smart_broker_id": smart_broker_id,
+                "secure_computation_node_id": secure_computation_node_id,
+                "state": state,
             }
         )
         if creation_time is not UNSET:
             field_dict["creation_time"] = creation_time
-        if secure_computation_nodes_id is not UNSET:
-            field_dict["secure_computation_nodes_id"] = secure_computation_nodes_id
 
         return field_dict
 
@@ -76,7 +74,9 @@ class GetDataFederationProvision:
 
         organization_id = d.pop("organization_id")
 
-        smart_broker_id = d.pop("smart_broker_id")
+        secure_computation_node_id = d.pop("secure_computation_node_id")
+
+        state = DataFederationProvisionState(d.pop("state"))
 
         _creation_time = d.pop("creation_time", UNSET)
         creation_time: Union[Unset, datetime.datetime]
@@ -85,16 +85,14 @@ class GetDataFederationProvision:
         else:
             creation_time = isoparse(_creation_time)
 
-        secure_computation_nodes_id = cast(List[str], d.pop("secure_computation_nodes_id", UNSET))
-
         get_data_federation_provision = cls(
             data_federation_id=data_federation_id,
             secure_computation_nodes_size=secure_computation_nodes_size,
             id=id,
             organization_id=organization_id,
-            smart_broker_id=smart_broker_id,
+            secure_computation_node_id=secure_computation_node_id,
+            state=state,
             creation_time=creation_time,
-            secure_computation_nodes_id=secure_computation_nodes_id,
         )
 
         get_data_federation_provision.additional_properties = d

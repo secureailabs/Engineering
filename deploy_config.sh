@@ -13,7 +13,7 @@ export DOCKER_REGISTRY_PASSWORD=$DOCKER_REGISTRY_PASSWORD
 # this is a hack to let the CI use default values for the tags
 # the CI will override the $ values with the user provided tags
 # if the user does not provide any tags, the default values will be used
-export API_SERVICES_TAG="v0.1.0_19e39ff"
+export API_SERVICES_TAG="v0.1.0_22be6eb"
 export API_SERVICES_TAG=$API_SERVICES_TAG
 export AUDIT_SERVICES_TAG="v0.1.0_d1dae58b"
 export AUDIT_SERVICES_TAG=$AUDIT_SERVICES_TAG

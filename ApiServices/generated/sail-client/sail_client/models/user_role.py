@@ -8,6 +8,7 @@ class UserRole(str, Enum):
     DIGITAL_CONTRACT_ADMIN = "DIGITAL_CONTRACT_ADMIN"
     DATASET_ADMIN = "DATASET_ADMIN"
     SAIL_ADMIN = "SAIL_ADMIN"
+    ORGANIZATION_ADMIN = "ORGANIZATION_ADMIN"
 
     def __str__(self) -> str:
         return str(self.value)

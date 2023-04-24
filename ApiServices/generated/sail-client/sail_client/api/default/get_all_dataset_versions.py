@@ -8,20 +8,23 @@ from ...client import AuthenticatedClient, Client
 from ...models.get_multiple_dataset_version_out import GetMultipleDatasetVersionOut
 from ...models.http_exception_obj import HTTPExceptionObj
 from ...models.validation_error import ValidationError
-from ...types import Response
+from ...types import UNSET, Response
 
 
 def _get_kwargs(
     *,
     client: AuthenticatedClient,
-    json_body: str,
+    dataset_id: str,
 ) -> Dict[str, Any]:
     url = "{}/dataset-versions".format(client.base_url)
 
     headers: Dict[str, str] = client.get_headers()
     cookies: Dict[str, Any] = client.get_cookies()
 
-    json_json_body = json_body
+    params: Dict[str, Any] = {}
+    params["dataset_id"] = dataset_id
+
+    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     return {
         "method": "get",
@@ -29,14 +32,13 @@ def _get_kwargs(
         "headers": headers,
         "cookies": cookies,
         "timeout": client.get_timeout(),
-        "json": json_json_body,
+        "params": params,
     }
 
 
 def _parse_response(
     *, client: Client, response: httpx.Response
 ) -> Optional[Union[GetMultipleDatasetVersionOut, HTTPExceptionObj, ValidationError]]:
-
     if response.status_code < 200 or response.status_code >= 300:
         raise Exception(f"Failure status code: {response.status_code}. Details: {response.text}")
 
@@ -72,14 +74,14 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    json_body: str,
+    dataset_id: str,
 ) -> Response[Union[GetMultipleDatasetVersionOut, HTTPExceptionObj, ValidationError]]:
     """Get All Dataset Versions
 
      Get list of all the dataset-versions for the dataset
 
     Args:
-        json_body (str): UUID of the dataset
+        dataset_id (str): UUID of the dataset
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -91,7 +93,7 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         client=client,
-        json_body=json_body,
+        dataset_id=dataset_id,
     )
 
     response = httpx.request(
@@ -105,14 +107,14 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    json_body: str,
+    dataset_id: str,
 ) -> Optional[Union[GetMultipleDatasetVersionOut, HTTPExceptionObj, ValidationError]]:
     """Get All Dataset Versions
 
      Get list of all the dataset-versions for the dataset
 
     Args:
-        json_body (str): UUID of the dataset
+        dataset_id (str): UUID of the dataset
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -124,21 +126,21 @@ def sync(
 
     return sync_detailed(
         client=client,
-        json_body=json_body,
+        dataset_id=dataset_id,
     ).parsed
 
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    json_body: str,
+    dataset_id: str,
 ) -> Response[Union[GetMultipleDatasetVersionOut, HTTPExceptionObj, ValidationError]]:
     """Get All Dataset Versions
 
      Get list of all the dataset-versions for the dataset
 
     Args:
-        json_body (str): UUID of the dataset
+        dataset_id (str): UUID of the dataset
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -150,7 +152,7 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         client=client,
-        json_body=json_body,
+        dataset_id=dataset_id,
     )
 
     async with httpx.AsyncClient(verify=client.verify_ssl) as _client:
@@ -162,14 +164,14 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    json_body: str,
+    dataset_id: str,
 ) -> Optional[Union[GetMultipleDatasetVersionOut, HTTPExceptionObj, ValidationError]]:
     """Get All Dataset Versions
 
      Get list of all the dataset-versions for the dataset
 
     Args:
-        json_body (str): UUID of the dataset
+        dataset_id (str): UUID of the dataset
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -182,6 +184,6 @@ async def asyncio(
     return (
         await asyncio_detailed(
             client=client,
-            json_body=json_body,
+            dataset_id=dataset_id,
         )
     ).parsed

@@ -40,7 +40,6 @@ def _get_kwargs(
 def _parse_response(
     *, client: Client, response: httpx.Response
 ) -> Optional[Union[HTTPExceptionObj, None, ValidationError]]:
-
     if response.status_code < 200 or response.status_code >= 300:
         raise Exception(f"Failure status code: {response.status_code}. Details: {response.text}")
 
@@ -85,7 +84,9 @@ def sync_detailed(
 ) -> Response[Union[HTTPExceptionObj, None, ValidationError]]:
     """Update User Info
 
-     Update user information
+     Update user information.
+            Only organization admin can update the user role and account state for a user.
+            Only the account owner can update the job title and avatar.
 
     Args:
         organization_id (str): UUID of the organization
@@ -124,7 +125,9 @@ def sync(
 ) -> Optional[Union[HTTPExceptionObj, None, ValidationError]]:
     """Update User Info
 
-     Update user information
+     Update user information.
+            Only organization admin can update the user role and account state for a user.
+            Only the account owner can update the job title and avatar.
 
     Args:
         organization_id (str): UUID of the organization
@@ -156,7 +159,9 @@ async def asyncio_detailed(
 ) -> Response[Union[HTTPExceptionObj, None, ValidationError]]:
     """Update User Info
 
-     Update user information
+     Update user information.
+            Only organization admin can update the user role and account state for a user.
+            Only the account owner can update the job title and avatar.
 
     Args:
         organization_id (str): UUID of the organization
@@ -193,7 +198,9 @@ async def asyncio(
 ) -> Optional[Union[HTTPExceptionObj, None, ValidationError]]:
     """Update User Info
 
-     Update user information
+     Update user information.
+            Only organization admin can update the user role and account state for a user.
+            Only the account owner can update the job title and avatar.
 
     Args:
         organization_id (str): UUID of the organization

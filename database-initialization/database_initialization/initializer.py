@@ -13,10 +13,27 @@
 # -------------------------------------------------------------------------------
 
 import pkgutil
+from pydoc import cli
 from typing import Dict
 
-from sail_client import AuthenticatedClient, Client, SyncAuthenticatedOperations, SyncOperations
-from sail_client.models import BodyLogin, DataFederationDataFormat, RegisterDataFederationIn, RegisterUserIn, UserRole
+from sail_client import AuthenticatedClient, Client
+from sail_client.api.default import (
+    drop_database,
+    login,
+    register_data_federation,
+    register_data_submitter,
+    register_researcher,
+    register_user,
+)
+from sail_client.models import (
+    BodyLogin,
+    DataFederationDataFormat,
+    LoginSuccessOut,
+    RegisterDataFederationIn,
+    RegisterDataFederationOut,
+    RegisterUserIn,
+    UserRole,
+)
 
 from .data_model import DataModelManager
 from .organization import OrganizationManager
@@ -38,8 +55,7 @@ class Initializer:
         self.config = config
         self.use_template = use_template
         self.org_manager = OrganizationManager(client=client)
-        self.operations = SyncOperations(self.client)
-        self.auth_operations: Dict[str, SyncAuthenticatedOperations] = {}
+        self.auth_operations: Dict[str, AuthenticatedClient] = {}
         self.organization_id: Dict[str, str] = {}
 
     def user_login(self, username: str, password: str):
@@ -51,25 +67,25 @@ class Initializer:
         :param password: password of the user
         :type password: str
         """
-        operation = SyncOperations(self.client)
         login_req = BodyLogin(username=username, password=password)
-        login_resp = operation.login(login_req)
+        login_resp = login.sync(client=self.client, form_data=login_req)
+        assert type(login_resp) == LoginSuccessOut
 
-        authenticated_client = AuthenticatedClient(
+        self.auth_operations[username] = AuthenticatedClient(
             base_url=self.client.base_url,
             timeout=self.client.timeout,
             raise_on_unexpected_status=self.client.raise_on_unexpected_status,
             verify_ssl=self.client.verify_ssl,
             token=login_resp.access_token,
+            follow_redirects=self.client.follow_redirects,
         )
-        self.auth_operations[username] = SyncAuthenticatedOperations(authenticated_client)
 
     def delete_database(self):
         """
         Delete/Drop the existing database and all the data
         """
         print("Deleting database")
-        self.operations.drop_database()
+        drop_database.sync_detailed(client=self.client)
 
     def register_organizations(self):
         """
@@ -106,7 +122,8 @@ class Initializer:
                     job_title=user["title"],
                     role=UserRole(user["role"]),
                 )
-                self.auth_operations[admin_user["email"]].register_user(
+                register_user.sync(
+                    client=self.auth_operations[admin_user["email"]],
                     organization_id=self.org_manager.get_id_by_name(organization["name"]),
                     json_body=register_user_req,
                 )
@@ -141,20 +158,24 @@ class Initializer:
                     data_format=DataFederationDataFormat(federation["data_format"]),
                     data_model=federation["data_model_txt"],
                 )
-                data_federation_id = self.auth_operations[admin_user["email"]].register_data_federation(
+                data_federation_id = register_data_federation.sync(
+                    client=self.auth_operations[admin_user["email"]],
                     json_body=data_federation_req,
                 )
+                assert type(data_federation_id) == RegisterDataFederationOut
 
                 # Add the data submitter to the data federation
                 for data_submitter in federation["data_submitters"]:
-                    self.auth_operations[admin_user["email"]].register_data_submitter(
+                    register_data_submitter.sync(
+                        client=self.auth_operations[admin_user["email"]],
                         data_submitter_organization_id=self.org_manager.get_id_by_name(data_submitter),
                         data_federation_id=data_federation_id.id,
                     )
 
                 # Add the researchers to the data federation
                 for researcher in federation["researchers"]:
-                    self.auth_operations[admin_user["email"]].register_researcher(
+                    register_researcher.sync(
+                        client=self.auth_operations[admin_user["email"]],
                         researcher_organization_id=self.org_manager.get_id_by_name(researcher),
                         data_federation_id=data_federation_id.id,
                     )

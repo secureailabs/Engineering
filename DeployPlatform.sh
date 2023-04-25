@@ -67,28 +67,29 @@ mkdir -p $tempDeployDir
 
 # Build and Package the Platform Services
 make package_audit_service
-make sail_client database_initializer
-#make package_newwebfrontend
+make database_initializer
 
 # Copy the files to the temporary directory
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
-# cp Binary/newwebfrontend.tar.gz $tempDeployDir
-cp ApiServices/generated/sail-client/dist/sail_client-0.1.0-py3-none-any.whl $tempDeployDir
+cp database-initialization/sail_client-0.1.0-py3-none-any.whl $tempDeployDir
 cp database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl $tempDeployDir
 cp -r DeployPlatform/* $tempDeployDir
 cp Binary/auditserver.tar.gz $tempDeployDir
 
 # Copy the configuration file
 cp deploy_config.sh $tempDeployDir
+
 # Run the docker image to deploy the application on the Azure
 export OWNER=$owner
 export PURPOSE=$purpose
 export VERSION=$gitCommitId
 export PUBLIC_IP=$PUBLIC_IP
+
 # Install additional dependencies for Deploy.py
 pushd $tempDeployDir
 pip3 install sail_client-0.1.0-py3-none-any.whl
 pip3 install database_initialization-0.1.0-py3-none-any.whl
+
 # Run Deploy script
 source deploy_config.sh
 python3 Deploy.py

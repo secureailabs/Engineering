@@ -1,7 +1,6 @@
 import json
 import os
 import random
-import tarfile
 import time
 import uuid
 
@@ -31,10 +30,10 @@ DOCKER_REGISTRY_USERNAME = os.environ["DOCKER_REGISTRY_USERNAME"]
 DOCKER_REGISTRY_PASSWORD = os.environ["DOCKER_REGISTRY_PASSWORD"]
 API_SERVICES_TAG = os.environ["API_SERVICES_TAG"]
 AUDIT_SERVICES_TAG = os.environ["AUDIT_SERVICES_TAG"]
-AGGREGATOR_SCN_TAG = os.environ["AGGREGATOR_SCN_TAG"]
-PARTICIPANT_SCN_TAG = os.environ["PARTICIPANT_SCN_TAG"]
-WEB_FRONTEND_TAG = os.environ["WEB_FRONTEND_TAG"]
+SCN_TAG = os.environ["SCN_TAG"]
 SLACK_WEBHOOK_URL = os.environ["SLACK_WEBHOOK_URL"]
+DATA_UPLOAD_TAG = os.environ["DATA_UPLOAD_TAG"]
+USER_PORTAL_TAG = os.environ["USER_PORTAL_TAG"]
 
 
 class DeploymentResponse(BaseModel):
@@ -58,67 +57,15 @@ DEV_PARAMS = {
     "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
 }
 
-TEST_PARAMS = {
-    "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/sail_test/providers/Microsoft.Compute/galleries/sail_image_gallery_1/images/sailbaseimage/versions/0.1.0",
-    "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
-    + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
-    "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
-    "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
-    "azure_storage_resource_group": "sail_test",
-    "azure_storage_account_name": "sailvmimages9998",
-    "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
-}
 
-RELEASE_CANDIDATE_PARAMS = {
-    "azure_subscription_id": "40cdb551-8a8d-401f-b884-db1599022002",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/"  # change this line depending on your subscription resourcegroup where images are stored
-    + "SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
-    "virtualNetworkId": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/"  # change this line depending on your subscription
-    + "rg-sail-wus-rls-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-rls-01",  # change this line depending on your vnet
-    "subnetName": "snet-sail-wus-rls-platformservice-01",  # change this line depending on your vnet
-    "azure_scn_subnet_name": "snet-sail-wus-rls-scn-01",
-    "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
-    "azure_storage_account_name": "sailvmimages9828",
-    "azure_scn_virtual_network_id": "/subscriptions/40cdb551-8a8d-401f-b884-db1599022002/resourceGroups/rg-sail-wus-rls-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-rls-01",
-}
-
-PRODUCTIONGA_PARAMS = {
-    "azure_subscription_id": "ba383264-b9d6-4dba-b71f-58b3755382d8",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/"  # change this line depending on your subscription resourcegroup where images are stored
-    + "SAIL-PAYLOADS-ImageStorage-WUS-Rg/providers/Microsoft.Compute/images/",
-    "virtualNetworkId": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/"  # change this line depending on your subscription
-    + "rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",  # change this line depending on your vnet
-    "subnetName": "snet-sail-wus-prd-platformservice-01",  # change this line depending on your vnet
-    "azure_scn_subnet_name": "snet-sail-wus-prd-scn-01",
-    "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
-    "azure_storage_account_name": "sailvmimages9829",
-    "azure_scn_virtual_network_id": "/subscriptions/ba383264-b9d6-4dba-b71f-58b3755382d8/resourceGroups/rg-sail-wus-prd-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-prd-01",
-}
-
-
-def set_params(subscription_id, module_name, test_flag=False):
-    """
-    Set Params based on selected subscription
-
-    """
+def set_params(module_name):
     parameters = {
         "vmName": module_name,
         "vmSize": "Standard_D4s_v4",
         "adminUserName": "sailuser",
         "adminPassword": "SailPassword@123",
     }
-
-    if subscription_id == "b7a46052-b7b1-433e-9147-56efbfe28ac5":
-        if test_flag:
-            parameters.update(TEST_PARAMS)
-        else:
-            parameters.update(DEV_PARAMS)
-    elif subscription_id == "40cdb551-8a8d-401f-b884-db1599022002":
-        parameters.update(RELEASE_CANDIDATE_PARAMS)
-    elif subscription_id == "ba383264-b9d6-4dba-b71f-58b3755382d8":
-        parameters.update(PRODUCTIONGA_PARAMS)
-
+    parameters.update(DEV_PARAMS)
     return parameters
 
 
@@ -144,11 +91,9 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
             time.sleep(15)
 
 
-def deploy_module(account_credentials, deployment_name, module_name, test_flag, custom_data):
+def deploy_module(account_credentials, deployment_name, module_name, custom_data):
     """Deploy the template to a resource group."""
     print("Deploying module: ", module_name)
-
-    subscription_id = account_credentials["subscription_id"]
 
     # Each module will be deployed in a unique resource group
     resource_group_name = deployment_name + "-" + module_name
@@ -161,7 +106,7 @@ def deploy_module(account_credentials, deployment_name, module_name, test_flag, 
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
 
-    set_parameters: dict[str, str] = set_params(subscription_id, module_name, test_flag)
+    set_parameters: dict[str, str] = set_params(module_name)
     parameters = {
         "vmName": set_parameters["vmName"],
         "vmSize": set_parameters["vmSize"],
@@ -257,7 +202,7 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     monitor_client.diagnostic_settings.create_or_update(
         resource_uri=key_vault_resource_id,
         name="Key vault logs",
-        parameters=diagnostic_settings_resource,
+        parameters=diagnostic_settings_resource,  # type: ignore
     )
 
     # return the url of the keyvault
@@ -289,20 +234,10 @@ def create_cloud_init_file(initialization_json: dict, imageName: str, docker_par
     return cloud_init_file
 
 
-def deploy_audit_service(
-    account_credentials,
-    storage_account_name,
-    deployment_name,
-    test_flag,
-):
+def deploy_audit_service(account_credentials, storage_account_name, deployment_name):
     """
     Deploy Audit Service
     """
-    subscription_id = account_credentials["subscription_id"]
-
-    # Get params to update json
-    set_parameters = set_params(subscription_id, "auditserver", test_flag)
-
     # Read backend json from file and set params
     audit_json = {}
     audit_json["owner"] = OWNER
@@ -316,11 +251,14 @@ def deploy_audit_service(
 
     # Create a cloud-init file
     custom_data = create_cloud_init_file(
-        audit_json, "auditserver", "-v /opt/auditserver_dir:/app -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096", AUDIT_SERVICES_TAG
+        audit_json,
+        "auditserver",
+        "-v /opt/auditserver_dir:/app -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096",
+        AUDIT_SERVICES_TAG,
     )
 
     # Deploy the frontend server
-    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", test_flag, custom_data)
+    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", custom_data)
 
     # Upload the package to the audit server
     upload_package(audit_service_ip, "auditserver.json", "auditserver.tar.gz")
@@ -336,7 +274,6 @@ def deploy_apiservices(
     storage_resource_group_name,
     key_vault_url,
     audit_service_ip,
-    test_flag,
 ):
     """
     Deploy Api Services
@@ -344,7 +281,7 @@ def deploy_apiservices(
     subscription_id = account_credentials["subscription_id"]
 
     # Get params to update json
-    set_parameters = set_params(subscription_id, "apiservices", test_flag)
+    set_parameters = set_params("apiservices")
 
     # Read backend json from file and set params
     backend_json = {}
@@ -374,17 +311,22 @@ def deploy_apiservices(
     backend_json["docker_registry_username"] = DOCKER_REGISTRY_USERNAME
     backend_json["docker_registry_password"] = DOCKER_REGISTRY_PASSWORD
     backend_json["smartbroker_docker_params"] = "-p 8000:8001 -p 9090:9091 "
-    backend_json["smartbroker_image_tag"] = AGGREGATOR_SCN_TAG
+    backend_json["smartbroker_image_tag"] = SCN_TAG
     backend_json[
         "securecomputationnode_docker_params"
     ] = "-p 8888:8889 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
-    backend_json["securecomputationnode_image_tag"] = PARTICIPANT_SCN_TAG
+    backend_json["securecomputationnode_image_tag"] = SCN_TAG
 
     # Create a cloud-init file
-    custom_data = create_cloud_init_file(backend_json, "apiservices", "-v /etc/initialization.json:/InitializationVector.json -p 9090:9091 -p 8000:8001", API_SERVICES_TAG)
+    custom_data = create_cloud_init_file(
+        backend_json,
+        "apiservices",
+        "-v /etc/initialization.json:/InitializationVector.json -p 9090:9091 -p 8000:8001",
+        API_SERVICES_TAG,
+    )
 
     # Deploy the apiservices server
-    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", test_flag, custom_data)
+    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", custom_data)
 
     # Sleeping for some time
     time.sleep(120)
@@ -396,28 +338,38 @@ def deploy_apiservices(
     return apiservices_ip
 
 
-# def deploy_frontend(account_credentials, deployment_name, platform_services_ip, test_flag):
-#     """Deploy the frontend server"""
+def deploy_dataupload_service(
+    account_credentials,
+    deployment_name,
+    api_service_ip,
+):
+    # Create a cloud-init file
+    custom_data = create_cloud_init_file(
+        {},
+        "dataupload",
+        f"-p 8000:8001 --env SAIL_API_SERVICE_URL=https://{api_service_ip}:8000",
+        DATA_UPLOAD_TAG,
+    )
 
-#     # Prepare the initialization vector for the frontend server
-#     initialization_vector = {
-#         "ApiServicesUrl": "https://" + platform_services_ip + ":8000",
-#         "VirtualMachinePublicIp": "https://" + frontend_server_ip + ":443",
-#     }
+    # Deploy the apiservices server
+    data_upload_ip = deploy_module(account_credentials, deployment_name, "dataupload", custom_data)
 
-#     with open("newwebfrontend.json", "w") as outfile:
-#         json.dump(initialization_vector, outfile)
+    return data_upload_ip
 
-#     # Create a cloud-init file
-#     custom_data = create_cloud_init_file(backend_json, "newwebfrontend", "-p 9090:9091 -p 443:443")
 
-#     # Deploy the frontend server
-#     frontend_server_ip = deploy_module(account_credentials, deployment_name, "newwebfrontend", test_flag)
+def deploy_user_portal(account_credentials, deployment_name, api_service_ip, data_upload_ip):
+    # Create a cloud-init file
+    custom_data = create_cloud_init_file(
+        {},
+        "userportal",
+        f"-p 3000:3001 --env REACT_APP_SAIL_API_SERVICE_URL=https://{api_service_ip}:8000 --env REACT_APP_SAIL_DATA_UPLOAD_SERVICE_URL=https://{data_upload_ip}:8000",
+        USER_PORTAL_TAG,
+    )
 
-#     # Upload the package to the frontend server
-#     upload_package(frontend_server_ip, "newwebfrontend.json", "newwebfrontend.tar.gz")
+    # Deploy the apiservices server
+    data_upload_ip = deploy_module(account_credentials, deployment_name, "userportal", custom_data)
 
-#     return frontend_server_ip
+    return data_upload_ip
 
 
 def create_storage_account(account_credentials: dict, deployment_name: str, account_name_prefix: str, location: str):
@@ -524,7 +476,11 @@ def update_firewall(deployment_name, module_name, private_ip_address):
     print(f"{module_name}'s firewall public ip : {firewall_ip}")
     print(f"{module_name}'s firewall public ip id : {firewall_ip_id}")
 
-    async_updated_fw_pip_result, firewall_ip_id, firewall_ip_name, = sailazure.update_fw_pip(
+    (
+        async_updated_fw_pip_result,
+        firewall_ip_id,
+        firewall_ip_name,
+    ) = sailazure.update_fw_pip(
         account_credentials,
         firewall_ip_id,
         firewall_ip_name,
@@ -554,10 +510,6 @@ def update_firewall(deployment_name, module_name, private_ip_address):
 
 
 if __name__ == "__main__":
-    TEST_FLAG = False
-    if PURPOSE == "test":
-        TEST_FLAG = True
-
     # Check if public ip is required
     public_ip = False
     if "PUBLIC_IP" in os.environ:
@@ -596,12 +548,7 @@ if __name__ == "__main__":
     )
 
     # Deploy the audit services
-    audit_service_ip = deploy_audit_service(
-        account_credentials,
-        storage_account_name,
-        deployment_id,
-        TEST_FLAG,
-    )
+    audit_service_ip = deploy_audit_service(account_credentials, storage_account_name, deployment_id)
     print("Audit Service server: ", audit_service_ip)
 
     # Deploy the API services
@@ -613,18 +560,25 @@ if __name__ == "__main__":
         storage_resource_group_name,
         key_vault_url,
         audit_service_ip,
-        TEST_FLAG,
     )
     print("API Services server: ", platform_services_ip)
 
-    # Commented out deployment of webfrontend as not used atm BOARD-2148
-    # # Deploy the frontend server
-    # frontend_ip = deploy_frontend(
-    #     account_credentials,
-    #     deployment_id,
-    #     platform_services_ip,
-    # )
-    # print("Frontend server: ", frontend_ip)
+    # Deploy the data upload service
+    data_upload_service_ip = deploy_dataupload_service(
+        account_credentials,
+        deployment_id,
+        platform_services_ip,
+    )
+    print("Data Upload Service server: ", data_upload_service_ip)
+
+    # Deploy the user portal
+    user_portal = deploy_user_portal(
+        account_credentials,
+        deployment_id,
+        platform_services_ip,
+        data_upload_service_ip,
+    )
+    print("User Portal server: ", user_portal)
 
     # Deploy Firewall IPv4Address and update DNAT Rules
     if public_ip:
@@ -640,9 +594,7 @@ if __name__ == "__main__":
         # print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
         # print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
         # print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
-        print(
-            f"Current Azure Firewall Information:\n {json.dumps(async_updated_fw_pip_result.as_dict(), indent=4, sort_keys=True)}"
-        )
+        print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
     print("\n\n===============================================================")
     print("================= SUMMARY: Deploy Platform =====================")
     # print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")
@@ -650,8 +602,6 @@ if __name__ == "__main__":
     #     f"Deployment complete. Please visit the link to access the public demo: https://{web_fw_info['newwebfrontend-firewall_ip']}"
     # )
     print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
-    if public_ip:
-        print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
     print(f"Deployment GUID:{guid}")
     print(f"Deployment ID: {deployment_id}")
     print("Kindly delete all the resource group created on azure with the deployment ID.")

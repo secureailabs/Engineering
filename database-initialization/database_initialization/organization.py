@@ -12,8 +12,9 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
-from sail_client import Client, SyncOperations
-from sail_client.models import RegisterOrganizationIn
+from sail_client import Client
+from sail_client.api.default import register_organization
+from sail_client.models import RegisterOrganizationIn, RegisterOrganizationOut
 
 
 class OrganizationManager:
@@ -24,7 +25,7 @@ class OrganizationManager:
         :param client: client from the sail_client library to make API calls
         :type client: Client
         """
-        self.operations = SyncOperations(client)
+        self.client = client
         self.map_name_to_id = {}
 
     def create(
@@ -62,7 +63,9 @@ class OrganizationManager:
             admin_email=admin_email,
             admin_password=admin_password,
         )
-        response = self.operations.register_organization(register_organization_req)
+        response = register_organization.sync(client=self.client, json_body=register_organization_req)
+        assert type(response) == RegisterOrganizationOut
+
         self.map_name_to_id[name] = response.id
         return response.id
 

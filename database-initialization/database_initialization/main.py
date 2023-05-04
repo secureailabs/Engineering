@@ -49,10 +49,7 @@ def initialize_database(
 
     print(f"Connecting to {hostname}")
     client = Client(
-        base_url=hostname,
-        timeout=60,
-        raise_on_unexpected_status=True,
-        verify_ssl=False,
+        base_url=hostname, timeout=60, raise_on_unexpected_status=True, verify_ssl=False, follow_redirects=False
     )
 
     initializer = Initializer(client=client, config=configuration_json, use_template=use_template)

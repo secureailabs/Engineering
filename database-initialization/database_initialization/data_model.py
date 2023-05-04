@@ -16,11 +16,21 @@ import json
 from typing import List, Optional
 
 from pydantic import BaseModel
-from sail_client import SyncAuthenticatedOperations
+from sail_client import AuthenticatedClient
+from sail_client.api.default import (
+    register_data_model,
+    register_data_model_dataframe,
+    register_data_model_series,
+    update_data_model,
+    update_data_model_dataframe,
+)
 from sail_client.models import (
     RegisterDataModelDataframeIn,
+    RegisterDataModelDataframeOut,
     RegisterDataModelIn,
+    RegisterDataModelOut,
     RegisterDataModelSeriesIn,
+    RegisterDataModelSeriesOut,
     SeriesDataModelSchema,
     UpdateDataModelDataframeIn,
     UpdateDataModelIn,
@@ -52,9 +62,8 @@ class DataModel(BaseModel):
 
 
 class DataModelManager:
-    def __init__(self, data_model_json: str, sync_authenticated_operations: SyncAuthenticatedOperations):
-        self.operations = sync_authenticated_operations
-
+    def __init__(self, data_model_json: str, authenticated_client: AuthenticatedClient):
+        self.authenticated_client = authenticated_client
         # Load data model from file
         self.data_model = DataModel.parse_obj(json.loads(data_model_json))
 
@@ -63,7 +72,8 @@ class DataModelManager:
     def register_data_model(self):
         # Register data model
         data_model = RegisterDataModelIn(name=self.data_model.type, description=self.data_model.type)
-        data_model_resp = self.operations.register_data_model(json_body=data_model)
+        data_model_resp = register_data_model.sync(client=self.authenticated_client, json_body=data_model)
+        assert type(data_model_resp) == RegisterDataModelOut
 
         # Register tabular dataset data model
         list_data_frame_ids = []
@@ -72,7 +82,10 @@ class DataModelManager:
                 name=data_frame_data_model.data_frame_name,
                 description=data_frame_data_model.data_frame_name,
             )
-            dataframe_register_resp = self.operations.register_data_model_dataframe(json_body=data_frame_data_model_req)
+            dataframe_register_resp = register_data_model_dataframe.sync(
+                client=self.authenticated_client, json_body=data_frame_data_model_req
+            )
+            assert type(dataframe_register_resp) == RegisterDataModelDataframeOut
             list_data_frame_ids.append(dataframe_register_resp.id)
 
             # Register series data model
@@ -94,16 +107,23 @@ class DataModelManager:
                         resolution=series_data_model.resolution,
                     ),
                 )
-                register_series_resp = self.operations.register_data_model_series(json_body=series_data_model)
+                register_series_resp = register_data_model_series.sync(
+                    client=self.authenticated_client, json_body=series_data_model
+                )
+                assert type(register_series_resp) == RegisterDataModelSeriesOut
                 list_of_series_ids.append(register_series_resp.id)
 
             # Update the data model dataframe with the list of series ids
             update_data_frame_req = UpdateDataModelDataframeIn(data_model_series_to_add=list_of_series_ids)
-            self.operations.update_data_model_dataframe(
-                data_model_dataframe_id=dataframe_register_resp.id, json_body=update_data_frame_req
+            update_data_model_dataframe.sync(
+                client=self.authenticated_client,
+                data_model_dataframe_id=dataframe_register_resp.id,
+                json_body=update_data_frame_req,
             )
         # Update the data model with the list of data frame ids
         data_model_update_req = UpdateDataModelIn(data_model_dataframe_to_add=list_data_frame_ids)
-        self.operations.update_data_model(data_model_id=data_model_resp.id, json_body=data_model_update_req)
+        update_data_model.sync(
+            client=self.authenticated_client, data_model_id=data_model_resp.id, json_body=data_model_update_req
+        )
 
         return data_model_resp.id

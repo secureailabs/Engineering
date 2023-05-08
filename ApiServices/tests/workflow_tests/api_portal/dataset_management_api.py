@@ -33,7 +33,6 @@ class DataSetManagementFastApi:
         """
         Get all datasets.\n
         [GET] /datasets
-
         :param sail_portal: fixture, SailPortalFastApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalFastApi
         :returns: response, response.json()
@@ -58,7 +57,6 @@ class DataSetManagementFastApi:
         """
         Add Register a new dataset.\n
         [POST] /datasets
-
         :param sail_portal: fixture, SailPortalApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalApi
         :param payload: url payload
@@ -96,7 +94,6 @@ class DataSetManagementFastApi:
         """
         Get dataset by ID.\n
         [GET] /datasets/{dataset_id}
-
         :param sail_portal: fixture, SailPortalFastApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalFastApi
         :param dataset_id: dataset ID
@@ -127,7 +124,6 @@ class DataSetManagementFastApi:
         """
         Update dataset.\n
         [PUT] /datasets/{dataset_id}
-
         :param sail_portal: fixture, SailPortalFastApi
         :type sail_portal: SailPortalFastApi
         :param dataset_id: dataset ID
@@ -166,7 +162,6 @@ class DataSetManagementFastApi:
         """
         Delete a dataset.\n
         [DELETE] /datasets/{dataset_id}
-
         :param sail_portal: Fixture, SailPortalFastApi
         :type sail_portal: SailPortalFastApi
         :param dataset_id: dataset ID
@@ -197,7 +192,6 @@ class DataSetManagementFastApi:
         """
         Get all dataset versions.\n
         [GET] /dataset-versions
-
         :param sail_portal: fixture, SailPortalFastApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalFastApi
         :returns: response, response.json()
@@ -228,7 +222,6 @@ class DataSetManagementFastApi:
         """
         Add Register a new dataset version.\n
         [POST] /dataset-versions
-
         :param sail_portal: fixture, SailPortalApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalApi
         :param payload: url payload
@@ -267,7 +260,6 @@ class DataSetManagementFastApi:
         """
         Get dataset-version by ID.\n
         [GET] /dataset-version/{dataset_version_id}
-
         :param sail_portal: fixture, SailPortalFastApi
         :type sail_portal: SailPortalFastApi
         :param dataset_id: dataset-version ID
@@ -300,7 +292,6 @@ class DataSetManagementFastApi:
         """
         Update dataset-version.\n
         [PUT] /dataset-versions/{dataset_version_id}
-
         :param sail_portal: fixture, SailPortalFastApi
         :type sail_portal: SailPortalFastApi
         :param dataset_id: dataset-version ID
@@ -340,7 +331,6 @@ class DataSetManagementFastApi:
         """
         Delete a dataset-version.\n
         [DELETE] /dataset-versions/{dataset_version_id}
-
         :param sail_portal: Fixture, SailPortalFastApi
         :type sail_portal: SailPortalFastApi
         :param dataset_version_id: dataset-version ID
@@ -383,7 +373,6 @@ class DataSetManagementApi:
     def list_datasets(self, sail_portal):
         """
         List Datasets
-
         :param sail_portal: fixture, SailPortalApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalApi
         :return: response, response.json(), user_eosb
@@ -412,7 +401,6 @@ class DataSetManagementApi:
     def pull_dataset(self, sail_portal, dataset_guid):
         """
         Pull Dataset
-
         :param sail_portal: fixture, SailPortalApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalApi
         :return: response, response.json(), user_eosb
@@ -441,7 +429,6 @@ class DataSetManagementApi:
     def register_dataset(self, sail_portal, payload):
         """
         Add Register a new dataset
-
         :param sail_portal: fixture, SailPortalApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalApi
         :param payload: url payload
@@ -467,7 +454,6 @@ class DataSetManagementApi:
     def delete_dataset(self, sail_portal, payload):
         """
         Delete registered dataset
-
         :param sail_portal: fixture, SailPortalApi
         :type sail_portal: class : api_portal.sail_portal_api.SailPortalApi
         :param payload: url payload

@@ -21,7 +21,6 @@ from tests.workflow_tests.utils.helpers import random_name
 def get_dataset_payload():
     """
     Helper to return template for dataset payload
-
     :return: dataset_payload, rand_uuid, dataset_name
     :rtype: (dict, str, str)
     """

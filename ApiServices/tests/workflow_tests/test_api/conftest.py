@@ -15,39 +15,26 @@ import sys
 
 import pytest
 from tests.workflow_tests.api_portal.account_management_api import (
-    AccountManagementApi,
-    AccountManagementFastApi,
-)
-from tests.workflow_tests.api_portal.azure_template_managment_api import (
-    AzureTemplateApi,
-)
+    AccountManagementApi, AccountManagementFastApi)
+from tests.workflow_tests.api_portal.azure_template_managment_api import \
+    AzureTemplateApi
 from tests.workflow_tests.api_portal.datafederation_management_api import (
-    DataFederationManagementApi,
-)
+    DataFederationManagementApi, DataFederationManagementFastApi)
 from tests.workflow_tests.api_portal.dataset_management_api import (
-    DataSetManagementApi,
-    DataSetManagementFastApi,
-)
-from tests.workflow_tests.api_portal.datasetfamily_management_api import (
-    DatasetFamilyManagementApi,
-)
-from tests.workflow_tests.api_portal.digital_contract_management_api import (
-    DigitalContractManagementApi,
-)
-from tests.workflow_tests.api_portal.sail_portal_api import (
-    SailPortalApi,
-    SailPortalFastApi,
-)
-from tests.workflow_tests.api_portal.virtual_machine_api import VirtualMachineApi
-from tests.workflow_tests.config import (
-    API_PORTAL_IP,
-    DATAOWNER_EMAIL,
-    ORCHESTRATOR_PATH,
-    PORT,
-    RESEARCHER_EMAIL,
-    SAIL_PASS,
-)
+    DataSetManagementApi, DataSetManagementFastApi)
+from tests.workflow_tests.api_portal.datasetfamily_management_api import \
+    DatasetFamilyManagementApi
+from tests.workflow_tests.api_portal.digital_contract_management_api import \
+    DigitalContractManagementApi
+from tests.workflow_tests.api_portal.sail_portal_api import (SailPortalApi,
+                                                             SailPortalFastApi)
+from tests.workflow_tests.api_portal.virtual_machine_api import \
+    VirtualMachineApi
+from tests.workflow_tests.config import (API_PORTAL_IP, DATAOWNER_EMAIL,
+                                         ORCHESTRATOR_PATH, PORT,
+                                         RESEARCHER_EMAIL, SAIL_PASS)
 from tests.workflow_tests.utils.dataset_helpers import Dataset, DatasetVersion
+from tests.workflow_tests.utils.federation_helpers import DataFederation
 from tests.workflow_tests.utils.helpers import random_name
 from tests.workflow_tests.utils.organization_helper import Organization, User
 
@@ -55,7 +42,6 @@ from tests.workflow_tests.utils.organization_helper import Organization, User
 def pytest_addoption(parser):
     """
     Pytest addoption cmdline arguments
-
     :param parser:
     :type parser:
     """
@@ -69,7 +55,6 @@ def pytest_addoption(parser):
 def get_base_url(pytestconfig):
     """
     Fixture to set base_url for tests in session
-
     :param pytestconfig:
     :type pytestconfig:
     :return: base_url
@@ -85,7 +70,6 @@ def get_base_url(pytestconfig):
 def data_owner_sail_fast_api_portal(get_base_url):
     """
     Fixture for SailPortalApi with datowner session
-
     :return: SailPortalApi
     :rtype: class : api_portal.sail_portal_api.SailPortalApi
     """
@@ -98,7 +82,6 @@ def data_owner_sail_fast_api_portal(get_base_url):
 def researcher_sail_fast_api_portal(get_base_url):
     """
     Fixture for SailPortalApi with researcher session
-
     :return: SailPortalApi
     :rtype: class : api_portal.sail_portal_api.SailPortalApi
     """
@@ -111,7 +94,6 @@ def researcher_sail_fast_api_portal(get_base_url):
 def researcher_sail_portal(get_base_url):
     """
     Fixture for SailPortalApi with researcher session
-
     :return: SailPortalApi
     :rtype: class : api_portal.sail_portal_api.SailPortalApi
     """
@@ -124,7 +106,6 @@ def researcher_sail_portal(get_base_url):
 def data_owner_sail_portal(get_base_url):
     """
     Fixture for SailPortalApi with datowner session
-
     :return: SailPortalApi
     :rtype: class : api_portal.sail_portal_api.SailPortalApi
     """
@@ -137,7 +118,6 @@ def data_owner_sail_portal(get_base_url):
 def account_management_fast_api(get_base_url):
     """
     Fixture for AccountManagementApi
-
     :return: AccountManagementApi
     :rtype: class : api_portal.account_management_api.AccountManagementApi
     """
@@ -148,7 +128,6 @@ def account_management_fast_api(get_base_url):
 def account_management(get_base_url):
     """
     Fixture for AccountManagementApi
-
     :return: AccountManagementApi
     :rtype: class : api_portal.account_management_api.AccountManagementApi
     """
@@ -170,18 +149,16 @@ def dataset_management_fast_api(get_base_url):
 def dataset_management(get_base_url):
     """
     Fixture for DataSetManagementApi
-
     :return: DataSetManagementApi
     :rtype: class : api_portal.dataset_management_api.DataSetManagementApi
     """
-    return DataSetManagementApi(base_url=get_base_url)
+    return DataSetManagementFastApi(base_url=get_base_url)
 
 
 @pytest.fixture
 def digitalcontract_management(get_base_url):
     """
     Fixture for DigitalContractManagementApi
-
     :return: DigitalContractManagementApi
     :rtype: class : api_portal.digital_contract_management_api.DigitalContractManagementApi
     """
@@ -192,7 +169,6 @@ def digitalcontract_management(get_base_url):
 def azuretemplate_management(get_base_url):
     """
     Fixture for DigitalContractManagementApi
-
     :return: DigitalContractManagementApi
     :rtype: class : api_portal.digital_contract_management_api.DigitalContractManagementApi
     """
@@ -203,7 +179,6 @@ def azuretemplate_management(get_base_url):
 def datasetfamily_management(get_base_url):
     """
     Fixture for DatasetFamilyManagementApi
-
     :return: DatasetFamilyManagementApi
     :rtype: class : api_portal.datasetfamily_management_api.DatasetFamilyManagementApi
     """
@@ -211,10 +186,19 @@ def datasetfamily_management(get_base_url):
 
 
 @pytest.fixture
+def datafederation_management_fast_api(get_base_url):
+    """
+    Fixture for DataFederationManagementApi
+    :return: DataFederationManagementApi
+    :rtype: class : api_portal.datafederation_management.DataFederationManagementApi
+    """
+    return DataFederationManagementFastApi(base_url=get_base_url)
+
+
+@pytest.fixture
 def datafederation_management(get_base_url):
     """
     Fixture for DataFederationManagementApi
-
     :return: DataFederationManagementApi
     :rtype: class : api_portal.datafederation_management.DataFederationManagementApi
     """
@@ -225,7 +209,6 @@ def datafederation_management(get_base_url):
 def virtualmachine_management(get_base_url):
     """
     [summary]
-
     :param get_base_url: [description]
     :type get_base_url: [type]
     :return: [description]
@@ -244,13 +227,13 @@ def create_valid_organization():
     """
     new_org = Organization(
         name=f"Test Org {random_name(8)}",
-        description=f"Description {random_name(16)}",
-        avatar=f"Avatar{random_name(8)}",
-        admin_name=f"admin{random_name(4)}",
-        admin_job_title=f"admintitle{random_name(4)}",
-        admin_email=f"{random_name(4)}@{random_name(4)}.com",
+        description=f"Description-{random_name(16)}",
+        avatar=f"Avatar-{random_name(8)}",
+        admin_name=f"AdminName-{random_name(4)}",
+        admin_job_title=f"AdminTitle-{random_name(4)}",
+        admin_email=f"AdminEmail@{random_name(4)}.com",
         admin_password="password1",
-        admin_avatar=f"adminavatar{random_name(4)}",
+        admin_avatar=f"AdminAvatar-{random_name(4)}",
     )
 
     return new_org
@@ -317,6 +300,8 @@ def create_invalid_user():
 def create_valid_dataset_csv():
     """
     Fixture to create a valid dataset for /datasets endpoint testing.
+    :return: new_dataset
+    :rtype: Dataset
     """
     new_dataset = Dataset(
         name=f"DatasetName{random_name(4)}",
@@ -332,6 +317,8 @@ def create_valid_dataset_csv():
 def create_valid_dataset_fhir():
     """
     Fixture to create a valid dataset for /datasets endpoint testing.
+    :return: new_dataset
+    :rtype: Dataset
     """
     new_dataset = Dataset(
         name=f"DatasetName{random_name(8)}",
@@ -346,6 +333,10 @@ def create_valid_dataset_fhir():
 @pytest.fixture
 def create_invalid_dataset():
     """
+    Fixture to create an invalid dataset for /datasets endpoint testing.
+
+    :return: new_dataset
+    :rtype: Dataset
     Fixture to create a valid dataset for /datasets endpoint testing.
     """
     new_dataset = Dataset(name=12345, description=None, tags=None, format=None)
@@ -355,7 +346,12 @@ def create_invalid_dataset():
 
 @pytest.fixture
 def create_valid_dataset_version():
+    """
+    Fixture to create a valid dataset-version for /dataset-versions endpoint testing.
 
+    :return: new_dataset_version
+    :rtype: DatasetVersion
+    """
     new_dataset_version = DatasetVersion(
         dataset_id="TEMP",
         description=f"DatasetVersionDescription {random_name(8)}",
@@ -368,9 +364,58 @@ def create_valid_dataset_version():
 
 @pytest.fixture
 def create_invalid_dataset_version():
+    """
+    Fixture to create an invalid dataset-version for /dataset-versions endpoint testing.
 
+    :return: new_dataset_version
+    :rtype: DatasetVersion
+    """
     new_dataset_version = DatasetVersion(
         dataset_id=12345, description=None, name=None, state=None
     )
 
     return new_dataset_version
+
+
+@pytest.fixture
+def create_valid_data_federation():
+    """
+    Fixture to create a valid data federation for /data-federation endpoint testing.
+
+    :return: new_federation
+    :rtype: DataFederation
+    """
+    new_federation = DataFederation(
+        name=f"Test Federation-{random_name(4)}",
+        description=f"This is a test Federation-{random_name(4)} {random_name(8)}",
+        format="FHIR",
+    )
+
+    return new_federation
+
+
+@pytest.fixture
+def create_invalid_data_federation():
+    """
+    Fixture to create an invalid data federation for /data-federation endpoint testing.
+
+    :return: new_federation
+    :rtype: DataFederation
+    """
+    new_federation = DataFederation(
+        name=None,
+        description=None,
+        format=None,
+    )
+
+    return new_federation
+
+
+def pytest_configure():
+    pytest.new_organizations = []
+
+    pytest.new_datasets = []
+
+    pytest.new_federations = []
+
+    pytest.new_provisions = []

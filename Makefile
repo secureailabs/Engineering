@@ -1,7 +1,4 @@
-include Make/Modules.mk
-include Make/newwebfrontend.mk
-
-.PHONY: package all clean sail_client database_initializer package_rpcrelated package_smartbroker
+.PHONY: package all clean database_initializer package_rpcrelated package_smartbroker
 
 .SECONDEXPANSION:
 package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService/.*")
@@ -19,12 +16,8 @@ package_smartbroker:
 	@tar -czvf Binary/smartbroker.tar.gz RPCLib/ sail-aggregator-fastapi
 
 package:
-	@make package_audit_service package_newwebfrontend package_rpcrelated
+	@make package_audit_service package_rpcrelated
 	@echo "package done!"
-
-sail_client:
-	@cd ApiServices/generated/sail-client && poetry build
-	@echo "sail_client done!"
 
 database_initializer:
 	@cd database-initialization && poetry build
@@ -35,7 +28,7 @@ move_datascience:
 
 all:
 	@make package
-	@make sail_client database_initializer
+	@make database_initializer
 	@echo "All build and packaged!"
 
 clean:

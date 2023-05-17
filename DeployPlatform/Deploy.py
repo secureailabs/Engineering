@@ -9,7 +9,8 @@ import yaml
 from azure.core.exceptions import AzureError
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
-from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
+from azure.mgmt.monitor.models import (DiagnosticSettingsResource, LogSettings,
+                                       MetricSettings)
 from azure.mgmt.network.models import PublicIPAddress
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
@@ -79,6 +80,7 @@ DEPLOYMENT_INFO = DeploymentInfo(
     subscription_id=AZURE_SUBSCRIPTION_ID,
     id=deployment_id,
     name=f"{OWNER}-{deployment_id}-{PURPOSE}",
+    location=LOCATION,
 )
 sailazure.set_deployment_info(DEPLOYMENT_INFO)
 
@@ -114,7 +116,7 @@ def deploy_module(module_name, custom_data) -> str:
     resource_group_name = DEPLOYMENT_INFO.name + "-" + module_name
 
     # Create the resource group
-    sailazure.create_resource_group(resource_group_name, LOCATION)
+    sailazure.create_resource_group(resource_group_name)
 
     template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", "sailvm.json")
 
@@ -169,7 +171,7 @@ def deploy_key_vault(key_vault_name_prefix, storage_account_id):
         raise Exception("Unable to find an available storage account name.")
 
     # Create the resource group
-    sailazure.create_resource_group(resource_group_name, LOCATION)
+    sailazure.create_resource_group(resource_group_name)
 
     template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", "keyvault" + ".json")
 
@@ -370,7 +372,7 @@ def create_storage_account(account_name_prefix: str):
         resource_group_name = DEPLOYMENT_INFO.name + "-storage"
 
         # Create the resource group
-        sailazure.create_resource_group(resource_group_name, LOCATION)
+        sailazure.create_resource_group(resource_group_name)
 
         # Check if the account name is available. Storage account names must be unique across
         # Azure because they're used in URLs.
@@ -392,7 +394,7 @@ def create_storage_account(account_name_prefix: str):
         poller = storage_client.storage_accounts.begin_create(
             resource_group_name,
             account_name,
-            {"location": LOCATION, "kind": "StorageV2", "sku": {"name": "Standard_LRS"}},  # type: ignore
+            {"location": DEPLOYMENT_INFO.location, "kind": "StorageV2", "sku": {"name": "Standard_LRS"}},  # type: ignore
         )
         # Long-running operations return a poller object; calling poller.result() waits for completion.
         account_result = poller.result()
@@ -421,17 +423,14 @@ def create_storage_account(account_name_prefix: str):
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
-def update_firewall(module_name, private_ip_address, firewall_ip: PublicIPAddress):
-    # Authenticate the azure credentials for SAIL GLOBAL HUB
-    DEPLOYMENT_INFO.subscription_id = "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
-    sailazure.set_deployment_info(DEPLOYMENT_INFO)
+def update_firewall(private_ip_address: str, firewall_ip: PublicIPAddress):
+    sailazure.update_fw_pip(firewall_ip)
 
-    (async_updated_fw_pip_result, firewall_ip_name) = sailazure.update_fw_pip(firewall_ip.id, firewall_ip.name)
+    if firewall_ip.name is None or firewall_ip.ip_address is None:
+        raise Exception("Firewall Public IP Address is not available")
 
     # Update DNAT Rules per module
-    sailazure.update_fw_dnat_rules(firewall_ip_name, firewall_ip, private_ip_address, module_name)
-
-    return async_updated_fw_pip_result
+    sailazure.update_fw_dnat_rules(firewall_ip, private_ip_address)
 
 
 if __name__ == "__main__":
@@ -496,12 +495,17 @@ if __name__ == "__main__":
     add_domain_dns_post.sync(client=dns_client, json_body=request)
 
     # Deploy Firewall IPv4Address and update DNAT Rules
+    # Note: this should be the last thing to be done
     if public_ip:
+        # Authenticate the azure credentials for SAIL GLOBAL HUB
+        DEPLOYMENT_INFO.subscription_id = "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
+        sailazure.set_deployment_info(DEPLOYMENT_INFO)
+
         pip_name = "PIP-" + deployment_id + "-gateway"
-        public_ip = sailazure.create_public_ip("rg-sail-wus-hubpipdev-001", LOCATION, pip_name)
-        if public_ip.id is None:
+        public_ip = sailazure.create_public_ip("rg-sail-wus-hubpipdev-001", pip_name)
+        if public_ip.id is None or public_ip.name is None or public_ip.ip_address is None:
             raise Exception("Unable to create public ip address")
-        async_updated_fw_pip_result = update_firewall("gateway", api_services_ip, public_ip)
+        update_firewall(gateway_private_ip, public_ip)
 
     print("\n\n===============================================================")
     print("================= SUMMARY: Deploy Platform =====================")

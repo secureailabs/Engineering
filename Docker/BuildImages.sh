@@ -64,11 +64,6 @@ do
     esac
 done
 
-echo "--------------------------------------------------"
-echo "move datascience package"
-echo "--------------------------------------------------"
-(cd ../ && make move_datascience)
-
 # Build the asked image if it specified in the input parameters
 if [ -z "$imageName" ]; then
     echo "No image specified. Building all of them..."

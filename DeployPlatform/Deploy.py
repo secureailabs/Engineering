@@ -9,8 +9,7 @@ import yaml
 from azure.core.exceptions import AzureError
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
-from azure.mgmt.monitor.models import (DiagnosticSettingsResource, LogSettings,
-                                       MetricSettings)
+from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
 from azure.mgmt.network.models import PublicIPAddress
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
@@ -269,7 +268,7 @@ def deploy_audit_service(storage_account_name, deployment_name):
 
 
 def deploy_apiservices(
-    storage_account_name, storage_account_password, storage_resource_group_name, key_vault_url
+    storage_account_name, storage_account_password, storage_resource_group_name, key_vault_url, gateway_ip
 ) -> str:
     # Read backend json from file and set params
     backend_json = {}
@@ -298,12 +297,12 @@ def deploy_apiservices(
     backend_json["docker_registry_url"] = DOCKER_REGISTRY_URL
     backend_json["docker_registry_username"] = DOCKER_REGISTRY_USERNAME
     backend_json["docker_registry_password"] = DOCKER_REGISTRY_PASSWORD
-    backend_json["smartbroker_docker_params"] = "-p 8000:8001 -p 9090:9091 "
-    backend_json["smartbroker_image_tag"] = SCN_TAG
     backend_json[
         "securecomputationnode_docker_params"
-    ] = "-p 8888:8889 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
+    ] = "-p 8000:8888 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
     backend_json["securecomputationnode_image_tag"] = SCN_TAG
+    backend_json["base_domain"] = BASE_DOMAIN
+    backend_json["dns_ip"] = gateway_ip
 
     # Create a cloud-init file
     custom_data = create_cloud_init_file(
@@ -476,7 +475,7 @@ if __name__ == "__main__":
 
     # Deploy the API services
     api_services_ip = deploy_apiservices(
-        storage_account_name, storage_accout_password, storage_resource_group_name, key_vault_url
+        storage_account_name, storage_accout_password, storage_resource_group_name, key_vault_url, gateway_private_ip
     )
     print("API Services server: ", api_services_ip)
     request = DomainData(ip=api_services_ip, domain=f"api.{BASE_DOMAIN}.")

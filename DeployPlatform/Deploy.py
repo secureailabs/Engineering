@@ -213,7 +213,9 @@ def deploy_key_vault(key_vault_name_prefix, storage_account_id):
     return keyvault_url
 
 
-def create_cloud_init_file(initialization_json: dict, imageName: str, docker_params: str, image_tag: str):
+def create_cloud_init_file(
+    initialization_json: dict, imageName: str, docker_params: str, image_tag: str, run_image: bool = True
+):
     """Create the cloud init file"""
     cloud_init_file = "#cloud-config\n"
 
@@ -230,15 +232,19 @@ def create_cloud_init_file(initialization_json: dict, imageName: str, docker_par
     cloud_init_yaml["runcmd"] = [
         f"sudo mkdir -p /opt/{imageName}_dir",
         f"sudo docker login {DOCKER_REGISTRY_URL} --username {DOCKER_REGISTRY_USERNAME} --password {DOCKER_REGISTRY_PASSWORD}",
-        f"sudo docker run -dit {docker_params} -v /opt/certs:/etc/nginx/certs --name {imageName} {DOCKER_REGISTRY_URL}/{imageName}:{image_tag}",
     ]
+
+    if run_image:
+        cloud_init_yaml["runcmd"].append(
+            f"sudo docker run -dit {docker_params} --name {imageName} {DOCKER_REGISTRY_URL}/{imageName}:{image_tag}",
+        )
 
     cloud_init_file += yaml.dump(cloud_init_yaml)
 
     return cloud_init_file
 
 
-def deploy_audit_service(storage_account_name, deployment_name):
+def deploy_audit_service(storage_account_name):
     # Read backend json from file and set params
     audit_json = {}
     audit_json["owner"] = OWNER
@@ -254,7 +260,7 @@ def deploy_audit_service(storage_account_name, deployment_name):
     custom_data = create_cloud_init_file(
         audit_json,
         "auditserver",
-        "-v /opt/auditserver_dir:/app -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096",
+        "-v /opt/auditserver_dir:/app -v /opt/certs:/etc/nginx/certs -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096",
         AUDIT_SERVICES_TAG,
     )
 
@@ -352,9 +358,19 @@ def deploy_user_portal():
     return data_upload_ip
 
 
-def deploy_gateway():
+def deploy_gateway(public_ip: bool):
+
+    gateway_iv = {}
+    gateway_iv["root_domain"] = BASE_DOMAIN
+
     # Create a cloud-init file
-    custom_data = create_cloud_init_file({}, "gateway", f"-p 443:443 -p 8000:8001", GATEWAY_TAG)
+    custom_data = create_cloud_init_file(
+        gateway_iv,
+        "gateway",
+        f"-p 443:443 -p 8000:8001 -v /etc/initialization.json:/InitializationVector.json -v /opt/certs/nginx-selfsigned.crt:/etc/nginx/certs/fullchain.pem -v /opt/certs/nginx-selfsigned.key:/etc/nginx/certs/privkey.pem",
+        GATEWAY_TAG,
+        not public_ip,
+    )
 
     # Deploy the gateway server
     gateway_ip = deploy_module("gateway", custom_data)
@@ -457,12 +473,56 @@ if __name__ == "__main__":
     key_vault_url = deploy_key_vault(key_vault_name_prefix="sailkeyvault", storage_account_id=storage_account_id)
 
     # Deploy the audit services
-    audit_service_ip = deploy_audit_service(storage_account_name, deployment_id)
+    audit_service_ip = deploy_audit_service(storage_account_name)
     print("Audit Service server: ", audit_service_ip)
 
     # Deploy the Gateway
-    gateway_private_ip = deploy_gateway()
+    gateway_private_ip = deploy_gateway(public_ip)
     print("Gateway server: ", gateway_private_ip)
+
+    # Ask the user if they want to add a DNS mapping to the gateway
+    if public_ip:
+        # Authenticate the azure credentials for SAIL GLOBAL HUB
+        # DEPLOYMENT_INFO.subscription_id = "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
+        # sailazure.set_deployment_info(DEPLOYMENT_INFO)
+
+        # pip_name = "PIP-" + deployment_id + "-gateway"
+        # public_ip = sailazure.create_public_ip("rg-sail-wus-hubpipdev-001", pip_name)
+        # if public_ip.id is None or public_ip.name is None or public_ip.ip_address is None:
+        #     raise Exception("Unable to create public ip address")
+        # update_firewall(gateway_private_ip, public_ip)
+
+        # # Revert the azure credentials back to the user's subscription
+        # DEPLOYMENT_INFO.subscription_id = AZURE_SUBSCRIPTION_ID
+        # sailazure.set_deployment_info(DEPLOYMENT_INFO)
+
+        # Ask the user to add the SSL certificates to the gateway and then type done to continue
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        print("Please add the SSL certificates to the gateway and type 'done' to continue")
+        print("Instructions:")
+        print("1. SSH to the gateway VM using the following command:")
+        print(f"ssh sailuser@{gateway_private_ip}")
+        print("2. Create ssl certificates by following the instructions on executing:")
+        print("sudo su")
+        print(
+            f"docker run -it --rm --name certbot -v /etc/letsencrypt:/etc/letsencrypt -v /var/lib/letsencrypt:/var/lib/letsencrypt certbot/certbot certonly --manual --preferred-challenges dns -d *.{BASE_DOMAIN}"
+        )
+        print("3. Start the gateway nginx server:")
+        print(
+            f"docker run -dit -p 443:443 -p 8000:8001 -v /etc/letsencrypt:/etc/letsencrypt -v /etc/initialization.json:/InitializationVector.json --name gateway {DOCKER_REGISTRY_URL}/gateway:{GATEWAY_TAG}"
+        )
+        print("4. Exit the VM by typing 'exit'")
+
+        # Continue only if the user types done
+        while True:
+            user_input = input("Please add the SSL certificates to the gateway and type 'done' to continue: ")
+            if user_input.lower() == "done":
+                break
+    else:
+        print("Continuing without public ip and using the private ip for the gateway")
+        # TODO: Add a private DNS to the gateway
+        pass
 
     # Create the dns client
     dns_client = DNSClient(
@@ -493,22 +553,9 @@ if __name__ == "__main__":
     request = DomainData(ip=user_portal_ip, domain=f"userportal.{BASE_DOMAIN}.")
     add_domain_dns_post.sync(client=dns_client, json_body=request)
 
-    # Deploy Firewall IPv4Address and update DNAT Rules
-    # Note: this should be the last thing to be done
-    if public_ip:
-        # Authenticate the azure credentials for SAIL GLOBAL HUB
-        DEPLOYMENT_INFO.subscription_id = "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
-        sailazure.set_deployment_info(DEPLOYMENT_INFO)
-
-        pip_name = "PIP-" + deployment_id + "-gateway"
-        public_ip = sailazure.create_public_ip("rg-sail-wus-hubpipdev-001", pip_name)
-        if public_ip.id is None or public_ip.name is None or public_ip.ip_address is None:
-            raise Exception("Unable to create public ip address")
-        update_firewall(gateway_private_ip, public_ip)
-
     print("\n\n===============================================================")
     print("================= SUMMARY: Deploy Platform =====================")
-    print(f"SAIL API Services is hosted internally on: https://{api_services_ip}:8000")
+    print(f"SAIL platform is hosted on: https://{BASE_DOMAIN}")
     print(f"Deployment ID: {deployment_id}")
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")

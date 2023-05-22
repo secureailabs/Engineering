@@ -5,7 +5,7 @@ imageName="securecomputationnode"
 # cd /app || exit
 
 # Start the nginx server
-# nginx -g 'daemon off;' 2>&1 | tee /app/nginx.log &
+# nginx -g 'daemon off;' 2>&1 | tee /nginx.log &
 
 # mv /decrypt_file.py ./decrypt_file.py
 
@@ -62,7 +62,7 @@ while read -r id version_id key; do
   mount_datasets "$id" "$version_id" "$key"
 done
 
-jupyter notebook --no-browser --ip 0.0.0.0 --port 8888 --allow-root --NotebookApp.password='argon2:$argon2id$v=19$m=10240,t=10,p=8$CxhdT07OWZQ/VJYTmuT2GA$SFN8uqEKgga19cESOi3jLN5iecshMFPt7BpyHIoL7/g'
+jupyter notebook --no-browser --ip 0.0.0.0 --port 8888 --allow-root --NotebookApp.password='argon2:$argon2id$v=19$m=10240,t=10,p=8$CxhdT07OWZQ/VJYTmuT2GA$SFN8uqEKgga19cESOi3jLN5iecshMFPt7BpyHIoL7/g' --NotebookApp.allow_origin='*'
 
 # To keep the container running
 tail -f /dev/null

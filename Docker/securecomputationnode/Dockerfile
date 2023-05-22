@@ -17,8 +17,6 @@ RUN apt-get update && \
     cifs-utils \
     zip
 
-COPY securecomputationnode/nginx.conf /etc/nginx/nginx.conf
-
 COPY securecomputationnode/requirements.txt /requirements.txt
 RUN pip3 install -r requirements.txt
 
@@ -32,6 +30,7 @@ RUN pip3 install /sail_data_layer-1.0.1-py3-none-any.whl
 COPY vm-initializer/decrypt_file.py /decrypt_file.py
 
 COPY securecomputationnode/Entrypoint.sh /Entrypoint.sh
+# COPY securecomputationnode/nginx.conf /etc/nginx/nginx.conf
 RUN chmod +x /Entrypoint.sh
 
 ENTRYPOINT [ "/Entrypoint.sh" ]

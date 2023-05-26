@@ -483,18 +483,18 @@ if __name__ == "__main__":
     # Ask the user if they want to add a DNS mapping to the gateway
     if public_ip:
         # Authenticate the azure credentials for SAIL GLOBAL HUB
-        # DEPLOYMENT_INFO.subscription_id = "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
-        # sailazure.set_deployment_info(DEPLOYMENT_INFO)
+        DEPLOYMENT_INFO.subscription_id = "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
+        sailazure.set_deployment_info(DEPLOYMENT_INFO)
 
-        # pip_name = "PIP-" + deployment_id + "-gateway"
-        # public_ip = sailazure.create_public_ip("rg-sail-wus-hubpipdev-001", pip_name)
-        # if public_ip.id is None or public_ip.name is None or public_ip.ip_address is None:
-        #     raise Exception("Unable to create public ip address")
-        # update_firewall(gateway_private_ip, public_ip)
+        pip_name = "PIP-" + deployment_id + "-gateway"
+        public_ip = sailazure.create_public_ip("rg-sail-wus-hubpipdev-001", pip_name)
+        if public_ip.id is None or public_ip.name is None or public_ip.ip_address is None:
+            raise Exception("Unable to create public ip address")
+        update_firewall(gateway_private_ip, public_ip)
 
-        # # Revert the azure credentials back to the user's subscription
-        # DEPLOYMENT_INFO.subscription_id = AZURE_SUBSCRIPTION_ID
-        # sailazure.set_deployment_info(DEPLOYMENT_INFO)
+        # Revert the azure credentials back to the user's subscription
+        DEPLOYMENT_INFO.subscription_id = AZURE_SUBSCRIPTION_ID
+        sailazure.set_deployment_info(DEPLOYMENT_INFO)
 
         # Ask the user to add the SSL certificates to the gateway and then type done to continue
         print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")

@@ -369,7 +369,7 @@ def deploy_gateway(public_ip: bool):
         "gateway",
         f"-p 443:443 -p 8000:8001 -v /etc/initialization.json:/InitializationVector.json -v /opt/certs/nginx-selfsigned.crt:/etc/nginx/certs/fullchain.pem -v /opt/certs/nginx-selfsigned.key:/etc/nginx/certs/privkey.pem",
         GATEWAY_TAG,
-        not public_ip,
+        False,
     )
 
     # Deploy the gateway server
@@ -495,34 +495,35 @@ if __name__ == "__main__":
         # Revert the azure credentials back to the user's subscription
         DEPLOYMENT_INFO.subscription_id = AZURE_SUBSCRIPTION_ID
         sailazure.set_deployment_info(DEPLOYMENT_INFO)
-
-        # Ask the user to add the SSL certificates to the gateway and then type done to continue
-        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-        print("Please add the SSL certificates to the gateway and type 'done' to continue")
-        print("Instructions:")
-        print("1. SSH to the gateway VM using the following command:")
-        print(f"ssh sailuser@{gateway_private_ip}")
-        print("2. Create ssl certificates by following the instructions on executing:")
-        print("sudo su")
-        print(
-            f"docker run -it --rm --name certbot -v /etc/letsencrypt:/etc/letsencrypt -v /var/lib/letsencrypt:/var/lib/letsencrypt certbot/certbot certonly --manual --preferred-challenges dns -d *.{BASE_DOMAIN}"
-        )
-        print("3. Start the gateway nginx server:")
-        print(
-            f"docker run -dit -p 443:443 -p 8000:8001 -v /etc/letsencrypt:/etc/letsencrypt -v /etc/initialization.json:/InitializationVector.json --name gateway {DOCKER_REGISTRY_URL}/gateway:{GATEWAY_TAG}"
-        )
-        print("4. Exit the VM by typing 'exit'")
-
-        # Continue only if the user types done
-        while True:
-            user_input = input("Please add the SSL certificates to the gateway and type 'done' to continue: ")
-            if user_input.lower() == "done":
-                break
+        pass
     else:
         print("Continuing without public ip and using the private ip for the gateway")
         # TODO: Add a private DNS to the gateway
         pass
+
+    # Ask the user to add the SSL certificates to the gateway and then type done to continue
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("Please add the SSL certificates to the gateway and type 'done' to continue")
+    print("Instructions:")
+    print("1. SSH to the gateway VM using the following command:")
+    print(f"ssh sailuser@{gateway_private_ip}")
+    print("2. Create ssl certificates by following the instructions on executing:")
+    print("sudo su")
+    print(
+        f"docker run -it --rm --name certbot -v /etc/letsencrypt:/etc/letsencrypt -v /var/lib/letsencrypt:/var/lib/letsencrypt certbot/certbot certonly --manual --preferred-challenges dns -d *.{BASE_DOMAIN}"
+    )
+    print("3. Start the gateway nginx server:")
+    print(
+        f"docker run -dit -p 443:443 -p 8000:8001 -v /etc/letsencrypt:/etc/letsencrypt -v /etc/initialization.json:/InitializationVector.json --name gateway {DOCKER_REGISTRY_URL}/gateway:{GATEWAY_TAG}"
+    )
+    print("4. Exit the VM by typing 'exit'")
+
+    # Continue only if the user types done
+    while True:
+        user_input = input("Please add the SSL certificates to the gateway and type 'done' to continue: ")
+        if user_input.lower() == "done":
+            break
 
     # Create the dns client
     dns_client = DNSClient(

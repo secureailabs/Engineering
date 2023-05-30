@@ -7,7 +7,8 @@
                 "name": "Admin",
                 "title": "Platform Administrator",
                 "email": "admin@secureailabs.com",
-                "password": "SailPassword@123"
+                "password": "SailPassword@123",
+                "roles": [ "ADMIN", "RESEARCHER" ]
             }
         },
         {
@@ -17,7 +18,8 @@
                 "name": "Michael Phelps",
                 "title": "Data Administrator",
                 "email": "michael@saintjacob.org",
-                "password": "SailPassword@123"
+                "password": "SailPassword@123",
+                "roles": [ "ADMIN", "DATA_SUBMITTER" ]
             }
         },
         {
@@ -27,7 +29,8 @@
                 "name": "Lily Bart",
                 "title": "System Administrator",
                 "email": "lbart@igr.com",
-                "password": "SailPassword@123"
+                "password": "SailPassword@123",
+                "roles": [ "ADMIN", "DATA_SUBMITTER" ]
             },
             "users": [
                 {
@@ -35,35 +38,35 @@
                     "password": "SailPassword@123",
                     "name": "Philip Carey",
                     "title": "Network Engineer",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "abede@igr.com",
                     "password": "SailPassword@123",
                     "name": "Adam Bede",
                     "title": "Supply Generator",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "iarcher@igr.com",
                     "password": "SailPassword@123",
                     "name": "Isabel Archar",
                     "title": "Security Expert",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "achristie@igr.com",
                     "password": "SailPassword@123",
                     "name": "Anna Christie",
                     "title": "Research Scientist",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "rcory@igr.com",
                     "password": "SailPassword@123",
                     "name": "Richard Cory",
                     "title": "Data Scientist",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 }
             ]
         },
@@ -74,7 +77,8 @@
                 "email": "nadams@mghl.com",
                 "password": "SailPassword@123",
                 "name": "Nick Adams",
-                "title": "System Administrator"
+                "title": "System Administrator",
+                "roles": [ "ADMIN", "DATA_SUBMITTER" ]
             },
             "users": [
                 {
@@ -82,35 +86,35 @@
                     "password": "SailPassword@123",
                     "name": "Nora Helmer",
                     "title": "Network Engineer",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "sbowles@mghl.com",
                     "password": "SailPassword@123",
                     "name": "Sally Bowles",
                     "title": "Hardware Engineer",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "ncarter@mghl.com",
                     "password": "SailPassword@123",
                     "name": "Nick Carter",
                     "title": "Supply Generator",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "pmason@mghl.com",
                     "password": "SailPassword@123",
                     "name": "Perry Mason",
                     "title": "Research Scientist",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 },
                 {
                     "email": "dquilp@mghl.com",
                     "password": "SailPassword@123",
                     "name": "Daniel Quilp",
                     "title": "Data Scientist",
-                    "role": "USER"
+                    "roles": [ "USER", "DATA_SUBMITTER" ]
                 }
             ]
         },
@@ -121,7 +125,8 @@
                 "email": "sallie@kidneycancer.org",
                 "password": "SailPassword@123",
                 "name": "Sallie Director",
-                "title": "Medical Director"
+                "title": "Medical Director",
+                "roles": [ "ADMIN", "FEDERATION_OWNER" ]
             },
             "users": [
                 {
@@ -129,7 +134,7 @@
                     "password": "SailPassword@123",
                     "name": "Isabel Archer",
                     "title": "System Administrator",
-                    "role": "USER"
+                    "roles": [ "USER", "FEDERATION_OWNER" ]
                 }
             ],
             "data_federations": [

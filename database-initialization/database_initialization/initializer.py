@@ -101,6 +101,7 @@ class Initializer:
                 admin_job_title=admin_user["title"],
                 admin_email=admin_user["email"],
                 admin_password=admin_user["password"],
+                admin_roles=[UserRole(role) for role in admin_user["roles"]],
             )
             # Login for each organization as admin
             self.user_login(admin_user["email"], admin_user["password"])
@@ -120,7 +121,7 @@ class Initializer:
                     email=user["email"],
                     password=user["password"],
                     job_title=user["title"],
-                    role=UserRole(user["role"]),
+                    roles=[UserRole(role) for role in user["roles"]],
                 )
                 register_user.sync(
                     client=self.auth_operations[admin_user["email"]],

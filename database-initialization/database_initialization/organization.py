@@ -12,9 +12,11 @@
 #     prior written permission of Secure Ai Labs, Inc.
 # -------------------------------------------------------------------------------
 
+from typing import List
+
 from sail_client import Client
 from sail_client.api.default import register_organization
-from sail_client.models import RegisterOrganizationIn, RegisterOrganizationOut
+from sail_client.models import RegisterOrganizationIn, RegisterOrganizationOut, UserRole
 
 
 class OrganizationManager:
@@ -36,6 +38,7 @@ class OrganizationManager:
         admin_job_title: str,
         admin_email: str,
         admin_password: str,
+        admin_roles: List[UserRole],
     ) -> str:
         """
         Register a new organization and store the name to id mapping
@@ -62,6 +65,7 @@ class OrganizationManager:
             admin_job_title=admin_job_title,
             admin_email=admin_email,
             admin_password=admin_password,
+            admin_roles=admin_roles,
         )
         response = register_organization.sync(client=self.client, json_body=register_organization_req)
         assert type(response) == RegisterOrganizationOut

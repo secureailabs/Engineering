@@ -1,0 +1,38 @@
+Version 0.x.0 (2023-05-31)
+==========================
+
+Features
+--------
+-  
+
+Bug Fixes
+---------
+- 
+
+Compatibility Notes
+-------------------
+-
+
+
+Version 0.1.0 (2023-05-31)
+==========================
+
+Features
+--------
+- Data upload via UI
+    - Data validation against data model on browser before upload
+    - Data is sent to data upload service(a Confidential VM), key generated, encrypted, and key and data stored on azure key vault
+    - Encryption during transit TLS enabled
+- Manage Researcher Portal from UI
+    - Researcher Portal can provisioned and deprovisioned from the UI by researcher user
+    - Researcher Portal loads data and spins up Notebook environment automatically for data analysis
+- Gateway
+    - Single Public IP with wildcard TLS certificate to interact with all the sail services using nginx as gateway and TLS endpoint
+    - Private DNS Resolution server is setup and used by nginx to reolve all URL for traffic re-direction within the VPN using private IPs
+    - DNS entries can be edited runtime by internal services
+- TLS setup
+    - Certificate obtained from Let’s tEncrypt (has to be manually replaced on expiration - 90 days)
+    - Manual step at deployment time to create certificates for the asked domain
+- Auditing
+    - Audit logs accessible using a REST API
+    - Logs are captured for all the API calls to SAIL Platform Serivces API

@@ -15,7 +15,7 @@ export DOCKER_REGISTRY_PASSWORD=$DOCKER_REGISTRY_PASSWORD
 # if the user does not provide any tags, the default values will be used
 export GATEWAY_TAG="v0.1.0_51e8480"
 export GATEWAY_TAG=$GATEWAY_TAG
-export API_SERVICES_TAG="v0.1.0_c06fd29"
+export API_SERVICES_TAG="v0.1.0_d353a6c"
 export API_SERVICES_TAG=$API_SERVICES_TAG
 export AUDIT_SERVICES_TAG="v0.1.0_d1dae58b"
 export AUDIT_SERVICES_TAG=$AUDIT_SERVICES_TAG
@@ -23,7 +23,7 @@ export SCN_TAG="v0.1.0_588d7c90"
 export SCN_TAG=$SCN_TAG
 export DATA_UPLOAD_TAG="v0.1.0_5ae016d"
 export DATA_UPLOAD_TAG=$DATA_UPLOAD_TAG
-export USER_PORTAL_TAG="v0.1.0_8d913d5"
+export USER_PORTAL_TAG="v0.1.0_5613c65"
 export USER_PORTAL_TAG=$USER_PORTAL_TAG
 
 export BASE_DOMAIN="demo.arrayinsights.net"

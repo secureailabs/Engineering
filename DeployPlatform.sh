@@ -53,7 +53,7 @@ fi
 # Check for whether script was started via manual run of bash script
 if [ "$create_docker_flag" = "true" ]; then
     echo "Start docker container on local machine to run DeployPlatform.sh"
-    docker run -it -v $(pwd):/app -w /app --env OWNER=$owner --env PURPOSE=$purpose --env GIT_COMMIT=$gitCommitId --entrypoint="/app/Docker/ci_deploy_platform/Entrypoint.sh" developmentdockerregistry.azurecr.io/ciubuntu:v0.1.0_5f85ced
+    docker run -it -v $(pwd):/app -w /app --env OWNER=$owner --env PURPOSE=$purpose --env GIT_COMMIT=$gitCommitId --env PUBLIC_IP=$PUBLIC_IP --entrypoint="/app/Docker/ci_deploy_platform/Entrypoint.sh" developmentdockerregistry.azurecr.io/ciubuntu:v0.1.0_5f85ced
     exit 0
 fi
 
@@ -73,6 +73,8 @@ make database_initializer
 cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 cp database-initialization/sail_client-0.1.0-py3-none-any.whl $tempDeployDir
 cp database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl $tempDeployDir
+cp sail_dns_management_client-0.1.0-py3-none-any.whl $tempDeployDir
+
 cp -r DeployPlatform/* $tempDeployDir
 cp Binary/auditserver.tar.gz $tempDeployDir
 
@@ -89,6 +91,7 @@ export PUBLIC_IP=$PUBLIC_IP
 pushd $tempDeployDir
 pip3 install sail_client-0.1.0-py3-none-any.whl
 pip3 install database_initialization-0.1.0-py3-none-any.whl
+pip3 install sail_dns_management_client-0.1.0-py3-none-any.whl
 
 # Run Deploy script
 source deploy_config.sh

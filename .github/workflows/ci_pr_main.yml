@@ -102,21 +102,21 @@ jobs:
           docker rm $(docker ps -a -q) || true
           sudo make clean
 
-  call-deploy-platform-workflow:
-    needs: build
-    uses: ./.github/workflows/wf_dispatch_deploy_platform.yml
-    with:
-      subscription: "Development"
-      purpose: "PR-${{ github.event.pull_request.number }}"
-      owner: "CI_RUNNER"
-      api_services_tag: "default"
-      audit_service_tag: "default"
-      aggregator_scn_tag: "default"
-      participant_scn_tag: "default"
-      preload_dataset: true
-      run_tests: true
-      deprovision_after: true
-    secrets: inherit
+  # call-deploy-platform-workflow:
+  #   needs: build
+  #   uses: ./.github/workflows/wf_dispatch_deploy_platform.yml
+  #   with:
+  #     subscription: "Development"
+  #     purpose: "PR-${{ github.event.pull_request.number }}"
+  #     owner: "CI_RUNNER"
+  #     api_services_tag: "default"
+  #     audit_service_tag: "default"
+  #     aggregator_scn_tag: "default"
+  #     participant_scn_tag: "default"
+  #     preload_dataset: true
+  #     run_tests: true
+  #     deprovision_after: true
+  #   secrets: inherit
 
   # stop-runner:
   #   # Always stop runner even if build step fails

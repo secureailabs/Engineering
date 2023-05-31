@@ -15,9 +15,8 @@ RUN apt-get update && \
     python3-pip \
     python3.8-venv \
     cifs-utils \
-    zip
-
-COPY securecomputationnode/nginx.conf /etc/nginx/nginx.conf
+    zip \
+    sudo
 
 COPY securecomputationnode/requirements.txt /requirements.txt
 RUN pip3 install -r requirements.txt
@@ -29,10 +28,15 @@ RUN pip3 install -U jupyter
 COPY securecomputationnode/sail_data_layer-1.0.1-py3-none-any.whl /sail_data_layer-1.0.1-py3-none-any.whl
 RUN pip3 install /sail_data_layer-1.0.1-py3-none-any.whl
 
-COPY vm-initializer/vm_initializer.py /vm_initializer.py
 COPY vm-initializer/decrypt_file.py /decrypt_file.py
 
 COPY securecomputationnode/Entrypoint.sh /Entrypoint.sh
+# COPY securecomputationnode/nginx.conf /etc/nginx/nginx.conf
 RUN chmod +x /Entrypoint.sh
+
+RUN useradd -ms /bin/bash jupyternotebook
+RUN echo "jupyternotebook ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/jupyternotebook
+
+USER jupyternotebook
 
 ENTRYPOINT [ "/Entrypoint.sh" ]

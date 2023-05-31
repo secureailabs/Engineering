@@ -5,17 +5,21 @@ import time
 import uuid
 
 import requests
-import sailazure
 import yaml
 from azure.core.exceptions import AzureError
 from azure.mgmt.keyvault import KeyVaultManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
 from azure.mgmt.monitor.models import DiagnosticSettingsResource, LogSettings, MetricSettings
+from azure.mgmt.network.models import PublicIPAddress
 from azure.mgmt.storage import StorageManagementClient
 from azure.mgmt.storage.models import StorageAccountListKeysResult
 from azure.storage.blob import BlobServiceClient
 from database_initialization import initialize_database
 from pydantic import BaseModel, Field, StrictStr
+from sail_dns_management_client import Client as DNSClient
+from sail_dns_management_client.api.default import add_domain_dns_post
+from sail_dns_management_client.models import DomainData
+from sailazure import DeploymentInfo, SailAzure
 
 AZURE_SUBSCRIPTION_ID = os.environ["AZURE_SUBSCRIPTION_ID"]
 AZURE_TENANT_ID = os.environ["AZURE_TENANT_ID"]
@@ -34,39 +38,50 @@ SCN_TAG = os.environ["SCN_TAG"]
 SLACK_WEBHOOK_URL = os.environ["SLACK_WEBHOOK_URL"]
 DATA_UPLOAD_TAG = os.environ["DATA_UPLOAD_TAG"]
 USER_PORTAL_TAG = os.environ["USER_PORTAL_TAG"]
+GATEWAY_TAG = os.environ["GATEWAY_TAG"]
+LOCATION = "westus"
+
+BASE_DOMAIN = os.environ["BASE_DOMAIN"]
+API_SERVICE_URL = f"https://api.{BASE_DOMAIN}"
+AUDIT_SERVICE_URL = f"https://audit.{BASE_DOMAIN}"
+DATA_UPLOAD_URL = f"https://dataupload.{BASE_DOMAIN}"
+USER_PORTAL_URL = f"https://userportal.{BASE_DOMAIN}"
+
+DEV_PARAMS = {
+    "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",
+    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/sailbaseimage/versions/0.1.0",
+    "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
+    "subnetName": "snet-sail-wus-dev-platformservice-01",
+    "subnet_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01/subnets/snet-sail-wus-dev-platformservice-01",
+    "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
+    "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
+    "azure_storage_account_name": "sailvmimages9827",
+    "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
+    "vmSize": "Standard_D4s_v4",
+    "adminUserName": "sailuser",
+    "adminPassword": "SailPassword@123",
+}
 
 
 class DeploymentResponse(BaseModel):
-    """Deployment response."""
-
     status: StrictStr = Field(...)
     response: StrictStr = Field(default="")
     ip_address: StrictStr = Field(default="")
     note: StrictStr = Field(...)
 
 
-DEV_PARAMS = {
-    "azure_subscription_id": "b7a46052-b7b1-433e-9147-56efbfe28ac5",  # change this line depending on your subscription
-    "vmImageResourceId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/SAIL-PAYLOADS-ImageStorage-WUS-CVM-Rg/providers/Microsoft.Compute/galleries/sail_image_gallery/images/sailbaseimage/versions/0.1.0",
-    "virtualNetworkId": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/"  # change this line depending on your subscription
-    + "rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",  # change this line depending on your vnet
-    "subnetName": "snet-sail-wus-dev-platformservice-01",  # change this line depending on your vnet
-    "azure_scn_subnet_name": "snet-sail-wus-dev-scn-01",
-    "azure_storage_resource_group": "SAIL-PAYLOADS-ImageStorage-WUS-Rg",
-    "azure_storage_account_name": "sailvmimages9827",
-    "azure_scn_virtual_network_id": "/subscriptions/b7a46052-b7b1-433e-9147-56efbfe28ac5/resourceGroups/rg-sail-wus-dev-vnet-01/providers/Microsoft.Network/virtualNetworks/vnet-sail-wus-dev-01",
-}
+sailazure = SailAzure()
 
-
-def set_params(module_name):
-    parameters = {
-        "vmName": module_name,
-        "vmSize": "Standard_D4s_v4",
-        "adminUserName": "sailuser",
-        "adminPassword": "SailPassword@123",
-    }
-    parameters.update(DEV_PARAMS)
-    return parameters
+deployment_id = str(uuid.uuid1())
+DEPLOYMENT_INFO = DeploymentInfo(
+    credentials=sailazure.authenticate(AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID),
+    object_id=AZURE_OBJECT_ID,
+    subscription_id=AZURE_SUBSCRIPTION_ID,
+    id=deployment_id,
+    name=f"{OWNER}-{deployment_id}-{PURPOSE}",
+    location=LOCATION,
+)
+sailazure.set_deployment_info(DEPLOYMENT_INFO)
 
 
 def upload_package(virtual_machine_ip, initialization_vector_file, package_file):
@@ -91,64 +106,53 @@ def upload_package(virtual_machine_ip, initialization_vector_file, package_file)
             time.sleep(15)
 
 
-def deploy_module(account_credentials, deployment_name, module_name, custom_data):
-    """Deploy the template to a resource group."""
+def deploy_module(module_name, custom_data) -> str:
+
+    # Deploy the template to a resource group.
     print("Deploying module: ", module_name)
 
     # Each module will be deployed in a unique resource group
-    resource_group_name = deployment_name + "-" + module_name
+    resource_group_name = DEPLOYMENT_INFO.name + "-" + module_name
 
     # Create the resource group
-    sailazure.create_resource_group(account_credentials, resource_group_name, "westus")
+    sailazure.create_resource_group(resource_group_name)
 
     template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", "sailvm.json")
 
     with open(template_path, "r") as template_file_fd:
         template = json.load(template_file_fd)
 
-    set_parameters: dict[str, str] = set_params(module_name)
     parameters = {
-        "vmName": set_parameters["vmName"],
-        "vmSize": set_parameters["vmSize"],
-        "adminUserName": set_parameters["adminUserName"],
-        "adminPassword": set_parameters["adminPassword"],
-        "vmImageResourceId": set_parameters["vmImageResourceId"],
-        "subnetName": set_parameters["subnetName"],
-        "virtualNetworkId": set_parameters["virtualNetworkId"],
+        "vmName": module_name,
+        "vmSize": DEV_PARAMS["vmSize"],
+        "adminUserName": DEV_PARAMS["adminUserName"],
+        "adminPassword": DEV_PARAMS["adminPassword"],
+        "vmImageResourceId": DEV_PARAMS["vmImageResourceId"],
+        "subnetName": DEV_PARAMS["subnetName"],
+        "virtualNetworkId": DEV_PARAMS["virtualNetworkId"],
         "customData": custom_data,
     }
 
-    deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
+    deploy_status = sailazure.deploy_template(resource_group_name, template, parameters)
     print(f"{module_name} server status: {deploy_status}")
 
-    # virtual_machine_public_ip = sailazure.get_ip(account_credentials, resource_group_name, module_name + "-ip")
-    virtual_machine_private_ip = sailazure.get_private_ip(
-        account_credentials, resource_group_name, module_name + "-nic"
-    )
+    # virtual_machine_public_ip = sailazure.get_ip( resource_group_name, module_name + "-ip")
+    virtual_machine_private_ip = sailazure.get_private_ip(resource_group_name, module_name + "-nic")
 
     return virtual_machine_private_ip
 
 
 def get_randomized_name(prefix: str) -> str:
-    """
-    Get a randomized name.
-
-    :param prefix: The prefix for the randomized name.
-    :type prefix: str
-    :return: The randomized name.
-    :rtype: str
-    """
     return f"{prefix}{random.randint(1,100000):05}"
 
 
-def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix, storage_account_id):
-    """Deploy the azure key vault"""
+def deploy_key_vault(key_vault_name_prefix, storage_account_id):
     # Key vault will be deployed in a unique resource group
-    resource_group_name = deployment_name + "-keyvault"
+    resource_group_name = DEPLOYMENT_INFO.name + "-keyvault"
 
     # Create a key vault name that's available because they're used in URLs.
     keyvault_client = KeyVaultManagementClient(
-        credential=account_credentials["credentials"], subscription_id=account_credentials["subscription_id"]
+        credential=DEPLOYMENT_INFO.credentials, subscription_id=DEPLOYMENT_INFO.subscription_id
     )
 
     number_tries = 0
@@ -166,7 +170,7 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
         raise Exception("Unable to find an available storage account name.")
 
     # Create the resource group
-    sailazure.create_resource_group(account_credentials, resource_group_name, "westus")
+    sailazure.create_resource_group(resource_group_name)
 
     template_path = os.path.join(os.path.dirname(__file__), "ArmTemplates", "keyvault" + ".json")
 
@@ -175,11 +179,11 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
 
     parameters = {
         "keyvault_name": key_vault_name,
-        "azure_tenant_id": account_credentials["credentials"]._tenant_id,
-        "azure_object_id": account_credentials["object_id"],
+        "azure_tenant_id": DEPLOYMENT_INFO.credentials._tenant_id,
+        "azure_object_id": DEPLOYMENT_INFO.object_id,
     }
 
-    deploy_status = sailazure.deploy_template(account_credentials, resource_group_name, template, parameters)
+    deploy_status = sailazure.deploy_template(resource_group_name, template, parameters)
     print("keyvault status: ", deploy_status)
 
     if deploy_status != "Succeeded":
@@ -188,9 +192,9 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     keyvault_url = f"https://{key_vault_name}.vault.azure.net/"
 
     # Setup monitoring and audit logs
-    key_vault_resource_id = f"/subscriptions/{account_credentials['subscription_id']}/resourceGroups/{resource_group_name}/providers/Microsoft.KeyVault/vaults/{key_vault_name}"
+    key_vault_resource_id = f"/subscriptions/{DEPLOYMENT_INFO.subscription_id}/resourceGroups/{resource_group_name}/providers/Microsoft.KeyVault/vaults/{key_vault_name}"
     monitor_client = MonitorManagementClient(
-        credential=account_credentials["credentials"], subscription_id=account_credentials["subscription_id"]
+        credential=DEPLOYMENT_INFO.credentials, subscription_id=DEPLOYMENT_INFO.subscription_id
     )
 
     diagnostic_settings_resource = DiagnosticSettingsResource(
@@ -209,7 +213,9 @@ def deploy_key_vault(account_credentials, deployment_name, key_vault_name_prefix
     return keyvault_url
 
 
-def create_cloud_init_file(initialization_json: dict, imageName: str, docker_params: str, image_tag: str):
+def create_cloud_init_file(
+    initialization_json: dict, imageName: str, docker_params: str, image_tag: str, run_image: bool = True
+):
     """Create the cloud init file"""
     cloud_init_file = "#cloud-config\n"
 
@@ -226,25 +232,26 @@ def create_cloud_init_file(initialization_json: dict, imageName: str, docker_par
     cloud_init_yaml["runcmd"] = [
         f"sudo mkdir -p /opt/{imageName}_dir",
         f"sudo docker login {DOCKER_REGISTRY_URL} --username {DOCKER_REGISTRY_USERNAME} --password {DOCKER_REGISTRY_PASSWORD}",
-        f"sudo docker run -dit {docker_params} -v /opt/certs:/etc/nginx/certs --name {imageName} {DOCKER_REGISTRY_URL}/{imageName}:{image_tag}",
     ]
+
+    if run_image:
+        cloud_init_yaml["runcmd"].append(
+            f"sudo docker run -dit {docker_params} --name {imageName} {DOCKER_REGISTRY_URL}/{imageName}:{image_tag}",
+        )
 
     cloud_init_file += yaml.dump(cloud_init_yaml)
 
     return cloud_init_file
 
 
-def deploy_audit_service(account_credentials, storage_account_name, deployment_name):
-    """
-    Deploy Audit Service
-    """
+def deploy_audit_service(storage_account_name):
     # Read backend json from file and set params
     audit_json = {}
     audit_json["owner"] = OWNER
     audit_json["azure_storage_account_name"] = storage_account_name
-    audit_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
-    audit_json["azure_client_id"] = account_credentials["credentials"]._client_id
-    audit_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
+    audit_json["azure_tenant_id"] = DEPLOYMENT_INFO.credentials._tenant_id
+    audit_json["azure_client_id"] = DEPLOYMENT_INFO.credentials._client_id
+    audit_json["azure_client_secret"] = DEPLOYMENT_INFO.credentials._client_credential
 
     with open("auditserver.json", "w") as outfile:
         json.dump(audit_json, outfile)
@@ -253,12 +260,12 @@ def deploy_audit_service(account_credentials, storage_account_name, deployment_n
     custom_data = create_cloud_init_file(
         audit_json,
         "auditserver",
-        "-v /opt/auditserver_dir:/app -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096",
+        "-v /opt/auditserver_dir:/app -v /opt/certs:/etc/nginx/certs -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096",
         AUDIT_SERVICES_TAG,
     )
 
     # Deploy the frontend server
-    audit_service_ip = deploy_module(account_credentials, deployment_name, "auditserver", custom_data)
+    audit_service_ip = deploy_module("auditserver", custom_data)
 
     # Upload the package to the audit server
     upload_package(audit_service_ip, "auditserver.json", "auditserver.tar.gz")
@@ -267,22 +274,8 @@ def deploy_audit_service(account_credentials, storage_account_name, deployment_n
 
 
 def deploy_apiservices(
-    account_credentials,
-    deployment_name,
-    storage_account_name,
-    storage_account_password,
-    storage_resource_group_name,
-    key_vault_url,
-    audit_service_ip,
-):
-    """
-    Deploy Api Services
-    """
-    subscription_id = account_credentials["subscription_id"]
-
-    # Get params to update json
-    set_parameters = set_params("apiservices")
-
+    storage_account_name, storage_account_password, storage_resource_group_name, key_vault_url, gateway_ip
+) -> str:
     # Read backend json from file and set params
     backend_json = {}
     backend_json["jwt_secret"] = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -293,15 +286,15 @@ def deploy_apiservices(
     backend_json["azure_scn_user_name"] = "sailuser"
     backend_json["azure_scn_password"] = "SailPassword@123"
     backend_json["owner"] = OWNER
-    backend_json["azure_subscription_id"] = subscription_id
-    backend_json["azure_tenant_id"] = account_credentials["credentials"]._tenant_id
-    backend_json["azure_client_id"] = account_credentials["credentials"]._client_id
-    backend_json["azure_client_secret"] = account_credentials["credentials"]._client_credential
-    backend_json["azure_scn_image_id"] = set_parameters["vmImageResourceId"]
-    backend_json["azure_scn_subnet_name"] = set_parameters["azure_scn_subnet_name"]
+    backend_json["azure_subscription_id"] = DEPLOYMENT_INFO.subscription_id
+    backend_json["azure_tenant_id"] = DEPLOYMENT_INFO.credentials._tenant_id
+    backend_json["azure_client_id"] = DEPLOYMENT_INFO.credentials._client_id
+    backend_json["azure_client_secret"] = DEPLOYMENT_INFO.credentials._client_credential
+    backend_json["azure_scn_image_id"] = DEV_PARAMS["vmImageResourceId"]
+    backend_json["azure_scn_subnet_name"] = DEV_PARAMS["azure_scn_subnet_name"]
     backend_json["azure_storage_resource_group"] = storage_resource_group_name
     backend_json["azure_storage_account_name"] = storage_account_name
-    backend_json["azure_scn_virtual_network_id"] = set_parameters["azure_scn_virtual_network_id"]
+    backend_json["azure_scn_virtual_network_id"] = DEV_PARAMS["azure_scn_virtual_network_id"]
     backend_json["azure_storage_account_password"] = storage_account_password
     backend_json["azure_keyvault_url"] = key_vault_url
     backend_json["version"] = VERSION
@@ -310,95 +303,91 @@ def deploy_apiservices(
     backend_json["docker_registry_url"] = DOCKER_REGISTRY_URL
     backend_json["docker_registry_username"] = DOCKER_REGISTRY_USERNAME
     backend_json["docker_registry_password"] = DOCKER_REGISTRY_PASSWORD
-    backend_json["smartbroker_docker_params"] = "-p 8000:8001 -p 9090:9091 "
-    backend_json["smartbroker_image_tag"] = SCN_TAG
     backend_json[
         "securecomputationnode_docker_params"
-    ] = "-p 8888:8889 -p 9090:9091 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
+    ] = "-p 8000:8888 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
     backend_json["securecomputationnode_image_tag"] = SCN_TAG
+    backend_json["base_domain"] = BASE_DOMAIN
+    backend_json["dns_ip"] = gateway_ip
 
     # Create a cloud-init file
     custom_data = create_cloud_init_file(
         backend_json,
         "apiservices",
-        "-v /etc/initialization.json:/InitializationVector.json -p 9090:9091 -p 8000:8001",
+        "-v /etc/initialization.json:/InitializationVector.json -p 8000:8000",
         API_SERVICES_TAG,
     )
 
     # Deploy the apiservices server
-    apiservices_ip = deploy_module(account_credentials, deployment_name, "apiservices", custom_data)
+    apiservices_ip = deploy_module("apiservices", custom_data)
 
     # Sleeping for some time
     time.sleep(120)
 
     # Run database tools for the backend server
-    initialize_database(hostname=f"https://{apiservices_ip}:8000")
+    initialize_database(hostname=f"http://{apiservices_ip}:8000")
     print("Api Services Database Initialization Tool run: Success")
 
     return apiservices_ip
 
 
-def deploy_dataupload_service(
-    account_credentials,
-    deployment_name,
-    api_service_ip,
-):
+def deploy_dataupload_service():
     # Create a cloud-init file
     custom_data = create_cloud_init_file(
-        {},
-        "dataupload",
-        f"-p 8000:8001 --env SAIL_API_SERVICE_URL=https://{api_service_ip}:8000",
-        DATA_UPLOAD_TAG,
+        {}, "dataupload", f"-p 8000:8000 --env SAIL_API_SERVICE_URL={API_SERVICE_URL}", DATA_UPLOAD_TAG
     )
 
     # Deploy the apiservices server
-    data_upload_ip = deploy_module(account_credentials, deployment_name, "dataupload", custom_data)
+    data_upload_ip = deploy_module("dataupload", custom_data)
 
     return data_upload_ip
 
 
-def deploy_user_portal(account_credentials, deployment_name, api_service_ip, data_upload_ip):
+def deploy_user_portal():
     # Create a cloud-init file
     custom_data = create_cloud_init_file(
         {},
         "userportal",
-        f"-p 3000:3001 --env REACT_APP_SAIL_API_SERVICE_URL=https://{api_service_ip}:8000 --env REACT_APP_SAIL_DATA_UPLOAD_SERVICE_URL=https://{data_upload_ip}:8000",
+        f"-p 8000:3000 --env REACT_APP_SAIL_API_SERVICE_URL={API_SERVICE_URL} --env REACT_APP_SAIL_DATA_UPLOAD_SERVICE_URL={DATA_UPLOAD_URL}",
         USER_PORTAL_TAG,
     )
 
     # Deploy the apiservices server
-    data_upload_ip = deploy_module(account_credentials, deployment_name, "userportal", custom_data)
+    data_upload_ip = deploy_module("userportal", custom_data)
 
     return data_upload_ip
 
 
-def create_storage_account(account_credentials: dict, deployment_name: str, account_name_prefix: str, location: str):
-    """
-    Create a storage account and file share.
+def deploy_gateway(public_ip: bool):
 
-    :param account_credentials: The account credentials.
-    :type account_credentials: dict
-    :param resource_group_name: The resource group name.
-    :type resource_group_name: str
-    :param account_name_prefix: The account name prefix.
-    :type account_name_prefix: str
-    :param location: The location.
-    :type location: str
-    :raises Exception: If the storage account creation fails.
-    :return: The response with status and account name.
-    :rtype: DeploymentResponse
-    """
+    gateway_iv = {}
+    gateway_iv["root_domain"] = BASE_DOMAIN
+
+    # Create a cloud-init file
+    custom_data = create_cloud_init_file(
+        gateway_iv,
+        "gateway",
+        f"-p 443:443 -p 8000:8001 -v /etc/initialization.json:/InitializationVector.json -v /opt/certs/nginx-selfsigned.crt:/etc/nginx/certs/fullchain.pem -v /opt/certs/nginx-selfsigned.key:/etc/nginx/certs/privkey.pem",
+        GATEWAY_TAG,
+        False,
+    )
+
+    # Deploy the gateway server
+    gateway_ip = deploy_module("gateway", custom_data)
+
+    return gateway_ip
+
+
+def create_storage_account(account_name_prefix: str):
     try:
         # Provision the storage account, starting with a management object.
-        storage_client = StorageManagementClient(
-            account_credentials["credentials"], account_credentials["subscription_id"]
-        )
+        storage_client = StorageManagementClient(DEPLOYMENT_INFO.credentials, DEPLOYMENT_INFO.subscription_id)
 
         # Each module will be deployed in a unique resource group
-        resource_group_name = deployment_name + "-storage"
+        resource_group_name = DEPLOYMENT_INFO.name + "-storage"
 
         # Create the resource group
-        sailazure.create_resource_group(account_credentials, resource_group_name, location)
+        sailazure.create_resource_group(resource_group_name)
 
         # Check if the account name is available. Storage account names must be unique across
         # Azure because they're used in URLs.
@@ -420,7 +409,7 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
         poller = storage_client.storage_accounts.begin_create(
             resource_group_name,
             account_name,
-            {"location": location, "kind": "StorageV2", "sku": {"name": "Standard_LRS"}},  # type: ignore
+            {"location": DEPLOYMENT_INFO.location, "kind": "StorageV2", "sku": {"name": "Standard_LRS"}},  # type: ignore
         )
         # Long-running operations return a poller object; calling poller.result() waits for completion.
         account_result = poller.result()
@@ -431,7 +420,7 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
 
         # Create container
         az_oauth_url = f"https://{account_name}.blob.core.windows.net"
-        blob_service_client = BlobServiceClient(account_url=az_oauth_url, credential=account_credentials["credentials"])
+        blob_service_client = BlobServiceClient(account_url=az_oauth_url, credential=DEPLOYMENT_INFO.credentials)
         container_client = blob_service_client.get_container_client("audit")
         container_client.create_container()
 
@@ -449,64 +438,14 @@ def create_storage_account(account_credentials: dict, deployment_name: str, acco
         return DeploymentResponse(status="Fail", note=str(exception))
 
 
-def update_firewall(deployment_name, module_name, private_ip_address):
-    """
-    Update Firewall with a new public ipfor new deployment and ammend dnat rules to allow access
-    """
-    module_fw_info = {}
-    # Authenticate the azure credentials for SAIL GLOBAL HUB
-    account_credentials = sailazure.authenticate(
-        AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
-    )
-    print("\n\n===============================================================")
-    print("UPDATING FIREWALL")
-    print("===============================================================")
-    print("\n\n===============================================================")
-    print(f"Creating new Firewall Public IP Address for {module_name} public endpoint")
-    print("===============================================================")
-    # Create the firewall public ips for platform
-    pip_name = "PIP" + "-" + deployment_name + "-" + module_name
-    firewall_ip_name, firewall_ip, firewall_ip_id = sailazure.create_public_ip(
-        account_credentials, "rg-sail-wus-hubpipdev-001", "westus", pip_name
-    )
-    module_fw_info[module_name + "-firewall_ip_name"] = firewall_ip_name
-    module_fw_info[module_name + "-firewall_ip"] = firewall_ip
-    module_fw_info[module_name + "-firewall_ip_id"] = firewall_ip_id
-    print(f"{module_name}'s firewall public ip name : {firewall_ip_name}")
-    print(f"{module_name}'s firewall public ip : {firewall_ip}")
-    print(f"{module_name}'s firewall public ip id : {firewall_ip_id}")
+def update_firewall(private_ip_address: str, firewall_ip: PublicIPAddress):
+    sailazure.update_fw_pip(firewall_ip)
 
-    (
-        async_updated_fw_pip_result,
-        firewall_ip_id,
-        firewall_ip_name,
-    ) = sailazure.update_fw_pip(
-        account_credentials,
-        firewall_ip_id,
-        firewall_ip_name,
-    )
-    print("\n===============================================================\n")
-    print(
-        f"Updated azure firewall Information:\n{async_updated_fw_pip_result}\nfirewall_ip_id:\n{firewall_ip_id}firewall_ip_name:\n{firewall_ip_name}firewall_ip:\n{firewall_ip}"
-    )
-    print("\n\n===============================================================")
-    print(f"Updating new Firewall DNAT RULES for {module_name}")
-    print("===============================================================")
+    if firewall_ip.name is None or firewall_ip.ip_address is None:
+        raise Exception("Firewall Public IP Address is not available")
+
     # Update DNAT Rules per module
-    async_updated_fw_pol_result = sailazure.update_fw_dnat_rules(
-        account_credentials,
-        firewall_ip_name,
-        firewall_ip,
-        private_ip_address,
-        module_name,
-    )
-    print("\n===============================================================\n")
-    print(f"{module_name}'s Azure Firewall DNAT RULES result:\n{async_updated_fw_pol_result}")
-
-    print("\n\n===============================================================")
-    print("ENDING FUNCTION UPDATE_FIREWALL")
-    print("===============================================================")
-    return module_fw_info, async_updated_fw_pip_result
+    sailazure.update_fw_dnat_rules(firewall_ip, private_ip_address)
 
 
 if __name__ == "__main__":
@@ -519,93 +458,108 @@ if __name__ == "__main__":
         print("Please set the OWNER and PURPOSE environment variables")
         exit(1)
 
-    guid = str(uuid.uuid1())
-    deployment_id = f"{OWNER}-{guid}-{PURPOSE}"
-
-    # Authenticate the azure credentials
-    account_credentials = sailazure.authenticate(
-        AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
-    )
-    account_credentials["object_id"] = AZURE_OBJECT_ID
-
     # Deploy Storage Account
     (
         storage_account,
         storage_account_name,
         storage_accout_password,
         storage_resource_group_name,
-    ) = create_storage_account(account_credentials, deployment_id, "saildatastorage", "westus")
+    ) = create_storage_account("saildatastorage")
 
     # Create storage account id
     storage_account_id = f"/subscriptions/{AZURE_SUBSCRIPTION_ID}/resourceGroups/{storage_resource_group_name}/providers/Microsoft.Storage/storageAccounts/{storage_account_name}"
 
     # Provision a key vault
-    key_vault_url = deploy_key_vault(
-        account_credentials=account_credentials,
-        deployment_name=deployment_id,
-        key_vault_name_prefix="sailkeyvault",
-        storage_account_id=storage_account_id,
-    )
+    key_vault_url = deploy_key_vault(key_vault_name_prefix="sailkeyvault", storage_account_id=storage_account_id)
 
     # Deploy the audit services
-    audit_service_ip = deploy_audit_service(account_credentials, storage_account_name, deployment_id)
+    audit_service_ip = deploy_audit_service(storage_account_name)
     print("Audit Service server: ", audit_service_ip)
 
-    # Deploy the API services
-    platform_services_ip = deploy_apiservices(
-        account_credentials,
-        deployment_id,
-        storage_account_name,
-        storage_accout_password,
-        storage_resource_group_name,
-        key_vault_url,
-        audit_service_ip,
+    # Deploy the Gateway
+    gateway_private_ip = deploy_gateway(public_ip)
+    print("Gateway server: ", gateway_private_ip)
+
+    # Ask the user if they want to add a DNS mapping to the gateway
+    if public_ip:
+        # Authenticate the azure credentials for SAIL GLOBAL HUB
+        DEPLOYMENT_INFO.subscription_id = "6e7f356c-6059-4799-b83a-c4744e4a7c2e"
+        sailazure.set_deployment_info(DEPLOYMENT_INFO)
+
+        pip_name = "PIP-" + deployment_id + "-gateway"
+        public_ip = sailazure.create_public_ip("rg-sail-wus-hubpipdev-001", pip_name)
+        if public_ip.id is None or public_ip.name is None or public_ip.ip_address is None:
+            raise Exception("Unable to create public ip address")
+        update_firewall(gateway_private_ip, public_ip)
+
+        # Revert the azure credentials back to the user's subscription
+        DEPLOYMENT_INFO.subscription_id = AZURE_SUBSCRIPTION_ID
+        sailazure.set_deployment_info(DEPLOYMENT_INFO)
+        pass
+    else:
+        print("Continuing without public ip and using the private ip for the gateway")
+        # TODO: Add a private DNS to the gateway
+        pass
+
+    # Ask the user to add the SSL certificates to the gateway and then type done to continue
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("Please add the SSL certificates to the gateway and type 'done' to continue")
+    print("Instructions:")
+    print("1. SSH to the gateway VM using the following command:")
+    print(f"ssh sailuser@{gateway_private_ip}")
+    print("2. Create ssl certificates by following the instructions on executing:")
+    print("sudo su")
+    print(
+        f"docker run -it --rm --name certbot -v /etc/letsencrypt:/etc/letsencrypt -v /var/lib/letsencrypt:/var/lib/letsencrypt certbot/certbot certonly --manual --preferred-challenges dns -d *.{BASE_DOMAIN}"
     )
-    print("API Services server: ", platform_services_ip)
+    print("3. Start the gateway nginx server:")
+    print(
+        f"docker run -dit -p 443:443 -p 8000:8001 -v /etc/letsencrypt:/etc/letsencrypt -v /etc/initialization.json:/InitializationVector.json --name gateway {DOCKER_REGISTRY_URL}/gateway:{GATEWAY_TAG}"
+    )
+    print("4. Exit the VM by typing 'exit'")
+
+    # Continue only if the user types done
+    while True:
+        user_input = input("Please add the SSL certificates to the gateway and type 'done' to continue: ")
+        if user_input.lower() == "done":
+            break
+
+    # Create the dns client
+    dns_client = DNSClient(
+        base_url=f"https://{gateway_private_ip}:8000",
+        verify_ssl=False,
+        raise_on_unexpected_status=True,
+        timeout=30,
+        follow_redirects=True,
+    )
+
+    # Deploy the API services
+    api_services_ip = deploy_apiservices(
+        storage_account_name, storage_accout_password, storage_resource_group_name, key_vault_url, gateway_private_ip
+    )
+    print("API Services server: ", api_services_ip)
+    request = DomainData(ip=api_services_ip, domain=f"api.{BASE_DOMAIN}.")
+    add_domain_dns_post.sync(client=dns_client, json_body=request)
 
     # Deploy the data upload service
-    data_upload_service_ip = deploy_dataupload_service(
-        account_credentials,
-        deployment_id,
-        platform_services_ip,
-    )
+    data_upload_service_ip = deploy_dataupload_service()
     print("Data Upload Service server: ", data_upload_service_ip)
+    request = DomainData(ip=data_upload_service_ip, domain=f"dataupload.{BASE_DOMAIN}.")
+    add_domain_dns_post.sync(client=dns_client, json_body=request)
 
     # Deploy the user portal
-    user_portal = deploy_user_portal(
-        account_credentials,
-        deployment_id,
-        platform_services_ip,
-        data_upload_service_ip,
-    )
-    print("User Portal server: ", user_portal)
+    user_portal_ip = deploy_user_portal()
+    print("User Portal server: ", user_portal_ip)
+    request = DomainData(ip=user_portal_ip, domain=f"userportal.{BASE_DOMAIN}.")
+    add_domain_dns_post.sync(client=dns_client, json_body=request)
 
-    # Deploy Firewall IPv4Address and update DNAT Rules
-    if public_ip:
-        api_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "apiservices", platform_services_ip)
-        # web_fw_info, async_updated_fw_pip_result = update_firewall(deployment_id, "newwebfrontend", frontend_ip)
-
-        # Summary
-        print("\n\n===============================================================")
-        print("================= SUMMARY: Deploy Firewall =====================")
-        print(f"apiservices-firewall_ip_name: {api_fw_info['apiservices-firewall_ip_name']}")
-        print(f"apiservices-firewall_ip: {api_fw_info['apiservices-firewall_ip']}")
-        print(f"apiservices-firewall_ip_id: {api_fw_info['apiservices-firewall_ip_id']}")
-        # print(f"newwebfrontend-firewall_ip_name: {web_fw_info['newwebfrontend-firewall_ip_name']}")
-        # print(f"newwebfrontend-firewall_ip: {web_fw_info['newwebfrontend-firewall_ip']}")
-        # print(f"newwebfrontend-firewall_ip_id: {web_fw_info['newwebfrontend-firewall_ip_id']}")
-        print(f"SAIL API Services is hosted externally on: https://{api_fw_info['apiservices-firewall_ip']}:8000")
     print("\n\n===============================================================")
     print("================= SUMMARY: Deploy Platform =====================")
-    # print(f"Deployment complete. Please visit the link to access the internal demo: https://{frontend_ip}")
-    # print(
-    #     f"Deployment complete. Please visit the link to access the public demo: https://{web_fw_info['newwebfrontend-firewall_ip']}"
-    # )
-    print(f"SAIL API Services is hosted internally on: https://{platform_services_ip}:8000")
-    print(f"Deployment GUID:{guid}")
+    print(f"SAIL platform is hosted on: https://{BASE_DOMAIN}")
     print(f"Deployment ID: {deployment_id}")
     print("Kindly delete all the resource group created on azure with the deployment ID.")
     print("===============================================================\n\n")
 
     # Delete the resource group for the backend server
-    # sailazure.delete_resouce_group(account_credentials, deployment_id + "backend")
+    # sailazure.delete_resouce_group( deployment_id + "backend")

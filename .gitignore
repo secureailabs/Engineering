@@ -12,3 +12,4 @@ RPCLib/zero/zero.egg-info/*
 Docker/datascience
 **/*.egg-info/*
 *.pyc
+**/.hypothesis

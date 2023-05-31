@@ -28,11 +28,11 @@ Features
     - Researcher Portal loads data and spins up Notebook environment automatically for data analysis
 - Gateway
     - Single Public IP with wildcard TLS certificate to interact with all the sail services using nginx as gateway and TLS endpoint
-    - Private DNS Resolution server is setup and used by nginx to reolve all URL for traffic re-direction within the VPN using private IPs
+    - Private DNS Resolution server is setup and used by nginx to resolve all URL for traffic re-direction within the VPN using private IPs
     - DNS entries can be edited runtime by internal services
 - TLS setup
-    - Certificate obtained from Let’s tEncrypt (has to be manually replaced on expiration - 90 days)
+    - Certificate obtained from Let's Encrypt (has to be manually replaced on expiration - 90 days)
     - Manual step at deployment time to create certificates for the asked domain
 - Auditing
     - Audit logs accessible using a REST API
-    - Logs are captured for all the API calls to SAIL Platform Serivces API
+    - Logs are captured for all the API calls to SAIL Platform Services API

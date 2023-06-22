@@ -1,10 +1,6 @@
 .PHONY: package all clean database_initializer package_rpcrelated package_smartbroker
 
 .SECONDEXPANSION:
-package_audit_service: $$(shell find AuditService/ -type f ! -path "AuditService/.*")
-	@mkdir -p Binary
-	@tar -cvzf Binary/auditserver.tar.gz $^
-
 package_rpcrelated: $$(shell find RPCLib/ -type f ! -path "RPCLib/.*")
 	@mkdir -p Binary
 	@cp -r datascience Docker/
@@ -16,7 +12,7 @@ package_smartbroker:
 	@tar -czvf Binary/smartbroker.tar.gz RPCLib/ sail-aggregator-fastapi
 
 package:
-	@make package_audit_service package_rpcrelated
+	@make package_rpcrelated
 	@echo "package done!"
 
 database_initializer:

@@ -17,13 +17,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 from sail_client import AuthenticatedClient
-from sail_client.api.default import (
-    register_data_model,
-    register_data_model_dataframe,
-    register_data_model_series,
-    update_data_model,
-    update_data_model_dataframe,
-)
+from sail_client.api.default import register_data_model, register_data_model_dataframe, register_data_model_series
 from sail_client.models import (
     RegisterDataModelDataframeIn,
     RegisterDataModelDataframeOut,
@@ -32,15 +26,13 @@ from sail_client.models import (
     RegisterDataModelSeriesIn,
     RegisterDataModelSeriesOut,
     SeriesDataModelSchema,
-    UpdateDataModelDataframeIn,
-    UpdateDataModelIn,
+    SeriesDataModelType,
 )
 
 
 class SeriesDataModel(BaseModel):
     type: str
     series_name: str
-    series_data_model_id: str
     list_value: Optional[List[str]]
     unit: Optional[str] = None
     min: Optional[float] = None
@@ -51,13 +43,11 @@ class SeriesDataModel(BaseModel):
 class DataFrameDataModel(BaseModel):
     type: str
     data_frame_name: str
-    data_frame_data_model_id: str
     list_series_data_model: List[SeriesDataModel]
 
 
 class DataModel(BaseModel):
     type: str
-    tabular_dataset_data_model_id: str
     list_data_frame_data_model: List[DataFrameDataModel]
 
 
@@ -81,6 +71,7 @@ class DataModelManager:
             data_frame_data_model_req = RegisterDataModelDataframeIn(
                 name=data_frame_data_model.data_frame_name,
                 description=data_frame_data_model.data_frame_name,
+                data_model_id=data_model_resp.id,
             )
             dataframe_register_resp = register_data_model_dataframe.sync(
                 client=self.authenticated_client, json_body=data_frame_data_model_req
@@ -92,19 +83,18 @@ class DataModelManager:
             list_of_series_ids = []
 
             for series_data_model in data_frame_data_model.list_series_data_model:
-                foo = series_data_model.dict()
                 series_data_model = RegisterDataModelSeriesIn(
                     name=series_data_model.series_name,
                     description=series_data_model.series_name,
+                    data_model_dataframe_id=dataframe_register_resp.id,
                     series_schema=SeriesDataModelSchema(
-                        type=series_data_model.type,
+                        type=SeriesDataModelType(series_data_model.type),
                         series_name=series_data_model.series_name,
-                        series_data_model_id=series_data_model.series_data_model_id,
-                        list_value=series_data_model.list_value,
-                        unit=series_data_model.unit,
-                        min_=series_data_model.min,
-                        max_=series_data_model.max,
-                        resolution=series_data_model.resolution,
+                        list_value=series_data_model.list_value,  # type: ignore
+                        unit=series_data_model.unit,  # type: ignore
+                        min_=series_data_model.min,  # type: ignore
+                        max_=series_data_model.max,  # type: ignore
+                        resolution=series_data_model.resolution,  # type: ignore
                     ),
                 )
                 register_series_resp = register_data_model_series.sync(
@@ -112,18 +102,5 @@ class DataModelManager:
                 )
                 assert type(register_series_resp) == RegisterDataModelSeriesOut
                 list_of_series_ids.append(register_series_resp.id)
-
-            # Update the data model dataframe with the list of series ids
-            update_data_frame_req = UpdateDataModelDataframeIn(data_model_series_to_add=list_of_series_ids)
-            update_data_model_dataframe.sync(
-                client=self.authenticated_client,
-                data_model_dataframe_id=dataframe_register_resp.id,
-                json_body=update_data_frame_req,
-            )
-        # Update the data model with the list of data frame ids
-        data_model_update_req = UpdateDataModelIn(data_model_dataframe_to_add=list_data_frame_ids)
-        update_data_model.sync(
-            client=self.authenticated_client, data_model_id=data_model_resp.id, json_body=data_model_update_req
-        )
 
         return data_model_resp.id

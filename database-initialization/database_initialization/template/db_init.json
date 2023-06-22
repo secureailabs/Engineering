@@ -8,7 +8,7 @@
                 "title": "Platform Administrator",
                 "email": "admin@secureailabs.com",
                 "password": "SailPassword@123",
-                "roles": [ "ADMIN", "RESEARCHER" ]
+                "roles": [ "SAIL_ADMIN" ]
             }
         },
         {
@@ -19,7 +19,7 @@
                 "title": "Data Administrator",
                 "email": "michael@saintjacob.org",
                 "password": "SailPassword@123",
-                "roles": [ "ADMIN", "DATA_SUBMITTER" ]
+                "roles": [ "ORGANIZATION_ADMIN", "DATA_SUBMITTER" ]
             }
         },
         {
@@ -30,7 +30,7 @@
                 "title": "System Administrator",
                 "email": "lbart@igr.com",
                 "password": "SailPassword@123",
-                "roles": [ "ADMIN", "DATA_SUBMITTER" ]
+                "roles": [ "ORGANIZATION_ADMIN", "DATA_SUBMITTER" ]
             },
             "users": [
                 {
@@ -78,7 +78,7 @@
                 "password": "SailPassword@123",
                 "name": "Nick Adams",
                 "title": "System Administrator",
-                "roles": [ "ADMIN", "DATA_SUBMITTER" ]
+                "roles": [ "ORGANIZATION_ADMIN", "DATA_SUBMITTER" ]
             },
             "users": [
                 {
@@ -126,7 +126,7 @@
                 "password": "SailPassword@123",
                 "name": "Sallie Director",
                 "title": "Medical Director",
-                "roles": [ "ADMIN", "FEDERATION_OWNER" ]
+                "roles": [ "ORGANIZATION_ADMIN", "PAG_ADMIN", "DATA_MODEL_EDITOR" ]
             },
             "users": [
                 {
@@ -134,7 +134,7 @@
                     "password": "SailPassword@123",
                     "name": "Isabel Archer",
                     "title": "System Administrator",
-                    "roles": [ "USER", "FEDERATION_OWNER" ]
+                    "roles": [ "USER", "PAG_ADMIN", "DATA_MODEL_EDITOR" ]
                 }
             ],
             "data_federations": [
@@ -145,7 +145,8 @@
                     "data_submitters": [
                         "Mercy General Hospital",
                         "International Genetics Research Facility",
-                        "Saint Jacob's Clinic"
+                        "Saint Jacob's Clinic",
+                        "Secure AI Labs"
                     ],
                     "researchers": [
                         "Secure AI Labs"

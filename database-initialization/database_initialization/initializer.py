@@ -19,11 +19,14 @@ from typing import Dict
 from sail_client import AuthenticatedClient, Client
 from sail_client.api.default import (
     drop_database,
+    get_current_user_info,
     login,
     register_data_federation,
     register_data_submitter,
     register_researcher,
     register_user,
+    update_user_info,
+    upgrade_organization,
 )
 from sail_client.models import (
     BodyLogin,
@@ -32,6 +35,8 @@ from sail_client.models import (
     RegisterDataFederationIn,
     RegisterDataFederationOut,
     RegisterUserIn,
+    UpdateUserIn,
+    UserInfoOut,
     UserRole,
 )
 
@@ -91,9 +96,17 @@ class Initializer:
         """
         Register organizations and login as admin for each organization
         """
+        sail_admin_email = ""
         print("Registering organizations")
         for organization in self.config["organizations"]:
             admin_user = organization["admin"]
+            # if the user is not a SAIL_ADMIN, only add the ORGANIZATION_ADMIN role
+            if "SAIL_ADMIN" in admin_user["roles"]:
+                user_role = [UserRole(role) for role in admin_user["roles"]]
+                sail_admin_email = admin_user["email"]
+            else:
+                user_role = [UserRole.ORGANIZATION_ADMIN]
+
             self.org_manager.create(
                 name=organization["name"],
                 description=organization["description"],
@@ -101,9 +114,37 @@ class Initializer:
                 admin_job_title=admin_user["title"],
                 admin_email=admin_user["email"],
                 admin_password=admin_user["password"],
-                admin_roles=[UserRole(role) for role in admin_user["roles"]],
+                admin_roles=user_role,
             )
             # Login for each organization as admin
+            self.user_login(admin_user["email"], admin_user["password"])
+
+        if not sail_admin_email:
+            raise Exception("SAIL_ADMIN not found in the configuration")
+
+        # Login as SAIL_ADMIN and upgrade all the organizations to premium from freemium
+        for organization in self.config["organizations"]:
+            upgrade_organization.sync(
+                organization_id=self.org_manager.get_id_by_name(organization["name"]),
+                client=self.auth_operations[sail_admin_email],
+            )
+
+            # Add correct roles to admin user of the organization
+            admin_user = organization["admin"]
+            update_user_req = UpdateUserIn(roles=[UserRole(role) for role in admin_user["roles"]])
+
+            # Get the id of the admin user
+            admin_info = get_current_user_info.sync(client=self.auth_operations[admin_user["email"]])
+            assert type(admin_info) == UserInfoOut
+
+            update_user_info.sync(
+                client=self.auth_operations[admin_user["email"]],
+                json_body=update_user_req,
+                user_id=admin_info.id,
+                organization_id=self.org_manager.get_id_by_name(organization["name"]),
+            )
+
+            # Need to login again as the admin user to get the updated roles
             self.user_login(admin_user["email"], admin_user["password"])
 
     def register_users(self):

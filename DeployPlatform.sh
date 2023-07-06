@@ -66,7 +66,6 @@ export tempDeployDir=$(mktemp -d --tmpdir=.)
 mkdir -p $tempDeployDir
 
 # Build and Package the Platform Services
-make package_audit_service
 make database_initializer
 
 # Copy the files to the temporary directory
@@ -74,9 +73,7 @@ cp -r AzureDeploymentTemplates/ArmTemplates $tempDeployDir
 cp database-initialization/sail_client-0.1.0-py3-none-any.whl $tempDeployDir
 cp database-initialization/dist/database_initialization-0.1.0-py3-none-any.whl $tempDeployDir
 cp sail_dns_management_client-0.1.0-py3-none-any.whl $tempDeployDir
-
 cp -r DeployPlatform/* $tempDeployDir
-cp Binary/auditserver.tar.gz $tempDeployDir
 
 # Copy the configuration file
 cp deploy_config.sh $tempDeployDir

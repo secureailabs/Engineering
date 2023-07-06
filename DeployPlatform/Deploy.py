@@ -4,7 +4,6 @@ import random
 import time
 import uuid
 
-import requests
 import yaml
 from azure.core.exceptions import AzureError
 from azure.mgmt.keyvault import KeyVaultManagementClient
@@ -82,28 +81,6 @@ DEPLOYMENT_INFO = DeploymentInfo(
     location=LOCATION,
 )
 sailazure.set_deployment_info(DEPLOYMENT_INFO)
-
-
-def upload_package(virtual_machine_ip, initialization_vector_file, package_file):
-    # try for 5 minutes with a 15 second timeout for each request
-    for _ in range(20):
-        try:
-            headers = {"accept": "application/json"}
-            files = {
-                "initialization_vector": open(initialization_vector_file, "rb"),
-                "bin_package": open(package_file, "rb"),
-            }
-            response = requests.put(
-                "https://" + virtual_machine_ip + ":9090/initialization-data",
-                headers=headers,
-                files=files,
-                verify=False,
-            )
-            print(f"Upload package, {package_file} status: {response.status_code}")
-            break
-        except Exception as exception:
-            print(f"upload_package: {str(exception)}, retrying...")
-            time.sleep(15)
 
 
 def deploy_module(module_name, custom_data) -> str:
@@ -260,15 +237,12 @@ def deploy_audit_service(storage_account_name):
     custom_data = create_cloud_init_file(
         audit_json,
         "auditserver",
-        "-v /opt/auditserver_dir:/app -v /opt/certs:/etc/nginx/certs -p 3100:3100 -p 9090:9091 -p 9093:9093 -p 9096:9096",
+        "-v /etc/initialization.json:/app/InitializationVector.json -p 3100:3100",
         AUDIT_SERVICES_TAG,
     )
 
     # Deploy the frontend server
     audit_service_ip = deploy_module("auditserver", custom_data)
-
-    # Upload the package to the audit server
-    upload_package(audit_service_ip, "auditserver.json", "auditserver.tar.gz")
 
     return audit_service_ip
 

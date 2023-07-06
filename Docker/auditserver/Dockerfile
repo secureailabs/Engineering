@@ -14,7 +14,6 @@ RUN apt-get update && \
 
 RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
 
-COPY auditserver/InitializationVector.json /app/InitializationVector.json
 COPY auditserver/loki_linux_amd64 /app/loki_linux_amd64
 COPY auditserver/loki_local_config.yaml /app/loki_local_config.yaml
 

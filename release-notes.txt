@@ -3,15 +3,43 @@ Version 0.x.0 (2023-05-31)
 
 Features
 --------
--  
+-
 
 Bug Fixes
 ---------
-- 
+-
 
 Compatibility Notes
 -------------------
 -
+
+Version 0.2.0 (2023-07-06)
+==========================
+
+Features
+--------
+- Re-design of the sail user portal
+    - Moved the data model edit functionality to the user portal
+    - Data Upload validation and upload functionality moved to the user portal
+- User Roles and Permissions
+    - SAIL_ADMIN, ORGANIZATION_ADMIN, USER, DATA_SUBMITTER, RESEARCHER, PAG_ADMIN, DATA_MODEL_EDITOR user roles have been added
+    - Freemium users can only be assigned ORGANIZATION_ADMIN, USER and DATA_MODEL_EDITOR roles
+    - Paid users can be assigned a combination of above roles
+    - A freemium organization can be converted to a paid organization only by a SAIL_ADMIN user
+    - The user portal will display different functionalities based on the user roles
+- Audit Service Fixes
+    - The logs now contain the request and response status code for the REST API calls
+    - Better filtering mechanism for the logs based on the resources and the user
+    - Audit Logs also obey user roles
+
+Bug Fixes
+---------
+- API Service has better permission checks and error handling
+
+
+Compatibility Notes
+-------------------
+- The older version of the sail user portal will not work with this version of the sail platform services
 
 
 Version 0.1.0 (2023-05-31)

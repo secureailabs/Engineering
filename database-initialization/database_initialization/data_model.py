@@ -17,38 +17,59 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 from sail_client import AuthenticatedClient
-from sail_client.api.default import register_data_model, register_data_model_dataframe, register_data_model_series
+from sail_client.api.default import (
+    commit_data_model_version,
+    register_data_model,
+    register_data_model_version,
+    save_data_model,
+    update_data_model,
+)
 from sail_client.models import (
-    RegisterDataModelDataframeIn,
-    RegisterDataModelDataframeOut,
+    CommitDataModelVersionIn,
     RegisterDataModelIn,
     RegisterDataModelOut,
-    RegisterDataModelSeriesIn,
-    RegisterDataModelSeriesOut,
-    SeriesDataModelSchema,
-    SeriesDataModelType,
+    RegisterDataModelVersionIn,
+    RegisterDataModelVersionOut,
+    SaveDataModelVersionIn,
+    UpdateDataModelIn,
 )
 
 
-class SeriesDataModel(BaseModel):
-    type: str
-    series_name: str
+class SeriesDataModelType(str):
+    SeriesDataModelCategorical = "SeriesDataModelCategorical"
+    SeriesDataModelDate = "SeriesDataModelDate"
+    SeriesDataModelDateTime = "SeriesDataModelDateTime"
+    SeriesDataModelInterval = "SeriesDataModelInterval"
+    SeriesDataModelUnique = "SeriesDataModelUnique"
+
+
+class DataModelSeriesSchema(BaseModel):
+    type: SeriesDataModelType
     list_value: Optional[List[str]]
-    unit: Optional[str] = None
-    min: Optional[float] = None
-    max: Optional[float] = None
-    resolution: Optional[float] = None
+    unit: Optional[str]
+    min: Optional[float]
+    max: Optional[float]
+    resolution: Optional[float]
 
 
-class DataFrameDataModel(BaseModel):
-    type: str
-    data_frame_name: str
-    list_series_data_model: List[SeriesDataModel]
+class DataModelSeriesLocal(BaseModel):
+    id: str
+    name: str
+    description: str
+    series_schema: DataModelSeriesSchema
+
+
+class DataModelDataframeLocal(BaseModel):
+    id: str
+    name: str
+    description: str
+    series: List[DataModelSeriesLocal]
 
 
 class DataModel(BaseModel):
-    type: str
-    list_data_frame_data_model: List[DataFrameDataModel]
+    name: str
+    description: str
+    dataframes: List[DataModelDataframeLocal]
 
 
 class DataModelManager:
@@ -57,50 +78,41 @@ class DataModelManager:
         # Load data model from file
         self.data_model = DataModel.parse_obj(json.loads(data_model_json))
 
-        print(self.data_model.type)
-
     def register_data_model(self):
+        print("Registering data model")
         # Register data model
-        data_model = RegisterDataModelIn(name=self.data_model.type, description=self.data_model.type)
+        data_model = RegisterDataModelIn(name=self.data_model.name, description=self.data_model.name)
         data_model_resp = register_data_model.sync(client=self.authenticated_client, json_body=data_model)
         assert type(data_model_resp) == RegisterDataModelOut
 
-        # Register tabular dataset data model
-        list_data_frame_ids = []
-        for data_frame_data_model in self.data_model.list_data_frame_data_model:
-            data_frame_data_model_req = RegisterDataModelDataframeIn(
-                name=data_frame_data_model.data_frame_name,
-                description=data_frame_data_model.data_frame_name,
-                data_model_id=data_model_resp.id,
-            )
-            dataframe_register_resp = register_data_model_dataframe.sync(
-                client=self.authenticated_client, json_body=data_frame_data_model_req
-            )
-            assert type(dataframe_register_resp) == RegisterDataModelDataframeOut
-            list_data_frame_ids.append(dataframe_register_resp.id)
+        # Register data model version
+        data_model_version = RegisterDataModelVersionIn(
+            name=self.data_model.name, description=self.data_model.description, data_model_id=data_model_resp.id
+        )
+        data_model_version_resp = register_data_model_version.sync(
+            client=self.authenticated_client, json_body=data_model_version
+        )
+        assert type(data_model_version_resp) == RegisterDataModelVersionOut
 
-            # Register series data model
-            list_of_series_ids = []
+        data_model_dict = {"dataframes": [dataframe.dict() for dataframe in self.data_model.dataframes]}
+        save_req = SaveDataModelVersionIn.from_dict(data_model_dict)
+        # Save data model version
+        save_data_model.sync(
+            client=self.authenticated_client, data_model_version_id=data_model_version_resp.id, json_body=save_req
+        )
 
-            for series_data_model in data_frame_data_model.list_series_data_model:
-                series_data_model = RegisterDataModelSeriesIn(
-                    name=series_data_model.series_name,
-                    description=series_data_model.series_name,
-                    data_model_dataframe_id=dataframe_register_resp.id,
-                    series_schema=SeriesDataModelSchema(
-                        type=SeriesDataModelType(series_data_model.type),
-                        series_name=series_data_model.series_name,
-                        list_value=series_data_model.list_value,  # type: ignore
-                        unit=series_data_model.unit,  # type: ignore
-                        min_=series_data_model.min,  # type: ignore
-                        max_=series_data_model.max,  # type: ignore
-                        resolution=series_data_model.resolution,  # type: ignore
-                    ),
-                )
-                register_series_resp = register_data_model_series.sync(
-                    client=self.authenticated_client, json_body=series_data_model
-                )
-                assert type(register_series_resp) == RegisterDataModelSeriesOut
-                list_of_series_ids.append(register_series_resp.id)
+        # Commit the data model version
+        commit_req = CommitDataModelVersionIn(commit_message="Initial commit")
+        commit_data_model_version.sync(
+            client=self.authenticated_client, data_model_version_id=data_model_version_resp.id, json_body=commit_req
+        )
+
+        # Set the current data model version to the one we just created
+        update_req = UpdateDataModelIn(current_version_id=data_model_version_resp.id)
+        update_data_model.sync(
+            client=self.authenticated_client,
+            data_model_id=data_model_resp.id,
+            json_body=update_req,
+        )
 
         return data_model_resp.id

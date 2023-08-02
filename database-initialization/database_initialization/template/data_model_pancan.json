@@ -1,156 +1,254 @@
 {
-  "type": "TabularDatasetDataModel",
-  "list_data_frame_data_model": [
+  "name": "TabularDatasetDataModel",
+  "description": "TabularDatasetDataModel",
+  "dataframes": [
     {
-      "type": "DataFrameDataModel",
-      "data_frame_name": "static_data_table",
-      "list_series_data_model": [
+      "id": "4a379d27-3b46-4c33-8cf2-74503d8f45a5",
+      "name": "static_data_table",
+      "description": "static_data_table",
+      "series": [
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "patient_id"
+          "id": "54ad23ed-e597-4943-9ca8-c52b320e36b3",
+          "name": "patient_id",
+          "description": "patient_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "dataset_id"
+          "id": "cbcccd54-db2b-4542-96e3-09ad285d2461",
+          "name": "dataset_id",
+          "description": "dataset_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelDate",
-          "series_name": "date_of_birth"
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f720b",
+          "name": "date_of_birth",
+          "description": "date_of_birth",
+          "series_schema": {
+            "type": "SeriesDataModelDate"
+          }
         },
         {
-          "type": "SeriesDataModelDate",
-          "series_name": "pancreatic_cancer_date_of_diagnosis"
+          "id": "9b5221f5-bd21-4592-8fb1-35bf44cac286",
+          "name": "pancreatic_cancer_date_of_diagnosis",
+          "description": "pancreatic_cancer_date_of_diagnosis",
+          "series_schema": {
+            "type": "SeriesDataModelDate"
+          }
         },
         {
-          "type": "SeriesDataModelCategorical",
-          "series_name": "pancreatic_cancer_metastatic_at_diagnosis",
-          "list_value": [
-            "local",
-            "metastatic"
-          ]
+          "id": "d1fbe8aa-9147-4d12-a0a3-ff928e3b5037",
+          "name": "pancreatic_cancer_metastatic_at_diagnosis",
+          "description": "pancreatic_cancer_metastatic_at_diagnosis",
+          "series_schema": {
+            "type": "SeriesDataModelCategorical",
+            "list_value": [
+              "local",
+              "metastatic"
+            ]
+          }
         },
         {
-          "type": "SeriesDataModelCategorical",
-          "series_name": "pancreatic_cancer_method_of_diagnosis",
-          "list_value": [
-            "posible",
-            "probable",
-            "definite"
-          ]
+          "id": "59354632-6392-4fcd-b966-0d2edf477b50",
+          "name": "pancreatic_cancer_method_of_diagnosis",
+          "description": "pancreatic_cancer_method_of_diagnosis",
+          "series_schema": {
+            "type": "SeriesDataModelCategorical",
+            "list_value": [
+              "posible",
+              "probable",
+              "definite"
+            ]
+          }
         },
         {
-          "type": "SeriesDataModelDate",
-          "series_name": "preexisting_diabetes_date_of_diagnosis"
+          "id": "f7b59787-f568-4f6f-bbff-e1e3b8e3cce8",
+          "name": "preexisting_diabetes_date_of_diagnosis",
+          "description": "preexisting_diabetes_date_of_diagnosis",
+          "series_schema": {
+            "type": "SeriesDataModelDate"
+          }
         },
         {
-          "type": "SeriesDataModelDate",
-          "series_name": "new_onset_diabetes_date_of_diagnosis"
+          "id": "3e592b99-94de-448b-97e2-9dddc16463a0",
+          "name": "new_onset_diabetes_date_of_diagnosis",
+          "description": "new_onset_diabetes_date_of_diagnosis",
+          "series_schema": {
+            "type": "SeriesDataModelDate"
+          }
         },
         {
-          "type": "SeriesDataModelCategorical",
-          "series_name": "race",
-          "list_value": [
-            "American Indian or Alaska Native",
-            "Asian",
-            "Black or African American",
-            "Hispanic or Latino",
-            "Native Hawaiian or Other Pacific Islander",
-            "White"
-          ]
+          "id": "e6c7dbf0-6657-46e0-8efe-4a55b81abdec",
+          "name": "race",
+          "description": "race",
+          "series_schema": {
+            "type": "SeriesDataModelCategorical",
+            "list_value": [
+              "American Indian or Alaska Native",
+              "Asian",
+              "Black or African American",
+              "Hispanic or Latino",
+              "Native Hawaiian or Other Pacific Islander",
+              "White"
+            ]
+          }
         },
         {
-          "type": "SeriesDataModelCategorical",
-          "series_name": "ethnicity",
-          "list_value": [
-            "Hispanic or Latino",
-            "Not Hispanic or Latino"
-          ]
+          "id": "258b2d6d-2c23-40a3-8837-3f3435f0ecc6",
+          "name": "ethnicity",
+          "description": "ethnicity",
+          "series_schema": {
+            "type": "SeriesDataModelCategorical",
+            "list_value": [
+              "Hispanic or Latino",
+              "Not Hispanic or Latino"
+            ]
+          }
         },
         {
-          "type": "SeriesDataModelInterval",
-          "series_name": "height",
-          "unit": "cm",
-          "min": null,
-          "max": null,
-          "resolution": null
+          "id": "7dbc8c85-8ca8-4c73-a7ce-d54f9328971e",
+          "name": "height",
+          "description": "height",
+          "series_schema": {
+            "type": "SeriesDataModelInterval",
+            "unit": "cm",
+            "min": null,
+            "max": null,
+            "resolution": null
+          }
         }
       ]
     },
     {
-      "type": "DataFrameDataModel",
-      "data_frame_name": "longitudinal_weight_table",
-      "list_series_data_model": [
+      "id": "10d72971-136d-49d8-aa99-c583c707d415",
+      "name": "longitudinal_weight_table",
+      "description": "longitudinal_weight_table",
+      "series": [
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "patient_id"
+          "id": "b7d41c64-4b09-4d43-aae6-ca9dd1430fb3",
+          "name": "patient_id",
+          "description": "patient_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "dataset_id"
+          "id": "308b6187-b378-41b8-8c7e-b84204468c62",
+          "name": "dataset_id",
+          "description": "dataset_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelDateTime",
-          "series_name": "datetime_of_measurement"
+          "id": "f441e376-8f76-4932-a8af-1f6d501dbb7c",
+          "name": "datetime_of_measurement",
+          "description": "datetime_of_measurement",
+          "series_schema": {
+            "type": "SeriesDataModelDateTime"
+          }
         },
         {
-          "type": "SeriesDataModelInterval",
-          "series_name": "weight",
-          "unit": "kg",
-          "min": null,
-          "max": null,
-          "resolution": null
+          "id": "c5e5e0a6-17b6-46d2-b84b-324bcd0e182a",
+          "name": "weight",
+          "description": "weight",
+          "series_schema": {
+            "type": "SeriesDataModelInterval",
+            "unit": "kg",
+            "min": null,
+            "max": null,
+            "resolution": null
+          }
         }
       ]
     },
     {
-      "type": "DataFrameDataModel",
-      "data_frame_name": "longitudinal_hba1c_table",
-      "list_series_data_model": [
+      "id": "9bd8a0fe-9551-4684-a050-a6c538294de1",
+      "name": "longitudinal_hba1c_table",
+      "description": "longitudinal_hba1c_table",
+      "series": [
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "patient_id"
+          "id": "77565964-73cd-487c-9b59-4edec03cf071",
+          "name": "patient_id",
+          "description": "patient_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "dataset_id"
+          "id": "a723669f-adfb-4676-86ee-d75750d63551",
+          "name": "dataset_id",
+          "description": "dataset_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelDateTime",
-          "series_name": "datetime_of_measurement"
+          "id": "cc5a67b1-ca61-40c7-91a9-ee7c61d929dd",
+          "name": "datetime_of_measurement",
+          "description": "datetime_of_measurement",
+          "series_schema": {
+            "type": "SeriesDataModelDateTime"
+          }
         },
         {
-          "type": "SeriesDataModelInterval",
-          "series_name": "HbA1C",
-          "unit": "%",
-          "min": null,
-          "max": null,
-          "resolution": null
+          "id": "59b1cba5-f6b9-4b22-bc37-f8bdbe3c3cc8",
+          "name": "HbA1C",
+          "description": "HbA1C",
+          "series_schema": {
+            "type": "SeriesDataModelInterval",
+            "unit": "%",
+            "min": null,
+            "max": null,
+            "resolution": null
+          }
         }
+
       ]
     },
     {
-      "type": "DataFrameDataModel",
-      "data_frame_name": "longitudinal_fbg_table",
-      "list_series_data_model": [
+      "id": "25a3cf3b-7db9-4be0-8dcf-ff3dbbff4c71",
+      "name": "longitudinal_fbg_table",
+      "description": "longitudinal_fbg_table",
+      "series": [
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "patient_id"
+          "id": "efd94b6a-5ce3-4d8a-9537-7248b991e3bd",
+          "name": "patient_id",
+          "description": "patient_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelUnique",
-          "series_name": "dataset_id"
+          "id": "49a29c8b-f324-4915-bc28-a453713ca3bd",
+          "name": "dataset_id",
+          "description": "dataset_id",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
         },
         {
-          "type": "SeriesDataModelDateTime",
-          "series_name": "datetime_of_measurement"
+          "id": "48ce7a08-969a-42c8-b6b0-c099c9ee69ce",
+          "name": "datetime_of_measurement",
+          "description": "datetime_of_measurement",
+          "series_schema": {
+            "type": "SeriesDataModelDateTime"
+          }
         },
         {
-          "type": "SeriesDataModelInterval",
-          "series_name": "FBG",
-          "unit": "mg/dl",
-          "min": null,
-          "max": null,
-          "resolution": null
+          "id": "d819a303-eae9-4b8a-9eb2-f668eef3d6c6",
+          "name": "FBG",
+          "description": "FBG",
+          "series_schema": {
+            "type": "SeriesDataModelInterval",
+            "unit": "mg/dl",
+            "min": null,
+            "max": null,
+            "resolution": null
+          }
         }
       ]
     }

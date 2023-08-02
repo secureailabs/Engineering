@@ -152,19 +152,6 @@
                         "Secure AI Labs"
                     ],
                     "data_model": "data_model_pancan.json"
-                },
-                {
-                    "name": "KCA Consortium - FHIR",
-                    "description": "The Kidney Cancer Consortium",
-                    "data_format": "FHIR",
-                    "data_submitters": [
-                        "Mercy General Hospital",
-                        "International Genetics Research Facility"
-                    ],
-                    "researchers": [
-                        "Secure AI Labs"
-                    ],
-                    "data_model": "data_model_pancan.json"
                 }
             ]
         }

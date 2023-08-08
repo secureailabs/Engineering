@@ -110,7 +110,7 @@ class Initializer:
             self.org_manager.create(
                 name=organization["name"],
                 description=organization["description"],
-                admin_name=organization["name"],
+                admin_name=admin_user["name"],
                 admin_job_title=admin_user["title"],
                 admin_email=admin_user["email"],
                 admin_password=admin_user["password"],

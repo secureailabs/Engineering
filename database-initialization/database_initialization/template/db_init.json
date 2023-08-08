@@ -122,9 +122,9 @@
             "name": "Kidney Cancer Association",
             "description": "The Kidney Cancer Association was founded in 1990 by Eugene P. Schonfeld and a small group of patients and doctors in Chicago, Illinois and has grown into an international non-profit organization. The KCA promotes scientific advances through two annual research symposiums and a robust grant program, participates in legislative advocacy, and seeks to be a source of education and resources for patients, caregivers, and anyone impacted by kidney cancer.",
             "admin": {
-                "email": "sallie@kidneycancer.org",
+                "email": "alex@kidneycancer.org",
                 "password": "SailPassword@123",
-                "name": "Sallie Director",
+                "name": "Alex Director",
                 "title": "Medical Director",
                 "roles": [ "ORGANIZATION_ADMIN", "PAG_ADMIN", "DATA_MODEL_EDITOR" ]
             },

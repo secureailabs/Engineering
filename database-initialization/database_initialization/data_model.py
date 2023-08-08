@@ -107,12 +107,4 @@ class DataModelManager:
             client=self.authenticated_client, data_model_version_id=data_model_version_resp.id, json_body=commit_req
         )
 
-        # Set the current data model version to the one we just created
-        update_req = UpdateDataModelIn(current_version_id=data_model_version_resp.id)
-        update_data_model.sync(
-            client=self.authenticated_client,
-            data_model_id=data_model_resp.id,
-            json_body=update_req,
-        )
-
         return data_model_resp.id

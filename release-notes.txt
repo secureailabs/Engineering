@@ -13,6 +13,19 @@ Compatibility Notes
 -------------------
 -
 
+Version 0.3.0 (2023-08-22)
+==========================
+
+Features
+--------
+- Data Model collaborative development for all the users with data model editor role
+- Data Model will have multiple versions but only one version can be published and it will be immutable once published
+- Secure Computation Node is active all the time and has all the uploaded datasets mounted on it. A new SCN is provisioned when a new dataset is uploaded and the old SCN is deleted
+- Seamless integration of the researcher portal and PAG backend to perform computations on your uploaded datasets. This improvement completes end-to-end functionality of the deta federation tool.
+- Revamped Feature List View: We've given the feature list in the researcher portal a fresh look and feel. The updated view provides a more intuitive and organized way to manage your research project's features.
+- Improved PAG Dashboard and Comparative Analysis Tool: Our PAG dashboard and comparative analysis tool have received a makeover and has been integrated within the new ui.
+
+
 Version 0.2.0 (2023-07-06)
 ==========================
 

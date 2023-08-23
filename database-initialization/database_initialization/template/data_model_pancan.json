@@ -119,6 +119,109 @@
             "max": null,
             "resolution": null
           }
+        },
+        {
+          "id": "d819a303-eae9-4b8a-9eb2-f668eef3d6c8",
+          "name": "first_postop_egfr_days_after_surgery",
+          "description": "first_postop_egfr_days_after_surgery",
+          "series_schema": {
+            "type": "SeriesDataModelInterval",
+            "unit": null,
+            "min": null,
+            "max": null,
+            "resolution": null
+          }
+        },
+        {
+          "id": "d819a303-eae9-4b8a-9eb2-f668eef3d6c9",
+          "name": "last_postop_egfr",
+          "description": "last_postop_egfr",
+          "series_schema": {
+            "type": "SeriesDataModelInterval",
+            "unit": null,
+            "min": null,
+            "max": null,
+            "resolution": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "4a379d27-3b46-4c33-8cf2-74503d8f45a7",
+      "name": "static_data_table_pag",
+      "description": "static_data_table_pag",
+      "series": [
+        {
+          "id": "54ad23ed-e597-4943-9ca8-c52b320e36b4",
+          "name": "Hospital name",
+          "description": "Hospital name",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
+        },
+        {
+          "id": "cbcccd54-db2b-4542-96e3-09ad285d2462",
+          "name": "Date of birth",
+          "description": "Date of birth",
+          "series_schema": {
+            "type": "SeriesDataModelDate"
+          }
+        },
+        {
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f7201",
+          "name": "Date of diagnosis",
+          "description": "Date of diagnosis",
+          "series_schema": {
+            "type": "SeriesDataModelDate"
+          }
+        },
+        {
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f7202",
+          "name": "Sex",
+          "description": "Sex",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
+        },
+        {
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f720a",
+          "name": "Race",
+          "description": "Race",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
+        },
+        {
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f7203",
+          "name": "Ethnicity",
+          "description": "Ethnicity",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
+        },
+        {
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f7204",
+          "name": "Socioeconomic",
+          "description": "Socioeconomic",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
+        },
+        {
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f7205",
+          "name": "Rurality",
+          "description": "Rurality",
+          "series_schema": {
+            "type": "SeriesDataModelUnique"
+          }
+        },
+        {
+          "id": "29d4eb88-f99f-4737-ba23-5c54895f7206",
+          "name": "Date of death",
+          "description": "Date of death",
+          "series_schema": {
+            "type": "SeriesDataModelDate"
+          }
         }
       ]
     },
@@ -206,7 +309,6 @@
             "resolution": null
           }
         }
-
       ]
     },
     {

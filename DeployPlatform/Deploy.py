@@ -279,7 +279,7 @@ def deploy_apiservices(
     backend_json["docker_registry_password"] = DOCKER_REGISTRY_PASSWORD
     backend_json[
         "securecomputationnode_docker_params"
-    ] = "-p 8000:8888 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
+    ] = "-p 8000:8000 --cap-add=SYS_ADMIN --cap-add=DAC_READ_SEARCH --privileged"
     backend_json["securecomputationnode_image_tag"] = SCN_TAG
     backend_json["base_domain"] = BASE_DOMAIN
     backend_json["dns_ip"] = gateway_ip
